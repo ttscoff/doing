@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    doing (0.1.1)
+    doing (0.1.2)
       gli (= 2.7.0)
 
 GEM
@@ -28,7 +28,7 @@ GEM
     json (1.8.1)
     multi_json (1.8.4)
     multi_test (0.0.3)
-    rake (10.1.1)
+    rake (0.9.6)
     rdoc (4.1.1)
       json (~> 1.4)
     rspec-expectations (2.14.5)
@@ -38,7 +38,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aruba
+  aruba (~> 0)
   doing!
-  rake
-  rdoc
+  rake (~> 0)
+  rdoc (~> 4.1.1)

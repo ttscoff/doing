@@ -8,6 +8,8 @@ spec = Gem::Specification.new do |s|
   s.homepage = 'http://brettterpstra.com'
   s.platform = Gem::Platform::RUBY
   s.summary = 'A command line tool for managing What Was I Doing reminders'
+  s.description = 'A tool for managing a TaskPaper-like file of recent activites. Perfect for the late-night hacker on too much caffeine to remember what they accomplished at 2 in the morning.'
+  s.license = 'MIT'
 # Add your other files here if you make them
   s.files = %w(
 bin/doing
@@ -21,8 +23,8 @@ lib/doing/wwid.rb
   s.rdoc_options << '--title' << 'doing' << '--main' << 'README.rdoc' << '-ri'
   s.bindir = 'bin'
   s.executables << 'doing'
-  s.add_development_dependency('rake')
-  s.add_development_dependency('rdoc')
-  s.add_development_dependency('aruba')
+  s.add_development_dependency 'rake', '~> 0'
+  s.add_development_dependency 'rdoc', '~> 4.1.1'
+  s.add_development_dependency 'aruba', '~> 0'
   s.add_runtime_dependency('gli','2.7.0')
 end

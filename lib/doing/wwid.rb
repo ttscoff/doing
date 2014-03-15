@@ -215,7 +215,7 @@ class WWID
 
     items.each {|item|
       if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
-        note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t / " + line.sub(/^\t\t/,'') }
+        note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t" + line.sub(/^\t\t/,'') }
         if opt[:wrap_width] && opt[:wrap_width] > 0
           width = opt[:wrap_width]
           note_lines.map! {|line|

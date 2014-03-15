@@ -6,13 +6,17 @@ The format of the "WWID" file is TaskPaper-compatible. You can edit it by hand a
 
 The config file is stored in "~/.doingrc", and is created on the first run. It contains, among other things, templates for various command outputs. Include placeholders by placing a % before the keyword. The available placeholders are:
 
+- %title: the "wwid" entry line
 - %date: the date based on the templates "date_format" setting
 - %shortdate: a custom date formatter that removes the day/month/year from the entry if they match the current day/month/year
 - %note: Any note in the entry will be included here, a newline and tabs are automatically added.
+- %odnote: The notes with a leading tab removed (outdented note)
 - %hr: a horizontal rule (`-`) the width of the terminal
 - %hr_under: a horizontal rule (`_`) the width of the terminal
 
 Date formats are based on Ruby `strftime` formatting.
+
+
 
 Usage:
 
@@ -23,7 +27,6 @@ Global options:
     --help              - Show this message
     --[no-]notes        - Output notes if included in the template (default: enabled)
     --version           - Display the program version
-    -w, --wrapwidth=arg - Wrap notes at X chars (0 for no wrap) (default: none)
 
 Commands:
 
