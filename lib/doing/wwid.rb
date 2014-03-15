@@ -27,19 +27,23 @@ class WWID
     @config['templates'] ||= {}
     @config['templates']['default'] ||= {
       'date_format' => '%Y-%m-%d %H:%M',
-      'template' => '%date | %title%note'
+      'template' => '%date | %title%note',
+      'wrap_width' => 0
     }
     @config['templates']['today'] ||= {
       'date_format' => '%_I:%M%P',
-      'template' => '%date: %title%note'
+      'template' => '%date: %title%note',
+      'wrap_width' => 0
     }
     @config['templates']['last'] ||= {
       'date_format' => '%_I:%M%P',
-      'template' => '%date: %title%note'
+      'template' => '%date: %title%note',
+      'wrap_width' => 60
     }
     @config['templates']['recent'] ||= {
       'date_format' => '%_I:%M%P',
-      'template' => '%shortdate: %title'
+      'template' => '%shortdate: %title',
+      'wrap_width' => 60
     }
 
     @doing_file = File.expand_path(config['doing_file'])
@@ -48,7 +52,6 @@ class WWID
     @default_date_format = config['templates']['default']['date_format']
 
     @config[:include_notes] ||= true
-    @config[:note_wrap_width] ||= 0
 
     File.open(File.expand_path(DOING_CONFIG), 'w') { |yf| YAML::dump(config, yf) }
 
@@ -212,14 +215,14 @@ class WWID
 
     items.each {|item|
       if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
-        note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t" + line.sub(/^\t\t/,'') }
-        if @config[:note_wrap_width] > 0
-          width = @config[:note_wrap_width]
+        note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t / " + line.sub(/^\t\t/,'') }
+        if opt[:wrap_width] && opt[:wrap_width] > 0
+          width = opt[:wrap_width]
           note_lines.map! {|line|
-            line.strip.gsub(/(.{1,#{width}})(\s+|\Z)/, "\t\\1\n").chomp
+            line.strip.gsub(/(.{1,#{width}})(\s+|\Z)/, "\t\\1\n")
           }
         end
-        note = "\n#{note_lines.join("\n")}"
+        note = "\n#{note_lines.join("\n").chomp}"
       else
         note = ""
       end
@@ -236,7 +239,13 @@ class WWID
           item['date'].strftime('%b %d %Y, %-I:%M%P')
         end
       }
-      output.sub!(/%title/,item['title'].strip)
+      output.sub!(/%title/) {|m|
+        if opt[:wrap_width] && opt[:wrap_width] > 0
+          item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").strip
+        else
+          item['title'].strip
+        end
+      }
       output.sub!(/%note/,note)
       output.sub!(/%odnote/,note.gsub(/\t\t/,"\t"))
       output.gsub!(/%hr(_under)?/) do |m|
@@ -267,23 +276,23 @@ class WWID
   def all(order="")
     order = "asc" if order == ""
     cfg = @config['templates']['default_template']
-    list_section({:section => @current_section, :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => order})
+    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => order})
   end
 
   def today
     cfg = @config['templates']['today']
-    list_section({:section => @current_section, :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true})
+    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true})
   end
 
   def recent(count=10,section=nil)
     cfg = @config['templates']['recent']
     section ||= @current_section
-    list_section({:section => section, :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc"})
+    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc"})
   end
 
   def last
     cfg = @config['templates']['last']
-    list_section({:section => @current_section, :count => 1, :template => cfg['template']})
+    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template']})
   end
 
 end

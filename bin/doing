@@ -52,7 +52,7 @@ end
 desc 'List entries from today'
 command :today do |c|
   c.action do |global_options,options,args|
-    puts wwid.today
+    puts wwid.today.strip
   end
 end
 
@@ -107,7 +107,7 @@ end
 desc 'Show the last entry'
 command :last do |c|
   c.action do |global_options,options,args|
-    puts wwid.last
+    puts wwid.last.strip
   end
 end
 
