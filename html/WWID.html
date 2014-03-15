@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>class WWID - Your application title</title>
+
+<link href="./fonts.css" rel="stylesheet">
+<link href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script src="./js/jquery.js"></script>
+<script src="./js/navigation.js"></script>
+<script src="./js/search_index.js"></script>
+<script src="./js/search.js"></script>
+<script src="./js/searcher.js"></script>
+<script src="./js/darkfish.js"></script>
+
+
+<body id="top" role="document" class="class">
+<nav role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search" spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+
+  <div id="class-metadata">
+    
+    <div id="parent-class-section" class="nav-section">
+  <h3>Parent</h3>
+
+  
+  <p class="link"><a href="Object.html">Object</a>
+  
+</div>
+
+    
+    
+    <!-- Method Quickref -->
+<div id="method-list-section" class="nav-section">
+  <h3>Methods</h3>
+
+  <ul class="link-list" role="directory">
+    
+    <li ><a href="#method-c-new">::new</a>
+    
+    <li ><a href="#method-i-add_item">#add_item</a>
+    
+    <li ><a href="#method-i-add_section">#add_section</a>
+    
+    <li ><a href="#method-i-all">#all</a>
+    
+    <li ><a href="#method-i-archive">#archive</a>
+    
+    <li ><a href="#method-i-choose_section">#choose_section</a>
+    
+    <li ><a href="#method-i-create">#create</a>
+    
+    <li ><a href="#method-i-last">#last</a>
+    
+    <li ><a href="#method-i-list_section">#list_section</a>
+    
+    <li ><a href="#method-i-read_config">#read_config</a>
+    
+    <li ><a href="#method-i-recent">#recent</a>
+    
+    <li ><a href="#method-i-today">#today</a>
+    
+    <li ><a href="#method-i-write">#write</a>
+    
+  </ul>
+</div>
+
+  </div>
+</nav>
+
+<main role="main" aria-labelledby="class-WWID">
+  <h1 id="class-WWID" class="class">
+    class WWID
+  </h1>
+
+  <section class="description">
+    
+  </section>
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+    <section class="attribute-method-details" class="method-section">
+      <header>
+        <h3>Attributes</h3>
+      </header>
+
+      
+      <div id="attribute-i-config" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">config</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-content" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">content</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-current_section" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">current_section</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-doing_file" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">doing_file</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-sections" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">sections</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+    </section>
+    
+
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section">
+       <header>
+         <h3>Public Class Methods</h3>
+       </header>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">new</span><span
+            class="method-args">(input=nil)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 19</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">input</span>=<span class="ruby-keyword">nil</span>)
+  <span class="ruby-ivar">@content</span> = {}
+
+  <span class="ruby-ivar">@config</span> = <span class="ruby-identifier">read_config</span>
+
+  <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;doing_file&#39;</span>] <span class="ruby-operator">||=</span> <span class="ruby-string">&quot;~/what_was_i_doing.md&quot;</span>
+  <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;current_section&#39;</span>] <span class="ruby-operator">||=</span> <span class="ruby-string">&#39;Currently&#39;</span>
+
+  <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;templates&#39;</span>] <span class="ruby-operator">||=</span> {}
+  <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;default&#39;</span>] <span class="ruby-operator">||=</span> {
+    <span class="ruby-string">&#39;date_format&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;%Y-%m-%d %H:%M&#39;</span>,
+    <span class="ruby-string">&#39;template&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;%date | %title%note&#39;</span>
+  }
+  <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;today&#39;</span>] <span class="ruby-operator">||=</span> {
+    <span class="ruby-string">&#39;date_format&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;%_I:%M%P&#39;</span>,
+    <span class="ruby-string">&#39;template&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;%date: %title%note&#39;</span>
+  }
+  <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;last&#39;</span>] <span class="ruby-operator">||=</span> {
+    <span class="ruby-string">&#39;date_format&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;%_I:%M%P&#39;</span>,
+    <span class="ruby-string">&#39;template&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;%date: %title%note&#39;</span>
+  }
+  <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;recent&#39;</span>] <span class="ruby-operator">||=</span> {
+    <span class="ruby-string">&#39;date_format&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;%_I:%M%P&#39;</span>,
+    <span class="ruby-string">&#39;template&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;%shortdate: %title&#39;</span>
+  }
+
+  <span class="ruby-ivar">@doing_file</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">config</span>[<span class="ruby-string">&#39;doing_file&#39;</span>])
+  <span class="ruby-ivar">@current_section</span> = <span class="ruby-identifier">config</span>[<span class="ruby-string">&#39;current_section&#39;</span>]
+  <span class="ruby-ivar">@default_template</span> = <span class="ruby-identifier">config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;default&#39;</span>][<span class="ruby-string">&#39;template&#39;</span>]
+  <span class="ruby-ivar">@default_date_format</span> = <span class="ruby-identifier">config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;default&#39;</span>][<span class="ruby-string">&#39;date_format&#39;</span>]
+
+  <span class="ruby-ivar">@config</span>[<span class="ruby-value">:include_notes</span>] <span class="ruby-operator">||=</span> <span class="ruby-keyword">true</span>
+  <span class="ruby-ivar">@config</span>[<span class="ruby-value">:note_wrap_width</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+
+  <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-constant">DOING_CONFIG</span>), <span class="ruby-string">&#39;w&#39;</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">yf</span><span class="ruby-operator">|</span> <span class="ruby-constant">YAML</span><span class="ruby-operator">::</span><span class="ruby-identifier">dump</span>(<span class="ruby-identifier">config</span>, <span class="ruby-identifier">yf</span>) }
+
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">nil?</span>
+    <span class="ruby-identifier">create</span>(<span class="ruby-ivar">@doing_file</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-ivar">@doing_file</span>)
+    <span class="ruby-identifier">input</span> = <span class="ruby-constant">IO</span>.<span class="ruby-identifier">read</span>(<span class="ruby-ivar">@doing_file</span>).<span class="ruby-identifier">force_encoding</span>(<span class="ruby-string">&#39;utf-8&#39;</span>)
+  <span class="ruby-keyword">elsif</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">input</span>)) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">input</span>)) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">input</span>)).<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+    <span class="ruby-identifier">input</span> = <span class="ruby-constant">IO</span>.<span class="ruby-identifier">read</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">input</span>)).<span class="ruby-identifier">force_encoding</span>(<span class="ruby-string">&#39;utf-8&#39;</span>)
+    <span class="ruby-ivar">@doing_file</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">input</span>)
+  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">256</span>
+    <span class="ruby-identifier">create</span>(<span class="ruby-identifier">input</span>)
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-ivar">@other_content_top</span> = []
+  <span class="ruby-ivar">@other_content_bottom</span> = []
+
+  <span class="ruby-identifier">section</span> = <span class="ruby-string">&quot;Uncategorized&quot;</span>
+  <span class="ruby-identifier">lines</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp">/\n/</span>)
+  <span class="ruby-identifier">current</span> = <span class="ruby-value">0</span>
+
+  <span class="ruby-identifier">lines</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">line</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^\s*$/</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^(\w[\w ]+):\s*(@\S+\s*)*$/</span>
+      <span class="ruby-identifier">section</span> = <span class="ruby-node">$1</span>
+      <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>] = {}
+      <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>][<span class="ruby-string">&#39;original&#39;</span>] = <span class="ruby-identifier">line</span>
+      <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>][<span class="ruby-string">&#39;items&#39;</span>] = []
+      <span class="ruby-identifier">current</span> = <span class="ruby-value">0</span>
+    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/</span>
+      <span class="ruby-identifier">date</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-node">$1</span>)
+      <span class="ruby-identifier">title</span> = <span class="ruby-node">$2</span>
+      <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>][<span class="ruby-string">&#39;items&#39;</span>].<span class="ruby-identifier">push</span>({<span class="ruby-string">&#39;title&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">title</span>, <span class="ruby-string">&#39;date&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">date</span>})
+      <span class="ruby-identifier">current</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+    <span class="ruby-keyword">else</span>
+      <span class="ruby-comment"># if content[section][&#39;items&#39;].length - 1 == current</span>
+        <span class="ruby-keyword">if</span> <span class="ruby-identifier">current</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
+          <span class="ruby-ivar">@other_content_top</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">line</span>)
+        <span class="ruby-keyword">else</span>
+          <span class="ruby-keyword">if</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^\S/</span>
+            <span class="ruby-ivar">@other_content_bottom</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">line</span>)
+          <span class="ruby-keyword">else</span>
+            <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>][<span class="ruby-string">&#39;items&#39;</span>][<span class="ruby-identifier">current</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>].<span class="ruby-identifier">has_key?</span> <span class="ruby-string">&#39;note&#39;</span>
+              <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>][<span class="ruby-string">&#39;items&#39;</span>][<span class="ruby-identifier">current</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>][<span class="ruby-string">&#39;note&#39;</span>] = []
+            <span class="ruby-keyword">end</span>
+            <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>][<span class="ruby-string">&#39;items&#39;</span>][<span class="ruby-identifier">current</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>][<span class="ruby-string">&#39;note&#39;</span>].<span class="ruby-identifier">push</span>(<span class="ruby-identifier">line</span>)
+          <span class="ruby-keyword">end</span>
+        <span class="ruby-keyword">end</span>
+      <span class="ruby-comment"># end</span>
+    <span class="ruby-keyword">end</span>
+  }
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+    </section>
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section">
+       <header>
+         <h3>Public Instance Methods</h3>
+       </header>
+
+    
+      <div id="method-i-add_item" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">add_item</span><span
+            class="method-args">(title,section=nil,opt={})</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="add_item-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 129</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_item</span>(<span class="ruby-identifier">title</span>,<span class="ruby-identifier">section</span>=<span class="ruby-keyword">nil</span>,<span class="ruby-identifier">opt</span>={})
+  <span class="ruby-identifier">section</span> = <span class="ruby-ivar">@current_section</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">section</span>.<span class="ruby-identifier">nil?</span>
+  <span class="ruby-identifier">add_section</span>(<span class="ruby-identifier">section</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@content</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">section</span>)
+  <span class="ruby-identifier">opt</span>[<span class="ruby-value">:date</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>
+  <span class="ruby-identifier">opt</span>[<span class="ruby-value">:note</span>] <span class="ruby-operator">||=</span> <span class="ruby-string">&quot;&quot;</span>
+
+  <span class="ruby-identifier">entry</span> = {<span class="ruby-string">&#39;title&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">title</span>.<span class="ruby-identifier">strip</span>.<span class="ruby-identifier">cap_first</span>, <span class="ruby-string">&#39;date&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">opt</span>[<span class="ruby-value">:date</span>]}
+  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opt</span>[<span class="ruby-value">:note</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^\s*$/s</span>
+    <span class="ruby-identifier">entry</span>[<span class="ruby-string">&#39;note&#39;</span>] = <span class="ruby-identifier">opt</span>[<span class="ruby-value">:note</span>]
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>][<span class="ruby-string">&#39;items&#39;</span>].<span class="ruby-identifier">push</span>(<span class="ruby-identifier">entry</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-add_section" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">add_section</span><span
+            class="method-args">(title)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="add_section-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 125</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_section</span>(<span class="ruby-identifier">title</span>)
+  <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">title</span>.<span class="ruby-identifier">cap_first</span>] = {<span class="ruby-string">&#39;original&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-node">&quot;#{title}:&quot;</span>, <span class="ruby-string">&#39;items&#39;</span> =<span class="ruby-operator">&gt;</span> []}
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-all" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">all</span><span
+            class="method-args">(order="")</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="all-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 266</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">all</span>(<span class="ruby-identifier">order</span>=<span class="ruby-string">&quot;&quot;</span>)
+  <span class="ruby-identifier">order</span> = <span class="ruby-string">&quot;asc&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">order</span> <span class="ruby-operator">==</span> <span class="ruby-string">&quot;&quot;</span>
+  <span class="ruby-identifier">cfg</span> = <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;default_template&#39;</span>]
+  <span class="ruby-identifier">list_section</span>({<span class="ruby-value">:section</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@current_section</span>, <span class="ruby-value">:count</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:format</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cfg</span>[<span class="ruby-string">&#39;date_format&#39;</span>], <span class="ruby-value">:template</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cfg</span>[<span class="ruby-string">&#39;template&#39;</span>], <span class="ruby-value">:order</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">order</span>})
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-archive" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">archive</span><span
+            class="method-args">(section=nil)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="archive-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 254</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">archive</span>(<span class="ruby-identifier">section</span>=<span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">section</span> = <span class="ruby-identifier">choose_section</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">section</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">section</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/choose/i</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">sections</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">section</span>)
+    <span class="ruby-identifier">items</span> = <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>][<span class="ruby-string">&#39;items&#39;</span>]
+    <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">items</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">10</span>
+    <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">section</span>][<span class="ruby-string">&#39;items&#39;</span>] = <span class="ruby-identifier">items</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>]
+    <span class="ruby-identifier">add_section</span>(<span class="ruby-string">&#39;Archive&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">sections</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-string">&#39;Archive&#39;</span>)
+    <span class="ruby-ivar">@content</span>[<span class="ruby-string">&#39;Archive&#39;</span>][<span class="ruby-string">&#39;items&#39;</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">items</span>[<span class="ruby-value">6</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
+    <span class="ruby-identifier">write</span>(<span class="ruby-ivar">@doing_file</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-choose_section" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">choose_section</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="choose_section-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 164</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">choose_section</span>
+  <span class="ruby-identifier">sections</span>.<span class="ruby-identifier">each_with_index</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">section</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;% 3d: %s&quot;</span> <span class="ruby-operator">%</span> [<span class="ruby-identifier">i</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>, <span class="ruby-identifier">section</span>]
+  }
+  <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;&gt; &quot;</span>
+  <span class="ruby-identifier">num</span> = <span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">gets</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">num</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^[a-z ]*$/i</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">sections</span>[<span class="ruby-identifier">num</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-create" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">create</span><span
+            class="method-args">(filename=nil)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="create-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 104</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">create</span>(<span class="ruby-identifier">filename</span>=<span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">filename</span> = <span class="ruby-ivar">@doing_file</span>
+  <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">filename</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-identifier">filename</span>).<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+    <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">filename</span>,<span class="ruby-string">&#39;w+&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">f</span>.<span class="ruby-identifier">puts</span> <span class="ruby-ivar">@current_section</span> <span class="ruby-operator">+</span> <span class="ruby-string">&quot;:&quot;</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-last" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">last</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="last-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 283</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">last</span>
+  <span class="ruby-identifier">cfg</span> = <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;last&#39;</span>]
+  <span class="ruby-identifier">list_section</span>({<span class="ruby-value">:section</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@current_section</span>, <span class="ruby-value">:count</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:template</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cfg</span>[<span class="ruby-string">&#39;template&#39;</span>]})
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-list_section" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">list_section</span><span
+            class="method-args">(opt={})</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="list_section-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 174</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">list_section</span>(<span class="ruby-identifier">opt</span>={})
+  <span class="ruby-identifier">opt</span>[<span class="ruby-value">:count</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+  <span class="ruby-identifier">count</span> = <span class="ruby-identifier">opt</span>[<span class="ruby-value">:count</span>] <span class="ruby-operator">-</span> <span class="ruby-value">1</span>
+  <span class="ruby-identifier">opt</span>[<span class="ruby-value">:section</span>] <span class="ruby-operator">||=</span> <span class="ruby-keyword">nil</span>
+  <span class="ruby-identifier">opt</span>[<span class="ruby-value">:format</span>] <span class="ruby-operator">||=</span> <span class="ruby-ivar">@default_date_format</span>
+  <span class="ruby-identifier">opt</span>[<span class="ruby-value">:template</span>] <span class="ruby-operator">||=</span> <span class="ruby-ivar">@default_template</span>
+  <span class="ruby-identifier">opt</span>[<span class="ruby-value">:order</span>] <span class="ruby-operator">||=</span> <span class="ruby-string">&quot;desc&quot;</span>
+  <span class="ruby-identifier">opt</span>[<span class="ruby-value">:today</span>] <span class="ruby-operator">||=</span> <span class="ruby-keyword">false</span>
+
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opt</span>[<span class="ruby-value">:section</span>].<span class="ruby-identifier">nil?</span>
+    <span class="ruby-identifier">opt</span>[<span class="ruby-value">:section</span>] = <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">choose_section</span>]
+  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opt</span>[<span class="ruby-value">:section</span>].<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-ivar">@content</span>.<span class="ruby-identifier">has_key?</span> <span class="ruby-identifier">opt</span>[<span class="ruby-value">:section</span>]
+      <span class="ruby-identifier">opt</span>[<span class="ruby-value">:section</span>] = <span class="ruby-ivar">@content</span>[<span class="ruby-identifier">opt</span>[<span class="ruby-value">:section</span>]]
+    <span class="ruby-keyword">else</span>
+      <span class="ruby-identifier">$stderr</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Section &#39;#{opt[:section]}&#39; not found&quot;</span>
+      <span class="ruby-keyword">return</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opt</span>[<span class="ruby-value">:section</span>].<span class="ruby-identifier">class</span> <span class="ruby-operator">!=</span> <span class="ruby-constant">Hash</span>
+    <span class="ruby-identifier">$stderr</span>.<span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Invalid section object&quot;</span>
+    <span class="ruby-keyword">return</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">items</span> = <span class="ruby-identifier">opt</span>[<span class="ruby-value">:section</span>][<span class="ruby-string">&#39;items&#39;</span>].<span class="ruby-identifier">sort_by</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">item</span><span class="ruby-operator">|</span> <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>] }
+
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opt</span>[<span class="ruby-value">:today</span>]
+    <span class="ruby-identifier">items</span>.<span class="ruby-identifier">delete_if</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">item</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>.<span class="ruby-identifier">to_time</span>
+    }.<span class="ruby-identifier">reverse!</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">items</span> = <span class="ruby-identifier">items</span>.<span class="ruby-identifier">reverse</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-identifier">count</span>]
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">items</span>.<span class="ruby-identifier">reverse!</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opt</span>[<span class="ruby-value">:order</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^asc/i</span>
+
+  <span class="ruby-identifier">out</span> = <span class="ruby-string">&quot;&quot;</span>
+
+  <span class="ruby-identifier">items</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">item</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">item</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-string">&#39;note&#39;</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;note&#39;</span>].<span class="ruby-identifier">empty?</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@config</span>[<span class="ruby-value">:include_notes</span>]
+      <span class="ruby-identifier">note_lines</span> = <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;note&#39;</span>].<span class="ruby-identifier">delete_if</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span><span class="ruby-operator">|</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^\s*$/</span> }.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span><span class="ruby-operator">|</span> <span class="ruby-string">&quot;\t&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">line</span>.<span class="ruby-identifier">sub</span>(<span class="ruby-regexp">/^\t\t/</span>,<span class="ruby-string">&#39;&#39;</span>) }
+      <span class="ruby-keyword">if</span> <span class="ruby-ivar">@config</span>[<span class="ruby-value">:note_wrap_width</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+        <span class="ruby-identifier">width</span> = <span class="ruby-ivar">@config</span>[<span class="ruby-value">:note_wrap_width</span>]
+        <span class="ruby-identifier">note_lines</span>.<span class="ruby-identifier">map!</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">line</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">line</span>.<span class="ruby-identifier">strip</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-node">/(.{1,#{width}})(\s+|\Z)/</span>, <span class="ruby-string">&quot;\t\\1\n&quot;</span>).<span class="ruby-identifier">chomp</span>
+        }
+      <span class="ruby-keyword">end</span>
+      <span class="ruby-identifier">note</span> = <span class="ruby-node">&quot;\n#{note_lines.join(&quot;\n&quot;)}&quot;</span>
+    <span class="ruby-keyword">else</span>
+      <span class="ruby-identifier">note</span> = <span class="ruby-string">&quot;&quot;</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-identifier">output</span> = <span class="ruby-identifier">opt</span>[<span class="ruby-value">:template</span>].<span class="ruby-identifier">dup</span>
+    <span class="ruby-identifier">output</span>.<span class="ruby-identifier">sub!</span>(<span class="ruby-regexp">/%date/</span>,<span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>].<span class="ruby-identifier">strftime</span>(<span class="ruby-identifier">opt</span>[<span class="ruby-value">:format</span>]))
+    <span class="ruby-identifier">output</span>.<span class="ruby-identifier">sub!</span>(<span class="ruby-regexp">/%shortdate/</span>) {
+      <span class="ruby-keyword">if</span> <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>.<span class="ruby-identifier">to_time</span>
+        <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>].<span class="ruby-identifier">strftime</span>(<span class="ruby-string">&#39;%_I:%M%P&#39;</span>)
+      <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>] <span class="ruby-operator">&gt;</span> (<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>).<span class="ruby-identifier">to_time</span>
+        <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>].<span class="ruby-identifier">strftime</span>(<span class="ruby-string">&#39;%a %-I:%M%P&#39;</span>)
+      <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>].<span class="ruby-identifier">year</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>.<span class="ruby-identifier">year</span>
+        <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>].<span class="ruby-identifier">strftime</span>(<span class="ruby-string">&#39;%b %d, %-I:%M%P&#39;</span>)
+      <span class="ruby-keyword">else</span>
+        <span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;date&#39;</span>].<span class="ruby-identifier">strftime</span>(<span class="ruby-string">&#39;%b %d %Y, %-I:%M%P&#39;</span>)
+      <span class="ruby-keyword">end</span>
+    }
+    <span class="ruby-identifier">output</span>.<span class="ruby-identifier">sub!</span>(<span class="ruby-regexp">/%title/</span>,<span class="ruby-identifier">item</span>[<span class="ruby-string">&#39;title&#39;</span>].<span class="ruby-identifier">strip</span>)
+    <span class="ruby-identifier">output</span>.<span class="ruby-identifier">sub!</span>(<span class="ruby-regexp">/%note/</span>,<span class="ruby-identifier">note</span>)
+    <span class="ruby-identifier">output</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">/%hr(_under)?/</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">o</span> = <span class="ruby-string">&quot;&quot;</span>
+      <span class="ruby-value">%xtput cols`</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span>
+        <span class="ruby-identifier">o</span> <span class="ruby-operator">+=</span> <span class="ruby-node">$1</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-string">&quot;-&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&quot;_&quot;</span>
+      <span class="ruby-keyword">end</span>
+      <span class="ruby-identifier">o</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-identifier">out</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">output</span> <span class="ruby-operator">+</span> <span class="ruby-string">&quot;\n&quot;</span>
+  }
+
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">out</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-read_config" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">read_config</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="read_config-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 113</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">read_config</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-constant">DOING_CONFIG</span>)
+    <span class="ruby-keyword">return</span> <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load_file</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-constant">DOING_CONFIG</span>))
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-keyword">return</span> {}
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-recent" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">recent</span><span
+            class="method-args">(count=10,section=nil)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="recent-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 277</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">recent</span>(<span class="ruby-identifier">count</span>=<span class="ruby-value">10</span>,<span class="ruby-identifier">section</span>=<span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">cfg</span> = <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;recent&#39;</span>]
+  <span class="ruby-identifier">section</span> <span class="ruby-operator">||=</span> <span class="ruby-ivar">@current_section</span>
+  <span class="ruby-identifier">list_section</span>({<span class="ruby-value">:section</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">section</span>, <span class="ruby-value">:count</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">count</span>, <span class="ruby-value">:format</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cfg</span>[<span class="ruby-string">&#39;date_format&#39;</span>], <span class="ruby-value">:template</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cfg</span>[<span class="ruby-string">&#39;template&#39;</span>], <span class="ruby-value">:order</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;asc&quot;</span>})
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-today" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">today</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="today-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 272</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">today</span>
+  <span class="ruby-identifier">cfg</span> = <span class="ruby-ivar">@config</span>[<span class="ruby-string">&#39;templates&#39;</span>][<span class="ruby-string">&#39;today&#39;</span>]
+  <span class="ruby-identifier">list_section</span>({<span class="ruby-value">:section</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@current_section</span>, <span class="ruby-value">:count</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:format</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cfg</span>[<span class="ruby-string">&#39;date_format&#39;</span>], <span class="ruby-value">:template</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cfg</span>[<span class="ruby-string">&#39;template&#39;</span>], <span class="ruby-value">:order</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;asc&quot;</span>, <span class="ruby-value">:today</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>})
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-write" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">write</span><span
+            class="method-args">(file=nil)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="write-source">
+            <pre><span class="ruby-comment"># File lib/doing/wwid.rb, line 142</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">write</span>(<span class="ruby-identifier">file</span>=<span class="ruby-keyword">nil</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@other_content_top</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-identifier">output</span> = <span class="ruby-string">&quot;&quot;</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">output</span> = <span class="ruby-ivar">@other_content_top</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>) <span class="ruby-operator">+</span> <span class="ruby-string">&quot;\n&quot;</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-ivar">@content</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">title</span>, <span class="ruby-identifier">section</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">output</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">section</span>[<span class="ruby-string">&#39;original&#39;</span>] <span class="ruby-operator">+</span> <span class="ruby-string">&quot;\n&quot;</span>
+    <span class="ruby-identifier">output</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">list_section</span>({<span class="ruby-value">:section</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">title</span>, <span class="ruby-value">:template</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;\t- %date | %title%note&quot;</span>})
+  }
+  <span class="ruby-identifier">output</span> <span class="ruby-operator">+=</span> <span class="ruby-ivar">@other_content_bottom</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">nil?</span>
+    <span class="ruby-identifier">$stdout</span>.<span class="ruby-identifier">puts</span> <span class="ruby-identifier">output</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">file</span>))
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">file</span>),<span class="ruby-string">&#39;w+&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">f</span>.<span class="ruby-identifier">puts</span> <span class="ruby-identifier">output</span>
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+    </section>
+  
+  </section>
+</main>
+
+
+<footer id="validator-badges" role="contentinfo">
+  <p><a href="http://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="http://rdoc.rubyforge.org">RDoc</a> 4.1.1.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+

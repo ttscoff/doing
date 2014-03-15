@@ -1,0 +1,41 @@
+= doing
+
+A basic CLI for adding and listing "what was I doing" reminders in a text file. Allows for multiple sections and flexible output formatting.
+
+The format of the "WWID" file is TaskPaper-compatible. You can edit it by hand at any time, but it uses a specific format for parsing, so be careful. By default the file is created in "~/what_was_i_doing.md", but this can be modified in the config file.
+
+The config file is stored in "~/.doingrc", and is created on the first run. It contains, among other things, templates for various command outputs. Include placeholders by placing a % before the keyword. The available placeholders are:
+
+- %date: the date based on the templates "date_format" setting
+- %shortdate: a custom date formatter that removes the day/month/year from the entry if they match the current day/month/year
+- %note: Any note in the entry will be included here, a newline and tabs are automatically added.
+- %hr: a horizontal rule (`-`) the width of the terminal
+- %hr_under: a horizontal rule (`_`) the width of the terminal
+
+Date formats are based on Ruby `strftime` formatting.
+
+Usage:
+
+    doing [global options] command [command options] [arguments...]
+
+Global options:
+
+    --help              - Show this message
+    --[no-]notes        - Output notes if included in the template (default: enabled)
+    --version           - Display the program version
+    -w, --wrapwidth=arg - Wrap notes at X chars (0 for no wrap) (default: none)
+
+Commands:
+
+    archive  - Archive all but the most recent 5 entries
+    choose   - Select a section to display
+    config   - Edit the default configuration
+    help     - Shows a list of commands or help for one command
+    last     - Show the last entry
+    later    - Add an item to the Later section
+    now      - Add an entry
+    recent   - List recent entries
+    sections - List sections
+    show     - List all entries
+    today    - List entries from today
+

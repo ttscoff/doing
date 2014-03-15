@@ -1,0 +1,158 @@
+#!/usr/bin/env ruby
+require 'gli'
+require 'doing'
+
+include GLI::App
+
+wwid = WWID.new
+
+program_desc 'A CLI for a What Was I Doing system'
+
+version Doing::VERSION
+
+default_command :recent
+
+desc 'Output notes if included in the template'
+default_value true
+switch [:notes], :default_value => true, :negatable => true
+
+desc 'Wrap notes at X chars (0 for no wrap)'
+flag [:w,:wrapwidth], :must_match => /^\d+$/, :type => Integer
+
+desc 'Add an entry'
+arg_name 'entry'
+command :now do |c|
+  c.desc 'Section'
+  c.default_value wwid.current_section
+  c.flag [:s,:section]
+
+  c.action do |global_options,options,args|
+    if args.length > 0
+      wwid.add_item(args.join(" ").cap_first, options[:s].cap_first)
+      wwid.write(wwid.doing_file)
+    else
+      raise "You must provide content when creating a new entry"
+    end
+  end
+end
+
+desc 'Add an item to the Later section'
+arg_name 'entry'
+command :later do |c|
+  c.action do |global_options,options,args|
+    if args.length > 0
+      wwid.add_item(args.join(" ").cap_first, "Later")
+      wwid.write(wwid.doing_file)
+    else
+      raise "You must provide content when creating a new entry"
+    end
+  end
+end
+
+desc 'List entries from today'
+command :today do |c|
+  c.action do |global_options,options,args|
+    puts wwid.today
+  end
+end
+
+desc 'List all entries'
+arg_name 'section'
+command :show do |c|
+  c.action do |global_options,options,args|
+    if args.length > 0
+      if wwid.sections.include? args.join(" ").cap_first
+        section = args.join(" ").cap_first
+      else
+        raise "No such section: #{args.join(" ")}"
+      end
+    else
+      section = wwid.current_section
+    end
+    puts wwid.list_section({:section => section, :count => 0})
+  end
+end
+
+desc 'List recent entries'
+default_value 10
+arg_name 'count'
+command :recent do |c|
+  c.desc 'Section'
+  c.default_value wwid.current_section
+  c.flag [:s,:section]
+  c.action do |global_options,options,args|
+    if args.length > 0
+      count = args[0].to_i
+    else
+      count = 10
+    end
+    puts wwid.recent(count,options[:s].cap_first)
+  end
+end
+
+desc 'Archive all but the most recent 5 entries'
+default_value wwid.current_section
+arg_name 'section'
+command :archive do |c|
+  c.action do |global_options,options,args|
+    if args.length > 0
+      section = args.join(" ").capitalize
+    else
+      section = wwid.current_section
+    end
+    wwid.archive(section)
+  end
+end
+
+desc 'Show the last entry'
+command :last do |c|
+  c.action do |global_options,options,args|
+    puts wwid.last
+  end
+end
+
+desc 'List sections'
+command :sections do |c|
+  c.action do |global_options,options,args|
+    puts wwid.sections.join(", ")
+  end
+end
+
+desc 'Select a section to display'
+command :choose do |c|
+  c.action do |global_options,options,args|
+    section = wwid.choose_section
+    puts wwid.list_section({:section => section.cap_first, :count => 0})
+  end
+end
+
+desc 'Edit the default configuration'
+command :config do |c|
+  c.action do |global_options,options,args|
+    system %Q{"#{ENV['EDITOR']}" "#{DOING_CONFIG}"}
+  end
+end
+
+pre do |global,command,options,args|
+  wwid.config[:include_notes] = false unless global[:notes]
+  wwid.config[:note_wrap_width] = global[:w] if global[:w]
+
+  # Return true to proceed; false to abort and not call the
+  # chosen command
+  # Use skips_pre before a command to skip this block
+  # on that command only
+  true
+end
+
+post do |global,command,options,args|
+  # Use skips_post before a command to skip this
+  # block on that command only
+end
+
+on_error do |exception|
+  # Error logic here
+  # return false to skip default error handling
+  true
+end
+
+exit run(ARGV)
