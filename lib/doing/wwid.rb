@@ -36,14 +36,14 @@ class WWID
       'wrap_width' => 0
     }
     @config['templates']['last'] ||= {
-      'date_format' => '%_I:%M%P',
-      'template' => '%date: %title%note',
-      'wrap_width' => 60
+      'date_format' => '%-I:%M%P on %a',
+      'template' => '%title (at %date)%odnote',
+      'wrap_width' => 88
     }
     @config['templates']['recent'] ||= {
       'date_format' => '%_I:%M%P',
       'template' => '%shortdate: %title',
-      'wrap_width' => 60
+      'wrap_width' => 88
     }
 
     @doing_file = File.expand_path(config['doing_file'])
@@ -57,9 +57,11 @@ class WWID
 
     if input.nil?
       create(@doing_file) unless File.exists?(@doing_file)
-      input = IO.read(@doing_file).force_encoding('utf-8')
+      input = IO.read(@doing_file)
+      input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
     elsif File.exists?(File.expand_path(input)) && File.file?(File.expand_path(input)) && File.stat(File.expand_path(input)).size > 0
-      input = IO.read(File.expand_path(input)).force_encoding('utf-8')
+      input = IO.read(File.expand_path(input))
+      input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
       @doing_file = File.expand_path(input)
     elsif input.length < 256
       create(input)
