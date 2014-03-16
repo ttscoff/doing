@@ -45,6 +45,15 @@ class WWID
       'template' => '%shortdate: %title',
       'wrap_width' => 88
     }
+    @config['views'] ||= {
+      'sample' => {
+        'date_format' => '%_I:%M%P',
+        'template' => '%date | %title%note',
+        'wrap_width' => 0,
+        'section' => 'section_name',
+        'count' => 5
+      }
+    }
 
     @doing_file = File.expand_path(config['doing_file'])
     @current_section = config['current_section']
@@ -132,7 +141,7 @@ class WWID
   end
 
   def add_item(title,section=nil,opt={})
-    section = @current_section if section.nil?
+    section ||= @current_section
     add_section(section) unless @content.has_key?(section)
     opt[:date] ||= Time.now
     opt[:note] ||= ""
@@ -174,6 +183,13 @@ class WWID
     num = STDIN.gets
     return false if num =~ /^[a-z ]*$/i
     return sections[num.to_i - 1]
+  end
+
+  def get_view(title)
+    if @config['views'].has_key?(title)
+      return @config['views'][title]
+    end
+    false
   end
 
   def list_section(opt={})
@@ -263,14 +279,14 @@ class WWID
     return out
   end
 
-  def archive(section=nil)
+  def archive(section=nil,count=10)
     section = choose_section if section.nil? || section =~ /choose/i
     if sections.include?(section)
       items = @content[section]['items']
       return if items.length < 10
       @content[section]['items'] = items[0..5]
       add_section('Archive') unless sections.include?('Archive')
-      @content['Archive']['items'] += items[6..-1]
+      @content['Archive']['items'] += items[count..-1]
       write(@doing_file)
     end
   end

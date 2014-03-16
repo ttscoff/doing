@@ -50,6 +50,29 @@ command :later do |c|
   end
 end
 
+desc 'Add a completed item with @done(date)'
+arg_name 'entry'
+command :done do |c|
+  c.desc 'Immediately archive the entry'
+  c.switch [:a,:archive], :negatable => true
+
+  c.desc 'Section'
+  c.default_value wwid.current_section
+  c.flag [:s,:section], :default_value => wwid.current_section
+
+  c.action do |global_options,options,args|
+    if args.length > 0
+      task = args.join(" ").cap_first
+      task += " @done(#{Time.now.strftime('%F %R')})"
+      section = options[:a] ? "Archive" : options[:s]
+      wwid.add_item(task, section)
+      wwid.write(wwid.doing_file)
+    else
+      raise "You must provide content when creating a new entry"
+    end
+  end
+end
+
 desc 'List all entries'
 arg_name 'section'
 command :show do |c|
@@ -113,24 +136,68 @@ command :choose do |c|
   end
 end
 
-desc 'Move all but the most recent 5 entries to the Archive section'
-default_value wwid.current_section
+desc 'Add a new section to the "doing" file'
+arg_name 'section_name'
+command :add_section do |c|
+  c.action do |global_options,options,args|
+    unless wwid.sections.include?(args[0])
+      wwid.add_section(args[0].cap_first)
+      wwid.write(wwid.doing_file)
+    else
+      raise "Section #{args[0]} already exists"
+    end
+  end
+end
+
+desc 'Display a user-created view'
+arg_name 'view_name'
+command :view do |c|
+  c.desc 'Section'
+  c.flag [:s,:section]
+
+  c.desc 'Count to display'
+  c.flag [:c,:count], :must_match => /^\d+$/, :type => Integer
+
+  c.action do |global_options,options,args|
+    view = wwid.get_view(args[0])
+    if view
+      template = view.has_key?('template') ? view['template'] : nil
+      format = view.has_key?('date_format') ? view['date_format'] : nil
+      count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
+      section = options[:s] ? options[:s] : view.has_key?('section') ? view['section'] : wwid.current_section
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format})
+    else
+      raise "View #{args[0]} not found in config"
+    end
+  end
+end
+
+desc 'Move all but the most recent 5 entries in a section to Archive'
 arg_name 'section'
+default_value wwid.current_section
 command :archive do |c|
+  c.desc 'Count to keep'
+  c.default_value 5
+  c.flag [:k,:keep], :default_value => 5, :must_match => /^\d+$/, :type => Integer
+
   c.action do |global_options,options,args|
     if args.length > 0
       section = args.join(" ").capitalize
     else
       section = wwid.current_section
     end
-    wwid.archive(section)
+    wwid.archive(section,options[:k])
   end
 end
 
-desc 'Edit the default configuration'
+desc 'Edit the configuration file'
 command :config do |c|
+  c.desc 'Editor to use'
+  c.default_value ENV['EDITOR']
+  c.flag [:e,:editor]
+
   c.action do |global_options,options,args|
-    system %Q{"#{ENV['EDITOR']}" "#{DOING_CONFIG}"}
+    system %Q{"#{options[:e]}" "#{File.expand_path(DOING_CONFIG)}"}
   end
 end
 

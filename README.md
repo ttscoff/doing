@@ -151,6 +151,37 @@ and output my recent entries like this:
 
     $ 
 
+### Custom views
+
+You can create your own "views" in the `~/.doingrc` file and view them with `doing view view_name`. Just add a section like this:
+
+    views:
+      old:
+        section: Old
+        count: 5
+        wrap_width: 0
+        date_format: '%F %_I:%M%P'
+        template: '%date | %title%note' 
+
+You can add additional custom views, just nest them under the "views" key (indented two spaces from the edge). Multiple views would look like this:
+
+    views:
+      mine:
+        section: Later
+        count: 5
+        wrap_width: 60
+        date_format: '%F %_I:%M%P'
+        template: '%date | %title%note'
+      old:
+        section: Old
+        count: 5
+        wrap_width: 0
+        date_format: '%F %_I:%M%P'
+        template: '%date | %title%note' 
+
+The "section" key is the default section to pull entries from. Count and section can be overridden at runtime with the `-c` and `-s` flags.
+
+You can add new sections with `done add_section section_name`. You can also create them on the fly by using the `-s section_name` flag when running `doing now`. For example, `doing now -s Misc just a random side note` would create the "just a random side note" entry in a new section called "Misc."
 
 ## Usage:
 
@@ -170,6 +201,7 @@ and output my recent entries like this:
 
     now      - Add an entry
     later    - Add an item to the Later section
+    done     - Add an entry tagged with @done(YYYY-mm-dd hh:mm)
 
 #### Displaying entries:
 

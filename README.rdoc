@@ -33,6 +33,7 @@ Commands:
     archive  - Archive all but the most recent 5 entries
     choose   - Select a section to display
     config   - Edit the default configuration
+    done     - Add an entry tagged with @done(YYYY-mm-dd hh:mm)
     help     - Shows a list of commands or help for one command
     last     - Show the last entry
     later    - Add an item to the Later section
