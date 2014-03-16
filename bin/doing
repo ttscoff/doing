@@ -197,7 +197,7 @@ command :config do |c|
   c.flag [:e,:editor]
 
   c.action do |global_options,options,args|
-    system %Q{"#{options[:e]}" "#{File.expand_path(DOING_CONFIG)}"}
+    system %Q{#{options[:e]} "#{File.expand_path(DOING_CONFIG)}"}
   end
 end
 
