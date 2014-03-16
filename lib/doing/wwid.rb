@@ -52,6 +52,13 @@ class WWID
         'wrap_width' => 0,
         'section' => 'section_name',
         'count' => 5
+      },
+      'color' => {
+          'date_format' => '%F %_I:%M%P',
+          'template' => '%boldblack%date %cyan| %boldwhite%title%default%note',
+          'wrap_width' => 0,
+          'section' => 'Currently',
+          'count' => 10,
       }
     }
 
@@ -245,6 +252,13 @@ class WWID
         note = ""
       end
       output = opt[:template].dup
+      output.gsub!(/%[a-z]+/) do |m|
+        if colors.has_key?(m.sub(/^%/,''))
+          colors[m.sub(/^%/,'')]
+        else
+          m
+        end
+      end
       output.sub!(/%date/,item['date'].strftime(opt[:format]))
       output.sub!(/%shortdate/) {
         if item['date'] > Date.today.to_time
@@ -273,6 +287,8 @@ class WWID
         end
         o
       end
+
+
       out += output + "\n"
     }
 
@@ -290,6 +306,47 @@ class WWID
       write(@doing_file)
     end
   end
+
+
+
+  def colors
+    color = {}
+    color['black'] = "\033[30m"
+    color['red'] = "\033[31m"
+    color['green'] = "\033[32m"
+    color['yellow'] = "\033[33m"
+    color['blue'] = "\033[34m"
+    color['magenta'] = "\033[35m"
+    color['cyan'] = "\033[36m"
+    color['white'] = "\033[37m"
+    color['bgblack'] = "\033[40m"
+    color['bgred'] = "\033[41m"
+    color['bggreen'] = "\033[42m"
+    color['bgyellow'] = "\033[43m"
+    color['bgblue'] = "\033[44m"
+    color['bgmagenta'] = "\033[45m"
+    color['bgcyan'] = "\033[46m"
+    color['bgwhite'] = "\033[47m"
+    color['boldblack'] = "\033[1;30m"
+    color['boldred'] = "\033[1;31m"
+    color['boldgreen'] = "\033[1;32m"
+    color['boldyellow'] = "\033[1;33m"
+    color['boldblue'] = "\033[1;34m"
+    color['boldmagenta'] = "\033[1;35m"
+    color['boldcyan'] = "\033[1;36m"
+    color['boldwhite'] = "\033[1;37m"
+    color['boldbgblack'] = "\033[1;40m"
+    color['boldbgred'] = "\033[1;41m"
+    color['boldbggreen'] = "\033[1;42m"
+    color['boldbgyellow'] = "\033[1;43m"
+    color['boldbgblue'] = "\033[1;44m"
+    color['boldbgmagenta'] = "\033[1;45m"
+    color['boldbgcyan'] = "\033[1;46m"
+    color['boldbgwhite'] = "\033[1;47m"
+    color['default']="\033[0;39m"
+    color
+  end
+
 
   def all(order="")
     order = "asc" if order == ""
