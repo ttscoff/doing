@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    doing (0.1.5)
+    doing (0.1.6)
       gli (= 2.7.0)
 
 GEM

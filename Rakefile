@@ -41,4 +41,9 @@ Rake::TestTask.new do |t|
   t.test_files = FileList['test/*_test.rb']
 end
 
+desc 'Install the gem in the current ruby'
+task :install do |t|
+  sh "gem install pkg/*.gem"
+end
+
 task :default => [:test,:features]

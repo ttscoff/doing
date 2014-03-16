@@ -55,7 +55,7 @@ class WWID
       },
       'color' => {
           'date_format' => '%F %_I:%M%P',
-          'template' => '%boldblack%date %cyan| %boldwhite%title%default%note',
+          'template' => '%boldblack%date %boldgreen| %boldwhite%title%default%note',
           'wrap_width' => 0,
           'section' => 'Currently',
           'count' => 10,

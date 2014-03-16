@@ -76,6 +76,9 @@ The config also contains templates for various command outputs. Include placehol
 - `%odnote`: The notes with a leading tab removed (outdented note)
 - `%hr`: a horizontal rule (`-`) the width of the terminal
 - `%hr_under`: a horizontal rule (`_`) the width of the terminal
+- `%[color]`: color can be black, red, green, blue, yellow, magenta, cyan or white
+  - you can prefix "bg" to affect background colors (%bgyellow)
+  - prefix "bold" and "boldbg" for strong colors (%boldgreen, %boldbgblue)
 
 Date formats are based on Ruby [strftime](http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime) formatting.
 
