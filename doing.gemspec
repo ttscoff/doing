@@ -26,5 +26,5 @@ lib/doing/wwid.rb
   s.add_development_dependency 'rake', '~> 0'
   s.add_development_dependency 'rdoc', '~> 4.1', '>= 4.1.1'
   s.add_development_dependency 'aruba', '~> 0'
-  s.add_runtime_dependency('gli','2.7.0')
+  s.add_runtime_dependency('gli','2.9.0')
 end
