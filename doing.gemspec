@@ -19,8 +19,8 @@ lib/doing/wwid.rb
   )
   s.require_paths << 'lib'
   s.has_rdoc = true
-  s.extra_rdoc_files = ['README.rdoc','doing.rdoc']
-  s.rdoc_options << '--title' << 'doing' << '--main' << 'README.rdoc' << '-ri'
+  s.extra_rdoc_files = ['README.md']
+  s.rdoc_options << '--title' << 'doing' << '--main' << 'README.md' << '--markup' << 'markdown' << '-ri'
   s.bindir = 'bin'
   s.executables << 'doing'
   s.add_development_dependency 'rake', '~> 0'
