@@ -114,15 +114,44 @@ command :done do |c|
   c.default_value wwid.current_section
   c.flag [:s,:section], :default_value => wwid.current_section
 
+  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.switch [:e,:editor]
+
+  # c.desc "Edit entry with specified app"
+  # c.arg_name 'editor_app'
+  # c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
+  # c.flag [:a,:app]
+
   c.action do |global_options,options,args|
-    if args.length > 0
-      task = args.join(" ").cap_first
-      task += " @done(#{Time.now.strftime('%F %R')})"
-      section = options[:a] ? "Archive" : options[:s]
-      wwid.add_item(task, section)
-      wwid.write(wwid.doing_file)
+    if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
+      input = ""
+      input += args.join(" ") if args.length > 0
+      input = wwid.fork_editor(input)
+      if input
+        title, note = wwid.format_input(input)
+        title += " @done(#{Time.now.strftime('%F %R')})"
+        section = options[:a] ? "Archive" : options[:s]
+        wwid.add_item(title.cap_first, section.cap_first, {:note => note})
+        wwid.write(wwid.doing_file)
+      else
+        raise "No content"
+      end
     else
-      raise "You must provide content when creating a new entry"
+      if args.length > 0
+        title, note = wwid.format_input(args.join(" "))
+        title += " @done(#{Time.now.strftime('%F %R')})"
+        section = options[:a] ? "Archive" : options[:s]
+        wwid.add_item(title.cap_first, section.cap_first, {:note => note})
+        wwid.write(wwid.doing_file)
+      elsif STDIN.stat.size > 0
+        title, note = wwid.format_input(STDIN.read)
+        title += " @done(#{Time.now.strftime('%F %R')})"
+        section = options[:a] ? "Archive" : options[:s]
+        wwid.add_item(title.cap_first, section.cap_first, {:note => note})
+        wwid.write(wwid.doing_file)
+      else
+        raise "You must provide content when creating a new entry"
+      end
     end
   end
 end
@@ -263,7 +292,7 @@ command :open do |c|
       k.class == String || v.nil? || v == false
     }
 
-    if params.length == 1
+    if params.length < 2
       if options[:a]
         system %Q{open -a "#{options[:a]}" "#{File.expand_path(wwid.doing_file)}"}
       elsif options[:b]
@@ -271,10 +300,13 @@ command :open do |c|
       elsif options[:e]
         system %Q{$EDITOR "#{File.expand_path(wwid.doing_file)}"}
       else
-        system %Q{open "#{File.expand_path(wwid.doing_file)}"}
+        if wwid.config.has_key?('editor_app') && !wwid.config['editor_app'].nil?
+          system %Q{open -a "#{wwid.config['editor_app']}" "#{File.expand_path(wwid.doing_file)}"}
+        else
+          system %Q{open "#{File.expand_path(wwid.doing_file)}"}
+        end
       end
     else
-      p params
       raise "The open command takes a single parameter. #{params.length} specified."
     end
   end

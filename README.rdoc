@@ -26,24 +26,26 @@ Usage:
 
     doing [global options] command [command options] [arguments...]
 
-Global options:
+Global Options
 
-    --help              - Show this message
-    --[no-]notes        - Output notes if included in the template (default: enabled)
-    --version           - Display the program version
+    --version    - Display the program version
+    --[no-]notes - Output notes if included in the template (default: enabled)
+    --help       - Show this message
 
-Commands:
+Commands
 
-    archive  - Archive all but the most recent 5 entries
-    choose   - Select a section to display
-    config   - Edit the default configuration
-    done     - Add an entry tagged with @done(YYYY-mm-dd hh:mm)
-    help     - Shows a list of commands or help for one command
-    last     - Show the last entry
-    later    - Add an item to the Later section
-    now      - Add an entry
-    recent   - List recent entries
-    sections - List sections
-    show     - List all entries
-    today    - List entries from today
-
+    help        - Shows a list of commands or help for one command
+    now         - Add an entry
+    later       - Add an item to the Later section
+    done        - Add a completed item with @done(date)
+    show        - List all entries
+    recent      - List recent entries
+    today       - List entries from today
+    last        - Show the last entry
+    sections    - List sections
+    choose      - Select a section to display from a menu
+    add_section - Add a new section to the "doing" file
+    view        - Display a user-created view
+    archive     - Move all but the most recent 5 entries in a section to Archive
+    open        - Open the "doing" file in an editor (OS X)
+    config      - Edit the configuration file
