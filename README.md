@@ -61,15 +61,31 @@ A basic configuration looks like this:
 
 The config file is stored in "~/.doingrc", and is created on the first run. 
 
+### Doing file location
+
 The one thing you'll probably want to adjust is the file that the notes are stored in. That's the `doing_file` key:
 
     doing_file: /Users/username/Dropbox/nvALT2.2/?? What was I doing.md
 
 I keep mine in my nvALT folder for quick access and syncing between machines. If desired, you can give it a `.taskpaper` extension to make it more recognizable to other applications. (If you do that in nvALT, make sure to add `taskpaper` as a recognized extension in preferences).
 
+### "Current actions" section
+
 You can rename the section that holds your current tasks. By default, this is "Currently," but if you have some other bright idea, feel free:
 
     current_section: Currently
+
+### Default editors
+
+The setting `editor_app` only applies to Mac OS X users. It's the default application that the command `doing open` will open your WWID file in. If this is blank, it will be opened by whatever the system default is, or you can use `-a app_name` or `-b bundle_id` to override.
+
+In the case of the `doing now -e` command, your $EDITOR environment variable will be used to complete the entry text and notes. Set it in your .bash_profile or whatever is appropriate for your system:
+
+    export EDITOR="mate -w"
+
+The only requirements are that your editor be launchable from the command line and able to "wait." In the case of Sublime Text and TextMate, just use `-w` like this: `export EDITOR="subl -w"`.
+
+### Templates
 
 The config also contains templates for various command outputs. Include placeholders by placing a % before the keyword. The available tokens are:
 
@@ -242,9 +258,9 @@ Outputs:
 
 ---
 
-### Troubleshooting
+## Troubleshooting
 
-#### Errors after "Successfully installed..."
+### Errors after "Successfully installed..."
 
 If you get errors in the terminal immediately after a message like:
 
@@ -255,7 +271,7 @@ If you get errors in the terminal immediately after a message like:
 
     $ gem install --no-document doing
 
-#### Command not found
+### Command not found
 
 If running `doing` after a successful install gives you a "command not found" error, then your gem path isn't in your $PATH, meaning the system can't find it. To locate the gem and link it into your path, you can try this:
 
@@ -264,11 +280,11 @@ If running `doing` after a successful install gives you a "command not found" er
 
 Then try running `doing` and see if it works.
 
-#### Encoding errors
+### Encoding errors
 
 Ruby is rife with encoding inconsistencies across platforms and versions. Feel free to file issues (see below).
 
-#### Support
+### Support
 
 I'm not making any money on `doing`, and I don't plan to spend a lot of time fixing errors on an array of operating systems and platforms I don't even have access to. You'll probably have to solve some things on your own.
 
