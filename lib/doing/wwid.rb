@@ -1,9 +1,4 @@
 #!/usr/bin/ruby
-require 'time'
-require 'date'
-require 'yaml'
-require 'pp'
-
 class String
   def cap_first
     self.sub(/^\w/) do |m|
@@ -23,7 +18,7 @@ class WWID
 
     @config['doing_file'] ||= "~/what_was_i_doing.md"
     @config['current_section'] ||= 'Currently'
-
+    @config['editor_app'] ||= nil
     @config['templates'] ||= {}
     @config['templates']['default'] ||= {
       'date_format' => '%Y-%m-%d %H:%M',
@@ -139,6 +134,50 @@ class WWID
     end
   end
 
+  def fork_editor(input="")
+    tmpfile = Tempfile.new('doing')
+
+    File.open(tmpfile.path,'w+') do |f|
+      f.puts input
+    end
+
+    pid = Process.fork { system(ENV['EDITOR'], "#{tmpfile.path}") }
+
+    trap("INT") {
+      Process.kill(9, pid) rescue Errno::ESRCH
+      tmpfile.unlink
+      tmpfile.close!
+      exit 0
+    }
+
+    Process.wait(pid)
+
+    begin
+      input = IO.read(tmpfile.path)
+    ensure
+      tmpfile.close
+      tmpfile.unlink
+    end
+
+    input
+  end
+
+  # This takes a multi-line string and formats it as an entry
+  # returns an array of [title(String), note(Array)]
+  def format_input(input)
+    return false unless input && input.length > 0
+    input_lines = input.strip.split(/[\n\r]+/)
+    title = input_lines[0].strip
+    note = input_lines.length > 1 ? input_lines[1..-1] : []
+    note.map! { |line|
+      line.strip
+    }.delete_if { |line|
+      line =~ /^\s*$/
+    }
+
+    [title, note]
+  end
+
   def sections
     @content.keys
   end
@@ -151,7 +190,7 @@ class WWID
     section ||= @current_section
     add_section(section) unless @content.has_key?(section)
     opt[:date] ||= Time.now
-    opt[:note] ||= ""
+    opt[:note] ||= []
 
     entry = {'title' => title.strip.cap_first, 'date' => opt[:date]}
     unless opt[:note] =~ /^\s*$/s

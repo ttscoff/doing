@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'gli'
 require 'doing'
+require 'tempfile'
 
 include GLI::App
 
@@ -24,15 +25,42 @@ desc 'Add an entry'
 arg_name 'entry'
 command :now do |c|
   c.desc 'Section'
+  c.arg_name 'section_name'
   c.default_value wwid.current_section
   c.flag [:s,:section]
 
+  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.switch [:e,:editor]
+
+  # c.desc "Edit entry with specified app"
+  # c.arg_name 'editor_app'
+  # c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
+  # c.flag [:a,:app]
+
   c.action do |global_options,options,args|
-    if args.length > 0
-      wwid.add_item(args.join(" ").cap_first, options[:s].cap_first)
-      wwid.write(wwid.doing_file)
+    if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
+      input = ""
+      input += args.join(" ") if args.length > 0
+      input = wwid.fork_editor(input)
+      if input
+        title, note = wwid.format_input(input)
+        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note})
+        wwid.write(wwid.doing_file)
+      else
+        raise "No content"
+      end
     else
-      raise "You must provide content when creating a new entry"
+      if args.length > 0
+        title, note = wwid.format_input(args.join(" "))
+        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note})
+        wwid.write(wwid.doing_file)
+      elsif STDIN.stat.size > 0
+        title, note = wwid.format_input(STDIN.read)
+        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note})
+        wwid.write(wwid.doing_file)
+      else
+        raise "You must provide content when creating a new entry"
+      end
     end
   end
 end
@@ -40,12 +68,38 @@ end
 desc 'Add an item to the Later section'
 arg_name 'entry'
 command :later do |c|
+  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.switch [:e,:editor]
+
+  c.desc "Edit entry with specified app"
+  c.arg_name 'editor_app'
+  c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
+  c.flag [:a,:app]
+
   c.action do |global_options,options,args|
-    if args.length > 0
-      wwid.add_item(args.join(" ").cap_first, "Later")
-      wwid.write(wwid.doing_file)
+    if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
+      input = ""
+      input += args.join(" ") if args.length > 0
+      input = wwid.fork_editor(input)
+      if input
+        title, note = wwid.format_input(input)
+        wwid.add_item(title.cap_first, "Later", {:note => note})
+        wwid.write(wwid.doing_file)
+      else
+        raise "No content"
+      end
     else
-      raise "You must provide content when creating a new entry"
+      if args.length > 0
+        title, note = wwid.format_input(args.join(" "))
+        wwid.add_item(title.cap_first, "Later", {:note => note})
+        wwid.write(wwid.doing_file)
+      elsif STDIN.stat.size > 0
+        title, note = wwid.format_input(STDIN.read)
+        wwid.add_item(title.cap_first, "Later", {:note => note})
+        wwid.write(wwid.doing_file)
+      else
+        raise "You must provide content when creating a new entry"
+      end
     end
   end
 end
@@ -182,7 +236,7 @@ command :archive do |c|
 
   c.action do |global_options,options,args|
     if args.length > 0
-      section = args.join(" ").capitalize
+      section = args.join(" ").cap_first
     else
       section = wwid.current_section
     end
