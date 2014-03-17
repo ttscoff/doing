@@ -16,7 +16,11 @@ _Side note:_ I actually use the library behind this utility as part of another s
 
 ## Installation
 
-    [sudo] gem install doing
+    $ [sudo] gem install doing
+
+Only use `sudo` if your environment requires it. If you're using the system Ruby on a Mac, for example, it will likely be necessary. If `gem install doing` fails, then run `sudo gem install doing` and provide your administrator password.
+
+See the [support](#support) section below for troubleshooting details.
 
 ## The "doing" file
 
@@ -169,7 +173,7 @@ You can create your own "views" in the `~/.doingrc` file and view them with `doi
 You can add additional custom views, just nest them under the "views" key (indented two spaces from the edge). Multiple views would look like this:
 
     views:
-      mine:
+      later:
         section: Later
         count: 5
         wrap_width: 60
@@ -185,6 +189,19 @@ You can add additional custom views, just nest them under the "views" key (inden
 The "section" key is the default section to pull entries from. Count and section can be overridden at runtime with the `-c` and `-s` flags.
 
 You can add new sections with `done add_section section_name`. You can also create them on the fly by using the `-s section_name` flag when running `doing now`. For example, `doing now -s Misc just a random side note` would create the "just a random side note" entry in a new section called "Misc."
+
+Regarding colors, you can use them to create very nice displays if you're outputting to a color terminal. Example:
+
+    color:
+      date_format: '%F %_I:%M%P'
+      section: Currently
+      count: 10
+      wrap_width: 0
+      template: '%boldblack%date %boldgreen| %boldwhite%title%default%note'
+
+Outputs: 
+
+![](http://ckyp.us/XKpj+)
 
 ## Usage:
 
@@ -223,4 +240,38 @@ You can add new sections with `done add_section section_name`. You can also crea
     archive  - Move all but the most recent 5 entries to the Archive section
     config   - Edit the default configuration
 
+---
 
+### Troubleshooting
+
+#### Errors after "Successfully installed..."
+
+If you get errors in the terminal immediately after a message like:
+
+    Successfully installed doing-x.x.x
+    2 gems installed
+
+...it may just be documentation related. If running `doing` works, you can ignore them. If not, try running the install command again with `--no-document`:
+
+    $ gem install --no-document doing
+
+#### Command not found
+
+If running `doing` after a successful install gives you a "command not found" error, then your gem path isn't in your $PATH, meaning the system can't find it. To locate the gem and link it into your path, you can try this:
+
+    cd $GEM_PATH/bin
+    ln -s doing /usr/local/bin/
+
+Then try running `doing` and see if it works.
+
+#### Encoding errors
+
+Ruby is rife with encoding inconsistencies across platforms and versions. Feel free to file issues (see below).
+
+#### Support
+
+I'm not making any money on `doing`, and I don't plan to spend a lot of time fixing errors on an array of operating systems and platforms I don't even have access to. You'll probably have to solve some things on your own.
+
+That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable issue in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message.
+
+Please try not to email me directly about GitHub projects.
