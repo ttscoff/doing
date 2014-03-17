@@ -82,7 +82,7 @@ class WWID
     @other_content_bottom = []
 
     section = "Uncategorized"
-    lines = input.split(/\n/)
+    lines = input.split(/[\n\r]/)
     current = 0
 
     lines.each {|line|
