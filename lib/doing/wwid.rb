@@ -141,7 +141,7 @@ class WWID
       f.puts input
     end
 
-    pid = Process.fork { system(ENV['EDITOR'], "#{tmpfile.path}") }
+    pid = Process.fork { system("$EDITOR #{tmpfile.path}") }
 
     trap("INT") {
       Process.kill(9, pid) rescue Errno::ESRCH
@@ -151,7 +151,7 @@ class WWID
     }
 
     Process.wait(pid)
-    p $?
+
     begin
       if $?.exitstatus == 0
         input = IO.read(tmpfile.path)
