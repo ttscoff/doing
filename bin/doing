@@ -190,6 +190,42 @@ command :archive do |c|
   end
 end
 
+desc 'Open the "doing" file in an editor (OS X)'
+command :open do |c|
+  c.desc 'open with app name'
+  c.arg_name 'app_name'
+  c.flag [:a]
+
+  c.desc 'open with app bundle id'
+  c.arg_name 'bundle_id'
+  c.flag [:b]
+
+  c.desc 'open with $EDITOR'
+  c.switch [:e], :negatable => false
+
+  c.action do |global_options,options,args|
+    params = options.dup
+    params.delete_if { |k,v|
+      k.class == String || v.nil? || v == false
+    }
+
+    if params.length == 1
+      if options[:a]
+        system %Q{open -a "#{options[:a]}" "#{File.expand_path(wwid.doing_file)}"}
+      elsif options[:b]
+        system %Q{open -b "#{options[:b]}" "#{File.expand_path(wwid.doing_file)}"}
+      elsif options[:e]
+        system %Q{$EDITOR "#{File.expand_path(wwid.doing_file)}"}
+      else
+        system %Q{open "#{File.expand_path(wwid.doing_file)}"}
+      end
+    else
+      p params
+      raise "The open command takes a single parameter. #{params.length} specified."
+    end
+  end
+end
+
 desc 'Edit the configuration file'
 command :config do |c|
   c.desc 'Editor to use'
