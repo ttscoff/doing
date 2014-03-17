@@ -4,12 +4,11 @@ require 'doing'
 require 'tempfile'
 
 include GLI::App
+version Doing::VERSION
 
 wwid = WWID.new
 
 program_desc 'A CLI for a What Was I Doing system'
-
-version Doing::VERSION
 
 default_command :recent
 sort_help :manually
@@ -181,12 +180,14 @@ command :recent do |c|
   c.default_value wwid.current_section
   c.flag [:s,:section]
   c.action do |global_options,options,args|
-    if args.length > 0
-      count = args[0].to_i
-    else
-      count = 10
+    unless global_options[:version]
+      if args.length > 0
+        count = args[0].to_i
+      else
+        count = 10
+      end
+      puts wwid.recent(count,options[:s].cap_first)
     end
-    puts wwid.recent(count,options[:s].cap_first)
   end
 end
 
@@ -325,7 +326,9 @@ end
 
 pre do |global,command,options,args|
   wwid.config[:include_notes] = false unless global[:notes]
-
+  if global[:version]
+    puts "doing v" + Doing::VERSION
+  end
   # Return true to proceed; false to abort and not call the
   # chosen command
   # Use skips_pre before a command to skip this block
