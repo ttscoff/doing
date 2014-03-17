@@ -47,4 +47,40 @@ task :install do |t|
   sh "gem install pkg/*.gem"
 end
 
+desc 'Development version check'
+task :ver do |t|
+  system "grep VERSION lib/doing/version.rb"
+end
+
+desc 'Bump incremental version number'
+task :bump, :type do |t, args|
+  args.with_defaults(:type => "inc")
+  version_file = "lib/doing/version.rb"
+  content = IO.read(version_file)
+  content.sub!(/VERSION = '(\d+)\.(\d+)\.(\d+)'/) {|m|
+    major = $1.to_i
+    minor = $2.to_i
+    inc = $3.to_i
+
+    case args[:type]
+    when /^maj/
+      major += 1
+      minor = 0
+      inc = 0
+    when /^min/
+      minor += 1
+      inc = 0
+    else
+      inc += 1
+    end
+
+    $stdout.puts "At version #{major}.#{minor}.#{inc}"
+    "VERSION = '#{major}.#{minor}.#{inc}'"
+  }
+  File.open(version_file, 'w+') {|f|
+    f.puts content
+  }
+end
+
 task :default => [:test,:features]
+task :build => [:clobber,:rdoc,:package]
