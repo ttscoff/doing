@@ -61,7 +61,7 @@ The one thing you'll probably want to adjust is the file that the notes are stor
 
     doing_file: /Users/username/Dropbox/nvALT2.2/?? What was I doing.md
 
-I keep mind in my nvALT folder for quick access and syncing between machines. If desired, you can give it a `.taskpaper` extension to make it more recognizable to other applications. (If you do that in nvALT, make sure to add `taskpaper` as a recognized extension in preferences).
+I keep mine in my nvALT folder for quick access and syncing between machines. If desired, you can give it a `.taskpaper` extension to make it more recognizable to other applications. (If you do that in nvALT, make sure to add `taskpaper` as a recognized extension in preferences).
 
 You can rename the section that holds your current tasks. By default, this is "Currently," but if you have some other bright idea, feel free:
 
