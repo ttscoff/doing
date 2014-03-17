@@ -151,9 +151,13 @@ class WWID
     }
 
     Process.wait(pid)
-
+    p $?
     begin
-      input = IO.read(tmpfile.path)
+      if $?.exitstatus == 0
+        input = IO.read(tmpfile.path)
+      else
+        raise "Cancelled"
+      end
     ensure
       tmpfile.close
       tmpfile.unlink
@@ -165,8 +169,8 @@ class WWID
   # This takes a multi-line string and formats it as an entry
   # returns an array of [title(String), note(Array)]
   def format_input(input)
-    return false unless input && input.length > 0
-    input_lines = input.strip.split(/[\n\r]+/)
+    raise "No content in entry" if input.nil? || input.strip.length == 0
+    input_lines = input.split(/[\n\r]+/)
     title = input_lines[0].strip
     note = input_lines.length > 1 ? input_lines[1..-1] : []
     note.map! { |line|
