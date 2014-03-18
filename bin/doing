@@ -253,7 +253,7 @@ command :view do |c|
       template = view.has_key?('template') ? view['template'] : nil
       format = view.has_key?('date_format') ? view['date_format'] : nil
       count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
-      section = options[:s] ? options[:s] : view.has_key?('section') ? view['section'] : wwid.current_section
+      section = options[:s] ? options[:s].cap_first : view.has_key?('section') ? view['section'] : wwid.current_section
       puts wwid.list_section({:section => section, :count => count, :template => template, :format => format})
     else
       raise "View #{args[0]} not found in config"
