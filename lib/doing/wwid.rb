@@ -323,6 +323,7 @@ class WWID
         @content.each {|k,v|
           combined['items'] += v['items']
         }
+        opt[:section] = combined
       else
         $stderr.puts "Section '#{opt[:section]}' not found"
         return

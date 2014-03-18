@@ -258,6 +258,12 @@ Outputs:
 
 ---
 
+## Extras
+
+### Bash completion
+
+Add basic command line completion for Bash with [this gist](https://gist.github.com/fcrespo82/9609318).
+
 ## Troubleshooting
 
 ### Errors after "Successfully installed..."
