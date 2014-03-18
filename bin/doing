@@ -248,16 +248,29 @@ command :view do |c|
   c.flag [:c,:count], :must_match => /^\d+$/, :type => Integer
 
   c.action do |global_options,options,args|
-    view = wwid.get_view(args[0])
+    if args.empty?
+      title = wwid.choose_view
+    else
+      title = args[0]
+    end
+    view = wwid.get_view(title)
     if view
       template = view.has_key?('template') ? view['template'] : nil
       format = view.has_key?('date_format') ? view['date_format'] : nil
       count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
       section = options[:s] ? options[:s].cap_first : view.has_key?('section') ? view['section'] : wwid.current_section
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format})
+      order = view.has_key?('order') ? view['order'] : "asc"
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order })
     else
-      raise "View #{args[0]} not found in config"
+      raise "View #{title} not found in config"
     end
+  end
+end
+
+desc 'List available custom views'
+command :views do |c|
+  c.action do |global_options,options,args|
+    puts wwid.views.join(", ")
   end
 end
 

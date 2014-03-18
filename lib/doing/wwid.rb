@@ -46,7 +46,8 @@ class WWID
         'template' => '%date | %title%note',
         'wrap_width' => 0,
         'section' => 'section_name',
-        'count' => 5
+        'count' => 5,
+        'order' => "desc"
       },
       'color' => {
           'date_format' => '%F %_I:%M%P',
@@ -54,6 +55,7 @@ class WWID
           'wrap_width' => 0,
           'section' => 'Currently',
           'count' => 10,
+          'order' => "asc"
       }
     }
 
@@ -235,6 +237,20 @@ class WWID
     return sections[num.to_i - 1]
   end
 
+  def views
+    @config.has_key?('views') ? @config['views'].keys : []
+  end
+
+  def choose_view
+    views.each_with_index {|view, i|
+      puts "% 3d: %s" % [i+1, view]
+    }
+    print "> "
+    num = STDIN.gets
+    return false if num =~ /^[a-z ]*$/i
+    return views[num.to_i - 1]
+  end
+
   def get_view(title)
     if @config['views'].has_key?(title)
       return @config['views'][title]
@@ -340,10 +356,11 @@ class WWID
 
   def archive(section=nil,count=10)
     section = choose_section if section.nil? || section =~ /choose/i
+    section = section.cap_first
     if sections.include?(section)
       items = @content[section]['items']
-      return if items.length < 10
-      @content[section]['items'] = items[0..5]
+      return if items.length < count
+      @content[section]['items'] = items[0..count-1]
       add_section('Archive') unless sections.include?('Archive')
       @content['Archive']['items'] += items[count..-1]
       write(@doing_file)
