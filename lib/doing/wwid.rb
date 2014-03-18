@@ -186,6 +186,25 @@ class WWID
     [title, note]
   end
 
+  def chronify(input)
+    if input =~ /^(\d+)([mhd])?$/i
+      amt = $1
+      type = $2.nil? ? "m" : $2
+      input = case type.downcase
+      when "m"
+        amt + " minutes ago"
+      when "h"
+        amt + " hours ago"
+      when "d"
+        amt + " days ago"
+      else
+        input
+      end
+    end
+
+    Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
+  end
+
   def sections
     @content.keys
   end
@@ -197,30 +216,44 @@ class WWID
   def guess_section(frag)
     return frag if sections.include?(frag.cap_first)
     section = false
-    frag = frag.split('').join(".*?")
+    re = frag.split('').join(".*?")
     sections.each {|sect|
-      if sect =~ /#{frag}/i
+      if sect =~ /#{re}/i
         $stderr.puts "Assuming you meant #{sect}"
         section = sect
         break
       end
     }
-    raise "Invalid section: #{frag}" unless section
+    unless section
+      alt = guess_view(frag)
+      if alt
+        raise "Did you mean `doing view #{alt}`?"
+      else
+        raise "Invalid section: #{frag}"
+      end
+    end
     section.cap_first
   end
 
   def guess_view(frag)
     return frag if views.include?(frag)
     view = false
-    frag = frag.split('').join(".*?")
+    re = frag.split('').join(".*?")
     views.each {|v|
-      if v =~ /#{frag}/i
+      if v =~ /#{re}/i
         $stderr.puts "Assuming you meant #{v}"
         view = v
         break
       end
     }
-    raise "Invalid view: #{frag}" unless view
+    unless view
+      alt = guess_section(frag)
+      if alt
+        raise "Did you mean `doing show #{alt}`?"
+      else
+        raise "Invalid view: #{frag}"
+      end
+    end
     view
   end
 
@@ -229,8 +262,9 @@ class WWID
     add_section(section) unless @content.has_key?(section)
     opt[:date] ||= Time.now
     opt[:note] ||= []
+    opt[:back] ||= Time.now
 
-    entry = {'title' => title.strip.cap_first, 'date' => opt[:date]}
+    entry = {'title' => title.strip.cap_first, 'date' => opt[:back]}
     unless opt[:note] =~ /^\s*$/s
       entry['note'] = opt[:note]
     end

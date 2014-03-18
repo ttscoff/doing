@@ -36,12 +36,22 @@ command :now do |c|
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch [:e,:editor]
 
+  c.desc 'Backdate to "date_string" (natural language)'
+  c.flag [:back]
+
   # c.desc "Edit entry with specified app"
   # c.arg_name 'editor_app'
   # c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
   # c.flag [:a,:app]
 
   c.action do |global_options,options,args|
+    if options[:back]
+      date = wwid.chronify(options[:back])
+      raise "Unable to parse date string" if date.nil?
+    else
+      date = Time.now
+    end
+
     if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
       input = ""
@@ -49,7 +59,7 @@ command :now do |c|
       input = wwid.fork_editor(input)
       if input
         title, note = wwid.format_input(input)
-        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note})
+        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
         raise "No content"
@@ -57,11 +67,11 @@ command :now do |c|
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
-        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note})
+        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
-        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note})
+        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
         raise "You must provide content when creating a new entry"
@@ -81,7 +91,17 @@ command :later do |c|
   c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
   c.flag [:a,:app]
 
+  c.desc 'Backdate to "date_string" (natural language)'
+  c.flag [:back]
+
   c.action do |global_options,options,args|
+    if options[:back]
+      date = wwid.chronify(options[:back])
+      raise "Unable to parse date string" if date.nil?
+    else
+      date = Time.now
+    end
+
     if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
       input = ""
@@ -89,7 +109,7 @@ command :later do |c|
       input = wwid.fork_editor(input)
       if input
         title, note = wwid.format_input(input)
-        wwid.add_item(title.cap_first, "Later", {:note => note})
+        wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
         raise "No content"
@@ -97,11 +117,11 @@ command :later do |c|
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
-        wwid.add_item(title.cap_first, "Later", {:note => note})
+        wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
-        wwid.add_item(title.cap_first, "Later", {:note => note})
+        wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
         raise "You must provide content when creating a new entry"
@@ -117,6 +137,9 @@ command :done do |c|
   c.default_value false
   c.switch [:a,:archive], :negatable => false, :default_value => false
 
+  c.desc 'Backdate to "date_string" (natural language)'
+  c.flag [:backdate]
+
   c.desc 'Section'
   c.default_value wwid.current_section
   c.flag [:s,:section], :default_value => wwid.current_section
@@ -130,6 +153,13 @@ command :done do |c|
   # c.flag [:a,:app]
 
   c.action do |global_options,options,args|
+    if options[:back]
+      date = wwid.chronify(options[:back])
+      raise "Unable to parse date string" if date.nil?
+    else
+      date = Time.now
+    end
+
     if options[:e]
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
       input = ""
@@ -139,25 +169,25 @@ command :done do |c|
         title, note = wwid.format_input(input)
         title += " @done(#{Time.now.strftime('%F %R')})"
         section = options[:a] ? "Archive" : options[:s]
-        wwid.add_item(title.cap_first, section.cap_first, {:note => note})
+        wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
         raise "No content"
       end
     elsif args.length == 0 && STDIN.stat.size == 0
-      wwid.finish_last({:tags => ["done"], :count => 1, :section => options[:s], :archive => options[:a]})
+      wwid.tag_last({:tags => ["done"], :count => 1, :section => options[:s], :archive => options[:a], :back => date})
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
         title += " @done(#{Time.now.strftime('%F %R')})"
         section = options[:a] ? "Archive" : options[:s]
-        wwid.add_item(title.cap_first, section.cap_first, {:note => note})
+        wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
         title += " @done(#{Time.now.strftime('%F %R')})"
         section = options[:a] ? "Archive" : options[:s]
-        wwid.add_item(title.cap_first, section.cap_first, {:note => note})
+        wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
         raise "You must provide content when creating a new entry"
