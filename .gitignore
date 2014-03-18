@@ -2,3 +2,4 @@ pkg
 html
 *.taskpaper
 *.sublime*
+.rake_tasks~
