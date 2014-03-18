@@ -351,7 +351,7 @@ command :view do |c|
     if args.empty?
       title = wwid.choose_view
     else
-      title = args[0]
+      title = wwid.guess_view(args[0])
     end
     view = wwid.get_view(title)
     if view

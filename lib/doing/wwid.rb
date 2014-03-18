@@ -209,6 +209,21 @@ class WWID
     section.cap_first
   end
 
+  def guess_view(frag)
+    return frag if views.include?(frag)
+    view = false
+    frag = frag.split('').join(".*?")
+    views.each {|v|
+      if v =~ /#{frag}/i
+        $stderr.puts "Assuming you meant #{v}"
+        view = v
+        break
+      end
+    }
+    raise "Invalid view: #{frag}" unless view
+    view
+  end
+
   def add_item(title,section=nil,opt={})
     section ||= @current_section
     add_section(section) unless @content.has_key?(section)
