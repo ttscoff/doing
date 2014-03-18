@@ -415,11 +415,26 @@ desc 'Edit the configuration file'
 command :config do |c|
   c.desc 'Editor to use'
   c.default_value ENV['EDITOR']
-  c.flag [:e,:editor]
+  c.flag [:e,:editor], :default_value => nil
+
+  c.desc 'Application to use (OS X only)'
+  c.flag [:a]
+
+  c.desc 'Application bundle id to use (OS X only)'
+  c.flag [:b]
 
   c.action do |global_options,options,args|
-    raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
-    system %Q{#{options[:e]} "#{File.expand_path(DOING_CONFIG)}"}
+    if options[:a] || options[:b]
+      if options[:a]
+        %x{open -a "#{options[:a]}" "#{File.expand_path(DOING_CONFIG)}"}
+      elsif options[:b]
+        %x{open -b #{options[:b]} "#{File.expand_path(DOING_CONFIG)}"}
+      end
+    else
+      raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
+      editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
+      system %Q{#{editor} "#{File.expand_path(DOING_CONFIG)}"}
+    end
   end
 end
 
