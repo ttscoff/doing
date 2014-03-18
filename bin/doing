@@ -43,6 +43,7 @@ command :now do |c|
 
   c.action do |global_options,options,args|
     if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
+      raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
       input = ""
       input += args.join(" ") if args.length > 0
       input = wwid.fork_editor(input)
@@ -82,6 +83,7 @@ command :later do |c|
 
   c.action do |global_options,options,args|
     if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
+      raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
       input = ""
       input += args.join(" ") if args.length > 0
       input = wwid.fork_editor(input)
@@ -108,11 +110,12 @@ command :later do |c|
   end
 end
 
-desc 'Add a completed item with @done(date)'
+desc 'Add a completed item with @done(date). No argument finishes last entry.'
 arg_name 'entry'
 command :done do |c|
   c.desc 'Immediately archive the entry'
-  c.switch [:a,:archive], :negatable => true
+  c.default_value false
+  c.switch [:a,:archive], :negatable => false, :default_value => false
 
   c.desc 'Section'
   c.default_value wwid.current_section
@@ -127,7 +130,8 @@ command :done do |c|
   # c.flag [:a,:app]
 
   c.action do |global_options,options,args|
-    if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
+    if options[:e]
+      raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
       input = ""
       input += args.join(" ") if args.length > 0
       input = wwid.fork_editor(input)
@@ -140,6 +144,8 @@ command :done do |c|
       else
         raise "No content"
       end
+    elsif args.length == 0 && STDIN.stat.size == 0
+      wwid.finish_last({:tags => ["done"], :count => 1, :section => options[:s], :archive => options[:a]})
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
@@ -160,15 +166,76 @@ command :done do |c|
   end
 end
 
+desc 'Mark last X entries as @done'
+arg_name 'count'
+command :finish do |c|
+  c.desc 'Archive entries'
+  c.default_value false
+  c.switch [:a,:archive], :negatable => false, :default_value => false
+
+  c.desc 'Section'
+  c.default_value wwid.current_section
+  c.flag [:s,:section], :default_value => wwid.current_section
+
+  c.action do |global_options,options,args|
+    if args.length > 1
+      raise "Only one argument allowed"
+    elsif args.length == 0 || args[0] =~ /\d+/
+      count = args[0] ? args[0].to_i : 1
+      wwid.tag_last({:tags => ["done"], :count => count, :section => options[:s], :archive => options[:a]})
+    else
+      raise "Invalid argument (specify number of recent items to mark @done)"
+    end
+  end
+end
+
+desc 'Tag last entry'
+arg_name 'tag1 [tag2...]'
+command :tag do |c|
+  c.desc 'Section'
+  c.default_value wwid.current_section
+  c.flag [:s,:section], :default_value => wwid.current_section
+
+  c.desc 'How many recent entries to tag'
+  c.default_value 1
+  c.flag [:c,:count], :default_value => 1
+
+  c.desc 'Include current date/time with tag'
+  c.default_value false
+  c.switch [:d,:date], :negatable => false, :default_value => false
+
+  c.desc 'Remove given tag(s)'
+  c.default_value false
+  c.switch [:r,:remove], :negatable => false, :default_value => false
+
+  c.action do |global_options,options,args|
+    if args.length == 0
+      raise "You must specify at least one tag"
+    else
+      count = options[:c].to_i
+      if args.join("") =~ /,/
+        tags = args.join("").split(/,/)
+      else
+        tags = args.join(" ").split(" ") # in case tags are quoted as one arg
+      end
+
+      tags.map!{|tag| tag.sub(/^@/,'').strip }
+
+      wwid.tag_last({:tags => tags, :count => count, :section => options[:s], :date => options[:d], :remove => options[:r]})
+    end
+  end
+end
+
+
 desc 'List all entries'
 arg_name 'section'
 command :show do |c|
   c.action do |global_options,options,args|
     if args.length > 0
-      if wwid.sections.include? args.join(" ").cap_first
-        section = args.join(" ").cap_first
+      if wwid.sections.include? args[0].cap_first
+        section = args[0].cap_first
       else
-        raise "No such section: #{args.join(" ")}"
+        raise "No such section: #{args[0]}"
       end
     else
       section = wwid.current_section
@@ -241,10 +308,10 @@ end
 desc 'Display a user-created view'
 arg_name 'view_name'
 command :view do |c|
-  c.desc 'Section'
+  c.desc 'Section (override view settings)'
   c.flag [:s,:section]
 
-  c.desc 'Count to display'
+  c.desc 'Count to display (override view settings)'
   c.flag [:c,:count], :must_match => /^\d+$/, :type => Integer
 
   c.action do |global_options,options,args|
@@ -257,10 +324,20 @@ command :view do |c|
     if view
       template = view.has_key?('template') ? view['template'] : nil
       format = view.has_key?('date_format') ? view['date_format'] : nil
+      tag_filter = false
+      if view.has_key?('tags')
+        tag_filter = {'tags' => [], 'bool' => "OR"}
+        tag_filter['bool'] = view.has_key?('tags_bool') ? view['tags_bool'].upcase : "OR"
+        if view['tags'].class == Array
+          tag_filter['tags'] = view['tags'].map{|tag| tag.strip }
+        else
+          tag_filter['tags'] = view['tags'].split(" ").map{|tag| tag.strip }
+        end
+      end
       count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
       section = options[:s] ? options[:s].cap_first : view.has_key?('section') ? view['section'] : wwid.current_section
       order = view.has_key?('order') ? view['order'] : "asc"
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order })
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter })
     else
       raise "View #{title} not found in config"
     end
@@ -317,6 +394,7 @@ command :open do |c|
       elsif options[:b]
         system %Q{open -b "#{options[:b]}" "#{File.expand_path(wwid.doing_file)}"}
       elsif options[:e]
+        raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
         system %Q{$EDITOR "#{File.expand_path(wwid.doing_file)}"}
       else
         if wwid.config.has_key?('editor_app') && !wwid.config['editor_app'].nil?
@@ -338,6 +416,7 @@ command :config do |c|
   c.flag [:e,:editor]
 
   c.action do |global_options,options,args|
+    raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
     system %Q{#{options[:e]} "#{File.expand_path(DOING_CONFIG)}"}
   end
 end

@@ -205,6 +205,49 @@ class WWID
     @content[section]['items'].push(entry)
   end
 
+  def tag_last(opt={})
+    opt[:section] ||= @current_section
+    opt[:count] ||= 1
+    opt[:archive] ||= false
+    opt[:tags] ||= ["done"]
+    opt[:date] ||= false
+    opt[:remove] ||= false
+
+    if @content.has_key?(opt[:section])
+      # sort_section(opt[:section])
+      # items = @content[opt[:section]]['items'].sort_by{|item| item['date'] }.reverse
+
+      @content[opt[:section]]['items'].each_with_index {|item, i|
+        break if i == opt[:count]
+        title = item['title']
+        opt[:tags].each {|tag|
+          if opt[:remove]
+            title.gsub!(/ @#{tag}/,'')
+          else
+            unless title =~ /@#{tag}/
+              if tag == "done" || opt[:date]
+                title += " @#{tag}(#{Time.now.strftime('%F %R')})"
+              else
+                title += " @#{tag}"
+              end
+            end
+          end
+        }
+        @content[opt[:section]]['items'][i]['title'] = title
+      }
+
+      if opt[:archive] && opt[:section] != "Archive"
+        archived = @content[opt[:section]]['items'][0..opt[:count]-1]
+        @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
+        @content['Archive']['items'] = archived + @content['Archive']['items']
+      end
+
+      write(@doing_file)
+    else
+      raise "Section not found #{section}"
+    end
+  end
+
   def write(file=nil)
     if @other_content_top.empty?
       output = ""
@@ -266,6 +309,7 @@ class WWID
     opt[:template] ||= @default_template
     opt[:order] ||= "desc"
     opt[:today] ||= false
+    opt[:tag_filter] ||= false
 
     if opt[:section].nil?
       opt[:section] = @content[choose_section]
@@ -284,6 +328,24 @@ class WWID
     end
 
     items = opt[:section]['items'].sort_by{|item| item['date'] }
+
+    if opt[:tag_filter]
+      items.delete_if {|item|
+        if opt[:tag_filter]['bool'] == "AND"
+          score = 0
+          opt[:tag_filter]['tags'].each {|tag|
+            score += 1 if item['title'] =~ /@#{tag}/
+          }
+          score < opt[:tag_filter]['tags'].length
+        else
+          del = true
+          opt[:tag_filter]['tags'].each {|tag|
+            del = false if item['title'] =~ /@#{tag}/
+          }
+          del
+        end
+      }
+    end
 
     if opt[:today]
       items.delete_if {|item|
