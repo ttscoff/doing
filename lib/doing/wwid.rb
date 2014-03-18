@@ -194,6 +194,21 @@ class WWID
     @content[title.cap_first] = {'original' => "#{title}:", 'items' => []}
   end
 
+  def guess_section(frag)
+    return frag if sections.include?(frag.cap_first)
+    section = false
+    frag = frag.split('').join(".*?")
+    sections.each {|sect|
+      if sect =~ /#{frag}/i
+        $stderr.puts "Assuming you meant #{sect}"
+        section = sect
+        break
+      end
+    }
+    raise "Invalid section: #{frag}" unless section
+    section.cap_first
+  end
+
   def add_item(title,section=nil,opt={})
     section ||= @current_section
     add_section(section) unless @content.has_key?(section)
@@ -214,6 +229,8 @@ class WWID
     opt[:tags] ||= ["done"]
     opt[:date] ||= false
     opt[:remove] ||= false
+
+    opt[:section] = guess_section(opt[:section])
 
     if @content.has_key?(opt[:section])
       # sort_section(opt[:section])
@@ -246,7 +263,7 @@ class WWID
 
       write(@doing_file)
     else
-      raise "Section not found #{section}"
+      raise "Section not found"
     end
   end
 
@@ -317,17 +334,14 @@ class WWID
     if opt[:section].nil?
       opt[:section] = @content[choose_section]
     elsif opt[:section].class == String
-      if @content.has_key? opt[:section]
-        opt[:section] = @content[opt[:section]]
-      elsif opt[:section] =~ /all/i
+      if opt[:section] =~ /all/i
         combined = {'items' => []}
         @content.each {|k,v|
           combined['items'] += v['items']
         }
         opt[:section] = combined
       else
-        $stderr.puts "Section '#{opt[:section]}' not found"
-        return
+        opt[:section] = @content[guess_section(opt[:section])]
       end
     end
 
@@ -374,7 +388,7 @@ class WWID
       end
     end
 
-    if opt[:order] =~ /^asc/i
+    if opt[:order] =~ /^a/i
       items.reverse!
     end
 
@@ -439,7 +453,7 @@ class WWID
 
   def archive(section=nil,count=10)
     section = choose_section if section.nil? || section =~ /choose/i
-    section = section.cap_first
+    section = guess_section(section)
     if sections.include?(section)
       items = @content[section]['items']
       return if items.length < count
@@ -505,6 +519,7 @@ class WWID
   def recent(count=10,section=nil)
     cfg = @config['templates']['recent']
     section ||= @current_section
+    section = guess_section(section)
     list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc"})
   end
 

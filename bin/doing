@@ -256,7 +256,8 @@ command :show do |c|
         section = "All"
         tags.push(args[0].sub(/^@/,''))
       else
-        raise "No such section: #{args[0]}"
+        section = wwid.guess_section(args[0])
+        raise "No such section: #{args[0]}" unless section
       end
       if args.length > 1
         tags += args[1..-1].map{|tag| tag.sub(/^@/,'').strip}
