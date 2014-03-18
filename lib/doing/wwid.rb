@@ -41,13 +41,15 @@ class WWID
       'wrap_width' => 88
     }
     @config['views'] ||= {
-      'sample' => {
+      'done' => {
         'date_format' => '%_I:%M%P',
         'template' => '%date | %title%note',
         'wrap_width' => 0,
-        'section' => 'section_name',
-        'count' => 5,
-        'order' => "desc"
+        'section' => 'All',
+        'count' => 0,
+        'order' => 'desc',
+        'tags' => 'done complete cancelled',
+        'tags_bool' => 'OR'
       },
       'color' => {
           'date_format' => '%F %_I:%M%P',
@@ -316,6 +318,11 @@ class WWID
     elsif opt[:section].class == String
       if @content.has_key? opt[:section]
         opt[:section] = @content[opt[:section]]
+      elsif opt[:section] =~ /all/i
+        combined = {'items' => []}
+        @content.each {|k,v|
+          combined['items'] += v['items']
+        }
       else
         $stderr.puts "Section '#{opt[:section]}' not found"
         return
@@ -329,7 +336,7 @@ class WWID
 
     items = opt[:section]['items'].sort_by{|item| item['date'] }
 
-    if opt[:tag_filter]
+    if opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
       items.delete_if {|item|
         if opt[:tag_filter]['bool'] == "AND"
           score = 0

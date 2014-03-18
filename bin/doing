@@ -326,12 +326,14 @@ command :view do |c|
       format = view.has_key?('date_format') ? view['date_format'] : nil
       tag_filter = false
       if view.has_key?('tags')
-        tag_filter = {'tags' => [], 'bool' => "OR"}
-        tag_filter['bool'] = view.has_key?('tags_bool') ? view['tags_bool'].upcase : "OR"
-        if view['tags'].class == Array
-          tag_filter['tags'] = view['tags'].map{|tag| tag.strip }
-        else
-          tag_filter['tags'] = view['tags'].split(" ").map{|tag| tag.strip }
+        unless view['tags'].nil? || view['tags'].empty?
+          tag_filter = {'tags' => [], 'bool' => "OR"}
+          if view['tags'].class == Array
+            tag_filter['tags'] = view['tags'].map{|tag| tag.strip }
+          else
+            tag_filter['tags'] = view['tags'].split(" ").map{|tag| tag.strip }
+          end
+          tag_filter['bool'] = view.has_key?('tags_bool') && !view['tags_bool'].nil? ? view['tags_bool'].upcase : "OR"
         end
       end
       count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
