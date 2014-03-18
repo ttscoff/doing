@@ -228,19 +228,43 @@ end
 
 
 desc 'List all entries'
-arg_name 'section'
+arg_name 'section [tags]'
 command :show do |c|
+  c.desc 'Tag boolean (AND,OR,NONE)'
+  c.default_value "OR"
+  c.flag [:b,:boolean], :default_value => "OR"
+
+  c.desc 'Max count to show'
+  c.default_value 0
+  c.flag [:c,:count], :default_value => 0
+
+  c.desc 'Age (oldest/newest)'
+  c.default_value 'newest'
+  c.flag [:a,:age], :default_value => 'newest'
+
+  c.desc 'Sort order (asc/desc)'
+  c.default_value 'asc'
+  c.flag [:s,:sort], :default_value => 'asc'
+
   c.action do |global_options,options,args|
+    tag_filter = false
     if args.length > 0
-      if wwid.sections.include? args[0].cap_first
+      if args[0] =~ /all/i || wwid.sections.include?(args[0].cap_first)
         section = args[0].cap_first
       else
         raise "No such section: #{args[0]}"
       end
+      if args.length > 1
+        tag_filter = {
+          'tags' => args[1..-1].map{|tag| tag.sub(/^@/,'').strip },
+          'bool' => options[:b]
+        }
+      end
     else
       section = wwid.current_section
     end
-    puts wwid.list_section({:section => section, :count => 0})
+
+    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s]})
   end
 end
 

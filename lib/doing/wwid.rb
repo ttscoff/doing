@@ -309,6 +309,7 @@ class WWID
     opt[:section] ||= nil
     opt[:format] ||= @default_date_format
     opt[:template] ||= @default_template
+    opt[:age] ||= "newest"
     opt[:order] ||= "desc"
     opt[:today] ||= false
     opt[:tag_filter] ||= false
@@ -339,13 +340,19 @@ class WWID
 
     if opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
       items.delete_if {|item|
-        if opt[:tag_filter]['bool'] == "AND"
+        if opt[:tag_filter]['bool'] =~ /(AND|ALL)/
           score = 0
           opt[:tag_filter]['tags'].each {|tag|
             score += 1 if item['title'] =~ /@#{tag}/
           }
           score < opt[:tag_filter]['tags'].length
-        else
+        elsif opt[:tag_filter]['bool'] =~ /NONE/
+          del = false
+          opt[:tag_filter]['tags'].each {|tag|
+            del = true if item['title'] =~ /@#{tag}/
+          }
+          del
+        elsif opt[:tag_filter]['bool'] =~ /(OR|ANY)/
           del = true
           opt[:tag_filter]['tags'].each {|tag|
             del = false if item['title'] =~ /@#{tag}/
@@ -360,10 +367,16 @@ class WWID
         item['date'] < Date.today.to_time
       }.reverse!
     else
-      items = items.reverse[0..count]
+      if opt[:age] =~ /oldest/i
+        items = items[0..count]
+      else
+        items = items.reverse[0..count]
+      end
     end
 
-    items.reverse! if opt[:order] =~ /^asc/i
+    if opt[:order] =~ /^asc/i
+      items.reverse!
+    end
 
     out = ""
 
