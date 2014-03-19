@@ -13,7 +13,7 @@ class WWID
 
   def initialize(input=nil)
     @content = {}
-
+    @timers = {}
     @config = read_config
 
     @config['doing_file'] ||= "~/what_was_i_doing.md"
@@ -380,6 +380,7 @@ class WWID
     opt[:today] ||= false
     opt[:tag_filter] ||= false
     opt[:tags_color] ||= false
+    opt[:times] ||= false
 
     if opt[:section].nil?
       opt[:section] = @content[choose_section]
@@ -481,6 +482,13 @@ class WWID
         end
 
         output.sub!(/%date/,item['date'].strftime(opt[:format]))
+
+        if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+          interval = get_interval(item)
+        end
+        interval ||= ""
+        output.sub!(/%interval/,interval)
+
         output.sub!(/%shortdate/) {
           if item['date'] > Date.today.to_time
             item['date'].strftime('%_I:%M%P')
@@ -597,7 +605,60 @@ class WWID
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template']})
   end
 
+  def tag_times
+    output = []
+    max = 0
+
+    @timers.each {|k,v|
+      output.push("#{k}: #{"%02d:%02d:%02d" % fmt_time(v)}")
+    }
+    output.join("\n")
+  end
+
+  private
+
+  def get_interval(item)
+    done = nil
+    start = nil
+
+    if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
+      done = Time.parse($1)
+    else
+      return nil
+    end
+
+    if item['title'] =~ /@start\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
+      start = Time.parse($1)
+    else
+      start = item['date']
+    end
+
+    seconds = (done - start).to_i
+
+    item['title'].scan(/ @(\S+?)(\(.*?\)| |$)/).each {|m|
+      next if m[0] == "done"
+      if @timers.has_key?(m[0])
+        @timers[m[0]] += seconds
+      else
+        @timers[m[0]] = seconds
+      end
+    }
+
+    "%02d:%02d:%02d" % fmt_time(seconds)
+  end
+
+  def fmt_time(seconds)
+    minutes =  (seconds / 60).to_i
+    hours = (minutes / 60).to_i
+    days = (hours / 24).to_i
+    hours = (hours % 60).to_i
+    minutes = (minutes % 60).to_i
+    [days, hours, minutes]
+  end
 end
+
+
+
 
 # infile = "~/Dropbox/nvALT2.2/?? What was I doing.md"
 

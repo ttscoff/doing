@@ -287,8 +287,12 @@ command :show do |c|
   c.flag [:s,:sort], :default_value => 'asc'
 
   c.desc 'Output to csv'
-  c.default_value 'false'
+  c.default_value false
   c.switch [:csv], :default_value => false, :negatable => false
+
+  c.desc 'Show time intervals on @done tasks'
+  c.default_value false
+  c.switch [:t,:times], :default_value => false
 
   c.action do |global_options,options,args|
     tag_filter = false
@@ -317,7 +321,13 @@ command :show do |c|
       }
     end
 
-    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :csv => options[:csv]})
+    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :csv => options[:csv], :times => options[:t]})
+
+    if options[:t]
+      puts
+      puts "------- Totals -------"
+      puts wwid.tag_times
+    end
   end
 end
 
