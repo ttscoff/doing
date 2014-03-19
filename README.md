@@ -109,8 +109,9 @@ The config also contains templates for various command outputs. Include placehol
 - `%hr`: a horizontal rule (`-`) the width of the terminal
 - `%hr_under`: a horizontal rule (`_`) the width of the terminal
 - `%[color]`: color can be black, red, green, blue, yellow, magenta, cyan or white
-  - you can prefix "bg" to affect background colors (%bgyellow)
-  - prefix "bold" and "boldbg" for strong colors (%boldgreen, %boldbgblue)
+    - you can prefix "bg" to affect background colors (%bgyellow)
+    - prefix "bold" and "boldbg" for strong colors (%boldgreen, %boldbgblue)
+- `%interval`: when used with the `-t` switch on the `show` command, it will display the time between a timestamp or `@start(date)` tag and the `@done(date)` tag, if it exists. Otherwise, it will remain empty.
 
 Date formats are based on Ruby [strftime](http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime) formatting.
 
@@ -292,6 +293,8 @@ All of these commands accept a `-e` argument. This opens your command line edito
 You can filter the `show` command by tags. Simply list them after the section name (or "all"). The boolean defaults to "ANY," meaning any entry that contains any of the listed tags will be shown. You can use `-b ALL` or `-b NONE` to change the filtering behavior: `doing show all done cancelled -b NONE` will show all tasks from all sections that do not have either "@done" or "@cancelled" tags.
 
 Use `-c X` to limit the displayed results. Combine it with `-a newest` or `-a oldest` to choose which chronological end it trims from. You can also set the sort order of the output with `-s asc` or `-s desc`.
+
+The `show` command can also show the time spent on a task if it has a `@done(date)` tag with the `-t` option. This requires that you include a `%interval` token in template -> default in the config. You can also include `@start(date)` tags, which override the timestamp when calculating the intervals.
 
 If you have a use for it, you can use `--csv` on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: `doing show all done --csv > ~/Desktop/done.csv`.
 

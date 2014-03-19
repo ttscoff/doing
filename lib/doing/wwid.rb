@@ -607,10 +607,15 @@ class WWID
 
   def tag_times
     output = []
-    max = 0
 
-    @timers.each {|k,v|
-      output.push("#{k}: #{"%02d:%02d:%02d" % fmt_time(v)}")
+    max = @timers.keys.sort_by {|k| k.length }.reverse[0].length + 1
+
+    @timers.sort_by{|k,v| v }.reverse.each {|k,v|
+      spacer = ""
+      (max - k.length).times do
+        spacer += " "
+      end
+      output.push("#{k}:#{spacer}#{"%02d:%02d:%02d" % fmt_time(v)}")
     }
     output.join("\n")
   end
