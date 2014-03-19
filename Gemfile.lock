@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    doing (0.2.3.pre)
+    doing (0.2.3)
       chronic (~> 0.10, >= 0.10.2)
       gli (= 2.9.0)
 

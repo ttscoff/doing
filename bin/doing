@@ -294,6 +294,10 @@ command :show do |c|
   c.default_value false
   c.switch [:t,:times], :default_value => false
 
+  c.desc 'Show intervals with totals at the end of output'
+  c.default_value false
+  c.switch [:totals], :default_value => false, :negatable => true
+
   c.action do |global_options,options,args|
     tag_filter = false
     tags = []
@@ -321,13 +325,12 @@ command :show do |c|
       }
     end
 
+    options[:t] = true if options[:totals]
+
     puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :csv => options[:csv], :times => options[:t]})
 
-    if options[:t]
-      puts
-      puts "------- Totals -------"
-      puts wwid.tag_times
-    end
+    puts wwid.tag_times if options[:totals]
+
   end
 end
 
@@ -355,8 +358,21 @@ end
 
 desc 'List entries from today'
 command :today do |c|
+  c.desc 'Show time intervals on @done tasks'
+  c.default_value false
+  c.switch [:t,:times], :default_value => false
+
+  c.desc 'Show time totals at the end of output'
+  c.default_value false
+  c.switch [:totals], :default_value => false, :negatable => true
+
   c.action do |global_options,options,args|
-    puts wwid.today.strip
+
+    options[:t] = true if options[:totals]
+
+    puts wwid.today(options[:t]).strip
+
+    puts wwid.tag_times if options[:totals]
   end
 end
 
@@ -408,6 +424,14 @@ command :view do |c|
   c.default_value 'false'
   c.switch [:csv], :default_value => false, :negatable => false
 
+  c.desc 'Show time intervals on @done tasks'
+  c.default_value false
+  c.switch [:t,:times], :default_value => false
+
+  c.desc 'Show intervals with totals at the end of output'
+  c.default_value false
+  c.switch [:totals], :default_value => false, :negatable => true
+
   c.action do |global_options,options,args|
     if args.empty?
       title = wwid.choose_view
@@ -439,7 +463,11 @@ command :view do |c|
       count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
       section = options[:s] ? section : view.has_key?('section') ? view['section'] : wwid.current_section
       order = view.has_key?('order') ? view['order'] : "asc"
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :csv => options[:csv], :tags_color => tags_color })
+      options[:t] = true if options[:totals]
+
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :csv => options[:csv], :tags_color => tags_color, :times => options[:t] })
+
+      puts wwid.tag_times if options[:totals]
     else
       raise "View #{title} not found in config"
     end

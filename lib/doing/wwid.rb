@@ -27,7 +27,7 @@ class WWID
     }
     @config['templates']['today'] ||= {
       'date_format' => '%_I:%M%P',
-      'template' => '%date: %title%note',
+      'template' => '%date: %title %interval%note',
       'wrap_width' => 0
     }
     @config['templates']['last'] ||= {
@@ -588,9 +588,9 @@ class WWID
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => order})
   end
 
-  def today
+  def today(times=false)
     cfg = @config['templates']['today']
-    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true})
+    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times})
   end
 
   def recent(count=10,section=nil)
@@ -607,8 +607,10 @@ class WWID
 
   def tag_times
     output = []
-
+    return "" if @timers.length == 0
     max = @timers.keys.sort_by {|k| k.length }.reverse[0].length + 1
+
+    total = @timers.delete("All")
 
     @timers.sort_by{|k,v| v }.reverse.each {|k,v|
       spacer = ""
@@ -617,7 +619,7 @@ class WWID
       end
       output.push("#{k}:#{spacer}#{"%02d:%02d:%02d" % fmt_time(v)}")
     }
-    output.join("\n")
+    output.empty? ? "" : "\n--- Tag Totals ---\n" + output.join("\n") + "\n\nTotal tracked: #{"%02d:%02d:%02d" % fmt_time(total)}\n"
   end
 
   private
@@ -640,12 +642,12 @@ class WWID
 
     seconds = (done - start).to_i
 
-    item['title'].scan(/ @(\S+?)(\(.*?\)| |$)/).each {|m|
-      next if m[0] == "done"
-      if @timers.has_key?(m[0])
-        @timers[m[0]] += seconds
+    item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each {|m|
+      k = m[0] == "done" ? "All" : m[0]
+      if @timers.has_key?(k)
+        @timers[k] += seconds
       else
-        @timers[m[0]] = seconds
+        @timers[k] = seconds
       end
     }
 
