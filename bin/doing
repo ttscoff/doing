@@ -140,7 +140,7 @@ command :done do |c|
   c.switch [:a,:archive], :negatable => false, :default_value => false
 
   c.desc 'Backdate to "date_string" (natural language)'
-  c.flag [:backdate]
+  c.flag [:back]
 
   c.desc 'Section'
   c.default_value wwid.current_section
