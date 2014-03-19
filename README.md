@@ -20,6 +20,8 @@ _Side note:_ I actually use the library behind this utility as part of another s
 
 Only use `sudo` if your environment requires it. If you're using the system Ruby on a Mac, for example, it will likely be necessary. If `gem install doing` fails, then run `sudo gem install doing` and provide your administrator password.
 
+Run `doing config` to open your `~/.doingrc` file in the editor defined in the $EDITOR environment variable. Set up your `doing_file` right away (where you want entries to be stored), and cover the rest after you've read the docs.
+
 See the [support](#support) section below for troubleshooting details.
 
 ## The "doing" file
@@ -28,7 +30,9 @@ The file that stores all of your entries is generated the first time you add an 
 
 The format of the "doing" file is TaskPaper-compatible. You can edit it by hand at any time (in TaskPaper or any text editor), but it uses a specific format for parsing, so be sure to maintain the dates and pipe characters. 
 
-Notes are anything in the list without a leading hyphen and date. They belong to the entry directly before them, and they should be indented one level beyond the parent item. The `now` and `later` commands don't currently make it possible to add notes at the time of entry creation, but I have scripts that do it and will incorporate them soon.
+Notes are anything in the list without a leading hyphen and date. They belong to the entry directly before them, and they should be indented one level beyond the parent item. When using the `now` and `later` commands on the command line, you can start the entry with a quote and hit return, then type the note and close the quote. Anything after the first line will be turned into a TaskPaper-compatible note for the task and can be displayed in templates using `%note`.
+
+Notes can be prevented from ever appearing in output with the global option `--no-notes`: `doing --no-notes show all`.
 
 ## Configuration
 
@@ -87,7 +91,7 @@ You can rename the section that holds your current tasks. By default, this is "C
 
 The setting `editor_app` only applies to Mac OS X users. It's the default application that the command `doing open` will open your WWID file in. If this is blank, it will be opened by whatever the system default is, or you can use `-a app_name` or `-b bundle_id` to override.
 
-In the case of the `doing now -e` command, your $EDITOR environment variable will be used to complete the entry text and notes. Set it in your .bash_profile or whatever is appropriate for your system:
+In the case of the `doing now -e` command, your $EDITOR environment variable will be used to complete the entry text and notes. Set it in your `~/.bash_profile` or whatever is appropriate for your system:
 
     export EDITOR="mate -w"
 
