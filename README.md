@@ -39,6 +39,14 @@ A basic configuration looks like this:
     current_section: Currently
     default_template: '%date: %title%note'
     default_date_format: '%Y-%m-%d %H:%M'
+    views:
+      color:
+        date_format: '%F %_I:%M%P'
+        section: Currently
+        count: 10
+        wrap_width: 0
+        template: '%boldblack%date %boldgreen| %boldwhite%title%default%note'
+        order: desc
     templates:
       default:
         date_format: '%Y-%m-%d %H:%M'
@@ -184,7 +192,10 @@ You can create your own "views" in the `~/.doingrc` file and view them with `doi
         count: 5
         wrap_width: 0
         date_format: '%F %_I:%M%P'
-        template: '%date | %title%note' 
+        template: '%date | %title%note'
+        order: asc
+        tags: done finished cancelled
+        tags_bool: ANY
 
 You can add additional custom views, just nest them under the "views" key (indented two spaces from the edge). Multiple views would look like this:
 
@@ -202,9 +213,13 @@ You can add additional custom views, just nest them under the "views" key (inden
         date_format: '%F %_I:%M%P'
         template: '%date | %title%note' 
 
-The "section" key is the default section to pull entries from. Count and section can be overridden at runtime with the `-c` and `-s` flags.
+The "section" key is the default section to pull entries from. Count and section can be overridden at runtime with the `-c` and `-s` flags. Setting `section` to All will combine all sections in the output.
 
-You can add new sections with `done add_section section_name`. You can also create them on the fly by using the `-s section_name` flag when running `doing now`. For example, `doing now -s Misc just a random side note` would create the "just a random side note" entry in a new section called "Misc."
+You can add new sections with `doing add_section section_name`. You can also create them on the fly by using the `-s section_name` flag when running `doing now`. For example, `doing now -s Misc just a random side note` would create the "just a random side note" entry in a new section called "Misc," if Misc didn't already exist.
+
+The `tags` and `tags_bool` keys allow you to specify tags that the view is filtered by. You can list multiple tags separated by spaces, and then use `tags_bool` to specify "ALL," "ANY," or "NONE" to determine how it handles the multiple tags.
+
+The `order` key defines the sort order of the output. This is applied _after_ the tasks are retrieved and cut off at the maximum number specified in `count`.
 
 Regarding colors, you can use them to create very nice displays if you're outputting to a color terminal. Example:
 
@@ -231,13 +246,35 @@ Outputs:
 
 ### Commands:
 
-    help     - Shows a list of commands or help for one command (`doing help now`)
+    help           - Shows a list of commands and global options
+    help [command] - Shows help for any command (`doing help now`)
 
 #### Adding entries:
 
     now      - Add an entry
     later    - Add an item to the Later section
-    done     - Add an entry tagged with @done(YYYY-mm-dd hh:mm)
+    done     - Add a completed item with @done(date). No argument finishes last entry.
+
+The `doing now` command can accept `-s section_name` to send the new entry straight to a non-default section. 
+
+`doing done` is used to add an entry that you've already completed. Like `now`, you can specify a section with `-s section_name`. You can also skip straight to Archive with `-a`.
+
+You can also backdate entries using natural language with `--back 15m` or `--back "3/15 3pm"`. That will modify the timestamp of the entry. When used with `doing done`, this allows time intervals to be accurately counted when entering items after the fact.
+
+All of these commands accept a `-e` argument. This opens your command line editor as defined in the environment variable `$EDITOR`. Add your entry, save the temp file and close it, and the new entry will be added. Anything after the first line is included as a note on the entry.
+
+#### Modifying entries:
+
+    finish      - Mark last X entries as @done
+    tag         - Tag last entry
+
+`doing finish` by itself is the same as `doing done` by itself. It adds `@done(timestamp)` to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add `-a` to also archive the affected entries.
+
+`tag` adds one or more tags to the last entry, or specify a count with `-c X`. Tags are specified as basic arguments, separated by spaces. For example:
+
+    doing tag -c 3 client cancelled
+
+... will mark the last three entries as "@client @cancelled." Add `-r` as a switch to remove the listed tags instead.
 
 #### Displaying entries:
 
@@ -246,14 +283,31 @@ Outputs:
     today    - List entries from today
     last     - Show the last entry
 
+`doing show` on its own will list all entries in the "Currently" section. Add a section name as an argument to display that section instead. Use "all" to display all entries from all sections.
+
+You can filter the `show` command by tags. Simply list them after the section name (or "all"). The boolean defaults to "ANY," meaning any entry that contains any of the listed tags will be shown. You can use `-b ALL` or `-b NONE` to change the filtering behavior: `doing show all done cancelled -b NONE` will show all tasks from all sections that do not have either "@done" or "@cancelled" tags.
+
+Use `-c X` to limit the displayed results. Combine it with `-a newest` or `-a oldest` to choose which chronological end it trims from. You can also set the sort order of the output with `-s asc` or `-s desc`.
+
+If you have a use for it, you can use `--csv` on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: `doing show all done --csv > ~/Desktop/done.csv`.
+
+#### Views
+
+    view     - Display a user-created view
+    views    - List available custom views
+
+Display any of the custom views you make in `~/.doingrc` with the `view` command. Use `doing views` to get a list of available views. Any time a section or view is specified on the command line, fuzzy matching will be used to find the closest match. Thus, `lat` will match `Later`, etc..
+
 #### Sections
 
-    sections - List sections
-    choose   - Select a section to display from a menu
+    sections    - List sections
+    choose      - Select a section to display from a menu
+    add_section - Add a new section to the "doing" file
 
 #### Utilities
 
     archive  - Move all but the most recent 5 entries to the Archive section
+    open     - Open the "doing" file in an editor (OS X)
     config   - Edit the default configuration
 
 ---
