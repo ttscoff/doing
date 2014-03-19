@@ -214,7 +214,7 @@ class WWID
   end
 
   def guess_section(frag)
-    return frag if sections.include?(frag.cap_first)
+    sections.each {|section| return section if frag.downcase == section.downcase}
     section = false
     re = frag.split('').join(".*?")
     sections.each {|sect|
@@ -236,7 +236,7 @@ class WWID
   end
 
   def guess_view(frag)
-    return frag if views.include?(frag)
+    views.each {|view| return view if frag.downcase == view.downcase}
     view = false
     re = frag.split('').join(".*?")
     views.each {|v|
@@ -383,7 +383,7 @@ class WWID
     if opt[:section].nil?
       opt[:section] = @content[choose_section]
     elsif opt[:section].class == String
-      if opt[:section] =~ /all/i
+      if opt[:section] =~ /^all$/i
         combined = {'items' => []}
         @content.each {|k,v|
           combined['items'] += v['items']

@@ -294,8 +294,8 @@ command :show do |c|
     tag_filter = false
     tags = []
     if args.length > 0
-      if args[0] =~ /all/i || wwid.sections.include?(args[0].cap_first)
-        section = args[0].cap_first
+      if args[0] =~ /^all$/i
+        section = "All"
       elsif args[0] =~ /^@/
         section = "All"
         tags.push(args[0].sub(/^@/,''))
