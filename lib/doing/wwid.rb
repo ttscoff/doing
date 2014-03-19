@@ -91,7 +91,7 @@ class WWID
 
     lines.each {|line|
       next if line =~ /^\s*$/
-      if line =~ /^(\w[\w ]+):\s*(@\S+\s*)*$/
+      if line =~ /^(\S[\S ]+):\s*(@\S+\s*)*$/
         section = $1
         @content[section] = {}
         @content[section]['original'] = line
