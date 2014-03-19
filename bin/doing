@@ -381,6 +381,10 @@ command :view do |c|
   c.desc 'Count to display (override view settings)'
   c.flag [:c,:count], :must_match => /^\d+$/, :type => Integer
 
+  c.desc 'Output to csv'
+  c.default_value 'false'
+  c.switch [:csv], :default_value => false, :negatable => false
+
   c.action do |global_options,options,args|
     if args.empty?
       title = wwid.choose_view
@@ -406,7 +410,7 @@ command :view do |c|
       count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
       section = options[:s] ? options[:s].cap_first : view.has_key?('section') ? view['section'] : wwid.current_section
       order = view.has_key?('order') ? view['order'] : "asc"
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter })
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :csv => options[:csv] })
     else
       raise "View #{title} not found in config"
     end
