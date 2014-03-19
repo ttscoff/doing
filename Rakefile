@@ -43,8 +43,14 @@ Rake::TestTask.new do |t|
 end
 
 desc 'Install the gem in the current ruby'
-task :install do |t|
-  sh "gem install pkg/*.gem"
+task :install, :all do |t, args|
+  args.with_defaults(:all => false)
+  if args[:all]
+    sh "rvm all do gem install pkg/*.gem"
+    sh "sudo gem intsall pkg/*.gem"
+  else
+    sh "gem install pkg/*.gem"
+  end
 end
 
 desc 'Development version check'
@@ -57,10 +63,11 @@ task :bump, :type do |t, args|
   args.with_defaults(:type => "inc")
   version_file = "lib/doing/version.rb"
   content = IO.read(version_file)
-  content.sub!(/VERSION = '(\d+)\.(\d+)\.(\d+)'/) {|m|
+  content.sub!(/VERSION = '(\d+)\.(\d+)\.(\d+)(\.\S+)?'/) {|m|
     major = $1.to_i
     minor = $2.to_i
     inc = $3.to_i
+    pre = $4
 
     case args[:type]
     when /^maj/
@@ -74,7 +81,7 @@ task :bump, :type do |t, args|
       inc += 1
     end
 
-    $stdout.puts "At version #{major}.#{minor}.#{inc}"
+    $stdout.puts "At version #{major}.#{minor}.#{inc}#{pre}"
     "VERSION = '#{major}.#{minor}.#{inc}'"
   }
   File.open(version_file, 'w+') {|f|
