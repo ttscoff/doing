@@ -325,6 +325,29 @@ Display any of the custom views you make in `~/.doingrc` with the `view` command
 
 Add basic command line completion for Bash with [this gist](https://gist.github.com/fcrespo82/9609318).
 
+### Launchbar
+
+The previous incarnation of `doing` had a [LaunchBar](http://obdev.at/launchbar/) action that I used frequently. The Day One popup has mostly replaced that for me, but only because I have a system that connects it to my WWID file. However, I've still found a place for adding WWID entries without including them in my journal, and LaunchBar is the perfect way to do that for me.
+
+All you need is an AppleScript saved at "~/Library/Application Support/LaunchBar/Actions/Doing.scpt". It should look like this:
+
+
+    on handle_string(message)
+        -- get the input from LaunchBar
+        if message is "?" then
+            -- if the input is just "?" display the last three entries
+            set _doing to do shell script "/usr/bin/doing recent 3"
+            tell application "LaunchBar" to display in large type _doing
+        else
+            -- otherwise, create a new entry using the input
+            do shell script "/usr/bin/doing now " & quoted form of message
+        end if
+        
+    end handle_string
+
+
+Evan Lovely has [converted this to an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
+
 ## Troubleshooting
 
 ### Errors after "Successfully installed..."
