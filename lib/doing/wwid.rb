@@ -379,6 +379,7 @@ class WWID
     opt[:order] ||= "desc"
     opt[:today] ||= false
     opt[:tag_filter] ||= false
+    opt[:tags_color] ||= false
 
     if opt[:section].nil?
       opt[:section] = @content[choose_section]
@@ -470,6 +471,7 @@ class WWID
           note = ""
         end
         output = opt[:template].dup
+
         output.gsub!(/%[a-z]+/) do |m|
           if colors.has_key?(m.sub(/^%/,''))
             colors[m.sub(/^%/,'')]
@@ -477,6 +479,7 @@ class WWID
             m
           end
         end
+
         output.sub!(/%date/,item['date'].strftime(opt[:format]))
         output.sub!(/%shortdate/) {
           if item['date'] > Date.today.to_time
@@ -496,6 +499,9 @@ class WWID
             item['title'].strip
           end
         }
+        if opt[:tags_color]
+          output.gsub!(/\s(@\S+(?:\(.*?\))?)/," #{colors[opt[:tags_color]]}\\1")
+        end
         output.sub!(/%note/,note)
         output.sub!(/%odnote/,note.gsub(/\t\t/,"\t"))
         output.gsub!(/%hr(_under)?/) do |m|
