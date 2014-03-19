@@ -443,59 +443,73 @@ class WWID
 
     out = ""
 
-    items.each {|item|
-      if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
-        note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t" + line.sub(/^\t\t/,'') }
-        if opt[:wrap_width] && opt[:wrap_width] > 0
-          width = opt[:wrap_width]
-          note_lines.map! {|line|
-            line.strip.gsub(/(.{1,#{width}})(\s+|\Z)/, "\t\\1\n")
-          }
-        end
-        note = "\n#{note_lines.join("\n").chomp}"
-      else
+    if opt[:csv]
+      output = [['date','title','note'].to_csv]
+      items.each {|i|
         note = ""
-      end
-      output = opt[:template].dup
-      output.gsub!(/%[a-z]+/) do |m|
-        if colors.has_key?(m.sub(/^%/,''))
-          colors[m.sub(/^%/,'')]
-        else
-          m
+        if i['note']
+          arr = i['note'].map{|line| line.strip}.delete_if{|e| e =~ /^\s*$/}
+          note = arr.join("\n") unless arr.nil?
         end
-      end
-      output.sub!(/%date/,item['date'].strftime(opt[:format]))
-      output.sub!(/%shortdate/) {
-        if item['date'] > Date.today.to_time
-          item['date'].strftime('%_I:%M%P')
-        elsif item['date'] > (Date.today - 7).to_time
-          item['date'].strftime('%a %-I:%M%P')
-        elsif item['date'].year == Date.today.year
-          item['date'].strftime('%b %d, %-I:%M%P')
-        else
-          item['date'].strftime('%b %d %Y, %-I:%M%P')
-        end
+        output.push([i['date'],i['title'],note].to_csv)
       }
-      output.sub!(/%title/) {|m|
-        if opt[:wrap_width] && opt[:wrap_width] > 0
-          item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").strip
+      out = output.join()
+    else
+
+      items.each {|item|
+        if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
+          note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t" + line.sub(/^\t\t/,'') }
+          if opt[:wrap_width] && opt[:wrap_width] > 0
+            width = opt[:wrap_width]
+            note_lines.map! {|line|
+              line.strip.gsub(/(.{1,#{width}})(\s+|\Z)/, "\t\\1\n")
+            }
+          end
+          note = "\n#{note_lines.join("\n").chomp}"
         else
-          item['title'].strip
+          note = ""
         end
-      }
-      output.sub!(/%note/,note)
-      output.sub!(/%odnote/,note.gsub(/\t\t/,"\t"))
-      output.gsub!(/%hr(_under)?/) do |m|
-        o = ""
-        `tput cols`.to_i.times do
-          o += $1.nil? ? "-" : "_"
+        output = opt[:template].dup
+        output.gsub!(/%[a-z]+/) do |m|
+          if colors.has_key?(m.sub(/^%/,''))
+            colors[m.sub(/^%/,'')]
+          else
+            m
+          end
         end
-        o
-      end
+        output.sub!(/%date/,item['date'].strftime(opt[:format]))
+        output.sub!(/%shortdate/) {
+          if item['date'] > Date.today.to_time
+            item['date'].strftime('%_I:%M%P')
+          elsif item['date'] > (Date.today - 7).to_time
+            item['date'].strftime('%a %-I:%M%P')
+          elsif item['date'].year == Date.today.year
+            item['date'].strftime('%b %d, %-I:%M%P')
+          else
+            item['date'].strftime('%b %d %Y, %-I:%M%P')
+          end
+        }
+        output.sub!(/%title/) {|m|
+          if opt[:wrap_width] && opt[:wrap_width] > 0
+            item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").strip
+          else
+            item['title'].strip
+          end
+        }
+        output.sub!(/%note/,note)
+        output.sub!(/%odnote/,note.gsub(/\t\t/,"\t"))
+        output.gsub!(/%hr(_under)?/) do |m|
+          o = ""
+          `tput cols`.to_i.times do
+            o += $1.nil? ? "-" : "_"
+          end
+          o
+        end
 
 
-      out += output + "\n"
-    }
+        out += output + "\n"
+      }
+    end
 
     return out
   end

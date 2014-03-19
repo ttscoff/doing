@@ -276,6 +276,10 @@ command :show do |c|
   c.default_value 'asc'
   c.flag [:s,:sort], :default_value => 'asc'
 
+  c.desc 'Output to csv'
+  c.default_value 'false'
+  c.switch [:csv], :default_value => false, :negatable => false
+
   c.action do |global_options,options,args|
     tag_filter = false
     tags = []
@@ -303,7 +307,7 @@ command :show do |c|
       }
     end
 
-    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s]})
+    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :csv => options[:csv]})
   end
 end
 
