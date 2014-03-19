@@ -31,7 +31,7 @@ command :now do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
   c.default_value wwid.current_section
-  c.flag [:s,:section]
+  c.flag [:s,:section], :default_value => wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch [:e,:editor]
@@ -52,6 +52,8 @@ command :now do |c|
       date = Time.now
     end
 
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
     if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
       input = ""
@@ -59,7 +61,7 @@ command :now do |c|
       input = wwid.fork_editor(input)
       if input
         title, note = wwid.format_input(input)
-        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note, :back => date})
+        wwid.add_item(title.cap_first, section, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
         raise "No content"
@@ -67,11 +69,11 @@ command :now do |c|
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
-        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note, :back => date})
+        wwid.add_item(title.cap_first, section, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
-        wwid.add_item(title.cap_first, options[:s].cap_first, {:note => note, :back => date})
+        wwid.add_item(title.cap_first, section, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
         raise "You must provide content when creating a new entry"
@@ -160,6 +162,8 @@ command :done do |c|
       date = Time.now
     end
 
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
     if options[:e]
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
       input = ""
@@ -168,25 +172,25 @@ command :done do |c|
       if input
         title, note = wwid.format_input(input)
         title += " @done(#{Time.now.strftime('%F %R')})"
-        section = options[:a] ? "Archive" : options[:s]
+        section = "Archive" if options[:a]
         wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
         raise "No content"
       end
     elsif args.length == 0 && STDIN.stat.size == 0
-      wwid.tag_last({:tags => ["done"], :count => 1, :section => options[:s], :archive => options[:a], :back => date})
+      wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => date})
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
         title += " @done(#{Time.now.strftime('%F %R')})"
-        section = options[:a] ? "Archive" : options[:s]
+        section = "Archive" if options[:a]
         wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
         title += " @done(#{Time.now.strftime('%F %R')})"
-        section = options[:a] ? "Archive" : options[:s]
+        section = options[:a] ? "Archive" : section
         wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
@@ -208,11 +212,14 @@ command :finish do |c|
   c.flag [:s,:section], :default_value => wwid.current_section
 
   c.action do |global_options,options,args|
+
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
     if args.length > 1
       raise "Only one argument allowed"
     elsif args.length == 0 || args[0] =~ /\d+/
       count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({:tags => ["done"], :count => count, :section => options[:s], :archive => options[:a]})
+      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a]})
     else
       raise "Invalid argument (specify number of recent items to mark @done)"
     end
@@ -242,6 +249,9 @@ command :tag do |c|
     if args.length == 0
       raise "You must specify at least one tag"
     else
+
+      section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
       count = options[:c].to_i
       if args.join("") =~ /,/
         tags = args.join("").split(/,/)
@@ -251,7 +261,7 @@ command :tag do |c|
 
       tags.map!{|tag| tag.sub(/^@/,'').strip }
 
-      wwid.tag_last({:tags => tags, :count => count, :section => options[:s], :date => options[:d], :remove => options[:r]})
+      wwid.tag_last({:tags => tags, :count => count, :section => section, :date => options[:d], :remove => options[:r]})
     end
   end
 end
@@ -317,15 +327,18 @@ arg_name 'count'
 command :recent do |c|
   c.desc 'Section'
   c.default_value wwid.current_section
-  c.flag [:s,:section]
+  c.flag [:s,:section], :default_value => wwid.current_section
   c.action do |global_options,options,args|
+
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
     unless global_options[:version]
       if args.length > 0
         count = args[0].to_i
       else
         count = 10
       end
-      puts wwid.recent(count,options[:s].cap_first)
+      puts wwid.recent(count,section.cap_first)
     end
   end
 end
@@ -391,6 +404,11 @@ command :view do |c|
     else
       title = wwid.guess_view(args[0])
     end
+
+    if options[:s]
+      section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    end
+
     view = wwid.get_view(title)
     if view
       template = view.has_key?('template') ? view['template'] : nil
@@ -408,7 +426,7 @@ command :view do |c|
         end
       end
       count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
-      section = options[:s] ? options[:s].cap_first : view.has_key?('section') ? view['section'] : wwid.current_section
+      section = options[:s] ? section : view.has_key?('section') ? view['section'] : wwid.current_section
       order = view.has_key?('order') ? view['order'] : "asc"
       puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :csv => options[:csv] })
     else
