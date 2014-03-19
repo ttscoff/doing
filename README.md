@@ -313,9 +313,32 @@ Display any of the custom views you make in `~/.doingrc` with the `view` command
 
 #### Utilities
 
-    archive  - Move all but the most recent 5 entries to the Archive section
+    archive  - Move entries between sections
     open     - Open the "doing" file in an editor (OS X)
     config   - Edit the default configuration
+
+#### Archiving
+
+    COMMAND OPTIONS
+        -k, --keep=arg - Count to keep (ignored if archiving by tag) (default: 5)
+        -t, --to=arg   - Move entries to (default: Archive)
+        -b, --bool=arg - Tag boolean (default: AND)
+
+The `archive` command will move entries from one section (default: Currently) to another section (default: Archive). 
+
+`doing archive` on its own will move all but the most recent 5 entries from currently into the archive.
+
+`doing archive other_section` will archive from "other_section" to Archive.
+
+`doing archive other_section -t alternate` will move from "other_section" to "alternate." You can use the `-k` flag on any of these to change the number of items to leave behind. To move everything, use `-k 0`.
+
+You can also use tags to archive. You define the section first, and anything following it is treated as tags. If your first argument starts with "@", it will assume the "Currently" section and use all arguments as tags.
+
+By default tag archiving uses an "AND" boolean, meaning all the tags listed must exist on the entry for it to be moved. You can change this behavior with `-b OR` or `-b NONE` ("ALL" and "ANY" also work). 
+
+Example: Archive all Currently items for @client that are marked @done
+
+    doing archive @client @done
 
 ---
 

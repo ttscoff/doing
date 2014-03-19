@@ -528,16 +528,59 @@ class WWID
     return out
   end
 
-  def archive(section=nil,count=10)
+  def archive(section="Currently",count=5,destination=nil,tags=nil,bool=nil)
+
     section = choose_section if section.nil? || section =~ /choose/i
     section = guess_section(section)
-    if sections.include?(section)
+    if destination =~ /archive/i && !sections.include?("Archive")
+      add_section("Archive")
+    end
+    destination = guess_section(destination)
+
+    if sections.include?(section) && sections.include?(destination)
       items = @content[section]['items']
+      moved_items = []
+
+      if tags && !tags.empty?
+        items.delete_if {|item|
+          if bool =~ /(AND|ALL)/
+            score = 0
+            tags.each {|tag|
+              score += 1 if item['title'] =~ /@#{tag}/
+            }
+            res = score < tags.length
+            moved_items.push(item) if res
+            res
+          elsif bool =~ /NONE/
+            del = false
+            tags.each {|tag|
+              del = true if item['title'] =~ /@#{tag}/
+            }
+            moved_items.push(item) if del
+            del
+          elsif bool =~ /(OR|ANY)/
+            del = true
+            tags.each {|tag|
+              del = false if item['title'] =~ /@#{tag}/
+            }
+            moved_items.push(item) if del
+            del
+          end
+        }
+        @content[section]['items'] = moved_items
+        @content[destination]['items'] = items
+        write(nil)
+        return
+      end
+
       return if items.length < count
-      @content[section]['items'] = items[0..count-1]
-      add_section('Archive') unless sections.include?('Archive')
-      @content['Archive']['items'] += items[count..-1]
-      write(@doing_file)
+      if count == 0
+        @content[section]['items'] = []
+      else
+        @content[section]['items'] = items[0..count-1]
+      end
+      @content[destination]['items'] += items[count..-1]
+      write(nil)
     end
   end
 

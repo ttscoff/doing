@@ -481,21 +481,36 @@ command :views do |c|
   end
 end
 
-desc 'Move all but the most recent 5 entries in a section to Archive'
+desc 'Move entries in between sections'
 arg_name 'section'
 default_value wwid.current_section
 command :archive do |c|
-  c.desc 'Count to keep'
+  c.desc 'Count to keep (ignored if archiving by tag)'
   c.default_value 5
   c.flag [:k,:keep], :default_value => 5, :must_match => /^\d+$/, :type => Integer
 
+  c.desc 'Move entries to'
+  c.default_value "Archive"
+  c.flag [:t,:to], :default_value => "Archive"
+
+  c.desc 'Tag boolean'
+  c.default_value "AND"
+  c.flag [:b,:bool], :default_value => "AND"
+
   c.action do |global_options,options,args|
     if args.length > 0
-      section = args.join(" ").cap_first
+      if args[0] =~ /^@\S+/
+        section = wwid.current_section
+        tags = args.map {|t| t.sub(/^@/,'').strip }
+      else
+        section = args[0].cap_first
+        tags = args.length > 1 ? args[1..-1] : nil
+      end
     else
       section = wwid.current_section
+      tags = nil
     end
-    wwid.archive(section,options[:k])
+    wwid.archive(section,options[:k],options[:t],tags,options[:b])
   end
 end
 
