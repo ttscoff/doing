@@ -559,7 +559,7 @@ class WWID
           if bool =~ /(AND|ALL)/
             score = 0
             tags.each {|tag|
-              score += 1 if item['title'] =~ /@#{tag}/
+              score += 1 if item['title'] =~ /@#{tag}/i
             }
             res = score < tags.length
             moved_items.push(item) if res
@@ -567,21 +567,22 @@ class WWID
           elsif bool =~ /NONE/
             del = false
             tags.each {|tag|
-              del = true if item['title'] =~ /@#{tag}/
+              del = true if item['title'] =~ /@#{tag}/i
             }
             moved_items.push(item) if del
             del
           elsif bool =~ /(OR|ANY)/
             del = true
             tags.each {|tag|
-              del = false if item['title'] =~ /@#{tag}/
+              del = false if item['title'] =~ /@#{tag}/i
             }
             moved_items.push(item) if del
             del
           end
         }
+
         @content[section]['items'] = moved_items
-        @content[destination]['items'] = items
+        @content[destination]['items'] += items
         write(doing_file)
         return
       end

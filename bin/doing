@@ -427,7 +427,7 @@ end
 desc 'List sections'
 command :sections do |c|
   c.action do |global_options,options,args|
-    puts wwid.sections.map{|sect| %Q{"#{sect}"} }.join(" ") + " All"
+    puts wwid.sections.join("\t")
   end
 end
 
@@ -518,7 +518,7 @@ end
 desc 'List available custom views'
 command :views do |c|
   c.action do |global_options,options,args|
-    puts wwid.views.map{|view| %Q{"#{view}"} }.join(" ")
+    puts wwid.views.join("\t")
   end
 end
 
@@ -545,7 +545,7 @@ command :archive do |c|
         tags = args.map {|t| t.sub(/^@/,'').strip }
       else
         section = args[0].cap_first
-        tags = args.length > 1 ? args[1..-1] : nil
+        tags = args.length > 1 ? args[1..-1].map {|t| t.sub(/^@/,'').strip } : nil
       end
     else
       section = wwid.current_section
