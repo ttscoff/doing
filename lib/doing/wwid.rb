@@ -216,6 +216,7 @@ class WWID
   end
 
   def guess_section(frag,guessed=false)
+    # return "All" if frag =~ /all/i
     sections.each {|section| return section.cap_first if frag.downcase == section.downcase }
     section = false
     re = frag.split('').join(".*?")
