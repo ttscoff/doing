@@ -135,6 +135,10 @@ end
 desc 'Add a completed item with @done(date). No argument finishes last entry.'
 arg_name 'entry'
 command :done do |c|
+  c.desc 'Include date'
+  c.default_value true
+  c.switch [:d,:date], :default_value => true
+
   c.desc 'Immediately archive the entry'
   c.default_value false
   c.switch [:a,:archive], :negatable => false, :default_value => false
@@ -163,6 +167,7 @@ command :done do |c|
     end
 
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    date = options[:d] ? "(#{Time.now.strftime('%F %R')})" : ""
 
     if options[:e]
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
@@ -171,7 +176,7 @@ command :done do |c|
       input = wwid.fork_editor(input)
       if input
         title, note = wwid.format_input(input)
-        title += " @done(#{Time.now.strftime('%F %R')})"
+        title += " @done#{date}"
         section = "Archive" if options[:a]
         wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
@@ -179,17 +184,17 @@ command :done do |c|
         raise "No content"
       end
     elsif args.length == 0 && STDIN.stat.size == 0
-      wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => date})
+      wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => date, :date => options[:d]})
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
-        title += " @done(#{Time.now.strftime('%F %R')})"
+        title += " @done#{date}"
         section = "Archive" if options[:a]
         wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
-        title += " @done(#{Time.now.strftime('%F %R')})"
+        title += " @done#{date}"
         section = options[:a] ? "Archive" : section
         wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
         wwid.write(wwid.doing_file)
@@ -203,6 +208,10 @@ end
 desc 'Mark last X entries as @done'
 arg_name 'count'
 command :finish do |c|
+  c.desc 'Include date'
+  c.default_value true
+  c.switch [:d,:date], :default_value => true
+
   c.desc 'Archive entries'
   c.default_value false
   c.switch [:a,:archive], :negatable => false, :default_value => false
@@ -219,7 +228,7 @@ command :finish do |c|
       raise "Only one argument allowed"
     elsif args.length == 0 || args[0] =~ /\d+/
       count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a]})
+      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :date => options[:d]})
     else
       raise "Invalid argument (specify number of recent items to mark @done)"
     end
@@ -404,7 +413,8 @@ end
 desc 'List sections'
 command :sections do |c|
   c.action do |global_options,options,args|
-    puts wwid.sections.join(", ")
+    puts wwid.sections.join("\n")
+    puts "All"
   end
 end
 
