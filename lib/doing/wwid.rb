@@ -60,6 +60,8 @@ class WWID
           'order' => "asc"
       }
     }
+    @config['marker_tag'] ||= 'flagged'
+    @config['marker_color'] ||= 'red'
 
     @doing_file = File.expand_path(config['doing_file'])
     @current_section = config['current_section']
@@ -213,8 +215,8 @@ class WWID
     @content[title.cap_first] = {'original' => "#{title}:", 'items' => []}
   end
 
-  def guess_section(frag)
-    sections.each {|section| return section if frag.downcase == section.downcase}
+  def guess_section(frag,guessed=false)
+    sections.each {|section| return section.cap_first if frag.downcase == section.downcase }
     section = false
     re = frag.split('').join(".*?")
     sections.each {|sect|
@@ -224,18 +226,18 @@ class WWID
         break
       end
     }
-    unless section
-      alt = guess_view(frag)
+    unless section || guessed
+      alt = guess_view(frag,true)
       if alt
         raise "Did you mean `doing view #{alt}`?"
       else
-        raise "Invalid section: #{frag}"
+        raise "Unknown section: #{frag}"
       end
     end
-    section.cap_first
+    section ? section.cap_first : section
   end
 
-  def guess_view(frag)
+  def guess_view(frag,guessed=false)
     views.each {|view| return view if frag.downcase == view.downcase}
     view = false
     re = frag.split('').join(".*?")
@@ -246,12 +248,12 @@ class WWID
         break
       end
     }
-    unless view
-      alt = guess_section(frag)
+    unless view || guessed
+      alt = guess_section(frag,true)
       if alt
         raise "Did you mean `doing show #{alt}`?"
       else
-        raise "Invalid view: #{frag}"
+        raise "Unknown view: #{frag}"
       end
     end
     view
@@ -457,8 +459,13 @@ class WWID
       }
       out = output.join()
     else
+      if @config['marker_tag'] && @config['marker_color']
+        marker_tag = @config['marker_tag']
+        marker_color = colors[@config['marker_color']]
+      end
 
       items.each {|item|
+        flag = item['title'] =~ /@#{marker_tag}\b/i ? marker_color : ""
         if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
           note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t" + line.sub(/^\t\t/,'') }
           if opt[:wrap_width] && opt[:wrap_width] > 0
@@ -500,11 +507,12 @@ class WWID
             item['date'].strftime('%b %d %Y, %-I:%M%P')
           end
         }
+
         output.sub!(/%title/) {|m|
           if opt[:wrap_width] && opt[:wrap_width] > 0
-            item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").strip
+            flag+item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").strip
           else
-            item['title'].strip
+            flag+item['title'].strip
           end
         }
         if opt[:tags_color]

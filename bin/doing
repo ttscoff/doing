@@ -266,6 +266,24 @@ command :tag do |c|
   end
 end
 
+desc 'Mark last entry as highlighted'
+command :mark do |c|
+  c.desc 'Section'
+  c.default_value wwid.current_section
+  c.flag [:s,:section], :default_value => wwid.current_section
+
+  c.desc 'Remove mark'
+  c.default_value false
+  c.switch [:r,:remove], :negatable => false, :default_value => false
+
+
+  c.action do |global_options,options,args|
+    mark = wwid.config['marker_tag'] || "flagged"
+    wwid.tag_last({:tags => [mark], :section => options[:s], :remove => options[:r]})
+  end
+end
+
+
 
 desc 'List all entries'
 arg_name 'section [tags]'
