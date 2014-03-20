@@ -649,11 +649,12 @@ class WWID
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times})
   end
 
-  def recent(count=10,section=nil)
+  def recent(count=10,section=nil,opt={})
+    times = opt[:t] || false
     cfg = @config['templates']['recent']
     section ||= @current_section
     section = guess_section(section)
-    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc"})
+    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :times => times })
   end
 
   def last
