@@ -292,10 +292,10 @@ class WWID
         title = item['title']
         opt[:tags].each {|tag|
           if opt[:remove]
-            title.gsub!(/ @#{tag}/,'')
+            title.gsub!(/(^| )@#{tag}/,'')
           else
             unless title =~ /@#{tag}/
-              if tag == "done" || opt[:date]
+              if (tag == "done" && opt[:date]) || opt[:date]
                 title += " @#{tag}(#{Time.now.strftime('%F %R')})"
               else
                 title += " @#{tag}"
@@ -307,9 +307,9 @@ class WWID
       }
 
       if opt[:archive] && opt[:section] != "Archive"
-        archived = @content[opt[:section]]['items'][0..opt[:count]-1]
+        archived = @content[opt[:section]]['items'][0..opt[:count]-1].concat(@content['Archive']['items'])
         @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
-        @content['Archive']['items'] = archived + @content['Archive']['items']
+        @content['Archive']['items'] = archived
       end
 
       write(@doing_file)
