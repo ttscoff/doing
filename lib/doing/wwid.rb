@@ -326,7 +326,7 @@ class WWID
     end
     @content.each {|title, section|
       output += section['original'] + "\n"
-      output += list_section({:section => title, :template => "\t- %date | %title%note"})
+      output += list_section({:section => title, :template => "\t- %date | %title%note", :highlight => false})
     }
     output += @other_content_bottom.join("\n")
     if file.nil?
@@ -383,6 +383,7 @@ class WWID
     opt[:tag_filter] ||= false
     opt[:tags_color] ||= false
     opt[:times] ||= false
+    # opt[:highlight] ||= true
 
     if opt[:section].nil?
       opt[:section] = @content[choose_section]
@@ -459,13 +460,17 @@ class WWID
       }
       out = output.join()
     else
-      if @config['marker_tag'] && @config['marker_color']
-        marker_tag = @config['marker_tag']
-        marker_color = colors[@config['marker_color']]
-      end
 
       items.each {|item|
-        flag = item['title'] =~ /@#{marker_tag}\b/i ? marker_color : ""
+
+        if opt[:highlight] && item['title'] =~ /@#{@config['marker_tag']}\b/i
+          flag = colors[@config['marker_color']]
+          reset = colors['default']
+        else
+          flag = ""
+          reset = ""
+        end
+
         if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
           note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t" + line.sub(/^\t\t/,'') }
           if opt[:wrap_width] && opt[:wrap_width] > 0
@@ -510,9 +515,9 @@ class WWID
 
         output.sub!(/%title/) {|m|
           if opt[:wrap_width] && opt[:wrap_width] > 0
-            flag+item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").strip
+            flag+item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").strip+reset
           else
-            flag+item['title'].strip
+            flag+item['title'].strip+reset
           end
         }
         if opt[:tags_color]
@@ -577,7 +582,7 @@ class WWID
         }
         @content[section]['items'] = moved_items
         @content[destination]['items'] = items
-        write(nil)
+        write(doing_file)
         return
       end
 
@@ -588,7 +593,7 @@ class WWID
         @content[section]['items'] = items[0..count-1]
       end
       @content[destination]['items'] += items[count..-1]
-      write(nil)
+      write(doing_file)
     end
   end
 

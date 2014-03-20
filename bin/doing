@@ -345,7 +345,7 @@ command :show do |c|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :csv => options[:csv], :times => options[:t]})
+    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :csv => options[:csv], :times => options[:t], :highlight => true})
 
     puts wwid.tag_times if options[:totals]
 
@@ -483,7 +483,7 @@ command :view do |c|
       order = view.has_key?('order') ? view['order'] : "asc"
       options[:t] = true if options[:totals]
 
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :csv => options[:csv], :tags_color => tags_color, :times => options[:t] })
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :csv => options[:csv], :tags_color => tags_color, :times => options[:t], :highlight => true })
 
       puts wwid.tag_times if options[:totals]
     else
