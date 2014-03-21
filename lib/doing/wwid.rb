@@ -465,37 +465,38 @@ class WWID
     end
 
     if opt[:output] == "csv"
-      output = [['date','title','note'].to_csv]
+      output = [CSV.generate_line(['date','title','note'])]
       items.each {|i|
         note = ""
         if i['note']
           arr = i['note'].map{|line| line.strip}.delete_if{|e| e =~ /^\s*$/}
           note = arr.join("\n") unless arr.nil?
         end
-        output.push([i['date'],i['title'],note].to_csv)
+        output.push(CSV.generate_line([i['date'],i['title'],note]))
       }
-      out = output.join()
+      out = output.join("\n")
     elsif opt[:output] == "html"
       page_title = section
       items_out = []
       items.each {|i|
-        if i.has_key?('note')
-          note = '<span class="note">' + i['note'].map{|n| n.strip }.join('<br>') + '</span>'
-        else
-          note = ''
-        end
+        # if i.has_key?('note')
+        #   note = '<span class="note">' + i['note'].map{|n| n.strip }.join('<br>') + '</span>'
+        # else
+        #   note = ''
+        # end
         items_out << {
-          :date => i['date'].strftime('%Y-%m-%d %I:%M%P'),
-          :title => i['title'].gsub(/(@[^ \(]+(\(.*?\))?)/is,'<span class="tag">\1</span>').strip + " #{note}"
+          :date => i['date'].strftime('%a %-I:%M%p'),
+          :title => i['title'].gsub(/(@[^ \(]+(\(.*?\))?)/is,'<span class="tag">\1</span>').strip, #+ " #{note}"
+          :note => i['note']
         }
       }
-      style = "body{background:#faf9f5;color:#333;font-family:Palatino,Georgia,serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px}ul li .date{font-weight:700;position:absolute;left:-110px;color:#777}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:8px 0 0 12px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa}ul li:hover .note{display:block}"
+      style = "body{background:#faf9f5;color:#333;font-family:Palatino,Georgia,serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:1.75}ul li .date{font-size:14px;position:absolute;left:-82px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}"
       template =<<EOT
 !!!
 %html
   %head
-    %meta{charset: "utf-8"}/
-    %meta{content: "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}/
+    %meta{"charset" => "utf-8"}/
+    %meta{"content" => "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}/
     %title what are you doing?
     %style= @style
   %body
@@ -505,13 +506,14 @@ class WWID
       %ul
         - @items.each do |i|
           %li
-            %p
-              %span.date= i[:date]
-              = i[:title]
+            %span.date= i[:date]
+            = i[:title]
+            - if i[:note]
+              %span.note= i[:note].map{|n| n.strip }.join('<br>')
 EOT
       engine = Haml::Engine.new(template)
       puts engine.render(Object.new, { :@items => items_out, :@page_title => page_title, :@style => style })
-      return
+
     else
       items.each {|item|
 
