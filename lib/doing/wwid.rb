@@ -614,10 +614,10 @@ EOT
         to_archive = sections.dup
         to_archive.delete(destination)
         to_archive.each {|source,v|
-          do_archive(source, destination, count, tags, bool)
+          do_archive(source, destination, { :count => count, :tags => tags, :bool => bool, :label => true })
         }
       else
-        do_archive(section, destination, count, tags, bool)
+        do_archive(section, destination, { :count => count, :tags => tags, :bool => bool, :label => true })
       end
 
       write(doing_file)
@@ -626,7 +626,12 @@ EOT
     end
   end
 
-  def do_archive(section, destination, count, tags, bool)
+  def do_archive(section, destination, opt={})
+    count = opt[:count] || 5
+    tags = opt[:tags] || []
+    bool = opt[:bool] || "AND"
+    label = opt[:label] || false
+
     items = @content[section]['items']
     moved_items = []
 
@@ -656,7 +661,11 @@ EOT
           del
         end
       }
-
+      moved_items.each {|item|
+        if label
+          item['title'] += " @from(#{section})" unless section == "Currently" || item['title'] =~ /@from\(/
+        end
+      }
       @content[section]['items'] = moved_items
       @content[destination]['items'] += items
     else
@@ -667,6 +676,12 @@ EOT
       else
         @content[section]['items'] = items[0..count-1]
       end
+
+      items.each{|item|
+        if label
+          item['title'] += " @from(#{section})" unless section == "Currently"
+        end
+      }
       @content[destination]['items'] += items[count..-1]
     end
   end
