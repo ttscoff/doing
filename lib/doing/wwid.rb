@@ -289,6 +289,7 @@ class WWID
     opt[:tags] ||= ["done"]
     opt[:date] ||= false
     opt[:remove] ||= false
+    opt[:back] ||= Time.now
 
     opt[:section] = guess_section(opt[:section])
 
@@ -305,7 +306,7 @@ class WWID
           else
             unless title =~ /@#{tag}/
               if (tag == "done" && opt[:date]) || opt[:date]
-                title += " @#{tag}(#{Time.now.strftime('%F %R')})"
+                title += " @#{tag}(#{opt[:back].strftime('%F %R')})"
               else
                 title += " @#{tag}"
               end
@@ -446,6 +447,7 @@ class WWID
       items.delete_if {|item|
         item['date'] < Date.today.to_time
       }.reverse!
+      section = Time.now.strftime('%A, %B %d')
     else
       if opt[:age] =~ /oldest/i
         items = items[0..count]
@@ -474,7 +476,7 @@ class WWID
         end
         output.push(CSV.generate_line([i['date'],i['title'],note]))
       }
-      out = output.join("\n")
+      out = output.join("")
     elsif opt[:output] == "html"
       page_title = section
       items_out = []
@@ -714,9 +716,9 @@ EOT
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => order})
   end
 
-  def today(times=false)
+  def today(times=false,output=nil)
     cfg = @config['templates']['today']
-    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times})
+    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output})
   end
 
   def recent(count=10,section=nil,opt={})

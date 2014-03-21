@@ -213,6 +213,9 @@ command :finish do |c|
   c.default_value true
   c.switch [:d,:date], :default_value => true
 
+  c.desc 'Backdate to "date_string" (natural language)'
+  c.flag [:back]
+
   c.desc 'Archive entries'
   c.default_value false
   c.switch [:a,:archive], :negatable => false, :default_value => false
@@ -225,11 +228,19 @@ command :finish do |c|
 
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
+    if options[:back]
+      date = wwid.chronify(options[:back])
+
+      raise "Unable to parse date string" if date.nil?
+    else
+      date = Time.now
+    end
+
     if args.length > 1
       raise "Only one argument allowed"
     elsif args.length == 0 || args[0] =~ /\d+/
       count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :date => options[:d]})
+      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :date => options[:d], :back => date })
     else
       raise "Invalid argument (specify number of recent items to mark @done)"
     end
@@ -315,7 +326,7 @@ command :show do |c|
   c.flag [:s,:sort], :default_value => 'asc'
 
   c.desc 'Output to format'
-  c.flag [:output]
+  c.flag [:o,:output]
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value false
@@ -406,11 +417,14 @@ command :today do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Output to format'
+  c.flag [:o,:output]
+
   c.action do |global_options,options,args|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.today(options[:t]).strip
+    puts wwid.today(options[:t],options[:output]).strip
 
     puts wwid.tag_times if options[:totals]
   end
@@ -461,7 +475,7 @@ command :view do |c|
   c.flag [:c,:count], :must_match => /^\d+$/, :type => Integer
 
   c.desc 'Output to format'
-  c.flag [:output]
+  c.flag [:o,:output]
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value false
