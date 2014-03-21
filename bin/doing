@@ -541,7 +541,7 @@ command :archive do |c|
   c.action do |global_options,options,args|
     if args.length > 0
       if args[0] =~ /^@\S+/
-        section = wwid.current_section
+        section = "all"
         tags = args.map {|t| t.sub(/^@/,'').strip }
       else
         section = args[0].cap_first

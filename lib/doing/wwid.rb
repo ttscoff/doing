@@ -216,7 +216,7 @@ class WWID
   end
 
   def guess_section(frag,guessed=false)
-    # return "All" if frag =~ /all/i
+    return "All" if frag =~ /all/i
     sections.each {|section| return section.cap_first if frag.downcase == section.downcase }
     section = false
     re = frag.split('').join(".*?")
@@ -232,6 +232,13 @@ class WWID
       if alt
         raise "Did you mean `doing view #{alt}`?"
       else
+        print "Create a new section called #{frag.cap_first} (y/N)?"
+        input = STDIN.gets
+        if input =~ /^y/i
+          add_section(frag.cap_first)
+          write(doing_file)
+          return frag.cap_first
+        end
         raise "Unknown section: #{frag}"
       end
     end
@@ -545,48 +552,66 @@ class WWID
   def archive(section="Currently",count=5,destination=nil,tags=nil,bool=nil)
 
     section = choose_section if section.nil? || section =~ /choose/i
-    section = guess_section(section)
+    archive_all = section =~ /all/i # && !(tags.nil? || tags.empty?)
+    section = guess_section(section) unless archive_all
+
     if destination =~ /archive/i && !sections.include?("Archive")
       add_section("Archive")
     end
+
     destination = guess_section(destination)
 
-    if sections.include?(section) && sections.include?(destination)
-      items = @content[section]['items']
-      moved_items = []
-
-      if tags && !tags.empty?
-        items.delete_if {|item|
-          if bool =~ /(AND|ALL)/
-            score = 0
-            tags.each {|tag|
-              score += 1 if item['title'] =~ /@#{tag}/i
-            }
-            res = score < tags.length
-            moved_items.push(item) if res
-            res
-          elsif bool =~ /NONE/
-            del = false
-            tags.each {|tag|
-              del = true if item['title'] =~ /@#{tag}/i
-            }
-            moved_items.push(item) if del
-            del
-          elsif bool =~ /(OR|ANY)/
-            del = true
-            tags.each {|tag|
-              del = false if item['title'] =~ /@#{tag}/i
-            }
-            moved_items.push(item) if del
-            del
-          end
+    if sections.include?(destination) && (sections.include?(section) || archive_all)
+      if archive_all
+        to_archive = sections.dup
+        to_archive.delete(destination)
+        to_archive.each {|source,v|
+          do_archive(source, destination, count, tags, bool)
         }
-
-        @content[section]['items'] = moved_items
-        @content[destination]['items'] += items
-        write(doing_file)
-        return
+      else
+        do_archive(section, destination, count, tags, bool)
       end
+
+      write(doing_file)
+    else
+      raise "Either source or destination does not exist"
+    end
+  end
+
+  def do_archive(section, destination, count, tags, bool)
+    items = @content[section]['items']
+    moved_items = []
+
+    if tags && !tags.empty?
+      items.delete_if {|item|
+        if bool =~ /(AND|ALL)/
+          score = 0
+          tags.each {|tag|
+            score += 1 if item['title'] =~ /@#{tag}/i
+          }
+          res = score < tags.length
+          moved_items.push(item) if res
+          res
+        elsif bool =~ /NONE/
+          del = false
+          tags.each {|tag|
+            del = true if item['title'] =~ /@#{tag}/i
+          }
+          moved_items.push(item) if del
+          del
+        elsif bool =~ /(OR|ANY)/
+          del = true
+          tags.each {|tag|
+            del = false if item['title'] =~ /@#{tag}/i
+          }
+          moved_items.push(item) if del
+          del
+        end
+      }
+
+      @content[section]['items'] = moved_items
+      @content[destination]['items'] += items
+    else
 
       return if items.length < count
       if count == 0
@@ -595,11 +620,8 @@ class WWID
         @content[section]['items'] = items[0..count-1]
       end
       @content[destination]['items'] += items[count..-1]
-      write(doing_file)
     end
   end
-
-
 
   def colors
     color = {}
