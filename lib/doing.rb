@@ -6,6 +6,7 @@ require 'pp'
 require 'csv'
 require 'tempfile'
 require 'chronic'
+require 'haml'
 require 'doing/wwid.rb'
 
 DOING_CONFIG = "~/.doingrc"

@@ -314,9 +314,8 @@ command :show do |c|
   c.default_value 'asc'
   c.flag [:s,:sort], :default_value => 'asc'
 
-  c.desc 'Output to csv'
-  c.default_value false
-  c.switch [:csv], :default_value => false, :negatable => false
+  c.desc 'Output to format'
+  c.flag [:output]
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value false
@@ -355,7 +354,7 @@ command :show do |c|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :csv => options[:csv], :times => options[:t], :highlight => true})
+    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :highlight => true})
 
     puts wwid.tag_times if options[:totals]
 
@@ -461,9 +460,8 @@ command :view do |c|
   c.desc 'Count to display (override view settings)'
   c.flag [:c,:count], :must_match => /^\d+$/, :type => Integer
 
-  c.desc 'Output to csv'
-  c.default_value 'false'
-  c.switch [:csv], :default_value => false, :negatable => false
+  c.desc 'Output to format'
+  c.flag [:output]
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value false
@@ -505,8 +503,8 @@ command :view do |c|
       section = options[:s] ? section : view.has_key?('section') ? view['section'] : wwid.current_section
       order = view.has_key?('order') ? view['order'] : "asc"
       options[:t] = true if options[:totals]
-
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :csv => options[:csv], :tags_color => tags_color, :times => options[:t], :highlight => true })
+      options[:output].downcase! if options[:output]
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:output], :tags_color => tags_color, :times => options[:t], :highlight => true })
 
       puts wwid.tag_times if options[:totals]
     else

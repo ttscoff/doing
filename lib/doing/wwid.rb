@@ -5,6 +5,7 @@ class String
       m.upcase
     end
   end
+
 end
 
 class WWID
@@ -392,18 +393,21 @@ class WWID
     opt[:tags_color] ||= false
     opt[:times] ||= false
     # opt[:highlight] ||= true
-
+    section = ""
     if opt[:section].nil?
-      opt[:section] = @content[choose_section]
+      section = choose_section
+      opt[:section] = @content[section]
     elsif opt[:section].class == String
       if opt[:section] =~ /^all$/i
         combined = {'items' => []}
         @content.each {|k,v|
           combined['items'] += v['items']
         }
+        section = opt[:tag_filter] ? opt[:tag_filter]['tags'].map {|tag| "@#{tag}"}.join(" + ") : "doing"
         opt[:section] = combined
       else
-        opt[:section] = @content[guess_section(opt[:section])]
+        section = guess_section(opt[:section])
+        opt[:section] = @content[section]
       end
     end
 
@@ -456,7 +460,11 @@ class WWID
 
     out = ""
 
-    if opt[:csv]
+    if opt[:output]
+      raise "Unknown output format" unless opt[:output] =~ /(html|csv)/
+    end
+
+    if opt[:output] == "csv"
       output = [['date','title','note'].to_csv]
       items.each {|i|
         note = ""
@@ -467,8 +475,40 @@ class WWID
         output.push([i['date'],i['title'],note].to_csv)
       }
       out = output.join()
+    elsif opt[:output] == "html"
+      page_title = section
+      items_out = []
+      items.each {|i|
+        items_out << {
+          :date => i['date'].strftime('%Y-%m-%d %I:%M%P'),
+          :title => i['title'].gsub(/(@[^ \(]+(\(.*?\))?)/is,'<span class="tag">\1</span>')
+        }
+      }
+      style = "body{background:#faf9f5;color:#333;font-family:Palatino,Georgia,serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px}ul li .date{font-weight:700;position:absolute;left:-110px;color:#777}ul li .tag{color:#999}
+"
+      template =<<EOT
+!!!
+%html
+  %head
+    %meta{charset: "utf-8"}/
+    %meta{content: "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}/
+    %title
+    %style= @style
+  %body
+    %header
+      %h1= @page_title
+    %article
+      %ul
+        - @items.each do |i|
+          %li
+            %p
+              %span.date= i[:date]
+              = i[:title]
+EOT
+      engine = Haml::Engine.new(template)
+      puts engine.render(Object.new, { :@items => items_out, :@page_title => page_title, :@style => style })
+      return
     else
-
       items.each {|item|
 
         if opt[:highlight] && item['title'] =~ /@#{@config['marker_tag']}\b/i
@@ -549,7 +589,7 @@ class WWID
     return out
   end
 
-  def archive(section="Currently",count=5,destination=nil,tags=nil,bool=nil)
+  def archive(section="Currently",count=5,destination=nil,tags=nil,bool=nil,export=nil)
 
     section = choose_section if section.nil? || section =~ /choose/i
     archive_all = section =~ /all/i # && !(tags.nil? || tags.empty?)
@@ -744,7 +784,6 @@ class WWID
     [days, hours, minutes]
   end
 end
-
 
 
 
