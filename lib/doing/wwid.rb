@@ -571,9 +571,9 @@ EOT
 
         output.sub!(/%title/) {|m|
           if opt[:wrap_width] && opt[:wrap_width] > 0
-            flag+item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").strip+reset
+            flag+item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").chomp+reset
           else
-            flag+item['title'].strip+reset
+            flag+item['title'].chomp+reset
           end
         }
         if opt[:tags_color]
@@ -731,27 +731,28 @@ EOT
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => order})
   end
 
-  def today(times=false,output=nil)
+  def today(times=true,output=nil)
     cfg = @config['templates']['today']
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output})
   end
 
   def recent(count=10,section=nil,opt={})
-    times = opt[:t] || false
+    times = opt[:t] || true
     cfg = @config['templates']['recent']
     section ||= @current_section
     section = guess_section(section)
     list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :times => times })
   end
 
-  def last
+  def last(times=true)
     cfg = @config['templates']['last']
-    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template']})
+    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template'], :times => times})
   end
 
   def tag_times
     output = []
-    return "" if @timers.length == 0
+    # return "" if @timers.length == 0
+
     max = @timers.keys.sort_by {|k| k.length }.reverse[0].length + 1
 
     total = @timers.delete("All")
@@ -763,7 +764,10 @@ EOT
       end
       output.push("#{k}:#{spacer}#{"%02d:%02d:%02d" % fmt_time(v)}")
     }
-    output.empty? ? "" : "\n--- Tag Totals ---\n" + output.join("\n") + "\n\nTotal tracked: #{"%02d:%02d:%02d" % fmt_time(total)}\n"
+
+    output = output.empty? ? "" : "\n--- Tag Totals ---\n" + output.join("\n")
+    output += "\n\nTotal tracked: #{"%02d:%02d:%02d" % fmt_time(total)}\n"
+    output
   end
 
   private

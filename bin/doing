@@ -330,7 +330,7 @@ command :show do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value false
-  c.switch [:t,:times], :default_value => false
+  c.switch [:t,:times], :default_value => true
 
   c.desc 'Show intervals with totals at the end of output'
   c.default_value false
@@ -382,7 +382,7 @@ command :recent do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value false
-  c.switch [:t,:times], :default_value => false
+  c.switch [:t,:times], :default_value => true
 
   c.desc 'Show intervals with totals at the end of output'
   c.default_value false
@@ -400,7 +400,7 @@ command :recent do |c|
       end
       options[:t] = true if options[:totals]
 
-      puts wwid.recent(count,section.cap_first,{ :times => options[:d] })
+      puts wwid.recent(count,section.cap_first,{ :times => options[:t] })
 
       puts wwid.tag_times if options[:totals]
     end
@@ -411,7 +411,7 @@ desc 'List entries from today'
 command :today do |c|
   c.desc 'Show time intervals on @done tasks'
   c.default_value false
-  c.switch [:t,:times], :default_value => false
+  c.switch [:t,:times], :default_value => true
 
   c.desc 'Show time totals at the end of output'
   c.default_value false
@@ -424,7 +424,7 @@ command :today do |c|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.today(options[:t],options[:output]).strip
+    puts wwid.today(options[:t],options[:output]).chomp
 
     puts wwid.tag_times if options[:totals]
   end
@@ -479,7 +479,7 @@ command :view do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value false
-  c.switch [:t,:times], :default_value => false
+  c.switch [:t,:times], :default_value => true
 
   c.desc 'Show intervals with totals at the end of output'
   c.default_value false
@@ -508,7 +508,7 @@ command :view do |c|
           if view['tags'].class == Array
             tag_filter['tags'] = view['tags'].map{|tag| tag.strip }
           else
-            tag_filter['tags'] = view['tags'].split(" ").map{|tag| tag.strip }
+            tag_filter['tags'] = view['tags'].gsub(/[, ]+/," ").split(" ").map{|tag| tag.strip }
           end
           tag_filter['bool'] = view.has_key?('tags_bool') && !view['tags_bool'].nil? ? view['tags_bool'].upcase : "OR"
         end
