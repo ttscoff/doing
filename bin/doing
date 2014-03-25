@@ -105,7 +105,7 @@ command :later do |c|
       date = Time.now
     end
 
-    if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
+    if options[:e]
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
       input = ""
       input += args.join(" ") if args.length > 0
@@ -127,7 +127,7 @@ command :later do |c|
         wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
-        raise "You must provide content when creating a new entry"
+        puts wwid.list_section({:section=>"Later"})
       end
     end
   end
