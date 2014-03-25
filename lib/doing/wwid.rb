@@ -431,6 +431,10 @@ class WWID
       items.delete_if {|item|
         item['date'] < Date.today.to_time
       }.reverse!
+    elsif opt[:yesterday]
+      items.delete_if {|item| item['date'] <= Date.today.prev_day.to_time or
+                       item['date'] >= Date.today.to_time
+                      }.reverse!
     else
       if opt[:age] =~ /oldest/i
         items = items[0..count]
@@ -591,6 +595,10 @@ class WWID
   def today(times=false)
     cfg = @config['templates']['today']
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times})
+  end
+
+  def yesterday
+    list_section({:section => @current_section, :count => 0, :order => "asc", :yesterday => true})
   end
 
   def recent(count=10,section=nil)
