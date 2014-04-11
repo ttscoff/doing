@@ -5,13 +5,14 @@ class String
       m.upcase
     end
   end
+
 end
 
 class WWID
   attr_accessor :content, :sections, :current_section, :doing_file, :config
 
 
-  def initialize(input=nil)
+  def initialize
     @content = {}
     @timers = {}
     @config = read_config
@@ -60,8 +61,9 @@ class WWID
           'order' => "asc"
       }
     }
+    @config['marker_tag'] ||= 'flagged'
+    @config['marker_color'] ||= 'red'
 
-    @doing_file = File.expand_path(config['doing_file'])
     @current_section = config['current_section']
     @default_template = config['templates']['default']['template']
     @default_date_format = config['templates']['default']['date_format']
@@ -69,17 +71,24 @@ class WWID
     @config[:include_notes] ||= true
 
     File.open(File.expand_path(DOING_CONFIG), 'w') { |yf| YAML::dump(config, yf) }
+  end
+
+  def init_doing_file(input=nil)
+    @doing_file = File.expand_path(config['doing_file'])
 
     if input.nil?
       create(@doing_file) unless File.exists?(@doing_file)
       input = IO.read(@doing_file)
       input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
     elsif File.exists?(File.expand_path(input)) && File.file?(File.expand_path(input)) && File.stat(File.expand_path(input)).size > 0
+      @doing_file = File.expand_path(input)
       input = IO.read(File.expand_path(input))
       input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
-      @doing_file = File.expand_path(input)
     elsif input.length < 256
+      @doing_file = File.expand_path(input)
       create(input)
+      input = IO.read(File.expand_path(input))
+      input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
     end
 
     @other_content_top = []
@@ -122,7 +131,9 @@ class WWID
   end
 
   def create(filename=nil)
-    filename = @doing_file
+    if filename.nil?
+      filename = @doing_file
+    end
     unless File.exists?(filename) && File.stat(filename).size > 0
       File.open(filename,'w+') do |f|
         f.puts @current_section + ":"
@@ -213,8 +224,9 @@ class WWID
     @content[title.cap_first] = {'original' => "#{title}:", 'items' => []}
   end
 
-  def guess_section(frag)
-    sections.each {|section| return section if frag.downcase == section.downcase}
+  def guess_section(frag,guessed=false)
+    return "All" if frag =~ /all/i
+    sections.each {|section| return section.cap_first if frag.downcase == section.downcase }
     section = false
     re = frag.split('').join(".*?")
     sections.each {|sect|
@@ -224,18 +236,25 @@ class WWID
         break
       end
     }
-    unless section
-      alt = guess_view(frag)
+    unless section || guessed
+      alt = guess_view(frag,true)
       if alt
         raise "Did you mean `doing view #{alt}`?"
       else
-        raise "Invalid section: #{frag}"
+        print "Create a new section called #{frag.cap_first} (y/N)?"
+        input = STDIN.gets
+        if input =~ /^y/i
+          add_section(frag.cap_first)
+          write(doing_file)
+          return frag.cap_first
+        end
+        raise "Unknown section: #{frag}"
       end
     end
-    section.cap_first
+    section ? section.cap_first : section
   end
 
-  def guess_view(frag)
+  def guess_view(frag,guessed=false)
     views.each {|view| return view if frag.downcase == view.downcase}
     view = false
     re = frag.split('').join(".*?")
@@ -246,12 +265,12 @@ class WWID
         break
       end
     }
-    unless view
-      alt = guess_section(frag)
+    unless view || guessed
+      alt = guess_section(frag,true)
       if alt
         raise "Did you mean `doing show #{alt}`?"
       else
-        raise "Invalid view: #{frag}"
+        raise "Unknown view: #{frag}"
       end
     end
     view
@@ -278,6 +297,7 @@ class WWID
     opt[:tags] ||= ["done"]
     opt[:date] ||= false
     opt[:remove] ||= false
+    opt[:back] ||= Time.now
 
     opt[:section] = guess_section(opt[:section])
 
@@ -290,11 +310,11 @@ class WWID
         title = item['title']
         opt[:tags].each {|tag|
           if opt[:remove]
-            title.gsub!(/ @#{tag}/,'')
+            title.gsub!(/(^| )@#{tag.strip}(\([^\)]*\))?/,'')
           else
             unless title =~ /@#{tag}/
-              if tag == "done" || opt[:date]
-                title += " @#{tag}(#{Time.now.strftime('%F %R')})"
+              if (tag == "done" && opt[:date]) || opt[:date]
+                title += " @#{tag}(#{opt[:back].strftime('%F %R')})"
               else
                 title += " @#{tag}"
               end
@@ -305,9 +325,9 @@ class WWID
       }
 
       if opt[:archive] && opt[:section] != "Archive"
-        archived = @content[opt[:section]]['items'][0..opt[:count]-1]
+        archived = @content[opt[:section]]['items'][0..opt[:count]-1].concat(@content['Archive']['items'])
         @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
-        @content['Archive']['items'] = archived + @content['Archive']['items']
+        @content['Archive']['items'] = archived
       end
 
       write(@doing_file)
@@ -324,7 +344,7 @@ class WWID
     end
     @content.each {|title, section|
       output += section['original'] + "\n"
-      output += list_section({:section => title, :template => "\t- %date | %title%note"})
+      output += list_section({:section => title, :template => "\t- %date | %title%note", :highlight => false})
     }
     output += @other_content_bottom.join("\n")
     if file.nil?
@@ -381,18 +401,22 @@ class WWID
     opt[:tag_filter] ||= false
     opt[:tags_color] ||= false
     opt[:times] ||= false
-
+    # opt[:highlight] ||= true
+    section = ""
     if opt[:section].nil?
-      opt[:section] = @content[choose_section]
+      section = choose_section
+      opt[:section] = @content[section]
     elsif opt[:section].class == String
       if opt[:section] =~ /^all$/i
         combined = {'items' => []}
         @content.each {|k,v|
           combined['items'] += v['items']
         }
+        section = opt[:tag_filter] ? opt[:tag_filter]['tags'].map {|tag| "@#{tag}"}.join(" + ") : "doing"
         opt[:section] = combined
       else
-        opt[:section] = @content[guess_section(opt[:section])]
+        section = guess_section(opt[:section])
+        opt[:section] = @content[section]
       end
     end
 
@@ -431,6 +455,11 @@ class WWID
       items.delete_if {|item|
         item['date'] < Date.today.to_time
       }.reverse!
+      section = Time.now.strftime('%A, %B %d')
+    elsif opt[:yesterday]
+      items.delete_if {|item| item['date'] <= Date.today.prev_day.to_time or
+                       item['date'] >= Date.today.to_time
+                      }.reverse!
     else
       if opt[:age] =~ /oldest/i
         items = items[0..count]
@@ -445,20 +474,78 @@ class WWID
 
     out = ""
 
-    if opt[:csv]
-      output = [['date','title','note'].to_csv]
+    if opt[:output]
+      raise "Unknown output format" unless opt[:output] =~ /(html|csv)/
+    end
+
+    if opt[:output] == "csv"
+      output = [CSV.generate_line(['date','title','note'])]
       items.each {|i|
         note = ""
         if i['note']
           arr = i['note'].map{|line| line.strip}.delete_if{|e| e =~ /^\s*$/}
           note = arr.join("\n") unless arr.nil?
         end
-        output.push([i['date'],i['title'],note].to_csv)
+        output.push(CSV.generate_line([i['date'],i['title'],note]))
       }
-      out = output.join()
-    else
+      out = output.join("")
+    elsif opt[:output] == "html"
+      page_title = section
+      items_out = []
+      items.each {|i|
+        # if i.has_key?('note')
+        #   note = '<span class="note">' + i['note'].map{|n| n.strip }.join('<br>') + '</span>'
+        # else
+        #   note = ''
+        # end
+        if RUBY_VERSION.to_f > 1.8
+          title = i['title'].force_encoding('utf-8')
+          note = i['note'].map {|line| line.force_encoding('utf-8').strip } if i['note']
+        else
+          title = i['title']
+          note = i['note'].map { |line| line.strip }
+        end
+        items_out << {
+          :date => i['date'].strftime('%a %-I:%M%p'),
+          :title => title.gsub(/(@[^ \(]+(\(.*?\))?)/im,'<span class="tag">\1</span>').strip, #+ " #{note}"
+          :note => note
+        }
+      }
+      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2}ul li .date{font-size:14px;position:absolute;left:-82px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}"
+      template =<<EOT
+!!!
+%html
+  %head
+    %meta{"charset" => "utf-8"}/
+    %meta{"content" => "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}/
+    %title what are you doing?
+    %style= @style
+  %body
+    %header
+      %h1= @page_title
+    %article
+      %ul
+        - @items.each do |i|
+          %li
+            %span.date= i[:date]
+            = i[:title]
+            - if i[:note]
+              %span.note= i[:note].map{|n| n.strip }.join('<br>')
+EOT
+      engine = Haml::Engine.new(template)
+      puts engine.render(Object.new, { :@items => items_out, :@page_title => page_title, :@style => style })
 
+    else
       items.each {|item|
+
+        if opt[:highlight] && item['title'] =~ /@#{@config['marker_tag']}\b/i
+          flag = colors[@config['marker_color']]
+          reset = colors['default']
+        else
+          flag = ""
+          reset = ""
+        end
+
         if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
           note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t" + line.sub(/^\t\t/,'') }
           if opt[:wrap_width] && opt[:wrap_width] > 0
@@ -500,11 +587,12 @@ class WWID
             item['date'].strftime('%b %d %Y, %-I:%M%P')
           end
         }
+
         output.sub!(/%title/) {|m|
           if opt[:wrap_width] && opt[:wrap_width] > 0
-            item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").strip
+            flag+item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").chomp+reset
           else
-            item['title'].strip
+            flag+item['title'].chomp+reset
           end
         }
         if opt[:tags_color]
@@ -528,20 +616,94 @@ class WWID
     return out
   end
 
-  def archive(section=nil,count=10)
+  def archive(section="Currently",count=5,destination=nil,tags=nil,bool=nil,export=nil)
+
     section = choose_section if section.nil? || section =~ /choose/i
-    section = guess_section(section)
-    if sections.include?(section)
-      items = @content[section]['items']
-      return if items.length < count
-      @content[section]['items'] = items[0..count-1]
-      add_section('Archive') unless sections.include?('Archive')
-      @content['Archive']['items'] += items[count..-1]
-      write(@doing_file)
+    archive_all = section =~ /all/i # && !(tags.nil? || tags.empty?)
+    section = guess_section(section) unless archive_all
+
+    if destination =~ /archive/i && !sections.include?("Archive")
+      add_section("Archive")
+    end
+
+    destination = guess_section(destination)
+
+    if sections.include?(destination) && (sections.include?(section) || archive_all)
+      if archive_all
+        to_archive = sections.dup
+        to_archive.delete(destination)
+        to_archive.each {|source,v|
+          do_archive(source, destination, { :count => count, :tags => tags, :bool => bool, :label => true })
+        }
+      else
+        do_archive(section, destination, { :count => count, :tags => tags, :bool => bool, :label => true })
+      end
+
+      write(doing_file)
+    else
+      raise "Either source or destination does not exist"
     end
   end
 
+  def do_archive(section, destination, opt={})
+    count = opt[:count] || 5
+    tags = opt[:tags] || []
+    bool = opt[:bool] || "AND"
+    label = opt[:label] || false
 
+    items = @content[section]['items']
+    moved_items = []
+
+    if tags && !tags.empty?
+      items.delete_if {|item|
+        if bool =~ /(AND|ALL)/
+          score = 0
+          tags.each {|tag|
+            score += 1 if item['title'] =~ /@#{tag}/i
+          }
+          res = score < tags.length
+          moved_items.push(item) if res
+          res
+        elsif bool =~ /NONE/
+          del = false
+          tags.each {|tag|
+            del = true if item['title'] =~ /@#{tag}/i
+          }
+          moved_items.push(item) if del
+          del
+        elsif bool =~ /(OR|ANY)/
+          del = true
+          tags.each {|tag|
+            del = false if item['title'] =~ /@#{tag}/i
+          }
+          moved_items.push(item) if del
+          del
+        end
+      }
+      moved_items.each {|item|
+        if label
+          item['title'] += " @from(#{section})" unless section == "Currently" || item['title'] =~ /@from\(/
+        end
+      }
+      @content[section]['items'] = moved_items
+      @content[destination]['items'] += items
+    else
+
+      return if items.length < count
+      if count == 0
+        @content[section]['items'] = []
+      else
+        @content[section]['items'] = items[0..count-1]
+      end
+
+      items.each{|item|
+        if label
+          item['title'] += " @from(#{section})" unless section == "Currently"
+        end
+      }
+      @content[destination]['items'] += items[count..-1]
+    end
+  end
 
   def colors
     color = {}
@@ -588,26 +750,32 @@ class WWID
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => order})
   end
 
-  def today(times=false)
+  def today(times=true,output=nil)
     cfg = @config['templates']['today']
-    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times})
+    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output})
   end
 
-  def recent(count=10,section=nil)
+  def yesterday
+    list_section({:section => @current_section, :count => 0, :order => "asc", :yesterday => true})
+  end
+
+  def recent(count=10,section=nil,opt={})
+    times = opt[:t] || true
     cfg = @config['templates']['recent']
     section ||= @current_section
     section = guess_section(section)
-    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc"})
+    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :times => times })
   end
 
-  def last
+  def last(times=true)
     cfg = @config['templates']['last']
-    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template']})
+    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template'], :times => times})
   end
 
   def tag_times
     output = []
-    return "" if @timers.length == 0
+    # return "" if @timers.length == 0
+
     max = @timers.keys.sort_by {|k| k.length }.reverse[0].length + 1
 
     total = @timers.delete("All")
@@ -619,7 +787,10 @@ class WWID
       end
       output.push("#{k}:#{spacer}#{"%02d:%02d:%02d" % fmt_time(v)}")
     }
-    output.empty? ? "" : "\n--- Tag Totals ---\n" + output.join("\n") + "\n\nTotal tracked: #{"%02d:%02d:%02d" % fmt_time(total)}\n"
+
+    output = output.empty? ? "" : "\n--- Tag Totals ---\n" + output.join("\n")
+    output += "\n\nTotal tracked: #{"%02d:%02d:%02d" % fmt_time(total)}\n"
+    output
   end
 
   private
@@ -663,7 +834,6 @@ class WWID
     [days, hours, minutes]
   end
 end
-
 
 
 

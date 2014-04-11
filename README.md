@@ -4,6 +4,8 @@
 
 _If you're one of the rare people like me who find this useful, feel free to contribute to my [GitTip fund](https://www.gittip.com/ttscoff/) or just [buy me some coffee](http://brettterpstra.com/donate)._
 
+[Changelog](#changelog)
+
 ## What and why
 
 `doing` is a basic CLI for adding and listing "what was I doing" reminders in a [TaskPaper-formatted](http://www.hogbaysoftware.com/products/taskpaper) text file. It allows for multiple sections/categories and flexible output formatting.
@@ -313,9 +315,32 @@ Display any of the custom views you make in `~/.doingrc` with the `view` command
 
 #### Utilities
 
-    archive  - Move all but the most recent 5 entries to the Archive section
+    archive  - Move entries between sections
     open     - Open the "doing" file in an editor (OS X)
     config   - Edit the default configuration
+
+#### Archiving
+
+    COMMAND OPTIONS
+        -k, --keep=arg - Count to keep (ignored if archiving by tag) (default: 5)
+        -t, --to=arg   - Move entries to (default: Archive)
+        -b, --bool=arg - Tag boolean (default: AND)
+
+The `archive` command will move entries from one section (default: Currently) to another section (default: Archive). 
+
+`doing archive` on its own will move all but the most recent 5 entries from currently into the archive.
+
+`doing archive other_section` will archive from "other_section" to Archive.
+
+`doing archive other_section -t alternate` will move from "other_section" to "alternate." You can use the `-k` flag on any of these to change the number of items to leave behind. To move everything, use `-k 0`.
+
+You can also use tags to archive. You define the section first, and anything following it is treated as tags. If your first argument starts with "@", it will assume all sections and assume any following arguments are tags.
+
+By default tag archiving uses an "AND" boolean, meaning all the tags listed must exist on the entry for it to be moved. You can change this behavior with `-b OR` or `-b NONE` ("ALL" and "ANY" also work). 
+
+Example: Archive all Currently items for @client that are marked @done
+
+    doing archive @client @done
 
 ---
 
@@ -323,7 +348,7 @@ Display any of the custom views you make in `~/.doingrc` with the `view` command
 
 ### Bash completion
 
-Add basic command line completion for Bash with [this gist](https://gist.github.com/fcrespo82/9609318).
+See the file `doing.completion.bash` in the git repository for full bash completion. Thanks to [fcrespo82](https://github.com/fcrespo82) for getting it [started](https://gist.github.com/fcrespo82/9609318).
 
 ### Launchbar
 
@@ -381,3 +406,20 @@ I'm not making any money on `doing`, and I don't plan to spend a lot of time fix
 That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable issue in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message.
 
 Please try not to email me directly about GitHub projects.
+
+### Changelog
+
+#### 0.2.5 / 2014-03-21 
+
+ * Default to showing times #26, show totals even if no tags exist #27, fix indentation #29
+ * Add section label to archived tasks automatically, excepting Currently section
+ * Today outputs and backdate for finish
+ * html styling and fix for 1.8.7 haml errors
+ * Look, HTML output! (`--output html`)
+ * Also, `--output csv`
+ * let doing archive function on all sections
+ * option to exclude date from `@done`,  
+ * output newlines in sections and views
+ * Flagging (`doing mark`)
+ * fix for view/section guess error
+ * Adding tag filtering to archive command (`doing archive @done`)

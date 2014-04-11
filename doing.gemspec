@@ -27,5 +27,6 @@ lib/doing/wwid.rb
   s.add_development_dependency 'rdoc', '~> 4.1', '>= 4.1.1'
   s.add_development_dependency 'aruba', '~> 0'
   s.add_runtime_dependency('gli','2.9.0')
+  s.add_runtime_dependency('haml','4.0.3')
   s.add_runtime_dependency('chronic','~> 0.10', '>= 0.10.2')
 end
