@@ -302,7 +302,7 @@ class WWID
         title = item['title']
         opt[:tags].each {|tag|
           if opt[:remove]
-            title.gsub!(/(^| )@#{tag}/,'')
+            title.gsub!(/(^| )@#{tag.strip}(\([^\)]*\))?/,'')
           else
             unless title =~ /@#{tag}/
               if (tag == "done" && opt[:date]) || opt[:date]

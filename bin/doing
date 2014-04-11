@@ -136,6 +136,10 @@ end
 desc 'Add a completed item with @done(date). No argument finishes last entry.'
 arg_name 'entry'
 command :done do |c|
+  c.desc 'Remove @done tag'
+  c.default_value false
+  c.switch [:r,:remove], :negatable => false, :default_value => false
+
   c.desc 'Include date'
   c.default_value true
   c.switch [:d,:date], :default_value => true
@@ -185,7 +189,11 @@ command :done do |c|
         raise "No content"
       end
     elsif args.length == 0 && STDIN.stat.size == 0
-      wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => date, :date => options[:d]})
+      if options[:r]
+        wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :remove => true })
+      else
+        wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => date, :date => options[:d]})
+      end
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
