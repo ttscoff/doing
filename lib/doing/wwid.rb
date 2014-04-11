@@ -12,7 +12,7 @@ class WWID
   attr_accessor :content, :sections, :current_section, :doing_file, :config
 
 
-  def initialize(input=nil)
+  def initialize
     @content = {}
     @timers = {}
     @config = read_config
@@ -64,7 +64,6 @@ class WWID
     @config['marker_tag'] ||= 'flagged'
     @config['marker_color'] ||= 'red'
 
-    @doing_file = File.expand_path(config['doing_file'])
     @current_section = config['current_section']
     @default_template = config['templates']['default']['template']
     @default_date_format = config['templates']['default']['date_format']
@@ -72,17 +71,24 @@ class WWID
     @config[:include_notes] ||= true
 
     File.open(File.expand_path(DOING_CONFIG), 'w') { |yf| YAML::dump(config, yf) }
+  end
+
+  def init_doing_file(input=nil)
+    @doing_file = File.expand_path(config['doing_file'])
 
     if input.nil?
       create(@doing_file) unless File.exists?(@doing_file)
       input = IO.read(@doing_file)
       input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
     elsif File.exists?(File.expand_path(input)) && File.file?(File.expand_path(input)) && File.stat(File.expand_path(input)).size > 0
+      @doing_file = File.expand_path(input)
       input = IO.read(File.expand_path(input))
       input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
-      @doing_file = File.expand_path(input)
     elsif input.length < 256
+      @doing_file = File.expand_path(input)
       create(input)
+      input = IO.read(File.expand_path(input))
+      input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
     end
 
     @other_content_top = []
@@ -125,7 +131,9 @@ class WWID
   end
 
   def create(filename=nil)
-    filename = @doing_file
+    if filename.nil?
+      filename = @doing_file
+    end
     unless File.exists?(filename) && File.stat(filename).size > 0
       File.open(filename,'w+') do |f|
         f.puts @current_section + ":"

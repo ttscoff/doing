@@ -25,6 +25,9 @@ switch [:notes], :default_value => true, :negatable => true
 # desc 'Wrap notes at X chars (0 for no wrap)'
 # flag [:w,:wrapwidth], :must_match => /^\d+$/, :type => Integer
 
+desc 'Specify a different doing_file'
+flag [:f, :doing_file]
+
 desc 'Add an entry'
 arg_name 'entry'
 command :now do |c|
@@ -650,6 +653,11 @@ command :config do |c|
 end
 
 pre do |global,command,options,args|
+  if global[:doing_file]
+    wwid.init_doing_file(input=global[:doing_file])
+  else
+    wwid.init_doing_file
+  end
   wwid.config[:include_notes] = false unless global[:notes]
   if global[:version]
     puts "doing v" + Doing::VERSION
