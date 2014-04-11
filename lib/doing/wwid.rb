@@ -499,7 +499,7 @@ class WWID
         end
         items_out << {
           :date => i['date'].strftime('%a %-I:%M%p'),
-          :title => title.gsub(/(@[^ \(]+(\(.*?\))?)/is,'<span class="tag">\1</span>').strip, #+ " #{note}"
+          :title => title.gsub(/(@[^ \(]+(\(.*?\))?)/im,'<span class="tag">\1</span>').strip, #+ " #{note}"
           :note => note
         }
       }
