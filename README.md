@@ -261,6 +261,7 @@ Outputs:
     now      - Add an entry
     later    - Add an item to the Later section
     done     - Add a completed item with @done(date). No argument finishes last entry.
+    meanwhile - Finish any @meanwhile tasks and optionally create a new one
 
 The `doing now` command can accept `-s section_name` to send the new entry straight to a non-default section. 
 
@@ -269,6 +270,8 @@ The `doing now` command can accept `-s section_name` to send the new entry strai
 You can also backdate entries using natural language with `--back 15m` or `--back "3/15 3pm"`. That will modify the timestamp of the entry. When used with `doing done`, this allows time intervals to be accurately counted when entering items after the fact.
 
 All of these commands accept a `-e` argument. This opens your command line editor as defined in the environment variable `$EDITOR`. Add your entry, save the temp file and close it, and the new entry will be added. Anything after the first line is included as a note on the entry.
+
+`doing meanwhile` is a special command for creating and finishing tasks that may have other entries come before they're complete. When you create an entry with `doing meanwhile [entry text]`, it will automatically complete the last @meanwhile item (dated @done tag) and add the @meanwhile tag to the new item. This allows time tracking on a more general basis, and still lets you keep track of the smaller things you do while working on an overarching project. The `meanwhile` command accepts `--back [time]` and will backdate the @done tag and start date of the new task at the same time. Running `meanwhile` with no arguments will simply complete the last @meanwhile task. See `doing help meanwhile` for more options.
 
 #### Modifying entries:
 

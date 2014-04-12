@@ -336,6 +336,43 @@ class WWID
     end
   end
 
+  # accepts one tag and the raw text of a new item
+  # if the passed tag is on any item, it's replaced with @done
+  # if new_item is not nil, it's tagged with the passed tag and inserted
+  # This is for use where only one instance of a given tag should exist (@meanwhile)
+  def stop_start(tag,opt={})
+    opt[:section] ||= @current_section
+    opt[:archive] ||= false
+    opt[:back] ||= Time.now
+    opt[:new_item] ||= false
+
+    opt[:section] = guess_section(opt[:section])
+
+    tag.sub!(/^@/,'')
+
+    @content[opt[:section]]['items'].each_with_index {|item, i|
+      if item['title'] =~ /@#{tag}/
+        title = item['title'].gsub(/(^| )@(#{tag}|done)(\([^\)]*\))?/,'')
+        title += " @done(#{opt[:back].strftime('%F %R')})"
+
+        @content[opt[:section]]['items'][i]['title'] = title
+
+        if opt[:archive] && opt[:section] != "Archive"
+          @content['Archive']['items'].push(@content[opt[:section]]['items'][i])
+          @content[opt[:section]]['items'].delete_at(i)
+        end
+      end
+    }
+
+    if opt[:new_item]
+      title, note = format_input(opt[:new_item])
+      title += " @#{tag}"
+      add_item(title.cap_first, opt[:section], {:note => note, :back => opt[:back]})
+    end
+
+    write(@doing_file)
+  end
+
   def write(file=nil)
     if @other_content_top.empty?
       output = ""

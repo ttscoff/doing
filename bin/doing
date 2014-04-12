@@ -86,6 +86,53 @@ command :now do |c|
   end
 end
 
+desc 'Finish any running @meanwhile tasks and optionally create a new one'
+arg_name 'entry'
+command :meanwhile do |c|
+  c.desc 'Section'
+  c.arg_name 'section_name'
+  c.default_value wwid.current_section
+  c.flag [:s,:section], :default_value => wwid.current_section
+
+  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.switch [:e,:editor]
+
+  c.desc "Archive previous @meanwhile entry"
+  c.switch [:a,:archive], :default_value => false
+
+  c.desc 'Backdate to "date_string" (natural language)'
+  c.flag [:back]
+
+  c.action do |global_options,options,args|
+    if options[:back]
+      date = wwid.chronify(options[:back])
+
+      raise "Unable to parse date string" if date.nil?
+    else
+      date = Time.now
+    end
+
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    input = ""
+
+    if options[:e]
+      raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
+      input += args.join(" ") if args.length > 0
+      input = wwid.fork_editor(input)
+    else
+      if args.length > 0
+        input = args.join(" ")
+      elsif STDIN.stat.size > 0
+        input = STDIN.read
+      end
+    end
+    input = false unless input && input.length > 0
+
+    wwid.stop_start("meanwhile",{:new_item => input, :back => date, :section => section, :archive => options[:a]})
+    wwid.write(wwid.doing_file)
+  end
+end
+
 desc 'Add an item to the Later section'
 arg_name 'entry'
 command :later do |c|
