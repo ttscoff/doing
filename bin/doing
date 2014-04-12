@@ -684,11 +684,16 @@ command :config do |c|
   c.desc 'Application to use (OS X only)'
   c.flag [:a]
 
+  c.desc "Use the editor_app defined in ~/.doingrc (#{wwid.config['editor_app']})"
+  c.switch [:x]
+
   c.desc 'Application bundle id to use (OS X only)'
   c.flag [:b]
 
   c.action do |global_options,options,args|
-    if options[:a] || options[:b]
+    if options[:x]
+      %x{open -a "#{wwid.config['editor_app']}" "#{File.expand_path(DOING_CONFIG)}"}
+    elsif options[:a] || options[:b]
       if options[:a]
         %x{open -a "#{options[:a]}" "#{File.expand_path(DOING_CONFIG)}"}
       elsif options[:b]
