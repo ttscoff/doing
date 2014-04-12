@@ -415,7 +415,7 @@ Please try not to email me directly about GitHub projects.
 
 ### Changelog
 
-#### 0.2.5 / 2014-03-21 
+#### 0.2.5
 
  * Default to showing times #26, show totals even if no tags exist #27, fix indentation #29
  * Add section label to archived tasks automatically, excepting Currently section
@@ -428,4 +428,77 @@ Please try not to email me directly about GitHub projects.
  * output newlines in sections and views
  * Flagging (`doing mark`)
  * fix for view/section guess error
- * Adding tag filtering to archive command (`doing archive @done`)
+ * Adding tag filtering to archive command (`doing archive \@done`)
+ * `doing yesterday`
+ * `doing done -r` to remove last doing tag (optionally from `-s Section`)
+ * Add -f flag to specify alternate doing file
+ * Meanwhile command
+
+#### 0.2.1
+
+- CSV output for show command (`--csv`)
+- HTML output for show command (`--output html`)
+- fuzzy searching for all commands that specify a view. 
+  - On the terminal you'll see "Assume you meant XXX" to show what match it found, but this is output to STDERR and won't show up if you're redirecting the output or using it in GeekTool, etc.
+- tags_color in view config to highlight tags at the end of the lines. Can be set to any of the %colors.
+- Basic time tracking. 
+  - `-t` on `show` and `view` will turn on time calculations
+  - Intervals between timestamps and dated `@done` tags are calculated for each line, if the tag exists. 
+  - You must include a %interval token in the appropriate template for it to show
+  - `@start(date)` tags can optionally be used to override the time stamp in the calculation
+  - Any other tags in the line have that line's total added to them
+  - Totals for tags can be displayed at the end of output with `--totals`
+
+
+#### 0.2.0
+
+- `doing done` without argument tags last entry done
+  - `-a` archives them
+- `doing finish` or `doing finish X` marks last X entries done
+  - `-a` archives them
+- `doing tag tag1 [tag2]` tags last entry or `-c X` entries
+  - `doing tag -r tag1 [tag2]` removes said tag(s)
+- custom views additions
+  - custom views can include `tags` and `tags_bool`
+    - tags is a space separated list of tags to filter the results by
+    - tags_bool defines AND (all tags must exist), OR (any tag exists), or NONE (none of the tags exist)
+  - order key (asc or desc) defines output sort order by date
+  - section key can be set to "All" to combine sections
+- `doing show` updates
+  - accepts "all" as a section
+  - arguments following section name are tags to filter by
+    - `-b` sets boolean (AND, OR, NONE) or (ALL, ANY, NONE) (default OR/ANY)
+  - use `-c X` to limit results
+  - use `-s` to set sort order (asc or desc)
+  - use `-a` to set age (newest or oldest)
+- fuzzy section guessing when specified section isn't found
+- fuzzy view guessing for `doing view` command
+
+----
+
+#### 0.1.9
+
+- colors in templated output
+- open command
+  - opens in the default app for file type
+  - -a APPNAME (`doing open -a TaskPaper`)
+  - -b bundle_id (`doing open -b com.sublimetext.3`)
+- -e switch for `now`, `later` and `done` commands
+  - save a tmp file and open it in an editor
+  - allows multi-line entries, anything after first line is considered a note
+  - assumed when no input is provided (`doing now`)
+- `doing views` shows all available custom views
+- `doing view` without a view name will let you choose a view from a menu
+- `doing archive` fixed so that `-k X` works to keep X number of entries in the section
+
+#### 0.1.7
+
+- colors in templated output
+- open command
+  - opens in the default app for file type
+  - -a APPNAME (`doing open -a TaskPaper`)
+  - -b bundle_id (`doing open -b com.sublimetext.3`)
+- -e switch for `now`, `later` and `done` commands
+  - save a tmp file and open it in an editor
+  - allows multi-line entries, anything after first line is considered a note
+  - assumed when no input is provided (`doing now`)
