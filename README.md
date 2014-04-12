@@ -288,10 +288,11 @@ All of these commands accept a `-e` argument. This opens your command line edito
 
 #### Displaying entries:
 
-    show     - List all entries
-    recent   - List recent entries
-    today    - List entries from today
-    last     - Show the last entry
+    show      - List all entries
+    recent    - List recent entries
+    today     - List entries from today
+    yesterday - List entries from yesterday
+    last      - Show the last entry
 
 `doing show` on its own will list all entries in the "Currently" section. Add a section name as an argument to display that section instead. Use "all" to display all entries from all sections.
 
@@ -302,6 +303,8 @@ Use `-c X` to limit the displayed results. Combine it with `-a newest` or `-a ol
 The `show` command can also show the time spent on a task if it has a `@done(date)` tag with the `-t` option. This requires that you include a `%interval` token in template -> default in the config. You can also include `@start(date)` tags, which override the timestamp when calculating the intervals.
 
 If you have a use for it, you can use `--csv` on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: `doing show all done --csv > ~/Desktop/done.csv`.
+
+`doing yesterday` is great for stand-ups, thanks to [Sean Collins](https://github.com/sc68cal) for that. Note that you can show yesterday's activity from an alternate section by using the section name as an argument (e.g. `doing yesterday archive`).
 
 #### Views
 

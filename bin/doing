@@ -489,9 +489,12 @@ command :today do |c|
 end
 
 desc 'List entries from yesterday'
+default_value wwid.current_section
+arg_name 'section'
 command :yesterday do |c|
   c.action do |global_options, options,args|
-    puts wwid.yesterday.strip
+    section = args.length > 0 ? args.join(" ") : wwid.current_section
+    puts wwid.yesterday(section).strip
   end
 end
 

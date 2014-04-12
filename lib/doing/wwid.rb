@@ -636,7 +636,7 @@ EOT
           output.gsub!(/\s(@\S+(?:\(.*?\))?)/," #{colors[opt[:tags_color]]}\\1")
         end
         output.sub!(/%note/,note)
-        output.sub!(/%odnote/,note.gsub(/\t\t/,"\t"))
+        output.sub!(/%odnote/,note.gsub(/^\t*/,""))
         output.gsub!(/%hr(_under)?/) do |m|
           o = ""
           `tput cols`.to_i.times do
@@ -792,8 +792,9 @@ EOT
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output})
   end
 
-  def yesterday
-    list_section({:section => @current_section, :count => 0, :order => "asc", :yesterday => true})
+  def yesterday(section)
+    section = guess_section(section)
+    list_section({:section => section, :count => 0, :order => "asc", :yesterday => true})
   end
 
   def recent(count=10,section=nil,opt={})
