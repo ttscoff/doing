@@ -3,3 +3,4 @@ html
 *.taskpaper
 *.sublime*
 .rake_tasks~
+.sass-cache

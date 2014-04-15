@@ -282,12 +282,27 @@ class WWID
     opt[:date] ||= Time.now
     opt[:note] ||= []
     opt[:back] ||= Time.now
+    opt[:timed] ||= false
 
     entry = {'title' => title.strip.cap_first, 'date' => opt[:back]}
     unless opt[:note] =~ /^\s*$/s
       entry['note'] = opt[:note]
     end
-    @content[section]['items'].push(entry)
+    items = @content[section]['items']
+    if opt[:timed]
+      items.reverse!
+      items.each_with_index {|i,x|
+        if i['title'] =~ / @done/
+          next
+        else
+          items[x]['title'] = "#{i['title']} @done(#{opt[:back].strftime('%F %R')})"
+          break
+        end
+      }
+      items.reverse!
+    end
+    items.push(entry)
+    @content[section]['items'] = items
   end
 
   def tag_last(opt={})

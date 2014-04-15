@@ -263,7 +263,9 @@ Outputs:
     done     - Add a completed item with @done(date). No argument finishes last entry.
     meanwhile - Finish any @meanwhile tasks and optionally create a new one
 
-The `doing now` command can accept `-s section_name` to send the new entry straight to a non-default section. 
+The `doing now` command can accept `-s section_name` to send the new entry straight to a non-default section. It also accepts `--back AMOUNT` to let you specify a start date in the past using "natural language." For example, `doing now --back 25m ENTRY` or `doing now --back "yesterday 3:30pm" ENTRY`.
+
+You can finish the last unfinished task when starting a new one using `doing now` with the `-f` switch. It will look for the last task not marked `@done` and add the `@done` tag with the start time of the new task (either the current time or what you specified with `--back`).
 
 `doing done` is used to add an entry that you've already completed. Like `now`, you can specify a section with `-s section_name`. You can also skip straight to Archive with `-a`.
 

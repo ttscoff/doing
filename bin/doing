@@ -39,8 +39,12 @@ command :now do |c|
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch [:e,:editor]
 
-  c.desc 'Backdate to "date_string" (natural language)'
+  c.desc 'Backdate start time [4pm|20m|2h|yesterday noon]'
   c.flag [:back]
+
+  c.desc 'Timed entry, marks last entry in section as @done'
+  c.default_value false
+  c.switch [:f,:finish_last], :negatable => false, :default_value => false
 
   # c.desc "Edit entry with specified app"
   # c.arg_name 'editor_app'
@@ -65,7 +69,7 @@ command :now do |c|
       input = wwid.fork_editor(input)
       if input
         title, note = wwid.format_input(input)
-        wwid.add_item(title.cap_first, section, {:note => note, :back => date})
+        wwid.add_item(title.cap_first, section, {:note => note, :back => date, :timed => options[:f]})
         wwid.write(wwid.doing_file)
       else
         raise "No content"
@@ -73,11 +77,11 @@ command :now do |c|
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
-        wwid.add_item(title.cap_first, section, {:note => note, :back => date})
+        wwid.add_item(title.cap_first, section, {:note => note, :back => date, :timed => options[:f]})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
-        wwid.add_item(title.cap_first, section, {:note => note, :back => date})
+        wwid.add_item(title.cap_first, section, {:note => note, :back => date, :timed => options[:f]})
         wwid.write(wwid.doing_file)
       else
         raise "You must provide content when creating a new entry"
@@ -192,7 +196,7 @@ command :done do |c|
 
   c.desc 'Include date'
   c.default_value true
-  c.switch [:d,:date], :default_value => true
+  c.switch [:d,:date], :negatable => true, :default_value => true
 
   c.desc 'Immediately archive the entry'
   c.default_value false
@@ -265,6 +269,7 @@ command :done do |c|
 end
 
 desc 'Mark last X entries as @done'
+long_desc 'Marks the last X entries with a @done tag and current date. Does not alter already completed entries.'
 arg_name 'count'
 command :finish do |c|
   c.desc 'Include date'
