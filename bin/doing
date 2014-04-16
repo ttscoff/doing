@@ -640,8 +640,9 @@ command :archive do |c|
   end
 end
 
-desc 'Open the "doing" file in an editor (OS X)'
+desc 'Open the "doing" file in an editor'
 command :open do |c|
+if `uname` =~ /Darwin/
   c.desc 'open with app name'
   c.arg_name 'app_name'
   c.flag [:a]
@@ -649,7 +650,7 @@ command :open do |c|
   c.desc 'open with app bundle id'
   c.arg_name 'bundle_id'
   c.flag [:b]
-
+end
   c.desc 'open with $EDITOR'
   c.switch [:e], :negatable => false
 
@@ -658,7 +659,7 @@ command :open do |c|
     params.delete_if { |k,v|
       k.class == String || v.nil? || v == false
     }
-
+    if `uname` =~ /Darwin/
     if params.length < 2
       if options[:a]
         system %Q{open -a "#{options[:a]}" "#{File.expand_path(wwid.doing_file)}"}
@@ -677,8 +678,13 @@ command :open do |c|
     else
       raise "The open command takes a single parameter. #{params.length} specified."
     end
+    else
+      raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
+      system %Q{$EDITOR "#{File.expand_path(wwid.doing_file)}"}
+    end
   end
 end
+
 
 desc 'Edit the configuration file'
 command :config do |c|
@@ -686,23 +692,30 @@ command :config do |c|
   c.default_value ENV['EDITOR']
   c.flag [:e,:editor], :default_value => nil
 
-  c.desc 'Application to use (OS X only)'
+if `uname` =~ /Darwins/
+  c.desc 'Application to use'
   c.flag [:a]
 
   c.desc "Use the editor_app defined in ~/.doingrc (#{wwid.config['editor_app']})"
   c.switch [:x]
 
-  c.desc 'Application bundle id to use (OS X only)'
+  c.desc 'Application bundle id to use'
   c.flag [:b]
-
+end
   c.action do |global_options,options,args|
-    if options[:x]
-      %x{open -a "#{wwid.config['editor_app']}" "#{File.expand_path(DOING_CONFIG)}"}
-    elsif options[:a] || options[:b]
-      if options[:a]
-        %x{open -a "#{options[:a]}" "#{File.expand_path(DOING_CONFIG)}"}
-      elsif options[:b]
-        %x{open -b #{options[:b]} "#{File.expand_path(DOING_CONFIG)}"}
+    if `uname` =~ /Darwins/
+      if options[:x]
+        %x{open -a "#{wwid.config['editor_app']}" "#{File.expand_path(DOING_CONFIG)}"}
+      elsif options[:a] || options[:b]
+        if options[:a]
+          %x{open -a "#{options[:a]}" "#{File.expand_path(DOING_CONFIG)}"}
+        elsif options[:b]
+          %x{open -b #{options[:b]} "#{File.expand_path(DOING_CONFIG)}"}
+        end
+      else
+        raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
+        editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
+        system %Q{#{editor} "#{File.expand_path(DOING_CONFIG)}"}
       end
     else
       raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
