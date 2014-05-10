@@ -717,13 +717,13 @@ if `uname` =~ /Darwins/
 end
   c.action do |global_options,options,args|
     if `uname` =~ /Darwins/
-      if options[:x]
-        %x{open -a "#{wwid.config['editor_app']}" "#{File.expand_path(DOING_CONFIG)}"}
-      elsif options[:a] || options[:b]
-        if options[:a]
-          %x{open -a "#{options[:a]}" "#{File.expand_path(DOING_CONFIG)}"}
-        elsif options[:b]
-          %x{open -b #{options[:b]} "#{File.expand_path(DOING_CONFIG)}"}
+    if options[:x]
+      %x{open -a "#{wwid.config['editor_app']}" "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
+    elsif options[:a] || options[:b]
+      if options[:a]
+        %x{open -a "#{options[:a]}" "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
+      elsif options[:b]
+        %x{open -b #{options[:b]} "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
         end
       else
         raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
@@ -733,7 +733,7 @@ end
     else
       raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
       editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
-      system %Q{#{editor} "#{File.expand_path(DOING_CONFIG)}"}
+      system %Q{#{editor} "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
     end
   end
 end

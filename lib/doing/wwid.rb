@@ -1,4 +1,7 @@
 #!/usr/bin/ruby
+
+require 'deep_merge'
+
 class String
   def cap_first
     self.sub(/^\w/) do |m|
@@ -63,14 +66,15 @@ class WWID
     }
     @config['marker_tag'] ||= 'flagged'
     @config['marker_color'] ||= 'red'
-
+    @config['default_tags'] ||= []
+    
     @current_section = config['current_section']
     @default_template = config['templates']['default']['template']
     @default_date_format = config['templates']['default']['date_format']
 
     @config[:include_notes] ||= true
 
-    File.open(File.expand_path(DOING_CONFIG), 'w') { |yf| YAML::dump(config, yf) }
+    File.open(home_config, 'w') { |yf| YAML::dump(config, yf) }
   end
 
   def init_doing_file(input=nil)
@@ -141,12 +145,23 @@ class WWID
     end
   end
 
+  def home_config
+    File.join(Dir.home, DOING_CONFIG_NAME)
+  end
+  
   def read_config
-    if File.exists? File.expand_path(DOING_CONFIG)
-      return YAML.load_file(File.expand_path(DOING_CONFIG))
-    else
-      return {}
+    config = {}
+    dir = Dir.pwd
+    while(dir != '/')
+      if File.exists? File.join(dir, DOING_CONFIG_NAME)
+        config = YAML.load_file(File.join(dir, DOING_CONFIG_NAME)).deep_merge!(config)
+      end
+      dir = File.dirname(dir)
     end
+    if config.empty? && File.exists?(home_config)
+      config = YAML.load_file(home_config)
+    end
+    config
   end
 
   def fork_editor(input="")
@@ -284,7 +299,8 @@ class WWID
     opt[:back] ||= Time.now
     opt[:timed] ||= false
 
-    entry = {'title' => title.strip.cap_first, 'date' => opt[:back]}
+    title = [title.strip.cap_first] + @config['default_tags'].map{|t| '@' + t.sub(/^ *@/,'').chomp}
+    entry = {'title' => title.join(' '), 'date' => opt[:back]}
     unless opt[:note] =~ /^\s*$/s
       entry['note'] = opt[:note]
     end

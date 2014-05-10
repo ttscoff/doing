@@ -9,4 +9,4 @@ require 'chronic'
 require 'haml'
 require 'doing/wwid.rb'
 
-DOING_CONFIG = "~/.doingrc"
+DOING_CONFIG_NAME = ".doingrc"
