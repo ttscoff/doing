@@ -807,9 +807,9 @@ EOT
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output})
   end
 
-  def yesterday(section)
+  def yesterday(section,times=nil,output=nil)
     section = guess_section(section)
-    list_section({:section => section, :count => 0, :order => "asc", :yesterday => true})
+    list_section({:section => section, :count => 0, :order => "asc", :yesterday => true, :times => times, :output => output })
   end
 
   def recent(count=10,section=nil,opt={})
