@@ -282,6 +282,10 @@ All of these commands accept a `-e` argument. This opens your command line edito
 
 `doing finish` by itself is the same as `doing done` by itself. It adds `@done(timestamp)` to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add `-a` to also archive the affected entries.
 
+`doing finish` also provides an `--auto` flag, which you can use to set the end time of any entry to 1 minute before the start time of the next. Running a command such as `doing finish --auto 10` will go through the last 10 entries and sequentially update any without a `@done` tag with one set to the time just before the next entry in the list.
+
+As mentioned above, `finish` also accepts `--back "2 hours"` (sets the date from time now minus interval) or `--took 30m` (sets the date from time started plus interval) so you can accurately add times to completed tasks, even if you don't do it in the moment.
+
 `tag` adds one or more tags to the last entry, or specify a count with `-c X`. Tags are specified as basic arguments, separated by spaces. For example:
 
     doing tag -c 3 client cancelled
@@ -428,6 +432,7 @@ I'll try to document some of the code structure as I flesh it out. I'm currently
 * -f flag to `now` command for finishing last task when starting a new one (Looks back for the last unfinished task in the list)
 * --took option for `done` and `finish` for specifying intervals from the start date for the completion date
 * Basic command line reporting
+* --auto flag for `finish` and `done` that will automatically set the completion time to 1 minute before the next start time in the list. You can use it retroactively to add times to sequential todos.
 
 #### 0.2.5
 

@@ -289,10 +289,10 @@ command :finish do |c|
   c.switch [:d,:date], :default_value => true
 
   c.desc 'Backdate completed date to date string [4pm|20m|2h|yesterday noon]'
-  c.flag [:back,:b]
+  c.flag [:b,:back]
 
   c.desc 'Set the completed date to the start date plus XX[hmd]'
-  c.flag [:took,:t]
+  c.flag [:t,:took]
 
   c.desc 'Auto-generate finish dates from next entry\'s start time'
   c.long_desc 'Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.'
