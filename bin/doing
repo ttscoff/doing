@@ -104,7 +104,7 @@ command :meanwhile do |c|
   c.desc "Archive previous @meanwhile entry"
   c.switch [:a,:archive], :default_value => false
 
-  c.desc 'Backdate to "date_string" (natural language)'
+  c.desc 'Backdate completed date to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:back]
 
   c.action do |global_options,options,args|
@@ -148,7 +148,7 @@ command :later do |c|
   c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
   c.flag [:a,:app]
 
-  c.desc 'Backdate to "date_string" (natural language)'
+  c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:back]
 
   c.action do |global_options,options,args|
@@ -202,8 +202,8 @@ command :done do |c|
   c.default_value false
   c.switch [:a,:archive], :negatable => false, :default_value => false
 
-  c.desc 'Backdate to "date_string" (natural language)'
-  c.flag [:back]
+  c.desc 'Backdate start date to date string [4pm|20m|2h|yesterday noon]'
+  c.flag [:back,:took]
 
   c.desc 'Section'
   c.default_value wwid.current_section
@@ -276,7 +276,7 @@ command :finish do |c|
   c.default_value true
   c.switch [:d,:date], :default_value => true
 
-  c.desc 'Backdate to "date_string" (natural language)'
+  c.desc 'Backdate completed date to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:back]
 
   c.desc 'Archive entries'

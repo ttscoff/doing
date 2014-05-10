@@ -67,7 +67,7 @@ class WWID
     @config['marker_tag'] ||= 'flagged'
     @config['marker_color'] ||= 'red'
     @config['default_tags'] ||= []
-    
+
     @current_section = config['current_section']
     @default_template = config['templates']['default']['template']
     @default_date_format = config['templates']['default']['date_format']
@@ -148,7 +148,7 @@ class WWID
   def home_config
     File.join(Dir.home, DOING_CONFIG_NAME)
   end
-  
+
   def read_config
     config = {}
     dir = Dir.pwd
@@ -213,15 +213,15 @@ class WWID
   end
 
   def chronify(input)
-    if input =~ /^(\d+)([mhd])?$/i
+    if input =~ /^(\d+)\s*([mhd])?/i
       amt = $1
       type = $2.nil? ? "m" : $2
       input = case type.downcase
-      when "m"
+      when 'm'
         amt + " minutes ago"
-      when "h"
+      when 'h'
         amt + " hours ago"
-      when "d"
+      when 'd'
         amt + " days ago"
       else
         input
