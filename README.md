@@ -269,7 +269,7 @@ You can finish the last unfinished task when starting a new one using `doing now
 
 `doing done` is used to add an entry that you've already completed. Like `now`, you can specify a section with `-s section_name`. You can also skip straight to Archive with `-a`.
 
-You can also backdate entries using natural language with `--back 15m` or `--back "3/15 3pm"`. That will modify the timestamp of the entry. When used with `doing done`, this allows time intervals to be accurately counted when entering items after the fact.
+You can also backdate entries using natural language with `--back 15m` or `--back "3/15 3pm"`. That will modify the starting timestamp of the entry. You can also use `--took 1h20m` or `--took 1:20` to set the finish date based on a "natural language" time interval. When used with `doing done`, this allows time intervals to be accurately counted when entering items after the fact. `--took` is also available for the `doing finish` command, but cannot be used in conjunction with `--back`. (In `finish` they both set the end date, and neither has priority. `--back` allows specific days/times, `--took` uses time intervals.)
 
 All of these commands accept a `-e` argument. This opens your command line editor as defined in the environment variable `$EDITOR`. Add your entry, save the temp file and close it, and the new entry will be added. Anything after the first line is included as a note on the entry.
 
@@ -414,6 +414,10 @@ I'm not making any money on `doing`, and I don't plan to spend a lot of time fix
 That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable issue in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message.
 
 Please try not to email me directly about GitHub projects.
+
+### Developer notes
+
+I'll try to document some of the code structure as I flesh it out. I'm currently working on adding a CLI reporting structure and logging methods, as well as santizing and standardizing all the flags and switches for consistency. Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
 ### Changelog
 

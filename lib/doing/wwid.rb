@@ -12,13 +12,14 @@ class String
 end
 
 class WWID
-  attr_accessor :content, :sections, :current_section, :doing_file, :config
+  attr_accessor :content, :sections, :current_section, :doing_file, :config, :results
 
 
   def initialize
     @content = {}
     @timers = {}
     @config = read_config
+    @results = []
 
     @config['doing_file'] ||= "~/what_was_i_doing.md"
     @config['current_section'] ||= 'Currently'
@@ -197,7 +198,10 @@ class WWID
   end
 
   # This takes a multi-line string and formats it as an entry
-  # returns an array of [title(String), note(Array)]
+  # Params:
+  # +input+:: String
+  # Returns:
+  # [title(String), note(Array)]
   def format_input(input)
     raise "No content in entry" if input.nil? || input.strip.length == 0
     input_lines = input.split(/[\n\r]+/)
@@ -212,6 +216,11 @@ class WWID
     [title, note]
   end
 
+  # Converts simple strings into seconds that can be added to a Time object
+  # Params:
+  # +qty+:: HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m, 1.5d, 1h20m, etc.)
+  # Returns:
+  # seconds(Integer)
   def chronify(input)
     if input =~ /^(\d+)\s*([mhd])?/i
       amt = $1
@@ -229,6 +238,32 @@ class WWID
     end
 
     Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
+  end
+
+
+  # Converts simple strings into seconds that can be added to a Time object
+  # Params:
+  # +qty+:: HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m, 1.5d, 1h20m, etc.)
+  # Returns seconds (Integer)
+  def chronify_qty(qty)
+    minutes = 0
+    if qty.strip =~ /^(\d+):(\d\d)$/
+      minutes += $1.to_i * 60
+      minutes += $2.to_i
+    elsif qty.strip =~ /\d+\s*[hmd]/
+      matches = qty.scan(/([\d\.]+)\s*([hmd])/)
+      matches.each {|m|
+        case m[1]
+        when "m"
+          minutes += m[0].to_i
+        when "h"
+          minutes += (m[0].to_f * 60).round
+        when "d"
+          minutes += (m[0].to_f * 60 * 24).round
+        end
+      }
+    end
+    minutes * 60
   end
 
   def sections
@@ -319,6 +354,7 @@ class WWID
     end
     items.push(entry)
     @content[section]['items'] = items
+    @results.push(%Q{Added "#{entry['title']}" to #{section}})
   end
 
   def tag_last(opt={})
@@ -326,39 +362,68 @@ class WWID
     opt[:count] ||= 1
     opt[:archive] ||= false
     opt[:tags] ||= ["done"]
+    opt[:sequential] ||= false
     opt[:date] ||= false
     opt[:remove] ||= false
     opt[:back] ||= Time.now
+
+
 
     opt[:section] = guess_section(opt[:section])
 
     if @content.has_key?(opt[:section])
       # sort_section(opt[:section])
-      # items = @content[opt[:section]]['items'].sort_by{|item| item['date'] }.reverse
+      items = @content[opt[:section]]['items'].dup.sort_by{|item| item['date'] }.reverse
 
-      @content[opt[:section]]['items'].each_with_index {|item, i|
-        break if i == opt[:count]
+      index = 0
+      done_date = Time.now
+      next_start = Time.now
+      items.map! {|item|
+        break if index == opt[:count]
+        if opt[:sequential]
+          done_date = next_start - 1
+          next_start = item['date']
+        elsif opt[:back].instance_of? Fixnum
+          done_date = item['date'] + opt[:back]
+        else
+          done_date = opt[:back]
+        end
+
         title = item['title']
         opt[:tags].each {|tag|
           if opt[:remove]
             title.gsub!(/(^| )@#{tag.strip}(\([^\)]*\))?/,'')
+            @results.push("Updated: #{title}")
           else
             unless title =~ /@#{tag}/
-              if (tag == "done" && opt[:date]) || opt[:date]
-                title += " @#{tag}(#{opt[:back].strftime('%F %R')})"
+              title.chomp!
+              if opt[:date]
+                title += " @#{tag}(#{done_date.strftime('%F %R')})"
               else
                 title += " @#{tag}"
               end
+              @results.push("Updated: #{title}")
             end
           end
         }
-        @content[opt[:section]]['items'][i]['title'] = title
+
+        item['title'] = title
+        index += 1
+        item
       }
 
+      @content[opt[:section]]['items'] = items
+
       if opt[:archive] && opt[:section] != "Archive"
+        # concat [count] items from [section] and archive section
         archived = @content[opt[:section]]['items'][0..opt[:count]-1].concat(@content['Archive']['items'])
+        # chop [count] items off of [section] items
         @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
+        # overwrite archive section with concatenated array
         @content['Archive']['items'] = archived
+        # log it
+        result = opt[:count] == 1 ? "1 entry" : "#{opt[:count]} entries"
+        @results.push("Archived #{result}")
       end
 
       write(@doing_file)
@@ -389,8 +454,11 @@ class WWID
         @content[opt[:section]]['items'][i]['title'] = title
 
         if opt[:archive] && opt[:section] != "Archive"
+          @results.push(%Q{Completed and archived "#{@content[opt[:section]]['items'][i]['title']}"})
           @content['Archive']['items'].push(@content[opt[:section]]['items'][i])
           @content[opt[:section]]['items'].delete_at(i)
+        else
+          @results.push(%Q{Completed "#{@content[opt[:section]]['items'][i]['title']}"})
         end
       end
     }
@@ -419,12 +487,21 @@ class WWID
       $stdout.puts output
     else
       if File.exists?(File.expand_path(file))
+        FileUtils.cp(file,file+"~")
         File.open(File.expand_path(file),'w+') do |f|
           f.puts output
         end
       end
     end
   end
+
+  def restore_backup(file)
+    if File.exists?(file+"~")
+      FileUtils.cp(file+"~",file)
+      @results.push("Restored #{file}")
+    end
+  end
+
 
   def choose_section
     sections.each_with_index {|section, i|

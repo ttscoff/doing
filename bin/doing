@@ -104,7 +104,7 @@ command :meanwhile do |c|
   c.desc "Archive previous @meanwhile entry"
   c.switch [:a,:archive], :default_value => false
 
-  c.desc 'Backdate completed date to date string [4pm|20m|2h|yesterday noon]'
+  c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:back]
 
   c.action do |global_options,options,args|
@@ -203,7 +203,10 @@ command :done do |c|
   c.switch [:a,:archive], :negatable => false, :default_value => false
 
   c.desc 'Backdate start date to date string [4pm|20m|2h|yesterday noon]'
-  c.flag [:back,:took]
+  c.flag [:b,:back]
+
+  c.desc 'Set completion date to start date plus XX[mhd] or [HH:MM]'
+  c.flag [:t,:took]
 
   c.desc 'Section'
   c.default_value wwid.current_section
@@ -220,13 +223,21 @@ command :done do |c|
   c.action do |global_options,options,args|
     if options[:back]
       date = wwid.chronify(options[:back])
-      raise "Unable to parse date string" if date.nil?
+      raise "Unable to parse date string for --back" if date.nil?
     else
       date = Time.now
     end
 
+    if options[:took]
+      minutes = wwid.chronify_qty(options[:took])
+      finish_date = date + minutes
+      raise "Unable to parse date string for --took" if date.nil?
+    else
+      finish_date = Time.now
+    end
+
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
-    donedate = options[:d] ? "(#{Time.now.strftime('%F %R')})" : ""
+    donedate = options[:d] ? "(#{finish_date.strftime('%F %R')})" : ""
 
     if options[:e]
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
@@ -246,11 +257,12 @@ command :done do |c|
       if options[:r]
         wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :remove => true })
       else
-        wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => date, :date => options[:d]})
+        wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => finish_date, :date => options[:d]})
       end
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
+        title.chomp!
         title += " @done#{donedate}"
         section = "Archive" if options[:a]
         wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
@@ -277,7 +289,15 @@ command :finish do |c|
   c.switch [:d,:date], :default_value => true
 
   c.desc 'Backdate completed date to date string [4pm|20m|2h|yesterday noon]'
-  c.flag [:back]
+  c.flag [:back,:b]
+
+  c.desc 'Set the completed date to the start date plus XX[hmd]'
+  c.flag [:took,:t]
+
+  c.desc 'Auto-generate finish dates from next entry\'s start time'
+  c.long_desc 'Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.'
+  c.default_value false
+  c.switch [:auto], :negatable => false, :default_value => false
 
   c.desc 'Archive entries'
   c.default_value false
@@ -291,19 +311,25 @@ command :finish do |c|
 
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
-    if options[:back]
-      date = wwid.chronify(options[:back])
+    unless options[:auto]
+      raise "--back and --took cannot be used together" if options[:back] and options[:took]
 
-      raise "Unable to parse date string" if date.nil?
-    else
-      date = Time.now
+      if options[:back]
+        date = wwid.chronify(options[:back])
+
+        raise "Unable to parse date string" if date.nil?
+      elsif options[:took]
+        date = wwid.chronify_qty(options[:took])
+      else
+        date = Time.now
+      end
     end
 
     if args.length > 1
       raise "Only one argument allowed"
     elsif args.length == 0 || args[0] =~ /\d+/
       count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :date => options[:d], :back => date })
+      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :sequential => options[:auto], :date => options[:d], :back => date })
     else
       raise "Invalid argument (specify number of recent items to mark @done)"
     end
@@ -705,25 +731,25 @@ command :config do |c|
   c.default_value ENV['EDITOR']
   c.flag [:e,:editor], :default_value => nil
 
-if `uname` =~ /Darwins/
-  c.desc 'Application to use'
-  c.flag [:a]
+  if `uname` =~ /Darwins/
+    c.desc 'Application to use'
+    c.flag [:a]
 
-  c.desc "Use the editor_app defined in ~/.doingrc (#{wwid.config['editor_app']})"
-  c.switch [:x]
+    c.desc "Use the editor_app defined in ~/.doingrc (#{wwid.config['editor_app']})"
+    c.switch [:x]
 
-  c.desc 'Application bundle id to use'
-  c.flag [:b]
-end
+    c.desc 'Application bundle id to use'
+    c.flag [:b]
+  end
   c.action do |global_options,options,args|
     if `uname` =~ /Darwins/
-    if options[:x]
-      %x{open -a "#{wwid.config['editor_app']}" "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
-    elsif options[:a] || options[:b]
-      if options[:a]
-        %x{open -a "#{options[:a]}" "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
-      elsif options[:b]
-        %x{open -b #{options[:b]} "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
+      if options[:x]
+        %x{open -a "#{wwid.config['editor_app']}" "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
+      elsif options[:a] || options[:b]
+        if options[:a]
+          %x{open -a "#{options[:a]}" "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
+        elsif options[:b]
+          %x{open -b #{options[:b]} "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
         end
       else
         raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
@@ -737,6 +763,19 @@ end
     end
   end
 end
+
+desc 'Undo the last change to the doing_file'
+command :undo do |c|
+  c.desc 'Specify alternate doing file'
+  c.default_value wwid.doing_file
+  c.flag [:f,:file], :default_value => wwid.doing_file
+
+  c.action do |global_options,options,args|
+    file = options[:f] || wwid.doing_file
+    wwid.restore_backup(file)
+  end
+end
+
 
 pre do |global,command,options,args|
   if global[:doing_file]
@@ -759,6 +798,7 @@ end
 post do |global,command,options,args|
   # Use skips_post before a command to skip this
   # block on that command only
+  puts wwid.results.join("\n")
 end
 
 on_error do |exception|
