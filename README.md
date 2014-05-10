@@ -426,6 +426,8 @@ I'll try to document some of the code structure as I flesh it out. I'm currently
 * --totals, --[no-]times, --output [csv,html] options for yesterday command.
 * Add tests for Darwin to hide OS X-only features on other systems
 * -f flag to `now` command for finishing last task when starting a new one (Looks back for the last unfinished task in the list)
+* --took option for `done` and `finish` for specifying intervals from the start date for the completion date
+* Basic command line reporting
 
 #### 0.2.5
 
