@@ -417,6 +417,12 @@ Please try not to email me directly about GitHub projects.
 
 ### Changelog
 
+#### 0.2.6pre
+
+* --totals, --[no-]times, --output [csv,html] options for yesterday command.
+* Add tests for Darwin to hide OS X-only features on other systems
+* -f flag to `now` command for finishing last task when starting a new one (Looks back for the last unfinished task in the list)
+
 #### 0.2.5
 
  * Default to showing times #26, show totals even if no tags exist #27, fix indentation #29
