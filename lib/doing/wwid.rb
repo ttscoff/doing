@@ -473,7 +473,7 @@ class WWID
   end
 
   def write(file=nil)
-    if @other_content_top.empty?
+    unless @other_content_top
       output = ""
     else
       output = @other_content_top.join("\n") + "\n"
@@ -482,7 +482,7 @@ class WWID
       output += section['original'] + "\n"
       output += list_section({:section => title, :template => "\t- %date | %title%note", :highlight => false})
     }
-    output += @other_content_bottom.join("\n")
+    output += @other_content_bottom.join("\n") unless @other_content_bottom.nil?
     if file.nil?
       $stdout.puts output
     else
@@ -497,6 +497,7 @@ class WWID
 
   def restore_backup(file)
     if File.exists?(file+"~")
+      puts file+"~"
       FileUtils.cp(file+"~",file)
       @results.push("Restored #{file}")
     end
