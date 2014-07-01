@@ -6,7 +6,6 @@ _If you're one of the rare people like me who find this useful, feel free to con
 
 [Changelog](#changelog)
 
-<div id="ghtoc" markdown="1">
 ## Contents
 
 - [What and why](#what-and-why)
@@ -31,7 +30,7 @@ _If you're one of the rare people like me who find this useful, feel free to con
     - [Support](#support)
     - [Developer notes](#developer-notes)
     - [Changelog](#changelog)
-</div>
+
 <!-- end toc -->
 
 ## What and why
