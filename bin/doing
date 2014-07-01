@@ -461,6 +461,37 @@ command :show do |c|
   end
 end
 
+desc 'Search for entries'
+long_desc 'Search all sections (or limit to a single section) for entries matching text or regular expression.'
+arg_name 'search_pattern'
+command :grep do |c|
+  c.desc 'Section'
+  c.default_value "all"
+  c.flag [:s,:section], :default_value => "All"
+
+  c.desc 'Output to export format (csv|html)'
+  c.flag [:o,:output]
+
+  c.desc 'Show time intervals on @done tasks'
+  c.default_value true
+  c.switch [:t,:times], :default_value => true
+
+  c.desc 'Show intervals with totals at the end of output'
+  c.default_value false
+  c.switch [:totals], :default_value => false, :negatable => true
+
+  c.action do |global_options,options,args|
+
+    section = wwid.guess_section(options[:s]) if options[:s]
+
+    options[:t] = true if options[:totals]
+
+    puts wwid.list_section({:search => args.join, :section => section, :output => options[:output], :times => options[:t], :highlight => true})
+
+    puts wwid.tag_times if options[:totals]
+  end
+end
+
 desc 'List recent entries'
 default_value 10
 arg_name 'count'

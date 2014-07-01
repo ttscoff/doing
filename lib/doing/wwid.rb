@@ -547,6 +547,8 @@ class WWID
     opt[:tag_filter] ||= false
     opt[:tags_color] ||= false
     opt[:times] ||= false
+    opt[:search] ||= false
+
     # opt[:highlight] ||= true
     section = ""
     if opt[:section].nil?
@@ -594,6 +596,13 @@ class WWID
           }
           del
         end
+      }
+    end
+
+    if opt[:search]
+      items.keep_if {|item|
+        text = item['note'] ? item['title'] + item['note'].join(" ") : item['title']
+        text =~ /#{opt[:search]}/i
       }
     end
 

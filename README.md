@@ -299,6 +299,7 @@ As mentioned above, `finish` also accepts `--back "2 hours"` (sets the date from
     today     - List entries from today
     yesterday - List entries from yesterday
     last      - Show the last entry
+    grep      - Show entries matching text or pattern
 
 `doing show` on its own will list all entries in the "Currently" section. Add a section name as an argument to display that section instead. Use "all" to display all entries from all sections.
 
@@ -433,25 +434,26 @@ I'll try to document some of the code structure as I flesh it out. I'm currently
 * --took option for `done` and `finish` for specifying intervals from the start date for the completion date
 * Basic command line reporting
 * --auto flag for `finish` and `done` that will automatically set the completion time to 1 minute before the next start time in the list. You can use it retroactively to add times to sequential todos.
+* `doing grep` for searching by text or regex
 
 #### 0.2.5
 
- * Default to showing times #26, show totals even if no tags exist #27, fix indentation #29
- * Add section label to archived tasks automatically, excepting Currently section
- * Today outputs and backdate for finish
- * html styling and fix for 1.8.7 haml errors
- * Look, HTML output! (`--output html`)
- * Also, `--output csv`
- * let doing archive function on all sections
- * option to exclude date from `@done`,  
- * output newlines in sections and views
- * Flagging (`doing mark`)
- * fix for view/section guess error
- * Adding tag filtering to archive command (`doing archive \@done`)
- * `doing yesterday`
- * `doing done -r` to remove last doing tag (optionally from `-s Section`)
- * Add -f flag to specify alternate doing file
- * Meanwhile command
+* Default to showing times #26, show totals even if no tags exist #27, fix indentation #29
+* Add section label to archived tasks automatically, excepting Currently section
+* Today outputs and backdate for finish
+* html styling and fix for 1.8.7 haml errors
+* Look, HTML output! (`--output html`)
+* Also, `--output csv`
+* let doing archive function on all sections
+* option to exclude date from `@done`,  
+* output newlines in sections and views
+* Flagging (`doing mark`)
+* fix for view/section guess error
+* Adding tag filtering to archive command (`doing archive \@done`)
+* `doing yesterday`
+* `doing done -r` to remove last doing tag (optionally from `-s Section`)
+* Add -f flag to specify alternate doing file
+* Meanwhile command
 
 #### 0.2.1
 

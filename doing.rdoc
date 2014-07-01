@@ -1,0 +1,502 @@
+== doing - A CLI for a What Was I Doing system
+
+v0.2.6pre
+
+=== Global Options
+=== -f|--doing_file arg
+
+Specify a different doing_file
+
+[Default Value] None
+
+
+=== --help
+Show this message
+
+
+
+=== --[no-]notes
+Output notes if included in the template
+
+
+
+=== --version
+Display the program version
+
+
+
+=== Commands
+==== Command: <tt>add_section  section_name</tt>
+Add a new section to the "doing" file
+
+
+==== Command: <tt>archive  section</tt>
+Move entries in between sections
+
+
+===== Options
+===== -b|--bool arg
+
+Tag boolean
+
+[Default Value] AND
+
+
+===== -k|--keep arg
+
+Count to keep (ignored if archiving by tag)
+
+[Default Value] 5
+[Must Match] (?-mix:^\d+$)
+
+
+===== -t|--to arg
+
+Move entries to
+
+[Default Value] Archive
+
+
+==== Command: <tt>choose </tt>
+Select a section to display from a menu
+
+
+==== Command: <tt>config </tt>
+Edit the configuration file
+
+
+===== Options
+===== -e|--editor arg
+
+Editor to use
+
+[Default Value] None
+
+
+==== Command: <tt>done  entry</tt>
+Add a completed item with @done(date). No argument finishes last entry.
+
+
+===== Options
+===== -b|--back arg
+
+Backdate start date to date string [4pm|20m|2h|yesterday noon]
+
+[Default Value] None
+
+
+===== -s|--section arg
+
+Section
+
+[Default Value] Currently
+
+
+===== -t|--took arg
+
+Set completion date to start date plus XX[mhd] or [HH:MM]
+
+[Default Value] None
+
+
+===== -a|--archive
+Immediately archive the entry
+
+
+
+===== -d|--[no-]date
+Include date
+
+
+
+===== -e|--[no-]editor
+Edit entry with /Users/ttscoff/scripts/editor.sh
+
+
+
+===== -r|--remove
+Remove @done tag
+
+
+
+==== Command: <tt>finish  count</tt>
+Mark last X entries as @done
+
+Marks the last X entries with a @done tag and current date. Does not alter already completed entries.
+===== Options
+===== -b|--back arg
+
+Backdate completed date to date string [4pm|20m|2h|yesterday noon]
+
+[Default Value] None
+
+
+===== -s|--section arg
+
+Section
+
+[Default Value] Currently
+
+
+===== -t|--took arg
+
+Set the completed date to the start date plus XX[hmd]
+
+[Default Value] None
+
+
+===== -a|--archive
+Archive entries
+
+
+
+===== --auto
+Auto-generate finish dates from next entry's start time
+
+Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.
+
+===== -d|--[no-]date
+Include date
+
+
+
+==== Command: <tt>help  command</tt>
+Shows a list of commands or help for one command
+
+Gets help for the application or its commands. Can also list the commands in a way helpful to creating a bash-style completion function
+===== Options
+===== -c
+List commands one per line, to assist with shell completion
+
+
+
+==== Command: <tt>last </tt>
+Show the last entry
+
+
+==== Command: <tt>later  entry</tt>
+Add an item to the Later section
+
+
+===== Options
+===== -a|--app editor_app
+
+Edit entry with specified app
+
+[Default Value] Sublime Text
+
+
+===== --back arg
+
+Backdate start time to date string [4pm|20m|2h|yesterday noon]
+
+[Default Value] None
+
+
+===== -e|--[no-]editor
+Edit entry with /Users/ttscoff/scripts/editor.sh
+
+
+
+==== Command: <tt>mark </tt>
+Mark last entry as highlighted
+
+
+===== Options
+===== -s|--section arg
+
+Section
+
+[Default Value] Currently
+
+
+===== -r|--remove
+Remove mark
+
+
+
+==== Command: <tt>meanwhile  entry</tt>
+Finish any running @meanwhile tasks and optionally create a new one
+
+
+===== Options
+===== --back arg
+
+Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
+
+[Default Value] None
+
+
+===== -s|--section section_name
+
+Section
+
+[Default Value] Currently
+
+
+===== -a|--[no-]archive
+Archive previous @meanwhile entry
+
+
+
+===== -e|--[no-]editor
+Edit entry with /Users/ttscoff/scripts/editor.sh
+
+
+
+==== Command: <tt>now  entry</tt>
+Add an entry
+
+
+===== Options
+===== --back arg
+
+Backdate start time [4pm|20m|2h|yesterday noon]
+
+[Default Value] None
+
+
+===== -s|--section section_name
+
+Section
+
+[Default Value] Currently
+
+
+===== -e|--[no-]editor
+Edit entry with /Users/ttscoff/scripts/editor.sh
+
+
+
+===== -f|--finish_last
+Timed entry, marks last entry in section as @done
+
+
+
+==== Command: <tt>open </tt>
+Open the "doing" file in an editor
+
+
+===== Options
+===== -a app_name
+
+open with app name
+
+[Default Value] None
+
+
+===== -b bundle_id
+
+open with app bundle id
+
+[Default Value] None
+
+
+===== -e
+open with $EDITOR
+
+
+
+==== Command: <tt>recent  count</tt>
+List recent entries
+
+
+===== Options
+===== -s|--section arg
+
+Section
+
+[Default Value] Currently
+
+
+===== -t|--[no-]times
+Show time intervals on @done tasks
+
+
+
+===== --[no-]totals
+Show intervals with totals at the end of output
+
+
+
+==== Command: <tt>sections </tt>
+List sections
+
+
+==== Command: <tt>show  section [tags]</tt>
+List all entries
+
+
+===== Options
+===== -a|--age arg
+
+Age (oldest/newest)
+
+[Default Value] newest
+
+
+===== -b|--boolean arg
+
+Tag boolean (AND,OR,NONE)
+
+[Default Value] OR
+
+
+===== -c|--count arg
+
+Max count to show
+
+[Default Value] 0
+
+
+===== -o|--output arg
+
+Output to export format (csv|html)
+
+[Default Value] None
+
+
+===== -s|--sort arg
+
+Sort order (asc/desc)
+
+[Default Value] asc
+
+
+===== -t|--[no-]times
+Show time intervals on @done tasks
+
+
+
+===== --[no-]totals
+Show intervals with totals at the end of output
+
+
+
+==== Command: <tt>tag  tag1 [tag2...]</tt>
+Tag last entry
+
+
+===== Options
+===== -c|--count arg
+
+How many recent entries to tag
+
+[Default Value] 1
+
+
+===== -s|--section arg
+
+Section
+
+[Default Value] Currently
+
+
+===== -d|--date
+Include current date/time with tag
+
+
+
+===== -r|--remove
+Remove given tag(s)
+
+
+
+==== Command: <tt>today </tt>
+List entries from today
+
+
+===== Options
+===== -o|--output arg
+
+Output to export format (csv|html)
+
+[Default Value] None
+
+
+===== -t|--[no-]times
+Show time intervals on @done tasks
+
+
+
+===== --[no-]totals
+Show time totals at the end of output
+
+
+
+==== Command: <tt>undo </tt>
+Undo the last change to the doing_file
+
+
+===== Options
+===== -f|--file arg
+
+Specify alternate doing file
+
+[Default Value] None
+
+
+==== Command: <tt>view  view_name</tt>
+Display a user-created view
+
+
+===== Options
+===== -c|--count arg
+
+Count to display (override view settings)
+
+[Default Value] None
+[Must Match] (?-mix:^\d+$)
+
+
+===== -o|--output arg
+
+Output to export format (csv|html)
+
+[Default Value] None
+
+
+===== -s|--section arg
+
+Section (override view settings)
+
+[Default Value] None
+
+
+===== -t|--[no-]times
+Show time intervals on @done tasks
+
+
+
+===== --[no-]totals
+Show intervals with totals at the end of output
+
+
+
+==== Command: <tt>views </tt>
+List available custom views
+
+
+==== Command: <tt>yesterday  section</tt>
+List entries from yesterday
+
+
+===== Options
+===== -o|--output arg
+
+Output to export format (csv|html)
+
+[Default Value] None
+
+
+===== -t|--[no-]times
+Show time intervals on @done tasks
+
+
+
+===== --[no-]totals
+Show time totals at the end of output
+
+
+
+[Default Command] recent
