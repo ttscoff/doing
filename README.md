@@ -6,7 +6,32 @@ _If you're one of the rare people like me who find this useful, feel free to con
 
 [Changelog](#changelog)
 
-[toc]
+## Contents
+
+- [What and why](#what-and-why)
+- [Installation](#installation)
+- [The "doing" file](#the-doing-file)
+- [Configuration](#configuration)
+    - [Doing file location](#doing-file-location)
+    - ["Current actions" section](#current-actions-section)
+    - [Default editors](#default-editors)
+    - [Templates](#templates)
+    - [Custom views](#custom-views)
+- [Usage](#usage)
+    - [Global options:](#global-options)
+    - [Commands:](#commands)
+- [Extras](#extras)
+    - [Bash completion](#bash-completion)
+    - [Launchbar](#launchbar)
+- [Troubleshooting](#troubleshooting)
+    - [Errors after "Successfully installed..."](#errors-after-successfully-installed)
+    - [Command not found](#command-not-found)
+    - [Encoding errors](#encoding-errors)
+    - [Support](#support)
+    - [Developer notes](#developer-notes)
+    - [Changelog](#changelog)
+
+<!-- end toc -->
 
 ## What and why
 
