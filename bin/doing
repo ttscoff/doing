@@ -46,6 +46,11 @@ command :now do |c|
   c.default_value false
   c.switch [:f,:finish_last], :negatable => false, :default_value => false
 
+  c.desc 'Note'
+  c.arg_name 'note_text'
+  c.default_value wwid.current_section
+  c.flag [:n,:note]
+
   # c.desc "Edit entry with specified app"
   # c.arg_name 'editor_app'
   # c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
@@ -69,6 +74,7 @@ command :now do |c|
       input = wwid.fork_editor(input)
       if input
         title, note = wwid.format_input(input)
+        note.push(options[:n]) if options[:n]
         wwid.add_item(title.cap_first, section, {:note => note, :back => date, :timed => options[:f]})
         wwid.write(wwid.doing_file)
       else
@@ -77,16 +83,69 @@ command :now do |c|
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
+        note.push(options[:n]) if options[:n]
         wwid.add_item(title.cap_first, section, {:note => note, :back => date, :timed => options[:f]})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
+        note.push(options[:n]) if options[:n]
         wwid.add_item(title.cap_first, section, {:note => note, :back => date, :timed => options[:f]})
         wwid.write(wwid.doing_file)
       else
         raise "You must provide content when creating a new entry"
       end
     end
+  end
+end
+
+desc 'Add a note to the last entry'
+arg_name 'note_text'
+command :note do |c|
+  c.desc 'Section'
+  c.arg_name 'section_name'
+  c.default_value wwid.current_section
+  c.flag [:s,:section], :default_value => wwid.current_section
+
+  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.switch [:e,:editor], :negatable => false, :default_value => false
+
+  c.desc "Replace/Remove last entry's note"
+  c.long_desc "If -r is provided with no other arguments, the last note is removed. If new content is specified through arguments or STDIN, any previous note will be replaced with the new one."
+  c.switch [:r,:remove], :negatable => false, :default_value => false
+
+  c.action do |global_options,options,args|
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
+    if options[:e] || (args.length == 0 && STDIN.stat.size == 0 && !options[:r])
+      raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
+      input = ""
+      input += args.join(" ") if args.length > 0
+      input = wwid.fork_editor(input)
+      if input
+        title, note = wwid.format_input(input)
+        note.insert(0, title)
+        wwid.note_last(section, note, options[:r])
+      else
+        raise "No content"
+      end
+    else
+      if args.length > 0
+        title, note = wwid.format_input(args.join(" "))
+        note.insert(0, title)
+        wwid.note_last(section, note, options[:r])
+      elsif STDIN.stat.size > 0
+        title, note = wwid.format_input(STDIN.read)
+        note.insert(0, title)
+        wwid.note_last(section, note, options[:r])
+      else
+        if options[:r]
+          wwid.note_last(section, [], true)
+        else
+          raise "You must provide content when adding a note"
+        end
+      end
+    end
+    wwid.write(wwid.doing_file)
   end
 end
 
@@ -106,6 +165,11 @@ command :meanwhile do |c|
 
   c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:back]
+
+  c.desc 'Note'
+  c.arg_name 'note_text'
+  c.default_value wwid.current_section
+  c.flag [:n,:note]
 
   c.action do |global_options,options,args|
     if options[:back]
@@ -132,7 +196,8 @@ command :meanwhile do |c|
     end
     input = false unless input && input.length > 0
 
-    wwid.stop_start("meanwhile",{:new_item => input, :back => date, :section => section, :archive => options[:a]})
+    note = options[:n] ? options[:n] : false
+    wwid.stop_start("meanwhile",{:new_item => input, :back => date, :section => section, :archive => options[:a], :note => note})
     wwid.write(wwid.doing_file)
   end
 end
@@ -151,6 +216,11 @@ command :later do |c|
   c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:back]
 
+  c.desc 'Note'
+  c.arg_name 'note_text'
+  c.default_value wwid.current_section
+  c.flag [:n,:note]
+
   c.action do |global_options,options,args|
     if options[:back]
       date = wwid.chronify(options[:back])
@@ -166,6 +236,7 @@ command :later do |c|
       input = wwid.fork_editor(input)
       if input
         title, note = wwid.format_input(input)
+        note.push(options[:n]) if options[:n]
         wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else
@@ -174,10 +245,12 @@ command :later do |c|
     else
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
+        note.push(options[:n]) if options[:n]
         wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
+        note.push(options[:n]) if options[:n]
         wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
         wwid.write(wwid.doing_file)
       else

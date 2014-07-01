@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    doing (0.2.6pre)
+    doing (0.2.7pre)
       chronic (~> 0.10, >= 0.10.2)
       deep_merge
       gli (= 2.9.0)

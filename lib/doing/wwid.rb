@@ -432,6 +432,41 @@ class WWID
     end
   end
 
+  def note_last(section, note, replace=false)
+    section = guess_section(section)
+
+    if @content.has_key?(section)
+      # sort_section(opt[:section])
+      items = @content[section]['items'].dup.sort_by{|item| item['date'] }.reverse
+
+      current_note = items[0]['note']
+      current_note = [] if current_note.nil?
+      title = items[0]['title']
+      if replace
+        items[0]['note'] = note
+        if note.empty? && !current_note.empty?
+          @results.push(%Q{Removed note from "#{title}"})
+        elsif current_note.length > 0 && note.length > 0
+          @results.push(%Q{Replaced note from "#{title}"})
+        elsif note.length > 0
+          @results.push(%Q{Added note to #{title}})
+        else
+          @results.push(%Q{Entry "#{title}" has no note})
+        end
+      elsif current_note.class == Array
+        items[0]['note'] = current_note.concat(note)
+        @results.push(%Q{Added note to "#{title}"}) if note.length > 0
+      else
+        items[0]['note'] = note
+        @results.push(%Q{Added note to "#{title}"}) if note.length > 0
+      end
+
+      @content[section]['items'] = items
+    else
+      raise "Section not found"
+    end
+  end
+
   # accepts one tag and the raw text of a new item
   # if the passed tag is on any item, it's replaced with @done
   # if new_item is not nil, it's tagged with the passed tag and inserted
@@ -441,6 +476,7 @@ class WWID
     opt[:archive] ||= false
     opt[:back] ||= Time.now
     opt[:new_item] ||= false
+    opt[:note] ||= false
 
     opt[:section] = guess_section(opt[:section])
 
@@ -465,6 +501,7 @@ class WWID
 
     if opt[:new_item]
       title, note = format_input(opt[:new_item])
+      note.push(opt[:note]) if opt[:note]
       title += " @#{tag}"
       add_item(title.cap_first, opt[:section], {:note => note, :back => opt[:back]})
     end

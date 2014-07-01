@@ -279,6 +279,7 @@ All of these commands accept a `-e` argument. This opens your command line edito
 
     finish      - Mark last X entries as @done
     tag         - Tag last entry
+    note        - Add a note to the last entry
 
 `doing finish` by itself is the same as `doing done` by itself. It adds `@done(timestamp)` to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add `-a` to also archive the affected entries.
 
@@ -291,6 +292,10 @@ As mentioned above, `finish` also accepts `--back "2 hours"` (sets the date from
     doing tag -c 3 client cancelled
 
 ... will mark the last three entries as "@client @cancelled." Add `-r` as a switch to remove the listed tags instead.
+
+`note` lets you enter a note on the last entry. You can specify a section with `-s section_name`. `-e` will open your $EDITOR for typing the note, but you can just include it on the command line after any arguments. You can also pipe a note in on STDIN (`echo "fun stuff"|doing note`). The `-r` switch will remove/replace a note; if there's new note text passed when using the `-r` switch, it will replace any existing note. If the `-r` switch is used alone, any existing note will be removed.
+
+You can also add notes at the time of entry by using the `-n` or `--note` flag with `doing now`, `doing later`, or `doing done`. If you pass in text to any of the creation commands that has multiple lines, everything after the first line break will become the note.
 
 #### Displaying entries:
 
