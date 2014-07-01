@@ -6,6 +6,8 @@ _If you're one of the rare people like me who find this useful, feel free to con
 
 [Changelog](#changelog)
 
+[toc]
+
 ## What and why
 
 `doing` is a basic CLI for adding and listing "what was I doing" reminders in a [TaskPaper-formatted](http://www.hogbaysoftware.com/products/taskpaper) text file. It allows for multiple sections/categories and flexible output formatting.
@@ -241,7 +243,7 @@ Outputs:
 
 ![](http://ckyp.us/XKpj+)
 
-## Usage:
+## Usage
 
     doing [global options] command [command options] [arguments...]
 
@@ -421,7 +423,7 @@ Ruby is rife with encoding inconsistencies across platforms and versions. Feel f
 
 I'm not making any money on `doing`, and I don't plan to spend a lot of time fixing errors on an array of operating systems and platforms I don't even have access to. You'll probably have to solve some things on your own.
 
-That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable issue in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message.
+That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable bug in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message. To get a more verbose error message, try running `GLI_DEBUG=true doing [...]` for a full trace.
 
 Please try not to email me directly about GitHub projects.
 
@@ -430,6 +432,11 @@ Please try not to email me directly about GitHub projects.
 I'll try to document some of the code structure as I flesh it out. I'm currently working on adding a CLI reporting structure and logging methods, as well as santizing and standardizing all the flags and switches for consistency. Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
 ### Changelog
+
+#### 1.0.0pre
+
+* Skipped ahead in the version numbering. Because I don't care.
+* Added a `note` command and `--note` flags for entry creation commands
 
 #### 0.2.6pre
 
