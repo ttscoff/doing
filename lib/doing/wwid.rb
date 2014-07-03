@@ -879,6 +879,7 @@ EOT
       }
       @content[section]['items'] = moved_items
       @content[destination]['items'] += items
+      @results.push("Archived #{items.length} items from #{section} to #{destination}")
     else
 
       return if items.length < count
@@ -894,6 +895,7 @@ EOT
         end
       }
       @content[destination]['items'] += items[count..-1]
+      @results.push("Archived #{items.length - count} items from #{section} to #{destination}")
     end
   end
 
