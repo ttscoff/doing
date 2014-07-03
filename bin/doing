@@ -48,7 +48,6 @@ command :now do |c|
 
   c.desc 'Note'
   c.arg_name 'note_text'
-  c.default_value wwid.current_section
   c.flag [:n,:note]
 
   # c.desc "Edit entry with specified app"
@@ -168,7 +167,6 @@ command :meanwhile do |c|
 
   c.desc 'Note'
   c.arg_name 'note_text'
-  c.default_value wwid.current_section
   c.flag [:n,:note]
 
   c.action do |global_options,options,args|
@@ -218,7 +216,6 @@ command :later do |c|
 
   c.desc 'Note'
   c.arg_name 'note_text'
-  c.default_value wwid.current_section
   c.flag [:n,:note]
 
   c.action do |global_options,options,args|
