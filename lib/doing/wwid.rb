@@ -739,7 +739,7 @@ EOT
         end
 
         if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
-          note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t" + line.sub(/^\t\t/,'') }
+          note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t" + line.sub(/^\t*/,'') + "  " }
           if opt[:wrap_width] && opt[:wrap_width] > 0
             width = opt[:wrap_width]
             note_lines.map! {|line|
@@ -799,7 +799,8 @@ EOT
           end
           o
         end
-
+        output.gsub!(/%n/,"\n")
+        output.gsub!(/%t/,"\t")
 
         out += output + "\n"
       }
