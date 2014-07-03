@@ -222,7 +222,7 @@ class WWID
   # Returns:
   # seconds(Integer)
   def chronify(input)
-    if input =~ /^(\d+)\s*([mhd])?/i
+    if input =~ /^(\d+)([mhd])?$/i
       amt = $1
       type = $2.nil? ? "m" : $2
       input = case type.downcase
@@ -250,18 +250,20 @@ class WWID
     if qty.strip =~ /^(\d+):(\d\d)$/
       minutes += $1.to_i * 60
       minutes += $2.to_i
-    elsif qty.strip =~ /\d+\s*[hmd]/
-      matches = qty.scan(/([\d\.]+)\s*([hmd])/)
-      matches.each {|m|
-        case m[1]
-        when "m"
-          minutes += m[0].to_i
-        when "h"
-          minutes += (m[0].to_f * 60).round
-        when "d"
-          minutes += (m[0].to_f * 60 * 24).round
-        end
-      }
+    elsif qty.strip =~ /^(\d+)([hmd])?$/
+      amt = $1
+      type = $2.nil? ? "m" : $2
+
+      minutes = case type.downcase
+      when 'm'
+        $1.to_i
+      when 'h'
+        ($1.to_f * 60).round
+      when 'd'
+        ($1.to_f * 60 * 24).round
+      else
+        minutes
+      end
     end
     minutes * 60
   end
