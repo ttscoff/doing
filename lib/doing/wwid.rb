@@ -586,6 +586,7 @@ class WWID
     opt[:tag_filter] ||= false
     opt[:tags_color] ||= false
     opt[:times] ||= false
+    opt[:totals] ||= false
     opt[:search] ||= false
 
     # opt[:highlight] ||= true
@@ -699,13 +700,20 @@ class WWID
           title = i['title']
           note = i['note'].map { |line| line.strip }
         end
+
+        if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+          interval = get_interval(i)
+        end
+        interval ||= false
+
         items_out << {
           :date => i['date'].strftime('%a %-I:%M%p'),
           :title => title.gsub(/(@[^ \(]+(\(.*?\))?)/im,'<span class="tag">\1</span>').strip, #+ " #{note}"
-          :note => note
+          :note => note,
+          :time => interval
         }
       }
-      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2}ul li .date{font-size:14px;position:absolute;left:-82px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}"
+      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2;position:relative}ul li .date{font-size:14px;position:absolute;left:-122px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}span.time{color:#729953;float:left;position:relative;padding:0 5px;font-size:15px;border-bottom:dashed 1px #ccc;text-align:right;background:#f9fced;margin-right:4px}table td{border-bottom:solid 1px #ddd;height:24px}caption{text-align:left;border-bottom:solid 1px #aaa;margin:10px 0}table{width:400px;margin:50px 0 0 211px}"
       template =<<EOT
 !!!
 %html
@@ -723,11 +731,15 @@ class WWID
           %li
             %span.date= i[:date]
             = i[:title]
+            - if i[:time] && i[:time] != "00:00:00"
+              %span.time= i[:time]
             - if i[:note]
               %span.note= i[:note].map{|n| n.strip }.join('<br>')
+      = @totals
 EOT
+      totals = opt[:totals] ? tag_times("html") : ""
       engine = Haml::Engine.new(template)
-      puts engine.render(Object.new, { :@items => items_out, :@page_title => page_title, :@style => style })
+      puts engine.render(Object.new, { :@items => items_out, :@page_title => page_title, :@style => style, :@totals => totals })
 
     else
       items.each {|item|
@@ -807,7 +819,7 @@ EOT
         out += output + "\n"
       }
     end
-
+    out += tag_times if opt[:totals]
     return out
   end
 
@@ -947,22 +959,25 @@ EOT
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => order})
   end
 
-  def today(times=true,output=nil)
+  def today(times=true,output=nil,opt={})
+    opt[:totals] ||= false
     cfg = @config['templates']['today']
-    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output})
+    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output, :totals => opt[:totals]})
   end
 
-  def yesterday(section,times=nil,output=nil)
+  def yesterday(section,times=nil,output=nil,opt={})
+    opt[:totals] ||= false
     section = guess_section(section)
-    list_section({:section => section, :count => 0, :order => "asc", :yesterday => true, :times => times, :output => output })
+    list_section({:section => section, :count => 0, :order => "asc", :yesterday => true, :times => times, :output => output, :totals => opt[:totals] })
   end
 
   def recent(count=10,section=nil,opt={})
     times = opt[:t] || true
+    opt[:totals] ||= false
     cfg = @config['templates']['recent']
     section ||= @current_section
     section = guess_section(section)
-    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :times => times })
+    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :times => times, :totals => opt[:totals] })
   end
 
   def last(times=true)
@@ -970,25 +985,59 @@ EOT
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template'], :times => times})
   end
 
-  def tag_times
-    output = []
-    # return "" if @timers.length == 0
+  def tag_times(format="text")
+
+    return "" if @timers.empty?
 
     max = @timers.keys.sort_by {|k| k.length }.reverse[0].length + 1
 
     total = @timers.delete("All")
 
-    @timers.sort_by{|k,v| v }.reverse.each {|k,v|
-      spacer = ""
-      (max - k.length).times do
-        spacer += " "
-      end
-      output.push("#{k}:#{spacer}#{"%02d:%02d:%02d" % fmt_time(v)}")
-    }
+    if format == "html"
+      output =<<EOS
+        <table>
+        <caption id="tagtotals">Tag Totals</caption>
+        <colgroup>
+        <col style="text-align:left;"/>
+        <col style="text-align:left;"/>
+        </colgroup>
+        <thead>
+        <tr>
+          <th style="text-align:left;">project</th>
+          <th style="text-align:left;">time</th>
+        </tr>
+        </thead>
+        <tbody>
+EOS
+      @timers.sort_by{|k,v| v }.reverse.each {|k,v|
+        output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{"%02d:%02d:%02d" % fmt_time(v)}</td></tr>\n"
+      }
+      tail =<<EOS
+      <tr>
+        <td style="text-align:left;" colspan="2"></td>
+      </tr>
+      <tr>
+        <td style="text-align:left;"><strong>Total</strong></td>
+        <td style="text-align:left;">#{"%02d:%02d:%02d" % fmt_time(total)}</td>
+      </tr>
+      </tbody>
+      </table>
+EOS
+      output + tail
+    else
+      output = []
+      @timers.sort_by{|k,v| v }.reverse.each {|k,v|
+        spacer = ""
+        (max - k.length).times do
+          spacer += " "
+        end
+        output.push("#{k}:#{spacer}#{"%02d:%02d:%02d" % fmt_time(v)}")
+      }
 
-    output = output.empty? ? "" : "\n--- Tag Totals ---\n" + output.join("\n")
-    output += "\n\nTotal tracked: #{"%02d:%02d:%02d" % fmt_time(total)}\n"
-    output
+      output = output.empty? ? "" : "\n--- Tag Totals ---\n" + output.join("\n")
+      output += "\n\nTotal tracked: #{"%02d:%02d:%02d" % fmt_time(total)}\n"
+      output
+    end
   end
 
   private
@@ -1032,12 +1081,3 @@ EOT
     [days, hours, minutes]
   end
 end
-
-
-
-# infile = "~/Dropbox/nvALT2.2/?? What was I doing.md"
-
-# wwid = WWID.new(infile)
-
-# wwid.add_item("Getting freaky with wwid CLI","Currently",{:date => Time.now})
-# wwid.write(infile)

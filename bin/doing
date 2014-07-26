@@ -524,9 +524,7 @@ command :show do |c|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :highlight => true})
-
-    puts wwid.tag_times if options[:totals]
+    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :totals => options[:totals], :highlight => true})
 
   end
 end
@@ -556,9 +554,8 @@ command :grep do |c|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.list_section({:search => args.join, :section => section, :output => options[:output], :times => options[:t], :highlight => true})
+    puts wwid.list_section({:search => args.join, :section => section, :output => options[:output], :times => options[:t], :highlight => true, :totals => options[:totals]})
 
-    puts wwid.tag_times if options[:totals]
   end
 end
 
@@ -590,9 +587,8 @@ command :recent do |c|
       end
       options[:t] = true if options[:totals]
 
-      puts wwid.recent(count,section.cap_first,{ :times => options[:t] })
+      puts wwid.recent(count,section.cap_first,{ :times => options[:t], :totals => options[:totals] })
 
-      puts wwid.tag_times if options[:totals]
     end
   end
 end
@@ -614,9 +610,8 @@ command :today do |c|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.today(options[:t],options[:output]).chomp
+    puts wwid.today(options[:t],options[:output],{:totals => options[:totals]}).chomp
 
-    puts wwid.tag_times if options[:totals]
   end
 end
 
@@ -637,9 +632,8 @@ command :yesterday do |c|
 
   c.action do |global_options, options,args|
     section = args.length > 0 ? args.join(" ") : wwid.current_section
-    puts wwid.yesterday(section,options[:t],options[:o]).chomp
+    puts wwid.yesterday(section,options[:t],options[:o],{:totals => options[:totals]}).chomp
 
-    puts wwid.tag_times if options[:totals]
   end
 end
 
@@ -731,9 +725,7 @@ command :view do |c|
       order = view.has_key?('order') ? view['order'] : "asc"
       options[:t] = true if options[:totals]
       options[:output].downcase! if options[:output]
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:output], :tags_color => tags_color, :times => options[:t], :highlight => true })
-
-      puts wwid.tag_times if options[:totals]
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:output], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals] })
     else
       raise "View #{title} not found in config"
     end
