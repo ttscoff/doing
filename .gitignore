@@ -4,3 +4,4 @@ html
 *.sublime*
 .rake_tasks~
 .sass-cache
+Gemfile.lock
