@@ -272,10 +272,15 @@ command :done do |c|
   c.default_value false
   c.switch [:a,:archive], :negatable => false, :default_value => false
 
-  c.desc 'Backdate start date to date string [4pm|20m|2h|yesterday noon]'
+  # TODO: Set @done date to specific time, backtracking start date in case of --took option. Should ignore --back option if present.
+  # c.desc 'Set finish date to specific date/time (natural langauge)'
+  # c.flag [:at]
+
+  c.desc 'Backdate start date by interval [4pm|20m|2h|yesterday noon]'
   c.flag [:b,:back]
 
-  c.desc 'Set completion date to start date plus XX[mhd] or [HH:MM]'
+  c.desc 'Set completion date to start date plus interval (XX[mhd] or HH:MM)'
+  c.long_desc 'If used without the --back option, the start date will be moved back to allow the completion date to be the current time.'
   c.flag [:t,:took]
 
   c.desc 'Section'
@@ -291,17 +296,22 @@ command :done do |c|
   # c.flag [:a,:app]
 
   c.action do |global_options,options,args|
+    took = 0
+
+    if options[:took]
+      took = wwid.chronify_qty(options[:took])
+      raise "Unable to parse date string for --took" if took.nil?
+    end
+
     if options[:back]
       date = wwid.chronify(options[:back])
       raise "Unable to parse date string for --back" if date.nil?
     else
-      date = Time.now
+      date = options[:took] ? Time.now - took : Time.now
     end
 
     if options[:took]
-      minutes = wwid.chronify_qty(options[:took])
-      finish_date = date + minutes
-      raise "Unable to parse date string for --took" if date.nil?
+      finish_date = date + took
     else
       finish_date = Time.now
     end
