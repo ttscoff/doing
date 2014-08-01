@@ -384,6 +384,10 @@ Example: Archive all Currently items for @client that are marked @done
 
 See the file `doing.completion.bash` in the git repository for full bash completion. Thanks to [fcrespo82](https://github.com/fcrespo82) for getting it [started](https://gist.github.com/fcrespo82/9609318).
 
+### Zsh completion
+
+See the file doing.completion.zsh in the git repository for zsh completion.
+
 ### Launchbar
 
 The previous incarnation of `doing` had a [LaunchBar](http://obdev.at/launchbar/) action that I used frequently. The Day One popup has mostly replaced that for me, but only because I have a system that connects it to my WWID file. However, I've still found a place for adding WWID entries without including them in my journal, and LaunchBar is the perfect way to do that for me.
