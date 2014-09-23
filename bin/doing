@@ -423,7 +423,7 @@ command :tag do |c|
   c.default_value wwid.current_section
   c.flag [:s,:section], :default_value => wwid.current_section
 
-  c.desc 'How many recent entries to tag'
+  c.desc 'How many recent entries to tag (0 for all)'
   c.default_value 1
   c.flag [:c,:count], :default_value => 1
 
@@ -442,7 +442,6 @@ command :tag do |c|
 
       section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
-      count = options[:c].to_i
       if args.join("") =~ /,/
         tags = args.join("").split(/,/)
       else
@@ -450,6 +449,22 @@ command :tag do |c|
       end
 
       tags.map!{|tag| tag.sub(/^@/,'').strip }
+
+      count = options[:c].to_i
+
+      if count == 0
+        if options[:r]
+          print "Are you sure you want to remove #{tags.join(" and ")} from all records? (y/N) "
+        else
+          print "Are you sure you want to add #{tags.join(" and ")} to all records? (y/N) "
+        end
+
+        res = STDIN.gets
+
+        unless res.strip =~ /^y(es)?$/i
+          raise "Cancelled"
+        end
+      end
 
       wwid.tag_last({:tags => tags, :count => count, :section => section, :date => options[:d], :remove => options[:r]})
     end
@@ -515,6 +530,8 @@ command :show do |c|
     if args.length > 0
       if args[0] =~ /^all$/i
         section = "All"
+      elsif args[0] =~ /^(choose|pick)$/i
+        section = wwid.choose_section
       elsif args[0] =~ /^@/
         section = "All"
         tags.push(args[0].sub(/^@/,''))

@@ -374,68 +374,85 @@ class WWID
     opt[:back] ||= Time.now
 
 
+    sec_arr = []
 
-    opt[:section] = guess_section(opt[:section])
+    if opt[:section].nil?
+      sec_arr = [@current_section]
+    elsif opt[:section].class == String
+      if opt[:section] =~ /^all$/i
+        sec_arr = sections
+      else
+        sec_arr = [guess_section(opt[:section])]
+      end
+    end
 
-    if @content.has_key?(opt[:section])
-      # sort_section(opt[:section])
-      items = @content[opt[:section]]['items'].dup.sort_by{|item| item['date'] }.reverse
+    sec_arr.each {|section|
+      if @content.has_key?(section)
 
-      index = 0
-      done_date = Time.now
-      next_start = Time.now
-      items.map! {|item|
-        break if index == opt[:count]
-        if opt[:sequential]
-          done_date = next_start - 1
-          next_start = item['date']
-        elsif opt[:back].instance_of? Fixnum
-          done_date = item['date'] + opt[:back]
-        else
-          done_date = opt[:back]
-        end
+        items = @content[section]['items'].dup.sort_by{|item| item['date'] }.reverse
 
-        title = item['title']
-        opt[:tags].each {|tag|
-          if opt[:remove]
-            title.gsub!(/(^| )@#{tag.strip}(\([^\)]*\))?/,'')
-            @results.push("Updated: #{title}")
+        index = 0
+        done_date = Time.now
+        next_start = Time.now
+        count = opt[:count] == 0 ? items.length : opt[:count]
+        items.map! {|item|
+          break if index == count
+          if opt[:sequential]
+            done_date = next_start - 1
+            next_start = item['date']
+          elsif opt[:back].instance_of? Fixnum
+            done_date = item['date'] + opt[:back]
           else
-            unless title =~ /@#{tag}/
-              title.chomp!
-              if opt[:date]
-                title += " @#{tag}(#{done_date.strftime('%F %R')})"
-              else
-                title += " @#{tag}"
-              end
-              @results.push("Updated: #{title}")
-            end
+            done_date = opt[:back]
           end
+
+          title = item['title']
+          opt[:tags].each {|tag|
+            tag.strip!
+            if opt[:remove]
+              if title =~ /@#{tag}/
+                title.gsub!(/(^| )@#{tag}(\([^\)]*\))?/,'')
+                @results.push("Removed @#{tag}: #{title}")
+              end
+            else
+              unless title =~ /@#{tag}/
+                title.chomp!
+                if opt[:date]
+                  title += " @#{tag}(#{done_date.strftime('%F %R')})"
+                else
+                  title += " @#{tag}"
+                end
+                @results.push("Added @#{tag}: #{title}")
+              end
+            end
+          }
+
+          item['title'] = title
+          index += 1
+          item
         }
 
-        item['title'] = title
-        index += 1
-        item
-      }
+        @content[section]['items'] = items
 
-      @content[opt[:section]]['items'] = items
-
-      if opt[:archive] && opt[:section] != "Archive"
-        # concat [count] items from [section] and archive section
-        archived = @content[opt[:section]]['items'][0..opt[:count]-1].concat(@content['Archive']['items'])
-        # chop [count] items off of [section] items
-        @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
-        # overwrite archive section with concatenated array
-        @content['Archive']['items'] = archived
-        # log it
-        result = opt[:count] == 1 ? "1 entry" : "#{opt[:count]} entries"
-        @results.push("Archived #{result}")
+        if opt[:archive] && section != "Archive" && opt[:count] > 0
+          # concat [count] items from [section] and archive section
+          archived = @content[section]['items'][0..opt[:count]-1].concat(@content['Archive']['items'])
+          # chop [count] items off of [section] items
+          @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
+          # overwrite archive section with concatenated array
+          @content['Archive']['items'] = archived
+          # log it
+          result = opt[:count] == 1 ? "1 entry" : "#{opt[:count]} entries"
+          @results.push("Archived #{result}")
+        elsif opt[:archive] && opt[:count] == 0
+          @results.push("Archiving is skipped when operating on all entries") if opt[:count] == 0
+        end
+      else
+        raise "Section not found: #{section}"
       end
+    }
 
-      write(@doing_file)
-    else
-      raise "Section not found"
-    end
+    write(@doing_file)
   end
 
   def note_last(section, note, replace=false)
@@ -488,12 +505,15 @@ class WWID
 
     tag.sub!(/^@/,'')
 
+    found_items = 0
+
     @content[opt[:section]]['items'].each_with_index {|item, i|
       if item['title'] =~ /@#{tag}/
         title = item['title'].gsub(/(^| )@(#{tag}|done)(\([^\)]*\))?/,'')
         title += " @done(#{opt[:back].strftime('%F %R')})"
 
         @content[opt[:section]]['items'][i]['title'] = title
+        found_items += 1
 
         if opt[:archive] && opt[:section] != "Archive"
           @results.push(%Q{Completed and archived "#{@content[opt[:section]]['items'][i]['title']}"})
@@ -504,6 +524,8 @@ class WWID
         end
       end
     }
+
+    @results.push("No active @#{tag} tasks found.") if found_items == 0
 
     if opt[:new_item]
       title, note = format_input(opt[:new_item])
@@ -530,7 +552,9 @@ class WWID
       $stdout.puts output
     else
       if File.exists?(File.expand_path(file))
+        # Create a backup copy for the undo command
         FileUtils.cp(file,file+"~")
+
         File.open(File.expand_path(file),'w+') do |f|
           f.puts output
         end
