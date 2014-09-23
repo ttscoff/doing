@@ -147,7 +147,11 @@ class WWID
   end
 
   def home_config
-    File.join(Dir.home, DOING_CONFIG_NAME)
+    if Dir.respond_to?('home')
+      File.join(Dir.home, DOING_CONFIG_NAME)
+    else
+      File.join(File.expand_path("~"), DOING_CONFIG_NAME)
+    end
   end
 
   def read_config
