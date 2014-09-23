@@ -651,6 +651,12 @@ class WWID
       }
     end
 
+    if opt[:only_timed]
+      items.delete_if {|item|
+        get_interval(item) == "00:00:00"
+      }
+    end
+
     if opt[:today]
       items.delete_if {|item|
         item['date'] < Date.today.to_time
@@ -672,12 +678,6 @@ class WWID
       items.reverse!
     end
 
-    if opt[:only_timed]
-      items.delete_if {|item|
-        get_interval(item) == "00:00:00"
-      }
-    end
-
     out = ""
 
     if opt[:output]
@@ -685,14 +685,18 @@ class WWID
     end
 
     if opt[:output] == "csv"
-      output = [CSV.generate_line(['date','title','note'])]
+      output = [CSV.generate_line(['date','title','note','timer'])]
       items.each {|i|
         note = ""
         if i['note']
           arr = i['note'].map{|line| line.strip}.delete_if{|e| e =~ /^\s*$/}
           note = arr.join("\n") unless arr.nil?
         end
-        output.push(CSV.generate_line([i['date'],i['title'],note]))
+        if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+          interval = get_interval(i, false)
+        end
+        interval ||= 0
+        output.push(CSV.generate_line([i['date'],i['title'],note,interval]))
       }
       out = output.join("")
     elsif opt[:output] == "html"
@@ -1057,7 +1061,7 @@ EOS
 
   private
 
-  def get_interval(item)
+  def get_interval(item, formatted=true)
     done = nil
     start = nil
 
@@ -1083,6 +1087,8 @@ EOS
         @timers[k] = seconds
       end
     }
+
+    return seconds unless formatted
 
     "%02d:%02d:%02d" % fmt_time(seconds)
   end
