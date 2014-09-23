@@ -1016,8 +1016,10 @@ EOT
         </thead>
         <tbody>
 EOS
-      @timers.sort_by{|k,v| v }.reverse.each {|k,v|
-        output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{"%02d:%02d:%02d" % fmt_time(v)}</td></tr>\n"
+      @timers.sort_by {|k,v|
+        v
+      }.reverse.each {|k,v|
+        output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{"%02d:%02d:%02d" % fmt_time(v)}</td></tr>\n" if v > 0
       }
       tail =<<EOS
       <tr>
@@ -1035,7 +1037,7 @@ EOS
       output + tail
     else
       output = []
-      @timers.sort_by{|k,v| v }.reverse.each {|k,v|
+      @timers.delete_if { |k,v| v == 0}.sort_by{|k,v| v }.reverse.each {|k,v|
         spacer = ""
         (max - k.length).times do
           spacer += " "
