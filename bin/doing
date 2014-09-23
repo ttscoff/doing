@@ -491,6 +491,7 @@ end
 
 
 desc 'List all entries'
+long_desc 'The argument can be a section name, tag(s) or both. "pick" or "choose" as an argument will offer a section menu.'
 arg_name 'section [tags]'
 command :show do |c|
   c.desc 'Tag boolean (AND,OR,NONE)'
@@ -530,17 +531,26 @@ command :show do |c|
     if args.length > 0
       if args[0] =~ /^all$/i
         section = "All"
+        args.shift
       elsif args[0] =~ /^(choose|pick)$/i
         section = wwid.choose_section
+        args.shift
       elsif args[0] =~ /^@/
         section = "All"
-        tags.push(args[0].sub(/^@/,''))
       else
         section = wwid.guess_section(args[0])
         raise "No such section: #{args[0]}" unless section
       end
-      if args.length > 1
-        tags += args[1..-1].map{|tag| tag.sub(/^@/,'').strip}
+      if args.length > 0
+        args.each {|arg|
+          if arg =~ /,/
+            arg_tags = arg.split(/,/).each {|tag|
+              tags.push(tag.strip.sub(/^@/,''))
+            }
+          else
+            tags.push(arg.strip.sub(/^@/,''))
+          end
+        }
       end
     else
       section = wwid.current_section
