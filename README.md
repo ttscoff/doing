@@ -451,6 +451,11 @@ I'll try to document some of the code structure as I flesh it out. I'm currently
 
 ### Changelog
 
+#### 1.0.4pre
+
+* Improved HTML output
+* --only_timed option for view/show commands that only outputs items with elapsed timers (interval between start and done dates)
+
 #### 1.0.0pre
 
 * Skipped ahead in the version numbering. Because I don't care.

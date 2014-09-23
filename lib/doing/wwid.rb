@@ -588,6 +588,7 @@ class WWID
     opt[:times] ||= false
     opt[:totals] ||= false
     opt[:search] ||= false
+    opt[:only_timed] ||= false
 
     # opt[:highlight] ||= true
     section = ""
@@ -667,6 +668,12 @@ class WWID
       items.reverse!
     end
 
+    if opt[:only_timed]
+      items.delete_if {|item|
+        get_interval(item) == "00:00:00"
+      }
+    end
+
     out = ""
 
     if opt[:output]
@@ -713,7 +720,7 @@ class WWID
           :time => interval
         }
       }
-      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2;position:relative}ul li .date{font-size:14px;position:absolute;left:-122px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}span.time{color:#729953;float:left;position:relative;padding:0 5px;font-size:15px;border-bottom:dashed 1px #ccc;text-align:right;background:#f9fced;margin-right:4px}table td{border-bottom:solid 1px #ddd;height:24px}caption{text-align:left;border-bottom:solid 1px #aaa;margin:10px 0}table{width:400px;margin:50px 0 0 211px}"
+      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2;position:relative}ul li .date{font-size:14px;position:absolute;left:-122px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}span.time{color:#729953;float:left;position:relative;padding:0 5px;font-size:15px;border-bottom:dashed 1px #ccc;text-align:right;background:#f9fced;margin-right:4px}table td{border-bottom:solid 1px #ddd;height:24px}caption{text-align:left;border-bottom:solid 1px #aaa;margin:10px 0}table{width:400px;margin:50px 0 0 211px}th{padding-bottom:10px}th,td{padding-right:20px}table{max-width:400px;margin:50px 0 0 221px}"
       template =<<EOT
 !!!
 %html
@@ -1016,11 +1023,13 @@ EOS
       <tr>
         <td style="text-align:left;" colspan="2"></td>
       </tr>
+      </tbody>
+      <tfoot>
       <tr>
         <td style="text-align:left;"><strong>Total</strong></td>
         <td style="text-align:left;">#{"%02d:%02d:%02d" % fmt_time(total)}</td>
       </tr>
-      </tbody>
+      </tfoot>
       </table>
 EOS
       output + tail

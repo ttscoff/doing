@@ -16,7 +16,7 @@ wwid = WWID.new
 program_desc 'A CLI for a What Was I Doing system'
 
 default_command :recent
-sort_help :manually
+# sort_help :manually
 
 desc 'Output notes if included in the template'
 default_value true
@@ -505,6 +505,10 @@ command :show do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Only show items with recorded time intervals'
+  c.default_value false
+  c.switch [:only_timed], :default_value => false, :negatable => false
+
   c.action do |global_options,options,args|
     tag_filter = false
     tags = []
@@ -534,7 +538,7 @@ command :show do |c|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :totals => options[:totals], :highlight => true})
+    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :totals => options[:totals], :highlight => true, :only_timed => options[:only_timed]})
 
   end
 end
@@ -558,13 +562,17 @@ command :grep do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Only show items with recorded time intervals'
+  c.default_value false
+  c.switch [:only_timed], :default_value => false, :negatable => false
+
   c.action do |global_options,options,args|
 
     section = wwid.guess_section(options[:s]) if options[:s]
 
     options[:t] = true if options[:totals]
 
-    puts wwid.list_section({:search => args.join, :section => section, :output => options[:output], :times => options[:t], :highlight => true, :totals => options[:totals]})
+    puts wwid.list_section({:search => args.join, :section => section, :output => options[:output], :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => options[:only_timed]})
 
   end
 end
@@ -702,6 +710,10 @@ command :view do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Only show items with recorded time intervals'
+  c.default_value false
+  c.switch [:only_timed], :default_value => false, :negatable => false
+
   c.action do |global_options,options,args|
     if args.empty?
       title = wwid.choose_view
@@ -735,7 +747,7 @@ command :view do |c|
       order = view.has_key?('order') ? view['order'] : "asc"
       options[:t] = true if options[:totals]
       options[:output].downcase! if options[:output]
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:output], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals] })
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:output], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => options[:only_timed] })
     else
       raise "View #{title} not found in config"
     end
