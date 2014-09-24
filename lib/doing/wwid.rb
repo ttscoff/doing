@@ -363,6 +363,17 @@ class WWID
     @results.push(%Q{Added "#{entry['title']}" to #{section}})
   end
 
+  def last_note(section=@current_section)
+    section = guess_section(section)
+    if @content.has_key?(section)
+      last_item = @content[section]['items'].dup.sort_by{|item| item['date'] }.reverse[0]
+      p last_item
+      return last_item['note']
+    else
+      raise "Section #{section} not found"
+    end
+  end
+
   def tag_last(opt={})
     opt[:section] ||= @current_section
     opt[:count] ||= 1

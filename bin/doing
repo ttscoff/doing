@@ -117,15 +117,22 @@ command :note do |c|
 
     if options[:e] || (args.length == 0 && STDIN.stat.size == 0 && !options[:r])
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
-      input = ""
-      input += args.join(" ") if args.length > 0
+
+      input = args.length > 0 ? args.join(" ") : ""
+
+      prev_input = wwid.last_note(section)
+      if prev_input.class == Array
+        prev_input = prev_input.join("\n")
+      end
+      input = prev_input + input
+
       input = wwid.fork_editor(input)
       if input
         title, note = wwid.format_input(input)
         note.insert(0, title)
-        wwid.note_last(section, note, options[:r])
+        wwid.note_last(section, note, true)
       else
-        raise "No content"
+        raise "No content, cancelled"
       end
     else
       if args.length > 0
