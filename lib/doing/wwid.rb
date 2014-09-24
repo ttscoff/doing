@@ -717,7 +717,7 @@ class WWID
     out = ""
 
     if opt[:output]
-      raise "Unknown output format" unless opt[:output] =~ /(html|csv|json)/
+      raise "Unknown output format" unless opt[:output] =~ /(html|csv|json|timeline)/
     end
     if opt[:output] == "csv"
       output = [CSV.generate_line(['date','title','note','timer'])]
@@ -734,10 +734,12 @@ class WWID
         output.push(CSV.generate_line([i['date'],i['title'],note,interval]))
       }
       out = output.join("")
-    elsif opt[:output] == "json"
+    elsif opt[:output] == "json" || opt[:output] == "timeline"
 
       items_out = []
-      items.each {|i|
+      max = items[-1]['date'].strftime('%F')
+      min = items[0]['date'].strftime('%F')
+      items.each_with_index {|i,index|
         if RUBY_VERSION.to_f > 1.8
           title = i['title'].force_encoding('utf-8')
           note = i['note'].map {|line| line.force_encoding('utf-8').strip } if i['note']
@@ -748,7 +750,7 @@ class WWID
 
         if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
           end_date = Time.parse($1)
-          interval = get_interval(i)
+          interval = get_interval(i,false)
         end
         end_date ||= ""
         interval ||= 0
@@ -759,22 +761,77 @@ class WWID
         i['title'].scan(/@([^\(\s]+)(?:\((.*?)\))?/).each {|tag|
           tags.push(tag[0]) unless skip_tags.include?(tag[0])
         }
+        if opt[:output] == "json"
+          items_out << {
+            :date => i['date'],
+            :end_date => end_date,
+            :title => title.strip, #+ " #{note}"
+            :note => note.class == Array ? note.join("\n") : note,
+            :time => "%02d:%02d:%02d" % fmt_time(interval),
+            :tags => tags
+          }
+        elsif opt[:output] == "timeline"
+          new_item = {
+            'id' => index + 1,
+            'content' => title.strip, #+ " #{note}"
+            'title' => title.strip + " (#{"%02d:%02d:%02d" % fmt_time(interval)})",
+            'start' => i['date'].strftime('%F'),
+            'type' => 'point'
+          }
 
-        items_out << {
-          :date => i['date'],
-          :end_date => end_date,
-          :title => title.strip, #+ " #{note}"
-          :note => note.class == Array ? note.join("\n") : note,
-          :time => interval,
-          :tags => tags
+          if interval && interval > 0
+            new_item['end'] = end_date.strftime('%F')
+            if interval > 3600 * 3
+              new_item['type'] = 'range'
+            end
+          end
+          items_out.push(new_item)
+        end
+      }
+      if opt[:output] == "json"
+        out = {
+          'section' => section,
+          'items' => items_out,
+          'timers' => tag_times("json")
         }
-      }
-      out = {
-        'section' => section,
-        'items' => items_out,
-        'timers' => tag_times("json")
-      }
-      return out.to_json
+      elsif opt[:output] == "timeline"
+                template =<<EOTEMPLATE
+<!doctype html>
+<html>
+<head>
+  <link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
+  <script src="http://visjs.org/dist/vis.js"></script>
+</head>
+<body>
+  <div id="mytimeline"></div>
+
+  <script type="text/javascript">
+    // DOM element where the Timeline will be attached
+    var container = document.getElementById('mytimeline');
+
+    // Create a DataSet with data (enables two way data binding)
+    var data = new vis.DataSet(#{items_out.to_json});
+
+    // Configuration for the Timeline
+    var options = {
+      width: '100%',
+      height: '800px',
+      margin: {
+        item: 20
+      },
+      stack: true,
+      min: '#{min}',
+      max: '#{max}'
+    };
+
+    // Create a Timeline
+    var timeline = new vis.Timeline(container, data, options);
+  </script>
+</body>
+</html>
+EOTEMPLATE
+        return template
+      end
     elsif opt[:output] == "html"
       page_title = section
       items_out = []
