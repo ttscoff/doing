@@ -746,7 +746,7 @@ command :view do |c|
 
   c.desc 'Only show items with recorded time intervals'
   c.default_value false
-  c.switch [:only_timed], :default_value => false, :negatable => false
+  c.switch [:only_timed], :default_value => false, :negatable => true
 
   c.action do |global_options,options,args|
     if args.empty?
@@ -761,6 +761,12 @@ command :view do |c|
 
     view = wwid.get_view(title)
     if view
+      if (view.has_key?('only_timed') && view['only_timed']) || options[:only_timed]
+        only_timed = true
+      else
+        only_timed = false
+      end
+
       template = view.has_key?('template') ? view['template'] : nil
       format = view.has_key?('date_format') ? view['date_format'] : nil
       tags_color = view.has_key?('tags_color') ? view['tags_color'] : nil
@@ -781,7 +787,7 @@ command :view do |c|
       order = view.has_key?('order') ? view['order'] : "asc"
       options[:t] = true if options[:totals]
       options[:output].downcase! if options[:output]
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:output], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => options[:only_timed] })
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:output], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => only_timed })
     else
       raise "View #{title} not found in config"
     end
@@ -934,7 +940,7 @@ pre do |global,command,options,args|
   end
   wwid.config[:include_notes] = false unless global[:notes]
   if global[:version]
-    puts "doing v" + Doing::VERSION
+    exit_now! "doing v" + Doing::VERSION
   end
 
   # Return true to proceed; false to abort and not call the
@@ -951,9 +957,8 @@ post do |global,command,options,args|
 end
 
 on_error do |exception|
-  # Error logic here
-  # return false to skip default error handling
-  true
+  puts exception.message
+  false
 end
 
 exit run(ARGV)

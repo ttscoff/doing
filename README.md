@@ -309,9 +309,9 @@ As mentioned above, `finish` also accepts `--back "2 hours"` (sets the finish da
 
 ... will mark the last three entries as "@client @cancelled." Add `-r` as a switch to remove the listed tags instead.
 
-`note` lets you enter a note on the last entry. You can specify a section with `-s section_name`. `-e` will open your $EDITOR for typing the note, but you can just include it on the command line after any arguments. You can also pipe a note in on STDIN (`echo "fun stuff"|doing note`). The `-r` switch will remove/replace a note; if there's new note text passed when using the `-r` switch, it will replace any existing note. If the `-r` switch is used alone, any existing note will be removed.
+`note` lets you append a note to the last entry. You can specify a section to grab the last entry from with `-s section_name`. `-e` will open your $EDITOR for typing the note, but you can also just include it on the command line after any flags. You can also pipe a note in on STDIN (`echo "fun stuff"|doing note`). If you don't use the `-r` switch, new notes will be appended to the existing notes, and using the `-e` switch will let you edit and add to an existing note. The `-r` switch will remove/replace a note; if there's new note text passed when using the `-r` switch, it will replace any existing note. If the `-r` switch is used alone, any existing note will be removed.
 
-You can also add notes at the time of entry by using the `-n` or `--note` flag with `doing now`, `doing later`, or `doing done`. If you pass in text to any of the creation commands that has multiple lines, everything after the first line break will become the note.
+You can also add notes at the time of entry by using the `-n` or `--note` flag with `doing now`, `doing later`, or `doing done`. If you pass text to any of the creation commands which has multiple lines, everything after the first line break will become the note.
 
 #### Displaying entries:
 
