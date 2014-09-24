@@ -5,3 +5,4 @@ html
 .rake_tasks~
 .sass-cache
 Gemfile.lock
+helpfile.txt
