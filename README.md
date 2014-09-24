@@ -335,7 +335,7 @@ Use `-c X` to limit the displayed results. Combine it with `-a newest` or `-a ol
 
 The `show` command can also show the time spent on a task if it has a `@done(date)` tag with the `-t` option. This requires that you include a `%interval` token in template -> default in the config. You can also include `@start(date)` tags, which override the timestamp when calculating the intervals.
 
-If you have a use for it, you can use `--csv` on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: `doing show all done --csv > ~/Desktop/done.csv`.
+If you have a use for it, you can use `-o csv` on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: `doing show all done -o csv > ~/Desktop/done.csv`. You can do the same with `-o json`.
 
 `doing yesterday` is great for stand-ups, thanks to [Sean Collins](https://github.com/sc68cal) for that. Note that you can show yesterday's activity from an alternate section by using the section name as an argument (e.g. `doing yesterday archive`).
 
@@ -456,8 +456,11 @@ I'll try to document some of the code structure as I flesh it out. I'm currently
 
 ### Changelog
 
+#### 1.0.8pre
 
-#### 1.0.7pre / 2014-09-23 
+* JSON output option
+
+#### 1.0.7pre
 
 * fix for -v option
 * Slightly fuzzier searching in the grep command

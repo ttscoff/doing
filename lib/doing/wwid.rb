@@ -717,9 +717,8 @@ class WWID
     out = ""
 
     if opt[:output]
-      raise "Unknown output format" unless opt[:output] =~ /(html|csv)/
+      raise "Unknown output format" unless opt[:output] =~ /(html|csv|json)/
     end
-
     if opt[:output] == "csv"
       output = [CSV.generate_line(['date','title','note','timer'])]
       items.each {|i|
@@ -735,6 +734,47 @@ class WWID
         output.push(CSV.generate_line([i['date'],i['title'],note,interval]))
       }
       out = output.join("")
+    elsif opt[:output] == "json"
+
+      items_out = []
+      items.each {|i|
+        if RUBY_VERSION.to_f > 1.8
+          title = i['title'].force_encoding('utf-8')
+          note = i['note'].map {|line| line.force_encoding('utf-8').strip } if i['note']
+        else
+          title = i['title']
+          note = i['note'].map { |line| line.strip }
+        end
+
+        if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+          end_date = Time.parse($1)
+          interval = get_interval(i)
+        end
+        end_date ||= ""
+        interval ||= 0
+        note ||= ""
+
+        tags = []
+        skip_tags = ['meanwhile', 'done', 'cancelled', 'flagged']
+        i['title'].scan(/@([^\(\s]+)(?:\((.*?)\))?/).each {|tag|
+          tags.push(tag[0]) unless skip_tags.include?(tag[0])
+        }
+
+        items_out << {
+          :date => i['date'],
+          :end_date => end_date,
+          :title => title.strip, #+ " #{note}"
+          :note => note.class == Array ? note.join("\n") : note,
+          :time => interval,
+          :tags => tags
+        }
+      }
+      out = {
+        'section' => section,
+        'items' => items_out,
+        'timers' => tag_times("json")
+      }
+      return out.to_json
     elsif opt[:output] == "html"
       page_title = section
       items_out = []
@@ -764,34 +804,34 @@ class WWID
           :time => interval
         }
       }
+
       style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2;position:relative}ul li .date{font-size:14px;position:absolute;left:-122px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}span.time{color:#729953;float:left;position:relative;padding:0 5px;font-size:15px;border-bottom:dashed 1px #ccc;text-align:right;background:#f9fced;margin-right:4px}table td{border-bottom:solid 1px #ddd;height:24px}caption{text-align:left;border-bottom:solid 1px #aaa;margin:10px 0}table{width:400px;margin:50px 0 0 211px}th{padding-bottom:10px}th,td{padding-right:20px}table{max-width:400px;margin:50px 0 0 221px}"
       template =<<EOT
 !!!
 %html
-  %head
-    %meta{"charset" => "utf-8"}/
-    %meta{"content" => "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}/
-    %title what are you doing?
-    %style= @style
-  %body
-    %header
-      %h1= @page_title
-    %article
-      %ul
-        - @items.each do |i|
-          %li
-            %span.date= i[:date]
-            = i[:title]
-            - if i[:time] && i[:time] != "00:00:00"
-              %span.time= i[:time]
-            - if i[:note]
-              %span.note= i[:note].map{|n| n.strip }.join('<br>')
-      = @totals
+%head
+  %meta{"charset" => "utf-8"}/
+  %meta{"content" => "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}/
+  %title what are you doing?
+  %style= @style
+%body
+  %header
+    %h1= @page_title
+  %article
+    %ul
+      - @items.each do |i|
+        %li
+          %span.date= i[:date]
+          = i[:title]
+          - if i[:time] && i[:time] != "00:00:00"
+            %span.time= i[:time]
+          - if i[:note]
+            %span.note= i[:note].map{|n| n.strip }.join('<br>')
+    = @totals
 EOT
       totals = opt[:totals] ? tag_times("html") : ""
       engine = Haml::Engine.new(template)
       puts engine.render(Object.new, { :@items => items_out, :@page_title => page_title, :@style => style, :@totals => totals })
-
     else
       items.each {|item|
 
@@ -1085,6 +1125,16 @@ EOS
       </table>
 EOS
       output + tail
+    elsif format == "json"
+      output = []
+      @timers.delete_if { |k,v| v == 0}.sort_by{|k,v| v }.reverse.each {|k,v|
+        output << {
+          'tag' => k,
+          'seconds' => v,
+          'formatted' => "%02d:%02d:%02d" % fmt_time(v)
+        }
+      }
+      output
     else
       output = []
       @timers.delete_if { |k,v| v == 0}.sort_by{|k,v| v }.reverse.each {|k,v|

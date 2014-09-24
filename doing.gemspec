@@ -30,4 +30,5 @@ lib/doing/wwid.rb
   s.add_runtime_dependency('haml','4.0.3')
   s.add_runtime_dependency('chronic','~> 0.10', '>= 0.10.2')
   s.add_runtime_dependency('deep_merge')
+  s.add_runtime_dependency('json', '~> 1.8.1')
 end
