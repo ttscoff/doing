@@ -457,7 +457,7 @@ I'll try to document some of the code structure as I flesh it out. I'm currently
 ### Changelog
 
 
-#### 1.0.7 / 2014-09-23 
+#### 1.0.7pre / 2014-09-23 
 
 * fix for -v option
 * Slightly fuzzier searching in the grep command
