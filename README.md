@@ -32,6 +32,10 @@ _Side note:_ I actually use the library behind this utility as part of another s
 
     $ [sudo] gem install doing
 
+To install the _latest_ version, use `--pre`:
+
+    $ [sudo] gem install --pre doing
+
 Only use `sudo` if your environment requires it. If you're using the system Ruby on a Mac, for example, it will likely be necessary. If `gem install doing` fails, then run `sudo gem install doing` and provide your administrator password.
 
 Run `doing config` to open your `~/.doingrc` file in the editor defined in the $EDITOR environment variable. Set up your `doing_file` right away (where you want entries to be stored), and cover the rest after you've read the docs.
