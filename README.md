@@ -452,10 +452,36 @@ I'll try to document some of the code structure as I flesh it out. I'm currently
 
 ### Changelog
 
+
+#### 1.0.7 / 2014-09-23 
+
+* fix for -v option
+* Slightly fuzzier searching in the grep command
+* cleaner exits, only_timed key for view configs
+* making the note command append new notes better, and load existing notes in the editor if -e is called
+* handle multiple tag input in 'show' tag filter
+* Global tag operations, better reporting
+
 #### 1.0.4pre
 
 * Improved HTML output
 * --only_timed option for view/show commands that only outputs items with elapsed timers (interval between start and done dates)
+* add seconds for timed items in CSV output, run --only_timed before chopping off --count #
+* fix for 1.8.7 Dir.home issue
+* version bump
+* don't show tag totals with zero times
+* zsh completion for doing
+* HTML styling
+* --only_timed option
+* added zsh completion file to README.md
+* add zsh completion file
+
+#### 1.0.3pre
+
+* done command: making --took modify start time if --back isn't specified
+* Cleaned up time totals, improved HTML output
+* fixes for --back and --took parsing
+* Adding more complete terminal reporting to archive command
 
 #### 1.0.0pre
 
