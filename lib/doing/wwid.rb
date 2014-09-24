@@ -682,13 +682,14 @@ class WWID
     if opt[:search]
       items.keep_if {|item|
         text = item['note'] ? item['title'] + item['note'].join(" ") : item['title']
-        text =~ /#{opt[:search]}/i
+        pattern = opt[:search].split('').join('.{0,3}')
+        text =~ /#{pattern}/i
       }
     end
 
     if opt[:only_timed]
       items.delete_if {|item|
-        get_interval(item) == "00:00:00"
+        get_interval(item) == false
       }
     end
 
@@ -998,6 +999,12 @@ EOT
     color['boldbgmagenta'] = "\033[1;45m"
     color['boldbgcyan'] = "\033[1;46m"
     color['boldbgwhite'] = "\033[1;47m"
+    color['softpurple'] = "\033[0;35;40m"
+    color['hotpants'] = "\033[7;34;40m"
+    color['knightrider'] = "\033[7;30;40m"
+    color['flamingo'] = "\033[7;31;47m"
+    color['yeller'] = "\033[1;37;43m"
+    color['whiteboard'] = "\033[1;30;47m"
     color['default']="\033[0;39m"
     color
   end
@@ -1125,7 +1132,7 @@ EOS
 
     return seconds unless formatted
 
-    "%02d:%02d:%02d" % fmt_time(seconds)
+    seconds > 0 ? "%02d:%02d:%02d" % fmt_time(seconds) : false
   end
 
   def fmt_time(seconds)

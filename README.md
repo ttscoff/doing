@@ -127,6 +127,7 @@ The config also contains templates for various command outputs. Include placehol
 - `%[color]`: color can be black, red, green, blue, yellow, magenta, cyan or white
     - you can prefix "bg" to affect background colors (%bgyellow)
     - prefix "bold" and "boldbg" for strong colors (%boldgreen, %boldbgblue)
+    - there are some random special combo colors. Use `doing colors` to see the list
 - `%interval`: when used with the `-t` switch on the `show` command, it will display the time between a timestamp or `@start(date)` tag and the `@done(date)` tag, if it exists. Otherwise, it will remain empty.
 
 Date formats are based on Ruby [strftime](http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime) formatting.

@@ -547,6 +547,7 @@ command :show do |c|
       else
         section = wwid.guess_section(args[0])
         raise "No such section: #{args[0]}" unless section
+        args.shift
       end
       if args.length > 0
         args.each {|arg|
@@ -606,7 +607,7 @@ command :grep do |c|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.list_section({:search => args.join, :section => section, :output => options[:output], :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => options[:only_timed]})
+    puts wwid.list_section({:search => args.join(' '), :section => section, :output => options[:output], :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => options[:only_timed]})
 
   end
 end
@@ -721,6 +722,24 @@ command :add_section do |c|
     else
       raise "Section #{args[0]} already exists"
     end
+  end
+end
+
+desc 'List available color variables for configuration templates and views'
+command :colors do |c|
+  c.action do |global_options,options,args|
+    clrs = wwid.colors
+    bgs = []
+    fgs = []
+    clrs.each {|k,v|
+      if k =~ /bg/
+        bgs.push("#{v}    #{clrs['default']} <-- #{k}")
+      else
+        fgs.push("#{v}XXXX#{clrs['default']} <-- #{k}")
+      end
+    }
+    puts fgs.join("\n")
+    puts bgs.join("\n")
   end
 end
 
@@ -957,8 +976,8 @@ post do |global,command,options,args|
 end
 
 on_error do |exception|
-  puts exception.message
-  false
+  # puts exception.message
+  true
 end
 
 exit run(ARGV)
