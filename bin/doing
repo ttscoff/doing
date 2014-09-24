@@ -959,7 +959,7 @@ pre do |global,command,options,args|
   end
   wwid.config[:include_notes] = false unless global[:notes]
   if global[:version]
-    exit_now! "doing v" + Doing::VERSION
+    $stdout.puts "doing v" + Doing::VERSION
   end
 
   # Return true to proceed; false to abort and not call the
