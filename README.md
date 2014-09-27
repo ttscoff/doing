@@ -124,6 +124,7 @@ The config also contains templates for various command outputs. Include placehol
 - `%shortdate`: a custom date formatter that removes the day/month/year from the entry if they match the current day/month/year
 - `%note`: Any note in the entry will be included here, a newline and tabs are automatically added.
 - `%odnote`: The notes with a leading tab removed (outdented note)
+- `%chompnote`: Notes on one line, beginning and trailing whitespace removed.
 - `%hr`: a horizontal rule (`-`) the width of the terminal
 - `%hr_under`: a horizontal rule (`_`) the width of the terminal
 - `%n`: inserts a newline
@@ -259,6 +260,8 @@ Regarding colors, you can use them to create very nice displays if you're output
 Outputs: 
 
 ![](http://ckyp.us/XKpj+)
+
+You can also specify a default output format for a view. Most of the optional output formats override the template specification (html, csv, json). If the `view` command is used with the `-o` flag, it will override what's specified in the file.
 
 ## Usage
 

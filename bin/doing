@@ -801,14 +801,22 @@ command :view do |c|
           tag_filter['bool'] = view.has_key?('tags_bool') && !view['tags_bool'].nil? ? view['tags_bool'].upcase : "OR"
         end
       end
+
+      # If the -o/--output flag was specified, override any default in the view template
+      options[:o] ||= view.has_key?('output_format') ? view['output_format'] : "template"
+
       count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
       section = options[:s] ? section : view.has_key?('section') ? view['section'] : wwid.current_section
       order = view.has_key?('order') ? view['order'] : "asc"
       options[:t] = true if options[:totals]
       options[:output].downcase! if options[:output]
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:output], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => only_timed })
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:o], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => only_timed })
     else
-      raise "View #{title} not found in config"
+      if title.class == FalseClass
+        exit_now! "Cancelled"
+      else
+        raise "View #{title} not found in config"
+      end
     end
   end
 end

@@ -717,7 +717,7 @@ class WWID
     out = ""
 
     if opt[:output]
-      raise "Unknown output format" unless opt[:output] =~ /(html|csv|json|timeline)/
+      raise "Unknown output format" unless opt[:output] =~ /(template|html|csv|json|timeline)/
     end
     if opt[:output] == "csv"
       output = [CSV.generate_line(['date','title','note','timer'])]
@@ -954,6 +954,7 @@ EOT
         end
         output.sub!(/%note/,note)
         output.sub!(/%odnote/,note.gsub(/^\t*/,""))
+        output.sub!(/%chompnote/,note.gsub(/\n+/,' ').gsub(/(^[\s\t]*|[\s\t]*$)/,'').gsub(/\s+/,' '))
         output.gsub!(/%hr(_under)?/) do |m|
           o = ""
           `tput cols`.to_i.times do
