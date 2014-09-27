@@ -793,7 +793,7 @@ class WWID
           'section' => section,
           'items' => items_out,
           'timers' => tag_times("json")
-        }
+        }.to_json
       elsif opt[:output] == "timeline"
                 template =<<EOTEMPLATE
 <!doctype html>
