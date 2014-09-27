@@ -63,7 +63,7 @@ task :bump, :type do |t, args|
   args.with_defaults(:type => "inc")
   version_file = "lib/doing/version.rb"
   content = IO.read(version_file)
-  content.sub!(/VERSION = '(\d+)\.(\d+)\.(\d+)(\.\S+)?'/) {|m|
+  content.sub!(/VERSION = '(\d+)\.(\d+)\.(\d+)(\S+)?'/) {|m|
     major = $1.to_i
     minor = $2.to_i
     inc = $3.to_i

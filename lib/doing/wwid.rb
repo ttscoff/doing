@@ -226,22 +226,29 @@ class WWID
   # Returns:
   # seconds(Integer)
   def chronify(input)
-    if input =~ /^(\d+)([mhd])?$/i
-      amt = $1
-      type = $2.nil? ? "m" : $2
-      input = case type.downcase
-      when 'm'
-        amt + " minutes ago"
-      when 'h'
-        amt + " hours ago"
-      when 'd'
-        amt + " days ago"
-      else
-        input
-      end
-    end
 
-    Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
+    had_to_try = Time.parse(input) rescue false
+
+    if had_to_try.class == FalseClass
+      if input =~ /^(\d+)([mhd])?$/i
+        amt = $1
+        type = $2.nil? ? "m" : $2
+        input = case type.downcase
+        when 'm'
+          amt + " minutes ago"
+        when 'h'
+          amt + " hours ago"
+        when 'd'
+          amt + " days ago"
+        else
+          input
+        end
+      end
+
+      Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
+    else
+      had_to_try
+    end
   end
 
 
@@ -628,6 +635,7 @@ class WWID
     opt[:totals] ||= false
     opt[:search] ||= false
     opt[:only_timed] ||= false
+    opt[:date_filter] ||= []
 
     # opt[:highlight] ||= true
     section = ""
@@ -654,6 +662,14 @@ class WWID
     end
 
     items = opt[:section]['items'].sort_by{|item| item['date'] }
+
+    if opt[:date_filter].length == 2
+      start_date = opt[:date_filter][0]
+      end_date = opt[:date_filter][1]
+      items.keep_if {|item|
+        item['date'] >= start_date && item['date'] <= end_date
+      }
+    end
 
     if opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
       items.delete_if {|item|
@@ -1118,6 +1134,16 @@ EOT
     opt[:totals] ||= false
     cfg = @config['templates']['today']
     list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output, :totals => opt[:totals]})
+  end
+
+  def list_date(dates,section,times=nil,output=nil,opt={})
+    opt[:totals] ||= false
+    section = guess_section(section)
+    # :date_filter expects an array with start and end date
+    if dates.class == String
+      dates = [dates, dates]
+    end
+    list_section({:section => section, :count => 0, :order => "asc", :date_filter => dates, :times => times, :output => output, :totals => opt[:totals] })
   end
 
   def yesterday(section,times=nil,output=nil,opt={})

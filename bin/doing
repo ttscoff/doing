@@ -517,7 +517,7 @@ command :show do |c|
   c.default_value 'asc'
   c.flag [:s,:sort], :default_value => 'asc'
 
-  c.desc 'Output to export format (csv|html)'
+  c.desc 'Output to export format (csv|html|json)'
   c.flag [:o,:output]
 
   c.desc 'Show time intervals on @done tasks'
@@ -586,7 +586,7 @@ command :grep do |c|
   c.default_value "all"
   c.flag [:s,:section], :default_value => "All"
 
-  c.desc 'Output to export format (csv|html)'
+  c.desc 'Output to export format (csv|html|json)'
   c.flag [:o,:output]
 
   c.desc 'Show time intervals on @done tasks'
@@ -656,7 +656,7 @@ command :today do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
-  c.desc 'Output to export format (csv|html)'
+  c.desc 'Output to export format (csv|html|json)'
   c.flag [:o,:output]
 
   c.action do |global_options,options,args|
@@ -668,11 +668,52 @@ command :today do |c|
   end
 end
 
+desc 'List entries for a date'
+long_desc 'Date argument can be natural language. "thursday" would be interpreted as "last thursday," and "2d" would be interpreted as "two days ago." If you use "to" or "through" between two dates, it will create a range.'
+arg_name 'date_string'
+command :on do |c|
+  c.desc 'Section'
+  c.arg_name 'section_name'
+  c.default_value wwid.current_section
+  c.flag [:s,:section], :default_value => wwid.current_section
+
+  c.desc 'Show time intervals on @done tasks'
+  c.default_value true
+  c.switch [:t,:times], :default_value => true
+
+  c.desc 'Show time totals at the end of output'
+  c.default_value false
+  c.switch [:totals], :default_value => false, :negatable => true
+
+  c.desc 'Output to export format (csv|html|json)'
+  c.flag [:o,:output]
+
+  c.action do |global_options,options,args|
+
+    date_string = args.join(" ")
+
+    if date_string =~ / (to|through) /
+      start, finish = date_string.split(/ (to|through) /).map {|d|
+        wwid.chronify(d)
+      }
+    else
+      date = wwid.chronify(date_string)
+      start, finish = [date, date]
+    end
+    exit_now! "Unrecognized date string" unless start && finish
+
+    options[:t] = true if options[:totals]
+
+    puts wwid.list_date([start,finish],options[:s],options[:t],options[:output],{:totals => options[:totals]}).chomp
+
+  end
+end
+
 desc 'List entries from yesterday'
 default_value wwid.current_section
 arg_name 'section'
 command :yesterday do |c|
-  c.desc 'Output to export format (csv|html)'
+  c.desc 'Output to export format (csv|html|json)'
   c.flag [:o,:output]
 
   c.desc 'Show time intervals on @done tasks'
@@ -752,7 +793,7 @@ command :view do |c|
   c.desc 'Count to display (override view settings)'
   c.flag [:c,:count], :must_match => /^\d+$/, :type => Integer
 
-  c.desc 'Output to export format (csv|html)'
+  c.desc 'Output to export format (csv|html|json)'
   c.flag [:o,:output]
 
   c.desc 'Show time intervals on @done tasks'
