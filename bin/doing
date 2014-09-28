@@ -517,8 +517,9 @@ command :show do |c|
   c.default_value 'asc'
   c.flag [:s,:sort], :default_value => 'asc'
 
-  c.desc 'Output to export format (csv|html|json)'
-  c.flag [:o,:output]
+  c.desc 'Date range to show, or a single day to filter date on.'
+  c.long_desc 'Date range argument should be quoted. Date specifications can be natural language. To specify a range, use "to," or "through,".\n\ndoing show --from "monday to friday"'
+  c.flag [:f,:from]
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value true
@@ -532,7 +533,10 @@ command :show do |c|
   c.default_value false
   c.switch [:only_timed], :default_value => false, :negatable => false
 
+  c.desc 'Output to export format (csv|html|json)'
+  c.flag [:o,:output]
   c.action do |global_options,options,args|
+
     tag_filter = false
     tags = []
     if args.length > 0
@@ -552,7 +556,7 @@ command :show do |c|
       if args.length > 0
         args.each {|arg|
           if arg =~ /,/
-            arg_tags = arg.split(/,/).each {|tag|
+            arg.split(/,/).each {|tag|
               tags.push(tag.strip.sub(/^@/,''))
             }
           else
@@ -571,9 +575,23 @@ command :show do |c|
       }
     end
 
+    if options[:f]
+      date_string = options[:f]
+      if date_string =~ / (to|through|thru|(un)?til|-+) /
+        dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
+        start = wwid.chronify(dates[0])
+        finish = wwid.chronify(dates[2])
+      else
+        start = wwid.chronify(date_string)
+        finish = false
+      end
+      exit_now! "Unrecognized date string" unless start
+      dates = [start,finish]
+    end
+
     options[:t] = true if options[:totals]
 
-    puts wwid.list_section({:section => section, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :totals => options[:totals], :highlight => true, :only_timed => options[:only_timed]})
+    puts wwid.list_section({:section => section, :date_filter => dates, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :totals => options[:totals], :highlight => true, :only_timed => options[:only_timed]})
 
   end
 end
@@ -674,8 +692,8 @@ arg_name 'date_string'
 command :on do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
-  c.default_value wwid.current_section
-  c.flag [:s,:section], :default_value => wwid.current_section
+  c.default_value 'All'
+  c.flag [:s,:section], :default_value => 'All'
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value true
@@ -692,15 +710,15 @@ command :on do |c|
 
     date_string = args.join(" ")
 
-    if date_string =~ / (to|through) /
-      start, finish = date_string.split(/ (to|through) /).map {|d|
-        wwid.chronify(d)
-      }
+    if date_string =~ / (to|through|thru) /
+      dates = date_string.split(/ (to|through|thru) /)
+      start = wwid.chronify(dates[0])
+      finish = wwid.chronify(dates[2])
     else
-      date = wwid.chronify(date_string)
-      start, finish = [date, date]
+      start = wwid.chronify(date_string)
+      finish = false
     end
-    exit_now! "Unrecognized date string" unless start && finish
+    exit_now! "Unrecognized date string" unless start
 
     options[:t] = true if options[:totals]
 
@@ -1002,7 +1020,7 @@ end
 
 pre do |global,command,options,args|
   if global[:doing_file]
-    wwid.init_doing_file(input=global[:doing_file])
+    wwid.init_doing_file(global[:doing_file])
   else
     wwid.init_doing_file
   end

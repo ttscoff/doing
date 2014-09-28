@@ -342,6 +342,8 @@ If you have a use for it, you can use `-o csv` on the show or view commands to o
 
 `doing yesterday` is great for stand-ups, thanks to [Sean Collins](https://github.com/sc68cal) for that. Note that you can show yesterday's activity from an alternate section by using the section name as an argument (e.g. `doing yesterday archive`).
 
+`doing on` allows for full date ranges and filtering. `doing on saturday`, or `doing on one month to today` will give you ranges. You can use the same terms with the `show` command by adding the `-f` or `--from` flag. `doing show @done --from "monday to friday"` will give you all of your completed items for the last week (assuming it's the weekend).
+
 #### Views
 
     view     - Display a user-created view

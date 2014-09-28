@@ -267,11 +267,11 @@ class WWID
 
       minutes = case type.downcase
       when 'm'
-        $1.to_i
+        amt.to_i
       when 'h'
-        ($1.to_f * 60).round
+        (amt.to_f * 60).round
       when 'd'
-        ($1.to_f * 60 * 24).round
+        (amt.to_f * 60 * 24).round
       else
         minutes
       end
@@ -667,7 +667,11 @@ class WWID
       start_date = opt[:date_filter][0]
       end_date = opt[:date_filter][1]
       items.keep_if {|item|
-        item['date'] >= start_date && item['date'] <= end_date
+        if end_date
+          item['date'] >= start_date && item['date'] <= end_date
+        else
+          item['date'].strftime('%F') == start_date.strftime('%F')
+        end
       }
     end
 
@@ -970,7 +974,7 @@ EOT
         end
         output.sub!(/%note/,note)
         output.sub!(/%odnote/,note.gsub(/^\t*/,""))
-        output.sub!(/%chompnote/,note.gsub(/\n+/,' ').gsub(/(^[\s\t]*|[\s\t]*$)/,'').gsub(/\s+/,' '))
+        output.sub!(/%chompnote/,note.gsub(/\n+/,' ').gsub(/(^[\s\t]+|[\s\t]+$)/,'').gsub(/\s+/,' '))
         output.gsub!(/%hr(_under)?/) do |m|
           o = ""
           `tput cols`.to_i.times do
@@ -1143,6 +1147,7 @@ EOT
     if dates.class == String
       dates = [dates, dates]
     end
+
     list_section({:section => section, :count => 0, :order => "asc", :date_filter => dates, :times => times, :output => output, :totals => opt[:totals] })
   end
 
