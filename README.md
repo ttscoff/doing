@@ -493,7 +493,12 @@ I'll try to document some of the code structure as I flesh it out. I'm currently
 
 #### 1.0.8pre
 
-* JSON output option
+* JSON output option to view commands
+* Added autotagging to tag command
+* date filtering, improved date language
+* added doing on command
+* let view templates define output format (csv, json, html, template)
+    * add %chompnote template variable (item note with newlines and extra whitespace stripped)
 
 #### 1.0.7pre
 
