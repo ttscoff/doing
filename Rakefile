@@ -47,7 +47,7 @@ task :install, :all do |t, args|
   args.with_defaults(:all => false)
   if args[:all]
     sh "rvm all do gem install pkg/*.gem"
-    sh "sudo gem intsall pkg/*.gem"
+    sh "sudo gem install pkg/*.gem"
   else
     sh "gem install pkg/*.gem"
   end

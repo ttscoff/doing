@@ -442,25 +442,35 @@ command :tag do |c|
   c.default_value false
   c.switch [:r,:remove], :negatable => false, :default_value => false
 
+  c.desc 'Autotag entries based on autotag configuration in ~/.doingrc'
+  c.default_value false
+  c.switch [:a,:autotag], :negatable => false, :default_value => false
+
   c.action do |global_options,options,args|
-    if args.length == 0
+    if args.length == 0 && !options[:a]
       raise "You must specify at least one tag"
     else
 
       section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
-      if args.join("") =~ /,/
-        tags = args.join("").split(/,/)
-      else
-        tags = args.join(" ").split(" ") # in case tags are quoted as one arg
-      end
+      unless options[:a]
+        if args.join("") =~ /,/
+          tags = args.join("").split(/,/)
+        else
+          tags = args.join(" ").split(" ") # in case tags are quoted as one arg
+        end
 
-      tags.map!{|tag| tag.sub(/^@/,'').strip }
+        tags.map!{|tag| tag.sub(/^@/,'').strip }
+      else
+        tags = []
+      end
 
       count = options[:c].to_i
 
       if count == 0
-        if options[:r]
+        if options[:a]
+          print "Are you sure you want to autotag all records? (y/N) "
+        elsif options[:r]
           print "Are you sure you want to remove #{tags.join(" and ")} from all records? (y/N) "
         else
           print "Are you sure you want to add #{tags.join(" and ")} to all records? (y/N) "
@@ -473,7 +483,7 @@ command :tag do |c|
         end
       end
 
-      wwid.tag_last({:tags => tags, :count => count, :section => section, :date => options[:d], :remove => options[:r]})
+      wwid.tag_last({:tags => tags, :count => count, :section => section, :date => options[:d], :remove => options[:r], :autotag => options[:a]})
     end
   end
 end
@@ -494,8 +504,6 @@ command :mark do |c|
     wwid.tag_last({:tags => [mark], :section => options[:s], :remove => options[:r]})
   end
 end
-
-
 
 desc 'List all entries'
 long_desc 'The argument can be a section name, tag(s) or both. "pick" or "choose" as an argument will offer a section menu.'

@@ -348,7 +348,8 @@ class WWID
     opt[:timed] ||= false
 
     title = [title.strip.cap_first] + @config['default_tags'].map{|t| '@' + t.sub(/^ *@/,'').chomp}
-    entry = {'title' => title.join(' '), 'date' => opt[:back]}
+    title = autotag(title.join(' '))
+    entry = {'title' => title, 'date' => opt[:back]}
     unless opt[:note] =~ /^\s*$/s
       entry['note'] = opt[:note]
     end
@@ -389,6 +390,7 @@ class WWID
     opt[:sequential] ||= false
     opt[:date] ||= false
     opt[:remove] ||= false
+    opt[:autotag] ||= false
     opt[:back] ||= Time.now
 
 
@@ -415,38 +417,44 @@ class WWID
         count = opt[:count] == 0 ? items.length : opt[:count]
         items.map! {|item|
           break if index == count
-          if opt[:sequential]
-            done_date = next_start - 1
-            next_start = item['date']
-          elsif opt[:back].instance_of? Fixnum
-            done_date = item['date'] + opt[:back]
+
+          unless opt[:autotag]
+            if opt[:sequential]
+              done_date = next_start - 1
+              next_start = item['date']
+            elsif opt[:back].instance_of? Fixnum
+              done_date = item['date'] + opt[:back]
+            else
+              done_date = opt[:back]
+            end
+
+            title = item['title']
+            opt[:tags].each {|tag|
+              tag.strip!
+              if opt[:remove]
+                if title =~ /@#{tag}/
+                  title.gsub!(/(^| )@#{tag}(\([^\)]*\))?/,'')
+                  @results.push("Removed @#{tag}: #{title}")
+                end
+              else
+                unless title =~ /@#{tag}/
+                  title.chomp!
+                  if opt[:date]
+                    title += " @#{tag}(#{done_date.strftime('%F %R')})"
+                  else
+                    title += " @#{tag}"
+                  end
+                  @results.push("Added @#{tag}: #{title}")
+                end
+              end
+            }
+            item['title'] = title
           else
-            done_date = opt[:back]
+            item['title'] = autotag(item['title'])
           end
 
-          title = item['title']
-          opt[:tags].each {|tag|
-            tag.strip!
-            if opt[:remove]
-              if title =~ /@#{tag}/
-                title.gsub!(/(^| )@#{tag}(\([^\)]*\))?/,'')
-                @results.push("Removed @#{tag}: #{title}")
-              end
-            else
-              unless title =~ /@#{tag}/
-                title.chomp!
-                if opt[:date]
-                  title += " @#{tag}(#{done_date.strftime('%F %R')})"
-                else
-                  title += " @#{tag}"
-                end
-                @results.push("Added @#{tag}: #{title}")
-              end
-            end
-          }
-
-          item['title'] = title
           index += 1
+
           item
         }
 
@@ -974,7 +982,7 @@ EOT
         end
         output.sub!(/%note/,note)
         output.sub!(/%odnote/,note.gsub(/^\t*/,""))
-        output.sub!(/%chompnote/,note.gsub(/\n+/,' ').gsub(/(^[\s\t]+|[\s\t]+$)/,'').gsub(/\s+/,' '))
+        output.sub!(/%chompnote/,note.gsub(/\n+/,' ').gsub(/(^\s*|\s*$)/,'').gsub(/\s+/,' '))
         output.gsub!(/%hr(_under)?/) do |m|
           o = ""
           `tput cols`.to_i.times do
@@ -1238,6 +1246,30 @@ EOS
       output += "\n\nTotal tracked: #{"%02d:%02d:%02d" % fmt_time(total)}\n"
       output
     end
+  end
+
+  # Uses autotag: configuration to turn keywords into tags for time tracking.
+  # Does not repeat tags in a title, and only converts the first instance of
+  # an untagged keyword
+  def autotag(title)
+    return unless title
+    @config['autotag']['whitelist'].each {|tag|
+      title.sub!(/(?<!@)(#{tag.strip})\b/i,'@\1') unless title =~ /@#{tag}\b/i
+    }
+    tail_tags = []
+    @config['autotag']['synonyms'].each {|tag, v|
+      v.each {|word|
+        if title =~ /\b#{word}\b/i
+          tail_tags.push(tag)
+        end
+      }
+    }
+    title + tail_tags.uniq.map {|t| '@'+t }.join(' ')
+  end
+
+  def autotag_item(item)
+    item['title'] = autotag(item['title'])
+    item
   end
 
   private

@@ -305,17 +305,47 @@ All of these commands accept a `-e` argument. This opens your command line edito
     tag         - Tag last entry
     note        - Add a note to the last entry
 
+##### Finishing
+
 `doing finish` by itself is the same as `doing done` by itself. It adds `@done(timestamp)` to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add `-a` to also archive the affected entries.
 
 `doing finish` also provides an `--auto` flag, which you can use to set the end time of any entry to 1 minute before the start time of the next. Running a command such as `doing finish --auto 10` will go through the last 10 entries and sequentially update any without a `@done` tag with one set to the time just before the next entry in the list.
 
 As mentioned above, `finish` also accepts `--back "2 hours"` (sets the finish date from time now minus interval) or `--took 30m` (sets the finish date to time started plus interval) so you can accurately add times to completed tasks, even if you don't do it in the moment.
 
+
+##### Tagging and Autotagging
+
 `tag` adds one or more tags to the last entry, or specify a count with `-c X`. Tags are specified as basic arguments, separated by spaces. For example:
 
     doing tag -c 3 client cancelled
 
 ... will mark the last three entries as "@client @cancelled." Add `-r` as a switch to remove the listed tags instead.
+
+You can optionally define keywords for common tasks and projects in your `.doingrc` file. When these keywords appear in an item title, they'll automatically be converted into @tags. The "whitelist" tags are exact (but case insensitive) matches. You can also define "synonyms" which will add a tag at the end based on keywords associated with it.
+
+To add autotagging, include a section like this in your `~/.doingrc` file:
+
+    autotag:
+      whitelist:
+      - doing
+      - mindmeister
+      - marked
+      - playing
+      - working
+      - writing
+      synonyms:
+        playing:
+        - hacking
+        - tweaking
+        - toying
+        - messing
+        writing:
+        - blogging
+        - posting
+        - publishing
+
+##### Annotating
 
 `note` lets you append a note to the last entry. You can specify a section to grab the last entry from with `-s section_name`. `-e` will open your $EDITOR for typing the note, but you can also just include it on the command line after any flags. You can also pipe a note in on STDIN (`echo "fun stuff"|doing note`). If you don't use the `-r` switch, new notes will be appended to the existing notes, and using the `-e` switch will let you edit and add to an existing note. The `-r` switch will remove/replace a note; if there's new note text passed when using the `-r` switch, it will replace any existing note. If the `-r` switch is used alone, any existing note will be removed.
 
