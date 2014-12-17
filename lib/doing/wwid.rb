@@ -160,7 +160,7 @@ class WWID
   def read_config
     config = {}
     dir = Dir.pwd
-    while(dir != '/' && dir != 'C:/')
+    while (dir != '/' && (dir =~ /[A-Z]:\//) == nil)
       if File.exists? File.join(dir, DOING_CONFIG_NAME)
         config = YAML.load_file(File.join(dir, DOING_CONFIG_NAME)).deep_merge!(config)
       end
