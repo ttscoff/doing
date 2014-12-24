@@ -6,3 +6,4 @@ html
 .sass-cache
 Gemfile.lock
 helpfile.txt
+.doingrc

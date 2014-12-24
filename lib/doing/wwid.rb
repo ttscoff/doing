@@ -12,13 +12,20 @@ class String
 end
 
 class WWID
-  attr_accessor :content, :sections, :current_section, :doing_file, :config, :results
-
+  attr_accessor :content, :sections, :current_section, :doing_file, :config, :default_config_file, :results
 
   def initialize
     @content = {}
+    @doingrc_needs_update = false
+    @default_config_file = '.doingrc'
+  end
+
+  def configure(opt={})
     @timers = {}
-    @config = read_config
+    @config_file == File.join(ENV['HOME'],@default_config_file)
+
+    read_config
+    user_config = @config.dup
     @results = []
 
     @config['autotag'] ||= {}
@@ -72,17 +79,21 @@ class WWID
     @config['marker_color'] ||= 'red'
     @config['default_tags'] ||= []
 
-    @current_section = config['current_section']
-    @default_template = config['templates']['default']['template']
-    @default_date_format = config['templates']['default']['date_format']
-
     @config[:include_notes] ||= true
 
-    File.open(home_config, 'w') { |yf| YAML::dump(config, yf) }
+    File.open(@config_file, 'w') { |yf| YAML::dump(@config, yf) } if @config != user_config || @doingrc_needs_update
+
+
+    @config = @config.deep_merge(@local_config)
+
+    @current_section = @config['current_section']
+    @default_template = @config['templates']['default']['template']
+    @default_date_format = @config['templates']['default']['date_format']
+
   end
 
   def init_doing_file(input=nil)
-    @doing_file = File.expand_path(config['doing_file'])
+    @doing_file = File.expand_path(@config['doing_file'])
 
     if input.nil?
       create(@doing_file) unless File.exists?(@doing_file)
@@ -130,7 +141,7 @@ class WWID
               unless @content[section]['items'][current - 1].has_key? 'note'
                 @content[section]['items'][current - 1]['note'] = []
               end
-              @content[section]['items'][current - 1]['note'].push(line)
+              @content[section]['items'][current - 1]['note'].push(line.gsub(/ *$/,''))
             end
           end
         # end
@@ -149,27 +160,41 @@ class WWID
     end
   end
 
-  def home_config
-    if Dir.respond_to?('home')
-      File.join(Dir.home, DOING_CONFIG_NAME)
-    else
-      File.join(File.expand_path("~"), DOING_CONFIG_NAME)
+  def find_local_config
+
+
+    dir = Dir.pwd
+
+    local_config_file = nil
+
+    while (dir != '/' && (dir =~ /[A-Z]:\//) == nil)
+      if File.exists? File.join(dir, @default_config_file)
+        return File.join(dir, @default_config_file)
+      end
+
+      dir = File.dirname(dir)
     end
+
+    false
   end
 
   def read_config
-    config = {}
-    dir = Dir.pwd
-    while (dir != '/' && (dir =~ /[A-Z]:\//) == nil)
-      if File.exists? File.join(dir, DOING_CONFIG_NAME)
-        config = YAML.load_file(File.join(dir, DOING_CONFIG_NAME)).deep_merge!(config)
-      end
-      dir = File.dirname(dir)
+    if Dir.respond_to?('home')
+      @config_file = File.join(Dir.home, @default_config_file)
+    else
+      @config_file = File.join(File.expand_path("~"), @default_config_file)
     end
-    if config.empty? && File.exists?(home_config)
-      config = YAML.load_file(home_config)
+    @doingrc_needs_update = true if File.exists? @config_file
+    additional = find_local_config
+
+    begin
+      @config = YAML.load_file(@config_file) || {} if File.exists?(@config_file)
+      @local_config = YAML.load_file(additional) || {} if additional
+    rescue
+      @config = {}
+      @local_config = {}
+      # raise "error reading config"
     end
-    config
   end
 
   def fork_editor(input="")
@@ -311,7 +336,7 @@ class WWID
         input = STDIN.gets
         if input =~ /^y/i
           add_section(frag.cap_first)
-          write(doing_file)
+          write(@doing_file)
           return frag.cap_first
         end
         raise "Unknown section: #{frag}"
@@ -350,11 +375,23 @@ class WWID
     opt[:back] ||= Time.now
     opt[:timed] ||= false
 
-    title = [title.strip.cap_first] + @config['default_tags'].map{|t| '@' + t.sub(/^ *@/,'').chomp}
+    title = [title.strip.cap_first]
     title = autotag(title.join(' '))
-    entry = {'title' => title, 'date' => opt[:back]}
+    unless @config['default_tags'].empty?
+      title += @config['default_tags'].map{|t|
+        unless t.nil?
+          dt = t.sub(/^ *@/,'').chomp
+          if title =~ /@#{dt}/
+            ""
+          else
+            '@' + dt
+          end
+        end
+      }.delete_if {|t| t == "" }.join(" ")
+    end
+    entry = {'title' => title.strip, 'date' => opt[:back]}
     unless opt[:note] =~ /^\s*$/s
-      entry['note'] = opt[:note]
+      entry['note'] = opt[:note].map {|n| n.gsub(/ *$/,'')}
     end
     items = @content[section]['items']
     if opt[:timed]
@@ -495,7 +532,7 @@ class WWID
       current_note = [] if current_note.nil?
       title = items[0]['title']
       if replace
-        items[0]['note'] = note
+        items[0]['note'] = note.gsub(/ *$/,'')
         if note.empty? && !current_note.empty?
           @results.push(%Q{Removed note from "#{title}"})
         elsif current_note.length > 0 && note.length > 0
@@ -558,9 +595,9 @@ class WWID
 
     if opt[:new_item]
       title, note = format_input(opt[:new_item])
-      note.push(opt[:note]) if opt[:note]
+      note.push(opt[:note].gsub(/ *$/,'')) if opt[:note]
       title += " @#{tag}"
-      add_item(title.cap_first, opt[:section], {:note => note, :back => opt[:back]})
+      add_item(title.cap_first, opt[:section], {:note => note.gsub(/ *$/,''), :back => opt[:back]})
     end
 
     write(@doing_file)
@@ -771,12 +808,12 @@ class WWID
       max = items[-1]['date'].strftime('%F')
       min = items[0]['date'].strftime('%F')
       items.each_with_index {|i,index|
-        if RUBY_VERSION.to_f > 1.8
+        if String.method_defined? :force_encoding
           title = i['title'].force_encoding('utf-8')
           note = i['note'].map {|line| line.force_encoding('utf-8').strip } if i['note']
         else
           title = i['title']
-          note = i['note'].map { |line| line.strip }
+          note = i['note'].map { |line| line.strip } if i['note']
         end
 
         if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
@@ -872,7 +909,7 @@ EOTEMPLATE
         # else
         #   note = ''
         # end
-        if RUBY_VERSION.to_f > 1.8
+        if String.method_defined? :force_encoding
           title = i['title'].force_encoding('utf-8')
           note = i['note'].map {|line| line.force_encoding('utf-8').strip } if i['note']
         else
@@ -1257,7 +1294,10 @@ EOS
   def autotag(title)
     return unless title
     @config['autotag']['whitelist'].each {|tag|
-      title.sub!(/(?<!@)(#{tag.strip})\b/i,'@\1') unless title =~ /@#{tag}\b/i
+      title.sub!(/(?<!@)(#{tag.strip})\b/i) do |m|
+        m.downcase! if tag =~ /[a-z]/
+        "@#{m}"
+      end unless title =~ /@#{tag}\b/i
     }
     tail_tags = []
     @config['autotag']['synonyms'].each {|tag, v|
@@ -1267,6 +1307,7 @@ EOS
         end
       }
     }
+
     title + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
   end
 

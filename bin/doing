@@ -3,15 +3,25 @@ require 'gli'
 require 'doing'
 require 'tempfile'
 
-if RUBY_VERSION.to_f > 1.9
-  Encoding.default_external = Encoding::UTF_8
-  Encoding.default_internal = Encoding::UTF_8
+def class_exists?(class_name)
+  klass = Module.const_get(class_name)
+  return klass.is_a?(Class)
+rescue NameError
+  return false
 end
+
+if class_exists? 'Encoding'
+  Encoding.default_external = Encoding::UTF_8 if Encoding.respond_to?('default_external')
+  Encoding.default_internal = Encoding::UTF_8 if Encoding.respond_to?('default_internal')
+end
+
 
 include GLI::App
 version Doing::VERSION
 
 wwid = WWID.new
+wwid.configure
+
 
 program_desc 'A CLI for a What Was I Doing system'
 
@@ -726,7 +736,12 @@ command :on do |c|
       start = wwid.chronify(date_string)
       finish = false
     end
+
     exit_now! "Unrecognized date string" unless start
+
+    message = "Date interpreted as #{start}"
+    message += " to #{finish}" if finish
+    wwid.results.push(message)
 
     options[:t] = true if options[:totals]
 
@@ -993,22 +1008,22 @@ command :config do |c|
   c.action do |global_options,options,args|
     if `uname` =~ /Darwins/
       if options[:x]
-        %x{open -a "#{wwid.config['editor_app']}" "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
+        %x{open -a "#{wwid.config['editor_app']}" "#{File.join(Dir.home, wwid.default_config_file)}"}
       elsif options[:a] || options[:b]
         if options[:a]
-          %x{open -a "#{options[:a]}" "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
+          %x{open -a "#{options[:a]}" "#{File.join(Dir.home, wwid.default_config_file)}"}
         elsif options[:b]
-          %x{open -b #{options[:b]} "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
+          %x{open -b #{options[:b]} "#{File.join(Dir.home, wwid.default_config_file)}"}
         end
       else
         raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
         editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
-        system %Q{#{editor} "#{File.expand_path(DOING_CONFIG)}"}
+        system %Q{#{editor} "#{File.join(Dir.home, wwid.default_config_file)}"}
       end
     else
       raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
       editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
-      system %Q{#{editor} "#{File.join(Dir.home, DOING_CONFIG_NAME)}"}
+      system %Q{#{editor} "#{File.join(Dir.home, wwid.default_config_file)}"}
     end
   end
 end

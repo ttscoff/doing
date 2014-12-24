@@ -89,7 +89,13 @@ A basic configuration looks like this:
     :include_notes: true
 
 
-The config file is stored in "~/.doingrc", and is created on the first run. 
+The config file is stored in "~/.doingrc", and is created on the first run.
+
+### Per-folder configuration
+
+Any options found in a `.doingrc` anywhere in the hierarchy between your current folder and your home folder will be appended to the base configuration, overriding or extending existing options. This allows you to put a `.doingrc` file into the base of a project and add specific configurations (such as default tags) when working in that project on the command line.
+
+Any part of the configuration can be copied into these local files and modified. You only need to include the parts you want to change or add.
 
 ### Doing file location
 

@@ -10,4 +10,3 @@ require 'haml'
 require 'json'
 require 'doing/wwid.rb'
 
-DOING_CONFIG_NAME = ".doingrc"
