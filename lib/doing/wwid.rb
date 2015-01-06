@@ -1267,7 +1267,11 @@ EOS
         end
       }
     }
-    title + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
+    if tail_tags.length > 0
+      title + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
+    else
+      title
+    end
   end
 
   def autotag_item(item)
