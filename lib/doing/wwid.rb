@@ -230,28 +230,22 @@ class WWID
   # seconds(Integer)
   def chronify(input)
 
-    had_to_try = Time.parse(input) rescue false
-
-    if had_to_try.class == FalseClass
-      if input =~ /^(\d+)([mhd])?$/i
-        amt = $1
-        type = $2.nil? ? "m" : $2
-        input = case type.downcase
-        when 'm'
-          amt + " minutes ago"
-        when 'h'
-          amt + " hours ago"
-        when 'd'
-          amt + " days ago"
-        else
-          input
-        end
+    if input =~ /^(\d+)([mhd])?$/i
+      amt = $1
+      type = $2.nil? ? "m" : $2
+      input = case type.downcase
+      when 'm'
+        amt + " minutes ago"
+      when 'h'
+        amt + " hours ago"
+      when 'd'
+        amt + " days ago"
+      else
+        input
       end
-
-      Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
-    else
-      had_to_try
     end
+
+    Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
   end
 
 
