@@ -1294,7 +1294,7 @@ EOS
     seconds = (done - start).to_i
 
     item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each {|m|
-      k = m[0] == "done" ? "All" : m[0]
+      k = m[0] == "done" ? "All" : m[0].downcase
       if @timers.has_key?(k)
         @timers[k] += seconds
       else
