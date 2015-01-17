@@ -24,7 +24,7 @@ class WWID
     @timers = {}
     @config_file == File.join(ENV['HOME'],@default_config_file)
 
-    read_config
+    @config = read_config
     user_config = @config.dup
     @results = []
 
@@ -78,6 +78,10 @@ class WWID
     @config['marker_tag'] ||= 'flagged'
     @config['marker_color'] ||= 'red'
     @config['default_tags'] ||= []
+
+    @current_section = config['current_section']
+    @default_template = config['templates']['default']['template']
+    @default_date_format = config['templates']['default']['date_format']
 
     @config[:include_notes] ||= true
 
@@ -162,7 +166,7 @@ class WWID
 
   def find_local_config
 
-
+    config = {}
     dir = Dir.pwd
 
     local_config_file = nil
@@ -375,7 +379,7 @@ class WWID
     opt[:back] ||= Time.now
     opt[:timed] ||= false
 
-    title = [title.strip.cap_first]
+    title = [title.strip.cap_first] + @config['default_tags'].map{|t| '@' + t.sub(/^ *@/,'').chomp}
     title = autotag(title.join(' '))
     unless @config['default_tags'].empty?
       title += @config['default_tags'].map{|t|
@@ -1307,8 +1311,11 @@ EOS
         end
       }
     }
-
+    if tail_tags.length > 0
     title + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
+    else
+      title
+    end
   end
 
   def autotag_item(item)
@@ -1337,7 +1344,7 @@ EOS
     seconds = (done - start).to_i
 
     item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each {|m|
-      k = m[0] == "done" ? "All" : m[0]
+      k = m[0] == "done" ? "All" : m[0].downcase
       if @timers.has_key?(k)
         @timers[k] += seconds
       else
