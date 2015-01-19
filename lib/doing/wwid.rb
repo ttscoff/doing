@@ -230,28 +230,22 @@ class WWID
   # seconds(Integer)
   def chronify(input)
 
-    had_to_try = Time.parse(input) rescue false
-
-    if had_to_try.class == FalseClass
-      if input =~ /^(\d+)([mhd])?$/i
-        amt = $1
-        type = $2.nil? ? "m" : $2
-        input = case type.downcase
-        when 'm'
-          amt + " minutes ago"
-        when 'h'
-          amt + " hours ago"
-        when 'd'
-          amt + " days ago"
-        else
-          input
-        end
+    if input =~ /^(\d+)([mhd])?$/i
+      amt = $1
+      type = $2.nil? ? "m" : $2
+      input = case type.downcase
+      when 'm'
+        amt + " minutes ago"
+      when 'h'
+        amt + " hours ago"
+      when 'd'
+        amt + " days ago"
+      else
+        input
       end
-
-      Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
-    else
-      had_to_try
     end
+
+    Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
   end
 
 
@@ -1267,7 +1261,11 @@ EOS
         end
       }
     }
-    title + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
+    if tail_tags.length > 0
+      title + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
+    else
+      title
+    end
   end
 
   def autotag_item(item)
@@ -1296,7 +1294,7 @@ EOS
     seconds = (done - start).to_i
 
     item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each {|m|
-      k = m[0] == "done" ? "All" : m[0]
+      k = m[0] == "done" ? "All" : m[0].downcase
       if @timers.has_key?(k)
         @timers[k] += seconds
       else
