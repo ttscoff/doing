@@ -131,6 +131,7 @@ The config also contains templates for various command outputs. Include placehol
 - `%note`: Any note in the entry will be included here, a newline and tabs are automatically added.
 - `%odnote`: The notes with a leading tab removed (outdented note)
 - `%chompnote`: Notes on one line, beginning and trailing whitespace removed.
+- `%section`: The section/project the entry is currently in
 - `%hr`: a horizontal rule (`-`) the width of the terminal
 - `%hr_under`: a horizontal rule (`_`) the width of the terminal
 - `%n`: inserts a newline

@@ -1062,7 +1062,7 @@ end
 post do |global,command,options,args|
   # Use skips_post before a command to skip this
   # block on that command only
-  puts wwid.results.join("\n")
+  $stderr.puts wwid.results.join("\n")
 end
 
 on_error do |exception|

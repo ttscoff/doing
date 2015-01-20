@@ -132,7 +132,7 @@ class WWID
       elsif line =~ /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/
         date = Time.parse($1)
         title = $2
-        @content[section]['items'].push({'title' => title, 'date' => date})
+        @content[section]['items'].push({'title' => title, 'date' => date, 'section' => section})
         current += 1
       else
         # if content[section]['items'].length - 1 == current
@@ -506,7 +506,9 @@ class WWID
 
         if opt[:archive] && section != "Archive" && opt[:count] > 0
           # concat [count] items from [section] and archive section
-          archived = @content[section]['items'][0..opt[:count]-1].concat(@content['Archive']['items'])
+          archived = @content[section]['items'][0..opt[:count]-1].map {|i|
+            i['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{i['section']}")
+          }.concat(@content['Archive']['items'])
           # chop [count] items off of [section] items
           @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
           # overwrite archive section with concatenated array
@@ -587,7 +589,9 @@ class WWID
 
         if opt[:archive] && opt[:section] != "Archive"
           @results.push(%Q{Completed and archived "#{@content[opt[:section]]['items'][i]['title']}"})
-          @content['Archive']['items'].push(@content[opt[:section]]['items'][i])
+          archive_item = @content[opt[:section]]['items'][i]
+          archive_item['title'] = i['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{i['section']}")
+          @content['Archive']['items'].push(archive_item)
           @content[opt[:section]]['items'].delete_at(i)
         else
           @results.push(%Q{Completed "#{@content[opt[:section]]['items'][i]['title']}"})
@@ -792,7 +796,7 @@ class WWID
       raise "Unknown output format" unless opt[:output] =~ /(template|html|csv|json|timeline)/
     end
     if opt[:output] == "csv"
-      output = [CSV.generate_line(['date','title','note','timer'])]
+      output = [CSV.generate_line(['date','title','note','timer','section'])]
       items.each {|i|
         note = ""
         if i['note']
@@ -803,7 +807,7 @@ class WWID
           interval = get_interval(i, false)
         end
         interval ||= 0
-        output.push(CSV.generate_line([i['date'],i['title'],note,interval]))
+        output.push(CSV.generate_line([i['date'],i['title'],note,interval,i['section']]))
       }
       out = output.join("")
     elsif opt[:output] == "json" || opt[:output] == "timeline"
@@ -930,11 +934,12 @@ EOTEMPLATE
           :date => i['date'].strftime('%a %-I:%M%p'),
           :title => title.gsub(/(@[^ \(]+(\(.*?\))?)/im,'<span class="tag">\1</span>').strip, #+ " #{note}"
           :note => note,
-          :time => interval
+          :time => interval,
+          :section => i['section']
         }
       }
 
-      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2;position:relative}ul li .date{font-size:14px;position:absolute;left:-122px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}span.time{color:#729953;float:left;position:relative;padding:0 5px;font-size:15px;border-bottom:dashed 1px #ccc;text-align:right;background:#f9fced;margin-right:4px}table td{border-bottom:solid 1px #ddd;height:24px}caption{text-align:left;border-bottom:solid 1px #aaa;margin:10px 0}table{width:400px;margin:50px 0 0 211px}th{padding-bottom:10px}th,td{padding-right:20px}table{max-width:400px;margin:50px 0 0 221px}"
+      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2;position:relative}ul li .date{font-size:14px;position:absolute;left:-122px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}span.time{color:#729953;float:left;position:relative;padding:0 5px;font-size:15px;border-bottom:dashed 1px #ccc;text-align:right;background:#f9fced;margin-right:4px}table td{border-bottom:solid 1px #ddd;height:24px}caption{text-align:left;border-bottom:solid 1px #aaa;margin:10px 0}table{width:400px;margin:50px 0 0 211px}th{padding-bottom:10px}th,td{padding-right:20px}table{max-width:400px;margin:50px 0 0 221px}ul li .section{color:#dbbfad;border-left:solid 1px #dbbfad;border-right:solid 1px #dbbfad;border-radius:25px;padding:0 4px;line-height:1 !important;font-size:.8em}ul li .section:hover{color:#c5753f}"
       template =<<EOT
 !!!
 %html
@@ -952,6 +957,7 @@ EOTEMPLATE
         %li
           %span.date= i[:date]
           = i[:title]
+          %span.section= i[:section]
           - if i[:time] && i[:time] != "00:00:00"
             %span.time= i[:time]
           - if i[:note]
@@ -1021,6 +1027,9 @@ EOT
             flag+item['title'].chomp+reset
           end
         }
+
+        output.sub!(/%section/,item['section'])
+
         if opt[:tags_color]
           output.gsub!(/\s(@\S+(?:\(.*?\))?)/," #{colors[opt[:tags_color]]}\\1")
         end
@@ -1110,7 +1119,8 @@ EOT
       }
       moved_items.each {|item|
         if label
-          item['title'] += " @from(#{section})" unless section == "Currently" || item['title'] =~ /@from\(/
+          item['title'] = item['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{section}")  unless section == "Currently"
+          # item['title'] += " @from(#{section})" unless section == "Currently" || item['title'] =~ /@from\(/
         end
       }
       @content[section]['items'] = moved_items
@@ -1127,9 +1137,11 @@ EOT
 
       items.each{|item|
         if label
-          item['title'] += " @from(#{section})" unless section == "Currently"
+          item['title'] = item['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{section}")  unless section == "Currently"
+          # item['title'] += " @from(#{section})" unless section == "Currently"
         end
       }
+
       @content[destination]['items'] += items[count..-1]
       @results.push("Archived #{items.length - count} items from #{section} to #{destination}")
     end

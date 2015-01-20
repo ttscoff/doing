@@ -75,6 +75,22 @@ ul li:hover .note
 {
   display:block;
 }
+
+ul li .section
+{
+  color: #dbbfad;
+  border-left: solid 1px #dbbfad;
+  border-right: solid 1px #dbbfad;
+  border-radius: 25px;
+  padding: 0 4px;
+  line-height: 1!important;
+  font-size: .8em;
+}
+
+ul li .section:hover
+{
+  color: #c5753f;
+}
 EOSTYLE
 
 DOING_TEMPLATE=<<EOHAML
