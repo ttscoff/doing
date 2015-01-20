@@ -9,6 +9,25 @@ class String
     end
   end
 
+  def link_urls(opt={})
+    opt[:format] ||= :html
+    if opt[:format] == :html
+      self.gsub(/(?mi)((http|https):\/\/)?([\w\-_]+(\.[\w\-_]+)+)([\w\-\.,\@?^=%&amp;:\/~\+#]*[\w\-\@^=%&amp;\/~\+#])?/) {|match|
+        m = Regexp.last_match
+        proto = m[1].nil? ? "http://" : ""
+        %Q{<a href="#{proto}#{m[0]}" title="link to #{m[0]}">[#{m[3]}]</a>}
+      }.gsub(/\<(\w+:.*?)\>/) {|match|
+        m = Regexp.last_match
+        unless m[1] =~ /<a href/
+          %Q{<a href="#{m[1]}" title="Link to #{m[1]}">[link]</a>}
+        else
+          match
+        end
+      }
+    else
+      self
+    end
+  end
 end
 
 class WWID
@@ -918,11 +937,11 @@ EOTEMPLATE
         #   note = ''
         # end
         if String.method_defined? :force_encoding
-          title = i['title'].force_encoding('utf-8')
-          note = i['note'].map {|line| line.force_encoding('utf-8').strip } if i['note']
+          title = i['title'].force_encoding('utf-8').link_urls
+          note = i['note'].map {|line| line.force_encoding('utf-8').strip.link_urls } if i['note']
         else
-          title = i['title']
-          note = i['note'].map { |line| line.strip }
+          title = i['title'].link_urls
+          note = i['note'].map { |line| line.strip.link_urls } if i['note']
         end
 
         if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
@@ -939,7 +958,7 @@ EOTEMPLATE
         }
       }
 
-      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2;position:relative}ul li .date{font-size:14px;position:absolute;left:-122px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}span.time{color:#729953;float:left;position:relative;padding:0 5px;font-size:15px;border-bottom:dashed 1px #ccc;text-align:right;background:#f9fced;margin-right:4px}table td{border-bottom:solid 1px #ddd;height:24px}caption{text-align:left;border-bottom:solid 1px #aaa;margin:10px 0}table{width:400px;margin:50px 0 0 211px}th{padding-bottom:10px}th,td{padding-right:20px}table{max-width:400px;margin:50px 0 0 221px}ul li .section{color:#dbbfad;border-left:solid 1px #dbbfad;border-right:solid 1px #dbbfad;border-radius:25px;padding:0 4px;line-height:1 !important;font-size:.8em}ul li .section:hover{color:#c5753f}"
+      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2;position:relative}ul li .date{font-size:14px;position:absolute;left:-122px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}span.time{color:#729953;float:left;position:relative;padding:0 5px;font-size:15px;border-bottom:dashed 1px #ccc;text-align:right;background:#f9fced;margin-right:4px}table td{border-bottom:solid 1px #ddd;height:24px}caption{text-align:left;border-bottom:solid 1px #aaa;margin:10px 0}table{width:400px;margin:50px 0 0 211px}th{padding-bottom:10px}th,td{padding-right:20px}table{max-width:400px;margin:50px 0 0 221px}ul li .section{color:#dbbfad;border-left:solid 1px #dbbfad;border-right:solid 1px #dbbfad;border-radius:25px;padding:0 4px;line-height:1 !important;font-size:.8em}ul li .section:hover{color:#c5753f}ul li a:link{color:#64a9a5;text-decoration:none;background-color:rgba(203,255,251,.15)}"
       template =<<EOT
 !!!
 %html
@@ -1377,4 +1396,5 @@ EOS
     minutes = (minutes % 60).to_i
     [days, hours, minutes]
   end
+
 end

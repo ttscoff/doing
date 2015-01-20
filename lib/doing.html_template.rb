@@ -91,6 +91,12 @@ ul li .section:hover
 {
   color: #c5753f;
 }
+
+ul li a:link {
+  color: #64a9a5;
+  text-decoration: none;
+  background-color: rgba(203, 255, 251, .15);
+}
 EOSTYLE
 
 DOING_TEMPLATE=<<EOHAML
