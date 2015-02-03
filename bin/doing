@@ -20,6 +20,7 @@ include GLI::App
 version Doing::VERSION
 
 wwid = WWID.new
+wwid.user_home = %x{echo $HOME}.strip
 wwid.configure
 
 

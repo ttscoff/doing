@@ -31,7 +31,7 @@ class String
 end
 
 class WWID
-  attr_accessor :content, :sections, :current_section, :doing_file, :config, :default_config_file, :results
+  attr_accessor :content, :sections, :current_section, :doing_file, :config, :user_home, :default_config_file, :results
 
   def initialize
     @content = {}
@@ -41,7 +41,7 @@ class WWID
 
   def configure(opt={})
     @timers = {}
-    @config_file == File.join(ENV['HOME'],@default_config_file)
+    @config_file == File.join(@user_home, @default_config_file)
 
     @config = read_config
     user_config = @config.dup
