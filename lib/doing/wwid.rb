@@ -1047,7 +1047,7 @@ EOT
           end
         }
 
-        output.sub!(/%section/,item['section'])
+        output.sub!(/%section/,item['section']) if item['section']
 
         if opt[:tags_color]
           output.gsub!(/\s(@\S+(?:\(.*?\))?)/," #{colors[opt[:tags_color]]}\\1")
