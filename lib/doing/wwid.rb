@@ -1328,20 +1328,22 @@ EOS
   # an untagged keyword
   def autotag(title)
     return unless title
-    @config['autotag']['whitelist'].each {|tag|
-      title.sub!(/(?<!@)(#{tag.strip})\b/i) do |m|
-        m.downcase! if tag =~ /[a-z]/
-        "@#{m}"
-      end unless title =~ /@#{tag}\b/i
-    }
     tail_tags = []
-    @config['autotag']['synonyms'].each {|tag, v|
-      v.each {|word|
-        if title =~ /\b#{word}\b/i
-          tail_tags.push(tag)
-        end
+    if @config['autotag']
+      @config['autotag']['whitelist'].each {|tag|
+        title.sub!(/(?<!@)(#{tag.strip})\b/i) do |m|
+          m.downcase! if tag =~ /[a-z]/
+          "@#{m}"
+        end unless title =~ /@#{tag}\b/i
       }
-    }
+      @config['autotag']['synonyms'].each {|tag, v|
+        v.each {|word|
+          if title =~ /\b#{word}\b/i
+            tail_tags.push(tag)
+          end
+        }
+      }
+    end
     if tail_tags.length > 0
     title + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
     else
