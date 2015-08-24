@@ -365,7 +365,7 @@ class WWID
         raise "Unknown section: #{frag}"
       end
     end
-    section ? section.cap_first : section
+    section ? section.cap_first : guessed
   end
 
   def guess_view(frag,guessed=false)

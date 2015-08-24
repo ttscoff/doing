@@ -496,7 +496,7 @@ Please try not to email me directly about GitHub projects.
 
 I'll try to document some of the code structure as I flesh it out. I'm currently working on adding a CLI reporting structure and logging methods, as well as santizing and standardizing all the flags and switches for consistency. Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
-### Changelog
+## Changelog
 
 #### 1.0.8pre
 
