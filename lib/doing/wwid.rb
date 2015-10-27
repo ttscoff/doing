@@ -21,6 +21,9 @@ class WWID
     @config = read_config
     @results = []
 
+    @config['autotag'] ||= {}
+    @config['autotag']['whitelist'] ||= []
+    @config['autotag']['synonyms'] ||= {}
     @config['doing_file'] ||= "~/what_was_i_doing.md"
     @config['current_section'] ||= 'Currently'
     @config['editor_app'] ||= nil
