@@ -1392,7 +1392,7 @@ EOS
     minutes =  (seconds / 60).to_i
     hours = (minutes / 60).to_i
     days = (hours / 24).to_i
-    hours = (hours % 60).to_i
+    hours = (hours % 24).to_i
     minutes = (minutes % 60).to_i
     [days, hours, minutes]
   end
