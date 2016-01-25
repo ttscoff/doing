@@ -329,7 +329,7 @@ As mentioned above, `finish` also accepts `--back "2 hours"` (sets the finish da
 
 ... will mark the last three entries as "@client @cancelled." Add `-r` as a switch to remove the listed tags instead.
 
-You can optionally define keywords for common tasks and projects in your `.doingrc` file. When these keywords appear in an item title, they'll automatically be converted into @tags. The "whitelist" tags are exact (but case insensitive) matches. You can also define "synonyms" which will add a tag at the end based on keywords associated with it.
+You can optionally define keywords for common tasks and projects in your `.doingrc` file. When these keywords appear in an item title, they'll automatically be converted into @tags. The "whitelist" tags are exact (but case insensitive) matches. You can also define "synonyms" which will add a tag at the end based on keywords associated with it. When defining synonym keys, be sure to indent but _not_ hyphenate the keys themselves, while hyphenating the list of synonyms at the same indent level as their key. See "playing" and "writing" in the list below for illustration. Follow standard yaml syntax.
 
 To add autotagging, include a section like this in your `~/.doingrc` file:
 
