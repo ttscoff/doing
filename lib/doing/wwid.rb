@@ -213,6 +213,7 @@ class WWID
     begin
       @config = YAML.load_file(@config_file) || {} if File.exists?(@config_file)
       @local_config = YAML.load_file(additional) || {} if additional
+      @config.deep_merge(@local_config)
     rescue
       @config = {}
       @local_config = {}
