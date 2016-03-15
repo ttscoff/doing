@@ -272,37 +272,30 @@ class WWID
     [title, note]
   end
 
-  # Converts simple strings into seconds that can be added to a Time object
-  # Params:
-  # +qty+:: HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m, 1.5d, 1h20m, etc.)
-  # Returns:
-  # seconds(Integer)
+  # Converts `input` string into a Time object when `input` takes on the
+  # following formats:
+  # - interval format e.g. '1d2h30m', '45m' etc.
+  # - a semantic phrase e.g. 'yesterday 5:30pm'
+  # - a strftime e.g. '2016-03-15 15:32:04 PDT'
   def chronify(input)
+    now = Time.now
+    raise "Invalid time expression #{input.inspect}" if input.to_s.strip == ""
+    secs_ago = if input.match /^(\d+)$/
+      # plain number, assume minutes
+      $1.to_i * 60
+    elsif (m = input.match /^((?<day>\d+)d)?((?<hour>\d+)h)?((?<min>\d+)m)?$/i)
+      # day/hour/minute format e.g. 1d2h30m
+      [[m['day'], 24*3600],
+       [m['hour'], 3600],
+       [m['min'], 60]].map {|qty, secs| qty ? (qty.to_i * secs) : 0 }.reduce(0, :+)
+    end
 
-    had_to_try = Time.parse(input) rescue false
-
-    if had_to_try.class == FalseClass
-      if input =~ /^(\d+)([mhd])?$/i
-        amt = $1
-        type = $2.nil? ? "m" : $2
-        input = case type.downcase
-        when 'm'
-          amt + " minutes ago"
-        when 'h'
-          amt + " hours ago"
-        when 'd'
-          amt + " days ago"
-        else
-          input
-        end
-      end
-
-      Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
+    if secs_ago
+      now - secs_ago
     else
-      had_to_try
+      Chronic.parse(input, {:context => :past, :ambiguous_time_range => 8})
     end
   end
-
 
   # Converts simple strings into seconds that can be added to a Time object
   # Params:
