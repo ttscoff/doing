@@ -132,7 +132,7 @@ command :note do |c|
 
       input = args.length > 0 ? args.join(" ") : ""
 
-      prev_input = wwid.last_note(section)
+      prev_input = wwid.last_note(section) || ""
       if prev_input.class == Array
         prev_input = prev_input.join("\n")
       end
