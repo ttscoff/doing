@@ -558,7 +558,7 @@ class WWID
       current_note = [] if current_note.nil?
       title = items[0]['title']
       if replace
-        items[0]['note'] = note.gsub(/ *$/,'')
+        items[0]['note'] = note
         if note.empty? && !current_note.empty?
           @results.push(%Q{Removed note from "#{title}"})
         elsif current_note.length > 0 && note.length > 0
