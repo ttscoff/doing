@@ -16,6 +16,18 @@ class NoteEditorTest < Test::Unit::TestCase
     FileUtils.rm_rf(@tmpdirs)
   end
 
+  def test_new_note_via_editor
+    # Add a note to the task and replace it
+    subject = 'Test new note via editor'
+    doing('now', subject)
+    assert_match(/#{subject}\s*$/, doing('show'), 'should have added task')
+
+    editor_note = 'I would type this into my editor'
+    editor = mk_replacing_editor(editor_note)
+    doing_with_env({ 'EDITOR' => editor }, 'note', '-e')
+    assert_match(/#{editor_note}\s*$/, doing('show'), 'should add first note')
+  end
+
   def test_replace_note_via_editor
     # Add a note to the task and replace it
     subject = 'Test replace note via editor'
