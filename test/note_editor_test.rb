@@ -1,10 +1,10 @@
 require 'fileutils'
 require 'tempfile'
-require 'open3'
 require 'test_helper'
+require 'doing-helpers'
 
 class NoteEditorTest < Test::Unit::TestCase
-  DOING_EXEC = File.join(File.dirname(__FILE__), '..', 'bin', 'doing')
+  include DoingHelpers
 
   def setup
     @tmpdirs = []
@@ -23,8 +23,7 @@ class NoteEditorTest < Test::Unit::TestCase
     assert_match(/#{subject}\s*$/, doing('show'), 'should have added task')
 
     editor_note = 'I would type this into my editor'
-    editor = mk_replacing_editor(editor_note)
-    doing_with_env({ 'EDITOR' => editor }, 'note', '-e')
+    doing_env({ 'EDITOR' => mk_replacing_editor(editor_note) }, 'note', '-e')
     assert_match(/#{editor_note}\s*$/, doing('show'), 'should add first note')
   end
 
@@ -46,7 +45,7 @@ class NoteEditorTest < Test::Unit::TestCase
     # Replace should replace both
     replacer_note = 'replaced #1 and #2'
     editor = mk_replacing_editor(replacer_note)
-    doing_with_env({ 'EDITOR' => editor }, 'note', '-e')
+    doing_env({ 'EDITOR' => editor }, 'note', '-e')
     assert_doing_shows([
       [/#{replacer_note}\s*$/, "replacer note should be visible"],
       [/#{note1}\s*$/, "note #1 should have been replaced", :refute],
@@ -66,22 +65,11 @@ private
   end
 
   def doing(*args)
-    doing_with_env({}, *args)
+    doing_with_env({}, '--doing_file', @wwid_file, *args)
   end
 
-  def doing_with_env(env, *args)
-    pread(env, DOING_EXEC, '--doing_file', @wwid_file, *args)
-  end
-
-  def pread(env, *cmd)
-    out, err, status = Open3.capture3(env, *cmd)
-    unless status.success?
-      raise [
-        "Error (#{status}): #{cmd.inspect} failed", "STDOUT:", out.inspect, "STDERR:", err.inspect
-      ].join("\n")
-    end
-
-    out
+  def doing_env(env, *args)
+    doing_with_env(env, '--doing_file', @wwid_file, *args)
   end
 
   def mktmpdir
