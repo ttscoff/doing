@@ -39,7 +39,7 @@ task 'cucumber:wip' => 'features:wip'
 task :wip => 'features:wip'
 require 'rake/testtask'
 Rake::TestTask.new do |t|
-  t.libs << "test"
+  t.libs << ["test", "test/helpers"]
   t.test_files = FileList['test/*_test.rb']
 end
 
