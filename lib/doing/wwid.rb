@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require 'deep_merge'
+require 'pp'
 
 class String
   def cap_first
@@ -448,7 +449,7 @@ class WWID
     opt[:date] ||= false
     opt[:remove] ||= false
     opt[:autotag] ||= false
-    opt[:back] ||= Time.now
+    opt[:back] ||= false
 
 
     sec_arr = []
@@ -479,10 +480,10 @@ class WWID
             if opt[:sequential]
               done_date = next_start - 1
               next_start = item['date']
-            elsif opt[:back].instance_of? Fixnum
-              done_date = item['date'] + opt[:back]
+            elsif opt[:back]
+              done_date = item['date'] + (opt[:back] - item['date'])
             else
-              done_date = opt[:back]
+              done_date = Time.now
             end
 
             title = item['title']

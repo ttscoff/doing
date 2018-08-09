@@ -331,6 +331,8 @@ command :done do |c|
 
     if options[:took]
       finish_date = date + took
+    elsif options[:back]
+      finish_date = date
     else
       finish_date = Time.now
     end
