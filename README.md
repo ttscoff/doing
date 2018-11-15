@@ -20,7 +20,7 @@ _If you're one of the rare people like me who find this useful, feel free to con
 
 ## What and why
 
-`doing` is a basic CLI for adding and listing "what was I doing" reminders in a [TaskPaper-formatted](http://www.hogbaysoftware.com/products/taskpaper) text file. It allows for multiple sections/categories and flexible output formatting.
+`doing` is a basic CLI for adding and listing "what was I doing" reminders in a [TaskPaper-formatted](https://www.taskpaper.com) text file. It allows for multiple sections/categories and flexible output formatting.
 
 While I'm working, I have hourly reminders to record what I'm working on, and I try to remember to punch in quick notes if I'm unexpectedly called away from a project. I can do this just by typing `doing now tracking down the CG bug`. 
 
