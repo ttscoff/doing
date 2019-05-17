@@ -18,7 +18,7 @@ lib/doing.rb
 lib/doing/wwid.rb
   )
   s.require_paths << 'lib'
-  s.has_rdoc = true
+
   s.extra_rdoc_files = ['README.md']
   s.rdoc_options << '--title' << 'doing' << '--main' << 'README.md' << '--markup' << 'markdown' << '-ri'
   s.bindir = 'bin'
