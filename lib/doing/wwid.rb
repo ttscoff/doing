@@ -592,7 +592,7 @@ class WWID
     tag.sub!(/^@/,'')
 
     found_items = 0
-
+    begin
     @content[opt[:section]]['items'].each_with_index {|item, i|
       if item['title'] =~ /@#{tag}/
         title = item['title'].gsub(/(^| )@(#{tag}|done)(\([^\)]*\))?/,'')
@@ -619,8 +619,14 @@ class WWID
       title, note = format_input(opt[:new_item])
       note.push(opt[:note].gsub(/ *$/,'')) if opt[:note]
       title += " @#{tag}"
-      add_item(title.cap_first, opt[:section], {:note => note.gsub(/ *$/,''), :back => opt[:back]})
+      add_item(title.cap_first, opt[:section], {:note => note.join(' ').rstrip, :back => opt[:back]})
     end
+
+    rescue Exception=>e
+      puts e
+      puts e.backtrace
+    end
+
 
     write(@doing_file)
   end
