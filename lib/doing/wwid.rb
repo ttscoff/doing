@@ -16,7 +16,7 @@ class String
       self.gsub(/(?mi)((http|https):\/\/)?([\w\-_]+(\.[\w\-_]+)+)([\w\-\.,\@?^=%&amp;:\/~\+#]*[\w\-\@^=%&amp;\/~\+#])?/) {|match|
         m = Regexp.last_match
         proto = m[1].nil? ? "http://" : ""
-        %Q{<a href="#{proto}#{m[0]}" title="link to #{m[0]}">[#{m[3]}]</a>}
+        %Q{<a href="#{proto}#{m[0]}" title="Link to #{m[0]}">[#{m[3]}]</a>}
       }.gsub(/\<(\w+:.*?)\>/) {|match|
         m = Regexp.last_match
         unless m[1] =~ /<a href/
@@ -521,7 +521,7 @@ class WWID
         if opt[:archive] && section != "Archive" && opt[:count] > 0
           # concat [count] items from [section] and archive section
           archived = @content[section]['items'][0..opt[:count]-1].map {|i|
-            i['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{i['section']}")
+            i['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{i['section']})")
           }.concat(@content['Archive']['items'])
           # chop [count] items off of [section] items
           @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
@@ -604,7 +604,7 @@ class WWID
         if opt[:archive] && opt[:section] != "Archive"
           @results.push(%Q{Completed and archived "#{@content[opt[:section]]['items'][i]['title']}"})
           archive_item = @content[opt[:section]]['items'][i]
-          archive_item['title'] = i['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{i['section']}")
+          archive_item['title'] = i['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{i['section']})")
           @content['Archive']['items'].push(archive_item)
           @content[opt[:section]]['items'].delete_at(i)
         else
@@ -1051,7 +1051,8 @@ EOT
         output.sub!(/%section/,item['section']) if item['section']
 
         if opt[:tags_color]
-          output.gsub!(/\s(@\S+(?:\(.*?\))?)/," #{colors[opt[:tags_color]]}\\1")
+          last_color = output.scan(/(\e\[[\d;]+m)[^\e]+@/)[-1][0]
+          output.gsub!(/\s(@[^ \(]+)/," #{colors[opt[:tags_color]]}\\1#{last_color}")
         end
         output.sub!(/%note/,note)
         output.sub!(/%odnote/,note.gsub(/^\t*/,""))
@@ -1139,8 +1140,7 @@ EOT
       }
       moved_items.each {|item|
         if label
-          item['title'] = item['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{section}")  unless section == "Currently"
-          # item['title'] += " @from(#{section})" unless section == "Currently" || item['title'] =~ /@from\(/
+          item['title'] = item['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{section})")  unless section == "Currently"
         end
       }
       @content[section]['items'] = moved_items
@@ -1157,8 +1157,7 @@ EOT
 
       items.each{|item|
         if label
-          item['title'] = item['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{section}")  unless section == "Currently"
-          # item['title'] += " @from(#{section})" unless section == "Currently"
+          item['title'] = item['title'].sub(/(?:@from\(.*?\))?(.*)$/,"\\1 @from(#{section})")  unless section == "Currently"
         end
       }
 
