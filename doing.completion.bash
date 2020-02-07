@@ -10,9 +10,9 @@ _doing_show() {
 
 
 	if [[ "$token" == --* ]]; then
-		COMPREPLY=( $( compgen -W '--boolean --count --age --sort --times --totals --csv' -- $token ) )
+		COMPREPLY=( $( compgen -W '--bool --count --age --sort --times --totals --csv' -- $token ) )
 	elif [[ "$token" == -* ]]; then
-		COMPREPLY=( $( compgen -W '-b -c -a -s -t --boolean --count --age --sort --times --totals --csv' -- $token ) )
+		COMPREPLY=( $( compgen -W '-b -c -a -s -t --bool --count --age --sort --times --totals --csv' -- $token ) )
 	else
 
 		local nocasematchWasOff=0
@@ -46,9 +46,9 @@ _doing_view() {
 	IFS="$OLD_IFS"
 
 	if [[ "$token" == --* ]]; then
-		COMPREPLY=( $( compgen -W '--section--count --csv --times --totals' -- $token ) )
+		COMPREPLY=( $( compgen -W '--section --count --csv --times --totals' -- $token ) )
 	elif [[ "$token" == -* ]]; then
-		COMPREPLY=( $( compgen -W '-s -c -t --section--count --csv --times --totals' -- $token ) )
+		COMPREPLY=( $( compgen -W '-s -c -t --section --count --csv --times --totals' -- $token ) )
 	else
 		local nocasematchWasOff=0
 		shopt nocasematch >/dev/null || nocasematchWasOff=1

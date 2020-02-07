@@ -785,8 +785,13 @@ end
 
 desc 'List sections'
 command :sections do |c|
+  c.desc 'List in single column'
+  c.default_value false
+  c.switch [:c,:column], :default_value => false
+
   c.action do |global_options,options,args|
-    puts wwid.sections.join("\t")
+    joiner = options[:c] ? "\n" : "\t"
+    print wwid.sections.join(joiner)
   end
 end
 
@@ -909,8 +914,13 @@ end
 
 desc 'List available custom views'
 command :views do |c|
+  c.desc 'List in single column'
+  c.default_value false
+  c.switch [:c,:column], :default_value => false
+
   c.action do |global_options,options,args|
-    puts wwid.views.join("\t")
+    joiner = options[:c] ? "\n" : "\t"
+    print wwid.views.join(joiner)
   end
 end
 
