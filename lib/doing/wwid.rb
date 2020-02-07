@@ -1069,8 +1069,8 @@ EOT
 
         out += output + "\n"
       }
+      out += tag_times if opt[:totals]
     end
-    out += tag_times if opt[:totals]
     return out
   end
 
@@ -1168,38 +1168,38 @@ EOT
 
   def colors
     color = {}
-    color['black'] = "\033[30m"
-    color['red'] = "\033[31m"
-    color['green'] = "\033[32m"
-    color['yellow'] = "\033[33m"
-    color['blue'] = "\033[34m"
-    color['magenta'] = "\033[35m"
-    color['cyan'] = "\033[36m"
-    color['white'] = "\033[37m"
-    color['bgblack'] = "\033[40m"
-    color['bgred'] = "\033[41m"
-    color['bggreen'] = "\033[42m"
-    color['bgyellow'] = "\033[43m"
-    color['bgblue'] = "\033[44m"
-    color['bgmagenta'] = "\033[45m"
-    color['bgcyan'] = "\033[46m"
-    color['bgwhite'] = "\033[47m"
+    color['black'] = "\033[0;0;30m"
+    color['red'] = "\033[0;0;31m"
+    color['green'] = "\033[0;0;32m"
+    color['yellow'] = "\033[0;0;33m"
+    color['blue'] = "\033[0;0;34m"
+    color['magenta'] = "\033[0;0;35m"
+    color['cyan'] = "\033[0;0;36m"
+    color['white'] = "\033[0;0;37m"
+    color['bgblack'] = "\033[0;0;40m"
+    color['bgred'] = "\033[0;0;41m"
+    color['bggreen'] = "\033[0;0;42m"
+    color['bgyellow'] = "\033[0;0;43m"
+    color['bgblue'] = "\033[0;0;44m"
+    color['bgmagenta'] = "\033[0;0;45m"
+    color['bgcyan'] = "\033[0;0;46m"
+    color['bgwhite'] = "\033[0;0;47m"
     color['boldblack'] = "\033[1;30m"
     color['boldred'] = "\033[1;31m"
-    color['boldgreen'] = "\033[1;32m"
-    color['boldyellow'] = "\033[1;33m"
-    color['boldblue'] = "\033[1;34m"
-    color['boldmagenta'] = "\033[1;35m"
-    color['boldcyan'] = "\033[1;36m"
-    color['boldwhite'] = "\033[1;37m"
-    color['boldbgblack'] = "\033[1;40m"
-    color['boldbgred'] = "\033[1;41m"
-    color['boldbggreen'] = "\033[1;42m"
-    color['boldbgyellow'] = "\033[1;43m"
-    color['boldbgblue'] = "\033[1;44m"
-    color['boldbgmagenta'] = "\033[1;45m"
-    color['boldbgcyan'] = "\033[1;46m"
-    color['boldbgwhite'] = "\033[1;47m"
+    color['boldgreen'] = "\033[0;1;32m"
+    color['boldyellow'] = "\033[0;1;33m"
+    color['boldblue'] = "\033[0;1;34m"
+    color['boldmagenta'] = "\033[0;1;35m"
+    color['boldcyan'] = "\033[0;1;36m"
+    color['boldwhite'] = "\033[0;1;37m"
+    color['boldbgblack'] = "\033[0;1;40m"
+    color['boldbgred'] = "\033[0;1;41m"
+    color['boldbggreen'] = "\033[0;1;42m"
+    color['boldbgyellow'] = "\033[0;1;43m"
+    color['boldbgblue'] = "\033[0;1;44m"
+    color['boldbgmagenta'] = "\033[0;1;45m"
+    color['boldbgcyan'] = "\033[0;1;46m"
+    color['boldbgwhite'] = "\033[0;1;47m"
     color['softpurple'] = "\033[0;35;40m"
     color['hotpants'] = "\033[7;34;40m"
     color['knightrider'] = "\033[7;30;40m"
@@ -1389,6 +1389,9 @@ EOS
   end
 
   def fmt_time(seconds)
+    if seconds.nil?
+      return [0, 0, 0]
+    end
     minutes =  (seconds / 60).to_i
     hours = (minutes / 60).to_i
     days = (hours / 24).to_i
