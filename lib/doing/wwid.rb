@@ -724,7 +724,7 @@ class WWID
         @content.each {|k,v|
           combined['items'] += v['items']
         }
-        section = opt[:tag_filter] ? opt[:tag_filter]['tags'].map {|tag| "@#{tag}"}.join(" + ") : "doing"
+        section = opt[:tag_filter] && opt[:tag_filter]['bool'] != 'NONE' ? opt[:tag_filter]['tags'].map {|tag| "@#{tag}"}.join(" + ") : "doing"
         opt[:section] = combined
       else
         section = guess_section(opt[:section])

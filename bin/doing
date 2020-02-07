@@ -525,7 +525,7 @@ arg_name 'section [tags]'
 command :show do |c|
   c.desc 'Tag boolean (AND,OR,NONE)'
   c.default_value "OR"
-  c.flag [:b,:boolean], :default_value => "OR"
+  c.flag [:b,:bool], :default_value => "OR"
 
   c.desc 'Max count to show'
   c.default_value 0
