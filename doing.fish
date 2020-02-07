@@ -1,4 +1,4 @@
-# show and view completion for Fish
+# show and view completion for Fish (very incomplete for a completion script)
 function __fish_doing_needs_command
 	# Figure out if the current invocation already has a command.
 
