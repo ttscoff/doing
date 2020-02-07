@@ -504,9 +504,24 @@ I'll try to document some of the code structure as I flesh it out. I'm currently
 
 ## Changelog
 
+#### 1.0.15
+
+- CLI/text totals block was outputting when HTML output was selected
+- Have all template colors reset bold and background automatically when called
+
 #### 1.0.14
 
 Catching up on the changelog. Kind of. A lot has happened, mostly fixes.
+
+- Fish completion
+- views and sections subcommands have -c option to output single column
+- Fix html title when tag_bool is NONE
+- Fix @from tagging missing closing paren
+- Fix tag coloring
+
+#### 1.0.13
+
+- Fix gsub error in doing meanwhile
 
 #### 1.0.8pre
 
