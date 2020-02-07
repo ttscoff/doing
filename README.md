@@ -272,15 +272,57 @@ Outputs:
 
 You can also specify a default output format for a view. Most of the optional output formats override the template specification (`html`, `csv`, `json`). If the `view` command is used with the `-o` flag, it will override what's specified in the file.
 
+### Colors
+
+You can use the following colors in view templates. Set a foreground color with a named color:
+
+    %black
+    %red
+    %green
+    %yellow
+    %blue
+    %magenta
+    %cyan
+    %white
+
+You can also add a background color (`%bg[color]`) by placing one after the foreground color:
+
+    %white%bgblack
+    %black%bgred
+    ...etc.
+
+There are bold variants for both foreground and background colors
+
+    %boldblack
+    %boldred
+    ... etc.
+
+    %boldbgblack
+    %boldbgred
+    ... etc.
+
+And a few special colors you'll just have to try out to see:
+
+    %softpurple
+    %hotpants
+    %knightrider
+    %flamingo
+    %yeller
+    %whiteboard
+
+Any time you use one of the foreground colors it will reset the bold and background settings to their default automatically. You can force a reset to default terminal colors using `%default`.
+
 ## Usage
 
     doing [global options] command [command options] [arguments...]
 
 ### Global options:
 
-    --[no-]notes        - Output notes if included in the template (default: enabled)
-    --version           - Display the program version
-    --help              - Show help message and usage summary
+    -f, --doing_file=arg - Specify a different doing_file (default: none)
+    --help               - Show this message
+    --[no-]notes         - Output notes if included in the template (default: enabled)
+    --stdout             - Send results report to STDOUT instead of STDERR
+    --version            - Display the program version
 
 ### Commands:
 
@@ -489,6 +531,11 @@ Please try not to email me directly about GitHub projects.
 I'll try to document some of the code structure as I flesh it out. I'm currently working on adding a CLI reporting structure and logging methods, as well as santizing and standardizing all the flags and switches for consistency. Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
 ## Changelog
+
+#### 1.0.18
+
+- Fix `undefined method [] for nil class` error in `doing view`
+- Loosened up the template color resetting a bit more
 
 #### 1.0.17
 

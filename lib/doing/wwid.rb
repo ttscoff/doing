@@ -1051,7 +1051,12 @@ EOT
         output.sub!(/%section/,item['section']) if item['section']
 
         if opt[:tags_color]
-          last_color = output.scan(/(\e\[[\d;]+m)[^\e]+@/)[-1][0]
+          escapes = output.scan(/(\e\[[\d;]+m)[^\e]+@/)
+          if escapes.length > 0
+            last_color = escapes[-1][0]
+          else
+            last_color = colors['default']
+          end
           output.gsub!(/\s(@[^ \(]+)/," #{colors[opt[:tags_color]]}\\1#{last_color}")
         end
         output.sub!(/%note/,note)
@@ -1176,14 +1181,14 @@ EOT
     color['magenta'] = "\033[0;0;35m"
     color['cyan'] = "\033[0;0;36m"
     color['white'] = "\033[0;0;37m"
-    color['bgblack'] = "\033[0;40m"
-    color['bgred'] = "\033[0;41m"
-    color['bggreen'] = "\033[0;42m"
-    color['bgyellow'] = "\033[0;43m"
-    color['bgblue'] = "\033[0;44m"
-    color['bgmagenta'] = "\033[0;45m"
-    color['bgcyan'] = "\033[0;46m"
-    color['bgwhite'] = "\033[0;47m"
+    color['bgblack'] = "\033[40m"
+    color['bgred'] = "\033[41m"
+    color['bggreen'] = "\033[42m"
+    color['bgyellow'] = "\033[43m"
+    color['bgblue'] = "\033[44m"
+    color['bgmagenta'] = "\033[45m"
+    color['bgcyan'] = "\033[46m"
+    color['bgwhite'] = "\033[47m"
     color['boldblack'] = "\033[1;30m"
     color['boldred'] = "\033[1;31m"
     color['boldgreen'] = "\033[0;1;32m"
@@ -1206,7 +1211,7 @@ EOT
     color['flamingo'] = "\033[7;31;47m"
     color['yeller'] = "\033[1;37;43m"
     color['whiteboard'] = "\033[1;30;47m"
-    color['default']="\033[0;39m"
+    color['default'] = "\033[0;39m"
     color
   end
 
