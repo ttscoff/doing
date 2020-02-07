@@ -34,6 +34,10 @@ desc 'Output notes if included in the template'
 default_value true
 switch [:notes], :default_value => true, :negatable => true
 
+desc 'Send results report to STDOUT instead of STDERR'
+default_value false
+switch [:stdout], :default_value => false, :negatable => false
+
 # desc 'Wrap notes at X chars (0 for no wrap)'
 # flag [:w,:wrapwidth], :must_match => /^\d+$/, :type => Integer
 
@@ -1076,7 +1080,11 @@ end
 post do |global,command,options,args|
   # Use skips_post before a command to skip this
   # block on that command only
-  $stderr.puts wwid.results.join("\n")
+  if global[:stdout]
+    $stdout.print wwid.results.join("\n")
+  else
+    $stderr.puts wwid.results.join("\n")
+  end
 end
 
 on_error do |exception|

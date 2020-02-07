@@ -433,36 +433,22 @@ Example: Archive all Currently items for `@client` that are marked `@done`
 
 ## Extras
 
-### Bash completion
+### Shell completion
 
-See the file `doing.completion.bash` in the git repository for full bash completion. Thanks to [fcrespo82](https://github.com/fcrespo82) for getting it [started](https://gist.github.com/fcrespo82/9609318).
-
-### Zsh completion
-
-See the file `doing.completion.zsh` in the git repository for zsh completion.
-
-### Launchbar
-
-The previous incarnation of `doing` had a [LaunchBar](http://obdev.at/launchbar/) action that I used frequently. The Day One popup has mostly replaced that for me, but only because I have a system that connects it to my WWID file. However, I've still found a place for adding WWID entries without including them in my journal, and LaunchBar is the perfect way to do that for me.
-
-All you need is an AppleScript saved at `~/Library/Application Support/LaunchBar/Actions/Doing.scpt`. It should look like this:
+__Bash:__ See the file [`doing.completion.bash`](https://github.com/ttscoff/doing/blob/master/doing.completion.bash) in the git repository for full bash completion. Thanks to [fcrespo82](https://github.com/fcrespo82) for getting it [started](https://gist.github.com/fcrespo82/9609318).
 
 
-    on handle_string(message)
-        -- get the input from LaunchBar
-        if message is "?" then
-            -- if the input is just "?" display the last three entries
-            set _doing to do shell script "/usr/bin/doing recent 3"
-            tell application "LaunchBar" to display in large type _doing
-        else
-            -- otherwise, create a new entry using the input
-            do shell script "/usr/bin/doing now " & quoted form of message
-        end if
-        
-    end handle_string
+__Zsh:__ See the file [`doing.completion.zsh`](https://github.com/ttscoff/doing/blob/master/doing.completion.zsh) in the git repository for zsh completion. Courtesy of [Gabe Anzelini](https://github.com/gabeanzelini).
 
+__Fish:__ See the file [`doing.fish`](https://github.com/ttscoff/doing/blob/master/doing.fish) in the git repository for Fish completion. This is the least complete of all of the completions, but it will autocomplete the first level of subcommands, and your custom sections and views for the `doing show` and `doing view` commands.
 
-Evan Lovely has [converted this to an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
+### Launchbar/Alfred
+
+The LaunchBar action requires that `doing` be available in `/usr/local/bin/doing`. If it's not (because you're using RVM or similar), you'll need to symlink it there. Running the action with Return will show the latest 9 items from Currently, along with any time intervals recorded, and includes a submenu of Timers for each tag.
+
+{% download 117 %}
+
+Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
 
 ## Troubleshooting
 
@@ -503,6 +489,14 @@ Please try not to email me directly about GitHub projects.
 I'll try to document some of the code structure as I flesh it out. I'm currently working on adding a CLI reporting structure and logging methods, as well as santizing and standardizing all the flags and switches for consistency. Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
 ## Changelog
+
+#### 1.0.17
+
+- Add `--stdout` global option to send reporting to STDOUT instead of STDERR (for use with LaunchBar et al)
+
+#### 1.0.16
+
+- Fixes overzealous color resetting
 
 #### 1.0.15
 
