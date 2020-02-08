@@ -91,7 +91,7 @@ A basic configuration looks like this:
     :include_notes: true
 
 
-The config file is stored in `~/.doingrc`, and is created on the first run.
+  The config file is stored in `~/.doingrc`, and a skeleton file is created on the first run. Just run `doing` on its own to create the file.
 
 ### Per-folder configuration
 
@@ -545,7 +545,7 @@ Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add mo
 - For `doing note -e` include the entry title so you know what you're adding a note to
 - For any other command that allows `-e` include a comment noting that anything after the first line creates a note
 - Ignore # comments when parsing editor results
-
+- Add a .md extension to the temp file passed to the editor so you can take advantage of any syntax highlighting and other features in your editor
 
 #### 1.0.18
 
