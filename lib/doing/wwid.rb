@@ -97,7 +97,7 @@ class WWID
     }
     @config['templates']['recent'] ||= {
       'date_format' => '%_I:%M%P',
-      'template' => '%shortdate: %title',
+      'template' => '%shortdate: %title (%section)',
       'wrap_width' => 88
     }
     @config['views'] ||= {
@@ -507,7 +507,7 @@ class WWID
     opt[:back] ||= Time.now
     opt[:timed] ||= false
 
-    title = [title.strip.cap_first] + @config['default_tags'].map{|t| '@' + t.sub(/^ *@/,'').chomp}
+    title = [title.strip.cap_first]
     title = autotag(title.join(' '))
     unless @config['default_tags'].empty?
       title += @config['default_tags'].map{|t|
@@ -516,7 +516,7 @@ class WWID
           if title =~ /@#{dt}/
             ""
           else
-            '@' + dt
+            ' @' + dt
           end
         end
       }.delete_if {|t| t == "" }.join(" ")

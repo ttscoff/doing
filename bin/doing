@@ -692,8 +692,8 @@ default_value 10
 arg_name 'count'
 command :recent do |c|
   c.desc 'Section'
-  c.default_value wwid.current_section
-  c.flag [:s,:section], :default_value => wwid.current_section
+  c.default_value "All"
+  c.flag [:s,:section], :default_value => "All"
 
   c.desc 'Show time intervals on @done tasks'
   c.default_value true
@@ -813,7 +813,6 @@ command :yesterday do |c|
   c.switch [:totals], :default_value => false, :negatable => true
 
   c.action do |global_options, options,args|
-    section = args.length > 0 ? args.join(" ") : wwid.current_section
     puts wwid.yesterday(options[:s],options[:t],options[:o],{:totals => options[:totals]}).chomp
 
   end
