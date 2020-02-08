@@ -95,7 +95,9 @@ A basic configuration looks like this:
 
 ### Per-folder configuration
 
-Any options found in a `.doingrc` anywhere in the hierarchy between your current folder and your home folder will be appended to the base configuration, overriding or extending existing options. This allows you to put a `.doingrc` file into the base of a project and add specific configurations (such as default tags) when working in that project on the command line.
+Any options found in a `.doingrc` anywhere in the hierarchy between your current folder and your home folder will be appended to the base configuration, overriding or extending existing options. This allows you to put a `.doingrc` file into the base of a project and add specific configurations (such as default tags) when working in that project on the command line. These can be cascaded, with the closest `.doingrc` to your current directory taking precedence, though I'm not sure why you'd want to deal with that.
+
+This can also be used to define custom HTML output on a per-project basis using the html_template option for custom templates.
 
 Any part of the configuration can be copied into these local files and modified. You only need to include the parts you want to change or add.
 
@@ -549,6 +551,12 @@ Please try not to email me directly about GitHub projects.
 Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
 ## Changelog
+
+#### 1.0.22
+
+- Fix handling of "local" config files, allowing per-project configurations
+- Allow cascading of local config files
+- Allow `doing today` and `yesterday` to specify a section
 
 #### 1.0.21
 

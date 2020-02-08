@@ -3,6 +3,9 @@
 require 'deep_merge'
 require 'pp'
 
+##
+## @brief      String helpers
+##
 class String
   def cap_first
     self.sub(/^\w/) do |m|
@@ -10,6 +13,11 @@ class String
     end
   end
 
+  ##
+  ## @brief      Turn raw urls into HTML links
+  ##
+  ## @param      opt   (Hash) Additional Options
+  ##
   def link_urls(opt={})
     opt[:format] ||= :html
     if opt[:format] == :html
@@ -31,20 +39,32 @@ class String
   end
 end
 
+##
+## @brief      Main "What Was I Doing" methods
+##
 class WWID
   attr_accessor :content, :sections, :current_section, :doing_file, :config, :user_home, :default_config_file, :results
 
+  ##
+  ## @brief      Initializes the object.
+  ##
   def initialize
     @content = {}
     @doingrc_needs_update = false
     @default_config_file = '.doingrc'
   end
 
+  ##
+  ## @brief      Read user configuration and merge with defaults
+  ##
+  ## @param      opt   (Hash) Additional Options
+  ##
   def configure(opt={})
     @timers = {}
     @config_file == File.join(@user_home, @default_config_file)
 
-    @config = read_config
+    read_config
+
     user_config = @config.dup
     @results = []
 
@@ -110,10 +130,9 @@ class WWID
 
     @config[:include_notes] ||= true
 
-    File.open(@config_file, 'w') { |yf| YAML::dump(@config, yf) } if @config != user_config || @doingrc_needs_update
+    File.open(@config_file, 'w') { |yf| YAML::dump(@config, yf) } unless @config == user_config
 
-
-    @config = @config.deep_merge(@local_config)
+    @config = @local_config.deep_merge(@config)
 
     @current_section = @config['current_section']
     @default_template = @config['templates']['default']['template']
@@ -121,8 +140,15 @@ class WWID
 
   end
 
-  def init_doing_file(input=nil)
+  ##
+  ## @brief      Initializes the doing file.
+  ##
+  ## @param      path  (String) Override path to a doing file, optional
+  ##
+  def init_doing_file(path=nil)
     @doing_file = File.expand_path(@config['doing_file'])
+
+    input = path
 
     if input.nil?
       create(@doing_file) unless File.exists?(@doing_file)
@@ -178,14 +204,27 @@ class WWID
     }
   end
 
+  ##
+  ## @brief      Return the contents of the HAML template for HTML output
+  ##
+  ## @return     (String) HAML template
+  ##
   def haml_template
     IO.read(File.join(File.dirname(__FILE__), '../templates/doing.haml'))
   end
 
+  ##
+  ## @brief      Return the contents of the CSS template for HTML output
+  ##
+  ## @return     (String) CSS template
+  ##
   def css_template
     IO.read(File.join(File.dirname(__FILE__), '../templates/doing.css'))
   end
 
+  ##
+  ## @brief      Create a new doing file
+  ##
   def create(filename=nil)
     if filename.nil?
       filename = @doing_file
@@ -197,37 +236,51 @@ class WWID
     end
   end
 
+  ##
+  ## @brief      Finds a project-specific configuration file
+  ##
+  ## @return     (String) A file path
+  ##
   def find_local_config
 
     config = {}
     dir = Dir.pwd
 
-    local_config_file = nil
+    local_config_files = []
 
     while (dir != '/' && (dir =~ /[A-Z]:\//) == nil)
       if File.exists? File.join(dir, @default_config_file)
-        return File.join(dir, @default_config_file)
+        local_config_files.push(File.join(dir, @default_config_file))
       end
 
       dir = File.dirname(dir)
     end
 
-    false
+    local_config_files
   end
 
+  ##
+  ## @brief      Reads a configuration.
+  ##
   def read_config
     if Dir.respond_to?('home')
       @config_file = File.join(Dir.home, @default_config_file)
     else
       @config_file = File.join(File.expand_path("~"), @default_config_file)
     end
-    @doingrc_needs_update = true if File.exists? @config_file
-    additional = find_local_config
+    # @doingrc_needs_update = true if File.exists? @config_file
+    additional_configs = find_local_config
 
     begin
+      @local_config = {}
+
       @config = YAML.load_file(@config_file) || {} if File.exists?(@config_file)
-      @local_config = YAML.load_file(additional) || {} if additional
-      @config.deep_merge(@local_config)
+      additional_configs.each { |cfg|
+        new_config = YAML.load_file(cfg) || {} if cfg
+        @local_config = @local_config.deep_merge(new_config)
+      }
+
+      # @config.deep_merge(@local_config)
     rescue
       @config = {}
       @local_config = {}
@@ -235,6 +288,11 @@ class WWID
     end
   end
 
+  ##
+  ## @brief      Create a process for an editor and wait for the file handle to return
+  ##
+  ## @param      input  (String) Text input for editor
+  ##
   def fork_editor(input="")
     tmpfile = Tempfile.new(['doing','.md'])
 
@@ -268,11 +326,13 @@ class WWID
     input
   end
 
-  # This takes a multi-line string and formats it as an entry
-  # Params:
-  # +input+:: String
-  # Returns:
-  # [title(String), note(Array)]
+  #
+  # @brief      Takes a multi-line string and formats it as an entry
+  #
+  # @return     (Array) [(String)title, (Array)note]
+  #
+  # @param      input  (String) The string to parse
+  #
   def format_input(input)
     raise "No content in entry" if input.nil? || input.strip.length == 0
     input_lines = input.split(/[\n\r]+/)
@@ -287,11 +347,17 @@ class WWID
     [title, note]
   end
 
-  # Converts `input` string into a Time object when `input` takes on the
-  # following formats:
-  # - interval format e.g. '1d2h30m', '45m' etc.
-  # - a semantic phrase e.g. 'yesterday 5:30pm'
-  # - a strftime e.g. '2016-03-15 15:32:04 PDT'
+  #
+  # @brief      Converts input string into a Time object when input takes on the
+  #             following formats:
+  #             - interval format e.g. '1d2h30m', '45m' etc.
+  #             - a semantic phrase e.g. 'yesterday 5:30pm'
+  #             - a strftime e.g. '2016-03-15 15:32:04 PDT'
+  #
+  # @param      input  (String) String to chronify
+  #
+  # @return     (DateTime) result
+  #
   def chronify(input)
     now = Time.now
     raise "Invalid time expression #{input.inspect}" if input.to_s.strip == ""
@@ -312,10 +378,15 @@ class WWID
     end
   end
 
-  # Converts simple strings into seconds that can be added to a Time object
-  # Params:
-  # +qty+:: HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m, 1.5d, 1h20m, etc.)
-  # Returns seconds (Integer)
+  #
+  # @brief      Converts simple strings into seconds that can be added to a Time
+  #             object
+  #
+  # @param      qty   (String) HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m,
+  #                   1.5d, 1h20m, etc.)
+  #
+  # @return     (Integer) seconds
+  #
   def chronify_qty(qty)
     minutes = 0
     if qty.strip =~ /^(\d+):(\d\d)$/
@@ -339,14 +410,30 @@ class WWID
     minutes * 60
   end
 
+  ##
+  ## @brief      List sections
+  ##
+  ## @return     (Array) section titles
+  ##
   def sections
     @content.keys
   end
 
+  ##
+  ## @brief      Adds a section.
+  ##
+  ## @param      title  (String) The new section title
+  ##
   def add_section(title)
     @content[title.cap_first] = {'original' => "#{title}:", 'items' => []}
   end
 
+  ##
+  ## @brief      Attempt to match a string with an existing section
+  ##
+  ## @param      frag     (String) The user-provided string
+  ## @param      guessed  (Boolean) already guessed and failed
+  ##
   def guess_section(frag,guessed=false)
     return "All" if frag =~ /all/i
     sections.each {|section| return section.cap_first if frag.downcase == section.downcase }
@@ -377,6 +464,12 @@ class WWID
     section ? section.cap_first : guessed
   end
 
+  ##
+  ## @brief      Attempt to match a string with an existing view
+  ##
+  ## @param      frag     (String) The user-provided string
+  ## @param      guessed  (Boolean) already guessed
+  ##
   def guess_view(frag,guessed=false)
     views.each {|view| return view if frag.downcase == view.downcase}
     view = false
@@ -399,6 +492,13 @@ class WWID
     view
   end
 
+  ##
+  ## @brief      Adds an entry
+  ##
+  ## @param      title    (String) The entry title
+  ## @param      section  (String) The section to add to
+  ## @param      opt      (Hash) Additional Options {:date, :note, :back, :timed}
+  ##
   def add_item(title,section=nil,opt={})
     section ||= @current_section
     add_section(section) unless @content.has_key?(section)
@@ -443,6 +543,12 @@ class WWID
     @results.push(%Q{Added "#{entry['title']}" to #{section}})
   end
 
+  ##
+  ## @brief      Return the content of the last note for a given section
+  ##
+  ## @param      section  (String) The section to retrieve from, default
+  ##                      Currently
+  ##
   def last_note(section=@current_section)
     section = guess_section(section)
     if @content.has_key?(section)
@@ -454,6 +560,11 @@ class WWID
     end
   end
 
+  ##
+  ## @brief      Tag the last entry or X entries
+  ##
+  ## @param      opt   (Hash) Additional Options
+  ##
   def tag_last(opt={})
     opt[:section] ||= @current_section
     opt[:count] ||= 1
@@ -555,6 +666,13 @@ class WWID
     write(@doing_file)
   end
 
+  ##
+  ## @brief      Add a note to the last entry in a section
+  ##
+  ## @param      section  (String) The section, default Currently
+  ## @param      note     (String) The note to add
+  ## @param      replace  (Bool) Should replace existing note
+  ##
   def note_last(section, note, replace=false)
     section = guess_section(section)
 
@@ -590,10 +708,17 @@ class WWID
     end
   end
 
-  # accepts one tag and the raw text of a new item
-  # if the passed tag is on any item, it's replaced with @done
-  # if new_item is not nil, it's tagged with the passed tag and inserted
-  # This is for use where only one instance of a given tag should exist (@meanwhile)
+
+  #
+  # @brief      Accepts one tag and the raw text of a new item if the passed tag
+  #             is on any item, it's replaced with @done. if new_item is not
+  #             nil, it's tagged with the passed tag and inserted. This is for
+  #             use where only one instance of a given tag should exist
+  #             (@meanwhile)
+  #
+  # @param      tag   (String) Tag to replace
+  # @param      opt   (Hash) Additional Options
+  #
   def stop_start(tag,opt={})
     opt[:section] ||= @current_section
     opt[:archive] ||= false
@@ -645,6 +770,11 @@ class WWID
     write(@doing_file)
   end
 
+  ##
+  ## @brief      Write content to file or STDOUT
+  ##
+  ## @param      file  (String) The filepath to write to
+  ##
   def write(file=nil)
     unless @other_content_top
       output = ""
@@ -670,6 +800,11 @@ class WWID
     end
   end
 
+  ##
+  ## @brief      Restore a backed up version of a file
+  ##
+  ## @param      file  (String) The filepath to restore
+  ##
   def restore_backup(file)
     if File.exists?(file+"~")
       puts file+"~"
@@ -679,6 +814,11 @@ class WWID
   end
 
 
+  ##
+  ## @brief      Generate a menu of sections and allow user selection
+  ##
+  ## @return     (String) The selected section name
+  ##
   def choose_section
     sections.each_with_index {|section, i|
       puts "% 3d: %s" % [i+1, section]
@@ -689,10 +829,20 @@ class WWID
     return sections[num.to_i - 1]
   end
 
+  ##
+  ## @brief      List available views
+  ##
+  ## @return     (Array) View names
+  ##
   def views
     @config.has_key?('views') ? @config['views'].keys : []
   end
 
+  ##
+  ## @brief      Generate a menu of views and allow user selection
+  ##
+  ## @return     (String) The selected view name
+  ##
   def choose_view
     views.each_with_index {|view, i|
       puts "% 3d: %s" % [i+1, view]
@@ -703,6 +853,11 @@ class WWID
     return views[num.to_i - 1]
   end
 
+  ##
+  ## @brief      Gets a view from configuration
+  ##
+  ## @param      title  (String) The title of the view to retrieve
+  ##
   def get_view(title)
     if @config['views'].has_key?(title)
       return @config['views'][title]
@@ -710,6 +865,12 @@ class WWID
     false
   end
 
+  ##
+  ## @brief      Overachieving function for displaying contents of a section.
+  ##             This is a fucking mess. I mean, Jesus Christ.
+  ##
+  ## @param      opt   (Hash) Additional Options
+  ##
   def list_section(opt={})
     opt[:count] ||= 0
     count = opt[:count] - 1
@@ -1084,6 +1245,16 @@ EOTEMPLATE
     return out
   end
 
+  ##
+  ## @brief      Move entries from a section to Archive or other specified
+  ##             section
+  ##
+  ## @param      section      (String) The source section
+  ## @param      count        (Integer) The count
+  ## @param      destination  (String) The destination section
+  ## @param      tags         (Array) Tags to archive
+  ## @param      bool         (String) Tag boolean combinator
+  ##
   def archive(section="Currently",count=5,destination=nil,tags=nil,bool=nil,export=nil)
 
     section = choose_section if section.nil? || section =~ /choose/i
@@ -1113,6 +1284,13 @@ EOTEMPLATE
     end
   end
 
+  ##
+  ## @brief      Helper function, performs the actual archiving
+  ##
+  ## @param      section      (String) The source section
+  ## @param      destination  (String) The destination section
+  ## @param      opt          (Hash) Additional Options
+  ##
   def do_archive(section, destination, opt={})
     count = opt[:count] || 5
     tags = opt[:tags] || []
@@ -1176,6 +1354,11 @@ EOTEMPLATE
     end
   end
 
+  ##
+  ## @brief      A dictionary of colors
+  ##
+  ## @return     (String) ANSI escape sequence
+  ##
   def colors
     color = {}
     color['black'] = "\033[0;0;30m"
@@ -1221,18 +1404,28 @@ EOTEMPLATE
   end
 
 
-  def all(order="")
-    order = "asc" if order == ""
-    cfg = @config['templates']['default_template']
-    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => order})
-  end
-
+  ##
+  ## @brief      Show all entries from the current day
+  ##
+  ## @param      times   (Boolean) show times
+  ## @param      output  (String) output format
+  ## @param      opt     (Hash) Options
+  ##
   def today(times=true,output=nil,opt={})
     opt[:totals] ||= false
     cfg = @config['templates']['today']
-    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output, :totals => opt[:totals]})
+    list_section({:section => opt[:section], :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output, :totals => opt[:totals]})
   end
 
+  ##
+  ## @brief      Display entries within a date range
+  ##
+  ## @param      dates    (Array) [start, end]
+  ## @param      section  (String) The section
+  ## @param      times    (Bool) Show times
+  ## @param      output   (String) Output format
+  ## @param      opt      (Hash) Additional Options
+  ##
   def list_date(dates,section,times=nil,output=nil,opt={})
     opt[:totals] ||= false
     section = guess_section(section)
@@ -1244,12 +1437,27 @@ EOTEMPLATE
     list_section({:section => section, :count => 0, :order => "asc", :date_filter => dates, :times => times, :output => output, :totals => opt[:totals] })
   end
 
+  ##
+  ## @brief      Show entries from the previous day
+  ##
+  ## @param      section  (String) The section
+  ## @param      times    (Bool) Show times
+  ## @param      output   (String) Output format
+  ## @param      opt      (Hash) Additional Options
+  ##
   def yesterday(section,times=nil,output=nil,opt={})
     opt[:totals] ||= false
     section = guess_section(section)
     list_section({:section => section, :count => 0, :order => "asc", :yesterday => true, :times => times, :output => output, :totals => opt[:totals] })
   end
 
+  ##
+  ## @brief      Show recent entries
+  ##
+  ## @param      count    (Integer) The number to show
+  ## @param      section  (String) The section to show from, default Currently
+  ## @param      opt      (Hash) Additional Options
+  ##
   def recent(count=10,section=nil,opt={})
     times = opt[:t] || true
     opt[:totals] ||= false
@@ -1259,6 +1467,12 @@ EOTEMPLATE
     list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :times => times, :totals => opt[:totals] })
   end
 
+  ##
+  ## @brief      Show the last entry
+  ##
+  ## @param      times    (Bool) Show times
+  ## @param      section  (String) Section to pull from, default Currently
+  ##
   def last(times=true,section=nil)
     section ||= @current_section
     section = guess_section(section)
@@ -1266,6 +1480,11 @@ EOTEMPLATE
     list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template'], :times => times})
   end
 
+  ##
+  ## @brief      Get total elapsed time for all tags in selection
+  ##
+  ## @param      format  (String) return format (html, json, or text)
+  ##
   def tag_times(format="text")
 
     return "" if @timers.empty?
@@ -1335,39 +1554,43 @@ EOS
     end
   end
 
-  # Uses autotag: configuration to turn keywords into tags for time tracking.
-  # Does not repeat tags in a title, and only converts the first instance of
-  # an untagged keyword
-  def autotag(title)
-    return unless title
+  # @brief Uses 'autotag' configuration to turn keywords into tags for time tracking.
+  # Does not repeat tags in a title, and only converts the first instance of an
+  # untagged keyword
+  #
+  # @param      text  (String) The text to tag
+  #
+  def autotag(text)
+    return unless text
     @config['autotag']['whitelist'].each {|tag|
-      title.sub!(/(?<!@)(#{tag.strip})\b/i) do |m|
+      text.sub!(/(?<!@)(#{tag.strip})\b/i) do |m|
         m.downcase! if tag =~ /[a-z]/
         "@#{m}"
-      end unless title =~ /@#{tag}\b/i
+      end unless text =~ /@#{tag}\b/i
     }
     tail_tags = []
     @config['autotag']['synonyms'].each {|tag, v|
       v.each {|word|
-        if title =~ /\b#{word}\b/i
+        if text =~ /\b#{word}\b/i
           tail_tags.push(tag)
         end
       }
     }
     if tail_tags.length > 0
-    title + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
+    text + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
     else
-      title
+      text
     end
-  end
-
-  def autotag_item(item)
-    item['title'] = autotag(item['title'])
-    item
   end
 
   private
 
+  ##
+  ## @brief      Gets the interval between entry's start date and @done date
+  ##
+  ## @param      item       (Hash) The entry
+  ## @param      formatted  (Bool) Return human readable time (default seconds)
+  ##
   def get_interval(item, formatted=true)
     done = nil
     start = nil
@@ -1400,6 +1623,11 @@ EOS
     seconds > 0 ? "%02d:%02d:%02d" % fmt_time(seconds) : false
   end
 
+  ##
+  ## @brief      Format human readable time from seconds
+  ##
+  ## @param      seconds  The seconds
+  ##
   def fmt_time(seconds)
     if seconds.nil?
       return [0, 0, 0]
