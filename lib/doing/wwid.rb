@@ -179,11 +179,11 @@ class WWID
   end
 
   def haml_template
-    IO.read(File.join(File.dirname(__FILE__), '../doing.haml'))
+    IO.read(File.join(File.dirname(__FILE__), '../templates/doing.haml'))
   end
 
   def css_template
-    IO.read(File.join(File.dirname(__FILE__), '../doing.css'))
+    IO.read(File.join(File.dirname(__FILE__), '../templates/doing.css'))
   end
 
   def create(filename=nil)

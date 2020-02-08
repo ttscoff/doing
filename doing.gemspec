@@ -16,6 +16,8 @@ bin/doing
 lib/doing/version.rb
 lib/doing.rb
 lib/doing/wwid.rb
+lib/templates/doing.haml
+lib/templates/doing.css
   )
   s.require_paths << 'lib'
 
