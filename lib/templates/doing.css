@@ -49,7 +49,7 @@ article > ul > li:hover {
 
 .date {
   color: #7d9ca2;
-  font-size: 14px;
+  font-size: 17px;
   padding: 15px 1ch 0 0;
   text-align: right;
   white-space: nowrap;
@@ -71,7 +71,7 @@ article > ul > li:hover {
 .note {
   color: #aaa;
   display: block;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.1;
   padding: 1em 0 0 2ch;
   position: relative;

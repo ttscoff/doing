@@ -418,12 +418,12 @@ You can also add notes at the time of entry by using the `-n` or `--note` flag w
 
 #### Displaying entries:
 
-    show      - List all entries
-    recent    - List recent entries
-    today     - List entries from today
-    yesterday - List entries from yesterday
-    last      - Show the last entry
-    grep      - Show entries matching text or pattern
+    show          - List all entries
+    recent        - List recent entries
+    today         - List entries from today
+    yesterday     - List entries from yesterday
+    last          - Show the last entry
+    grep, search  - Show entries matching text or pattern
 
 `doing show` on its own will list all entries in the "Currently" section. Add a section name as an argument to display that section instead. Use "all" to display all entries from all sections.
 
@@ -438,6 +438,8 @@ If you have a use for it, you can use `-o csv` on the show or view commands to o
 `doing yesterday` is great for stand-ups (thanks to [Sean Collins](https://github.com/sc68cal) for that!). Note that you can show yesterday's activity from an alternate section by using the section name as an argument (e.g. `doing yesterday archive`).
 
 `doing on` allows for full date ranges and filtering. `doing on saturday`, or `doing on one month to today` will give you ranges. You can use the same terms with the `show` command by adding the `-f` or `--from` flag. `doing show @done --from "monday to friday"` will give you all of your completed items for the last week (assuming it's the weekend).
+
+You can also show entries matching a search string with `doing grep` (synonym `doing search`). If you want to search with regular expressions or for an exact match, surround your search query with forward slashes, e.g. `doing search /project name/`. If you pass a search string without slashes, it's treated as a fuzzy search string, meaning matches can be found as long as the characters in the search string are in order and with no more than three other characters between each. By default searches are across all sections, but you can limit it to one with the `-s SECTION_NAME` flag. Searches can be displayed with the default template, or output as HTML, CSV, or JSON.
 
 #### Views
 
@@ -547,6 +549,12 @@ Please try not to email me directly about GitHub projects.
 Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
 ## Changelog
+
+#### 1.0.21
+
+- Add legitimate regex search capabilities
+- Synonyms for grep (search) and now (next)
+- CSS fix
 
 #### 1.0.20
 

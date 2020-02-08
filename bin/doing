@@ -46,7 +46,7 @@ flag [:f, :doing_file]
 
 desc 'Add an entry'
 arg_name 'entry'
-command :now do |c|
+command [:now,:next] do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
   c.default_value wwid.current_section
@@ -114,6 +114,11 @@ command :now do |c|
 end
 
 desc 'Add a note to the last entry'
+long_desc %{
+  If -r is provided with no other arguments, the last note is removed. If new content is specified through arguments or STDIN, any previous note will be replaced with the new one.
+
+  Use -e to load the last entry in a text editor where you can append a note.
+}
 arg_name 'note_text'
 command :note do |c|
   c.desc 'Section'
@@ -125,7 +130,6 @@ command :note do |c|
   c.switch [:e,:editor], :negatable => false, :default_value => false
 
   c.desc "Replace/Remove last entry's note"
-  c.long_desc "If -r is provided with no other arguments, the last note is removed. If new content is specified through arguments or STDIN, any previous note will be replaced with the new one."
   c.switch [:r,:remove], :negatable => false, :default_value => false
 
   c.action do |global_options,options,args|
@@ -226,7 +230,10 @@ command :meanwhile do |c|
   end
 end
 
-desc 'Output HTML templates for customization. Save them to files and use them in the configuration file under html_template'
+desc 'Output HTML templates for customization'
+long_desc %{
+  Templates are printed to STDOUT for piping to a file. Save them and use them in the configuration file under html_template. Example `doing templates --type=HAML > ~/styles/my_doing.haml`
+}
 command :templates do |c|
   c.desc "Type of template to output (HAML|CSS)"
   c.arg_name 'template_type'
@@ -327,8 +334,7 @@ command :done do |c|
   c.desc 'Backdate start date by interval [4pm|20m|2h|yesterday noon]'
   c.flag [:b,:back]
 
-  c.desc 'Set completion date to start date plus interval (XX[mhd] or HH:MM)'
-  c.long_desc 'If used without the --back option, the start date will be moved back to allow the completion date to be the current time.'
+  c.desc 'Set completion date to start date plus interval (XX[mhd] or HH:MM). If used without the --back option, the start date will be moved back to allow the completion date to be the current time.'
   c.flag [:t,:took]
 
   c.desc 'Section'
@@ -424,8 +430,7 @@ command :finish do |c|
   c.desc 'Set the completed date to the start date plus XX[hmd]'
   c.flag [:t,:took]
 
-  c.desc 'Auto-generate finish dates from next entry\'s start time'
-  c.long_desc 'Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.'
+  c.desc 'Auto-generate finish dates from next entry\'s start time. Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.'
   c.default_value false
   c.switch [:auto], :negatable => false, :default_value => false
 
@@ -549,7 +554,7 @@ command :mark do |c|
 end
 
 desc 'List all entries'
-long_desc 'The argument can be a section name, tag(s) or both. "pick" or "choose" as an argument will offer a section menu.'
+long_desc 'The argument can be a section name, @tag(s) or both. "pick" or "choose" as an argument will offer a section menu.'
 arg_name 'section [tags]'
 command :show do |c|
   c.desc 'Tag boolean (AND,OR,NONE)'
@@ -568,8 +573,9 @@ command :show do |c|
   c.default_value 'asc'
   c.flag [:s,:sort], :default_value => 'asc'
 
-  c.desc 'Date range to show, or a single day to filter date on.'
-  c.long_desc 'Date range argument should be quoted. Date specifications can be natural language. To specify a range, use "to," or "through,".\n\ndoing show --from "monday to friday"'
+  c.desc %{
+    Date range to show, or a single day to filter date on. Date range argument should be quoted. Date specifications can be natural language. To specify a range, use "to," or "through,". Example `doing show --from "monday to friday"`
+  }
   c.flag [:f,:from]
 
   c.desc 'Show time intervals on @done tasks'
@@ -648,9 +654,9 @@ command :show do |c|
 end
 
 desc 'Search for entries'
-long_desc 'Search all sections (or limit to a single section) for entries matching text or regular expression.'
+long_desc 'Search all sections (or limit to a single section) for entries matching text or regular expression. Normal strings are fuzzy matched, delineate regex with /expression/'
 arg_name 'search_pattern'
-command :grep do |c|
+command [:grep,:search] do |c|
   c.desc 'Section'
   c.default_value "all"
   c.flag [:s,:section], :default_value => "All"
@@ -807,8 +813,12 @@ end
 
 desc 'Show the last entry'
 command :last do |c|
+  c.desc 'Specify a section'
+  c.default_value wwid.current_section
+  c.flag [:s,:section]
+
   c.action do |global_options,options,args|
-    puts wwid.last.strip
+    puts wwid.last(true,options[:s]).strip
   end
 end
 

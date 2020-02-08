@@ -792,7 +792,11 @@ class WWID
     if opt[:search]
       items.keep_if {|item|
         text = item['note'] ? item['title'] + item['note'].join(" ") : item['title']
-        pattern = opt[:search].split('').join('.{0,3}')
+        if opt[:search].strip =~ /^\/.*?\/$/
+          pattern = opt[:search].sub(/\/(.*?)\//,'\1')
+        else
+          pattern = opt[:search].split('').join('.{0,3}')
+        end
         text =~ /#{pattern}/i
       }
     end
@@ -1255,9 +1259,11 @@ EOTEMPLATE
     list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :times => times, :totals => opt[:totals] })
   end
 
-  def last(times=true)
+  def last(times=true,section=nil)
+    section ||= @current_section
+    section = guess_section(section)
     cfg = @config['templates']['last']
-    list_section({:section => @current_section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template'], :times => times})
+    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => 1, :format => cfg['date_format'], :template => cfg['template'], :times => times})
   end
 
   def tag_times(format="text")
