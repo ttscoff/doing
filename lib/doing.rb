@@ -9,4 +9,3 @@ require 'chronic'
 require 'haml'
 require 'json'
 require 'doing/wwid.rb'
-

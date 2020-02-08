@@ -312,6 +312,14 @@ And a few special colors you'll just have to try out to see:
 
 Any time you use one of the foreground colors it will reset the bold and background settings to their default automatically. You can force a reset to default terminal colors using `%default`.
 
+### HTML Templates
+
+For commands that provide an HTML output option, you can customize the templates used for markup and CSS. The markup uses [HAML](http://haml.info/), and the styles are pure CSS.
+
+To export the default configurations for customization, use `doing templates --type=[HAML|CSS]`. This will output to STDOUT where you can pipe it to a file, e.g. `doing templates --type=HAML > my_template.haml`. You can modify the markup, the CSS, or both.
+
+Once you have either or both of the template files, edit `.doingrc` and look for the `html_template:` section. There are two subvalues, `haml:` and `css:`. Add the path to the templates you want to use. A tilde may be substituted for your home directory, e.g. `css: ~/styles/doing.css`.
+
 ## Usage
 
     doing [global options] command [command options] [arguments...]
@@ -540,6 +548,13 @@ Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add mo
 
 ## Changelog
 
+#### 1.0.20
+
+- Rewrite HTML export templates with responsive layout and typography
+- Ability to customize the HTML output using HAML and CSS
+- New command `doing templates` to export default templates for HAML and CSS
+- New config options under `html_template` for `haml` and `css`
+
 #### 1.0.19
 
 - For `doing note -e` include the entry title so you know what you're adding a note to
@@ -691,8 +706,6 @@ Catching up on the changelog. Kind of. A lot has happened, mostly fixes.
   - use `-a` to set age (`newest` or `oldest`)
 - fuzzy section guessing when specified section isn't found
 - fuzzy view guessing for `doing view` command
-
-----
 
 #### 0.1.9
 

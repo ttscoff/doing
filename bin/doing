@@ -226,6 +226,28 @@ command :meanwhile do |c|
   end
 end
 
+desc 'Output HTML templates for customization. Save them to files and use them in the configuration file under html_template'
+command :templates do |c|
+  c.desc "Type of template to output (HAML|CSS)"
+  c.arg_name 'template_type'
+  c.flag [:t,:type]
+
+  c.action do |global_options,options,args|
+    unless options[:type]
+      raise "No type specified, use --type=[HAML|CSS]"
+    else
+      if options[:t] =~ /html|haml/i
+        $stdout.puts wwid.haml_template
+      elsif options[:t] =~ /css/i
+        $stdout.puts wwid.css_template
+      else
+        raise "Invalid type specified, use --type=[HAML|CSS]"
+      end
+    end
+  end
+end
+
+
 desc 'Add an item to the Later section'
 arg_name 'entry'
 command :later do |c|

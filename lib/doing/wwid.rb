@@ -54,6 +54,11 @@ class WWID
     @config['doing_file'] ||= "~/what_was_i_doing.md"
     @config['current_section'] ||= 'Currently'
     @config['editor_app'] ||= nil
+
+    @config['html_template'] ||= {}
+    @config['html_template']['haml'] ||= nil
+    @config['html_template']['css'] ||= nil
+
     @config['templates'] ||= {}
     @config['templates']['default'] ||= {
       'date_format' => '%Y-%m-%d %H:%M',
@@ -171,6 +176,14 @@ class WWID
         # end
       end
     }
+  end
+
+  def haml_template
+    IO.read(File.join(File.dirname(__FILE__), '../doing.haml'))
+  end
+
+  def css_template
+    IO.read(File.join(File.dirname(__FILE__), '../doing.css'))
   end
 
   def create(filename=nil)
@@ -960,31 +973,18 @@ EOTEMPLATE
         }
       }
 
-      style = "body{background:#fff;color:#333;font-family:Helvetica,arial,freesans,clean,sans-serif;font-size:16px;line-height:120%;text-align:justify;padding:20px}h1{text-align:left;position:relative;left:220px;margin-bottom:1em}ul{list-style-position:outside;position:relative;left:170px;margin-right:170px;text-align:left}ul li{list-style-type:none;border-left:solid 1px #ccc;padding-left:10px;line-height:2;position:relative}ul li .date{font-size:14px;position:absolute;left:-122px;color:#7d9ca2;text-align:right;width:110px;line-height:2}ul li .tag{color:#999}ul li .note{display:block;color:#666;padding:0 0 0 22px;line-height:1.4;font-size:15px}ul li .note:before{content:'\\25BA';font-weight:300;position:absolute;left:40px;font-size:8px;color:#aaa;line-height:3}ul li:hover .note{display:block}span.time{color:#729953;float:left;position:relative;padding:0 5px;font-size:15px;border-bottom:dashed 1px #ccc;text-align:right;background:#f9fced;margin-right:4px}table td{border-bottom:solid 1px #ddd;height:24px}caption{text-align:left;border-bottom:solid 1px #aaa;margin:10px 0}table{width:400px;margin:50px 0 0 211px}th{padding-bottom:10px}th,td{padding-right:20px}table{max-width:400px;margin:50px 0 0 221px}ul li .section{color:#dbbfad;border-left:solid 1px #dbbfad;border-right:solid 1px #dbbfad;border-radius:25px;padding:0 4px;line-height:1 !important;font-size:.8em}ul li .section:hover{color:#c5753f}ul li a:link{color:#64a9a5;text-decoration:none;background-color:rgba(203,255,251,.15)}"
-      template =<<EOT
-!!!
-%html
-%head
-  %meta{"charset" => "utf-8"}/
-  %meta{"content" => "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}/
-  %title what are you doing?
-  %style= @style
-%body
-  %header
-    %h1= @page_title
-  %article
-    %ul
-      - @items.each do |i|
-        %li
-          %span.date= i[:date]
-          = i[:title]
-          %span.section= i[:section]
-          - if i[:time] && i[:time] != "00:00:00"
-            %span.time= i[:time]
-          - if i[:note]
-            %span.note= i[:note].map{|n| n.strip }.join('<br>')
-    = @totals
-EOT
+      if @config['html_template']['haml'] && File.exists?(File.expand_path(@config['html_template']['haml']))
+        template = IO.read(File.expand_path(@config['html_template']['haml']))
+      else
+        template = haml_template
+      end
+
+      if @config['html_template']['css'] && File.exists?(File.expand_path(@config['html_template']['css']))
+        style = IO.read(File.expand_path(@config['html_template']['css']))
+      else
+        style = css_template
+      end
+
       totals = opt[:totals] ? tag_times("html") : ""
       engine = Haml::Engine.new(template)
       puts engine.render(Object.new, { :@items => items_out, :@page_title => page_title, :@style => style, :@totals => totals })
