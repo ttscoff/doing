@@ -145,8 +145,11 @@ command :note do |c|
       input = wwid.fork_editor(input)
       if input
         title, note = wwid.format_input(input)
-        note.insert(0, title)
-        wwid.note_last(section, note, true)
+        if note
+          wwid.note_last(section, note, true)
+        else
+          raise "No note content"
+        end
       else
         raise "No content, cancelled"
       end

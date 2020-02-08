@@ -223,10 +223,11 @@ class WWID
   end
 
   def fork_editor(input="")
-    tmpfile = Tempfile.new('doing')
+    tmpfile = Tempfile.new(['doing','.md'])
 
     File.open(tmpfile.path,'w+') do |f|
       f.puts input
+      f.puts "\n# The first line is the entry title, any lines after that are added as a note"
     end
 
     pid = Process.fork { system("$EDITOR #{tmpfile.path}") }
@@ -267,7 +268,7 @@ class WWID
     note.map! { |line|
       line.strip
     }.delete_if { |line|
-      line =~ /^\s*$/
+      line =~ /^\s*$/ || line =~ /^#/
     }
 
     [title, note]
@@ -433,8 +434,8 @@ class WWID
     section = guess_section(section)
     if @content.has_key?(section)
       last_item = @content[section]['items'].dup.sort_by{|item| item['date'] }.reverse[0]
-      p last_item
-      return last_item['note']
+      $stderr.puts "Editing note for #{last_item['title']}"
+      return "#{last_item['title']}\n# EDIT BELOW THIS LINE ------------\n#{last_item['note'].map{|line| line.strip }.join("\n")}"
     else
       raise "Section #{section} not found"
     end

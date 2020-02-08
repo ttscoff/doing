@@ -336,7 +336,9 @@ Any time you use one of the foreground colors it will reset the bold and backgro
     done     - Add a completed item with @done(date). No argument finishes last entry.
     meanwhile - Finish any @meanwhile tasks and optionally create a new one
 
-The `doing now` command can accept `-s section_name` to send the new entry straight to a non-default section. It also accepts `--back AMOUNT` to let you specify a start date in the past using "natural language." For example, `doing now --back 25m ENTRY` or `doing now --back "yesterday 3:30pm" ENTRY`.
+The `doing now` command can accept `-s section_name` to send the new entry straight to a non-default section. It also accepts `--back=AMOUNT` to let you specify a start date in the past using "natural language." For example, `doing now --back=25m ENTRY` or `doing now --back="yesterday 3:30pm" ENTRY`.
+
+If you want to use `--back` with `doing done` but want the end time to be different than the start time, you can either use `--took` in addition, or just use `--took` on its own as it will backdate the start time such that the end time is now and the duration is equal to the value of the `--took` argument.
 
 You can finish the last unfinished task when starting a new one using `doing now` with the `-f` switch. It will look for the last task not marked `@done` and add the `@done` tag with the start time of the new task (either the current time or what you specified with `--back`).
 
@@ -488,7 +490,13 @@ __Fish:__ See the file [`doing.fish`](https://github.com/ttscoff/doing/blob/mast
 
 The LaunchBar action requires that `doing` be available in `/usr/local/bin/doing`. If it's not (because you're using RVM or similar), you'll need to symlink it there. Running the action with Return will show the latest 9 items from Currently, along with any time intervals recorded, and includes a submenu of Timers for each tag.
 
-{% download 117 %}
+Pressing Spacebar and typing allows you to add a new entry to currently. You an also trigger a custom show command by typing "show [section/tag]" and hitting return.
+
+Point of interest, the LaunchBar Action makes use of the `-o json` flag for outputting JSON to the action's script for parsing.
+
+<!--{% download 117 %}-->
+
+Download the Action at [brettterpstra.com](https://brettterpstra.com/projects/doing/)
 
 Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
 
@@ -528,9 +536,16 @@ Please try not to email me directly about GitHub projects.
 
 ### Developer notes
 
-I'll try to document some of the code structure as I flesh it out. I'm currently working on adding a CLI reporting structure and logging methods, as well as santizing and standardizing all the flags and switches for consistency. Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
+Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
 ## Changelog
+
+#### 1.0.19
+
+- For `doing note -e` include the entry title so you know what you're adding a note to
+- For any other command that allows `-e` include a comment noting that anything after the first line creates a note
+- Ignore # comments when parsing editor results
+
 
 #### 1.0.18
 
