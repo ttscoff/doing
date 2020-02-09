@@ -604,6 +604,8 @@ Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add mo
 
 - Apply default_tags after autotagging to avoid tags triggering tags
 - Set `doing recent` to default to All sections instead of Currently
+- Fix error in time reporting
+- improved y/n prompt for TTY
 
 #### 1.0.22
 
