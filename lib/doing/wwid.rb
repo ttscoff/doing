@@ -426,6 +426,7 @@ class WWID
   ##
   def add_section(title)
     @content[title.cap_first] = {'original' => "#{title}:", 'items' => []}
+    @results.push(%Q{Added section "#{title.cap_first}"})
   end
 
   ##
@@ -451,9 +452,9 @@ class WWID
       if alt
         raise "Did you mean `doing view #{alt}`?"
       else
-        print "Create a new section called #{frag.cap_first} (y/N)?"
-        input = STDIN.gets
-        if input =~ /^y/i
+        res = yn("Section #{frag} not found, create it",false)
+
+        if res
           add_section(frag.cap_first)
           write(@doing_file)
           return frag.cap_first
@@ -462,6 +463,57 @@ class WWID
       end
     end
     section ? section.cap_first : guessed
+  end
+
+  ##
+  ## @brief      Ask a yes or no question in the terminal
+  ##
+  ## @param      question     (String) The question to ask
+  ## @param      default      (Bool)   default response if no input
+  ##
+  ## @return     (Bool) yes or no
+  ##
+  def yn(question, default_response=false)
+    if default_response
+      default = 'y'
+    else
+      default = 'n'
+    end
+    # if this isn't an interactive shell, answer default
+    unless $stdout.isatty
+      if default.downcase == 'y'
+        return true
+      else
+        return false
+      end
+    end
+    # clear the buffer
+    if ARGV.length
+      ARGV.length.times do
+        ARGV.shift
+      end
+    end
+    system 'stty cbreak'
+    if default
+      if default =~ /y/i
+        options = "#{colors['white']}[#{colors['boldgreen']}Y#{colors['white']}/#{colors['boldwhite']}n#{colors['white']}]#{colors['default']}"
+      else
+        options = "#{colors['white']}[#{colors['boldwhite']}y#{colors['white']}/#{colors['boldgreen']}N#{colors['white']}]#{colors['default']}"
+      end
+    else
+      options = "#{colors['white']}[#{colors['boldwhite']}y#{colors['white']}/#{colors['boldwhite']}n#{colors['white']}]#{colors['default']}"
+    end
+    $stdout.syswrite "#{colors['boldwhite']}#{question.sub(/\?$/,'')} #{options}#{colors['boldwhite']}?#{colors['default']} "
+    res = $stdin.sysread 1
+    puts
+    system 'stty cooked'
+
+    res.chomp!
+    res.downcase!
+
+    res = default.downcase if res == ""
+
+    return res =~ /y/i
   end
 
   ##

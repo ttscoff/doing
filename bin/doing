@@ -516,17 +516,19 @@ command :tag do |c|
       count = options[:c].to_i
 
       if count == 0
+        section_q = section == 'All' ? "" : " in section #{section}"
+
         if options[:a]
-          print "Are you sure you want to autotag all records? (y/N) "
+          question = "Are you sure you want to autotag all records#{section_q}"
         elsif options[:r]
-          print "Are you sure you want to remove #{tags.join(" and ")} from all records? (y/N) "
+          question = "Are you sure you want to remove #{tags.join(" and ")} from all records#{section_q}"
         else
-          print "Are you sure you want to add #{tags.join(" and ")} to all records? (y/N) "
+          question = "Are you sure you want to add #{tags.join(" and ")} to all records#{section_q}"
         end
 
-        res = STDIN.gets
+        res = wwid.yn(question,false)
 
-        unless res.strip =~ /^y(es)?$/i
+        unless res
           raise "Cancelled"
         end
       end
