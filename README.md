@@ -4,7 +4,6 @@
 
 _If you're one of the rare people like me who find this useful, feel free to [buy me some coffee](http://brettterpstra.com/donate)._
 
-[Changelog](#changelog)
 
 ## Contents
 
@@ -15,6 +14,7 @@ _If you're one of the rare people like me who find this useful, feel free to [bu
 - [Usage](#usage)
 - [Extras](#extras)
 - [Troubleshooting](#troubleshooting)
+- [Changelog](#changelog)
 
 <!-- end toc -->
 
@@ -59,10 +59,15 @@ Notes can be prevented from ever appearing in output with the global option `--n
 A basic configuration looks like this:
 
     ---
-    doing_file: /Users/username/Dropbox/nvALT2.2/?? What was I doing.md
+    doing_file: /Users/username/Dropbox/doing.taskpaper
     current_section: Currently
     default_template: '%date: %title%note'
     default_date_format: '%Y-%m-%d %H:%M'
+    marker_tag: flagged
+    marker_color: yellow
+    default_tags: []
+    editor_app: TextEdit
+    :include_notes: true
     views:
       color:
         date_format: '%F %_I:%M%P'
@@ -88,16 +93,29 @@ A basic configuration looks like this:
         date_format: '%_I:%M%P'
         template: '%date > %title%odnote'
         wrap_width: 50
-    :include_notes: true
+    autotag:
+      whitelist:
+      - coding
+      - design
+      synonyms:
+        brainstorming:
+        - thinking
+        - idea
+    html_template:
+      haml: 
+      css: 
 
 
-  The config file is stored in `~/.doingrc`, and a skeleton file is created on the first run. Just run `doing` on its own to create the file.
+The config file is stored in `~/.doingrc`, and a skeleton file is created on the first run. Just run `doing` on its own to create the file.
 
 ### Per-folder configuration
 
 Any options found in a `.doingrc` anywhere in the hierarchy between your current folder and your home folder will be appended to the base configuration, overriding or extending existing options. This allows you to put a `.doingrc` file into the base of a project and add specific configurations (such as default tags) when working in that project on the command line. These can be cascaded, with the closest `.doingrc` to your current directory taking precedence, though I'm not sure why you'd want to deal with that.
 
-This can also be used to define custom HTML output on a per-project basis using the html_template option for custom templates.
+Possible uses:
+
+- Define custom HTML output on a per-project basis using the html_template option for custom templates. Customize time tracking reports based on project or client.
+- Define `default_tags` for a project so that every time you `doing now` from within that project directory or its subfolders, it gets tagged with that project automatically.
 
 Any part of the configuration can be copied into these local files and modified. You only need to include the parts you want to change or add.
 
@@ -144,7 +162,7 @@ The config also contains templates for various command outputs. Include placehol
     - you can prefix `bg` to affect background colors (`%bgyellow`)
     - prefix `bold` and `boldbg` for strong colors (`%boldgreen`, `%boldbgblue`)
     - there are some random special combo colors. Use `doing colors` to see the list
-- `%interval`: when used with the `-t` switch on the `show` command, it will display the time between a timestamp or `@start(date)` tag and the `@done(date)` tag, if it exists. Otherwise, it will remain empty.
+- `%interval`: when used with the `-t` switch on the `show` command, it will display the time between a timestamp or _@start(date)_ tag and the _@done(date)_ tag, if it exists. Otherwise, it will remain empty.
 
 Date formats are based on Ruby [`strftime`](http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime) formatting.
 
@@ -303,7 +321,7 @@ There are bold variants for both foreground and background colors
     %boldbgred
     ... etc.
 
-And a few special colors you'll just have to try out to see:
+And a few special colors you'll just have to try out to see (or just run `doing colors`):
 
     %softpurple
     %hotpants
@@ -321,6 +339,37 @@ For commands that provide an HTML output option, you can customize the templates
 To export the default configurations for customization, use `doing templates --type=[HAML|CSS]`. This will output to STDOUT where you can pipe it to a file, e.g. `doing templates --type=HAML > my_template.haml`. You can modify the markup, the CSS, or both.
 
 Once you have either or both of the template files, edit `.doingrc` and look for the `html_template:` section. There are two subvalues, `haml:` and `css:`. Add the path to the templates you want to use. A tilde may be substituted for your home directory, e.g. `css: ~/styles/doing.css`.
+
+### Autotagging
+
+Keywords in your entries can trigger automatic tagging, just to make life easier. There are three tools available: default tags, whitelisting, and synonym tagging.
+
+Default tags are tags that are applied to every entry. You probably don't want to add these in the root configuration, but using a local `.doingrc` in a project directory that defines default tags for that project allows anything added from that directory to be tagged automatically. A local `.doingrc` in my Marked development directory might contain:
+
+    ---
+    default_tags: [marked,coding]
+
+And anything I enter while in the directory gets tagged with _@marked_ and _@coding_.
+
+A whitelist is a list of words that should be converted directly into _@tags_. If my whitelist contains "design" and I type `doing now working on site design`, that's automatically converted to "working on site @design."
+
+Synonyms allow you to define keywords that will trigger their parent tag. If I have a tag called _@design_, I can add "typography" as a synonym. Then entering `doing now working on site typography` will become "working on site typography @design."
+
+White lists and synonyms are defined like this:
+
+    autotag:
+      synonyms:
+        design:
+        - typography
+        - layout
+        brainstorming
+        - thinking
+        - idea
+      whitelist:
+      - brainstorming
+      - coding
+
+Note that you can include a tag with synonyms in the whitelist as well to tag it directly when used.
 
 ## Usage
 
@@ -350,7 +399,7 @@ The `doing now` command can accept `-s section_name` to send the new entry strai
 
 If you want to use `--back` with `doing done` but want the end time to be different than the start time, you can either use `--took` in addition, or just use `--took` on its own as it will backdate the start time such that the end time is now and the duration is equal to the value of the `--took` argument.
 
-You can finish the last unfinished task when starting a new one using `doing now` with the `-f` switch. It will look for the last task not marked `@done` and add the `@done` tag with the start time of the new task (either the current time or what you specified with `--back`).
+You can finish the last unfinished task when starting a new one using `doing now` with the `-f` switch. It will look for the last task not marked _@done_ and add the _@done_ tag with the start time of the new task (either the current time or what you specified with `--back`).
 
 `doing done` is used to add an entry that you've already completed. Like `now`, you can specify a section with `-s section_name`. You can also skip straight to Archive with `-a`.
 
@@ -360,7 +409,7 @@ When used with `doing done`, `--back` and `--took` allow time intervals to be ac
 
 All of these commands accept a `-e` argument. This opens your command line editor (as defined in the environment variable `$EDITOR`). Add your entry, save the temp file, and close it. The new entry is added. Anything after the first line is included as a note on the entry.
 
-`doing meanwhile` is a special command for creating and finishing tasks that may have other entries come before they're complete. When you create an entry with `doing meanwhile [entry text]`, it will automatically complete the last @meanwhile item (dated `@done` tag) and add the `@meanwhile` tag to the new item. This allows time tracking on a more general basis, and still lets you keep track of the smaller things you do while working on an overarching project. The `meanwhile` command accepts `--back [time]` and will backdate the `@done` tag and start date of the new task at the same time. Running `meanwhile` with no arguments will simply complete the last `@meanwhile` task. 
+`doing meanwhile` is a special command for creating and finishing tasks that may have other entries come before they're complete. When you create an entry with `doing meanwhile [entry text]`, it will automatically complete the last _@meanwhile_ item (dated _@done_ tag) and add the _@meanwhile_ tag to the new item. This allows time tracking on a more general basis, and still lets you keep track of the smaller things you do while working on an overarching project. The `meanwhile` command accepts `--back [time]` and will backdate the _@done_ tag and start date of the new task at the same time. Running `meanwhile` with no arguments will simply complete the last _@meanwhile_ task. 
 
 See `doing help meanwhile` for more options.
 
@@ -372,9 +421,9 @@ See `doing help meanwhile` for more options.
 
 ##### Finishing
 
-`doing finish` by itself is the same as `doing done` by itself. It adds `@done(timestamp)` to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add `-a` to also archive the affected entries.
+`doing finish` by itself is the same as `doing done` by itself. It adds _@done(timestamp)_ to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add `-a` to also archive the affected entries.
 
-`doing finish` also provides an `--auto` flag, which you can use to set the end time of any entry to 1 minute before the start time of the next. Running a command such as `doing finish --auto 10` will go through the last 10 entries and sequentially update any without a `@done` tag with one set to the time just before the next entry in the list.
+`doing finish` also provides an `--auto` flag, which you can use to set the end time of any entry to 1 minute before the start time of the next. Running a command such as `doing finish --auto 10` will go through the last 10 entries and sequentially update any without a _@done_ tag with one set to the time just before the next entry in the list.
 
 As mentioned above, `finish` also accepts `--back "2 hours"` (sets the finish date from time now minus interval) or `--took 30m` (sets the finish date to time started plus interval) so you can accurately add times to completed tasks, even if you don't do it in the moment.
 
@@ -385,7 +434,7 @@ As mentioned above, `finish` also accepts `--back "2 hours"` (sets the finish da
 
     doing tag -c 3 client cancelled
 
-... will mark the last three entries as `@client @cancelled`. Add `-r` as a switch to remove the listed tags instead.
+... will mark the last three entries as _@client @cancelled_. Add `-r` as a switch to remove the listed tags instead.
 
 You can optionally define keywords for common tasks and projects in your `.doingrc` file. When these keywords appear in an item title, they'll automatically be converted into @tags. The `whitelist` tags are exact (but case insensitive) matches. 
 
@@ -420,20 +469,20 @@ You can also add notes at the time of entry by using the `-n` or `--note` flag w
 
 #### Displaying entries:
 
-    show          - List all entries
-    recent        - List recent entries
-    today         - List entries from today
-    yesterday     - List entries from yesterday
-    last          - Show the last entry
-    grep, search  - Show entries matching text or pattern
+    show      - List all entries
+    recent    - List recent entries
+    today     - List entries from today
+    yesterday - List entries from yesterday
+    last      - Show the last entry
+    grep      - Show entries matching text or pattern
 
 `doing show` on its own will list all entries in the "Currently" section. Add a section name as an argument to display that section instead. Use "all" to display all entries from all sections.
 
-You can filter the `show` command by tags. Simply list them after the section name (or `all`). The boolean defaults to `ANY`, meaning any entry that contains any of the listed tags will be shown. You can use `-b ALL` or `-b NONE` to change the filtering behavior: `doing show all done cancelled -b NONE` will show all tasks from all sections that do not have either `@done` or `@cancelled` tags.
+You can filter the `show` command by tags. Simply list them after the section name (or `all`). The boolean defaults to `ANY`, meaning any entry that contains any of the listed tags will be shown. You can use `-b ALL` or `-b NONE` to change the filtering behavior: `doing show all done cancelled -b NONE` will show all tasks from all sections that do not have either _@done_ or _@cancelled_ tags.
 
 Use `-c X` to limit the displayed results. Combine it with `-a newest` or `-a oldest` to choose which chronological end it trims from. You can also set the sort order of the output with `-s asc` or `-s desc`.
 
-The `show` command can also show the time spent on a task if it has a `@done(date)` tag with the `-t` option. This requires that you include a `%interval` token in template -> default in the config. You can also include `@start(date)` tags, which override the timestamp when calculating the intervals.
+The `show` command can also show the time spent on a task if it has a _@done(date)_ tag with the `-t` option. This requires that you include a `%interval` token in template -> default in the config. You can also include _@start(date)_ tags, which override the timestamp when calculating the intervals.
 
 If you have a use for it, you can use `-o csv` on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: `doing show all done -o csv > ~/Desktop/done.csv`. You can do the same with `-o json`.
 
@@ -481,7 +530,7 @@ You can also use tags to archive. You define the section first, and anything fol
 
 By default, tag archiving uses an `AND` boolean, meaning all the tags listed must exist on the entry for it to be moved. You can change this behavior with `-b OR` or `-b NONE` (`ALL` and `ANY` also work). 
 
-Example: Archive all Currently items for `@client` that are marked `@done`
+Example: Archive all Currently items for _@client_ that are marked _@done_
 
     doing archive @client @done
 
@@ -506,9 +555,7 @@ Pressing Spacebar and typing allows you to add a new entry to currently. You an 
 
 Point of interest, the LaunchBar Action makes use of the `-o json` flag for outputting JSON to the action's script for parsing.
 
-<!--{% download 117 %}-->
-
-Download the Action at [brettterpstra.com](https://brettterpstra.com/projects/doing/)
+{% download 117 %}
 
 Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
 
@@ -540,9 +587,8 @@ Ruby is rife with encoding inconsistencies across platforms and versions. Feel f
 
 ### Support
 
-I'm not making any money on `doing`, and I don't plan to spend a lot of time fixing errors on an array of operating systems and platforms I don't even have access to. You'll probably have to solve some things on your own.
 
-That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable bug in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message. To get a more verbose error message, try running `GLI_DEBUG=true doing [...]` for a full trace.
+As a free project, `doing` isn't heavily supported, but you can get support from myself and other users on GitHub. If you run into a replicatable bug in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message. To get a more verbose error message, try running `GLI_DEBUG=true doing [...]` for a full trace.
 
 Please try not to email me directly about GitHub projects.
 
@@ -550,7 +596,14 @@ Please try not to email me directly about GitHub projects.
 
 Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
+{% donate doing now sending coffee money to Brett. %}
+
 ## Changelog
+
+#### 1.0.23
+
+- Apply default_tags after autotagging to avoid tags triggering tags
+- Set `doing recent` to default to All sections instead of Currently
 
 #### 1.0.22
 
@@ -673,7 +726,7 @@ Catching up on the changelog. Kind of. A lot has happened, mostly fixes.
 * Look, HTML output! (`--output html`)
 * Also, `--output csv`
 * let doing `archive` function on all sections
-* option to exclude date from `@done`,  
+* option to exclude date from _@done_,  
 * output newlines in sections and views
 * Flagging (`doing mark`)
 * fix for view/section guess error
@@ -692,9 +745,9 @@ Catching up on the changelog. Kind of. A lot has happened, mostly fixes.
 - `tags_color` in view config to highlight tags at the end of the lines. Can be set to any of the `%colors`.
 - Basic time tracking. 
   - `-t` on `show` and `view` will turn on time calculations
-  - Intervals between timestamps and dated `@done` tags are calculated for each line, if the tag exists. 
+  - Intervals between timestamps and dated _@done_ tags are calculated for each line, if the tag exists. 
   - You must include a `%interval` token in the appropriate template for it to show
-  - `@start(date)` tags can optionally be used to override the timestamp in the calculation
+  - _@start(date)_ tags can optionally be used to override the timestamp in the calculation
   - Any other tags in the line have that line's total added to them
   - Totals for tags can be displayed at the end of output with `--totals`
 
@@ -723,6 +776,8 @@ Catching up on the changelog. Kind of. A lot has happened, mostly fixes.
 - fuzzy section guessing when specified section isn't found
 - fuzzy view guessing for `doing view` command
 
+----
+
 #### 0.1.9
 
 - colors in templated output
@@ -749,3 +804,4 @@ Catching up on the changelog. Kind of. A lot has happened, mostly fixes.
   - save a tmp file and open it in an editor
   - allows multi-line entries, anything after first line is considered a note
   - assumed when no input is provided (`doing now`)
+
