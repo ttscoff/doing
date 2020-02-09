@@ -52,6 +52,7 @@ class WWID
     @content = {}
     @doingrc_needs_update = false
     @default_config_file = '.doingrc'
+    @interval_cache = {}
   end
 
   ##
@@ -1647,6 +1648,11 @@ EOS
     done = nil
     start = nil
 
+    if @interval_cache.keys.include? item['title']
+      seconds = @interval_cache[item['title']]
+      return seconds > 0 ? "%02d:%02d:%02d" % fmt_time(seconds) : false
+    end
+
     if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
       done = Time.parse($1)
     else
@@ -1669,6 +1675,8 @@ EOS
         @timers[k] = seconds
       end
     }
+
+    @interval_cache[item['title']] = seconds
 
     return seconds unless formatted
 
