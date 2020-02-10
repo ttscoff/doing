@@ -124,13 +124,13 @@ command :note do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
   c.default_value wwid.current_section
-  c.flag [:s,:section], :default_value => wwid.current_section
+  c.flag [:s, :section], :default_value => "All"
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
-  c.switch [:e,:editor], :negatable => false, :default_value => false
+  c.switch [:e, :editor], :negatable => false, :default_value => false
 
   c.desc "Replace/Remove last entry's note"
-  c.switch [:r,:remove], :negatable => false, :default_value => false
+  c.switch [:r, :remove], :negatable => false, :default_value => false
 
   c.action do |global_options,options,args|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
@@ -184,20 +184,20 @@ command :meanwhile do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
   c.default_value wwid.current_section
-  c.flag [:s,:section], :default_value => wwid.current_section
+  c.flag [:s, :section], :default_value => wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
-  c.switch [:e,:editor]
+  c.switch [:e, :editor]
 
   c.desc "Archive previous @meanwhile entry"
-  c.switch [:a,:archive], :default_value => false
+  c.switch [:a, :archive], :default_value => false
 
   c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:back]
 
   c.desc 'Note'
   c.arg_name 'note_text'
-  c.flag [:n,:note]
+  c.flag [:n, :note]
 
   c.action do |global_options,options,args|
     if options[:back]
@@ -237,7 +237,7 @@ long_desc %{
 command :templates do |c|
   c.desc "Type of template to output (HAML|CSS)"
   c.arg_name 'template_type'
-  c.flag [:t,:type]
+  c.flag [:t, :type]
 
   c.action do |global_options,options,args|
     unless options[:type]
@@ -259,19 +259,19 @@ desc 'Add an item to the Later section'
 arg_name 'entry'
 command :later do |c|
   c.desc "Edit entry with #{ENV['EDITOR']}"
-  c.switch [:e,:editor]
+  c.switch [:e, :editor]
 
   c.desc "Edit entry with specified app"
   c.arg_name 'editor_app'
   c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
-  c.flag [:a,:app]
+  c.flag [:a, :app]
 
   c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:back]
 
   c.desc 'Note'
   c.arg_name 'note_text'
-  c.flag [:n,:note]
+  c.flag [:n, :note]
 
   c.action do |global_options,options,args|
     if options[:back]
@@ -317,25 +317,25 @@ arg_name 'entry'
 command :done do |c|
   c.desc 'Remove @done tag'
   c.default_value false
-  c.switch [:r,:remove], :negatable => false, :default_value => false
+  c.switch [:r, :remove], :negatable => false, :default_value => false
 
   c.desc 'Include date'
   c.default_value true
-  c.switch [:d,:date], :negatable => true, :default_value => true
+  c.switch [:d, :date], :negatable => true, :default_value => true
 
   c.desc 'Immediately archive the entry'
   c.default_value false
-  c.switch [:a,:archive], :negatable => false, :default_value => false
+  c.switch [:a, :archive], :negatable => false, :default_value => false
 
   # TODO: Set @done date to specific time, backtracking start date in case of --took option. Should ignore --back option if present.
   # c.desc 'Set finish date to specific date/time (natural langauge)'
   # c.flag [:at]
 
   c.desc 'Backdate start date by interval [4pm|20m|2h|yesterday noon]'
-  c.flag [:b,:back]
+  c.flag [:b, :back]
 
   c.desc 'Set completion date to start date plus interval (XX[mhd] or HH:MM). If used without the --back option, the start date will be moved back to allow the completion date to be the current time.'
-  c.flag [:t,:took]
+  c.flag [:t, :took]
 
   c.desc 'Section'
   c.default_value wwid.current_section

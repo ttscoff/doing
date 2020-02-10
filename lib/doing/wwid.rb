@@ -600,10 +600,18 @@ class WWID
   ## @brief      Return the content of the last note for a given section
   ##
   ## @param      section  (String) The section to retrieve from, default
-  ##                      Currently
+  ##                      All
   ##
-  def last_note(section=@current_section)
+  def last_note(section="All")
     section = guess_section(section)
+    if section =~ /^all$/i
+      combined = {'items' => []}
+      @content.each {|k,v|
+        combined['items'] += v['items']
+      }
+      section = combined['items'].dup.sort_by{|item| item['date'] }.reverse[0]['section']
+    end
+
     if @content.has_key?(section)
       last_item = @content[section]['items'].dup.sort_by{|item| item['date'] }.reverse[0]
       $stderr.puts "Editing note for #{last_item['title']}"
@@ -735,12 +743,20 @@ class WWID
   ##
   ## @brief      Add a note to the last entry in a section
   ##
-  ## @param      section  (String) The section, default Currently
+  ## @param      section  (String) The section, default "All"
   ## @param      note     (String) The note to add
   ## @param      replace  (Bool) Should replace existing note
   ##
   def note_last(section, note, replace=false)
     section = guess_section(section)
+
+    if section =~ /^all$/i
+      combined = {'items' => []}
+      @content.each {|k,v|
+        combined['items'] += v['items']
+      }
+      section = combined['items'].dup.sort_by{|item| item['date'] }.reverse[0]['section']
+    end
 
     if @content.has_key?(section)
       # sort_section(opt[:section])
@@ -770,7 +786,7 @@ class WWID
 
       @content[section]['items'] = items
     else
-      raise "Section not found"
+      raise "Section #{section} not found"
     end
   end
 
@@ -797,7 +813,6 @@ class WWID
     tag.sub!(/^@/,'')
 
     found_items = 0
-    begin
     @content[opt[:section]]['items'].each_with_index {|item, i|
       if item['title'] =~ /@#{tag}/
         title = item['title'].gsub(/(^| )@(#{tag}|done)(\([^\)]*\))?/,'')
@@ -826,12 +841,6 @@ class WWID
       title += " @#{tag}"
       add_item(title.cap_first, opt[:section], {:note => note.join(' ').rstrip, :back => opt[:back]})
     end
-
-    rescue Exception=>e
-      puts e
-      puts e.backtrace
-    end
-
 
     write(@doing_file)
   end
