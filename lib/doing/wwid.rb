@@ -636,11 +636,24 @@ class WWID
       sec_arr = [@current_section]
     elsif opt[:section].class == String
       if opt[:section] =~ /^all$/i
-        sec_arr = sections
+        if opt[:count] == 1
+          combined = {'items' => []}
+          @content.each {|k,v|
+            combined['items'] += v['items']
+          }
+          items = combined['items'].dup.sort_by{|item| item['date'] }.reverse
+          sec_arr.push(items[0]['section'])
+        elsif opt[:count] > 1
+          raise "A count greater than one requires a section to be specified"
+        else
+          sec_arr = sections
+        end
       else
         sec_arr = [guess_section(opt[:section])]
       end
     end
+
+
 
     sec_arr.each {|section|
       if @content.has_key?(section)
@@ -668,9 +681,9 @@ class WWID
             opt[:tags].each {|tag|
               tag.strip!
               if opt[:remove]
-                if title =~ /@#{tag}/
+                if title =~ /@#{tag}\b/
                   title.gsub!(/(^| )@#{tag}(\([^\)]*\))?/,'')
-                  @results.push("Removed @#{tag}: #{title}")
+                  @results.push(%Q{Removed @#{tag}: "#{title}" in #{section}})
                 end
               else
                 unless title =~ /@#{tag}/
@@ -680,7 +693,7 @@ class WWID
                   else
                     title += " @#{tag}"
                   end
-                  @results.push("Added @#{tag}: #{title}")
+                  @results.push(%Q{Added @#{tag}: "#{title}" in #{section}})
                 end
               end
             }
@@ -707,7 +720,7 @@ class WWID
           @content['Archive']['items'] = archived
           # log it
           result = opt[:count] == 1 ? "1 entry" : "#{opt[:count]} entries"
-          @results.push("Archived #{result}")
+          @results.push("Archived #{result} from #{section}")
         elsif opt[:archive] && opt[:count] == 0
           @results.push("Archiving is skipped when operating on all entries") if opt[:count] == 0
         end

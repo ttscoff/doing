@@ -475,8 +475,7 @@ desc 'Tag last entry'
 arg_name 'tag1 [tag2...]'
 command :tag do |c|
   c.desc 'Section'
-  c.default_value wwid.current_section
-  c.flag [:s,:section], :default_value => wwid.current_section
+  c.flag [:s,:section], :default_value => "All"
 
   c.desc 'How many recent entries to tag (0 for all)'
   c.default_value 1
