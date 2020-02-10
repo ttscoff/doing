@@ -21,7 +21,11 @@ include GLI::App
 version Doing::VERSION
 
 wwid = WWID.new
-wwid.user_home = %x{echo $HOME}.strip
+if Dir.respond_to?('home')
+  wwid.user_home = Dir.home
+else
+  wwid.user_home = File.expand_path("~")
+end
 wwid.configure
 
 

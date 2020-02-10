@@ -615,7 +615,11 @@ class WWID
     if @content.has_key?(section)
       last_item = @content[section]['items'].dup.sort_by{|item| item['date'] }.reverse[0]
       $stderr.puts "Editing note for #{last_item['title']}"
-      return "#{last_item['title']}\n# EDIT BELOW THIS LINE ------------\n#{last_item['note'].map{|line| line.strip }.join("\n")}"
+      note = ''
+      unless last_item['note'].nil?
+        note = last_item['note'].map{|line| line.strip }.join("\n")
+      end
+      return "#{last_item['title']}\n# EDIT BELOW THIS LINE ------------\n#{note}"
     else
       raise "Section #{section} not found"
     end
@@ -707,7 +711,13 @@ class WWID
             }
             item['title'] = title
           else
-            item['title'] = autotag(item['title'])
+            new_title = autotag(item['title'])
+            unless new_title == item['title']
+              @results.push("Tags updated: #{new_title}")
+              item['title'] = new_title
+            else
+              @results.push(%Q{Autotag: No changes})
+            end
           end
 
           index += 1
@@ -772,7 +782,7 @@ class WWID
         elsif current_note.length > 0 && note.length > 0
           @results.push(%Q{Replaced note from "#{title}"})
         elsif note.length > 0
-          @results.push(%Q{Added note to #{title}})
+          @results.push(%Q{Added note to "#{title}"})
         else
           @results.push(%Q{Entry "#{title}" has no note})
         end
@@ -1637,9 +1647,12 @@ EOS
   #
   def autotag(text)
     return unless text
+    current_tags = text.scan(/@\w+/)
+    whitelisted = []
     @config['autotag']['whitelist'].each {|tag|
       text.sub!(/(?<!@)(#{tag.strip})\b/i) do |m|
         m.downcase! if tag =~ /[a-z]/
+        whitelisted.push("@#{m}")
         "@#{m}"
       end unless text =~ /@#{tag}\b/i
     }
@@ -1647,12 +1660,19 @@ EOS
     @config['autotag']['synonyms'].each {|tag, v|
       v.each {|word|
         if text =~ /\b#{word}\b/i
-          tail_tags.push(tag)
+          unless current_tags.include?("@#{tag}")
+            tail_tags.push(tag)
+          end
         end
       }
     }
+    if whitelisted.length > 0
+      @results.push("Whitelisted tags: #{whitelisted.join(', ')}")
+    end
     if tail_tags.length > 0
-    text + ' ' + tail_tags.uniq.map {|t| '@'+t }.join(' ')
+      tags = tail_tags.uniq.map {|t| '@'+t }.join(' ')
+      @results.push("Synonym tags: #{tags}")
+      text + ' ' + tags
     else
       text
     end
