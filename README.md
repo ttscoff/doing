@@ -600,6 +600,14 @@ Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add mo
 
 ## Changelog
 
+#### 1.0.24
+
+- `doing note` operates on whatever is most recent, not just the last note in Currently
+- `doing tag` with no count specified operates on most recent entry in any section, not just Currently
+- `doing tag` with a count greater than 1 requires a section to be specified
+- Improved results reporting for `doing tag`
+- When removing tag do a whole-word match to avoid removing part of a longer tag
+
 #### 1.0.23
 
 - Apply default_tags after autotagging to avoid tags triggering tags
