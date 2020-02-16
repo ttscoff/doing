@@ -1,3 +1,8 @@
+### 1.0.27
+
+- More graceful writing of default config (~/.doingrc) on first run
+- Repaired testing setup. Needs moar tests.
+
 ### 1.0.26
 
 - Add `--at` flag for `doing done`, e.g. `doing done --at=1:35pm --took=15m A new task I already finished`

@@ -390,7 +390,7 @@ Note that you can include a tag with synonyms in the whitelist as well to tag it
 
 #### Adding entries:
 
-    now      - Add an entry
+    now, did - Add an entry
     later    - Add an item to the Later section
     done     - Add a completed item with @done(date). No argument finishes last entry.
     meanwhile - Finish any @meanwhile tasks and optionally create a new one

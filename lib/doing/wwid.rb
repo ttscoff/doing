@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
 require 'deep_merge'
-require 'pp'
 
 ##
 ## @brief      String helpers
@@ -43,7 +42,7 @@ end
 ## @brief      Main "What Was I Doing" methods
 ##
 class WWID
-  attr_accessor :content, :sections, :current_section, :doing_file, :config, :user_home, :default_config_file, :results
+  attr_accessor :content, :sections, :current_section, :doing_file, :config, :user_home, :default_config_file, :config_file, :results
 
   ##
   ## @brief      Initializes the object.
@@ -53,6 +52,65 @@ class WWID
     @doingrc_needs_update = false
     @default_config_file = '.doingrc'
     @interval_cache = {}
+    @results = []
+  end
+
+  ##
+  ## @brief      Finds a project-specific configuration file
+  ##
+  ## @return     (String) A file path
+  ##
+  def find_local_config
+
+    config = {}
+    dir = Dir.pwd
+
+    local_config_files = []
+
+    while (dir != '/' && (dir =~ /[A-Z]:\//) == nil)
+      if File.exists? File.join(dir, @default_config_file)
+        local_config_files.push(File.join(dir, @default_config_file))
+      end
+
+      dir = File.dirname(dir)
+    end
+
+    local_config_files
+  end
+
+  ##
+  ## @brief      Reads a configuration.
+  ##
+  def read_config(opt={})
+    unless @config_file
+      if Dir.respond_to?('home')
+        @config_file = File.join(Dir.home, @default_config_file)
+      else
+        @config_file = File.join(File.expand_path("~"), @default_config_file)
+      end
+    end
+
+    if opt[:ignore_local]
+      additional_configs = []
+    else
+      additional_configs = find_local_config
+    end
+
+    begin
+      @local_config = {}
+
+      @config = YAML.load_file(@config_file) || {} if File.exists?(@config_file)
+      additional_configs.each { |cfg|
+        new_config = YAML.load_file(cfg) || {} if cfg
+        @local_config = @local_config.deep_merge(new_config)
+      }
+
+      # @config.deep_merge(@local_config)
+    rescue
+      @config = {}
+      @local_config = {}
+      # raise "error reading config"
+    end
   end
 
   ##
@@ -62,12 +120,17 @@ class WWID
   ##
   def configure(opt={})
     @timers = {}
-    @config_file == File.join(@user_home, @default_config_file)
+    opt[:ignore_local] ||= false
 
-    read_config
+    unless @config_file
+      @config_file = File.join(@user_home, @default_config_file)
+    end
+
+    read_config({:ignore_local => opt[:ignore_local]})
 
     user_config = @config.dup
-    @results = []
+
+    @config = {} if @config.nil?
 
     @config['autotag'] ||= {}
     @config['autotag']['whitelist'] ||= []
@@ -144,6 +207,7 @@ class WWID
     @current_section = @config['current_section']
     @default_template = @config['templates']['default']['template']
     @default_date_format = @config['templates']['default']['date_format']
+
 
   end
 
@@ -240,58 +304,6 @@ class WWID
       File.open(filename,'w+') do |f|
         f.puts @current_section + ":"
       end
-    end
-  end
-
-  ##
-  ## @brief      Finds a project-specific configuration file
-  ##
-  ## @return     (String) A file path
-  ##
-  def find_local_config
-
-    config = {}
-    dir = Dir.pwd
-
-    local_config_files = []
-
-    while (dir != '/' && (dir =~ /[A-Z]:\//) == nil)
-      if File.exists? File.join(dir, @default_config_file)
-        local_config_files.push(File.join(dir, @default_config_file))
-      end
-
-      dir = File.dirname(dir)
-    end
-
-    local_config_files
-  end
-
-  ##
-  ## @brief      Reads a configuration.
-  ##
-  def read_config
-    if Dir.respond_to?('home')
-      @config_file = File.join(Dir.home, @default_config_file)
-    else
-      @config_file = File.join(File.expand_path("~"), @default_config_file)
-    end
-    # @doingrc_needs_update = true if File.exists? @config_file
-    additional_configs = find_local_config
-
-    begin
-      @local_config = {}
-
-      @config = YAML.load_file(@config_file) || {} if File.exists?(@config_file)
-      additional_configs.each { |cfg|
-        new_config = YAML.load_file(cfg) || {} if cfg
-        @local_config = @local_config.deep_merge(new_config)
-      }
-
-      # @config.deep_merge(@local_config)
-    rescue
-      @config = {}
-      @local_config = {}
-      # raise "error reading config"
     end
   end
 

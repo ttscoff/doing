@@ -3,6 +3,7 @@ $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'gli'
 require 'doing'
 require 'tempfile'
+require 'pp'
 
 def class_exists?(class_name)
   klass = Module.const_get(class_name)
@@ -41,6 +42,10 @@ switch [:notes], :default_value => true, :negatable => true
 desc 'Send results report to STDOUT instead of STDERR'
 default_value false
 switch [:stdout], :default_value => false, :negatable => false
+
+desc 'Use a specific configuration file'
+default_value false
+flag [:config_file]
 
 # desc 'Wrap notes at X chars (0 for no wrap)'
 # flag [:w,:wrapwidth], :must_match => /^\d+$/, :type => Integer
@@ -1077,22 +1082,22 @@ command :config do |c|
   c.action do |global_options,options,args|
     if `uname` =~ /Darwins/
       if options[:x]
-        %x{open -a "#{wwid.config['editor_app']}" "#{File.join(Dir.home, wwid.default_config_file)}"}
+        %x{open -a "#{wwid.config['editor_app']}" "#{wwid.config_file}"}
       elsif options[:a] || options[:b]
         if options[:a]
-          %x{open -a "#{options[:a]}" "#{File.join(Dir.home, wwid.default_config_file)}"}
+          %x{open -a "#{options[:a]}" "#{wwid.config_file}"}
         elsif options[:b]
-          %x{open -b #{options[:b]} "#{File.join(Dir.home, wwid.default_config_file)}"}
+          %x{open -b #{options[:b]} "#{wwid.config_file}"}
         end
       else
         raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
         editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
-        system %Q{#{editor} "#{File.join(Dir.home, wwid.default_config_file)}"}
+        system %Q{#{editor} "#{wwid.config_file}"}
       end
     else
       raise "No EDITOR variable defined in environment" if options[:e].nil? && ENV['EDITOR'].nil?
       editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
-      system %Q{#{editor} "#{File.join(Dir.home, wwid.default_config_file)}"}
+      system %Q{#{editor} "#{wwid.config_file}"}
     end
   end
 end
@@ -1111,12 +1116,20 @@ end
 
 
 pre do |global,command,options,args|
+  if global[:config_file]
+    wwid.config_file = global[:config_file]
+    wwid.configure({:ignore_local => true})
+    # wwid.results.push("Override config file #{wwid.config_file}")
+  end
+
   if global[:doing_file]
     wwid.init_doing_file(global[:doing_file])
   else
     wwid.init_doing_file
   end
+
   wwid.config[:include_notes] = false unless global[:notes]
+
   if global[:version]
     $stdout.puts "doing v" + Doing::VERSION
   end

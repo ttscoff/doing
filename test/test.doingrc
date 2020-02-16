@@ -1,0 +1,48 @@
+---
+autotag:
+  whitelist: []
+  synonyms: {}
+doing_file: "~/what_was_i_doing.md"
+current_section: Currently
+editor_app: 
+html_template:
+  haml: 
+  css: 
+templates:
+  default:
+    date_format: "%Y-%m-%d %H:%M"
+    template: "%date | %title%note"
+    wrap_width: 0
+  today:
+    date_format: "%_I:%M%P"
+    template: "%date: %title %interval%note"
+    wrap_width: 0
+  last:
+    date_format: "%-I:%M%P on %a"
+    template: "%title (at %date)%odnote"
+    wrap_width: 88
+  recent:
+    date_format: "%_I:%M%P"
+    template: "%shortdate: %title (%section)"
+    wrap_width: 88
+views:
+  done:
+    date_format: "%_I:%M%P"
+    template: "%date | %title%note"
+    wrap_width: 0
+    section: All
+    count: 0
+    order: desc
+    tags: done complete cancelled
+    tags_bool: OR
+  color:
+    date_format: "%F %_I:%M%P"
+    template: "%boldblack%date %boldgreen| %boldwhite%title%default%note"
+    wrap_width: 0
+    section: Currently
+    count: 10
+    order: asc
+marker_tag: flagged
+marker_color: red
+default_tags: []
+:include_notes: true

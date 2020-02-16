@@ -13,6 +13,7 @@ class DoingChronifyTest < Test::Unit::TestCase
     @tmpdirs = []
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
+    @config_file = File.join(File.dirname(__FILE__),'test.doingrc')
   end
 
   def teardown
@@ -51,6 +52,10 @@ class DoingChronifyTest < Test::Unit::TestCase
 
   private
 
+  def uncolor(string)
+    string.gsub(/\\e\[[\d;]+m/,'')
+  end
+
   def trunc_minutes(ts)
     ts.to_i / 60 * 60
   end
@@ -63,7 +68,7 @@ class DoingChronifyTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({}, '--doing_file', @wwid_file, *args)
+    doing_with_env({}, '--config_file', @config_file, '--doing_file', @wwid_file, *args)
   end
 end
 

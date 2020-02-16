@@ -10,6 +10,7 @@ class NoteEditorTest < Test::Unit::TestCase
     @tmpdirs = []
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
+    @config_file = File.join(File.dirname(__FILE__),'test.doingrc')
   end
 
   def teardown
@@ -23,7 +24,8 @@ class NoteEditorTest < Test::Unit::TestCase
     assert_match(/#{subject}\s*$/, doing('show'), 'should have added task')
 
     editor_note = 'I would type this into my editor'
-    doing_env({ 'EDITOR' => mk_replacing_editor(editor_note) }, 'note', '-e')
+    doing_env({ 'EDITOR' => mk_replacing_editor(subject, editor_note) }, 'note', '-e')
+
     assert_match(/#{editor_note}\s*$/, doing('show'), 'should add first note')
   end
 
@@ -44,7 +46,7 @@ class NoteEditorTest < Test::Unit::TestCase
 
     # Replace should replace both
     replacer_note = 'replaced #1 and #2'
-    editor = mk_replacing_editor(replacer_note)
+    editor = mk_replacing_editor(subject, replacer_note)
     doing_env({ 'EDITOR' => editor }, 'note', '-e')
     assert_doing_shows([
       [/#{replacer_note}\s*$/, "replacer note should be visible"],
@@ -65,11 +67,11 @@ private
   end
 
   def doing(*args)
-    doing_with_env({}, '--doing_file', @wwid_file, *args)
+    doing_with_env({}, '--config_file', @config_file, '--doing_file', @wwid_file, *args)
   end
 
   def doing_env(env, *args)
-    doing_with_env(env, '--doing_file', @wwid_file, *args)
+    doing_with_env(env, '--config_file', @config_file, '--doing_file', @wwid_file, *args)
   end
 
   def mktmpdir
@@ -81,13 +83,13 @@ private
 
   # Returns path to an executable that takes a file path as input and overwrites
   # the contents of that file with `replace_text`
-  def mk_replacing_editor(replace_text)
+  def mk_replacing_editor(entry_content, replace_text)
     editor = File.join(@basedir, 'editor')
     File.open(editor, 'w') do |f|
       f.puts <<-FAKE_EDITOR
 #!/bin/sh
 FILE=$1
-echo "#{replace_text}" > $FILE
+echo -e "#{entry_content}\n#{replace_text}" > $FILE
       FAKE_EDITOR
     end
     FileUtils.chmod('+x', editor)
