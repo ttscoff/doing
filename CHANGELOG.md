@@ -1,3 +1,9 @@
+### 1.0.26
+
+- Add `--at` flag for `doing done`, e.g. `doing done --at=1:35pm --took=15m A new task I already finished`
+- Allow decimal quantities when using natural language for hours or days, e.g. `--took=2.5h`
+- Add `did` as a synonym for `done` subcommand
+
 ### 1.0.25
 
 - Smarter method of getting user $HOME

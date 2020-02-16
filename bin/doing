@@ -133,7 +133,7 @@ command :note do |c|
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch [:e, :editor], :negatable => false, :default_value => false
 
-  c.desc "Replace/Remove last entry's note"
+  c.desc "Replace/Remove last entry's note (default append)"
   c.switch [:r, :remove], :negatable => false, :default_value => false
 
   c.action do |global_options,options,args|
@@ -318,7 +318,7 @@ end
 
 desc 'Add a completed item with @done(date). No argument finishes last entry.'
 arg_name 'entry'
-command :done do |c|
+command [:done,:did] do |c|
   c.desc 'Remove @done tag'
   c.default_value false
   c.switch [:r, :remove], :negatable => false, :default_value => false
@@ -331,9 +331,8 @@ command :done do |c|
   c.default_value false
   c.switch [:a, :archive], :negatable => false, :default_value => false
 
-  # TODO: Set @done date to specific time, backtracking start date in case of --took option. Should ignore --back option if present.
-  # c.desc 'Set finish date to specific date/time (natural langauge)'
-  # c.flag [:at]
+  c.desc 'Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back. Used with --took, backdates start date'
+  c.flag [:at]
 
   c.desc 'Backdate start date by interval [4pm|20m|2h|yesterday noon]'
   c.flag [:b, :back]
@@ -356,6 +355,7 @@ command :done do |c|
   c.action do |global_options,options,args|
     took = 0
 
+
     if options[:took]
       took = wwid.chronify_qty(options[:took])
       raise "Unable to parse date string for --took" if took.nil?
@@ -368,7 +368,11 @@ command :done do |c|
       date = options[:took] ? Time.now - took : Time.now
     end
 
-    if options[:took]
+    if options[:at]
+      finish_date = wwid.chronify(options[:at])
+      raise "Unable to parse date string for --at" if finish_date.nil?
+      date = options[:took] ? finish_date - took : finish_date
+    elsif options[:took]
       finish_date = date + took
     elsif options[:back]
       finish_date = date

@@ -131,6 +131,12 @@ class WWID
 
     @config[:include_notes] ||= true
 
+    # if ENV['DOING_DEBUG'].to_i == 3
+    #   if @config['default_tags'].length > 0
+    #     raise "DEFAULT CONFIG CHANGED"
+    #   end
+    # end
+
     File.open(@config_file, 'w') { |yf| YAML::dump(@config, yf) } unless @config == user_config
 
     @config = @local_config.deep_merge(@config)
@@ -393,7 +399,7 @@ class WWID
     if qty.strip =~ /^(\d+):(\d\d)$/
       minutes += $1.to_i * 60
       minutes += $2.to_i
-    elsif qty.strip =~ /^(\d+)([hmd])?$/
+    elsif qty.strip =~ /^(\d+(?:\.\d+)?)([hmd])?$/
       amt = $1
       type = $2.nil? ? "m" : $2
 
@@ -908,7 +914,7 @@ class WWID
     sections.each_with_index {|section, i|
       puts "% 3d: %s" % [i+1, section]
     }
-    print "> "
+    print "#{colors['green']}> #{colors['default']}"
     num = STDIN.gets
     return false if num =~ /^[a-z ]*$/i
     return sections[num.to_i - 1]
@@ -1660,7 +1666,7 @@ EOS
     @config['autotag']['synonyms'].each {|tag, v|
       v.each {|word|
         if text =~ /\b#{word}\b/i
-          unless current_tags.include?("@#{tag}")
+          unless current_tags.include?("@#{tag}") || whitelisted.include?("@#{tag}")
             tail_tags.push(tag)
           end
         end
