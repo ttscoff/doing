@@ -54,6 +54,8 @@ When using the `now` and `later` commands on the command line, you can start the
 
 Notes can be prevented from ever appearing in output with the global option `--no-notes`: `doing --no-notes show all`.
 
+Auto tagging (adding tags listed in .doingrc under `autotag` and `default_tags`) can be skipped for an entry with the `-x` global option: `doing -x done skipping some automatic tagging`.
+
 ## Configuration
 
 A basic configuration looks like this:
@@ -382,6 +384,7 @@ Note that you can include a tag with synonyms in the whitelist as well to tag it
     --[no-]notes         - Output notes if included in the template (default: enabled)
     --stdout             - Send results report to STDOUT instead of STDERR
     --version            - Display the program version
+    -x, --[no-]noauto    - Exclude auto tags and default tags
 
 ### Commands:
 

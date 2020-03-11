@@ -43,12 +43,13 @@ desc 'Send results report to STDOUT instead of STDERR'
 default_value false
 switch [:stdout], :default_value => false, :negatable => false
 
+desc 'Exclude auto tags and default tags'
+switch [:x,:noauto], :default_value => false
+
 desc 'Use a specific configuration file'
 default_value false
 flag [:config_file]
 
-desc 'Include auto tags and default tags'
-switch [:x,:noauto], :default_value => false
 
 # desc 'Wrap notes at X chars (0 for no wrap)'
 # flag [:w,:wrapwidth], :must_match => /^\d+$/, :type => Integer
