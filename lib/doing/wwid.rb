@@ -42,7 +42,7 @@ end
 ## @brief      Main "What Was I Doing" methods
 ##
 class WWID
-  attr_accessor :content, :sections, :current_section, :doing_file, :config, :user_home, :default_config_file, :config_file, :results
+  attr_accessor :content, :sections, :current_section, :doing_file, :config, :user_home, :default_config_file, :config_file, :results, :auto_tag
 
   ##
   ## @brief      Initializes the object.
@@ -53,6 +53,7 @@ class WWID
     @default_config_file = '.doingrc'
     @interval_cache = {}
     @results = []
+    @auto_tag = true
   end
 
   ##
@@ -579,19 +580,24 @@ class WWID
     opt[:timed] ||= false
 
     title = [title.strip.cap_first]
-    title = autotag(title.join(' '))
-    unless @config['default_tags'].empty?
-      title += @config['default_tags'].map{|t|
-        unless t.nil?
-          dt = t.sub(/^ *@/,'').chomp
-          if title =~ /@#{dt}/
-            ""
-          else
-            ' @' + dt
+    title = title.join(' ')
+
+    if @auto_tag
+      title = autotag(title)
+      unless @config['default_tags'].empty?
+        title += @config['default_tags'].map{|t|
+          unless t.nil?
+            dt = t.sub(/^ *@/,'').chomp
+            if title =~ /@#{dt}/
+              ""
+            else
+              ' @' + dt
+            end
           end
-        end
-      }.delete_if {|t| t == "" }.join(" ")
+        }.delete_if {|t| t == "" }.join(" ")
+      end
     end
+    title.gsub!(/ +/,' ')
     entry = {'title' => title.strip, 'date' => opt[:back]}
     unless opt[:note] =~ /^\s*$/s
       entry['note'] = opt[:note].map {|n| n.gsub(/ *$/,'')}
@@ -729,7 +735,7 @@ class WWID
             }
             item['title'] = title
           else
-            new_title = autotag(item['title'])
+            new_title = autotag(item['title']) if @auto_tag
             unless new_title == item['title']
               @results.push("Tags updated: #{new_title}")
               item['title'] = new_title
@@ -1665,6 +1671,7 @@ EOS
   #
   def autotag(text)
     return unless text
+    return text unless @auto_tag
     current_tags = text.scan(/@\w+/)
     whitelisted = []
     @config['autotag']['whitelist'].each {|tag|

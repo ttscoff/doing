@@ -47,6 +47,9 @@ desc 'Use a specific configuration file'
 default_value false
 flag [:config_file]
 
+desc 'Include auto tags and default tags'
+switch [:x,:noauto], :default_value => false
+
 # desc 'Wrap notes at X chars (0 for no wrap)'
 # flag [:w,:wrapwidth], :must_match => /^\d+$/, :type => Integer
 
@@ -488,23 +491,23 @@ desc 'Tag last entry'
 arg_name 'tag1 [tag2...]'
 command :tag do |c|
   c.desc 'Section'
-  c.flag [:s,:section], :default_value => "All"
+  c.flag [:s, :section], :default_value => "All"
 
   c.desc 'How many recent entries to tag (0 for all)'
   c.default_value 1
-  c.flag [:c,:count], :default_value => 1
+  c.flag [:c, :count], :default_value => 1
 
   c.desc 'Include current date/time with tag'
   c.default_value false
-  c.switch [:d,:date], :negatable => false, :default_value => false
+  c.switch [:d, :date], :negatable => false, :default_value => false
 
   c.desc 'Remove given tag(s)'
   c.default_value false
-  c.switch [:r,:remove], :negatable => false, :default_value => false
+  c.switch [:r, :remove], :negatable => false, :default_value => false
 
   c.desc 'Autotag entries based on autotag configuration in ~/.doingrc'
   c.default_value false
-  c.switch [:a,:autotag], :negatable => false, :default_value => false
+  c.switch [:a, :autotag], :negatable => false, :default_value => false
 
   c.action do |global_options,options,args|
     if args.length == 0 && !options[:a]
@@ -1127,6 +1130,8 @@ pre do |global,command,options,args|
   else
     wwid.init_doing_file
   end
+
+  wwid.auto_tag = !global[:noauto]
 
   wwid.config[:include_notes] = false unless global[:notes]
 
