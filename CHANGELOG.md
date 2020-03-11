@@ -1,3 +1,12 @@
+### 1.0.29
+
+- Bugfixes
+
+### 1.0.28
+
+- Global option `-x` to skip autotags and default_tags from global/local .doingrc
+- Remove extra spaces when creating entry
+
 ### 1.0.27
 
 - More graceful writing of default config (~/.doingrc) on first run
