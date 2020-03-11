@@ -25,7 +25,7 @@ lib/templates/doing.css
   s.rdoc_options << '--title' << 'doing' << '--main' << 'README.md' << '--markup' << 'markdown' << '-ri'
   s.bindir = 'bin'
   s.executables << 'doing'
-  s.add_development_dependency 'rake', '~> 0'
+  s.add_development_dependency 'rake', '>= 12.3.3'
   s.add_development_dependency 'rdoc', '~> 4.1', '>= 4.1.1'
   s.add_development_dependency 'aruba', '~> 0'
   s.add_development_dependency 'test-unit'
