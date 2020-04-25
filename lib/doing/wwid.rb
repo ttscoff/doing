@@ -599,7 +599,7 @@ class WWID
     end
     title.gsub!(/ +/,' ')
     entry = {'title' => title.strip, 'date' => opt[:back]}
-    unless opt[:note] =~ /^\s*$/s
+    unless opt[:note].join('').strip == ''
       entry['note'] = opt[:note].map {|n| n.gsub(/ *$/,'')}
     end
     items = @content[section]['items']

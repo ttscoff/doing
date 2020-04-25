@@ -1,3 +1,7 @@
+### 1.0.30
+
+- Fix for array comparison error
+
 ### 1.0.29
 
 - Bugfixes
