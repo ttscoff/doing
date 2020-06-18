@@ -201,13 +201,15 @@ class WWID
     #   end
     # end
 
-    File.open(@config_file, 'w') { |yf| YAML::dump(@config, yf) } unless @config == user_config
+    unless File.exists?(@config_file)
+      File.open(@config_file, 'w') { |yf| YAML::dump(@config, yf) }
+    end
 
     @config = @local_config.deep_merge(@config)
 
     @current_section = @config['current_section']
     @default_template = @config['templates']['default']['template']
-    @default_date_format = @config['templates']['default']['date_format']
+    @default_date_format = @config['templates']['default']['date_format'];
 
 
   end
