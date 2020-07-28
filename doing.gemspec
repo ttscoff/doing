@@ -33,5 +33,5 @@ lib/templates/doing.css
   s.add_runtime_dependency('haml','~>5.0.0', '>= 5.0.0')
   s.add_runtime_dependency('chronic','~> 0.10', '>= 0.10.2')
   s.add_runtime_dependency 'deep_merge', '~> 1.2', '>= 1.2.1'
-  s.add_runtime_dependency 'json', '~> 2.2.0', '>= 1.8.1'
+  s.add_runtime_dependency 'json', '~> 2.3.1', '>= 1.8.1'
 end
