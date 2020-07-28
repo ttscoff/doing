@@ -27,7 +27,7 @@ lib/templates/doing.css
   s.executables << 'doing'
   s.add_development_dependency 'rake', '>= 12.3.3'
   s.add_development_dependency 'rdoc', '~> 4.1', '>= 4.1.1'
-  s.add_development_dependency 'aruba', '~> 0'
+  s.add_development_dependency 'aruba', '~> 1.0.2'
   s.add_development_dependency 'test-unit'
   s.add_runtime_dependency 'gli', '~> 2.17', '>= 2.17.1'
   s.add_runtime_dependency('haml','~>5.0.0', '>= 5.0.0')
