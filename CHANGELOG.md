@@ -1,3 +1,7 @@
+### 1.0.32
+
+- Gem dependency updates
+
 ### 1.0.30
 
 - Fix for array comparison error
