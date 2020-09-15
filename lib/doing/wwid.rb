@@ -581,6 +581,8 @@ class WWID
     opt[:back] ||= Time.now
     opt[:timed] ||= false
 
+    opt[:note] = [opt[:note]] if opt[:note].class == String
+
     title = [title.strip.cap_first]
     title = title.join(' ')
 
@@ -602,7 +604,7 @@ class WWID
     title.gsub!(/ +/,' ')
     entry = {'title' => title.strip, 'date' => opt[:back]}
     unless opt[:note].join('').strip == ''
-      entry['note'] = opt[:note].map {|n| n.gsub(/ *$/,'')}
+      entry['note'] = opt[:note].map {|n| n.chomp}
     end
     items = @content[section]['items']
     if opt[:timed]
