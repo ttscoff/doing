@@ -1695,6 +1695,25 @@ EOS
         end
       }
     }
+    if @config['autotag'].key? 'transform'
+      @config['autotag']['transform'].each {|tag|
+        if tag =~ /\S+:\S+/
+          rx, r = tag.split(/:/)
+          r.gsub!(/\$/,'\\')
+          rx.sub!(/^@/,'')
+          regex = Regexp.new('@' + rx + '\b')
+
+          matches = text.scan(regex)
+
+          matches.each {|m|
+            puts rx,r
+            new_tag = m[0].sub(Regexp.new(rx), r)
+            puts new_tag
+            tail_tags.push(new_tag)
+          } if matches
+        end
+      }
+    end
     if whitelisted.length > 0
       @results.push("Whitelisted tags: #{whitelisted.join(', ')}")
     end

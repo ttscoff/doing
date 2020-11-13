@@ -464,6 +464,16 @@ To add autotagging, include a section like this in your `~/.doingrc` file:
         - posting
         - publishing
 
+###### Tag transformation
+
+You can include a `transform` section in the autotag config which contains pairs of regular expressions and replacement patterns separated by a colon. These will be used to look at existing tags in the text and generate additional tags from them. For example:
+
+  autotag:
+    transform:
+    - (\w+)-\d+:$1
+
+This creates a search pattern looking for a string of word characters followed by a hyphen and one or more digits, e.g. `@projecttag-12`. Do not include the @ symbol in the pattern. The replacement (`$1`) indicates that the first matched group (in parenthesis) should be used to generate the new tag, resulting in `@projecttag` being added to the entry.
+
 ##### Annotating
 
 `note` lets you append a note to the last entry. You can specify a section to grab the last entry from with `-s section_name`. `-e` will open your `$EDITOR` for typing the note, but you can also just include it on the command line after any flags. You can also pipe a note in on STDIN (`echo "fun stuff"|doing note`). If you don't use the `-r` switch, new notes will be appended to the existing notes, and using the `-e` switch will let you edit and add to an existing note. The `-r` switch will remove/replace a note; if there's new note text passed when using the `-r` switch, it will replace any existing note. If the `-r` switch is used alone, any existing note will be removed.
