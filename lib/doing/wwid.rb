@@ -188,6 +188,7 @@ class WWID
     @config['marker_tag'] ||= 'flagged'
     @config['marker_color'] ||= 'red'
     @config['default_tags'] ||= []
+    @config['tag_sort'] ||= 'time'
 
     @current_section = config['current_section']
     @default_template = config['templates']['default']['template']

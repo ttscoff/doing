@@ -605,8 +605,11 @@ command :show do |c|
   c.switch [:totals], :default_value => false, :negatable => true
 
   c.desc 'Sort tags by (name|time)'
-  c.default_value 'time'
-  c.flag [:tag_sort], :default_value => 'time', :negatable => true
+  default = 'time'
+  if wwid.config.has_key?('tag_sort')
+    default = wwid.config['tag_sort']
+  end
+  c.flag [:tag_sort], :default_value => default
 
   c.desc 'Only show items with recorded time intervals'
   c.default_value false
