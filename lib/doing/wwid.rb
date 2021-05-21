@@ -1711,11 +1711,15 @@ EOS
           regex = Regexp.new('@' + rx + '\b')
 
           matches = text.scan(regex)
-
           matches.each {|m|
-            puts rx,r
-            new_tag = m[0].sub(Regexp.new(rx), r)
-            puts new_tag
+            new_tag = r
+            if m.kind_of?(Array)
+              index = 1
+              m.each {|v|
+                new_tag = new_tag.sub('\\' + index.to_s, v)
+                index = index + 1
+              }
+            end
             tail_tags.push(new_tag)
           } if matches
         end
