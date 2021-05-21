@@ -604,6 +604,10 @@ command :show do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Sort tags by (name|time)'
+  c.default_value 'time'
+  c.flag [:tag_sort], :default_value => 'time', :negatable => true
+
   c.desc 'Only show items with recorded time intervals'
   c.default_value false
   c.switch [:only_timed], :default_value => false, :negatable => false
@@ -666,7 +670,9 @@ command :show do |c|
 
     options[:t] = true if options[:totals]
 
-    puts wwid.list_section({:section => section, :date_filter => dates, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :totals => options[:totals], :highlight => true, :only_timed => options[:only_timed]})
+    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+
+    puts wwid.list_section({:section => section, :date_filter => dates, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :totals => options[:totals], :sort_tags => options[:sort_tags], :highlight => true, :only_timed => options[:only_timed]})
 
   end
 end
