@@ -1,3 +1,8 @@
+### 1.0.39
+
+- Tag transforms
+- Option to sort tags by name in --totals
+
 ### 1.0.33
 
 - Gem dependency updates
