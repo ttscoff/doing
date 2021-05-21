@@ -997,7 +997,7 @@ class WWID
     opt[:tags_color] ||= false
     opt[:times] ||= false
     opt[:totals] ||= false
-    opt[:tag_order] ||= false
+    opt[:sort_tags] ||= false
     opt[:search] ||= false
     opt[:only_timed] ||= false
     opt[:date_filter] ||= []
@@ -1181,7 +1181,7 @@ class WWID
         out = {
           'section' => section,
           'items' => items_out,
-          'timers' => tag_times("json", opt[:tag_order])
+          'timers' => tag_times("json", opt[:sort_tags])
         }.to_json
       elsif opt[:output] == "timeline"
                 template =<<EOTEMPLATE
@@ -1264,7 +1264,7 @@ EOTEMPLATE
         style = css_template
       end
 
-      totals = opt[:totals] ? tag_times("html", opt[:tag_order]) : ""
+      totals = opt[:totals] ? tag_times("html", opt[:sort_tags]) : ""
       engine = Haml::Engine.new(template)
       puts engine.render(Object.new, { :@items => items_out, :@page_title => page_title, :@style => style, :@totals => totals })
     else
@@ -1354,7 +1354,7 @@ EOTEMPLATE
 
         out += output + "\n"
       }
-      out += tag_times if opt[:totals]
+      out += tag_times("text", opt[:sort_tags]) if opt[:totals]
     end
     return out
   end
@@ -1599,7 +1599,7 @@ EOTEMPLATE
   ##
   ## @param      format  (String) return format (html, json, or text)
   ##
-  def tag_times(format="text",sort_by_name=false)
+  def tag_times(format="text", sort_by_name = false)
 
     return "" if @timers.empty?
 
@@ -1609,7 +1609,7 @@ EOTEMPLATE
 
     tags_data = @timers.delete_if { |k,v| v == 0}
     if sort_by_name
-      sorted_tags_data = tags_data.sort_by{|k,v| k }
+      sorted_tags_data = tags_data.sort_by{|k,v| k }.reverse
     else
       sorted_tags_data = tags_data.sort_by{|k,v| v }
     end
