@@ -1,3 +1,7 @@
+### 1.0.41
+
+- Fix for repeated backreferences in tag transform
+
 ### 1.0.40
 
 - Add `--tag_sort` to all subcommands with `--totals` option
