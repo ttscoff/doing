@@ -1722,7 +1722,7 @@ EOS
             if m.kind_of?(Array)
               index = 1
               m.each {|v|
-                new_tag = new_tag.sub('\\' + index.to_s, v)
+                new_tag = new_tag.gsub('\\' + index.to_s, v)
                 index = index + 1
               }
             end
