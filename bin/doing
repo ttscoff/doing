@@ -699,6 +699,13 @@ command [:grep,:search] do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Sort tags by (name|time)'
+  default = 'time'
+  if wwid.config.has_key?('tag_sort')
+    default = wwid.config['tag_sort']
+  end
+  c.flag [:tag_sort], :default_value => default
+
   c.desc 'Only show items with recorded time intervals'
   c.default_value false
   c.switch [:only_timed], :default_value => false, :negatable => false
@@ -708,8 +715,9 @@ command [:grep,:search] do |c|
     section = wwid.guess_section(options[:s]) if options[:s]
 
     options[:t] = true if options[:totals]
+    options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_section({:search => args.join(' '), :section => section, :output => options[:output], :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => options[:only_timed]})
+    puts wwid.list_section({:search => args.join(' '), :section => section, :output => options[:output], :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => options[:only_timed], :sort_tags => options[:sort_tags]})
 
   end
 end
@@ -730,6 +738,13 @@ command :recent do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Sort tags by (name|time)'
+  default = 'time'
+  if wwid.config.has_key?('tag_sort')
+    default = wwid.config['tag_sort']
+  end
+  c.flag [:tag_sort], :default_value => default
+
   c.action do |global_options,options,args|
 
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
@@ -741,8 +756,9 @@ command :recent do |c|
         count = 10
       end
       options[:t] = true if options[:totals]
+      options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-      puts wwid.recent(count,section.cap_first,{ :times => options[:t], :totals => options[:totals] })
+      puts wwid.recent(count,section.cap_first,{ :times => options[:t], :totals => options[:totals], :sort_tags => options[:sort_tags] })
 
     end
   end
@@ -763,14 +779,22 @@ command :today do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Sort tags by (name|time)'
+  default = 'time'
+  if wwid.config.has_key?('tag_sort')
+    default = wwid.config['tag_sort']
+  end
+  c.flag [:tag_sort], :default_value => default
+
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o,:output]
 
   c.action do |global_options,options,args|
 
     options[:t] = true if options[:totals]
+    options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.today(options[:t],options[:output],{:totals => options[:totals], :section => options[:s]}).chomp
+    puts wwid.today(options[:t],options[:output],{:totals => options[:totals], :section => options[:s], :sort_tags => options[:sort_tags]}).chomp
 
   end
 end
@@ -791,6 +815,13 @@ command :on do |c|
   c.desc 'Show time totals at the end of output'
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
+
+  c.desc 'Sort tags by (name|time)'
+  default = 'time'
+  if wwid.config.has_key?('tag_sort')
+    default = wwid.config['tag_sort']
+  end
+  c.flag [:tag_sort], :default_value => default
 
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o,:output]
@@ -815,8 +846,9 @@ command :on do |c|
     wwid.results.push(message)
 
     options[:t] = true if options[:totals]
+    options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_date([start,finish],options[:s],options[:t],options[:output],{:totals => options[:totals]}).chomp
+    puts wwid.list_date([start, finish], options[:s], options[:t], options[:output], {:totals => options[:totals], :sort_tags => options[:sort_tags]}).chomp
 
   end
 end
@@ -839,8 +871,16 @@ command :yesterday do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Sort tags by (name|time)'
+  default = 'time'
+  if wwid.config.has_key?('tag_sort')
+    default = wwid.config['tag_sort']
+  end
+  c.flag [:tag_sort], :default_value => default
+
   c.action do |global_options, options,args|
-    puts wwid.yesterday(options[:s],options[:t],options[:o],{:totals => options[:totals]}).chomp
+    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    puts wwid.yesterday(options[:s],options[:t],options[:o],{:totals => options[:totals], :sort_tags => options[:sort_tags]}).chomp
 
   end
 end
@@ -927,6 +967,13 @@ command :view do |c|
   c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
+  c.desc 'Sort tags by (name|time)'
+  default = 'time'
+  if wwid.config.has_key?('tag_sort')
+    default = wwid.config['tag_sort']
+  end
+  c.flag [:tag_sort], :default_value => default
+
   c.desc 'Only show items with recorded time intervals'
   c.default_value false
   c.switch [:only_timed], :default_value => false, :negatable => true
@@ -972,9 +1019,12 @@ command :view do |c|
       count = options[:c] ? options[:c] : view.has_key?('count') ? view['count'] : 10
       section = options[:s] ? section : view.has_key?('section') ? view['section'] : wwid.current_section
       order = view.has_key?('order') ? view['order'] : "asc"
+
       options[:t] = true if options[:totals]
       options[:output].downcase! if options[:output]
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:o], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => only_timed })
+      options[:sort_tags] = options[:tag_sort] =~ /^n/i
+
+      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:o], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => only_timed, :sort_tags => options[:sort_tags] })
     else
       if title.class == FalseClass
         exit_now! "Cancelled"

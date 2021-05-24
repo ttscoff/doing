@@ -1,3 +1,7 @@
+### 1.0.40
+
+- Add `--tag_sort` to all subcommands with `--totals` option
+
 ### 1.0.39
 
 - Tag transforms

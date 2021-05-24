@@ -1528,8 +1528,10 @@ EOTEMPLATE
   ##
   def today(times=true,output=nil,opt={})
     opt[:totals] ||= false
+    opt[:sort_tags] ||= false
+
     cfg = @config['templates']['today']
-    list_section({:section => opt[:section], :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output, :totals => opt[:totals]})
+    list_section({:section => opt[:section], :wrap_width => cfg['wrap_width'], :count => 0, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :today => true, :times => times, :output => output, :totals => opt[:totals], :sort_tags => opt[:sort_tags]})
   end
 
   ##
@@ -1543,13 +1545,14 @@ EOTEMPLATE
   ##
   def list_date(dates,section,times=nil,output=nil,opt={})
     opt[:totals] ||= false
+    opt[:sort_tags] ||= false
     section = guess_section(section)
     # :date_filter expects an array with start and end date
     if dates.class == String
       dates = [dates, dates]
     end
 
-    list_section({:section => section, :count => 0, :order => "asc", :date_filter => dates, :times => times, :output => output, :totals => opt[:totals] })
+    list_section({:section => section, :count => 0, :order => "asc", :date_filter => dates, :times => times, :output => output, :totals => opt[:totals], :sort_tags => opt[:sort_tags] })
   end
 
   ##
@@ -1562,8 +1565,9 @@ EOTEMPLATE
   ##
   def yesterday(section,times=nil,output=nil,opt={})
     opt[:totals] ||= false
+    opt[:sort_tags] ||= false
     section = guess_section(section)
-    list_section({:section => section, :count => 0, :order => "asc", :yesterday => true, :times => times, :output => output, :totals => opt[:totals] })
+    list_section({:section => section, :count => 0, :order => "asc", :yesterday => true, :times => times, :output => output, :totals => opt[:totals], :sort_tags => opt[:sort_tags] })
   end
 
   ##
@@ -1576,10 +1580,12 @@ EOTEMPLATE
   def recent(count=10,section=nil,opt={})
     times = opt[:t] || true
     opt[:totals] ||= false
+    opt[:sort_tags] ||= false
+
     cfg = @config['templates']['recent']
     section ||= @current_section
     section = guess_section(section)
-    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :times => times, :totals => opt[:totals] })
+    list_section({:section => section, :wrap_width => cfg['wrap_width'], :count => count, :format => cfg['date_format'], :template => cfg['template'], :order => "asc", :times => times, :totals => opt[:totals], :sort_tags => opt[:sort_tags] })
   end
 
   ##
