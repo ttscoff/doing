@@ -1125,7 +1125,6 @@ class WWID
       }
       out = output.join("")
     elsif opt[:output] == "json" || opt[:output] == "timeline"
-
       items_out = []
       max = items[-1]['date'].strftime('%F')
       min = items[0]['date'].strftime('%F')
@@ -1137,7 +1136,6 @@ class WWID
           title = i['title']
           note = i['note'].map { |line| line.strip } if i['note']
         end
-
         if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
           end_date = Time.parse($1)
           interval = get_interval(i,false)
@@ -1152,14 +1150,16 @@ class WWID
           tags.push(tag[0]) unless skip_tags.include?(tag[0])
         }
         if opt[:output] == "json"
+
           items_out << {
             :date => i['date'],
             :end_date => end_date,
             :title => title.strip, #+ " #{note}"
-            :note => note.class == Array ? note.join("\n") : note,
+            :note => note.class == Array ? note.map(&:strip).join("\n") : note,
             :time => "%02d:%02d:%02d" % fmt_time(interval),
             :tags => tags
           }
+
         elsif opt[:output] == "timeline"
           new_item = {
             'id' => index + 1,
@@ -1280,7 +1280,7 @@ EOTEMPLATE
         end
 
         if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
-          note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t" + line.sub(/^\t*/,'') + "  " }
+          note_lines = item['note'].delete_if{|line| line =~ /^\s*$/ }.map{|line| "\t\t" + line.sub(/^\t*/,'').sub(/^-/, '—') + "  " }
           if opt[:wrap_width] && opt[:wrap_width] > 0
             width = opt[:wrap_width]
             note_lines.map! {|line|
@@ -1607,7 +1607,6 @@ EOTEMPLATE
   ## @param      format  (String) return format (html, json, or text)
   ##
   def tag_times(format="text", sort_by_name = false)
-
     return "" if @timers.empty?
 
     max = @timers.keys.sort_by {|k| k.length }.reverse[0].length + 1
@@ -1798,6 +1797,10 @@ EOS
   def fmt_time(seconds)
     if seconds.nil?
       return [0, 0, 0]
+    end
+    if seconds =~ /(\d+):(\d+):(\d+)/
+      h, m, s = [$1, $2, $3]
+      seconds = (h.to_i * 60 * 60) + (m.to_i * 60) + s.to_i
     end
     minutes =  (seconds / 60).to_i
     hours = (minutes / 60).to_i
