@@ -1233,7 +1233,7 @@ post do |global,command,options,args|
   if wwid.config['run_after']
     script = File.expand_path(wwid.config['run_after'])
     if File.exist?(script)
-      warn "Running #{script}"
+      # warn "Running #{script}"
       `#{script}`
     end
   end
