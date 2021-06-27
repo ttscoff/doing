@@ -1227,7 +1227,15 @@ post do |global,command,options,args|
   if global[:stdout]
     $stdout.print wwid.results.join("\n")
   else
-    $stderr.puts wwid.results.join("\n")
+    warn wwid.results.join("\n")
+  end
+
+  if wwid.config['run_after']
+    script = File.expand_path(wwid.config['run_after'])
+    if File.exist?(script)
+      warn "Running #{script}"
+      `#{script}`
+    end
   end
 end
 
