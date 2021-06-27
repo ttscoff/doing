@@ -1,3 +1,12 @@
+### 1.0.43
+
+- Add `again` command to repeat last entry without @done tag
+- Add `run_after` configuration option to execute external script after any change
+
+### 1.0.42
+
+- Fix note indentation in doing file
+
 ### 1.0.41
 
 - Fix for repeated backreferences in tag transform
