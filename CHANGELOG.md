@@ -1,3 +1,7 @@
+### 1.0.45
+
+- Only execute run_after script if changes are written
+
 ### 1.0.44
 
 - Remove unneccessary console logging
