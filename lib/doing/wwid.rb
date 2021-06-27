@@ -655,6 +655,62 @@ class WWID
   end
 
   ##
+  ## @brief      Restart the last entry
+  ##
+  ## @param      opt   (Hash) Additional Options
+  ##
+  def restart_last(opt = {})
+    opt[:section] ||= 'all'
+    opt[:note] ||= []
+
+    last = last_entry(opt)
+    if last.nil?
+      @results.push(%Q{No previous entry found})
+      return
+    end
+    # Remove @done tag
+    title = last['title'].sub!(/\s*@done(\(.*?\))?/, '').chomp
+    add_item(title, last['section'], {:note => opt[:note], :back => opt[:date], :timed => true})
+    write(@doing_file)
+  end
+
+  ##
+  ## @brief      Get the last entry
+  ##
+  ## @param      opt   (Hash) Additional Options
+  ##
+  def last_entry(opt={})
+    opt[:section] ||= @current_section
+
+    sec_arr = []
+
+    if opt[:section].nil?
+      sec_arr = [@current_section]
+    elsif opt[:section].class == String
+      if opt[:section] =~ /^all$/i
+        combined = {'items' => []}
+        @content.each {|k,v|
+          combined['items'] += v['items']
+        }
+        items = combined['items'].dup.sort_by{|item| item['date'] }.reverse
+        sec_arr.push(items[0]['section'])
+
+        sec_arr = sections
+      else
+        sec_arr = [guess_section(opt[:section])]
+      end
+    end
+
+
+    all_items = []
+    sec_arr.each do |section|
+      all_items.concat(@content[section]['items'].dup) if @content.has_key?(section)
+    end
+
+    all_items.sort_by { |item| item['date'] }.last
+  end
+
+  ##
   ## @brief      Tag the last entry or X entries
   ##
   ## @param      opt   (Hash) Additional Options

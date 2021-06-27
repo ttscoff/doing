@@ -488,6 +488,21 @@ command :finish do |c|
   end
 end
 
+desc 'Repeat last entry as new entry'
+arg_name 'section'
+command [:again,:resume] do |c|
+  c.desc 'Section'
+  c.flag [:s, :section], :default_value => "All"
+
+  c.desc 'Note'
+  c.arg_name 'note_text'
+  c.flag [:n,:note]
+
+  c.action do |global_options, options, args|
+    wwid.restart_last({ section: options[:s], note: options[:n] })
+  end
+end
+
 desc 'Tag last entry'
 arg_name 'tag1 [tag2...]'
 command :tag do |c|
@@ -555,7 +570,7 @@ command :tag do |c|
 end
 
 desc 'Mark last entry as highlighted'
-command :mark do |c|
+command [:mark,:flag] do |c|
   c.desc 'Section'
   c.default_value wwid.current_section
   c.flag [:s,:section], :default_value => wwid.current_section
