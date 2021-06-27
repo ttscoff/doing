@@ -669,7 +669,7 @@ class WWID
       return
     end
     # Remove @done tag
-    title = last['title'].sub!(/\s*@done(\(.*?\))?/, '').chomp
+    title = last['title'].sub(/\s*@done(\(.*?\))?/, '').chomp
     add_item(title, last['section'], {:note => opt[:note], :back => opt[:date], :timed => true})
     write(@doing_file)
   end
@@ -959,12 +959,21 @@ class WWID
     if file.nil?
       $stdout.puts output
     else
-      if File.exists?(File.expand_path(file))
+      file = File.expand_path(file)
+      if File.exists?(file)
         # Create a backup copy for the undo command
         FileUtils.cp(file,file+"~")
 
-        File.open(File.expand_path(file),'w+') do |f|
+        File.open(file,'w+') do |f|
           f.puts output
+        end
+      end
+
+      if @config.key?('run_after')
+        script = File.expand_path(@config['run_after'])
+        if File.exist?(script)
+          # warn "Running #{script}"
+          `#{script}`
         end
       end
     end

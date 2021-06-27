@@ -1229,14 +1229,6 @@ post do |global,command,options,args|
   else
     warn wwid.results.join("\n")
   end
-
-  if wwid.config['run_after']
-    script = File.expand_path(wwid.config['run_after'])
-    if File.exist?(script)
-      # warn "Running #{script}"
-      `#{script}`
-    end
-  end
 end
 
 on_error do |exception|
