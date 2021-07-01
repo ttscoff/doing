@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require 'deep_merge'
+require 'open3'
 
 ##
 ## @brief      String helpers
@@ -644,6 +645,7 @@ class WWID
     end
     # Remove @done tag
     title = last['title'].sub(/\s*@done(\(.*?\))?/, '').chomp
+    @auto_tag = false
     add_item(title, last['section'], { note: opt[:note], back: opt[:date], timed: true })
     write(@doing_file)
   end
@@ -931,10 +933,10 @@ class WWID
       end
 
       if @config.key?('run_after')
-        script = File.expand_path(@config['run_after'])
-        if File.exist?(script)
-          # warn "Running #{script}"
-          `#{script}`
+        stdout, stderr, status = Open3.capture3(@config['run_after'])
+        if status.exitstatus.positive?
+          warn "Error running #{@config['run_after']}"
+          warn stderr
         end
       end
     end

@@ -393,10 +393,11 @@ Note that you can include a tag with synonyms in the whitelist as well to tag it
 
 #### Adding entries:
 
-    now, did - Add an entry
-    later    - Add an item to the Later section
-    done     - Add a completed item with @done(date). No argument finishes last entry.
-    meanwhile - Finish any @meanwhile tasks and optionally create a new one
+    now, did      - Add an entry
+    later         - Add an item to the Later section
+    done          - Add a completed item with @done(date). No argument finishes last entry.
+    meanwhile     - Finish any @meanwhile tasks and optionally create a new one
+    again, resume - Duplicate the last entry as new entry (without @done tag)
 
 The `doing now` command can accept `-s section_name` to send the new entry straight to a non-default section. It also accepts `--back=AMOUNT` to let you specify a start date in the past using "natural language." For example, `doing now --back=25m ENTRY` or `doing now --back="yesterday 3:30pm" ENTRY`.
 

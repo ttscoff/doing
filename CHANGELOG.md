@@ -1,3 +1,9 @@
+### 1.0.47
+
+- Remove check for file existence before attempting to run run_after script
+- Don't autotag entries restarted with `again/resume`
+- Add short flags (`-b`) for `--back` on all commands that support it
+
 ### 1.0.46
 
 - Code cleanup
