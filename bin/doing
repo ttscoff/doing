@@ -163,7 +163,7 @@ command :note do |c|
       if input
         title, note = wwid.format_input(input)
         if note
-          wwid.note_last(section, note, true)
+          wwid.note_last(section, note, replace: true)
         else
           raise "No note content"
         end
@@ -174,14 +174,14 @@ command :note do |c|
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
         note.insert(0, title)
-        wwid.note_last(section, note, options[:r])
+        wwid.note_last(section, note, replace: options[:r])
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
         note.insert(0, title)
-        wwid.note_last(section, note, options[:r])
+        wwid.note_last(section, note, replace: options[:r])
       else
         if options[:r]
-          wwid.note_last(section, [], true)
+          wwid.note_last(section, [], replace: true)
         else
           raise "You must provide content when adding a note"
         end

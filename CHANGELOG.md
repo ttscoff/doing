@@ -1,3 +1,7 @@
+### 1.0.46
+
+- Code cleanup
+
 ### 1.0.45
 
 - Only execute run_after script if changes are written
