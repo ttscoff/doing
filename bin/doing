@@ -379,7 +379,7 @@ command [:done, :did] do |c|
     end
 
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
-    donedate = options[:d] ? "(#{finish_date.strftime('%F %R')})" : ""
+    donedate = options[:date] ? "(#{finish_date.strftime('%F %R')})" : ""
 
     if options[:e]
       raise "No EDITOR variable defined in environment" if ENV['EDITOR'].nil?
