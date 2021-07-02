@@ -62,7 +62,6 @@ arg_name 'entry'
 command [:now, :next] do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
-  c.default_value wwid.current_section
   c.flag [:s, :section], :default_value => wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
@@ -72,7 +71,6 @@ command [:now, :next] do |c|
   c.flag [:b, :back]
 
   c.desc 'Timed entry, marks last entry in section as @done'
-  c.default_value false
   c.switch [:f, :finish_last], :negatable => false, :default_value => false
 
   c.desc 'Note'
@@ -81,8 +79,7 @@ command [:now, :next] do |c|
 
   # c.desc "Edit entry with specified app"
   # c.arg_name 'editor_app'
-  # c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
-  # c.flag [:a, :app]
+  # # c.flag [:a, :app]
 
   c.action do |global_options,options,args|
     if options[:back]
@@ -136,7 +133,6 @@ arg_name 'note_text'
 command :note do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
-  c.default_value wwid.current_section
   c.flag [:s, :section], :default_value => "All"
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
@@ -196,7 +192,6 @@ arg_name 'entry'
 command :meanwhile do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
-  c.default_value wwid.current_section
   c.flag [:s, :section], :default_value => wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
@@ -276,7 +271,6 @@ command :later do |c|
 
   c.desc "Edit entry with specified app"
   c.arg_name 'editor_app'
-  c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
   c.flag [:a, :app]
 
   c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
@@ -329,15 +323,12 @@ desc 'Add a completed item with @done(date). No argument finishes last entry.'
 arg_name 'entry'
 command [:done, :did] do |c|
   c.desc 'Remove @done tag'
-  c.default_value false
   c.switch [:r, :remove], :negatable => false, :default_value => false
 
   c.desc 'Include date'
-  c.default_value true
   c.switch [:date], :negatable => true, :default_value => true
 
   c.desc 'Immediately archive the entry'
-  c.default_value false
   c.switch [:a, :archive], :negatable => false, :default_value => false
 
   c.desc 'Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back. Used with --took, backdates start date'
@@ -350,7 +341,6 @@ command [:done, :did] do |c|
   c.flag [:t, :took]
 
   c.desc 'Section'
-  c.default_value wwid.current_section
   c.flag [:s, :section], :default_value => wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
@@ -358,8 +348,7 @@ command [:done, :did] do |c|
 
   # c.desc "Edit entry with specified app"
   # c.arg_name 'editor_app'
-  # c.default_value wwid.config.has_key?('editor_app') && wwid.config['editor_app'] ? wwid.config['editor_app'] : false
-  # c.flag [:a, :app]
+  # # c.flag [:a, :app]
 
   c.action do |global_options,options,args|
     took = 0
@@ -447,15 +436,12 @@ command :finish do |c|
   c.flag [:t, :took]
 
   c.desc 'Auto-generate finish dates from next entry\'s start time. Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.'
-  c.default_value false
   c.switch [:auto], :negatable => false, :default_value => false
 
   c.desc 'Archive entries'
-  c.default_value false
   c.switch [:a, :archive], :negatable => false, :default_value => false
 
   c.desc 'Section'
-  c.default_value wwid.current_section
   c.flag [:s, :section], :default_value => wwid.current_section
 
   c.action do |global_options,options,args|
@@ -509,19 +495,15 @@ command :tag do |c|
   c.flag [:s, :section], :default_value => "All"
 
   c.desc 'How many recent entries to tag (0 for all)'
-  c.default_value 1
   c.flag [:c, :count], :default_value => 1
 
   c.desc 'Include current date/time with tag'
-  c.default_value false
   c.switch [:d, :date], :negatable => false, :default_value => false
 
   c.desc 'Remove given tag(s)'
-  c.default_value false
   c.switch [:r, :remove], :negatable => false, :default_value => false
 
   c.desc 'Autotag entries based on autotag configuration in ~/.doingrc'
-  c.default_value false
   c.switch [:a, :autotag], :negatable => false, :default_value => false
 
   c.action do |global_options,options,args|
@@ -571,11 +553,9 @@ end
 desc 'Mark last entry as highlighted'
 command [:mark, :flag] do |c|
   c.desc 'Section'
-  c.default_value wwid.current_section
   c.flag [:s, :section], :default_value => wwid.current_section
 
   c.desc 'Remove mark'
-  c.default_value false
   c.switch [:r, :remove], :negatable => false, :default_value => false
 
 
@@ -590,19 +570,15 @@ long_desc 'The argument can be a section name, @tag(s) or both. "pick" or "choos
 arg_name '[section|@tags]'
 command :show do |c|
   c.desc 'Tag boolean (AND,OR,NONE)'
-  c.default_value "OR"
   c.flag [:b, :bool], :default_value => "OR"
 
   c.desc 'Max count to show'
-  c.default_value 0
   c.flag [:c, :count], :default_value => 0
 
   c.desc 'Age (oldest/newest)'
-  c.default_value 'newest'
   c.flag [:a, :age], :default_value => 'newest'
 
   c.desc 'Sort order (asc/desc)'
-  c.default_value 'asc'
   c.flag [:s, :sort], :default_value => 'asc'
 
   c.desc %{
@@ -613,11 +589,9 @@ command :show do |c|
   c.flag [:f, :from]
 
   c.desc 'Show time intervals on @done tasks'
-  c.default_value true
   c.switch [:t, :times], :default_value => true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
   c.desc 'Sort tags by (name|time)'
@@ -628,7 +602,6 @@ command :show do |c|
   c.flag [:tag_sort], :default_value => default
 
   c.desc 'Only show items with recorded time intervals'
-  c.default_value false
   c.switch [:only_timed], :default_value => false, :negatable => false
 
   c.desc 'Output to export format (csv|html|json)'
@@ -706,18 +679,15 @@ EODESC
 arg_name 'search_pattern'
 command [:grep, :search] do |c|
   c.desc 'Section'
-  c.default_value "all"
   c.flag [:s, :section], :default_value => "All"
 
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o, :output]
 
   c.desc 'Show time intervals on @done tasks'
-  c.default_value true
   c.switch [:t, :times], :default_value => true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
   c.desc 'Sort tags by (name|time)'
@@ -728,7 +698,6 @@ command [:grep, :search] do |c|
   c.flag [:tag_sort], :default_value => default
 
   c.desc 'Only show items with recorded time intervals'
-  c.default_value false
   c.switch [:only_timed], :default_value => false, :negatable => false
 
   c.action do |global_options,options,args|
@@ -748,15 +717,12 @@ default_value 10
 arg_name 'count'
 command :recent do |c|
   c.desc 'Section'
-  c.default_value "All"
   c.flag [:s, :section], :default_value => "All"
 
   c.desc 'Show time intervals on @done tasks'
-  c.default_value true
   c.switch [:t, :times], :default_value => true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
   c.desc 'Sort tags by (name|time)'
@@ -789,15 +755,12 @@ desc 'List entries from today'
 command :today do |c|
   c.desc 'Specify a section'
   c.arg_name 'section_name'
-  c.default_value "All"
   c.flag [:s, :section], :default_value => 'All'
 
   c.desc 'Show time intervals on @done tasks'
-  c.default_value true
   c.switch [:t, :times], :default_value => true
 
   c.desc 'Show time totals at the end of output'
-  c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
   c.desc 'Sort tags by (name|time)'
@@ -826,15 +789,12 @@ arg_name 'date_string'
 command :on do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
-  c.default_value 'All'
   c.flag [:s, :section], :default_value => 'All'
 
   c.desc 'Show time intervals on @done tasks'
-  c.default_value true
   c.switch [:t, :times], :default_value => true
 
   c.desc 'Show time totals at the end of output'
-  c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
   c.desc 'Sort tags by (name|time)'
@@ -878,18 +838,15 @@ desc 'List entries from yesterday'
 command :yesterday do |c|
   c.desc 'Specify a section'
   c.arg_name 'section_name'
-  c.default_value "All"
   c.flag [:s, :section], :default_value => 'All'
 
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o, :output]
 
   c.desc 'Show time intervals on @done tasks'
-  c.default_value true
   c.switch [:t, :times], :default_value => true
 
   c.desc 'Show time totals at the end of output'
-  c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
   c.desc 'Sort tags by (name|time)'
@@ -909,7 +866,6 @@ end
 desc 'Show the last entry'
 command :last do |c|
   c.desc 'Specify a section'
-  c.default_value "All"
   c.flag [:s, :section]
 
   c.action do |global_options,options,args|
@@ -920,7 +876,6 @@ end
 desc 'List sections'
 command :sections do |c|
   c.desc 'List in single column'
-  c.default_value false
   c.switch [:c, :column], :default_value => false
 
   c.action do |global_options,options,args|
@@ -981,11 +936,9 @@ command :view do |c|
   c.flag [:o, :output]
 
   c.desc 'Show time intervals on @done tasks'
-  c.default_value true
   c.switch [:t, :times], :default_value => true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.default_value false
   c.switch [:totals], :default_value => false, :negatable => true
 
   c.desc 'Sort tags by (name|time)'
@@ -996,7 +949,6 @@ command :view do |c|
   c.flag [:tag_sort], :default_value => default
 
   c.desc 'Only show items with recorded time intervals'
-  c.default_value false
   c.switch [:only_timed], :default_value => false, :negatable => true
 
   c.action do |global_options,options,args|
@@ -1059,7 +1011,6 @@ end
 desc 'List available custom views'
 command :views do |c|
   c.desc 'List in single column'
-  c.default_value false
   c.switch [:c, :column], :default_value => false
 
   c.action do |global_options,options,args|
@@ -1073,15 +1024,12 @@ arg_name 'section'
 default_value wwid.current_section
 command :archive do |c|
   c.desc 'Count to keep (ignored if archiving by tag)'
-  c.default_value 5
   c.flag [:k, :keep], :default_value => 5, :must_match => /^\d+$/, :type => Integer
 
   c.desc 'Move entries to'
-  c.default_value "Archive"
   c.flag [:t, :to], :default_value => "Archive"
 
   c.desc 'Tag boolean'
-  c.default_value "AND"
   c.flag [:b, :bool], :default_value => "AND"
 
   c.action do |global_options,options,args|
@@ -1150,7 +1098,6 @@ end
 desc 'Edit the configuration file'
 command :config do |c|
   c.desc 'Editor to use'
-  c.default_value ENV['EDITOR']
   c.flag [:e, :editor], :default_value => nil
 
   if `uname` =~ /Darwins/
@@ -1189,7 +1136,6 @@ end
 desc 'Undo the last change to the doing_file'
 command :undo do |c|
   c.desc 'Specify alternate doing file'
-  c.default_value wwid.doing_file
   c.flag [:f, :file], :default_value => wwid.doing_file
 
   c.action do |global_options,options,args|
