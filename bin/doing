@@ -556,7 +556,7 @@ command :tag do |c|
           question = "Are you sure you want to add #{tags.join(" and ")} to all records#{section_q}"
         end
 
-        res = wwid.yn(question,false)
+        res = wwid.yn(question, default_response: false)
 
         unless res
           raise "Cancelled"

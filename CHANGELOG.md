@@ -1,3 +1,7 @@
+### 1.0.48
+
+- Fix confirmation dialog for `doing tag -a -c 0` (autotag all)
+
 ### 1.0.47
 
 - Remove check for file existence before attempting to run run_after script
