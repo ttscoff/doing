@@ -1,3 +1,7 @@
+### 1.0.49
+
+- Fix for missing date on @done tags
+
 ### 1.0.48
 
 - Fix confirmation dialog for `doing tag -a -c 0` (autotag all)

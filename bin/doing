@@ -410,7 +410,7 @@ command [:done, :did] do |c|
       if options[:r]
         wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :remove => true })
       else
-        wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => finish_date, :date => options[:d]})
+        wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => finish_date, :date => options[:date]})
       end
     else
       if args.length > 0
@@ -480,7 +480,7 @@ command :finish do |c|
       raise "Only one argument allowed"
     elsif args.length == 0 || args[0] =~ /\d+/
       count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :sequential => options[:auto], :date => options[:d], :back => date })
+      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :sequential => options[:auto], :date => options[:date], :back => date })
     else
       raise "Invalid argument (specify number of recent items to mark @done)"
     end
@@ -563,7 +563,7 @@ command :tag do |c|
         end
       end
 
-      wwid.tag_last({:tags => tags, :count => count, :section => section, :date => options[:d], :remove => options[:r], :autotag => options[:a]})
+      wwid.tag_last({:tags => tags, :count => count, :section => section, :date => options[:date], :remove => options[:r], :autotag => options[:a]})
     end
   end
 end
