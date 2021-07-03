@@ -461,7 +461,7 @@ command :finish do |c|
   c.flag [:t, :took]
 
   c.desc 'Finish the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)'
-  c.flag [:tag], :default_value => []
+  c.flag [:tag]
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.flag [:tag_bool], default_value: 'AND'
@@ -493,7 +493,9 @@ command :finish do |c|
       end
     end
 
-    if options[:tag]
+    if options[:tag].nil?
+      options[:tag] = []
+    else
       options[:tag] = options[:tag].split(/,/).map {|tag| tag.strip.sub(/^@/, '') }
       if options[:tag_bool] =~ /^(and|or|not)$/i
         options[:tag_bool] = options[:tag_bool].upcase
