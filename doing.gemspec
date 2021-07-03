@@ -29,7 +29,7 @@ lib/templates/doing.css
   s.add_development_dependency 'rdoc', '~> 6.2.1'
   s.add_development_dependency 'aruba', '~> 1.0.2'
   s.add_development_dependency 'test-unit'
-  s.add_runtime_dependency('gli', '~> 2.19', '>= 2.19.2')
+  s.add_runtime_dependency('gli', '~> 2.20', '>= 2.20.1')
   s.add_runtime_dependency('haml','~>5.0.0', '>= 5.0.0')
   s.add_runtime_dependency('chronic','~> 0.10', '>= 0.10.2')
   s.add_runtime_dependency 'deep_merge', '~> 1.2', '>= 1.2.1'
