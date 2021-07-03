@@ -725,7 +725,7 @@ class WWID
       all_items.concat(@content[section]['items'].dup) if @content.key?(section)
     end
 
-    all_items.select! {|item| item.has_tags?(opt[:tag], opt[:tag_bool]) } if opt[:tag].length.positive?
+    all_items.select! { |item| item.has_tags?(opt[:tag], opt[:tag_bool]) } if !opt[:tag].nil? && opt[:tag].length.positive?
 
     all_items.max_by { |item| item['date'] }
   end
@@ -780,7 +780,7 @@ class WWID
         items.map! do |item|
           break if index == count
 
-          tag_match = opt[:tag].length.positive? ? item.has_tags?(opt[:tag], opt[:tag_bool]) : true
+          tag_match = !opt[:tag].nil? && opt[:tag].length.positive? ? item.has_tags?(opt[:tag], opt[:tag_bool]) : true
 
           if tag_match
             if opt[:autotag]

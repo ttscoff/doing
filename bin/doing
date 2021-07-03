@@ -36,20 +36,20 @@ default_command :recent
 # sort_help :manually
 
 desc 'Output notes if included in the template'
-switch [:notes], :default_value => true, :negatable => true
+switch [:notes], default_value: true, negatable: true
 
 desc 'Send results report to STDOUT instead of STDERR'
-switch [:stdout], :default_value => false, :negatable => false
+switch [:stdout], default_value: false, negatable: false
 
 desc 'Exclude auto tags and default tags'
-switch [:x, :noauto], :default_value => false
+switch [:x, :noauto], default_value: false
 
 desc 'Use a specific configuration file'
 flag [:config_file]
 
 
 # desc 'Wrap notes at X chars (0 for no wrap)'
-# flag [:w, :wrapwidth], :must_match => /^\d+$/, :type => Integer
+# flag [:w, :wrapwidth], must_match: /^\d+$/, type: Integer
 
 desc 'Specify a different doing_file'
 flag [:f, :doing_file]
@@ -59,7 +59,7 @@ arg_name 'entry'
 command [:now, :next] do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
-  c.flag [:s, :section], :default_value => wwid.current_section
+  c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch [:e, :editor]
@@ -68,7 +68,7 @@ command [:now, :next] do |c|
   c.flag [:b, :back]
 
   c.desc 'Timed entry, marks last entry in section as @done'
-  c.switch [:f, :finish_last], :negatable => false, :default_value => false
+  c.switch [:f, :finish_last], negatable: false, default_value: false
 
   c.desc 'Note'
   c.arg_name 'note_text'
@@ -97,7 +97,7 @@ command [:now, :next] do |c|
       if input
         title, note = wwid.format_input(input)
         note.push(options[:n]) if options[:n]
-        wwid.add_item(title.cap_first, section, {:note => note, :back => date, :timed => options[:f]})
+        wwid.add_item(title.cap_first, section, {note: note, back: date, timed: options[:f]})
         wwid.write(wwid.doing_file)
       else
         raise "No content"
@@ -106,12 +106,12 @@ command [:now, :next] do |c|
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
         note.push(options[:n]) if options[:n]
-        wwid.add_item(title.cap_first, section, {:note => note, :back => date, :timed => options[:f]})
+        wwid.add_item(title.cap_first, section, {note: note, back: date, timed: options[:f]})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
         note.push(options[:n]) if options[:n]
-        wwid.add_item(title.cap_first, section, {:note => note, :back => date, :timed => options[:f]})
+        wwid.add_item(title.cap_first, section, {note: note, back: date, timed: options[:f]})
         wwid.write(wwid.doing_file)
       else
         raise "You must provide content when creating a new entry"
@@ -130,13 +130,13 @@ arg_name 'note_text'
 command :note do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
-  c.flag [:s, :section], :default_value => "All"
+  c.flag [:s, :section], default_value: "All"
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
-  c.switch [:e, :editor], :negatable => false, :default_value => false
+  c.switch [:e, :editor], negatable: false, default_value: false
 
   c.desc "Replace/Remove last entry's note (default append)"
-  c.switch [:r, :remove], :negatable => false, :default_value => false
+  c.switch [:r, :remove], negatable: false, default_value: false
 
   c.action do |global_options,options,args|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
@@ -189,13 +189,13 @@ arg_name 'entry'
 command :meanwhile do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
-  c.flag [:s, :section], :default_value => wwid.current_section
+  c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch [:e, :editor]
 
   c.desc "Archive previous @meanwhile entry"
-  c.switch [:a, :archive], :default_value => false
+  c.switch [:a, :archive], default_value: false
 
   c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:b, :back]
@@ -230,7 +230,7 @@ command :meanwhile do |c|
     input = false unless input && input.length > 0
 
     note = options[:n] ? options[:n] : false
-    wwid.stop_start('meanwhile', {:new_item => input, :back => date, :section => section, :archive => options[:a], :note => note})
+    wwid.stop_start('meanwhile', {new_item: input, back: date, section: section, archive: options[:a], note: note})
     wwid.write(wwid.doing_file)
   end
 end
@@ -293,7 +293,7 @@ command :later do |c|
       if input
         title, note = wwid.format_input(input)
         note.push(options[:n]) if options[:n]
-        wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
+        wwid.add_item(title.cap_first, "Later", {note: note, back: date})
         wwid.write(wwid.doing_file)
       else
         raise "No content"
@@ -302,12 +302,12 @@ command :later do |c|
       if args.length > 0
         title, note = wwid.format_input(args.join(" "))
         note.push(options[:n]) if options[:n]
-        wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
+        wwid.add_item(title.cap_first, "Later", {note: note, back: date})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
         note.push(options[:n]) if options[:n]
-        wwid.add_item(title.cap_first, "Later", {:note => note, :back => date})
+        wwid.add_item(title.cap_first, "Later", {note: note, back: date})
         wwid.write(wwid.doing_file)
       else
         raise "You must provide content when creating a new entry"
@@ -320,13 +320,13 @@ desc 'Add a completed item with @done(date). No argument finishes last entry.'
 arg_name 'entry'
 command [:done, :did] do |c|
   c.desc 'Remove @done tag'
-  c.switch [:r, :remove], :negatable => false, :default_value => false
+  c.switch [:r, :remove], negatable: false, default_value: false
 
   c.desc 'Include date'
-  c.switch [:date], :negatable => true, :default_value => true
+  c.switch [:date], negatable: true, default_value: true
 
   c.desc 'Immediately archive the entry'
-  c.switch [:a, :archive], :negatable => false, :default_value => false
+  c.switch [:a, :archive], negatable: false, default_value: false
 
   c.desc 'Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back. Used with --took, backdates start date'
   c.flag [:at]
@@ -338,7 +338,7 @@ command [:done, :did] do |c|
   c.flag [:t, :took]
 
   c.desc 'Section'
-  c.flag [:s, :section], :default_value => wwid.current_section
+  c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch [:e, :editor]
@@ -387,16 +387,16 @@ command [:done, :did] do |c|
         title, note = wwid.format_input(input)
         title += " @done#{donedate}"
         section = "Archive" if options[:a]
-        wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
+        wwid.add_item(title.cap_first, section.cap_first, {note: note, back: date})
         wwid.write(wwid.doing_file)
       else
         raise "No content"
       end
     elsif args.length == 0 && STDIN.stat.size == 0
       if options[:r]
-        wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :remove => true })
+        wwid.tag_last({tags: ["done"], count: 1, section: section, remove: true })
       else
-        wwid.tag_last({:tags => ["done"], :count => 1, :section => section, :archive => options[:a], :back => finish_date, :date => options[:date]})
+        wwid.tag_last({tags: ["done"], count: 1, section: section, archive: options[:a], back: finish_date, date: options[:date]})
       end
     else
       if args.length > 0
@@ -404,13 +404,13 @@ command [:done, :did] do |c|
         title.chomp!
         title += " @done#{donedate}"
         section = "Archive" if options[:a]
-        wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
+        wwid.add_item(title.cap_first, section.cap_first, {note: note, back: date})
         wwid.write(wwid.doing_file)
       elsif STDIN.stat.size > 0
         title, note = wwid.format_input(STDIN.read)
         title += " @done#{donedate}"
         section = options[:a] ? "Archive" : section
-        wwid.add_item(title.cap_first, section.cap_first, {:note => note, :back => date})
+        wwid.add_item(title.cap_first, section.cap_first, {note: note, back: date})
         wwid.write(wwid.doing_file)
       else
         raise "You must provide content when creating a new entry"
@@ -424,10 +424,10 @@ long_desc 'Adds @done tag without datestamp so no elapsed time is recorded. Alia
 arg_name 'count'
 command :cancel do |c|
   c.desc 'Archive entries'
-  c.switch [:a, :archive], :negatable => false, :default_value => false
+  c.switch [:a, :archive], negatable: false, default_value: false
 
   c.desc 'Section'
-  c.flag [:s, :section], :default_value => wwid.current_section
+  c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)'
   c.flag [:tag]
@@ -551,19 +551,19 @@ desc 'Tag last entry'
 arg_name 'tag1 [tag2...]'
 command :tag do |c|
   c.desc 'Section'
-  c.flag [:s, :section], :default_value => "All"
+  c.flag [:s, :section], default_value: 'All'
 
   c.desc 'How many recent entries to tag (0 for all)'
-  c.flag [:c, :count], :default_value => 1
+  c.flag [:c, :count], default_value: 1
 
   c.desc 'Include current date/time with tag'
-  c.switch [:d, :date], :negatable => false, :default_value => false
+  c.switch [:d, :date], negatable: false, default_value: false
 
   c.desc 'Remove given tag(s)'
-  c.switch [:r, :remove], :negatable => false, :default_value => false
+  c.switch [:r, :remove], negatable: false, default_value: false
 
   c.desc 'Autotag entries based on autotag configuration in ~/.doingrc'
-  c.switch [:a, :autotag], :negatable => false, :default_value => false
+  c.switch [:a, :autotag], negatable: false, default_value: false
 
   c.action do |global_options,options,args|
     if args.length == 0 && !options[:a]
@@ -604,7 +604,7 @@ command :tag do |c|
         end
       end
 
-      wwid.tag_last({:tags => tags, :count => count, :section => section, :date => options[:date], :remove => options[:r], :autotag => options[:a]})
+      wwid.tag_last({tags: tags, count: count, section: section, date: options[:date], remove: options[:r], autotag: options[:a]})
     end
   end
 end
@@ -612,15 +612,15 @@ end
 desc 'Mark last entry as highlighted'
 command [:mark, :flag] do |c|
   c.desc 'Section'
-  c.flag [:s, :section], :default_value => wwid.current_section
+  c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc 'Remove mark'
-  c.switch [:r, :remove], :negatable => false, :default_value => false
+  c.switch [:r, :remove], negatable: false, default_value: false
 
 
   c.action do |global_options,options,args|
     mark = wwid.config['marker_tag'] || "flagged"
-    wwid.tag_last({:tags => [mark], :section => options[:s], :remove => options[:r]})
+    wwid.tag_last({tags: [mark], section: options[:s], remove: options[:r]})
   end
 end
 
@@ -628,17 +628,20 @@ desc 'List all entries'
 long_desc 'The argument can be a section name, @tag(s) or both. "pick" or "choose" as an argument will offer a section menu.'
 arg_name '[section|@tags]'
 command :show do |c|
+  c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
+  c.flag [:tag]
+
   c.desc 'Tag boolean (AND,OR,NONE)'
   c.flag [:b, :bool], must_match: /^(and|or|not)$/i, default_value: 'OR'
 
   c.desc 'Max count to show'
-  c.flag [:c, :count], :default_value => 0
+  c.flag [:c, :count], default_value: 0
 
   c.desc 'Age (oldest/newest)'
-  c.flag [:a, :age], :default_value => 'newest'
+  c.flag [:a, :age], default_value: 'newest'
 
   c.desc 'Sort order (asc/desc)'
-  c.flag [:s, :sort], :default_value => 'asc'
+  c.flag [:s, :sort], default_value: 'asc'
 
   c.desc %{
     Date range to show, or a single day to filter date on.
@@ -648,20 +651,20 @@ command :show do |c|
   c.flag [:f, :from]
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch [:t, :times], :default_value => true
+  c.switch [:t, :times], default_value: true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], :default_value => false, :negatable => true
+  c.switch [:totals], default_value: false, negatable: true
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], :default_value => default
+  c.flag [:tag_sort], default_value: default
 
   c.desc 'Only show items with recorded time intervals'
-  c.switch [:only_timed], :default_value => false, :negatable => false
+  c.switch [:only_timed], default_value: false, negatable: false
 
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o, :output]
@@ -698,6 +701,8 @@ command :show do |c|
       section = wwid.current_section
     end
 
+    tags.concat(options[:tag].split(/ *, */).map {|t| t.sub(/^@/, '').strip }) if options[:tag]
+
     unless tags.empty?
       tag_filter = {
         'tags' => tags,
@@ -723,7 +728,7 @@ command :show do |c|
 
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_section({:section => section, :date_filter => dates, :count => options[:c].to_i, :tag_filter => tag_filter, :age => options[:a], :order => options[:s], :output => options[:output], :times => options[:t], :totals => options[:totals], :sort_tags => options[:sort_tags], :highlight => true, :only_timed => options[:only_timed]})
+    puts wwid.list_section({section: section, date_filter: dates, count: options[:c].to_i, tag_filter: tag_filter, age: options[:a], order: options[:s], output: options[:output], times: options[:t], totals: options[:totals], sort_tags: options[:sort_tags], highlight: true, only_timed: options[:only_timed]})
 
   end
 end
@@ -738,26 +743,26 @@ EODESC
 arg_name 'search_pattern'
 command [:grep, :search] do |c|
   c.desc 'Section'
-  c.flag [:s, :section], :default_value => "All"
+  c.flag [:s, :section], default_value: "All"
 
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o, :output]
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch [:t, :times], :default_value => true
+  c.switch [:t, :times], default_value: true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], :default_value => false, :negatable => true
+  c.switch [:totals], default_value: false, negatable: true
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], :default_value => default
+  c.flag [:tag_sort], default_value: default
 
   c.desc 'Only show items with recorded time intervals'
-  c.switch [:only_timed], :default_value => false, :negatable => false
+  c.switch [:only_timed], default_value: false, negatable: false
 
   c.action do |global_options,options,args|
 
@@ -766,7 +771,7 @@ command [:grep, :search] do |c|
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_section({:search => args.join(' '), :section => section, :output => options[:output], :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => options[:only_timed], :sort_tags => options[:sort_tags]})
+    puts wwid.list_section({search: args.join(' '), section: section, output: options[:output], times: options[:t], highlight: true, totals: options[:totals], only_timed: options[:only_timed], sort_tags: options[:sort_tags]})
 
   end
 end
@@ -776,20 +781,20 @@ default_value 10
 arg_name 'count'
 command :recent do |c|
   c.desc 'Section'
-  c.flag [:s, :section], :default_value => "All"
+  c.flag [:s, :section], default_value: "All"
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch [:t, :times], :default_value => true
+  c.switch [:t, :times], default_value: true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], :default_value => false, :negatable => true
+  c.switch [:totals], default_value: false, negatable: true
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], :default_value => default
+  c.flag [:tag_sort], default_value: default
 
   c.action do |global_options,options,args|
 
@@ -804,7 +809,7 @@ command :recent do |c|
       options[:t] = true if options[:totals]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-      puts wwid.recent(count,section.cap_first,{ :times => options[:t], :totals => options[:totals], :sort_tags => options[:sort_tags] })
+      puts wwid.recent(count,section.cap_first,{ times: options[:t], totals: options[:totals], sort_tags: options[:sort_tags] })
 
     end
   end
@@ -814,20 +819,20 @@ desc 'List entries from today'
 command :today do |c|
   c.desc 'Specify a section'
   c.arg_name 'section_name'
-  c.flag [:s, :section], :default_value => 'All'
+  c.flag [:s, :section], default_value: 'All'
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch [:t, :times], :default_value => true
+  c.switch [:t, :times], default_value: true
 
   c.desc 'Show time totals at the end of output'
-  c.switch [:totals], :default_value => false, :negatable => true
+  c.switch [:totals], default_value: false, negatable: true
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], :default_value => default
+  c.flag [:tag_sort], default_value: default
 
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o, :output]
@@ -837,7 +842,7 @@ command :today do |c|
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.today(options[:t],options[:output],{:totals => options[:totals], :section => options[:s], :sort_tags => options[:sort_tags]}).chomp
+    puts wwid.today(options[:t], options[:output], {totals: options[:totals], section: options[:s], sort_tags: options[:sort_tags]}).chomp
 
   end
 end
@@ -848,20 +853,20 @@ arg_name 'date_string'
 command :on do |c|
   c.desc 'Section'
   c.arg_name 'section_name'
-  c.flag [:s, :section], :default_value => 'All'
+  c.flag [:s, :section], default_value: 'All'
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch [:t, :times], :default_value => true
+  c.switch [:t, :times], default_value: true
 
   c.desc 'Show time totals at the end of output'
-  c.switch [:totals], :default_value => false, :negatable => true
+  c.switch [:totals], default_value: false, negatable: true
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], :default_value => default
+  c.flag [:tag_sort], default_value: default
 
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o, :output]
@@ -888,7 +893,7 @@ command :on do |c|
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_date([start, finish], options[:s], options[:t], options[:output], {:totals => options[:totals], :sort_tags => options[:sort_tags]}).chomp
+    puts wwid.list_date([start, finish], options[:s], options[:t], options[:output], {totals: options[:totals], sort_tags: options[:sort_tags]}).chomp
 
   end
 end
@@ -897,27 +902,27 @@ desc 'List entries from yesterday'
 command :yesterday do |c|
   c.desc 'Specify a section'
   c.arg_name 'section_name'
-  c.flag [:s, :section], :default_value => 'All'
+  c.flag [:s, :section], default_value: 'All'
 
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o, :output]
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch [:t, :times], :default_value => true
+  c.switch [:t, :times], default_value: true
 
   c.desc 'Show time totals at the end of output'
-  c.switch [:totals], :default_value => false, :negatable => true
+  c.switch [:totals], default_value: false, negatable: true
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], :default_value => default
+  c.flag [:tag_sort], default_value: default
 
   c.action do |global_options, options,args|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-    puts wwid.yesterday(options[:s],options[:t],options[:o],{:totals => options[:totals], :sort_tags => options[:sort_tags]}).chomp
+    puts wwid.yesterday(options[:s], options[:t], options[:o],{ totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
 
   end
 end
@@ -935,7 +940,7 @@ end
 desc 'List sections'
 command :sections do |c|
   c.desc 'List in single column'
-  c.switch [:c, :column], :default_value => false
+  c.switch [:c, :column], default_value: false
 
   c.action do |global_options,options,args|
     joiner = options[:c] ? "\n" : "\t"
@@ -947,7 +952,7 @@ desc 'Select a section to display from a menu'
 command :choose do |c|
   c.action do |global_options,options,args|
     section = wwid.choose_section
-    puts wwid.list_section({:section => section.cap_first, :count => 0})
+    puts wwid.list_section({ section: section.cap_first, count: 0 })
   end
 end
 
@@ -989,26 +994,26 @@ command :view do |c|
   c.flag [:s, :section]
 
   c.desc 'Count to display (override view settings)'
-  c.flag [:c, :count], :must_match => /^\d+$/, :type => Integer
+  c.flag [:c, :count], must_match: /^\d+$/, type: Integer
 
   c.desc 'Output to export format (csv|html|json)'
   c.flag [:o, :output]
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch [:t, :times], :default_value => true
+  c.switch [:t, :times], default_value: true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], :default_value => false, :negatable => true
+  c.switch [:totals], default_value: false, negatable: true
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], :default_value => default
+  c.flag [:tag_sort], default_value: default
 
   c.desc 'Only show items with recorded time intervals'
-  c.switch [:only_timed], :default_value => false, :negatable => true
+  c.switch [:only_timed], default_value: false, negatable: true
 
   c.action do |global_options,options,args|
     if args.empty?
@@ -1056,7 +1061,7 @@ command :view do |c|
       options[:output].downcase! if options[:output]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-      puts wwid.list_section({:section => section, :count => count, :template => template, :format => format, :order => order, :tag_filter => tag_filter, :output => options[:o], :tags_color => tags_color, :times => options[:t], :highlight => true, :totals => options[:totals], :only_timed => only_timed, :sort_tags => options[:sort_tags] })
+      puts wwid.list_section({section: section, count: count, template: template, format: format, order: order, tag_filter: tag_filter, output: options[:o], tags_color: tags_color, times: options[:t], highlight: true, totals: options[:totals], only_timed: only_timed, sort_tags: options[:sort_tags] })
     else
       if title.class == FalseClass
         exit_now! "Cancelled"
@@ -1070,7 +1075,7 @@ end
 desc 'List available custom views'
 command :views do |c|
   c.desc 'List in single column'
-  c.switch [:c, :column], :default_value => false
+  c.switch [:c, :column], default_value: false
 
   c.action do |global_options,options,args|
     joiner = options[:c] ? "\n" : "\t"
@@ -1126,7 +1131,7 @@ if `uname` =~ /Darwin/
   c.flag [:b]
 end
   c.desc 'open with $EDITOR'
-  c.switch [:e], :negatable => false
+  c.switch [:e], negatable: false
 
   c.action do |global_options,options,args|
     params = options.dup
@@ -1163,7 +1168,7 @@ end
 desc 'Edit the configuration file'
 command :config do |c|
   c.desc 'Editor to use'
-  c.flag [:e, :editor], :default_value => nil
+  c.flag [:e, :editor], default_value: nil
 
   if `uname` =~ /Darwins/
     c.desc 'Application to use'
@@ -1201,7 +1206,7 @@ end
 desc 'Undo the last change to the doing_file'
 command :undo do |c|
   c.desc 'Specify alternate doing file'
-  c.flag [:f, :file], :default_value => wwid.doing_file
+  c.flag [:f, :file], default_value: wwid.doing_file
 
   c.action do |global_options,options,args|
     file = options[:f] || wwid.doing_file
@@ -1213,7 +1218,7 @@ end
 pre do |global,command,options,args|
   if global[:config_file]
     wwid.config_file = global[:config_file]
-    wwid.configure({:ignore_local => true})
+    wwid.configure({ignore_local: true})
     # wwid.results.push("Override config file #{wwid.config_file}")
   end
 
