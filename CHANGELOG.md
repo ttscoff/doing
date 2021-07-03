@@ -1,3 +1,14 @@
+### 1.0.51
+
+#### NEW
+
+- Finish command accepts `--tag=` flag, finishing last entry
+- `doing cancel` to end X tasks without completion date (alias for
+
+#### FIXED
+
+- --archive flag on finish, done, and cancel causing error
+
 ### 1.0.49
 
 - Fix for missing date on @done tags
