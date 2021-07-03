@@ -721,7 +721,7 @@ command :show do |c|
         finish = false
       end
       exit_now! "Unrecognized date string" unless start
-      dates = [start,finish]
+      dates = [start, finish]
     end
 
     options[:t] = true if options[:totals]

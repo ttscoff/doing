@@ -1,3 +1,22 @@
+### 1.0.53
+
+#### NEW
+
+- `--tag` and `--bool` filtering for again/resume, cancel
+- `--in` flag for `again`/`resume` to specify to which section the new
+- Finish command accepts `--tag=` flag, finishing last entry
+- `doing cancel` to end X tasks without completion date (alias for
+
+#### IMPROVED
+
+- Add --no-color option to view command
+- Add --tag to show for compatibility
+
+#### FIXED
+
+- Error running finish without --tag flag
+- --archive flag on finish, done, and cancel causing error
+
 ### 1.0.52
 
 #### NEW

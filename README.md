@@ -17,6 +17,7 @@ _If you're one of the rare people like me who find this useful, feel free to [bu
 - [Changelog](#changelog)
 
 <!-- end toc -->
+<!--README-->
 
 ## What and why
 
@@ -623,7 +624,9 @@ Please try not to email me directly about GitHub projects.
 
 Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
 
-{% donate doing now sending coffee money to Brett. %}
+<!--END README-->
+
+PayPal link: [paypal.me/ttscoff](https://paypal.me/ttscoff)
 
 ## Changelog
 
