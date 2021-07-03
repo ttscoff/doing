@@ -872,6 +872,7 @@ command :on do |c|
   c.flag [:o, :output]
 
   c.action do |global_options,options,args|
+    exit_now! "Missing date argument" if args.empty?
 
     date_string = args.join(" ")
 
@@ -1005,6 +1006,9 @@ command :view do |c|
   c.desc 'Show intervals with totals at the end of output'
   c.switch [:totals], default_value: false, negatable: true
 
+  c.desc 'Include colors in output'
+  c.switch [:color], default_value: true, negatable: true
+
   c.desc 'Sort tags by (name|time)'
   default = 'time'
   if wwid.config.has_key?('tag_sort')
@@ -1061,7 +1065,7 @@ command :view do |c|
       options[:output].downcase! if options[:output]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-      puts wwid.list_section({section: section, count: count, template: template, format: format, order: order, tag_filter: tag_filter, output: options[:o], tags_color: tags_color, times: options[:t], highlight: true, totals: options[:totals], only_timed: only_timed, sort_tags: options[:sort_tags] })
+      puts wwid.list_section({section: section, count: count, template: template, format: format, order: order, tag_filter: tag_filter, output: options[:o], tags_color: tags_color, times: options[:t], highlight: options[:color], totals: options[:totals], only_timed: only_timed, sort_tags: options[:sort_tags] })
     else
       if title.class == FalseClass
         exit_now! "Cancelled"
