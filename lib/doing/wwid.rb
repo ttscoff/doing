@@ -1659,8 +1659,9 @@ class WWID
     cfg = @config['templates']['recent']
     section ||= @current_section
     section = guess_section(section)
+
     list_section({ section: section, wrap_width: cfg['wrap_width'], count: count,
-                   format: cfg['date_format'], template: cfg['template'], order: 'asc', times: times, totals: opt[:totals], sort_tags: opt[:sort_tags] })
+                   format: cfg['date_format'], template: cfg['template'], order: 'asc', times: times, totals: opt[:totals], sort_tags: opt[:sort_tags], tags_color: opt[:tags_color] })
   end
 
   ##

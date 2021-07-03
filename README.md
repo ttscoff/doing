@@ -68,6 +68,7 @@ A basic configuration looks like this:
     default_date_format: '%Y-%m-%d %H:%M'
     marker_tag: flagged
     marker_color: yellow
+    tags_color: boldcyan
     default_tags: []
     editor_app: TextEdit
     :include_notes: true

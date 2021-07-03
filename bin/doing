@@ -726,9 +726,11 @@ command :show do |c|
 
     options[:t] = true if options[:totals]
 
+    tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
+
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_section({section: section, date_filter: dates, count: options[:c].to_i, tag_filter: tag_filter, age: options[:a], order: options[:s], output: options[:output], times: options[:t], totals: options[:totals], sort_tags: options[:sort_tags], highlight: true, only_timed: options[:only_timed]})
+    puts wwid.list_section({section: section, date_filter: dates, count: options[:c].to_i, tag_filter: tag_filter, age: options[:a], order: options[:s], output: options[:output], times: options[:t], totals: options[:totals], sort_tags: options[:sort_tags], highlight: true, only_timed: options[:only_timed], tags_color: tags_color})
 
   end
 end
@@ -759,6 +761,9 @@ command [:grep, :search] do |c|
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
+
+  tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
+
   c.flag [:tag_sort], default_value: default
 
   c.desc 'Only show items with recorded time intervals'
@@ -771,7 +776,7 @@ command [:grep, :search] do |c|
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_section({search: args.join(' '), section: section, output: options[:output], times: options[:t], highlight: true, totals: options[:totals], only_timed: options[:only_timed], sort_tags: options[:sort_tags]})
+    puts wwid.list_section({search: args.join(' '), section: section, output: options[:output], times: options[:t], highlight: true, totals: options[:totals], only_timed: options[:only_timed], sort_tags: options[:sort_tags], tags_color: tags_color })
 
   end
 end
@@ -808,8 +813,8 @@ command :recent do |c|
       end
       options[:t] = true if options[:totals]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
-
-      puts wwid.recent(count,section.cap_first,{ times: options[:t], totals: options[:totals], sort_tags: options[:sort_tags] })
+      tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
+      puts wwid.recent(count,section.cap_first,{ times: options[:t], totals: options[:totals], sort_tags: options[:sort_tags], tags_color: tags_color })
 
     end
   end
