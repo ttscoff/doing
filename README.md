@@ -413,6 +413,8 @@ When used with `doing done`, `--back` and `--took` allow time intervals to be ac
 
 All of these commands accept a `-e` argument. This opens your command line editor (as defined in the environment variable `$EDITOR`). Add your entry, save the temp file, and close it. The new entry is added. Anything after the first line is included as a note on the entry.
 
+`doing again` (or `doing resume`) will duplicate the last @done entry (most recently completed) with a new start date (and without the @done tag). To resume the last entry matching specific tags, use `--tag=TAG`. You can specify multiple tags by separating with a comma. Multiple tags are combined with 'AND' by default (all tags must exist on the entry to match), but you can use `--bool=` to set it to 'OR' or 'NOT'. By default the new entry will be added to the same section as the matching entry, but you can specify a section with `--in=SECTION`.
+
 `doing meanwhile` is a special command for creating and finishing tasks that may have other entries come before they're complete. When you create an entry with `doing meanwhile [entry text]`, it will automatically complete the last _@meanwhile_ item (dated _@done_ tag) and add the _@meanwhile_ tag to the new item. This allows time tracking on a more general basis, and still lets you keep track of the smaller things you do while working on an overarching project. The `meanwhile` command accepts `--back [time]` and will backdate the _@done_ tag and start date of the new task at the same time. Running `meanwhile` with no arguments will simply complete the last _@meanwhile_ task. 
 
 See `doing help meanwhile` for more options.
@@ -438,9 +440,9 @@ You can finish the last entry containing a specific tag or combination of tags u
 
     doing finish --tag=work,project1
 
-You can change the boolean using `--tag_bool=OR` (last entry containing any of the specified tags) or `--tag_bool=NOT` (last entry containing none of the tags).
+You can change the boolean using `--bool=OR` (last entry containing any of the specified tags) or `--bool=NOT` (last entry containing none of the tags).
 
-You can also include a `--no-date` switch to add `@done` without a finish date, meaning no time is tracked for the task. `doing cancel` is an alias for this. Like `finish`, `cancel` accepts a count to act on the last X entries, as well as `--archive` and `--section` options.
+You can also include a `--no-date` switch to add `@done` without a finish date, meaning no time is tracked for the task. `doing cancel` is an alias for this. Like `finish`, `cancel` accepts a count to act on the last X entries, as well as `--archive` and `--section` options. `cancel` also accepts the `--tag` and `--bool` flags for tag filtering.
 
 
 ##### Tagging and Autotagging

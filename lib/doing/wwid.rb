@@ -4,6 +4,44 @@ require 'deep_merge'
 require 'open3'
 
 ##
+## @brief      Hash helpers
+##
+class Hash
+  def has_tags?(tags, bool = 'AND')
+    item = self
+    case bool
+    when 'AND'
+      result = true
+      tags.each do |tag|
+        unless item['title'] =~ /@#{tag}/
+          result = false
+          break
+        end
+      end
+      result
+    when 'NOT'
+      result = true
+      tags.each do |tag|
+        if item['title'] =~ /@#{tag}/
+          result = false
+          break
+        end
+      end
+      result
+    else
+      result = false
+      tags.each do |tag|
+        if item['title'] =~ /@#{tag}/
+          result = true
+          break
+        end
+      end
+      result
+    end
+  end
+end
+
+##
 ## @brief      String helpers
 ##
 class String
@@ -637,6 +675,8 @@ class WWID
   def restart_last(opt = {})
     opt[:section] ||= 'all'
     opt[:note] ||= []
+    opt[:tag] ||= []
+    opt[:tag_bool] ||= 'AND'
 
     last = last_entry(opt)
     if last.nil?
@@ -645,8 +685,9 @@ class WWID
     end
     # Remove @done tag
     title = last['title'].sub(/\s*@done(\(.*?\))?/, '').chomp
+    section = opt[:in].nil? ? last['section'] : guess_section(opt[:in])
     @auto_tag = false
-    add_item(title, last['section'], { note: opt[:note], back: opt[:date], timed: true })
+    add_item(title, section, { note: opt[:note], back: opt[:date], timed: true })
     write(@doing_file)
   end
 
@@ -656,6 +697,8 @@ class WWID
   ## @param      opt   (Hash) Additional Options
   ##
   def last_entry(opt = {})
+    opt[:tag] ||= []
+    opt[:tag_bool] ||= 'AND'
     opt[:section] ||= @current_section
 
     sec_arr = []
@@ -681,6 +724,8 @@ class WWID
     sec_arr.each do |section|
       all_items.concat(@content[section]['items'].dup) if @content.key?(section)
     end
+
+    all_items.select! {|item| item.has_tags?(opt[:tag], opt[:tag_bool]) } if opt[:tag].length.positive?
 
     all_items.max_by { |item| item['date'] }
   end
@@ -735,39 +780,7 @@ class WWID
         items.map! do |item|
           break if index == count
 
-          tag_match = if opt[:tag].length.positive?
-                        case opt[:tag_bool]
-                        when 'AND'
-                          result = true
-                          opt[:tag].each do |tag|
-                            unless item['title'] =~ /@#{tag}/
-                              result = false
-                              break
-                            end
-                          end
-                          result
-                        when 'NOT'
-                          result = true
-                          opt[:tag].each do |tag|
-                            if item['title'] =~ /@#{tag}/
-                              result = false
-                              break
-                            end
-                          end
-                          result
-                        else
-                          result = false
-                          opt[:tag].each do |tag|
-                            if item['title'] =~ /@#{tag}/
-                              result = true
-                              break
-                            end
-                          end
-                          result
-                        end
-                      else
-                        true
-                      end
+          tag_match = opt[:tag].length.positive? ? item.has_tags?(opt[:tag], opt[:tag_bool]) : true
 
           if tag_match
             if opt[:autotag]

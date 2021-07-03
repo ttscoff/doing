@@ -36,18 +36,15 @@ default_command :recent
 # sort_help :manually
 
 desc 'Output notes if included in the template'
-default_value true
 switch [:notes], :default_value => true, :negatable => true
 
 desc 'Send results report to STDOUT instead of STDERR'
-default_value false
 switch [:stdout], :default_value => false, :negatable => false
 
 desc 'Exclude auto tags and default tags'
 switch [:x, :noauto], :default_value => false
 
 desc 'Use a specific configuration file'
-default_value false
 flag [:config_file]
 
 
@@ -432,15 +429,29 @@ command :cancel do |c|
   c.desc 'Section'
   c.flag [:s, :section], :default_value => wwid.current_section
 
+  c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)'
+  c.flag [:tag]
+
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'AND'
+
+
   c.action do |global_options,options,args|
 
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
+    if options[:tag].nil?
+      tags = []
+    else
+      tags = options[:tag].split(/ *, */).map {|t| t.strip.sub(/^@/, '') }
+      options[:bool] = options[:bool] =~ /^(and|or|not)$/i ? options[:bool].upcase : 'AND'
+    end
 
     if args.length > 1
       raise "Only one argument allowed"
     elsif args.length == 0 || args[0] =~ /\d+/
       count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :sequential => false, :date => false })
+      wwid.tag_last({tags: ["done"], count: count, section: section, archive: options[:a], sequential: false, date: false, tag: tags, tag_bool: options[:bool] })
     else
       raise "Invalid argument (specify number of recent items to mark @done)"
     end
@@ -452,7 +463,7 @@ long_desc 'Marks the last X entries with a @done tag and current date. Does not 
 arg_name 'count'
 command :finish do |c|
   c.desc 'Include date'
-  c.switch [:date], :negatable => true, :default_value => true
+  c.switch [:date], negatable: true, default_value: true
 
   c.desc 'Backdate completed date to date string [4pm|20m|2h|yesterday noon]'
   c.flag [:b, :back]
@@ -464,16 +475,16 @@ command :finish do |c|
   c.flag [:tag]
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
-  c.flag [:tag_bool], default_value: 'AND'
+  c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'AND'
 
   c.desc 'Auto-generate finish dates from next entry\'s start time. Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.'
-  c.switch [:auto], :negatable => false, :default_value => false
+  c.switch [:auto], negatable: false, default_value: false
 
   c.desc 'Archive entries'
-  c.switch [:a, :archive], :negatable => false, :default_value => false
+  c.switch [:a, :archive], negatable: false, default_value: false
 
   c.desc 'Section'
-  c.flag [:s, :section], :default_value => wwid.current_section
+  c.flag [:s, :section], default_value: wwid.current_section
 
   c.action do |global_options,options,args|
 
@@ -494,21 +505,17 @@ command :finish do |c|
     end
 
     if options[:tag].nil?
-      options[:tag] = []
+      tags = []
     else
-      options[:tag] = options[:tag].split(/,/).map {|tag| tag.strip.sub(/^@/, '') }
-      if options[:tag_bool] =~ /^(and|or|not)$/i
-        options[:tag_bool] = options[:tag_bool].upcase
-      else
-        options[:tag_bool] = 'AND'
-      end
+      tags = options[:tag].split(/ *, */).map {|t| t.strip.sub(/^@/, '') }
+      options[:bool] = options[:bool] =~ /^(and|or|not)$/i ? options[:bool].upcase : 'AND'
     end
 
     if args.length > 1
       raise "Only one argument allowed"
     elsif args.length == 0 || args[0] =~ /\d+/
       count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({ tags: ["done"],count: count,section: section,archive: options[:a],sequential: options[:auto],date: options[:date], back: date, tag: options[:tag], tag_bool: options[:tag_bool] })
+      wwid.tag_last({ tags: ["done"],count: count,section: section,archive: options[:a],sequential: options[:auto],date: options[:date], back: date, tag: options[:tag], tag_bool: options[:bool] })
     else
       raise "Invalid argument (specify number of recent items to mark @done)"
     end
@@ -519,14 +526,24 @@ desc 'Repeat last entry as new entry'
 arg_name 'section'
 command [:again, :resume] do |c|
   c.desc 'Section'
-  c.flag [:s, :section], :default_value => "All"
+  c.flag [:s, :section], default_value: "All"
+
+  c.desc 'Add new entry to section (default: same section as repeated entry)'
+  c.flag [:in]
+
+  c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma.'
+  c.flag [:tag]
+
+  c.desc 'Boolean used to combine multiple tags'
+  c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'ALL'
 
   c.desc 'Note'
   c.arg_name 'note_text'
   c.flag [:n, :note]
 
   c.action do |global_options, options, args|
-    wwid.restart_last({ section: options[:s], note: options[:n] })
+    tags = options[:tag].nil? ? [] : options[:tag].split(/ *, */).map {|t| t.sub(/^@/, '').strip }
+    wwid.restart_last({ section: options[:s], note: options[:n], tag: tags, tag_bool: options[:bool], in: options[:in] })
   end
 end
 
@@ -612,7 +629,7 @@ long_desc 'The argument can be a section name, @tag(s) or both. "pick" or "choos
 arg_name '[section|@tags]'
 command :show do |c|
   c.desc 'Tag boolean (AND,OR,NONE)'
-  c.flag [:b, :bool], :default_value => "OR"
+  c.flag [:b, :bool], must_match: /^(and|or|not)$/i, default_value: 'OR'
 
   c.desc 'Max count to show'
   c.flag [:c, :count], :default_value => 0
@@ -1018,7 +1035,7 @@ command :view do |c|
       tag_filter = false
       if view.has_key?('tags')
         unless view['tags'].nil? || view['tags'].empty?
-          tag_filter = {'tags' => [], 'bool' => "OR"}
+          tag_filter = {'tags' => [], 'bool' => 'OR'}
           if view['tags'].class == Array
             tag_filter['tags'] = view['tags'].map{|tag| tag.strip }
           else
@@ -1061,18 +1078,21 @@ command :views do |c|
   end
 end
 
-desc 'Move entries in between sections'
+desc 'Move entries between sections'
 arg_name 'section'
 default_value wwid.current_section
 command :archive do |c|
   c.desc 'Count to keep (ignored if archiving by tag)'
-  c.flag [:k, :keep], :default_value => 5, :must_match => /^\d+$/, :type => Integer
+  c.flag [:k, :keep], default_value: 5, must_match: /^\d+$/, type: Integer
 
   c.desc 'Move entries to'
-  c.flag [:t, :to], :default_value => "Archive"
+  c.flag [:t, :to], default_value: 'Archive'
+
+  c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
+  c.flag [:tag]
 
   c.desc 'Tag boolean'
-  c.flag [:b, :bool], :default_value => "AND"
+  c.flag [:b, :bool], must_match: /(and|or|not)/i, default_value: 'AND'
 
   c.action do |global_options,options,args|
     if args.length > 0
@@ -1081,13 +1101,16 @@ command :archive do |c|
         tags = args.map {|t| t.sub(/^@/,'').strip }
       else
         section = args[0].cap_first
-        tags = args.length > 1 ? args[1..-1].map {|t| t.sub(/^@/,'').strip } : nil
+        tags = args.length > 1 ? args[1..-1].map {|t| t.sub(/^@/, '').strip } : nil
       end
     else
       section = wwid.current_section
-      tags = nil
+      tags = []
     end
-    wwid.archive(section,options[:k],options[:t],tags,options[:b])
+
+    tags.concat(options[:tag].split(/ *, */).map {|t| t.sub(/^@/, '').strip }) if options[:tag]
+
+    wwid.archive(section, options[:k], options[:t], tags, options[:b])
   end
 end
 
