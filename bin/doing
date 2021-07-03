@@ -460,6 +460,12 @@ command :finish do |c|
   c.desc 'Set the completed date to the start date plus XX[hmd]'
   c.flag [:t, :took]
 
+  c.desc 'Finish the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)'
+  c.flag [:tag], :default_value => []
+
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.flag [:tag_bool], default_value: 'AND'
+
   c.desc 'Auto-generate finish dates from next entry\'s start time. Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.'
   c.switch [:auto], :negatable => false, :default_value => false
 
@@ -487,11 +493,20 @@ command :finish do |c|
       end
     end
 
+    if options[:tag]
+      options[:tag] = options[:tag].split(/,/).map {|tag| tag.strip.sub(/^@/, '') }
+      if options[:tag_bool] =~ /^(and|or|not)$/i
+        options[:tag_bool] = options[:tag_bool].upcase
+      else
+        options[:tag_bool] = 'AND'
+      end
+    end
+
     if args.length > 1
       raise "Only one argument allowed"
     elsif args.length == 0 || args[0] =~ /\d+/
       count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :sequential => options[:auto], :date => options[:date], :back => date })
+      wwid.tag_last({ tags: ["done"],count: count,section: section,archive: options[:a],sequential: options[:auto],date: options[:date], back: date, tag: options[:tag], tag_bool: options[:tag_bool] })
     else
       raise "Invalid argument (specify number of recent items to mark @done)"
     end

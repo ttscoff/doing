@@ -420,6 +420,7 @@ See `doing help meanwhile` for more options.
 #### Modifying entries:
 
     finish      - Mark last X entries as @done
+    cancel      - Mark last X entries as @done without completion date
     tag         - Tag last entry
     note        - Add a note to the last entry
 
@@ -430,6 +431,16 @@ See `doing help meanwhile` for more options.
 `doing finish` also provides an `--auto` flag, which you can use to set the end time of any entry to 1 minute before the start time of the next. Running a command such as `doing finish --auto 10` will go through the last 10 entries and sequentially update any without a _@done_ tag with one set to the time just before the next entry in the list.
 
 As mentioned above, `finish` also accepts `--back "2 hours"` (sets the finish date from time now minus interval) or `--took 30m` (sets the finish date to time started plus interval) so you can accurately add times to completed tasks, even if you don't do it in the moment.
+
+Both `done` and `finish` accept an `--archive` switch which immediately moves the completed entries to the Archive section with a `@from(Project)` tag.
+
+You can finish the last entry containing a specific tag or combination of tags using the `--tag` flag. Multiple tags are separated by commas. By default tags are combined with an AND boolean, meaning the entry must contain all specified tags to be considered. For example, to finish the last entry containing both "@work" and "@project1", you would use:
+
+    doing finish --tag=work,project1
+
+You can change the boolean using `--tag_bool=OR` (last entry containing any of the specified tags) or `--tag_bool=NOT` (last entry containing none of the tags).
+
+You can also include a `--no-date` switch to add `@done` without a finish date, meaning no time is tracked for the task. `doing cancel` is an alias for this. Like `finish`, `cancel` accepts a count to act on the last X entries, as well as `--archive` and `--section` options.
 
 
 ##### Tagging and Autotagging

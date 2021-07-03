@@ -728,7 +728,6 @@ class WWID
       if @content.key?(section)
 
         items = @content[section]['items'].dup.sort_by { |item| item['date'] }.reverse
-
         index = 0
         done_date = Time.now
         next_start = Time.now
@@ -736,44 +735,80 @@ class WWID
         items.map! do |item|
           break if index == count
 
-          if opt[:autotag]
-            new_title = autotag(item['title']) if @auto_tag
-            if new_title == item['title']
-              @results.push(%(Autotag: No changes))
-            else
-              @results.push("Tags updated: #{new_title}")
-              item['title'] = new_title
-            end
-          else
-            if opt[:sequential]
-              done_date = next_start - 1
-              next_start = item['date']
-            elsif opt[:back]
-              done_date = item['date'] + (opt[:back] - item['date'])
-            else
-              done_date = Time.now
-            end
+          tag_match = if opt[:tag].length.positive?
+                        case opt[:tag_bool]
+                        when 'AND'
+                          result = true
+                          opt[:tag].each do |tag|
+                            unless item['title'] =~ /@#{tag}/
+                              result = false
+                              break
+                            end
+                          end
+                          result
+                        when 'NOT'
+                          result = true
+                          opt[:tag].each do |tag|
+                            if item['title'] =~ /@#{tag}/
+                              result = false
+                              break
+                            end
+                          end
+                          result
+                        else
+                          result = false
+                          opt[:tag].each do |tag|
+                            if item['title'] =~ /@#{tag}/
+                              result = true
+                              break
+                            end
+                          end
+                          result
+                        end
+                      else
+                        true
+                      end
 
-            title = item['title']
-            opt[:tags].each do |tag|
-              tag.strip!
-              if opt[:remove] && title =~ /@#{tag}\b/
-                title.gsub!(/(^| )@#{tag}(\([^)]*\))?/, '')
-                @results.push(%(Removed @#{tag}: "#{title}" in #{section}))
-              elsif title !~ /@#{tag}/
-                title.chomp!
-                title += if opt[:date]
-                           " @#{tag}(#{done_date.strftime('%F %R')})"
-                         else
-                           " @#{tag}"
-                         end
-                @results.push(%(Added @#{tag}: "#{title}" in #{section}))
+          if tag_match
+            if opt[:autotag]
+              new_title = autotag(item['title']) if @auto_tag
+              if new_title == item['title']
+                @results.push(%(Autotag: No changes))
+              else
+                @results.push("Tags updated: #{new_title}")
+                item['title'] = new_title
               end
-            end
-            item['title'] = title
-          end
+            else
+              if opt[:sequential]
+                done_date = next_start - 1
+                next_start = item['date']
+              elsif opt[:back]
+                done_date = item['date'] + (opt[:back] - item['date'])
+              else
+                done_date = Time.now
+              end
 
-          index += 1
+              title = item['title']
+              opt[:tags].each do |tag|
+                tag.strip!
+                if opt[:remove] && title =~ /@#{tag}\b/
+                  title.gsub!(/(^| )@#{tag}(\([^)]*\))?/, '')
+                  @results.push(%(Removed @#{tag}: "#{title}" in #{section}))
+                elsif title !~ /@#{tag}/
+                  title.chomp!
+                  title += if opt[:date]
+                             " @#{tag}(#{done_date.strftime('%F %R')})"
+                           else
+                             " @#{tag}"
+                           end
+                  @results.push(%(Added @#{tag}: "#{title}" in #{section}))
+                end
+              end
+              item['title'] = title
+            end
+
+            index += 1
+          end
 
           item
         end
