@@ -8,6 +8,7 @@ require 'open3'
 ##
 class Hash
   def has_tags?(tags, bool = 'AND')
+    tags = tags.split(/ *, */) if tags.is_a? String
     item = self
     case bool
     when 'AND'

@@ -579,11 +579,16 @@ __Fish:__ See the file [`doing.fish`](https://github.com/ttscoff/doing/blob/mast
 
 The LaunchBar action requires that `doing` be available in `/usr/local/bin/doing`. If it's not (because you're using RVM or similar), you'll need to symlink it there. Running the action with Return will show the latest 9 items from Currently, along with any time intervals recorded, and includes a submenu of Timers for each tag.
 
-Pressing Spacebar and typing allows you to add a new entry to currently. You an also trigger a custom show command by typing "show [section/tag]" and hitting return.
+Pressing Spacebar and typing allows you to add a new entry to currently. You an also trigger a custom show command by typing "show [section/tag]" and hitting return. Include any command line flags at the end of the string, and if you add text in parenthesis, it will be processed as a note on the entry.
 
 Point of interest, the LaunchBar Action makes use of the `-o json` flag for outputting JSON to the action's script for parsing.
 
+<!--GITHUB-->
 See <https://brettterpstra.com/projects/doing/> for the download.
+<!--JEKYLL
+{% download 117 %} 
+-->
+<!--END GITHUB-->
 
 Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
 

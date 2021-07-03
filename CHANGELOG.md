@@ -1,3 +1,9 @@
+### 1.0.54
+
+#### FIXED
+
+- Bugfix for `finish --tag=TAG`
+
 ### 1.0.53
 
 #### NEW
