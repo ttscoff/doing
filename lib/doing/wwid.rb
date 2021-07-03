@@ -783,9 +783,10 @@ class WWID
         if opt[:archive] && section != 'Archive' && (opt[:count]).positive?
           # concat [count] items from [section] and archive section
           archived = @content[section]['items'][0..opt[:count] - 1].map do |i|
-            i['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{i['section']})")
+            i['title'].sub!(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{i['section']})")
+            i
           end.concat(@content['Archive']['items'])
-          # chop [count] items off of [section] items
+          # slice [count] items off of [section] items
           @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
           # overwrite archive section with concatenated array
           @content['Archive']['items'] = archived

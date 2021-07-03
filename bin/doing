@@ -233,7 +233,7 @@ command :meanwhile do |c|
     input = false unless input && input.length > 0
 
     note = options[:n] ? options[:n] : false
-    wwid.stop_start("meanwhile",{:new_item => input, :back => date, :section => section, :archive => options[:a], :note => note})
+    wwid.stop_start('meanwhile', {:new_item => input, :back => date, :section => section, :archive => options[:a], :note => note})
     wwid.write(wwid.doing_file)
   end
 end
@@ -418,6 +418,31 @@ command [:done, :did] do |c|
       else
         raise "You must provide content when creating a new entry"
       end
+    end
+  end
+end
+
+desc 'End last X entries with no time tracked'
+long_desc 'Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doing finish --no-date`.'
+arg_name 'count'
+command :cancel do |c|
+  c.desc 'Archive entries'
+  c.switch [:a, :archive], :negatable => false, :default_value => false
+
+  c.desc 'Section'
+  c.flag [:s, :section], :default_value => wwid.current_section
+
+  c.action do |global_options,options,args|
+
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
+    if args.length > 1
+      raise "Only one argument allowed"
+    elsif args.length == 0 || args[0] =~ /\d+/
+      count = args[0] ? args[0].to_i : 1
+      wwid.tag_last({:tags => ["done"], :count => count, :section => section, :archive => options[:a], :sequential => false, :date => false })
+    else
+      raise "Invalid argument (specify number of recent items to mark @done)"
     end
   end
 end
