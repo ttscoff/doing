@@ -372,7 +372,7 @@ class WWID
       tmpfile.unlink
     end
 
-    input
+    input.split(/\n/).delete_if {|line| line =~ /^#/ }.join("\n").strip
   end
 
   #
@@ -385,8 +385,10 @@ class WWID
   def format_input(input)
     raise 'No content in entry' if input.nil? || input.strip.empty?
 
-    input_lines = input.split(/[\n\r]+/)
-    title = input_lines[0].strip
+    input_lines = input.split(/[\n\r]+/).delete_if {|line| line =~ /^#/ || line =~ /^\s*$/ }
+    title = input_lines[0]&.strip
+    raise 'No content in first line' if title.nil? || title.strip.empty?
+
     note = input_lines.length > 1 ? input_lines[1..-1] : []
     note.map!(&:strip)
     note.delete_if { |line| line =~ /^\s*$/ || line =~ /^#/ }

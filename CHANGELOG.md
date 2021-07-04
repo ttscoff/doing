@@ -1,3 +1,9 @@
+### 1.0.55
+
+#### NEW
+
+- Add `tags_color` as a primary config key to highlight @tags in displayed entries
+
 ### 1.0.54
 
 #### FIXED
