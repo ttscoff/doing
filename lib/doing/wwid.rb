@@ -856,6 +856,81 @@ class WWID
   end
 
   ##
+  ## @brief      Edit the last entry
+  ##
+  ## @param      section  (String) The section, default "All"
+  ##
+  def edit_last(section: 'All', options: {})
+    section = guess_section(section)
+
+    if section =~ /^all$/i
+      items = []
+      @content.each do |_k, v|
+        items.concat(v['items'])
+      end
+      # section = combined['items'].dup.sort_by { |item| item['date'] }.reverse[0]['section']
+    else
+      items = @content[section]['items']
+    end
+
+    items = items.sort_by { |item| item['date'] }.reverse
+
+    idx = nil
+
+    if options[:tag] && !options[:tag].empty?
+      items.each_with_index do |item, i|
+        if item.has_tags?(options[:tag], options[:tag_bool])
+          idx = i
+          break
+        end
+      end
+    elsif options[:search]
+      items.each_with_index do |item, i|
+        text = item['note'] ? item['title'] + item['note'].join(' ') : item['title']
+        pattern = if options[:search].strip =~ %r{^/.*?/$}
+                    options[:search].sub(%r{/(.*?)/}, '\1')
+                  else
+                    options[:search].split('').join('.{0,3}')
+                  end
+        if text =~ /#{pattern}/i
+          idx = i
+          break
+        end
+      end
+    else
+      idx = 0
+    end
+
+    if idx.nil?
+      @results.push('No entries found')
+      return
+    end
+
+    section = items[idx]['section']
+
+    section_items = @content[section]['items']
+    s_idx = section_items.index(items[idx])
+
+    current_item = section_items[s_idx]['title']
+    old_note = section_items[s_idx]['note'] ? section_items[s_idx]['note'].map(&:strip).join("\n") : nil
+    current_item += "\n#{old_note}" unless old_note.nil?
+    new_item = fork_editor(current_item)
+    title, note = format_input(new_item)
+
+    if title.nil? || title.empty?
+      @results.push('No content provided')
+    elsif title == section_items[s_idx]['title'] && note == old_note
+      @results.push('No change in content')
+    else
+      section_items[s_idx]['title'] = title
+      section_items[s_idx]['note'] = note
+      @results.push("Entry edited: #{section_items[s_idx]['title']}")
+      @content[section]['items'] = section_items
+      write(@doing_file)
+    end
+  end
+
+  ##
   ## @brief      Add a note to the last entry in a section
   ##
   ## @param      section  (String) The section, default "All"
@@ -1108,10 +1183,7 @@ class WWID
       end
     end
 
-    if opt[:section].class != Hash
-      warn 'Invalid section object'
-      return
-    end
+    raise 'Invalid section object' unless opt[:section].instance_of? Hash
 
     items = opt[:section]['items'].sort_by { |item| item['date'] }
 
@@ -1129,19 +1201,23 @@ class WWID
 
     if opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
       items.delete_if do |item|
-        if opt[:tag_filter]['bool'] =~ /(AND|ALL)/
-          score = 0
+        case opt[:tag_filter]['bool']
+        when /(AND|ALL)/
+          del = false
           opt[:tag_filter]['tags'].each do |tag|
-            score += 1 if item['title'] =~ /@#{tag}/
+            unless item['title'] =~ /@#{tag}/
+              del = true
+              break
+            end
           end
-          score < opt[:tag_filter]['tags'].length
-        elsif opt[:tag_filter]['bool'] =~ /NONE/
+          del
+        when /NONE/
           del = false
           opt[:tag_filter]['tags'].each do |tag|
             del = true if item['title'] =~ /@#{tag}/
           end
           del
-        elsif opt[:tag_filter]['bool'] =~ /(OR|ANY)/
+        when /(OR|ANY)/
           del = true
           opt[:tag_filter]['tags'].each do |tag|
             del = false if item['title'] =~ /@#{tag}/
@@ -1189,9 +1265,10 @@ class WWID
 
     out = ''
 
-    raise 'Unknown output format' if opt[:output] && !(opt[:output] =~ /(template|html|csv|json|timeline)/)
+    raise 'Unknown output format' if opt[:output] && (opt[:output] !~ /^(template|html|csv|json|timeline)$/i)
 
-    if opt[:output] == 'csv'
+    case opt[:output]
+    when /^csv$/i
       output = [CSV.generate_line(%w[date title note timer section])]
       items.each do |i|
         note = ''
@@ -1204,7 +1281,7 @@ class WWID
         output.push(CSV.generate_line([i['date'], i['title'], note, interval, i['section']]))
       end
       out = output.join('')
-    elsif opt[:output] == 'json' || opt[:output] == 'timeline'
+    when /^(json|timeline)/i
       items_out = []
       max = items[-1]['date'].strftime('%F')
       min = items[0]['date'].strftime('%F')
@@ -1300,7 +1377,7 @@ class WWID
         EOTEMPLATE
         return template
       end
-    elsif opt[:output] == 'html'
+    when /^html$/i
       page_title = section
       items_out = []
       items.each do |i|
@@ -1414,7 +1491,7 @@ class WWID
                        else
                          colors['default']
                        end
-          output.gsub!(/\s(@[^ (]+)/, " #{colors[opt[:tags_color]]}\\1#{last_color}")
+          output.gsub!(/(\s|m)(@[^ (]+)/, "\\1#{colors[opt[:tags_color]]}\\2#{last_color}")
         end
         output.sub!(/%note/, note)
         output.sub!(/%odnote/, note.gsub(/^\t*/, ''))
@@ -1429,7 +1506,7 @@ class WWID
         output.gsub!(/%n/, "\n")
         output.gsub!(/%t/, "\t")
 
-        out += output + "\n"
+        out += "#{output}\n"
       end
       out += tag_times('text', opt[:sort_tags]) if opt[:totals]
     end
@@ -1663,7 +1740,9 @@ class WWID
     section = guess_section(section)
 
     list_section({ section: section, wrap_width: cfg['wrap_width'], count: count,
-                   format: cfg['date_format'], template: cfg['template'], order: 'asc', times: times, totals: opt[:totals], sort_tags: opt[:sort_tags], tags_color: opt[:tags_color] })
+                   format: cfg['date_format'], template: cfg['template'],
+                   order: 'asc', times: times, totals: opt[:totals],
+                   sort_tags: opt[:sort_tags], tags_color: opt[:tags_color] })
   end
 
   ##
@@ -1672,12 +1751,29 @@ class WWID
   ## @param      times    (Bool) Show times
   ## @param      section  (String) Section to pull from, default Currently
   ##
-  def last(times = true, section = nil)
-    section ||= @current_section
-    section = guess_section(section)
+  def last(times: true, section: nil, options: {})
+    section = section.nil? || section =~ /all/i ? 'All' : guess_section(section)
     cfg = @config['templates']['last']
-    list_section({ section: section, wrap_width: cfg['wrap_width'], count: 1, format: cfg['date_format'],
-                   template: cfg['template'], times: times })
+
+    opts = {
+      section: section,
+      wrap_width: cfg['wrap_width'],
+      count: 1,
+      format: cfg['date_format'],
+      template: cfg['template'],
+      times: times
+    }
+
+    if options[:tag]
+      opts[:tag_filter] = {
+        'tags' => options[:tag],
+        'bool' => options[:tag_bool]
+      }
+    end
+
+    opts[:search] = options[:search] if options[:search]
+
+    list_section(opts)
   end
 
   ##

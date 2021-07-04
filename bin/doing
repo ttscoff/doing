@@ -58,20 +58,21 @@ desc 'Add an entry'
 arg_name 'entry'
 command [:now, :next] do |c|
   c.desc 'Section'
-  c.arg_name 'section_name'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch [:e, :editor], negatable: false, default_value: false
 
   c.desc 'Backdate start time [4pm|20m|2h|yesterday noon]'
+  c.arg_name 'DATE_STRING'
   c.flag [:b, :back]
 
   c.desc 'Timed entry, marks last entry in section as @done'
   c.switch [:f, :finish_last], negatable: false, default_value: false
 
   c.desc 'Note'
-  c.arg_name 'note_text'
+  c.arg_name 'TEXT'
   c.flag [:n, :note]
 
   # c.desc "Edit entry with specified app"
@@ -130,7 +131,7 @@ long_desc %{
 arg_name 'note_text'
 command :note do |c|
   c.desc 'Section'
-  c.arg_name 'section_name'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: "All"
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
@@ -189,7 +190,7 @@ desc 'Finish any running @meanwhile tasks and optionally create a new one'
 arg_name 'entry'
 command :meanwhile do |c|
   c.desc 'Section'
-  c.arg_name 'section_name'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
@@ -199,10 +200,11 @@ command :meanwhile do |c|
   c.switch [:a, :archive], default_value: false
 
   c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
+  c.arg_name 'DATE_STRING'
   c.flag [:b, :back]
 
   c.desc 'Note'
-  c.arg_name 'note_text'
+  c.arg_name 'TEXT'
   c.flag [:n, :note]
 
   c.action do |global_options,options,args|
@@ -253,8 +255,8 @@ long_desc %{
 }
 command :templates do |c|
   c.desc "Type of template to output (HAML|CSS)"
-  c.arg_name 'template_type'
-  c.flag [:t, :type]
+  c.arg_name 'TYPE'
+  c.flag [:t, :type], must_match: /^(haml|css)$/i
 
   c.action do |global_options,options,args|
     unless options[:type]
@@ -279,14 +281,15 @@ command :later do |c|
   c.switch [:e, :editor], negatable: false, default_value: false
 
   c.desc "Edit entry with specified app"
-  c.arg_name 'editor_app'
+  c.arg_name 'APP'
   c.flag [:a, :app]
 
   c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
+  c.arg_name 'DATE_STRING'
   c.flag [:b, :back]
 
   c.desc 'Note'
-  c.arg_name 'note_text'
+  c.arg_name 'TEXT'
   c.flag [:n, :note]
 
   c.action do |global_options,options,args|
@@ -340,15 +343,19 @@ command [:done, :did] do |c|
   c.switch [:a, :archive], negatable: false, default_value: false
 
   c.desc 'Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back. Used with --took, backdates start date'
+  c.arg_name 'DATE_STRING'
   c.flag [:at]
 
   c.desc 'Backdate start date by interval [4pm|20m|2h|yesterday noon]'
+  c.arg_name 'DATE_STRING'
   c.flag [:b, :back]
 
   c.desc 'Set completion date to start date plus interval (XX[mhd] or HH:MM). If used without the --back option, the start date will be moved back to allow the completion date to be the current time.'
+  c.arg_name 'INTERVAL'
   c.flag [:t, :took]
 
   c.desc 'Section'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
@@ -438,12 +445,15 @@ command :cancel do |c|
   c.switch [:a, :archive], negatable: false, default_value: false
 
   c.desc 'Section'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)'
+  c.arg_name 'TAG'
   c.flag [:tag]
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'AND'
 
 
@@ -477,15 +487,19 @@ command :finish do |c|
   c.switch [:date], negatable: true, default_value: true
 
   c.desc 'Backdate completed date to date string [4pm|20m|2h|yesterday noon]'
+  c.arg_name 'DATE_STRING'
   c.flag [:b, :back]
 
   c.desc 'Set the completed date to the start date plus XX[hmd]'
+  c.arg_name 'INTERVAL'
   c.flag [:t, :took]
 
   c.desc 'Finish the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)'
+  c.arg_name 'TAG'
   c.flag [:tag]
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'AND'
 
   c.desc 'Auto-generate finish dates from next entry\'s start time. Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.'
@@ -495,6 +509,7 @@ command :finish do |c|
   c.switch [:a, :archive], negatable: false, default_value: false
 
   c.desc 'Section'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: wwid.current_section
 
   c.action do |global_options,options,args|
@@ -537,19 +552,23 @@ desc 'Repeat last entry as new entry'
 arg_name 'section'
 command [:again, :resume] do |c|
   c.desc 'Section'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: "All"
 
   c.desc 'Add new entry to section (default: same section as repeated entry)'
+  c.arg_name 'SECTION_NAME'
   c.flag [:in]
 
   c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma.'
+  c.arg_name 'TAG'
   c.flag [:tag]
 
   c.desc 'Boolean used to combine multiple tags'
+  c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'ALL'
 
   c.desc 'Note'
-  c.arg_name 'note_text'
+  c.arg_name 'TEXT'
   c.flag [:n, :note]
 
   c.action do |global_options, options, args|
@@ -562,9 +581,11 @@ desc 'Tag last entry'
 arg_name 'tag1 [tag2...]'
 command :tag do |c|
   c.desc 'Section'
+  c.arg_name 'SECTION_NAME'
   c.flag [:s, :section], default_value: 'All'
 
   c.desc 'How many recent entries to tag (0 for all)'
+  c.arg_name 'COUNT'
   c.flag [:c, :count], default_value: 1
 
   c.desc 'Include current date/time with tag'
@@ -623,6 +644,7 @@ end
 desc 'Mark last entry as highlighted'
 command [:mark, :flag] do |c|
   c.desc 'Section'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: wwid.current_section
 
   c.desc 'Remove mark'
@@ -640,25 +662,31 @@ long_desc 'The argument can be a section name, @tag(s) or both. "pick" or "choos
 arg_name '[section|@tags]'
 command :show do |c|
   c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
+  c.arg_name 'TAG'
   c.flag [:tag]
 
   c.desc 'Tag boolean (AND,OR,NONE)'
+  c.arg_name 'BOOLEAN'
   c.flag [:b, :bool], must_match: /^(and|or|not)$/i, default_value: 'OR'
 
   c.desc 'Max count to show'
+  c.arg_name 'MAX'
   c.flag [:c, :count], default_value: 0
 
   c.desc 'Age (oldest/newest)'
+  c.arg_name 'AGE'
   c.flag [:a, :age], default_value: 'newest'
 
   c.desc 'Sort order (asc/desc)'
-  c.flag [:s, :sort], default_value: 'asc'
+  c.arg_name 'ORDER'
+  c.flag [:s, :sort], must_match: /^(a|d)/i, default_value: 'ASC'
 
   c.desc %{
     Date range to show, or a single day to filter date on.
     Date range argument should be quoted. Date specifications can be natural language.
     To specify a range, use "to" or "through": `doing show --from "monday to friday"`
   }
+  c.arg_name 'DATE_OR_RANGE'
   c.flag [:f, :from]
 
   c.desc 'Show time intervals on @done tasks'
@@ -672,13 +700,15 @@ command :show do |c|
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], default_value: default
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(name|time)/i, default_value: default
 
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
-  c.desc 'Output to export format (csv|html|json)'
-  c.flag [:o, :output]
+  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.arg_name 'FORMAT'
+  c.flag [:o, :output], must_match: /^(template|html|csv|json|timeline)$/i
   c.action do |global_options,options,args|
 
     tag_filter = false
@@ -756,10 +786,12 @@ EODESC
 arg_name 'search_pattern'
 command [:grep, :search] do |c|
   c.desc 'Section'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: "All"
 
-  c.desc 'Output to export format (csv|html|json)'
-  c.flag [:o, :output]
+  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.arg_name 'FORMAT'
+  c.flag [:o, :output], must_match: /^(template|html|csv|json|timeline)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch [:t, :times], default_value: true
@@ -772,15 +804,14 @@ command [:grep, :search] do |c|
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-
-  tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
-
-  c.flag [:tag_sort], default_value: default
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
   c.action do |global_options,options,args|
+    tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
 
     section = wwid.guess_section(options[:s]) if options[:s]
 
@@ -797,6 +828,7 @@ default_value 10
 arg_name 'count'
 command :recent do |c|
   c.desc 'Section'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: "All"
 
   c.desc 'Show time intervals on @done tasks'
@@ -810,7 +842,8 @@ command :recent do |c|
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], default_value: default
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
   c.action do |global_options,options,args|
 
@@ -834,7 +867,7 @@ end
 desc 'List entries from today'
 command :today do |c|
   c.desc 'Specify a section'
-  c.arg_name 'section_name'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: 'All'
 
   c.desc 'Show time intervals on @done tasks'
@@ -848,10 +881,12 @@ command :today do |c|
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], default_value: default
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
-  c.desc 'Output to export format (csv|html|json)'
-  c.flag [:o, :output]
+  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.arg_name 'FORMAT'
+  c.flag [:o, :output], must_match: /^(template|html|csv|json|timeline)$/i
 
   c.action do |global_options,options,args|
 
@@ -868,7 +903,7 @@ long_desc 'Date argument can be natural language. "thursday" would be interprete
 arg_name 'date_string'
 command :on do |c|
   c.desc 'Section'
-  c.arg_name 'section_name'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: 'All'
 
   c.desc 'Show time intervals on @done tasks'
@@ -882,10 +917,12 @@ command :on do |c|
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], default_value: default
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
-  c.desc 'Output to export format (csv|html|json)'
-  c.flag [:o, :output]
+  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.arg_name 'FORMAT'
+  c.flag [:o, :output], must_match: /^(template|html|csv|json|timeline)$/i
 
   c.action do |global_options,options,args|
     exit_now! "Missing date argument" if args.empty?
@@ -918,11 +955,12 @@ end
 desc 'List entries from yesterday'
 command :yesterday do |c|
   c.desc 'Specify a section'
-  c.arg_name 'section_name'
+  c.arg_name 'NAME'
   c.flag [:s, :section], default_value: 'All'
 
-  c.desc 'Output to export format (csv|html|json)'
-  c.flag [:o, :output]
+  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.arg_name 'FORMAT'
+  c.flag [:o, :output], must_match: /^(template|html|csv|json|timeline)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch [:t, :times], default_value: true
@@ -935,7 +973,8 @@ command :yesterday do |c|
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], default_value: default
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
   c.action do |global_options, options,args|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -944,13 +983,42 @@ command :yesterday do |c|
   end
 end
 
-desc 'Show the last entry'
+desc 'Show the last entry, optionally edit'
 command :last do |c|
   c.desc 'Specify a section'
-  c.flag [:s, :section]
+  c.arg_name 'NAME'
+  c.flag [:s, :section], default_value: 'All'
+
+  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.switch [:e, :editor], negatable: false, default_value: false
+
+  c.desc 'Tag filter, combine multiple tags with a comma.'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Tag boolean'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: /(and|or|not)/i, default_value: 'AND'
+
+  c.desc 'Search filter, surround with slashes for regex (/query/)'
+  c.arg_name 'QUERY'
+  c.flag [:search]
 
   c.action do |global_options,options,args|
-    puts wwid.last(true,options[:s]).strip
+    raise '--tag and --search cannot be used together' if options[:tag] && options[:search]
+
+    if options[:tag].nil?
+      tags = []
+    else
+      tags = options[:tag].split(/ *, */).map {|t| t.strip.sub(/^@/, '') }
+      options[:bool] = options[:bool] =~ /^(and|or|not)$/i ? options[:bool].upcase : 'AND'
+    end
+
+    if options[:e]
+      wwid.edit_last(section: options[:s], options: { search: options[:search], tag: tags, tag_bool: options[:bool] })
+    else
+      puts wwid.last(times: true, section: options[:s], options: { search: options[:search], tag: tags, tag_bool: options[:bool] }).strip
+    end
   end
 end
 
@@ -1008,13 +1076,16 @@ desc 'Display a user-created view'
 arg_name 'view_name'
 command :view do |c|
   c.desc 'Section (override view settings)'
+  c.arg_name 'NAME'
   c.flag [:s, :section]
 
   c.desc 'Count to display (override view settings)'
+  c.arg_name 'COUNT'
   c.flag [:c, :count], must_match: /^\d+$/, type: Integer
 
-  c.desc 'Output to export format (csv|html|json)'
-  c.flag [:o, :output]
+  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.arg_name 'FORMAT'
+  c.flag [:o, :output], must_match: /^(template|html|csv|json|timeline)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch [:t, :times], default_value: true
@@ -1030,7 +1101,8 @@ command :view do |c|
   if wwid.config.has_key?('tag_sort')
     default = wwid.config['tag_sort']
   end
-  c.flag [:tag_sort], default_value: default
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: true
@@ -1108,16 +1180,20 @@ arg_name 'section'
 default_value wwid.current_section
 command :archive do |c|
   c.desc 'Count to keep (ignored if archiving by tag)'
+  c.arg_name 'COUNT'
   c.flag [:k, :keep], default_value: 5, must_match: /^\d+$/, type: Integer
 
   c.desc 'Move entries to'
+  c.arg_name 'SECTION_NAME'
   c.flag [:t, :to], default_value: 'Archive'
 
   c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
+  c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Tag boolean'
-  c.flag [:b, :bool], must_match: /(and|or|not)/i, default_value: 'AND'
+  c.desc 'Tag boolean (AND|OR|NOT)'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: /(and|or|not)/i, default_value: 'AND'
 
   c.action do |global_options,options,args|
     if args.length > 0
@@ -1143,11 +1219,11 @@ desc 'Open the "doing" file in an editor'
 command :open do |c|
 if `uname` =~ /Darwin/
   c.desc 'Open with app name'
-  c.arg_name 'app_name'
+  c.arg_name 'APP_NAME'
   c.flag [:a]
 
   c.desc 'Open with app bundle id'
-  c.arg_name 'bundle_id'
+  c.arg_name 'BUNDLE_ID'
   c.flag [:b]
 end
   c.desc 'Open with $EDITOR'
@@ -1188,13 +1264,16 @@ end
 desc 'Edit the configuration file'
 command :config do |c|
   c.desc 'Editor to use'
+  c.arg_name 'EDITOR'
   c.flag [:e, :editor], default_value: nil
 
   if `uname` =~ /Darwins/
     c.desc 'Application to use'
+    c.arg_name 'APP_NAME'
     c.flag [:a]
 
     c.desc 'Application bundle id to use'
+    c.arg_name 'BUNDLE_ID'
     c.flag [:b]
 
     c.desc "Use the editor_app defined in ~/.doingrc (#{wwid.config['editor_app']})"
@@ -1227,6 +1306,7 @@ end
 desc 'Undo the last change to the doing_file'
 command :undo do |c|
   c.desc 'Specify alternate doing file'
+  c.arg_name 'PATH'
   c.flag [:f, :file], default_value: wwid.doing_file
 
   c.action do |global_options,options,args|

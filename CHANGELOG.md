@@ -4,6 +4,10 @@
 
 - Add `tags_color` as a primary config key to highlight @tags in displayed entries
 
+#### IMPROVED
+
+- --editor improvements for all commands that use it
+
 ### 1.0.54
 
 #### FIXED
