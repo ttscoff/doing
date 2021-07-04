@@ -2,10 +2,14 @@
 
 #### NEW
 
+- `--editor` flag for `doing last` to edit last entry
+- `--tag=` flag to filter `doing last` by tag
+- `--search=` to filter `doing last` by text/regex search
 - Add `tags_color` as a primary config key to highlight @tags in displayed entries
 
 #### IMPROVED
 
+- Clean up command line help
 - --editor improvements for all commands that use it
 
 ### 1.0.54
