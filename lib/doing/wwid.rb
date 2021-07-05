@@ -390,6 +390,15 @@ class WWID
     raise 'No content in first line' if title.nil? || title.strip.empty?
 
     note = input_lines.length > 1 ? input_lines[1..-1] : []
+    # If title line ends in a parenthetical, use that as the note
+    if note.empty? && title =~ /\(.*?\)$/
+      title.sub!(/\((.*?)\)$/) do
+        m = Regexp.last_match
+        note.push(m[1])
+        ''
+      end
+    end
+
     note.map!(&:strip)
     note.delete_if { |line| line =~ /^\s*$/ || line =~ /^#/ }
 
@@ -1025,7 +1034,7 @@ class WWID
 
     if opt[:new_item]
       title, note = format_input(opt[:new_item])
-      note.push(opt[:note].gsub(/ *$/, '')) if opt[:note]
+      note.push(opt[:note].map(&:chomp)) if opt[:note]
       title += " @#{tag}"
       add_item(title.cap_first, opt[:section], { note: note.join(' ').rstrip, back: opt[:back] })
     end
