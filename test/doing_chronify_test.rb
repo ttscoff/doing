@@ -25,12 +25,12 @@ class DoingChronifyTest < Test::Unit::TestCase
   end
 
   def test_back_interval
-    now = Time.now.to_i
+    now = Time.now
     doing('now', '--back', '20m', 'test interval format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
-    assert_equal(Time.parse(m['ts']).to_i, trunc_minutes(now - 20*60),
-        "New task should be equal to the nearest minute")
+    assert_equal(Time.parse(m['ts']).round_time(1), (now - 20*60).round_time(1),
+        'New task should be equal to the nearest minute')
   end
 
   def test_back_strftime
@@ -38,26 +38,23 @@ class DoingChronifyTest < Test::Unit::TestCase
     doing('now', '--back', ts, 'test strftime format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
-    assert_equal(Time.parse(m['ts']).to_i, trunc_minutes(Time.parse(ts)),
-        "New task should be equal to the nearest minute")
+    assert_equal(Time.parse(m['ts']).round_time(1), Time.parse(ts).round_time(1),
+        'New task should be equal to the nearest minute')
   end
 
   def test_back_semantic
-    yesterday = Time.parse((Time.now - 3600*24).strftime('%Y-%m-%d 18:30 %Z'))
+    yesterday = (Time.now - (60 * 60 * 24)).strftime('%Y-%m-%d 18:30 %Z')
     doing('now', '--back', 'yesterday 6:30pm', 'test semantic format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
-    assert_equal(Time.parse(m['ts']), yesterday, "new task is the wrong time")
+    task_time = Time.parse(m['ts']).strftime('%Y-%m-%d 18:30 %Z')
+    assert_equal(task_time, yesterday, 'new task is the wrong time')
   end
 
   private
 
   def uncolor(string)
     string.gsub(/\\e\[[\d;]+m/,'')
-  end
-
-  def trunc_minutes(ts)
-    ts.to_i / 60 * 60
   end
 
   def mktmpdir

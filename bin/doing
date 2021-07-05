@@ -1260,7 +1260,7 @@ command :archive do |c|
 
     tags.concat(options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if options[:tag]
 
-    wwid.archive(section, options[:k], options[:t], tags, options[:b])
+    wwid.archive(section, options[:keep], options[:to], tags, options[:bool])
   end
 end
 

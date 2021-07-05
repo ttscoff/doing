@@ -720,7 +720,6 @@ class WWID
   ## @param      opt   (Hash) Additional Options
   ##
   def last_entry(opt = {})
-    opt[:tag] ||= []
     opt[:tag_bool] ||= 'AND'
     opt[:section] ||= @current_section
 
@@ -748,9 +747,9 @@ class WWID
       all_items.concat(@content[section]['items'].dup) if @content.key?(section)
     end
 
-    if opt[:tag]&.length.positive?
+    if opt[:tag] && opt[:tag].length.positive?
       all_items.select! { |item| item.has_tags?(opt[:tag], opt[:tag_bool]) }
-    elsif opt[:search]&.length.positive?
+    elsif opt[:search]&.length
       all_items.select! { |item| item.matches_search?(opt[:search]) }
     end
 
@@ -1580,7 +1579,8 @@ class WWID
 
     if tags && !tags.empty?
       items.delete_if do |item|
-        if bool =~ /(AND|ALL)/
+        case bool
+        when /(AND|ALL)/i
           score = 0
           tags.each do |tag|
             score += 1 if item['title'] =~ /@#{tag}/i
@@ -1588,14 +1588,14 @@ class WWID
           res = score < tags.length
           moved_items.push(item) if res
           res
-        elsif bool =~ /NONE/
+        when /NONE/i
           del = false
           tags.each do |tag|
             del = true if item['title'] =~ /@#{tag}/i
           end
           moved_items.push(item) if del
           del
-        elsif bool =~ /(OR|ANY)/
+        when /(OR|ANY)/i
           del = true
           tags.each do |tag|
             del = false if item['title'] =~ /@#{tag}/i
@@ -1605,7 +1605,7 @@ class WWID
         end
       end
       moved_items.each do |item|
-        if label && !(section == 'Currently')
+        if label && section != 'Currently'
           item['title'] =
             item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
         end
@@ -1614,23 +1614,27 @@ class WWID
       @content[destination]['items'] += items
       @results.push("Archived #{items.length} items from #{section} to #{destination}")
     else
+      count = items.length if items.length < count
 
-      return if items.length < count
-
-      @content[section]['items'] = if count == 0
+      @content[section]['items'] = if count.zero?
                                      []
                                    else
                                      items[0..count - 1]
                                    end
 
-      items.each do |item|
-        if label && !(section == 'Currently')
+      items.map! do |item|
+        if label && section != 'Currently'
           item['title'] =
             item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
         end
+        item
+      end
+      if items.count > count
+        @content[destination]['items'].concat(items[count..-1])
+      else
+        @content[destination]['items'].concat(items)
       end
 
-      @content[destination]['items'] += items[count..-1]
       @results.push("Archived #{items.length - count} items from #{section} to #{destination}")
     end
   end
