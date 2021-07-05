@@ -40,6 +40,17 @@ class Hash
       result
     end
   end
+
+  def matches_search?(search)
+    item = self
+    text = item['note'] ? item['title'] + item['note'].join(' ') : item['title']
+    pattern = if search.strip =~ %r{^/.*?/$}
+                search.sub(%r{/(.*?)/}, '\1')
+              else
+                search.split('').join('.{0,3}')
+              end
+    text =~ /#{pattern}/i ? true : false
+  end
 end
 
 ##
@@ -737,7 +748,11 @@ class WWID
       all_items.concat(@content[section]['items'].dup) if @content.key?(section)
     end
 
-    all_items.select! { |item| item.has_tags?(opt[:tag], opt[:tag_bool]) } if !opt[:tag].nil? && opt[:tag].length.positive?
+    if opt[:tag]&.length.positive?
+      all_items.select! { |item| item.has_tags?(opt[:tag], opt[:tag_bool]) }
+    elsif opt[:search]&.length.positive?
+      all_items.select! { |item| item.matches_search?(opt[:search]) }
+    end
 
     all_items.max_by { |item| item['date'] }
   end
@@ -792,9 +807,10 @@ class WWID
         items.map! do |item|
           break if index == count
 
-          tag_match = !opt[:tag].nil? && opt[:tag].length.positive? ? item.has_tags?(opt[:tag], opt[:tag_bool]) : true
+          tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.has_tags?(opt[:tag], opt[:tag_bool])
+          search_match = opt[:search].nil? || opt[:search].empty? ? true : item.matches_search?(opt[:search])
 
-          if tag_match
+          if tag_match && search_match
             if opt[:autotag]
               new_title = autotag(item['title']) if @auto_tag
               if new_title == item['title']
@@ -815,10 +831,12 @@ class WWID
 
               title = item['title']
               opt[:tags].each do |tag|
-                tag.strip!
-                if opt[:remove] && title =~ /@#{tag}\b/
-                  title.gsub!(/(^| )@#{tag}(\([^)]*\))?/, '')
-                  @results.push(%(Removed @#{tag}: "#{title}" in #{section}))
+                tag = tag.strip
+                if opt[:remove]
+                  if title =~ /@#{tag}\b/
+                    title.gsub!(/(^| )@#{tag}(\([^)]*\))?/, '')
+                    @results.push(%(Removed @#{tag}: "#{title}" in #{section}))
+                  end
                 elsif title !~ /@#{tag}/
                   title.chomp!
                   title += if opt[:date]
@@ -895,13 +913,7 @@ class WWID
       end
     elsif options[:search]
       items.each_with_index do |item, i|
-        text = item['note'] ? item['title'] + item['note'].join(' ') : item['title']
-        pattern = if options[:search].strip =~ %r{^/.*?/$}
-                    options[:search].sub(%r{/(.*?)/}, '\1')
-                  else
-                    options[:search].split('').join('.{0,3}')
-                  end
-        if text =~ /#{pattern}/i
+        if item.matches_search?(options[:search])
           idx = i
           break
         end
@@ -1237,15 +1249,7 @@ class WWID
     end
 
     if opt[:search]
-      items.keep_if do |item|
-        text = item['note'] ? item['title'] + item['note'].join(' ') : item['title']
-        pattern = if opt[:search].strip =~ %r{^/.*?/$}
-                    opt[:search].sub(%r{/(.*?)/}, '\1')
-                  else
-                    opt[:search].split('').join('.{0,3}')
-                  end
-        text =~ /#{pattern}/i
-      end
+      items.keep_if {|item| item.matches_search?(opt[:search]) }
     end
 
     if opt[:only_timed]

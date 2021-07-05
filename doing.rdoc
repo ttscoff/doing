@@ -1,8 +1,15 @@
 == doing - A CLI for a What Was I Doing system
 
-v0.2.6pre
+v1.0.55
 
 === Global Options
+=== --config_file arg
+
+Use a specific configuration file
+
+[Default Value] /Users/ttscoff/.doingrc
+
+
 === -f|--doing_file arg
 
 Specify a different doing_file
@@ -20,29 +27,89 @@ Output notes if included in the template
 
 
 
+=== --stdout
+Send results report to STDOUT instead of STDERR
+
+
+
 === --version
 Display the program version
 
 
 
+=== -x|--[no-]noauto
+Exclude auto tags and default tags
+
+
+
 === Commands
-==== Command: <tt>add_section  section_name</tt>
+==== Command: <tt>add_section  SECTION_NAME</tt>
 Add a new section to the "doing" file
 
 
-==== Command: <tt>archive  section</tt>
-Move entries in between sections
+==== Command: <tt>again|resume </tt>
+Repeat last entry as new entry
 
 
 ===== Options
-===== -b|--bool arg
+===== --bool BOOLEAN
 
-Tag boolean
+Boolean used to combine multiple tags
+
+[Default Value] ALL
+[Must Match] (?i-mx:^(and|or|not)$)
+
+
+===== --in SECTION_NAME
+
+Add new entry to section (default: same section as repeated entry)
+
+[Default Value] None
+
+
+===== -n|--note TEXT
+
+Note
+
+[Default Value] None
+
+
+===== -s|--section NAME
+
+Section
+
+[Default Value] All
+
+
+===== --search QUERY
+
+Repeat last entry matching search. Surround with
+  slashes for regex (e.g. "/query/").
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Repeat last entry matching tags. Combine multiple tags with a comma.
+
+[Default Value] None
+
+
+==== Command: <tt>archive  SECTION_NAME</tt>
+Move entries between sections
+
+
+===== Options
+===== --bool BOOLEAN
+
+Tag boolean (AND|OR|NOT)
 
 [Default Value] AND
+[Must Match] (?i-mx:(and|or|not))
 
 
-===== -k|--keep arg
+===== -k|--keep COUNT
 
 Count to keep (ignored if archiving by tag)
 
@@ -50,15 +117,58 @@ Count to keep (ignored if archiving by tag)
 [Must Match] (?-mix:^\d+$)
 
 
-===== -t|--to arg
+===== -t|--to SECTION_NAME
 
 Move entries to
 
 [Default Value] Archive
 
 
+===== --tag TAG
+
+Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
+
+[Default Value] None
+
+
+==== Command: <tt>cancel  COUNT</tt>
+End last X entries with no time tracked
+
+Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doing finish --no-date`.
+===== Options
+===== --bool BOOLEAN
+
+Boolean (AND|OR|NOT) with which to combine multiple tag filters
+
+[Default Value] AND
+[Must Match] (?i-mx:^(and|or|not)$)
+
+
+===== -s|--section NAME
+
+Section
+
+[Default Value] Currently
+
+
+===== --tag TAG
+
+Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)
+
+[Default Value] None
+
+
+===== -a|--archive
+Archive entries
+
+
+
 ==== Command: <tt>choose </tt>
 Select a section to display from a menu
+
+
+==== Command: <tt>colors </tt>
+List available color variables for configuration templates and views
 
 
 ==== Command: <tt>config </tt>
@@ -66,35 +176,45 @@ Edit the configuration file
 
 
 ===== Options
-===== -e|--editor arg
+===== -e|--editor EDITOR
 
 Editor to use
 
 [Default Value] None
 
 
-==== Command: <tt>done  entry</tt>
+==== Command: <tt>done|did  ENTRY</tt>
 Add a completed item with @done(date). No argument finishes last entry.
 
 
 ===== Options
-===== -b|--back arg
+===== --at DATE_STRING
 
-Backdate start date to date string [4pm|20m|2h|yesterday noon]
+Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
+  If used, ignores --back. Used with --took, backdates start date
 
 [Default Value] None
 
 
-===== -s|--section arg
+===== -b|--back DATE_STRING
+
+Backdate start date by interval [4pm|20m|2h|yesterday noon]
+
+[Default Value] None
+
+
+===== -s|--section NAME
 
 Section
 
 [Default Value] Currently
 
 
-===== -t|--took arg
+===== -t|--took INTERVAL
 
-Set completion date to start date plus XX[mhd] or [HH:MM]
+Set completion date to start date plus interval (XX[mhd] or HH:MM).
+  If used without the --back option, the start date will be moved back to allow
+  the completion date to be the current time.
 
 [Default Value] None
 
@@ -104,12 +224,12 @@ Immediately archive the entry
 
 
 
-===== -d|--[no-]date
+===== --[no-]date
 Include date
 
 
 
-===== -e|--[no-]editor
+===== -e|--editor
 Edit entry with /Users/ttscoff/scripts/editor.sh
 
 
@@ -119,28 +239,51 @@ Remove @done tag
 
 
 
-==== Command: <tt>finish  count</tt>
+==== Command: <tt>finish  COUNT</tt>
 Mark last X entries as @done
 
 Marks the last X entries with a @done tag and current date. Does not alter already completed entries.
 ===== Options
-===== -b|--back arg
+===== -b|--back DATE_STRING
 
 Backdate completed date to date string [4pm|20m|2h|yesterday noon]
 
 [Default Value] None
 
 
-===== -s|--section arg
+===== --bool BOOLEAN
+
+Boolean (AND|OR|NOT) with which to combine multiple tag filters
+
+[Default Value] AND
+[Must Match] (?i-mx:^(and|or|not)$)
+
+
+===== -s|--section NAME
 
 Section
 
 [Default Value] Currently
 
 
-===== -t|--took arg
+===== --search QUERY
+
+Finish the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/")
+
+[Default Value] None
+
+
+===== -t|--took INTERVAL
 
 Set the completed date to the start date plus XX[hmd]
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Finish the last X entries containing TAG.
+  Separate multiple tags with comma (--tag=tag2,tag2), combine with --bool
 
 [Default Value] None
 
@@ -151,12 +294,59 @@ Archive entries
 
 
 ===== --auto
-Auto-generate finish dates from next entry's start time
+Auto-generate finish dates from next entry's start time.
+  Automatically generate completion dates 1 minute before next start date.
+  --auto overrides the --date and --back parameters.
 
-Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.
 
-===== -d|--[no-]date
+
+===== --[no-]date
 Include date
+
+
+
+==== Command: <tt>grep|search  SEARCH_PATTERN</tt>
+Search for entries
+
+Search all sections (or limit to a single section) for entries matching text or regular expression. Normal strings are fuzzy matched.
+
+To search with regular expressions, single quote the string and surround with slashes: `doing search '/\bm.*?x\b/'`
+===== Options
+===== -o|--output FORMAT
+
+Output to export format (csv|html|json|template|timeline)
+
+[Default Value] None
+[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+
+
+===== -s|--section NAME
+
+Section
+
+[Default Value] All
+
+
+===== --tag_sort KEY
+
+Sort tags by (name|time)
+
+[Default Value] name
+[Must Match] (?i-mx:^(name|time)$)
+
+
+===== --only_timed
+Only show items with recorded time intervals
+
+
+
+===== -t|--[no-]times
+Show time intervals on @done tasks
+
+
+
+===== --[no-]totals
+Show intervals with totals at the end of output
 
 
 
@@ -171,39 +361,81 @@ List commands one per line, to assist with shell completion
 
 
 ==== Command: <tt>last </tt>
-Show the last entry
+Show the last entry, optionally edit
 
 
-==== Command: <tt>later  entry</tt>
+===== Options
+===== --bool BOOLEAN
+
+Tag boolean
+
+[Default Value] AND
+[Must Match] (?i-mx:(and|or|not))
+
+
+===== -s|--section NAME
+
+Specify a section
+
+[Default Value] All
+
+
+===== --search QUERY
+
+Search filter, surround with slashes for regex (/query/)
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Tag filter, combine multiple tags with a comma.
+
+[Default Value] None
+
+
+===== -e|--editor
+Edit entry with /Users/ttscoff/scripts/editor.sh
+
+
+
+==== Command: <tt>later  ENTRY</tt>
 Add an item to the Later section
 
 
 ===== Options
-===== -a|--app editor_app
+===== -a|--app APP
 
 Edit entry with specified app
 
-[Default Value] Sublime Text
+[Default Value] None
 
 
-===== --back arg
+===== -b|--back DATE_STRING
 
 Backdate start time to date string [4pm|20m|2h|yesterday noon]
 
 [Default Value] None
 
 
-===== -e|--[no-]editor
+===== -n|--note TEXT
+
+Note
+
+[Default Value] None
+
+
+===== -e|--editor
 Edit entry with /Users/ttscoff/scripts/editor.sh
 
 
 
-==== Command: <tt>mark </tt>
+==== Command: <tt>mark|flag </tt>
 Mark last entry as highlighted
 
 
 ===== Options
-===== -s|--section arg
+===== -s|--section NAME
 
 Section
 
@@ -215,19 +447,26 @@ Remove mark
 
 
 
-==== Command: <tt>meanwhile  entry</tt>
+==== Command: <tt>meanwhile  ENTRY</tt>
 Finish any running @meanwhile tasks and optionally create a new one
 
 
 ===== Options
-===== --back arg
+===== -b|--back DATE_STRING
 
 Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
 
 [Default Value] None
 
 
-===== -s|--section section_name
+===== -n|--note TEXT
+
+Note
+
+[Default Value] None
+
+
+===== -s|--section NAME
 
 Section
 
@@ -239,31 +478,62 @@ Archive previous @meanwhile entry
 
 
 
-===== -e|--[no-]editor
+===== -e|--editor
 Edit entry with /Users/ttscoff/scripts/editor.sh
 
 
 
-==== Command: <tt>now  entry</tt>
+==== Command: <tt>note  NOTE_TEXT</tt>
+Add a note to the last entry
+
+If -r is provided with no other arguments, the last note is removed. If new content is specified through arguments or STDIN, any previous note will be replaced with the new one.
+
+  Use -e to load the last entry in a text editor where you can append a note.
+===== Options
+===== -s|--section NAME
+
+Section
+
+[Default Value] All
+
+
+===== -e|--editor
+Edit entry with /Users/ttscoff/scripts/editor.sh
+
+
+
+===== -r|--remove
+Replace/Remove last entry's note (default append)
+
+
+
+==== Command: <tt>now|next  ENTRY</tt>
 Add an entry
 
 
 ===== Options
-===== --back arg
+===== -b|--back DATE_STRING
 
 Backdate start time [4pm|20m|2h|yesterday noon]
 
 [Default Value] None
 
 
-===== -s|--section section_name
+===== -n|--note TEXT
+
+Note
+
+[Default Value] None
+
+
+===== -s|--section NAME
 
 Section
 
 [Default Value] Currently
 
 
-===== -e|--[no-]editor
+===== -e|--editor
 Edit entry with /Users/ttscoff/scripts/editor.sh
 
 
@@ -273,40 +543,88 @@ Timed entry, marks last entry in section as @done
 
 
 
+==== Command: <tt>on  DATE_STRING</tt>
+List entries for a date
+
+Date argument can be natural language. "thursday" would be interpreted as "last thursday,"
+and "2d" would be interpreted as "two days ago." If you use "to" or "through" between two dates,
+it will create a range.
+===== Options
+===== -o|--output FORMAT
+
+Output to export format (csv|html|json|template|timeline)
+
+[Default Value] None
+[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+
+
+===== -s|--section NAME
+
+Section
+
+[Default Value] All
+
+
+===== --tag_sort KEY
+
+Sort tags by (name|time)
+
+[Default Value] name
+[Must Match] (?i-mx:^(name|time)$)
+
+
+===== -t|--[no-]times
+Show time intervals on @done tasks
+
+
+
+===== --[no-]totals
+Show time totals at the end of output
+
+
+
 ==== Command: <tt>open </tt>
 Open the "doing" file in an editor
 
 
 ===== Options
-===== -a app_name
+===== -a APP_NAME
 
-open with app name
-
-[Default Value] None
-
-
-===== -b bundle_id
-
-open with app bundle id
+Open with app name
 
 [Default Value] None
 
 
-===== -e
-open with $EDITOR
+===== -b BUNDLE_ID
+
+Open with app bundle id
+
+[Default Value] None
+
+
+===== -e|--editor
+Open with $EDITOR
 
 
 
-==== Command: <tt>recent  count</tt>
+==== Command: <tt>recent  COUNT</tt>
 List recent entries
 
 
 ===== Options
-===== -s|--section arg
+===== -s|--section NAME
 
 Section
 
-[Default Value] Currently
+[Default Value] All
+
+
+===== --tag_sort KEY
+
+Sort tags by (name|time)
+
+[Default Value] name
+[Must Match] (?i-mx:^(name|time)$)
 
 
 ===== -t|--[no-]times
@@ -323,44 +641,83 @@ Show intervals with totals at the end of output
 List sections
 
 
-==== Command: <tt>show  section [tags]</tt>
+===== Options
+===== -c|--[no-]column
+List in single column
+
+
+
+==== Command: <tt>show  [SECTION|@TAGS]</tt>
 List all entries
 
-
+The argument can be a section name, @tag(s) or both.
+  "pick" or "choose" as an argument will offer a section menu.
 ===== Options
-===== -a|--age arg
+===== -a|--age AGE
 
 Age (oldest/newest)
 
 [Default Value] newest
 
 
-===== -b|--boolean arg
+===== -b|--bool BOOLEAN
 
 Tag boolean (AND,OR,NONE)
 
 [Default Value] OR
+[Must Match] (?i-mx:^(and|or|not)$)
 
 
-===== -c|--count arg
+===== -c|--count MAX
 
 Max count to show
 
 [Default Value] 0
 
 
-===== -o|--output arg
+===== -f|--from DATE_OR_RANGE
 
-Output to export format (csv|html)
+Date range to show, or a single day to filter date on.
+    Date range argument should be quoted. Date specifications can be natural language.
+    To specify a range, use "to" or "through": `doing show --from "monday to friday"`
 
 [Default Value] None
 
 
-===== -s|--sort arg
+===== -o|--output FORMAT
+
+Output to export format (csv|html|json|template|timeline)
+
+[Default Value] None
+[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+
+
+===== -s|--sort ORDER
 
 Sort order (asc/desc)
 
-[Default Value] asc
+[Default Value] ASC
+[Must Match] (?i-mx:^(a|d))
+
+
+===== --tag TAG
+
+Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
+
+[Default Value] None
+
+
+===== --tag_sort KEY
+
+Sort tags by (name|time)
+
+[Default Value] name
+[Must Match] (?i-mx:^(name|time))
+
+
+===== --only_timed
+Only show items with recorded time intervals
+
 
 
 ===== -t|--[no-]times
@@ -373,23 +730,28 @@ Show intervals with totals at the end of output
 
 
 
-==== Command: <tt>tag  tag1 [tag2...]</tt>
-Tag last entry
+==== Command: <tt>tag  TAG...</tt>
+Add tag(s) to last entry
 
 
 ===== Options
-===== -c|--count arg
+===== -c|--count COUNT
 
-How many recent entries to tag
+How many recent entries to tag (0 for all)
 
 [Default Value] 1
 
 
-===== -s|--section arg
+===== -s|--section SECTION_NAME
 
 Section
 
-[Default Value] Currently
+[Default Value] All
+
+
+===== -a|--autotag
+Autotag entries based on autotag configuration in ~/.doingrc
+
 
 
 ===== -d|--date
@@ -402,16 +764,39 @@ Remove given tag(s)
 
 
 
+==== Command: <tt>template  TYPE</tt>
+Output HTML and CSS templates for customization
+
+Templates are printed to STDOUT for piping to a file.
+  Save them and use them in the configuration file under html_template.
+
+  Example `doing template HAML > ~/styles/my_doing.haml`
 ==== Command: <tt>today </tt>
 List entries from today
 
 
 ===== Options
-===== -o|--output arg
+===== -o|--output FORMAT
 
-Output to export format (csv|html)
+Output to export format (csv|html|json|template|timeline)
 
 [Default Value] None
+[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+
+
+===== -s|--section NAME
+
+Specify a section
+
+[Default Value] All
+
+
+===== --tag_sort KEY
+
+Sort tags by (name|time)
+
+[Default Value] name
+[Must Match] (?i-mx:^(name|time)$)
 
 
 ===== -t|--[no-]times
@@ -429,19 +814,19 @@ Undo the last change to the doing_file
 
 
 ===== Options
-===== -f|--file arg
+===== -f|--file PATH
 
 Specify alternate doing file
 
 [Default Value] None
 
 
-==== Command: <tt>view  view_name</tt>
+==== Command: <tt>view  VIEW_NAME</tt>
 Display a user-created view
 
 
 ===== Options
-===== -c|--count arg
+===== -c|--count COUNT
 
 Count to display (override view settings)
 
@@ -449,18 +834,37 @@ Count to display (override view settings)
 [Must Match] (?-mix:^\d+$)
 
 
-===== -o|--output arg
+===== -o|--output FORMAT
 
-Output to export format (csv|html)
+Output to export format (csv|html|json|template|timeline)
 
 [Default Value] None
+[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
 
 
-===== -s|--section arg
+===== -s|--section NAME
 
 Section (override view settings)
 
 [Default Value] None
+
+
+===== --tag_sort KEY
+
+Sort tags by (name|time)
+
+[Default Value] name
+[Must Match] (?i-mx:^(name|time)$)
+
+
+===== --[no-]color
+Include colors in output
+
+
+
+===== --[no-]only_timed
+Only show items with recorded time intervals
+
 
 
 ===== -t|--[no-]times
@@ -477,16 +881,38 @@ Show intervals with totals at the end of output
 List available custom views
 
 
-==== Command: <tt>yesterday  section</tt>
+===== Options
+===== -c|--[no-]column
+List in single column
+
+
+
+==== Command: <tt>yesterday </tt>
 List entries from yesterday
 
 
 ===== Options
-===== -o|--output arg
+===== -o|--output FORMAT
 
-Output to export format (csv|html)
+Output to export format (csv|html|json|template|timeline)
 
 [Default Value] None
+[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+
+
+===== -s|--section NAME
+
+Specify a section
+
+[Default Value] All
+
+
+===== --tag_sort KEY
+
+Sort tags by (name|time)
+
+[Default Value] name
+[Must Match] (?i-mx:^(name|time)$)
 
 
 ===== -t|--[no-]times

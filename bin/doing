@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'gli'
 require 'doing'
@@ -84,27 +86,26 @@ command [:now, :next] do |c|
 
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
-    if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
+    if options[:e] || (args.empty? && $stdin.stat.size.zero?)
       raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = ''
-      input += args.join(' ') if args.length > 0
+      input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
-      if !input.empty?
-        title, note = wwid.format_input(input)
-        note.push(options[:n]) if options[:n]
-        wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
-        wwid.write(wwid.doing_file)
-      else
-        raise 'No content'
-      end
-    elsif args.length > 0
+
+      raise 'No content' if input.empty?
+
+      title, note = wwid.format_input(input)
+      note.push(options[:n]) if options[:n]
+      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
+      wwid.write(wwid.doing_file)
+    elsif args.length.positive?
       title, note = wwid.format_input(args.join(' '))
       note.push(options[:n]) if options[:n]
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
       wwid.write(wwid.doing_file)
-    elsif STDIN.stat.size > 0
-      title, note = wwid.format_input(STDIN.read)
+    elsif $stdin.stat.size.positive?
+      title, note = wwid.format_input($stdin.read)
       note.push(options[:n]) if options[:n]
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
       wwid.write(wwid.doing_file)
@@ -135,32 +136,29 @@ command :note do |c|
   c.action do |_global_options, options, args|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
-    if options[:e] || (args.length == 0 && STDIN.stat.size == 0 && !options[:r])
+    if options[:e] || (args.empty? && $stdin.stat.size.zero? && !options[:r])
       raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
-      input = args.length > 0 ? args.join(' ') : ''
+      input = !args.empty? ? args.join(' ') : ''
 
       prev_input = wwid.last_note(section) || ''
       prev_input = prev_input.join("\n") if prev_input.instance_of?(Array)
       input = prev_input + input
 
       input = wwid.fork_editor(input).strip
-      if input
-        title, note = wwid.format_input(input)
-        if note
-          wwid.note_last(section, note, replace: true)
-        else
-          raise 'No note content'
-        end
-      else
-        raise 'No content, cancelled'
-      end
-    elsif args.length > 0
+      raise 'No content, cancelled' unless input
+
+      _title, note = wwid.format_input(input)
+
+      raise 'No note content' unless note
+
+      wwid.note_last(section, note, replace: true)
+    elsif !args.empty?
       title, note = wwid.format_input(args.join(' '))
       note.insert(0, title)
       wwid.note_last(section, note, replace: options[:r])
-    elsif STDIN.stat.size > 0
-      title, note = wwid.format_input(STDIN.read)
+    elsif $stdin.stat.size.positive?
+      title, note = wwid.format_input($stdin.read)
       note.insert(0, title)
       wwid.note_last(section, note, replace: options[:r])
     elsif options[:r]
@@ -219,14 +217,14 @@ command :meanwhile do |c|
     if input && !input.empty?
       input, note = wwid.format_input(input)
     else
-      input = false
+      input = nil
       note = []
     end
 
     if options[:n]
       note.push(options[:n])
     elsif note.empty?
-      note = false
+      note = nil
     end
 
     wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:a], note: note })
@@ -236,16 +234,20 @@ end
 
 desc 'Output HTML and CSS templates for customization'
 long_desc %(
-  Templates are printed to STDOUT for piping to a file. Save them and use them in the configuration file under html_template. Example `doing templates HAML > ~/styles/my_doing.haml`
+  Templates are printed to STDOUT for piping to a file.
+  Save them and use them in the configuration file under html_template.
+
+  Example `doing template HAML > ~/styles/my_doing.haml`
 )
 arg_name 'TYPE', must_match: /^(html|haml|css)/i
-command :templates do |c|
+command :template do |c|
   c.action do |_global_options, options, args|
-    if args.empty?
-      raise 'No type specified, use `doing templates [HAML|CSS]`'
-    elsif options[:t] =~ /html|haml/i
+    raise 'No type specified, use `doing template [HAML|CSS]`' if args.empty?
+
+    case options[:t]
+    when /html|haml/i
       $stdout.puts wwid.haml_template
-    elsif options[:t] =~ /css/i
+    when /css/i
       $stdout.puts wwid.css_template
     else
       raise 'Invalid type specified, must be HAML or CSS'
@@ -279,26 +281,24 @@ command :later do |c|
       date = Time.now
     end
 
-    if options[:e] || (args.length == 0 && STDIN.stat.size == 0)
+    if options[:e] || (args.empty? && $stdin.stat.size.zero?)
       raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = args.empty? ? '' : args.join(' ')
       input = wwid.fork_editor(input).strip
-      if input && !input.empty?
-        title, note = wwid.format_input(input)
-        note.push(options[:n]) if options[:n]
-        wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-        wwid.write(wwid.doing_file)
-      else
-        raise 'No content'
-      end
-    elsif args.length > 0
+      raise 'No content' unless input && !input.empty?
+
+      title, note = wwid.format_input(input)
+      note.push(options[:n]) if options[:n]
+      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
+      wwid.write(wwid.doing_file)
+    elsif !args.empty?
       title, note = wwid.format_input(args.join(' '))
       note.push(options[:n]) if options[:n]
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
-    elsif STDIN.stat.size > 0
-      title, note = wwid.format_input(STDIN.read)
+    elsif $stdin.stat.size.positive?
+      title, note = wwid.format_input($stdin.read)
       note.push(options[:n]) if options[:n]
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
@@ -320,7 +320,8 @@ command [:done, :did] do |c|
   c.desc 'Immediately archive the entry'
   c.switch %i[a archive], negatable: false, default_value: false
 
-  c.desc 'Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back. Used with --took, backdates start date'
+  c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
+  If used, ignores --back. Used with --took, backdates start date)
   c.arg_name 'DATE_STRING'
   c.flag [:at]
 
@@ -328,7 +329,9 @@ command [:done, :did] do |c|
   c.arg_name 'DATE_STRING'
   c.flag %i[b back]
 
-  c.desc 'Set completion date to start date plus interval (XX[mhd] or HH:MM). If used without the --back option, the start date will be moved back to allow the completion date to be the current time.'
+  c.desc %(Set completion date to start date plus interval (XX[mhd] or HH:MM).
+  If used without the --back option, the start date will be moved back to allow
+  the completion date to be the current time.)
   c.arg_name 'INTERVAL'
   c.flag %i[t took]
 
@@ -378,18 +381,16 @@ command [:done, :did] do |c|
       raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = ''
-      input += args.join(' ') if args.length > 0
+      input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
-      if input && !input.empty?
-        title, note = wwid.format_input(input)
-        title += " @done#{donedate}"
-        section = 'Archive' if options[:a]
-        wwid.add_item(title.cap_first, section.cap_first, { note: note, back: date })
-        wwid.write(wwid.doing_file)
-      else
-        raise 'No content'
-      end
-    elsif args.length == 0 && STDIN.stat.size == 0
+      raise 'No content' unless input && !input.empty?
+
+      title, note = wwid.format_input(input)
+      title += " @done#{donedate}"
+      section = 'Archive' if options[:a]
+      wwid.add_item(title.cap_first, section.cap_first, { note: note, back: date })
+      wwid.write(wwid.doing_file)
+    elsif args.empty? && $stdin.stat.size.zero?
       if options[:r]
         wwid.tag_last({ tags: ['done'], count: 1, section: section, remove: true })
       else
@@ -403,8 +404,8 @@ command [:done, :did] do |c|
       section = 'Archive' if options[:a]
       wwid.add_item(title.cap_first, section.cap_first, { note: note, back: date })
       wwid.write(wwid.doing_file)
-    elsif STDIN.stat.size.positive?
-      title, note = wwid.format_input(STDIN.read)
+    elsif $stdin.stat.size.positive?
+      title, note = wwid.format_input($stdin.read)
       title += " @done#{donedate}"
       section = options[:a] ? 'Archive' : section
       wwid.add_item(title.cap_first, section.cap_first, { note: note, back: date })
@@ -426,7 +427,7 @@ command :cancel do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: wwid.current_section
 
-  c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)'
+  c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2)'
   c.arg_name 'TAG'
   c.flag [:tag]
 
@@ -444,15 +445,22 @@ command :cancel do |c|
       options[:bool] = options[:bool] =~ /^(and|or|not)$/i ? options[:bool].upcase : 'AND'
     end
 
-    if args.length > 1
-      raise 'Only one argument allowed'
-    elsif args.length == 0 || args[0] =~ /\d+/
-      count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({ tags: ['done'], count: count, section: section, archive: options[:a], sequential: false,
-                      date: false, tag: tags, tag_bool: options[:bool] })
-    else
-      raise 'Invalid argument (specify number of recent items to mark @done)'
-    end
+    raise 'Only one argument allowed' if args.length > 1
+
+    raise 'Invalid argument (specify number of recent items to mark @done)' unless args.empty? || args[0] =~ /\d+/
+
+    count = args[0] ? args[0].to_i : 1
+    opts = {
+      archive: options[:a],
+      count: count,
+      date: false,
+      section: section,
+      sequential: false,
+      tag: tags,
+      tag_bool: options[:bool],
+      tags: ['done']
+    }
+    wwid.tag_last(opts)
   end
 end
 
@@ -471,15 +479,22 @@ command :finish do |c|
   c.arg_name 'INTERVAL'
   c.flag %i[t took]
 
-  c.desc 'Finish the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)'
+  c.desc 'Finish the last X entries containing TAG.
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool'
   c.arg_name 'TAG'
   c.flag [:tag]
+
+  c.desc 'Finish the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/")'
+  c.arg_name 'QUERY'
+  c.flag [:search]
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'AND'
 
-  c.desc 'Auto-generate finish dates from next entry\'s start time. Automatically generate completion dates 1 minute before next start date. --auto overrides the --date and --back parameters.'
+  c.desc %(Auto-generate finish dates from next entry's start time.
+  Automatically generate completion dates 1 minute before next start date.
+  --auto overrides the --date and --back parameters.)
   c.switch [:auto], negatable: false, default_value: false
 
   c.desc 'Archive entries'
@@ -494,6 +509,8 @@ command :finish do |c|
 
     unless options[:auto]
       raise '--back and --took cannot be used together' if options[:back] && options[:took]
+
+      raise '--search and --tag cannot be used together' if options[:search] && options[:tag]
 
       if options[:back]
         date = wwid.chronify(options[:back])
@@ -513,15 +530,24 @@ command :finish do |c|
       options[:bool] = options[:bool] =~ /^(and|or|not)$/i ? options[:bool].upcase : 'AND'
     end
 
-    if args.length > 1
-      raise 'Only one argument allowed'
-    elsif args.length == 0 || args[0] =~ /\d+/
-      count = args[0] ? args[0].to_i : 1
-      wwid.tag_last({ tags: ['done'], count: count, section: section, archive: options[:a], sequential: options[:auto],
-                      date: options[:date], back: date, tag: options[:tag], tag_bool: options[:bool] })
-    else
-      raise 'Invalid argument (specify number of recent items to mark @done)'
-    end
+    raise 'Only one argument allowed' if args.length > 1
+
+    raise 'Invalid argument (specify number of recent items to mark @done)' unless args.length == 0 || args[0] =~ /\d+/
+
+    count = args[0] ? args[0].to_i : 1
+    opts = {
+      archive: options[:a],
+      back: date,
+      count: count,
+      date: options[:date],
+      search: options[:search],
+      section: section,
+      sequential: options[:auto],
+      tag: tags,
+      tag_bool: options[:bool],
+      tags: ['done']
+    }
+    wwid.tag_last(opts)
   end
 end
 
@@ -539,6 +565,11 @@ command [:again, :resume] do |c|
   c.arg_name 'TAG'
   c.flag [:tag]
 
+  c.desc 'Repeat last entry matching search. Surround with
+  slashes for regex (e.g. "/query/").'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
   c.desc 'Boolean used to combine multiple tags'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'ALL'
@@ -549,8 +580,15 @@ command [:again, :resume] do |c|
 
   c.action do |_global_options, options, _args|
     tags = options[:tag].nil? ? [] : options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }
-    wwid.restart_last({ section: options[:s], note: options[:n], tag: tags, tag_bool: options[:bool],
-                        in: options[:in] })
+    opts = {
+      in: options[:in],
+      note: options[:n],
+      search: options[:search],
+      section: options[:s],
+      tag: tags,
+      tag_bool: options[:bool]
+    }
+    wwid.restart_last(opts)
   end
 end
 
@@ -575,45 +613,48 @@ command :tag do |c|
   c.switch %i[a autotag], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
-    if args.length == 0 && !options[:a]
-      raise 'You must specify at least one tag'
+    raise 'You must specify at least one tag' if args.empty? && !options[:a]
+
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
+    if options[:a]
+      tags = []
     else
+      tags = if args.join('') =~ /,/
+               args.join('').split(/,/)
+             else
+               args.join(' ').split(' ') # in case tags are quoted as one arg
+             end
 
-      section = wwid.guess_section(options[:s]) || options[:s].cap_first
-
-      if options[:a]
-        tags = []
-      else
-        tags = if args.join('') =~ /,/
-                 args.join('').split(/,/)
-               else
-                 args.join(' ').split(' ') # in case tags are quoted as one arg
-               end
-
-        tags.map! { |tag| tag.sub(/^@/, '').strip }
-      end
-
-      count = options[:c].to_i
-
-      if count == 0
-        section_q = section == 'All' ? '' : " in section #{section}"
-
-        question = if options[:a]
-                     "Are you sure you want to autotag all records#{section_q}"
-                   elsif options[:r]
-                     "Are you sure you want to remove #{tags.join(' and ')} from all records#{section_q}"
-                   else
-                     "Are you sure you want to add #{tags.join(' and ')} to all records#{section_q}"
-                   end
-
-        res = wwid.yn(question, default_response: false)
-
-        raise 'Cancelled' unless res
-      end
-
-      wwid.tag_last({ tags: tags, count: count, section: section, date: options[:date], remove: options[:r],
-                      autotag: options[:a] })
+      tags.map! { |tag| tag.sub(/^@/, '').strip }
     end
+
+    count = options[:c].to_i
+
+    if count.zero?
+      section_q = section == 'All' ? '' : " in section #{section}"
+
+      question = if options[:a]
+                   "Are you sure you want to autotag all records#{section_q}"
+                 elsif options[:r]
+                   "Are you sure you want to remove #{tags.join(' and ')} from all records#{section_q}"
+                 else
+                   "Are you sure you want to add #{tags.join(' and ')} to all records#{section_q}"
+                 end
+
+      res = wwid.yn(question, default_response: false)
+
+      raise 'Cancelled' unless res
+    end
+    opts = {
+      autotag: options[:a],
+      count: count,
+      date: options[:date],
+      remove: options[:r],
+      section: section,
+      tags: tags
+    }
+    wwid.tag_last(opts)
   end
 end
 
@@ -633,7 +674,10 @@ command [:mark, :flag] do |c|
 end
 
 desc 'List all entries'
-long_desc 'The argument can be a section name, @tag(s) or both. "pick" or "choose" as an argument will offer a section menu.'
+long_desc %(
+  The argument can be a section name, @tag(s) or both.
+  "pick" or "choose" as an argument will offer a section menu.
+)
 arg_name '[SECTION|@TAGS]'
 command :show do |c|
   c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
@@ -672,7 +716,7 @@ command :show do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.has_key?('tag_sort')
+  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(name|time)/i, default_value: default
 
@@ -685,14 +729,15 @@ command :show do |c|
   c.action do |_global_options, options, args|
     tag_filter = false
     tags = []
-    if args.length > 0
-      if args[0] =~ /^all$/i
+    if args.length.positive?
+      case args[0]
+      when /^all$/i
         section = 'All'
         args.shift
-      elsif args[0] =~ /^(choose|pick)$/i
+      when /^(choose|pick)$/i
         section = wwid.choose_section
         args.shift
-      elsif args[0] =~ /^@/
+      when /^@/
         section = 'All'
       else
         section = wwid.guess_section(args[0])
@@ -700,7 +745,7 @@ command :show do |c|
 
         args.shift
       end
-      if args.length > 0
+      if args.length.positive?
         args.each do |arg|
           if arg =~ /,/
             arg.split(/,/).each do |tag|
@@ -743,9 +788,22 @@ command :show do |c|
     tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
 
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-
-    puts wwid.list_section({ section: section, date_filter: dates, count: options[:c].to_i, tag_filter: tag_filter,
-                             age: options[:a], order: options[:s], output: options[:output], times: options[:t], totals: options[:totals], sort_tags: options[:sort_tags], highlight: true, only_timed: options[:only_timed], tags_color: tags_color })
+    opts = {
+      age: options[:a],
+      count: options[:c].to_i,
+      date_filter: dates,
+      highlight: true,
+      only_timed: options[:only_timed],
+      order: options[:s],
+      output: options[:output],
+      section: section,
+      sort_tags: options[:sort_tags],
+      tag_filter: tag_filter,
+      tags_color: tags_color,
+      times: options[:t],
+      totals: options[:totals]
+    }
+    puts wwid.list_section(opts)
   end
 end
 
@@ -774,7 +832,7 @@ command [:grep, :search] do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.has_key?('tag_sort')
+  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
@@ -789,8 +847,19 @@ command [:grep, :search] do |c|
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_section({ search: args.join(' '), section: section, output: options[:output], times: options[:t],
-                             highlight: true, totals: options[:totals], only_timed: options[:only_timed], sort_tags: options[:sort_tags], tags_color: tags_color })
+    opts = {
+      highlight: true,
+      only_timed: options[:only_timed],
+      output: options[:output],
+      search: args.join(' '),
+      section: section,
+      sort_tags: options[:sort_tags],
+      tags_color: tags_color,
+      times: options[:t],
+      totals: options[:totals]
+    }
+
+    puts wwid.list_section(opts)
   end
 end
 
@@ -810,7 +879,7 @@ command :recent do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.has_key?('tag_sort')
+  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
@@ -818,16 +887,19 @@ command :recent do |c|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
     unless global_options[:version]
-      count = if args.length > 0
-                args[0].to_i
-              else
-                10
-              end
+      count = args.empty? ? 10 : args[0].to_i
       options[:t] = true if options[:totals]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
       tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
-      puts wwid.recent(count, section.cap_first,
-                       { times: options[:t], totals: options[:totals], sort_tags: options[:sort_tags], tags_color: tags_color })
+
+      opts = {
+        sort_tags: options[:sort_tags],
+        tags_color: tags_color,
+        times: options[:t],
+        totals: options[:totals]
+      }
+
+      puts wwid.recent(count, section.cap_first, opts)
 
     end
   end
@@ -847,7 +919,7 @@ command :today do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.has_key?('tag_sort')
+  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
@@ -865,7 +937,9 @@ command :today do |c|
 end
 
 desc 'List entries for a date'
-long_desc 'Date argument can be natural language. "thursday" would be interpreted as "last thursday," and "2d" would be interpreted as "two days ago." If you use "to" or "through" between two dates, it will create a range.'
+long_desc %(Date argument can be natural language. "thursday" would be interpreted as "last thursday,"
+and "2d" would be interpreted as "two days ago." If you use "to" or "through" between two dates,
+it will create a range.)
 arg_name 'DATE_STRING'
 command :on do |c|
   c.desc 'Section'
@@ -880,7 +954,7 @@ command :on do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.has_key?('tag_sort')
+  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
@@ -934,7 +1008,7 @@ command :yesterday do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.has_key?('tag_sort')
+  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
@@ -1008,12 +1082,10 @@ desc 'Add a new section to the "doing" file'
 arg_name 'SECTION_NAME'
 command :add_section do |c|
   c.action do |_global_options, _options, args|
-    if wwid.sections.include?(args[0])
-      raise "Section #{args[0]} already exists"
-    else
-      wwid.add_section(args[0].cap_first)
-      wwid.write(wwid.doing_file)
-    end
+    raise "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
+
+    wwid.add_section(args[0].cap_first)
+    wwid.write(wwid.doing_file)
   end
 end
 
@@ -1061,7 +1133,7 @@ command :view do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.has_key?('tag_sort')
+  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
 
@@ -1079,47 +1151,62 @@ command :view do |c|
 
     view = wwid.get_view(title)
     if view
-      only_timed = if (view.has_key?('only_timed') && view['only_timed']) || options[:only_timed]
+      only_timed = if (view.key?('only_timed') && view['only_timed']) || options[:only_timed]
                      true
                    else
                      false
                    end
 
-      template = view.has_key?('template') ? view['template'] : nil
-      format = view.has_key?('date_format') ? view['date_format'] : nil
-      tags_color = view.has_key?('tags_color') ? view['tags_color'] : nil
+      template = view.key?('template') ? view['template'] : nil
+      format = view.key?('date_format') ? view['date_format'] : nil
+      tags_color = view.key?('tags_color') ? view['tags_color'] : nil
       tag_filter = false
-      if view.has_key?('tags') && !(view['tags'].nil? || view['tags'].empty?)
+      if view.key?('tags') && !(view['tags'].nil? || view['tags'].empty?)
         tag_filter = { 'tags' => [], 'bool' => 'OR' }
         tag_filter['tags'] = if view['tags'].instance_of?(Array)
-                               view['tags'].map { |tag| tag.strip }
+                               view['tags'].map(&:strip)
                              else
-                               view['tags'].gsub(/[, ]+/, ' ').split(' ').map { |tag| tag.strip }
+                               view['tags'].gsub(/[, ]+/, ' ').split(' ').map(&:strip)
                              end
-        tag_filter['bool'] = view.has_key?('tags_bool') && !view['tags_bool'].nil? ? view['tags_bool'].upcase : 'OR'
+        tag_filter['bool'] = view.key?('tags_bool') && !view['tags_bool'].nil? ? view['tags_bool'].upcase : 'OR'
       end
 
       # If the -o/--output flag was specified, override any default in the view template
-      options[:o] ||= view.has_key?('output_format') ? view['output_format'] : 'template'
+      options[:o] ||= view.key?('output_format') ? view['output_format'] : 'template'
 
       count = if options[:c]
                 options[:c]
               else
-                view.has_key?('count') ? view['count'] : 10
+                view.key?('count') ? view['count'] : 10
               end
       section = if options[:s]
                   section
                 else
-                  view.has_key?('section') ? view['section'] : wwid.current_section
+                  view.key?('section') ? view['section'] : wwid.current_section
                 end
-      order = view.has_key?('order') ? view['order'] : 'asc'
+      order = view.key?('order') ? view['order'] : 'asc'
 
       options[:t] = true if options[:totals]
-      options[:output].downcase! if options[:output]
+      options[:output]&.downcase!
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-      puts wwid.list_section({ section: section, count: count, template: template, format: format, order: order,
-                               tag_filter: tag_filter, output: options[:o], tags_color: tags_color, times: options[:t], highlight: options[:color], totals: options[:totals], only_timed: only_timed, sort_tags: options[:sort_tags] })
+      opts = {
+        count: count,
+        format: format,
+        highlight: options[:color],
+        only_timed: only_timed,
+        order: order,
+        output: options[:o],
+        section: section,
+        sort_tags: options[:sort_tags],
+        tag_filter: tag_filter,
+        tags_color: tags_color,
+        template: template,
+        times: options[:t],
+        totals: options[:totals]
+      }
+
+      puts wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
       exit_now! 'Cancelled'
     else
@@ -1160,17 +1247,15 @@ command :archive do |c|
   c.flag [:bool], must_match: /(and|or|not)/i, default_value: 'AND'
 
   c.action do |_global_options, options, args|
-    if args.length > 0
-      if args[0] =~ /^@\S+/
-        section = 'all'
-        tags = args.map { |t| t.sub(/^@/, '').strip }
-      else
-        section = args[0].cap_first
-        tags = args.length > 1 ? args[1..-1].map { |t| t.sub(/^@/, '').strip } : nil
-      end
-    else
+    if args.empty?
       section = wwid.current_section
       tags = []
+    elsif args[0] =~ /^@\S+/
+      section = 'all'
+      tags = args.map { |t| t.sub(/^@/, '').strip }
+    else
+      section = args[0].cap_first
+      tags = args.length > 1 ? args[1..].map { |t| t.sub(/^@/, '').strip } : nil
     end
 
     tags.concat(options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if options[:tag]
@@ -1199,23 +1284,20 @@ command :open do |c|
       k.instance_of?(String) || v.nil? || v == false
     end
     if `uname` =~ /Darwin/
-      if params.length < 2
-        if options[:a]
-          system %(open -a "#{options[:a]}" "#{File.expand_path(wwid.doing_file)}")
-        elsif options[:b]
-          system %(open -b "#{options[:b]}" "#{File.expand_path(wwid.doing_file)}")
-        elsif options[:e]
-          raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      if options[:a]
+        system %(open -a "#{options[:a]}" "#{File.expand_path(wwid.doing_file)}")
+      elsif options[:b]
+        system %(open -b "#{options[:b]}" "#{File.expand_path(wwid.doing_file)}")
+      elsif options[:e]
+        raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
-          system %($EDITOR "#{File.expand_path(wwid.doing_file)}")
-        elsif wwid.config.has_key?('editor_app') && !wwid.config['editor_app'].nil?
-          system %(open -a "#{wwid.config['editor_app']}" "#{File.expand_path(wwid.doing_file)}")
-        else
-          system %(open "#{File.expand_path(wwid.doing_file)}")
-        end
+        system %($EDITOR "#{File.expand_path(wwid.doing_file)}")
+      elsif wwid.config.key?('editor_app') && !wwid.config['editor_app'].nil?
+        system %(open -a "#{wwid.config['editor_app']}" "#{File.expand_path(wwid.doing_file)}")
       else
-        raise "The open command takes a single parameter. #{params.length} specified."
+        system %(open "#{File.expand_path(wwid.doing_file)}")
       end
+
     else
       raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
@@ -1297,7 +1379,7 @@ pre do |global, _command, _options, _args|
 
   wwid.config[:include_notes] = false unless global[:notes]
 
-  $stdout.puts 'doing v' + Doing::VERSION if global[:version]
+  $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
 
   # Return true to proceed; false to abort and not call the
   # chosen command
