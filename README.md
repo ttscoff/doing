@@ -521,6 +521,18 @@ If you have a use for it, you can use `-o csv` on the show or view commands to o
 
 You can also show entries matching a search string with `doing grep` (synonym `doing search`). If you want to search with regular expressions or for an exact match, surround your search query with forward slashes, e.g. `doing search /project name/`. If you pass a search string without slashes, it's treated as a fuzzy search string, meaning matches can be found as long as the characters in the search string are in order and with no more than three other characters between each. By default searches are across all sections, but you can limit it to one with the `-s SECTION_NAME` flag. Searches can be displayed with the default template, or output as HTML, CSV, or JSON.
 
+##### Modifying the last entry
+
+If you want to make a change to the last entry added, use `doing last -e`. The `-e` flag opens the last entry (including note) in your editor, and when you close your editor, your doing file will be updated with any changes you made to the entry.
+
+You can choose the last entry in a specific section by including the `-s` flag, so `doing last -s Later -e` would edit the most recent entry in the Later section.
+
+You can also use text search or a tag filter to get an entry earlier than the most recent one. A tag search with `doing last --tag=project1 -e` will edit the last entry tagged `@project1`. Multiple tags can be combined with commas, and you can use `--bool` to specify whether the search is `AND` (matches all tags given), `OR` (matches any tag given), or `NOT` (matches none of the tags).
+
+You can edit the last entry that matches a search string with `--search=QUERY`. `QUERY` can either be a raw string, or you can surround it with slashes to search by regex (`doing last --search="/project./" -e`). If the string is raw text, fuzzy matching will be used, so the characters must be in order but can be separated by up to three other characters.
+
+Both `--tag` and `--search` can be constrained to a single section with `-s SECTION`.
+
 #### Views
 
     view     - Display a user-created view
