@@ -2,6 +2,8 @@
 
 #### NEW
 
+- Added config_editor_app setting to config so you can have
+- A parenthetical at the end of an entry title becomes an attached
 - `--editor` flag for `doing last` to edit last entry
 - `--tag=` flag to filter `doing last` by tag
 - `--search=` to filter `doing last` by text/regex search
@@ -10,13 +12,14 @@
 
 #### IMPROVED
 
-- Code cleanup
 - Clean up command line help
 - --editor improvements for all commands that use it
 
 #### FIXED
 
-- `doing tag --remove` was adding tags if they didn't exist
+- Doing finish --took throwing error
+- Doing tag --remove was adding tags if they didn't exist
+- Creating a meanwhile task with a note resulted in an error
 
 ### 1.0.54
 
