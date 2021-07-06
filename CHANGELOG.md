@@ -1,3 +1,13 @@
+### 1.0.56
+
+#### IMPROVED
+
+- Tag command tests
+
+#### FIXED
+
+- Doing not reading per-directory .doingrc configs
+
 ### 1.0.55
 
 #### NEW
