@@ -1,3 +1,9 @@
+### 1.0.58
+
+#### IMPROVED
+
+- Finish previous task if `doing again` and not already completed
+
 ### 1.0.57
 
 #### IMPROVED

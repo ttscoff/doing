@@ -61,6 +61,16 @@ class DoingTaskTest < Test::Unit::TestCase
                  'Finished time should be equal to the nearest minute')
   end
 
+  def test_finish_tag
+    doing('now', 'Test new task @tag1')
+    doing('now', 'Another new task @tag2')
+    doing('finish', '--tag', 'tag1')
+    t1 = doing('show', '@tag1').uncolor.strip
+    assert_match(ENTRY_DONE_REGEX, t1, "@tag1 task should have @done timestamp")
+    t2 = doing('show', '@tag2').uncolor.strip
+    assert_no_match(ENTRY_DONE_REGEX, t2, "@tag2 task should not have @done timestamp")
+  end
+
   def test_later_task
     subject = 'Test later task'
     result = doing('--stdout', 'later', subject)
@@ -74,14 +84,6 @@ class DoingTaskTest < Test::Unit::TestCase
     doing('cancel')
     result = doing('show')
     assert_match(/@done$/, result, 'should have @done tag with no timestamp')
-  end
-
-  def test_resume_task
-    subject = 'Test task'
-    doing('done', subject)
-    result = doing('--stdout', 'again')
-
-    assert_match(/Added "#{subject}" to Currently/, result, 'Task should be added again')
   end
 
   def test_archive_task

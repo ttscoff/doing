@@ -707,6 +707,11 @@ class WWID
       @results.push(%(No previous entry found))
       return
     end
+    unless last.has_tags?(['done'], 'ALL')
+      new_item = last.dup
+      new_item['title'] += " @done(#{Time.now.strftime('%F %R')})"
+      update_item(last, new_item)
+    end
     # Remove @done tag
     title = last['title'].sub(/\s*@done(\(.*?\))?/, '').chomp
     section = opt[:in].nil? ? last['section'] : guess_section(opt[:in])
@@ -736,8 +741,6 @@ class WWID
         end
         items = combined['items'].dup.sort_by { |item| item['date'] }.reverse
         sec_arr.push(items[0]['section'])
-
-        sec_arr = sections
       else
         sec_arr = [guess_section(opt[:section])]
       end
@@ -800,12 +803,12 @@ class WWID
       if @content.key?(section)
 
         items = @content[section]['items'].dup.sort_by { |item| item['date'] }.reverse
-        index = 0
+        idx = 0
         done_date = Time.now
         next_start = Time.now
         count = (opt[:count]).zero? ? items.length : opt[:count]
         items.map! do |item|
-          break if index == count
+          break if idx == count
 
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.has_tags?(opt[:tag], opt[:tag_bool])
           search_match = opt[:search].nil? || opt[:search].empty? ? true : item.matches_search?(opt[:search])
@@ -854,7 +857,7 @@ class WWID
               item['title'] = title
             end
 
-            index += 1
+            idx += 1
           end
 
           item
@@ -883,6 +886,37 @@ class WWID
       end
     end
 
+    write(@doing_file)
+  end
+
+  def update_item(old_item, new_item)
+    items = []
+    @content.each do |_k, v|
+      items.concat(v['items'])
+    end
+
+    idx = nil
+
+    items.each_with_index do |item, i|
+      if old_item == item
+        idx = i
+        break
+      end
+    end
+
+    if idx.nil?
+      @results.push('No entries found')
+      return
+    end
+
+    section = items[idx]['section']
+
+    section_items = @content[section]['items']
+    s_idx = section_items.index(old_item)
+
+    section_items[s_idx] = new_item
+    @results.push("Entry updated: #{section_items[s_idx]['title']}")
+    @content[section]['items'] = section_items
     write(@doing_file)
   end
 
@@ -1014,7 +1048,8 @@ class WWID
   # @param      tag   (String) Tag to replace
   # @param      opt   (Hash) Additional Options
   #
-  def stop_start(tag, opt = {})
+  def stop_start(target_tag, opt = {})
+    tag = target_tag.dup
     opt[:section] ||= @current_section
     opt[:archive] ||= false
     opt[:back] ||= Time.now
