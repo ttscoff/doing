@@ -18,4 +18,5 @@ jekyll.gsub!(/<!--GITHUB-->.*?<!--END GITHUB-->/m, '')
 jekyll.gsub!(/<!--JEKYLL(.*?)-->/m, '\1')
 project = IO.read(project_file).force_encoding('ASCII-8BIT').encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => '?')
 project.sub!(/(?<=\<!--README-->)(.*?)(?=\<!--END README-->)/m, jekyll)
+project.sub!(/^updated: \d{4}-\d{2}-\d{2}/, "updated: #{Time.now.strftime('%Y-%m-%d')}")
 File.open(project_file, 'w') { |f| f.puts(project) }

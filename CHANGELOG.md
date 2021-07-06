@@ -1,3 +1,9 @@
+### 1.0.57
+
+#### IMPROVED
+
+- Unit tests
+
 ### 1.0.56
 
 #### IMPROVED

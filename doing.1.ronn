@@ -1,21 +1,9 @@
-# doing
+doing(1) Command line time tracking
+===================================
 
 **A command line tool for remembering what you were doing and tracking what you've done.**
 
 _If you're one of the rare people like me who find this useful, feel free to [buy me some coffee](http://brettterpstra.com/donate/)._
-
-## Contents
-
-- [What and why](#what-and-why)
-- [Installation](#installation)
-- [The "doing" file](#the-doing-file)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Extras](#extras)
-- [Troubleshooting](#troubleshooting)
-- [Changelog](#changelog)
-
-<!--README-->
 
 ## What and why
 
@@ -29,9 +17,11 @@ _Side note:_ I actually use the library behind this utility as part of another s
 
 ## Installation
 
-The current version of `doing` is <!--VER-->1.0.56<!--END VER-->.
-
     $ [sudo] gem install doing
+
+To install the _latest_ version, use `--pre`:
+
+    $ [sudo] gem install --pre doing
 
 Only use `sudo` if your environment requires it. If you're using the system Ruby on a Mac, for example, it will likely be necessary. If `gem install doing` fails, then run `sudo gem install doing` and provide your administrator password.
 
@@ -588,63 +578,3 @@ __Bash:__ See the file [`doing.completion.bash`](https://github.com/ttscoff/doin
 __Zsh:__ See the file [`doing.completion.zsh`](https://github.com/ttscoff/doing/blob/master/doing.completion.zsh) in the git repository for zsh completion. Courtesy of [Gabe Anzelini](https://github.com/gabeanzelini).
 
 __Fish:__ See the file [`doing.fish`](https://github.com/ttscoff/doing/blob/master/doing.fish) in the git repository for Fish completion. This is the least complete of all of the completions, but it will autocomplete the first level of subcommands, and your custom sections and views for the `doing show` and `doing view` commands.
-
-### Launchbar/Alfred
-
-The LaunchBar action requires that `doing` be available in `/usr/local/bin/doing`. If it's not (because you're using RVM or similar), you'll need to symlink it there. Running the action with Return will show the latest 9 items from Currently, along with any time intervals recorded, and includes a submenu of Timers for each tag.
-
-Pressing Spacebar and typing allows you to add a new entry to currently. You an also trigger a custom show command by typing "show [section/tag]" and hitting return. Include any command line flags at the end of the string, and if you add text in parenthesis, it will be processed as a note on the entry.
-
-Point of interest, the LaunchBar Action makes use of the `-o json` flag for outputting JSON to the action's script for parsing.
-
-<!--GITHUB-->See <https://brettterpstra.com/projects/doing/> for the download.<!--END GITHUB-->
-<!--JEKYLL
-{% download 117 %} 
--->
-
-Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
-
-## Troubleshooting
-
-### Errors after "Successfully installed..."
-
-If you get errors in the terminal immediately after a message like:
-
-    Successfully installed doing-x.x.x
-    2 gems installed
-
-...it may just be documentation related. If running `doing` works, you can ignore them. If not, try running the install command again with `--no-document`:
-
-    $ gem install --no-document doing
-
-### Command not found
-
-If running `doing` after a successful install gives you a "command not found" error, then your gem path isn't in your `$PATH`, meaning the system can't find it. To locate the gem and link it into your path, you can try this:
-
-    cd $GEM_PATH/bin
-    ln -s doing /usr/local/bin/
-
-Then try running `doing` and see if it works.
-
-### Encoding errors
-
-Ruby is rife with encoding inconsistencies across platforms and versions. Feel free to file issues (see below).
-
-### Support
-
-
-As a free project, `doing` isn't heavily supported, but you can get support from myself and other users on GitHub. If you run into a replicatable bug in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message. To get a more verbose error message, try running `GLI_DEBUG=true doing [...]` for a full trace.
-
-Please try not to email me directly about GitHub projects.
-
-### Developer notes
-
-Feel free to [poke around](http://github.com/ttscoff/doing/), I'll try to add more comments in the future (and retroactively).
-
-<!--END README-->
-
-PayPal link: [paypal.me/ttscoff](https://paypal.me/ttscoff)
-
-## Changelog
-
-See [CHANGELOG.md](https://github.com/ttscoff/doing/blob/master/CHANGELOG.md)
