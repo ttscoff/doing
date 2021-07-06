@@ -61,23 +61,6 @@ class DoingTaskTest < Test::Unit::TestCase
                  'Finished time should be equal to the nearest minute')
   end
 
-  def test_tag_task
-    subject = 'Test new task'
-    tag = 'testtag'
-    doing('now', subject)
-    doing('tag', tag)
-    assert_match(/@#{tag}/, doing('last').uncolor, 'should have added tag to last task')
-  end
-
-  def test_flag_task
-    subject = 'Test new task'
-    doing('now', subject)
-    doing('flag')
-    assert_match(/@flagged/, doing('last').uncolor, 'should have added @flagged to last task')
-    doing('flag', '-r')
-    assert_no_match(/@flagged/, doing('last').uncolor, 'should have removed @flagged from last task')
-  end
-
   def test_later_task
     subject = 'Test later task'
     result = doing('--stdout', 'later', subject)

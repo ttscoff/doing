@@ -15,7 +15,6 @@ _If you're one of the rare people like me who find this useful, feel free to [bu
 - [Troubleshooting](#troubleshooting)
 - [Changelog](#changelog)
 
-<!-- end toc -->
 <!--README-->
 
 ## What and why
@@ -30,7 +29,7 @@ _Side note:_ I actually use the library behind this utility as part of another s
 
 ## Installation
 
-The current version of `doing` is <!--VER-->1.0.54<!--END VER-->.
+The current version of `doing` is <!--VER-->1.0.55<!--END VER-->.
 
     $ [sudo] gem install doing
 
@@ -150,8 +149,6 @@ In the case of the `doing now -e` command, your `$EDITOR` environment variable w
     export EDITOR="mate -w"
 
 The only requirements are that your editor be launchable from the command line and able to "wait." In the case of Sublime Text and TextMate, just use `-w` like this: `export EDITOR="subl -w"`.
-
-You can set a 
 
 ### Templates
 

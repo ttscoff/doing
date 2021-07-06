@@ -1,5 +1,7 @@
 ---
 autotag:
+  transform:
+  - (deploy|merge)\s+@(\w+)-\d+:$1-$2 @dev @dev-$2
   whitelist: []
   synonyms: {}
 doing_file: "~/what_was_i_doing.md"

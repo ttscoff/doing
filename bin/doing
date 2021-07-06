@@ -1364,7 +1364,7 @@ command :undo do |c|
 end
 
 pre do |global, _command, _options, _args|
-  if global[:config_file]
+  if global[:config_file] && global[:config_file] != wwid.config_file
     wwid.config_file = global[:config_file]
     wwid.configure({ ignore_local: true })
     # wwid.results.push("Override config file #{wwid.config_file}")
