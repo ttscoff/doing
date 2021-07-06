@@ -1265,6 +1265,7 @@ command :archive do |c|
 end
 
 desc 'Open the "doing" file in an editor'
+long_desc "`doing open` defaults to using the editor_app setting in #{wwid.config_file} (#{wwid.config.key?('editor_app') ? wwid.config['editor_app'] : 'not set'})"
 command :open do |c|
   if `uname` =~ /Darwin/
     c.desc 'Open with app name'
@@ -1275,7 +1276,7 @@ command :open do |c|
     c.arg_name 'BUNDLE_ID'
     c.flag [:b]
   end
-  c.desc 'Open with $EDITOR'
+  c.desc "Open with $EDITOR (#{ENV['EDITOR']})"
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
@@ -1312,7 +1313,7 @@ command :config do |c|
   c.arg_name 'EDITOR'
   c.flag %i[e editor], default_value: nil
 
-  if `uname` =~ /Darwins/
+  if `uname` =~ /Darwin/
     c.desc 'Application to use'
     c.arg_name 'APP_NAME'
     c.flag [:a]
@@ -1321,14 +1322,14 @@ command :config do |c|
     c.arg_name 'BUNDLE_ID'
     c.flag [:b]
 
-    c.desc "Use the editor_app defined in ~/.doingrc (#{wwid.config['editor_app']})"
+    c.desc "Use the config_editor_app defined in ~/.doingrc (#{wwid.config.key?('config_editor_app') ? wwid.config['config_editor_app'] : 'config_editor_app not set'})"
     c.switch [:x]
   end
 
   c.action do |_global_options, options, _args|
-    if `uname` =~ /Darwins/
+    if `uname` =~ /Darwin/
       if options[:x]
-        `open -a "#{wwid.config['editor_app']}" "#{wwid.config_file}"`
+        `open -a "#{wwid.config['config_editor_app']}" "#{wwid.config_file}"`
       elsif options[:a] || options[:b]
         if options[:a]
           `open -a "#{options[:a]}" "#{wwid.config_file}"`

@@ -181,6 +181,7 @@ class WWID
     @config['autotag']['synonyms'] ||= {}
     @config['doing_file'] ||= '~/what_was_i_doing.md'
     @config['current_section'] ||= 'Currently'
+    @config['config_editor_app'] ||= nil
     @config['editor_app'] ||= nil
 
     @config['html_template'] ||= {}

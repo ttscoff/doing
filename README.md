@@ -140,13 +140,17 @@ You can rename the section that holds your current tasks. By default, this is `C
 
 ### Default editors
 
-The setting `editor_app` only applies to Mac OS X users. It's the default application that the command `doing open` will open your WWID file in. If this is blank, it will be opened by whatever the system default is, or you can use `-a app_name` or `-b bundle_id` to override.
+The setting `editor_app` only applies to Mac OS X users. It's the default application that the command `doing open` will open your WWID file in. Personally, I use `editor_app: TaskPaper`. If this is blank, it will be opened by whatever the system default is for the doing file extension (default is `.md`), or you can use `-a app_name` or `-b bundle_id` to override.
+
+You can define a separate app to open the config file in when running `doing config`. The key for this is `config_editor_app`.
 
 In the case of the `doing now -e` command, your `$EDITOR` environment variable will be used to complete the entry text and notes. Set it in your `~/.bash_profile` or whatever is appropriate for your system:
 
     export EDITOR="mate -w"
 
 The only requirements are that your editor be launchable from the command line and able to "wait." In the case of Sublime Text and TextMate, just use `-w` like this: `export EDITOR="subl -w"`.
+
+You can set a 
 
 ### Templates
 
