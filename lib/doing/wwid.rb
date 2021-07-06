@@ -823,7 +823,11 @@ class WWID
                 done_date = next_start - 1
                 next_start = item['date']
               elsif opt[:back]
-                done_date = item['date'] + (opt[:back] - item['date'])
+                if opt[:back].is_a? Integer
+                  done_date = item['date'] + opt[:back]
+                else
+                  done_date = item['date'] + (opt[:back] - item['date'])
+                end
               else
                 done_date = Time.now
               end
