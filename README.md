@@ -4,7 +4,6 @@
 
 _If you're one of the rare people like me who find this useful, feel free to [buy me some coffee](http://brettterpstra.com/donate/)._
 
-
 ## Contents
 
 - [What and why](#what-and-why)
@@ -30,6 +29,8 @@ If there's something I want to look at later but doesn't need to be added to a t
 _Side note:_ I actually use the library behind this utility as part of another script that mirrors entries in [Day One](http://dayoneapp.com) that have the tag `wwid`. I can use the hourly writing reminders and enter my stuff in the quick entry popup. Someday I'll get around to cleaning that up and putting it out there.
 
 ## Installation
+
+The current version of `doing` is <!--VER-->1.0.54<!--END VER-->.
 
     $ [sudo] gem install doing
 
@@ -496,6 +497,8 @@ This creates a search pattern looking for a string of word characters followed b
 
 You can also add notes at the time of entry by using the `-n` or `--note` flag with `doing now`, `doing later`, or `doing done`. If you pass text to any of the creation commands which has multiple lines, everything after the first line break will become the note.
 
+If a string passed to `now`, `later`, or `done` has a parenthetical at the end, the parenthetical will be removed from the title and its contents added as a note. So `doing now Working on @project1 (Adding some unit tests)` would create an entry titled "Working on @project1" with a note "Adding some unit tests." This is the equivalent of `doing now Working on @project1 -n "Adding some unit tests"`.
+
 #### Displaying entries:
 
     show      - List all entries
@@ -596,12 +599,10 @@ Pressing Spacebar and typing allows you to add a new entry to currently. You an 
 
 Point of interest, the LaunchBar Action makes use of the `-o json` flag for outputting JSON to the action's script for parsing.
 
-<!--GITHUB-->
-See <https://brettterpstra.com/projects/doing/> for the download.
+<!--GITHUB-->See <https://brettterpstra.com/projects/doing/> for the download.<!--END GITHUB-->
 <!--JEKYLL
 {% download 117 %} 
 -->
-<!--END GITHUB-->
 
 Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
 
