@@ -71,7 +71,8 @@ A basic configuration looks like this:
     marker_color: yellow
     tags_color: boldcyan
     default_tags: []
-    editor_app: TextEdit
+    editor_app: TaskPaper
+    config_editor_app: Sublime Text
     :include_notes: true
     views:
       color:
