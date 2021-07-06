@@ -90,5 +90,4 @@ task :bump, :type do |t, args|
   }
 end
 
-task :default => [:test,:features]
-task :build => [:clobber,:rdoc,:package]
+task :default => [:clobber,:rdoc,:package]

@@ -10,7 +10,7 @@ class NoteEditorTest < Test::Unit::TestCase
     @tmpdirs = []
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
-    @config_file = File.join(File.dirname(__FILE__),'test.doingrc')
+    @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
   end
 
   def teardown
@@ -41,20 +41,23 @@ class NoteEditorTest < Test::Unit::TestCase
     doing('note', note1)
     doing('note', note2)
     assert_doing_shows([
-      [/#{note1}\s*$/, "Should add note #1"],
-      [/#{note2}\s*$/, "Should add note #2"]])
+                         [/#{note1}\s*$/, 'Should add note #1'],
+                         [/#{note2}\s*$/, 'Should add note #2']
+                       ])
 
     # Replace should replace both
     replacer_note = 'replaced #1 and #2'
     editor = mk_replacing_editor(subject, replacer_note)
     doing_env({ 'EDITOR' => editor }, 'note', '-e')
     assert_doing_shows([
-      [/#{replacer_note}\s*$/, "replacer note should be visible"],
-      [/#{note1}\s*$/, "note #1 should have been replaced", :refute],
-      [/#{note2}\s*$/, "note #2 should have been replaced", :refute]])
+                         [/#{replacer_note}\s*$/, 'replacer note should be visible'],
+                         [/#{note1}\s*$/, 'note #1 should have been replaced', :refute],
+                         [/#{note2}\s*$/, 'note #2 should have been replaced', :refute]
+                       ])
   end
 
-private
+  private
+
   def assert_doing_shows(matches)
     shown = doing('show')
     matches.each do |regexp, msg, opt_refute|
@@ -86,10 +89,10 @@ private
   def mk_replacing_editor(entry_content, replace_text)
     editor = File.join(@basedir, 'editor')
     File.open(editor, 'w') do |f|
-      f.puts <<-FAKE_EDITOR
-#!/bin/sh
-FILE=$1
-echo -e "#{entry_content}\n#{replace_text}" > $FILE
+      f.puts <<~FAKE_EDITOR
+        #!/bin/sh
+        FILE=$1
+        echo -e "#{entry_content}\n#{replace_text}" > $FILE
       FAKE_EDITOR
     end
     FileUtils.chmod('+x', editor)
