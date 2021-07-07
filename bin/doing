@@ -572,7 +572,7 @@ command [:again, :resume] do |c|
 
   c.desc 'Boolean used to combine multiple tags'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'ALL'
+  c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'AND'
 
   c.desc 'Note'
   c.arg_name 'TEXT'

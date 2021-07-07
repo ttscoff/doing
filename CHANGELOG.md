@@ -1,3 +1,9 @@
+### 1.0.60
+
+#### FIXED
+
+- Default value for `doing again --bool` was ALL, should be AND
+
 ### 1.0.59
 
 #### IMPROVED
