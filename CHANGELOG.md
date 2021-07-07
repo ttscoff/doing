@@ -1,3 +1,7 @@
+### 1.0.61
+
+- Add --search filter to `doing archive`
+
 ### 1.0.60
 
 #### FIXED
