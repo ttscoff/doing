@@ -1230,13 +1230,16 @@ desc 'Move entries between sections'
 arg_name 'SECTION_NAME'
 default_value wwid.current_section
 command :archive do |c|
-  c.desc 'Count to keep (ignored if archiving by tag)'
-  c.arg_name 'COUNT'
-  c.flag %i[k keep], default_value: 5, must_match: /^\d+$/, type: Integer
+  c.desc 'How many items to keep (ignored if archiving by tag or search)'
+  c.arg_name 'X'
+  c.flag %i[k keep], must_match: /^\d+$/, type: Integer
 
   c.desc 'Move entries to'
   c.arg_name 'SECTION_NAME'
   c.flag %i[t to], default_value: 'Archive'
+
+  c.desc 'Label moved items with @from(SECTION_NAME)'
+  c.switch [:label], default_value: true, negatable: true
 
   c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
   c.arg_name 'TAG'
@@ -1246,21 +1249,36 @@ command :archive do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: /(and|or|not)/i, default_value: 'AND'
 
+  c.desc 'Search filter'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
   c.action do |_global_options, options, args|
     if args.empty?
       section = wwid.current_section
       tags = []
+    elsif args[0] =~ /^all/i
+      section = 'all'
     elsif args[0] =~ /^@\S+/
       section = 'all'
       tags = args.map { |t| t.sub(/^@/, '').strip }
     else
       section = args[0].cap_first
-      tags = args.length > 1 ? args[1..].map { |t| t.sub(/^@/, '').strip } : nil
+      tags = args.length > 1 ? args[1..].map { |t| t.sub(/^@/, '').strip } : []
     end
+
+    raise '--keep and --count can\'t be used together' if options[:keep] && options[:count]
 
     tags.concat(options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if options[:tag]
 
-    wwid.archive(section, options[:keep], options[:to], tags, options[:bool])
+    opts = {
+      bool: options[:bool],
+      destination: options[:to],
+      keep: options[:keep],
+      search: options[:search],
+      tags: tags
+    }
+    wwid.archive(section, opts)
   end
 end
 

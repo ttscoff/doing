@@ -120,6 +120,26 @@ class DoingTaskTest < Test::Unit::TestCase
     assert_match(/#{subject}/, doing('show', 'Archive'), 'Archive section should contain test task')
   end
 
+  def test_archive_by_search
+    subject = 'Test task'
+    prefixes = %w[consuming eating]
+    search_terms = %w[bagels bacon eggs brunch breakfast lunch]
+    search_terms.each do |food|
+      prefixes.each do |prefix|
+        doing('done', "#{prefix.capitalize} @#{food}")
+      end
+    end
+
+    result = doing('--stdout', 'archive', '--search', '/consuming.*?bagels/')
+
+    assert_match(/Added section "Archive"/, result, 'Archive section should have been added')
+    assert_match(/Archived 1 items from Currently to Archive/, result, '1 item should have been archived')
+    assert_match(/consuming @bagels/i, doing('show', 'Archive'), 'Archive section should contain test entry')
+
+    result = doing('--stdout', 'archive', '--search', 'eating')
+    assert_match(/Archived 6 items from Currently to Archive/, result, '6 items should have been archived')
+  end
+
   private
 
   def assert_matches(matches, shown)

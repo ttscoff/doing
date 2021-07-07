@@ -1551,31 +1551,24 @@ class WWID
   ##             section
   ##
   ## @param      section      (String) The source section
-  ## @param      count        (Integer) The count
-  ## @param      destination  (String) The destination section
-  ## @param      tags         (Array) Tags to archive
-  ## @param      bool         (String) Tag boolean combinator
+  ## @param      options      (Hash) Options
   ##
-  def archive(section = 'Currently', count = 5, destination = nil, tags = nil, bool = nil, _export = nil)
+  def archive(section = 'Currently', options = {})
+    count       = options[:keep] || 0
+    destination = options[:destination] || 'Archive'
+    tags        = options[:tags] || []
+    bool        = options[:bool] || 'AND'
+
     section = choose_section if section.nil? || section =~ /choose/i
-    archive_all = section =~ /all/i # && !(tags.nil? || tags.empty?)
+    archive_all = section =~ /^all$/i # && !(tags.nil? || tags.empty?)
     section = guess_section(section) unless archive_all
 
-    add_section('Archive') if destination =~ /archive/i && !sections.include?('Archive')
+    add_section('Archive') if destination =~ /^archive$/i && !sections.include?('Archive')
 
     destination = guess_section(destination)
 
     if sections.include?(destination) && (sections.include?(section) || archive_all)
-      if archive_all
-        to_archive = sections.dup
-        to_archive.delete(destination)
-        to_archive.each do |source, _v|
-          do_archive(source, destination, { count: count, tags: tags, bool: bool, label: true })
-        end
-      else
-        do_archive(section, destination, { count: count, tags: tags, bool: bool, label: true })
-      end
-
+      do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label] })
       write(doing_file)
     else
       raise 'Either source or destination does not exist'
@@ -1589,74 +1582,69 @@ class WWID
   ## @param      destination  (String) The destination section
   ## @param      opt          (Hash) Additional Options
   ##
-  def do_archive(section, destination, opt = {})
-    count = opt[:count] || 5
-    tags = opt[:tags] || []
-    bool = opt[:bool] || 'AND'
-    label = opt[:label] || false
+  def do_archive(sect, destination, opt = {})
+    count = opt[:count] || 0
+    tags  = opt[:tags] || []
+    bool  = opt[:bool] || 'AND'
+    label = opt[:label] || true
 
-    items = @content[section]['items']
-    moved_items = []
-
-    if tags && !tags.empty?
-      items.delete_if do |item|
-        case bool
-        when /(AND|ALL)/i
-          score = 0
-          tags.each do |tag|
-            score += 1 if item['title'] =~ /@#{tag}/i
-          end
-          res = score < tags.length
-          moved_items.push(item) if res
-          res
-        when /NONE/i
-          del = false
-          tags.each do |tag|
-            del = true if item['title'] =~ /@#{tag}/i
-          end
-          moved_items.push(item) if del
-          del
-        when /(OR|ANY)/i
-          del = true
-          tags.each do |tag|
-            del = false if item['title'] =~ /@#{tag}/i
-          end
-          moved_items.push(item) if del
-          del
-        end
-      end
-      moved_items.each do |item|
-        if label && section != 'Currently'
-          item['title'] =
-            item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
-        end
-      end
-      @content[section]['items'] = moved_items
-      @content[destination]['items'] += items
-      @results.push("Archived #{items.length} items from #{section} to #{destination}")
+    if sect =~ /^all$/i
+      all_sections = sections.dup
+      all_sections.delete(destination)
     else
-      count = items.length if items.length < count
+      all_sections = [sect]
+    end
 
-      @content[section]['items'] = if count.zero?
-                                     []
-                                   else
-                                     items[0..count - 1]
-                                   end
+    counter = 0
 
-      items.map! do |item|
-        if label && section != 'Currently'
-          item['title'] =
-            item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+    all_sections.each do |section|
+      items = @content[section]['items']
+
+      moved_items = []
+      if !tags.empty? || opt[:search]
+        items.delete_if do |item|
+          if (!tags.empty? && item.has_tags?(tags, bool) || (opt[:search] && item.matches_search?(opt[:search].to_s)))
+            moved_items.push(item)
+            counter += 1
+            true
+          else
+            false
+          end
         end
-        item
-      end
-      if items.count > count
-        @content[destination]['items'].concat(items[count..-1])
-      else
-        @content[destination]['items'].concat(items)
-      end
+        moved_items.each do |item|
+          if label && section != 'Currently'
+            item['title'] =
+              item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+          end
+        end
 
-      @results.push("Archived #{items.length - count} items from #{section} to #{destination}")
+        @content[section]['items'] = items
+        @content[destination]['items'].concat(moved_items)
+        @results.push("Archived #{moved_items.length} items from #{section} to #{destination}")
+      else
+        count = items.length if count == 0 || items.length < count
+
+        @content[section]['items'] = if count.zero?
+                                       []
+                                     else
+                                       items[0..count - 1]
+                                     end
+
+        items.map! do |item|
+          if label && section != 'Currently'
+            item['title'] =
+              item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+          end
+          item
+        end
+        if items.count > count
+          @content[destination]['items'].concat(items[count..-1])
+        else
+          @content[destination]['items'].concat(items)
+        end
+
+        @results.push("Archived #{items.length - count} items from #{section} to #{destination}")
+      end
     end
   end
 
