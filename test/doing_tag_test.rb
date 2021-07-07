@@ -26,7 +26,7 @@ class DoingTagTest < Test::Unit::TestCase
     tag = 'testtag'
     doing('now', subject)
     doing('tag', tag)
-    assert_match(/@#{tag}/, doing('last').uncolor, 'should have added tag to last task')
+    assert_match(/@#{tag}/, doing('last').uncolor, "should have added @#{tag} to last task")
   end
 
   def test_flag_task
