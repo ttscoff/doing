@@ -1,6 +1,6 @@
 == doing - A CLI for a What Was I Doing system
 
-v1.0.55
+v1.0.60
 
 === Global Options
 === --config_file arg
@@ -56,7 +56,7 @@ Repeat last entry as new entry
 
 Boolean used to combine multiple tags
 
-[Default Value] ALL
+[Default Value] AND
 [Must Match] (?i-mx:^(and|or|not)$)
 
 
@@ -153,7 +153,7 @@ Section
 
 ===== --tag TAG
 
-Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag2,tag2)
+Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2)
 
 [Default Value] None
 
@@ -176,11 +176,30 @@ Edit the configuration file
 
 
 ===== Options
+===== -a APP_NAME
+
+Application to use
+
+[Default Value] None
+
+
+===== -b BUNDLE_ID
+
+Application bundle id to use
+
+[Default Value] None
+
+
 ===== -e|--editor EDITOR
 
 Editor to use
 
 [Default Value] None
+
+
+===== -x
+Use the config_editor_app defined in ~/.doingrc (Sublime Text)
+
 
 
 ==== Command: <tt>done|did  ENTRY</tt>
@@ -283,7 +302,7 @@ Set the completed date to the start date plus XX[hmd]
 ===== --tag TAG
 
 Finish the last X entries containing TAG.
-  Separate multiple tags with comma (--tag=tag2,tag2), combine with --bool
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool
 
 [Default Value] None
 
@@ -586,7 +605,7 @@ Show time totals at the end of output
 ==== Command: <tt>open </tt>
 Open the "doing" file in an editor
 
-
+`doing open` defaults to using the editor_app setting in /Users/ttscoff/.doingrc (Taskpaper)
 ===== Options
 ===== -a APP_NAME
 
@@ -603,7 +622,7 @@ Open with app bundle id
 
 
 ===== -e|--editor
-Open with $EDITOR
+Open with $EDITOR (/Users/ttscoff/scripts/editor.sh)
 
 
 
