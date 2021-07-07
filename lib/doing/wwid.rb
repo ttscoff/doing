@@ -2,6 +2,7 @@
 
 require 'deep_merge'
 require 'open3'
+require 'pp'
 
 ##
 ## @brief      Hash helpers
@@ -890,26 +891,7 @@ class WWID
   end
 
   def update_item(old_item, new_item)
-    items = []
-    @content.each do |_k, v|
-      items.concat(v['items'])
-    end
-
-    idx = nil
-
-    items.each_with_index do |item, i|
-      if old_item == item
-        idx = i
-        break
-      end
-    end
-
-    if idx.nil?
-      @results.push('No entries found')
-      return
-    end
-
-    section = items[idx]['section']
+    section = old_item['section']
 
     section_items = @content[section]['items']
     s_idx = section_items.index(old_item)
@@ -917,7 +899,6 @@ class WWID
     section_items[s_idx] = new_item
     @results.push("Entry updated: #{section_items[s_idx]['title']}")
     @content[section]['items'] = section_items
-    write(@doing_file)
   end
 
   ##

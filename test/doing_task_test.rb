@@ -23,15 +23,39 @@ class DoingTaskTest < Test::Unit::TestCase
     FileUtils.rm_rf(@tmpdirs)
   end
 
-  def test_section_rejects_empty_args
-    assert_raises(RuntimeError) { doing('now', '--section') }
-  end
-
   def test_new_task
     # Add a task
     subject = 'Test new task @tag1'
     doing('now', subject)
     assert_match(/#{subject}\s*$/, doing('show', '-c 1'), 'should have added task')
+  end
+
+  def test_new_task_finishing_last
+    subject = 'Test new task'
+    subject2 = 'Another task'
+    doing('now', subject)
+    doing('now', '--finish_last', subject2)
+    assert_matches([
+      [/#{subject} @done/, 'First task should be @done'],
+      [/#{subject2}\s*$/, 'Second task should be added']
+    ], doing('show'))
+  end
+
+  def test_section_rejects_empty_args
+    assert_raises(RuntimeError) { doing('now', '--section') }
+  end
+
+  def test_add_section
+    doing('add_section', 'Test Section')
+    assert_match(/^Test Section$/, doing('sections', '-c'), 'should have added section')
+  end
+
+  def test_add_to_section
+    section = 'Test Section'
+    subject = 'Test task @testtag'
+    doing('add_section', section)
+    doing('now', '--section', section, subject)
+    assert_match(/#{subject}/, doing('show', section), 'Task should exist in new section')
   end
 
   def test_done_task
@@ -74,16 +98,17 @@ class DoingTaskTest < Test::Unit::TestCase
   def test_later_task
     subject = 'Test later task'
     result = doing('--stdout', 'later', subject)
-    assert_match(/Added section "Later"/, result, 'should have added Later section')
-    assert_match(/Added "#{subject}" to Later/, result, 'should have added task to Later section')
+    assert_matches([
+      [/Added section "Later"/, 'should have added Later section'],
+      [/Added "#{subject}" to Later/, 'should have added task to Later section']
+    ], result)
     assert_equal(1, doing('show', 'later').uncolor.strip.split("\n").count, 'Later section should have 1 entry')
   end
 
   def test_cancel_task
     doing('now', 'Test task')
     doing('cancel')
-    result = doing('show')
-    assert_match(/@done$/, result, 'should have @done tag with no timestamp')
+    assert_match(/@done$/, doing('show'), 'should have @done tag with no timestamp')
   end
 
   def test_archive_task
@@ -96,6 +121,16 @@ class DoingTaskTest < Test::Unit::TestCase
   end
 
   private
+
+  def assert_matches(matches, shown)
+    matches.each do |regexp, msg, opt_refute|
+      if opt_refute
+        assert_no_match(regexp, shown, msg)
+      else
+        assert_match(regexp, shown, msg)
+      end
+    end
+  end
 
   def mktmpdir
     tmpdir = Dir.mktmpdir

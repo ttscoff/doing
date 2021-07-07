@@ -1,3 +1,9 @@
+### 1.0.59
+
+#### IMPROVED
+
+- Improvements to `doing again --tag=` functionality
+
 ### 1.0.58
 
 #### IMPROVED
