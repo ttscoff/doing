@@ -167,7 +167,7 @@ The config also contains templates for various command outputs. Include placehol
     - there are some random special combo colors. Use `doing colors` to see the list
 - `%interval`: when used with the `-t` switch on the `show` command, it will display the time between a timestamp or _@start(date)_ tag and the _@done(date)_ tag, if it exists. Otherwise, it will remain empty.
 
-Date formats are based on Ruby [`strftime`](http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime) formatting.
+Date formats are based on Ruby [`strftime`](http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime) formatting. You can try it out [here](http://strftime.net).
 
 My normal template for the `recent` command looks like this:
 
