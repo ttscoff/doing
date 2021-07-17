@@ -776,6 +776,7 @@ class WWID
     opt[:remove] ||= false
     opt[:autotag] ||= false
     opt[:back] ||= false
+    opt[:took] ||= nil
 
     sec_arr = []
 
@@ -833,6 +834,8 @@ class WWID
                 else
                   done_date = item['date'] + (opt[:back] - item['date'])
                 end
+              elsif opt[:took]
+                done_date = item['date'] + opt[:took]
               else
                 done_date = Time.now
               end

@@ -1,3 +1,7 @@
+### 1.0.62
+
+- Fix: `doing done` with `--took=` and without `--back=` should set end time to start date plus `--took` value
+
 ### 1.0.61
 
 - Add --search filter to `doing archive`

@@ -310,7 +310,7 @@ end
 
 desc 'Add a completed item with @done(date). No argument finishes last entry.'
 arg_name 'ENTRY'
-command [:done, :did] do |c|
+command %i[done did] do |c|
   c.desc 'Remove @done tag'
   c.switch %i[r remove], negatable: false, default_value: false
 
@@ -367,7 +367,7 @@ command [:done, :did] do |c|
 
       date = options[:took] ? finish_date - took : finish_date
     elsif options[:took]
-      finish_date = date + took
+      finish_date = options[:back] ? date + took : nil
     elsif options[:back]
       finish_date = date
     else
@@ -375,7 +375,9 @@ command [:done, :did] do |c|
     end
 
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
-    donedate = options[:date] ? "(#{finish_date.strftime('%F %R')})" : ''
+    if finish_date
+      donedate = options[:date] ? "(#{finish_date.strftime('%F %R')})" : ''
+    end
 
     if options[:e]
       raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
@@ -394,8 +396,15 @@ command [:done, :did] do |c|
       if options[:r]
         wwid.tag_last({ tags: ['done'], count: 1, section: section, remove: true })
       else
-        wwid.tag_last({ tags: ['done'], count: 1, section: section, archive: options[:a], back: finish_date,
-                        date: options[:date] })
+        options = { tags: ['done'],
+          archive: options[:a],
+          back: finish_date,
+          count: 1,
+          date: options[:date],
+          section: section,
+          took: took == 0 ? nil : took
+        }
+        wwid.tag_last(options)
       end
     elsif !args.empty?
       title, note = wwid.format_input(args.join(' '))

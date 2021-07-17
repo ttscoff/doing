@@ -66,6 +66,37 @@ class DoingChronifyTest < Test::Unit::TestCase
                  'Finished time should be 60 minutes after start')
   end
 
+  def test_done_took
+    now = Time.now
+    finish = (now - (30 * 60)).round_time(2)
+    doing('now', '--back', '1h', 'test interval format')
+    doing('done', '--took', '30m')
+    r = doing('show').uncolor.strip
+    d = r.match(ENTRY_DONE_REGEX)
+    assert(d, 'Entry should have done date')
+    end_time = Time.parse(d['ts']).round_time(2)
+    assert_equal(end_time, finish,
+                 'Finish time should be equal to the nearest minute')
+  end
+
+  def test_done_back_took
+    now = Time.now
+    start = (now - (30 * 60)).round_time(2)
+    finish = start + (10 * 60)
+    doing('done', '--back', '30m', '--took', '10m', 'Test task')
+    r = doing('show').uncolor.strip
+    t = r.match(ENTRY_TS_REGEX)
+    d = r.match(ENTRY_DONE_REGEX)
+    assert(t, "Entry should have timestamp")
+    assert(d, 'Entry should have @done with timestamp')
+    start_time = Time.parse(t['ts']).round_time(2)
+    end_time = Time.parse(d['ts']).round_time(2)
+    assert_equal(start_time, start,
+                 'Start time should be equal to the nearest minute')
+    assert_equal(end_time, finish,
+                 'Finish time should be equal to the nearest minute')
+  end
+
   private
 
   def mktmpdir
