@@ -412,6 +412,12 @@ You can finish the last unfinished task when starting a new one using `doing now
 
 When used with `doing done`, `--back` and `--took` allow time intervals to be accurately counted when entering items after the fact. `--took` is also available for the `doing finish` command, but cannot be used in conjunction with `--back`. (In `finish` they both set the end date, and neither has priority. `--back` allows specific days/times, `--took` uses time intervals.)
 
+> __Examples:__
+>
+> - `doing done --back 1h The thing I just did` --- Add an entry for a completed task that you started an hour ago and just finished 
+> - `doing done --back 1h --took 20m The thing I just finished` --- Record an entry you started an hour ago and finished 20 minutes later
+> - `doing done --took 20m` --- Finish the last task but change the finish date so that the total elapsed time is only 20 minutes
+
 All of these commands accept a `-e` argument. This opens your command line editor (as defined in the environment variable `$EDITOR`). Add your entry, save the temp file, and close it. The new entry is added. Anything after the first line is included as a note on the entry.
 
 `doing again` (or `doing resume`) will duplicate the last @done entry (most recently completed) with a new start date (and without the @done tag). To resume the last entry matching specific tags, use `--tag=TAG`. You can specify multiple tags by separating with a comma. Multiple tags are combined with 'AND' by default (all tags must exist on the entry to match), but you can use `--bool=` to set it to 'OR' or 'NOT'. By default the new entry will be added to the same section as the matching entry, but you can specify a section with `--in=SECTION`.
