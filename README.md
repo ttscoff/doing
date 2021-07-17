@@ -29,7 +29,7 @@ _Side note:_ I actually use the library behind this utility as part of another s
 
 ## Installation
 
-The current version of `doing` is <!--VER-->1.0.61<!--END VER-->.
+The current version of `doing` is <!--VER-->1.0.62<!--END VER-->.
 
     $ [sudo] gem install doing
 
@@ -394,21 +394,32 @@ Note that you can include a tag with synonyms in the whitelist as well to tag it
 
 #### Adding entries:
 
-    now, did      - Add an entry
+    now, next     - Add an entry
     later         - Add an item to the Later section
-    done          - Add a completed item with @done(date). No argument finishes last entry.
+    done, did     - Add a completed item with @done(date). No argument finishes last entry.
     meanwhile     - Finish any @meanwhile tasks and optionally create a new one
     again, resume - Duplicate the last entry as new entry (without @done tag)
 
-The `doing now` command can accept `-s section_name` to send the new entry straight to a non-default section. It also accepts `--back=AMOUNT` to let you specify a start date in the past using "natural language." For example, `doing now --back=25m ENTRY` or `doing now --back="yesterday 3:30pm" ENTRY`.
+##### now
 
-If you want to use `--back` with `doing done` but want the end time to be different than the start time, you can either use `--took` in addition, or just use `--took` on its own as it will backdate the start time such that the end time is now and the duration is equal to the value of the `--took` argument.
+The `doing now` command adds an entry to the "Currently" section by default. It accepts `-s section_name` to send the new entry straight to a non-default section. It also accepts `--back=AMOUNT` to let you specify a start date in the past using "natural language." For example, `doing now --back=25m ENTRY` or `doing now --back="yesterday 3:30pm" ENTRY`.
 
 You can finish the last unfinished task when starting a new one using `doing now` with the `-f` switch. It will look for the last task not marked _@done_ and add the _@done_ tag with the start time of the new task (either the current time or what you specified with `--back`).
 
-`doing done` is used to add an entry that you've already completed. Like `now`, you can specify a section with `-s section_name`. You can also skip straight to Archive with `-a`.
+> __Examples:__
+> 
+> - `doing now Working on project X` --- Add a new entry at the current time
+> - `doing now --section=Projects Working on @projectX` --- Add a new entry to a section titled "Projects"
+> - `doing now --back 30m` --- Add a new entry with a backdated start time, indicating you've been working on it for 30 minutes already
+> - `doing now --back 8am` --- Backdate a new entry to a specific time
+> - `doing now -f Starting the next thing` --- Add a new entry at the current time, and add a @done tag to the previous item with the current time as its completion date
+> - `doing now -f --back 30m Working on something new` --- Add a new entry and complete the last entry, but use a timestamp from 30 minutes ago for both.
 
-`doing done` can also backdate entries using natural language with `--back 15m` or `--back "3/15 3pm"`. That will modify the starting timestamp of the entry. You can also use `--took 1h20m` or `--took 1:20` to set the finish date based on a "natural language" time interval. If `--took` is used without `--back`, then the start date is adjusted (`--took` interval is subtracted) so that the completion date is the current time.
+##### done/finish
+
+`doing done` is used to add an entry that you've already completed. Like `now`, you can specify a section with `-s section_name`. You can also skip straight to the Archive with `-a`.
+
+`doing done` can also backdate entries using natural language with `--back 15m` or `--back "3/15 3pm"`. That will modify the starting timestamp of the entry. Used on its own, it will set the start date, and the finish date will be the current time. You can also use `--took 1h20m` or `--took 1:20` to set the finish date based on a "natural language" time interval. If `--took` is used without `--back`, then the start date is adjusted (`--took` interval is subtracted) so that the completion date is the current time.
 
 When used with `doing done`, `--back` and `--took` allow time intervals to be accurately counted when entering items after the fact. `--took` is also available for the `doing finish` command, but cannot be used in conjunction with `--back`. (In `finish` they both set the end date, and neither has priority. `--back` allows specific days/times, `--took` uses time intervals.)
 
@@ -416,7 +427,7 @@ When used with `doing done`, `--back` and `--took` allow time intervals to be ac
 >
 > - `doing done --back 1h The thing I just did` --- Add an entry for a completed task that you started an hour ago and just finished 
 > - `doing done --back 1h --took 20m The thing I just finished` --- Record an entry you started an hour ago and finished 20 minutes later
-> - `doing done --took 20m` --- Finish the last task but change the finish date so that the total elapsed time is only 20 minutes
+> - `doing done --took 20m` --- Finish the last task but change the finish date so that the total elapsed time is only 20 minutes (if the finish date would be in the future, start date will be adjusted accordingly)
 
 All of these commands accept a `-e` argument. This opens your command line editor (as defined in the environment variable `$EDITOR`). Add your entry, save the temp file, and close it. The new entry is added. Anything after the first line is included as a note on the entry.
 
@@ -435,7 +446,7 @@ See `doing help meanwhile` for more options.
 
 ##### Finishing
 
-`doing finish` by itself is the same as `doing done` by itself. It adds _@done(timestamp)_ to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add `-a` to also archive the affected entries.
+`doing finish` by itself is the same as `doing done` by itself. It adds _@done(timestamp)_ to the last entry. It also accepts a numeric argument to complete X number of tasks back in history (0 affects all entries). Add `-a` to also archive the affected entries.
 
 `doing finish` also provides an `--auto` flag, which you can use to set the end time of any entry to 1 minute before the start time of the next. Running a command such as `doing finish --auto 10` will go through the last 10 entries and sequentially update any without a _@done_ tag with one set to the time just before the next entry in the list.
 
@@ -450,6 +461,8 @@ You can finish the last entry containing a specific tag or combination of tags u
 You can change the boolean using `--bool=OR` (last entry containing any of the specified tags) or `--bool=NOT` (last entry containing none of the tags).
 
 You can also include a `--no-date` switch to add `@done` without a finish date, meaning no time is tracked for the task. `doing cancel` is an alias for this. Like `finish`, `cancel` accepts a count to act on the last X entries, as well as `--archive` and `--section` options. `cancel` also accepts the `--tag` and `--bool` flags for tag filtering.
+
+By default `doing finish` works on a single entry, the last entry or the most recent entry matching a `--tag` or `--search` query. Specifying `doing finish 10` would finish any unfinished entries within the last 10 entries. In the case of `--tag` or `--search` queries, the count serves as the maximum number of matches doing will act on, sorted in reverse date order (most recent first). A count of 0 will disable the limit entirely, acting on all matching entries.
 
 
 ##### Tagging and Autotagging
