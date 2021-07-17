@@ -6,7 +6,7 @@ require 'doing-helpers'
 require 'test_helper'
 
 # Tests for entry modifying commands
-class DoingTaskTest < Test::Unit::TestCase
+class DoingEntryTest < Test::Unit::TestCase
   include DoingHelpers
   ENTRY_TS_REGEX = /\s*(?<ts>[^|]+) \s*\|/.freeze
   ENTRY_DONE_REGEX = /@done\((?<ts>.*?)\)/.freeze
@@ -23,21 +23,21 @@ class DoingTaskTest < Test::Unit::TestCase
     FileUtils.rm_rf(@tmpdirs)
   end
 
-  def test_new_task
-    # Add a task
-    subject = 'Test new task @tag1'
+  def test_new_entry
+    # Add an entry
+    subject = 'Test new entry @tag1'
     doing('now', subject)
-    assert_match(/#{subject}\s*$/, doing('show', '-c 1'), 'should have added task')
+    assert_match(/#{subject}\s*$/, doing('show', '-c 1'), 'should have added entry')
   end
 
-  def test_new_task_finishing_last
-    subject = 'Test new task'
-    subject2 = 'Another task'
+  def test_new_entry_finishing_last
+    subject = 'Test new entry'
+    subject2 = 'Another entry'
     doing('now', subject)
     doing('now', '--finish_last', subject2)
     assert_matches([
-      [/#{subject} @done/, 'First task should be @done'],
-      [/#{subject2}\s*$/, 'Second task should be added']
+      [/#{subject} @done/, 'First entry should be @done'],
+      [/#{subject2}\s*$/, 'Second entry should be added']
     ], doing('show'))
   end
 
@@ -52,76 +52,38 @@ class DoingTaskTest < Test::Unit::TestCase
 
   def test_add_to_section
     section = 'Test Section'
-    subject = 'Test task @testtag'
+    subject = 'Test entry @testtag'
     doing('add_section', section)
     doing('now', '--section', section, subject)
-    assert_match(/#{subject}/, doing('show', section), 'Task should exist in new section')
+    assert_match(/#{subject}/, doing('show', section), 'Entry should exist in new section')
   end
 
-  def test_done_task
-    subject = 'Test finished task @tag1'
-    now = Time.now.round_time(1)
-    doing('done', subject)
-    r = doing('show').uncolor.strip
-    t = r.match(ENTRY_TS_REGEX)
-    d = r.match(ENTRY_DONE_REGEX)
-
-    assert(d, "#{r} should have @done tag with timestamp")
-
-    assert_equal(t['ts'], d['ts'], 'Timestamp and @done timestamp should match')
-    assert_equal(Time.parse(d['ts']).round_time(1), now,
-                 'Finished time should be equal to the nearest minute')
-  end
-
-  def test_finish_task
-    subject = 'Test new task @tag1'
-    doing('now', subject)
-    doing('finish')
-    r = doing('show').uncolor.strip
-    m = r.match(ENTRY_DONE_REGEX)
-    assert(m, "#{r} should have @done timestamp")
-    now = Time.now.round_time(1)
-    assert_equal(Time.parse(m['ts']).round_time(1), now,
-                 'Finished time should be equal to the nearest minute')
-  end
-
-  def test_finish_tag
-    doing('now', 'Test new task @tag1')
-    doing('now', 'Another new task @tag2')
-    doing('finish', '--tag', 'tag1')
-    t1 = doing('show', '@tag1').uncolor.strip
-    assert_match(ENTRY_DONE_REGEX, t1, "@tag1 task should have @done timestamp")
-    t2 = doing('show', '@tag2').uncolor.strip
-    assert_no_match(ENTRY_DONE_REGEX, t2, "@tag2 task should not have @done timestamp")
-  end
-
-  def test_later_task
-    subject = 'Test later task'
+  def test_later_entry
+    subject = 'Test later entry'
     result = doing('--stdout', 'later', subject)
     assert_matches([
       [/Added section "Later"/, 'should have added Later section'],
-      [/Added "#{subject}" to Later/, 'should have added task to Later section']
+      [/Added "#{subject}" to Later/, 'should have added entry to Later section']
     ], result)
-    assert_equal(1, doing('show', 'later').uncolor.strip.split("\n").count, 'Later section should have 1 entry')
+    assert_count_entries(1, doing('show', 'later'), 'There should be one later entry')
   end
 
-  def test_cancel_task
-    doing('now', 'Test task')
+  def test_cancel_entry
+    doing('now', 'Test entry')
     doing('cancel')
     assert_match(/@done$/, doing('show'), 'should have @done tag with no timestamp')
   end
 
-  def test_archive_task
-    subject = 'Test task'
+  def test_archive_entry
+    subject = 'Test entry'
     doing('done', subject)
     result = doing('--stdout', 'archive')
 
     assert_match(/Added section "Archive"/, result, 'Archive section should have been added')
-    assert_match(/#{subject}/, doing('show', 'Archive'), 'Archive section should contain test task')
+    assert_match(/#{subject}/, doing('show', 'Archive'), 'Archive section should contain test entry')
   end
 
   def test_archive_by_search
-    subject = 'Test task'
     prefixes = %w[consuming eating]
     search_terms = %w[bagels bacon eggs brunch breakfast lunch]
     search_terms.each do |food|
@@ -150,6 +112,10 @@ class DoingTaskTest < Test::Unit::TestCase
         assert_match(regexp, shown, msg)
       end
     end
+  end
+
+  def assert_count_entries(count, shown, message = 'Should be X entries shown')
+    assert_equal(count, shown.uncolor.strip.split("\n").count, message)
   end
 
   def mktmpdir

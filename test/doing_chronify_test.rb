@@ -32,7 +32,7 @@ class DoingChronifyTest < Test::Unit::TestCase
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
     assert_equal(Time.parse(m['ts']).round_time(1), (now - (20 * 60)).round_time(1),
-                 'New task should be equal to the nearest minute')
+                 'New entry should be equal to the nearest minute')
   end
 
   def test_back_strftime
@@ -41,7 +41,7 @@ class DoingChronifyTest < Test::Unit::TestCase
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
     assert_equal(Time.parse(m['ts']).round_time(1), Time.parse(ts).round_time(1),
-                 'New task should be equal to the nearest minute')
+                 'New entry should be equal to the nearest minute')
   end
 
   def test_back_semantic
@@ -49,52 +49,8 @@ class DoingChronifyTest < Test::Unit::TestCase
     doing('now', '--back', 'yesterday 6:30pm', 'test semantic format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
-    task_time = Time.parse(m['ts']).strftime('%Y-%m-%d 18:30 %Z')
-    assert_equal(task_time, yesterday, 'new task is the wrong time')
-  end
-
-  def test_finish_took
-    subject = 'Test new task @tag1'
-    doing('now', subject)
-    doing('finish', '--took=60m')
-    r = doing('show').uncolor.strip
-    t = r.match(ENTRY_TS_REGEX)
-    d = r.match(ENTRY_DONE_REGEX)
-    assert(d, "#{r} should have @done timestamp")
-    start = Time.parse(t['ts'])
-    assert_equal((start + (60 * 60)).round_time(2), Time.parse(d['ts']).round_time(2),
-                 'Finished time should be 60 minutes after start')
-  end
-
-  def test_done_took
-    now = Time.now
-    finish = (now - (30 * 60)).round_time(2)
-    doing('now', '--back', '1h', 'test interval format')
-    doing('done', '--took', '30m')
-    r = doing('show').uncolor.strip
-    d = r.match(ENTRY_DONE_REGEX)
-    assert(d, 'Entry should have done date')
-    end_time = Time.parse(d['ts']).round_time(2)
-    assert_equal(end_time, finish,
-                 'Finish time should be equal to the nearest minute')
-  end
-
-  def test_done_back_took
-    now = Time.now
-    start = (now - (30 * 60)).round_time(2)
-    finish = start + (10 * 60)
-    doing('done', '--back', '30m', '--took', '10m', 'Test task')
-    r = doing('show').uncolor.strip
-    t = r.match(ENTRY_TS_REGEX)
-    d = r.match(ENTRY_DONE_REGEX)
-    assert(t, "Entry should have timestamp")
-    assert(d, 'Entry should have @done with timestamp')
-    start_time = Time.parse(t['ts']).round_time(2)
-    end_time = Time.parse(d['ts']).round_time(2)
-    assert_equal(start_time, start,
-                 'Start time should be equal to the nearest minute')
-    assert_equal(end_time, finish,
-                 'Finish time should be equal to the nearest minute')
+    entry_time = Time.parse(m['ts']).strftime('%Y-%m-%d 18:30 %Z')
+    assert_equal(entry_time, yesterday, 'new entry is the wrong time')
   end
 
   private

@@ -21,21 +21,21 @@ class DoingTagTest < Test::Unit::TestCase
     FileUtils.rm_rf(@tmpdirs)
   end
 
-  def test_tag_task
-    subject = 'Test new task'
+  def test_tag_entry
+    subject = 'Test new entry'
     tag = 'testtag'
     doing('now', subject)
     doing('tag', tag)
-    assert_match(/@#{tag}/, doing('last').uncolor, "should have added @#{tag} to last task")
+    assert_match(/@#{tag}/, doing('last').uncolor, "should have added @#{tag} to last entry")
   end
 
-  def test_flag_task
-    subject = 'Test new task'
+  def test_flag_entry
+    subject = 'Test new entry'
     doing('now', subject)
     doing('flag')
-    assert_match(/@flagged/, doing('last').uncolor, 'should have added @flagged to last task')
+    assert_match(/@flagged/, doing('last').uncolor, 'should have added @flagged to last entry')
     doing('flag', '-r')
-    assert_no_match(/@flagged/, doing('last').uncolor, 'should have removed @flagged from last task')
+    assert_no_match(/@flagged/, doing('last').uncolor, 'should have removed @flagged from last entry')
   end
 
   def test_tag_transform

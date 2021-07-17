@@ -369,15 +369,16 @@ command %i[done did] do |c|
     elsif options[:took]
       finish_date = options[:back] ? date + took : nil
     elsif options[:back]
-      finish_date = date
+      finish_date = args.empty? ? date : Time.now
     else
       finish_date = Time.now
     end
 
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
     if finish_date
       donedate = options[:date] ? "(#{finish_date.strftime('%F %R')})" : ''
     end
+
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
     if options[:e]
       raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?

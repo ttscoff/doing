@@ -73,7 +73,7 @@ class NoteEditorTest < Test::Unit::TestCase
   private
 
   def assert_doing_shows(matches)
-    shown = doing('show')
+    shown = doing('show').uncolor.strip
     matches.each do |regexp, msg, opt_refute|
       if opt_refute
         refute_match(regexp, shown, msg)

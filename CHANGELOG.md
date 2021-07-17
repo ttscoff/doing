@@ -1,3 +1,7 @@
+### 1.0.63
+
+- Fix: `doing done` with `--back=` and without `--took=` should set start date to current minus `--back` value, and end date to current date.
+
 ### 1.0.62
 
 - Fix: `doing done` with `--took=` and without `--back=` should set end time to start date plus `--took` value
