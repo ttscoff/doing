@@ -1,6 +1,7 @@
 ### 1.0.63
 
-- Fix: `doing done` with `--back=` and without `--took=` should set start date to current minus `--back` value, and end date to current date.
+- README updates
+- If `doing done --took=X` results in completion date greater than current time, use current time as completion date and backdate the entry's timestamp to fit
 
 ### 1.0.62
 

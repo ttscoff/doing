@@ -835,7 +835,12 @@ class WWID
                   done_date = item['date'] + (opt[:back] - item['date'])
                 end
               elsif opt[:took]
-                done_date = item['date'] + opt[:took]
+                if item['date'] + opt[:took] > Time.now
+                  item['date'] = Time.now - opt[:took]
+                  done_date = Time.now
+                else
+                  done_date = item['date'] + opt[:took]
+                end
               else
                 done_date = Time.now
               end

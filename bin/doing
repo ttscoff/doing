@@ -369,7 +369,7 @@ command %i[done did] do |c|
     elsif options[:took]
       finish_date = options[:back] ? date + took : nil
     elsif options[:back]
-      finish_date = args.empty? ? date : Time.now
+      finish_date = date
     else
       finish_date = Time.now
     end

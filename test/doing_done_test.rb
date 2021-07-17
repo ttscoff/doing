@@ -104,8 +104,8 @@ class DoingDoneTest < Test::Unit::TestCase
     end_time = Time.parse(d['ts']).round_time(2)
     assert_equal(start_time, start,
                  'Start time should be equal to the nearest minute')
-    assert_equal(end_time, now.round_time(2),
-                 'Finish time should be now')
+    assert_equal(end_time, start,
+                 'Finish time should be the same as start time')
   end
 
   def test_done_took
