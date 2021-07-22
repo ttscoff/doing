@@ -32,7 +32,6 @@ class DoingOutputTest < Test::Unit::TestCase
     doing('done', subject)
     subject2 = 'Test new entry 2 @tag2'
     doing('done', subject2)
-    result = doing('view', 'done').strip
     assert_count_entries(2, doing('view', 'done'), 'There should be 2 entries shown by `view done`')
   end
 

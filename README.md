@@ -595,6 +595,29 @@ Example: Archive all Currently items for _@client_ that are marked _@done_
 
     doing archive @client @done
 
+##### Importing
+
+Doing can currently only import tasks from Timing.app reports. If you want to sync up your Doing file with Timing's tracking:
+
+1. Open Timing and go to Reports
+2. Set the date span you want to import into doing
+3. Group by Project, Then by None
+4. Include Tasks with Title, (not as subgroup), Timespan, and Notes
+5. Uncheck App Usage
+6. Set File Format to JSON and Duration format to "XX:YY:ZZ"
+7. Include short entries if desired
+8. Export the report to a new file
+
+Now you can run `doing import --type timing -s SECTION PATH`, where SECTION is the name of the section you want to import the entries to (defauts to Currently), and PATH is the path to the JSON file. You can also add a tag (or tags) to all entries, or a custom prefix.
+
+(`--type timing` is the only option right now, so it doesn't need to be included)
+
+    # Import entries to Projects section and add @timing to all new entries
+    doing import -s Projects --tag=timing "~/Desktop/All Activities.json"
+
+    # Import to default section (Currently) and prefix entries with '[Imported]'
+    doing import --prefix="[Imported]" "~/Desktop/All Activities.json"
+
 ---
 
 ## Extras
