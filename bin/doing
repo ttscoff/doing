@@ -1391,6 +1391,41 @@ command :undo do |c|
   end
 end
 
+desc 'Import entries from an external source'
+long_desc 'Imports entries from other sources. Currently only handles JSON reports exported from Timing.app.'
+arg_name 'PATH'
+command [:import] do |c|
+  c.desc 'Import type'
+  c.arg_name 'TYPE'
+  c.flag [:type], default_value: 'timing'
+
+  c.desc 'Target section'
+  c.arg_name 'NAME'
+  c.flag %i[s section], default_value: wwid.current_section
+
+  c.desc 'Tag all imported entries'
+  c.arg_name 'TAGS'
+  c.flag [:tag]
+
+  c.desc 'Prefix entries with'
+  c.arg_name 'PREFIX'
+  c.flag [:prefix]
+
+  c.action do |_global_options, options, args|
+
+    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+
+    if options[:type] =~ /^tim/i
+      args.each do |path|
+        wwid.import_timing(path, { section: section, tag: options[:tag], prefix: options[:prefix] })
+        wwid.write(wwid.doing_file)
+      end
+    else
+      raise 'Invalid import type'
+    end
+  end
+end
+
 pre do |global, _command, _options, _args|
   if global[:config_file] && global[:config_file] != wwid.config_file
     wwid.config_file = global[:config_file]

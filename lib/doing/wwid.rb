@@ -310,7 +310,7 @@ class WWID
       else
         @content[section]['items'][current - 1]['note'] = [] unless @content[section]['items'][current - 1].key? 'note'
 
-        @content[section]['items'][current - 1]['note'].push(line.gsub(/ *$/, ''))
+        @content[section]['items'][current - 1]['note'].push(line.chomp)
         # end
       end
     end
@@ -665,6 +665,55 @@ class WWID
     items.push(entry)
     @content[section]['items'] = items
     @results.push(%(Added "#{entry['title']}" to #{section}))
+  end
+
+  ##
+  ## @brief      Imports a Timing report
+  ##
+  ## @param      path     (String) Path to JSON report file
+  ## @param      section  (String) The section to add to
+  ## @param      opt      (Hash) Additional Options
+  ##
+  def import_timing(path, opt = {})
+    section = opt[:section] || @current_section
+    add_section(section) unless @content.has_key?(section)
+
+    add_tags = opt[:tag] ? opt[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '@') }.join(' ') : ''
+    prefix = opt[:prefix] ? opt[:prefix] : '[Timing.app]'
+    raise "File not found" unless File.exist?(File.expand_path(path))
+
+    data = JSON.parse(IO.read(File.expand_path(path)))
+    new_items = []
+    data.each do |entry|
+      # Only process task entries
+      next if entry.key?('activityType') && entry['activityType'] != 'Task'
+      # Only process entries with a start and end date
+      next unless entry.key?('startDate') && entry.key?('endDate')
+
+      start_time = Time.parse(entry['startDate'])
+      end_time = Time.parse(entry['endDate'])
+      next unless start_time && end_time
+      tags = entry['project'].split(/ ▸ /).map {|proj| proj.gsub(/ +/, '').downcase }
+      title = "#{prefix} "
+      title += entry.key?('activityTitle') && entry['activityTitle'] != '(Untitled Task)' ? entry['activityTitle'] : 'Working on'
+      tags.each do |tag|
+        if title =~ /\b#{tag}\b/i
+          title.sub!(/\b#{tag}\b/i, "@#{tag}")
+        else
+          title += " @#{tag}"
+        end
+      end
+      title = autotag(title) if @auto_tag
+      title += " @done(#{end_time.strftime('%Y-%m-%d %H:%M')})"
+      title.gsub!(/ +/, ' ')
+      title.strip!
+      new_entry = { 'title' => title, 'date' => start_time, 'section' => section }
+      new_entry['note'] = entry['notes'].split(/\n/).map(&:chomp) if entry.key?('notes')
+      new_items.push(new_entry)
+    end
+
+    @content[section]['items'].concat(new_items)
+    @results.push(%(Imported #{new_items.count} items to #{section}))
   end
 
   ##

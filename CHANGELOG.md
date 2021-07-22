@@ -1,3 +1,7 @@
+### 1.0.64
+
+- Initial import feature for Timing.app reports
+
 ### 1.0.63
 
 - README updates
