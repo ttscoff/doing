@@ -1,0 +1,55 @@
+[
+  {
+    "duration" : "1:06:49",
+    "endDate" : "2021-07-18T11:57:20Z",
+    "project" : "Bunch",
+    "startDate" : "2021-07-18T10:50:30Z"
+  },
+  {
+    "duration" : "0:24:52",
+    "endDate" : "2021-07-21T16:47:23Z",
+    "project" : "Content Creation ▸ Writing",
+    "startDate" : "2021-07-21T16:22:31Z"
+  },
+  {
+    "activityTitle" : "Editing Overtired 446",
+    "duration" : "0:54:23",
+    "endDate" : "2021-07-22T16:25:22Z",
+    "notes" : "Second Episode with Christina and Ashley",
+    "project" : "Podcasting",
+    "startDate" : "2021-07-22T15:30:59Z"
+  },
+  {
+    "activityTitle" : "Editing Overtired 446",
+    "duration" : "0:12:45",
+    "endDate" : "2021-07-22T16:43:12Z",
+    "project" : "Podcasting",
+    "startDate" : "2021-07-22T16:30:27Z"
+  },
+  {
+    "activityTitle" : "Jeff Severns Guntzel",
+    "duration" : "0:23:52",
+    "endDate" : "2021-07-19T21:05:07Z",
+    "project" : "Communication",
+    "startDate" : "2021-07-19T20:41:15Z"
+  },
+  {
+    "duration" : "0:14:17",
+    "endDate" : "2021-07-18T18:58:39Z",
+    "project" : "Oracle ▸ Communication",
+    "startDate" : "2021-07-18T18:44:22Z"
+  },
+  {
+    "duration" : "0:07:53",
+    "endDate" : "2021-07-18T18:05:03Z",
+    "project" : "Office & Business",
+    "startDate" : "2021-07-18T17:57:10Z"
+  },
+  {
+    "activityTitle" : "Writing",
+    "duration" : "0:00:20",
+    "endDate" : "2021-07-19T10:20:15Z",
+    "project" : "Oracle ▸ Writing",
+    "startDate" : "2021-07-19T10:19:55Z"
+  }
+]

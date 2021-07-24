@@ -7,7 +7,7 @@ require 'pp'
 ##
 ## @brief      Hash helpers
 ##
-class Hash
+class ::Hash
   def has_tags?(tags, bool = 'AND')
     tags = tags.split(/ *, */) if tags.is_a? String
     item = self
@@ -667,6 +667,40 @@ class WWID
     @results.push(%(Added "#{entry['title']}" to #{section}))
   end
 
+  def same_time?(item_a, item_b)
+    item_a['date'] == item_b['date'] ? get_interval(item_a, false) == get_interval(item_b, false) : false
+  end
+
+  def overlapping_time?(item_a, item_b)
+    return true if same_time?(item_a, item_b)
+
+    start_a = item_a['date']
+    interval = get_interval(item_a, false)
+    end_a = interval ? start_a + interval.to_i : start_a
+    start_b = item_b['date']
+    interval = get_interval(item_b, false)
+    end_b = interval ? start_b + interval.to_i : start_b
+    (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
+  end
+
+  def dedup(items, no_overlap = false)
+
+    combined = []
+    @content.each do |_k, v|
+      combined += v['items']
+    end
+
+    items.delete_if do |item|
+      duped = false
+      combined.each do |comp|
+        duped = no_overlap ? overlapping_time?(item, comp) : same_time?(item, comp)
+        break if duped
+      end
+      # warn "Skipping overlapping entry: #{item['title']}" if duped
+      duped
+    end
+  end
+
   ##
   ## @brief      Imports a Timing report
   ##
@@ -676,6 +710,8 @@ class WWID
   ##
   def import_timing(path, opt = {})
     section = opt[:section] || @current_section
+    opt[:no_overlap] ||= false
+
     add_section(section) unless @content.has_key?(section)
 
     add_tags = opt[:tag] ? opt[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '@') }.join(' ') : ''
@@ -690,10 +726,12 @@ class WWID
       # Only process entries with a start and end date
       next unless entry.key?('startDate') && entry.key?('endDate')
 
-      start_time = Time.parse(entry['startDate'])
-      end_time = Time.parse(entry['endDate'])
+      # Round down seconds and convert UTC to local time
+      start_time = Time.parse(entry['startDate'].sub(/:\d\dZ$/, ':00Z')).getlocal
+      end_time = Time.parse(entry['endDate'].sub(/:\d\dZ$/, ':00Z')).getlocal
       next unless start_time && end_time
-      tags = entry['project'].split(/ ▸ /).map {|proj| proj.gsub(/ +/, '').downcase }
+
+      tags = entry['project'].split(/ ▸ /).map {|proj| proj.gsub(/[^a-z0-9]+/i, '').downcase }
       title = "#{prefix} "
       title += entry.key?('activityTitle') && entry['activityTitle'] != '(Untitled Task)' ? entry['activityTitle'] : 'Working on'
       tags.each do |tag|
@@ -711,7 +749,10 @@ class WWID
       new_entry['note'] = entry['notes'].split(/\n/).map(&:chomp) if entry.key?('notes')
       new_items.push(new_entry)
     end
-
+    total = new_items.count
+    new_items = dedup(new_items, opt[:no_overlap])
+    dups = total - new_items.count
+    @results.push(%(Skipped #{dups} items with overlapping times)) if dups > 0
     @content[section]['items'].concat(new_items)
     @results.push(%(Imported #{new_items.count} items to #{section}))
   end

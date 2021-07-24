@@ -1394,10 +1394,10 @@ end
 desc 'Import entries from an external source'
 long_desc 'Imports entries from other sources. Currently only handles JSON reports exported from Timing.app.'
 arg_name 'PATH'
-command [:import] do |c|
+command :import do |c|
   c.desc 'Import type'
   c.arg_name 'TYPE'
-  c.flag [:type], default_value: 'timing'
+  c.flag :type, default_value: 'timing'
 
   c.desc 'Target section'
   c.arg_name 'NAME'
@@ -1405,11 +1405,14 @@ command [:import] do |c|
 
   c.desc 'Tag all imported entries'
   c.arg_name 'TAGS'
-  c.flag [:tag]
+  c.flag :tag
 
   c.desc 'Prefix entries with'
   c.arg_name 'PREFIX'
-  c.flag [:prefix]
+  c.flag :prefix
+
+  c.desc 'Allow entries that overlap existing times'
+  c.switch [:overlap], negatable: true
 
   c.action do |_global_options, options, args|
 
@@ -1417,7 +1420,7 @@ command [:import] do |c|
 
     if options[:type] =~ /^tim/i
       args.each do |path|
-        wwid.import_timing(path, { section: section, tag: options[:tag], prefix: options[:prefix] })
+        wwid.import_timing(path, { section: section, tag: options[:tag], prefix: options[:prefix], no_overlap: !options[:overlap] })
         wwid.write(wwid.doing_file)
       end
     else
