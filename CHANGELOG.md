@@ -1,3 +1,7 @@
+### 1.0.65
+
+- Prevent duplicates/overlapping entries when importing
+
 ### 1.0.64
 
 - Initial import feature for Timing.app reports
