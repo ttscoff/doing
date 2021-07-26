@@ -1093,14 +1093,12 @@ command :last do |c|
     else
       tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
       options[:bool] = case options[:bool]
-                       when /(and|all)/i
-                        'AND'
                        when /(any|or)/i
-                        'OR'
+                        :or
                        when /(not|none)/i
-                        'NOT'
+                        :not
                        else
-                        'AND'
+                        :and
                        end
 
     end
@@ -1223,7 +1221,7 @@ command :view do |c|
                              else
                                view['tags'].gsub(/[, ]+/, ' ').split(' ').map(&:strip)
                              end
-        tag_filter['bool'] = view.key?('tags_bool') && !view['tags_bool'].nil? ? view['tags_bool'].upcase : 'OR'
+        tag_filter['bool'] = view.key?('tags_bool') && !view['tags_bool'].nil? ? view['tags_bool'].normalize_bool : :or
       end
 
       # If the -o/--output flag was specified, override any default in the view template

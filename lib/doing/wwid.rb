@@ -5,92 +5,6 @@ require 'open3'
 require 'pp'
 
 ##
-## @brief      Hash helpers
-##
-class ::Hash
-  def has_tags?(tags, bool = 'AND')
-    tags = tags.split(/ *, */) if tags.is_a? String
-    item = self
-    case bool
-    when /(AND|ALL)/
-      result = true
-      tags.each do |tag|
-        unless item['title'] =~ /@#{tag}/
-          result = false
-          break
-        end
-      end
-      result
-    when /(NOT|NONE)/i
-      result = true
-      tags.each do |tag|
-        if item['title'] =~ /@#{tag}/
-          result = false
-          break
-        end
-      end
-      result
-    else
-      result = false
-      tags.each do |tag|
-        if item['title'] =~ /@#{tag}/
-          result = true
-          break
-        end
-      end
-      result
-    end
-  end
-
-  def matches_search?(search)
-    item = self
-    text = item['note'] ? item['title'] + item['note'].join(' ') : item['title']
-    pattern = if search.strip =~ %r{^/.*?/$}
-                search.sub(%r{/(.*?)/}, '\1')
-              else
-                search.split('').join('.{0,3}')
-              end
-    text =~ /#{pattern}/i ? true : false
-  end
-end
-
-##
-## @brief      String helpers
-##
-class String
-  def cap_first
-    sub(/^\w/) do |m|
-      m.upcase
-    end
-  end
-
-  ##
-  ## @brief      Turn raw urls into HTML links
-  ##
-  ## @param      opt   (Hash) Additional Options
-  ##
-  def link_urls(opt = {})
-    opt[:format] ||= :html
-    if opt[:format] == :html
-      gsub(%r{(?mi)((http|https)://)?([\w\-_]+(\.[\w\-_]+)+)([\w\-.,@?^=%&amp;:/~+#]*[\w\-@^=%&amp;/~+#])?}) do |_match|
-        m = Regexp.last_match
-        proto = m[1].nil? ? 'http://' : ''
-        %(<a href="#{proto}#{m[0]}" title="Link to #{m[0]}">[#{m[3]}]</a>)
-      end.gsub(/<(\w+:.*?)>/) do |match|
-        m = Regexp.last_match
-        if m[1] =~ /<a href/
-          match
-        else
-          %(<a href="#{m[1]}" title="Link to #{m[1]}">[link]</a>)
-        end
-      end
-    else
-      self
-    end
-  end
-end
-
-##
 ## @brief      Main "What Was I Doing" methods
 ##
 class WWID
@@ -791,7 +705,7 @@ class WWID
     opt[:section] ||= 'all'
     opt[:note] ||= []
     opt[:tag] ||= []
-    opt[:tag_bool] ||= 'AND'
+    opt[:tag_bool] ||= :and
 
     last = last_entry(opt)
     if last.nil?
@@ -817,7 +731,7 @@ class WWID
   ## @param      opt   (Hash) Additional Options
   ##
   def last_entry(opt = {})
-    opt[:tag_bool] ||= 'AND'
+    opt[:tag_bool] ||= :and
     opt[:section] ||= @current_section
 
     sec_arr = []
@@ -1308,7 +1222,7 @@ class WWID
         @content.each do |_k, v|
           combined['items'] += v['items']
         end
-        section = if opt[:tag_filter] && opt[:tag_filter]['bool'] !~ /(not|none)/i
+        section = if opt[:tag_filter] && opt[:tag_filter]['bool'].normalize_bool != :not
                     opt[:tag_filter]['tags'].map do |tag|
                       "@#{tag}"
                     end.join(' + ')
@@ -1631,7 +1545,7 @@ class WWID
     count       = options[:keep] || 0
     destination = options[:destination] || 'Archive'
     tags        = options[:tags] || []
-    bool        = options[:bool] || 'AND'
+    bool        = options[:bool] || :and
 
     section = choose_section if section.nil? || section =~ /choose/i
     archive_all = section =~ /^all$/i # && !(tags.nil? || tags.empty?)
@@ -1659,7 +1573,7 @@ class WWID
   def do_archive(sect, destination, opt = {})
     count = opt[:count] || 0
     tags  = opt[:tags] || []
-    bool  = opt[:bool] || 'AND'
+    bool  = opt[:bool] || :and
     label = opt[:label] || true
 
     if sect =~ /^all$/i
