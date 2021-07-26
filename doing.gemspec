@@ -16,6 +16,7 @@ bin/doing
 lib/doing/version.rb
 lib/doing.rb
 lib/doing/wwid.rb
+lib/doing/helpers.rb
 lib/templates/doing.haml
 lib/templates/doing.css
   )
