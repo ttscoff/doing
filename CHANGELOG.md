@@ -1,6 +1,8 @@
 ### 1.0.66
 
 - Fix for some long flags being interpreted as arrays instead of strings
+- More flexible boolean specification, can be: all, and, any, or, not, or none
+- Fix for archive command not removing original entries from archived section
 
 ### 1.0.65
 

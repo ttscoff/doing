@@ -8,6 +8,7 @@ require 'test_helper'
 # Tests for entry modifying commands
 class DoingEntryTest < Test::Unit::TestCase
   include DoingHelpers
+  ENTRY_REGEX = /^\d{4}-\d\d-\d\d \d\d:\d\d \|/.freeze
   ENTRY_TS_REGEX = /\s*(?<ts>[^|]+) \s*\|/.freeze
   ENTRY_DONE_REGEX = /@done\((?<ts>.*?)\)/.freeze
 
@@ -115,7 +116,7 @@ class DoingEntryTest < Test::Unit::TestCase
   end
 
   def assert_count_entries(count, shown, message = 'Should be X entries shown')
-    assert_equal(count, shown.uncolor.strip.split("\n").count, message)
+    assert_equal(count, shown.uncolor.strip.scan(ENTRY_REGEX).count, message)
   end
 
   def mktmpdir

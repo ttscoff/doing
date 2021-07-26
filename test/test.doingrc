@@ -16,8 +16,8 @@ templates:
     template: "%date | %title%note"
     wrap_width: 0
   today:
-    date_format: "%_I:%M%P"
-    template: "%date: %title %interval%note"
+    date_format: "%Y-%m-%d %H:%M"
+    template: "%date | %title %interval%note"
     wrap_width: 0
   last:
     date_format: "%-I:%M%P on %a"
@@ -29,7 +29,7 @@ templates:
     wrap_width: 88
 views:
   done:
-    date_format: "%_I:%M%P"
+    date_format: "%Y-%m-%d %H:%M"
     template: "%date | %title%note"
     wrap_width: 0
     section: All

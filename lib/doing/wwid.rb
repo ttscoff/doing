@@ -1586,7 +1586,7 @@ class WWID
     counter = 0
 
     all_sections.each do |section|
-      items = @content[section]['items']
+      items = @content[section]['items'].dup
 
       moved_items = []
       if !tags.empty? || opt[:search]
@@ -1610,13 +1610,7 @@ class WWID
         @content[destination]['items'].concat(moved_items)
         @results.push("Archived #{moved_items.length} items from #{section} to #{destination}")
       else
-        count = items.length if count == 0 || items.length < count
-
-        @content[section]['items'] = if count.zero?
-                                       []
-                                     else
-                                       items[0..count - 1]
-                                     end
+        count = items.length if items.length < count
 
         items.map! do |item|
           if label && section != 'Currently'
@@ -1625,11 +1619,18 @@ class WWID
           end
           item
         end
+
         if items.count > count
           @content[destination]['items'].concat(items[count..-1])
         else
           @content[destination]['items'].concat(items)
         end
+
+        @content[section]['items'] = if count.zero?
+                                       []
+                                     else
+                                       items[0..count - 1]
+                                     end
 
         @results.push("Archived #{items.length - count} items from #{section} to #{destination}")
       end
