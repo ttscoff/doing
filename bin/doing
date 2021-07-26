@@ -52,7 +52,7 @@ flag %i[f doing_file]
 
 desc 'Add an entry'
 arg_name 'ENTRY'
-command [:now, :next] do |c|
+command %i[now next] do |c|
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: wwid.current_section
@@ -105,7 +105,8 @@ command [:now, :next] do |c|
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
       wwid.write(wwid.doing_file)
     elsif $stdin.stat.size.positive?
-      title, note = wwid.format_input($stdin.read)
+      input = $stdin.read
+      title, note = wwid.format_input(input)
       note.push(options[:n]) if options[:n]
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
       wwid.write(wwid.doing_file)
@@ -239,7 +240,7 @@ long_desc %(
 
   Example `doing template HAML > ~/styles/my_doing.haml`
 )
-arg_name 'TYPE', must_match: /^(html|haml|css)/i
+arg_name 'TYPE', must_match: /^(?:html|haml|css)/i
 command :template do |c|
   c.action do |_global_options, options, args|
     raise 'No type specified, use `doing template [HAML|CSS]`' if args.empty?
@@ -443,7 +444,7 @@ command :cancel do |c|
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'AND'
+  c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
 
   c.action do |_global_options, options, args|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
@@ -452,7 +453,16 @@ command :cancel do |c|
       tags = []
     else
       tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
-      options[:bool] = options[:bool] =~ /^(and|or|not)$/i ? options[:bool].upcase : 'AND'
+      options[:bool] = case options[:bool]
+                       when /(and|all)/i
+                        'AND'
+                       when /(any|or)/i
+                        'OR'
+                       when /(not|none)/i
+                        'NOT'
+                       else
+                        'AND'
+                       end
     end
 
     raise 'Only one argument allowed' if args.length > 1
@@ -500,7 +510,7 @@ command :finish do |c|
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'AND'
+  c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
 
   c.desc %(Auto-generate finish dates from next entry's start time.
   Automatically generate completion dates 1 minute before next start date.
@@ -537,7 +547,16 @@ command :finish do |c|
       tags = []
     else
       tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
-      options[:bool] = options[:bool] =~ /^(and|or|not)$/i ? options[:bool].upcase : 'AND'
+      options[:bool] = case options[:bool]
+                             when /(and|all)/i
+                              'AND'
+                             when /(any|or)/i
+                              'OR'
+                             when /(not|none)/i
+                              'NOT'
+                             else
+                              'AND'
+                             end
     end
 
     raise 'Only one argument allowed' if args.length > 1
@@ -582,7 +601,7 @@ command [:again, :resume] do |c|
 
   c.desc 'Boolean used to combine multiple tags'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: /^(and|or|not)$/i, default_value: 'AND'
+  c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
 
   c.desc 'Note'
   c.arg_name 'TEXT'
@@ -590,6 +609,16 @@ command [:again, :resume] do |c|
 
   c.action do |_global_options, options, _args|
     tags = options[:tag].nil? ? [] : options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }
+    options[:bool] = case options[:bool]
+                     when /(and|all)/i
+                      'AND'
+                     when /(any|or)/i
+                      'OR'
+                     when /(not|none)/i
+                      'NOT'
+                     else
+                      'AND'
+                     end
     opts = {
       in: options[:in],
       note: options[:n],
@@ -694,9 +723,9 @@ command :show do |c|
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Tag boolean (AND,OR,NONE)'
+  c.desc 'Tag boolean (AND,OR,NOT)'
   c.arg_name 'BOOLEAN'
-  c.flag %i[b bool], must_match: /^(and|or|not)$/i, default_value: 'OR'
+  c.flag %i[b bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'OR'
 
   c.desc 'Max count to show'
   c.arg_name 'MAX'
@@ -708,7 +737,7 @@ command :show do |c|
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
-  c.flag %i[s sort], must_match: /^(a|d)/i, default_value: 'ASC'
+  c.flag %i[s sort], must_match: /^(?:a|d)/i, default_value: 'ASC'
 
   c.desc %(
     Date range to show, or a single day to filter date on.
@@ -728,14 +757,14 @@ command :show do |c|
   default = 'time'
   default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(name|time)/i, default_value: default
+  c.flag [:tag_sort], must_match: /^(?:name|time)/i, default_value: default
 
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
   c.desc 'Output to export format (csv|html|json|template|timeline)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
   c.action do |_global_options, options, args|
     tag_filter = false
     tags = []
@@ -757,13 +786,9 @@ command :show do |c|
       end
       if args.length.positive?
         args.each do |arg|
-          if arg =~ /,/
-            arg.split(/,/).each do |tag|
-              tags.push(tag.strip.sub(/^@/, ''))
-            end
-          else
-            tags.push(arg.strip.sub(/^@/, ''))
-          end
+          arg.split(/,/).each do |tag|
+                        tags.push(tag.strip.sub(/^@/, ''))
+                      end
         end
       end
     else
@@ -771,11 +796,21 @@ command :show do |c|
     end
 
     tags.concat(options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if options[:tag]
+    options[:bool] = case options[:bool]
+                     when /(and|all)/i
+                      'AND'
+                     when /(any|or)/i
+                      'OR'
+                     when /(not|none)/i
+                      'NOT'
+                     else
+                      'AND'
+                     end
 
     unless tags.empty?
       tag_filter = {
         'tags' => tags,
-        'bool' => options[:b]
+        'bool' => options[:bool]
       }
     end
 
@@ -832,7 +867,7 @@ command [:grep, :search] do |c|
 
   c.desc 'Output to export format (csv|html|json|template|timeline)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true
@@ -844,7 +879,7 @@ command [:grep, :search] do |c|
   default = 'time'
   default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -891,7 +926,7 @@ command :recent do |c|
   default = 'time'
   default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
   c.action do |global_options, options, args|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
@@ -931,11 +966,11 @@ command :today do |c|
   default = 'time'
   default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
   c.desc 'Output to export format (csv|html|json|template|timeline)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
 
   c.action do |_global_options, options, _args|
     options[:t] = true if options[:totals]
@@ -966,11 +1001,11 @@ command :on do |c|
   default = 'time'
   default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
   c.desc 'Output to export format (csv|html|json|template|timeline)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
 
   c.action do |_global_options, options, args|
     exit_now! 'Missing date argument' if args.empty?
@@ -1008,7 +1043,7 @@ command :yesterday do |c|
 
   c.desc 'Output to export format (csv|html|json|template|timeline)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true
@@ -1020,7 +1055,7 @@ command :yesterday do |c|
   default = 'time'
   default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
   c.action do |_global_options, options, _args|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -1044,7 +1079,7 @@ command :last do |c|
 
   c.desc 'Tag boolean'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: /(and|or|not)/i, default_value: 'AND'
+  c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
 
   c.desc 'Search filter, surround with slashes for regex (/query/)'
   c.arg_name 'QUERY'
@@ -1057,7 +1092,17 @@ command :last do |c|
       tags = []
     else
       tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
-      options[:bool] = options[:bool] =~ /^(and|or|not)$/i ? options[:bool].upcase : 'AND'
+      options[:bool] = case options[:bool]
+                       when /(and|all)/i
+                        'AND'
+                       when /(any|or)/i
+                        'OR'
+                       when /(not|none)/i
+                        'NOT'
+                       else
+                        'AND'
+                       end
+
     end
 
     if options[:e]
@@ -1130,7 +1175,7 @@ command :view do |c|
 
   c.desc 'Output to export format (csv|html|json|template|timeline)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true
@@ -1145,7 +1190,7 @@ command :view do |c|
   default = 'time'
   default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: true
@@ -1257,7 +1302,7 @@ command :archive do |c|
 
   c.desc 'Tag boolean (AND|OR|NOT)'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: /(and|or|not)/i, default_value: 'AND'
+  c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
 
   c.desc 'Search filter'
   c.arg_name 'QUERY'
@@ -1281,6 +1326,16 @@ command :archive do |c|
 
     tags.concat(options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if options[:tag]
 
+    options[:bool] = case options[:bool]
+                     when /(and|all)/i
+                      'AND'
+                     when /(any|or)/i
+                      'OR'
+                     when /(not|none)/i
+                      'NOT'
+                     else
+                      'AND'
+                     end
     opts = {
       bool: options[:bool],
       destination: options[:to],

@@ -1,3 +1,7 @@
+### 1.0.66
+
+- Fix for some long flags being interpreted as arrays instead of strings
+
 ### 1.0.65
 
 - Prevent duplicates/overlapping entries when importing

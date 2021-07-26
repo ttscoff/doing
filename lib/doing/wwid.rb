@@ -12,7 +12,7 @@ class ::Hash
     tags = tags.split(/ *, */) if tags.is_a? String
     item = self
     case bool
-    when 'AND'
+    when /(AND|ALL)/
       result = true
       tags.each do |tag|
         unless item['title'] =~ /@#{tag}/
@@ -21,7 +21,7 @@ class ::Hash
         end
       end
       result
-    when 'NOT'
+    when /(NOT|NONE)/i
       result = true
       tags.each do |tag|
         if item['title'] =~ /@#{tag}/
@@ -1308,7 +1308,7 @@ class WWID
         @content.each do |_k, v|
           combined['items'] += v['items']
         end
-        section = if opt[:tag_filter] && opt[:tag_filter]['bool'] != 'NONE'
+        section = if opt[:tag_filter] && opt[:tag_filter]['bool'] !~ /(not|none)/i
                     opt[:tag_filter]['tags'].map do |tag|
                       "@#{tag}"
                     end.join(' + ')
@@ -1339,31 +1339,7 @@ class WWID
     end
 
     if opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
-      items.delete_if do |item|
-        case opt[:tag_filter]['bool']
-        when /(AND|ALL)/
-          del = false
-          opt[:tag_filter]['tags'].each do |tag|
-            unless item['title'] =~ /@#{tag}/
-              del = true
-              break
-            end
-          end
-          del
-        when /NONE/
-          del = false
-          opt[:tag_filter]['tags'].each do |tag|
-            del = true if item['title'] =~ /@#{tag}/
-          end
-          del
-        when /(OR|ANY)/
-          del = true
-          opt[:tag_filter]['tags'].each do |tag|
-            del = false if item['title'] =~ /@#{tag}/
-          end
-          del
-        end
-      end
+      items.select! { |item| item.has_tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool']) }
     end
 
     if opt[:search]
