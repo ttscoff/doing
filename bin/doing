@@ -737,7 +737,7 @@ command :show do |c|
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
-  c.flag %i[s sort], must_match: /^(?:a|d)/i, default_value: 'ASC'
+  c.flag %i[s sort], must_match: /^[ad].*/i, default_value: 'ASC'
 
   c.desc %(
     Date range to show, or a single day to filter date on.

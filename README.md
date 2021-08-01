@@ -29,7 +29,7 @@ _Side note:_ I actually use the library behind this utility as part of another s
 
 ## Installation
 
-The current version of `doing` is <!--VER-->1.0.66<!--END VER-->.
+The current version of `doing` is <!--VER-->1.0.67<!--END VER-->.
 
     $ [sudo] gem install doing
 

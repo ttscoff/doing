@@ -1,3 +1,7 @@
+### 1.0.68
+
+- Fix error in `doing show --sort` argument parsing
+
 ### 1.0.67
 
 - Gem packaging error
