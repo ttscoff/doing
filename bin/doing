@@ -446,6 +446,9 @@ command :cancel do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
 
+  c.desc 'Cancel last entry (or entries) not already marked @done'
+  c.switch %i[u unfinished], negatable: false, default_value: false
+
   c.action do |_global_options, options, args|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
@@ -478,7 +481,8 @@ command :cancel do |c|
       sequential: false,
       tag: tags,
       tag_bool: options[:bool],
-      tags: ['done']
+      tags: ['done'],
+      unfinished: options[:unfinished]
     }
     wwid.tag_last(opts)
   end
@@ -511,6 +515,9 @@ command :finish do |c|
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
+
+  c.desc 'Finish last entry (or entries) not already marked @done'
+  c.switch %i[u unfinished], negatable: false, default_value: false
 
   c.desc %(Auto-generate finish dates from next entry's start time.
   Automatically generate completion dates 1 minute before next start date.
@@ -574,7 +581,8 @@ command :finish do |c|
       sequential: options[:auto],
       tag: tags,
       tag_bool: options[:bool],
-      tags: ['done']
+      tags: ['done'],
+      unfinished: options[:unfinished]
     }
     wwid.tag_last(opts)
   end
@@ -648,6 +656,9 @@ command :tag do |c|
   c.desc 'Remove given tag(s)'
   c.switch %i[r remove], negatable: false, default_value: false
 
+  c.desc 'Tag last entry (or entries) not marked @done'
+  c.switch %i[u unfinished], negatable: false, default_value: false
+
   c.desc 'Autotag entries based on autotag configuration in ~/.doingrc'
   c.switch %i[a autotag], negatable: false, default_value: false
 
@@ -691,7 +702,8 @@ command :tag do |c|
       date: options[:date],
       remove: options[:r],
       section: section,
-      tags: tags
+      tags: tags,
+      unfinished: options[:unfinished]
     }
     wwid.tag_last(opts)
   end
@@ -706,9 +718,17 @@ command [:mark, :flag] do |c|
   c.desc 'Remove mark'
   c.switch %i[r remove], negatable: false, default_value: false
 
+  c.desc 'Mark last entry not marked @done'
+  c.switch %i[u unfinished], negatable: false, default_value: false
+
   c.action do |_global_options, options, _args|
     mark = wwid.config['marker_tag'] || 'flagged'
-    wwid.tag_last({ tags: [mark], section: options[:s], remove: options[:r] })
+    wwid.tag_last({
+      remove: options[:r],
+      section: options[:s],
+      tags: [mark],
+      unfinished: options[:unfinished]
+    })
   end
 end
 

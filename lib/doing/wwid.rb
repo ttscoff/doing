@@ -781,6 +781,7 @@ class WWID
     opt[:autotag] ||= false
     opt[:back] ||= false
     opt[:took] ||= nil
+    opt[:unfinished] ||= false
 
     sec_arr = []
 
@@ -816,10 +817,11 @@ class WWID
         items.map! do |item|
           break if idx == count
 
+          finished = opt[:unfinished] && item.has_tags?('done', :and)
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.has_tags?(opt[:tag], opt[:tag_bool])
           search_match = opt[:search].nil? || opt[:search].empty? ? true : item.matches_search?(opt[:search])
 
-          if tag_match && search_match
+          if tag_match && search_match && !finished
             if opt[:autotag]
               new_title = autotag(item['title']) if @auto_tag
               if new_title == item['title']

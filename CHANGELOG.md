@@ -1,3 +1,7 @@
+### 1.0.69
+
+- Add `--unfinished` option to finish and cancel commands
+
 ### 1.0.68
 
 - Fix error in `doing show --sort` argument parsing

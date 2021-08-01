@@ -45,6 +45,13 @@ class DoingDoneTest < Test::Unit::TestCase
     assert_no_match(ENTRY_DONE_REGEX, t2, "@tag2 entry should not have @done timestamp")
   end
 
+  def test_finish_unfinished
+    doing('now', '--back=15m', 'Adding an unfinished entry')
+    doing('done', 'Adding a finished entry')
+    result = doing('--stdout', 'finish', '--unfinished')
+    assert_match(/Added @done: "Adding an unfinished entry/, result, "Earlier unfinished task should be marked @done")
+  end
+
   def test_finish_took
     subject = 'Test new entry @tag1'
     doing('now', subject)

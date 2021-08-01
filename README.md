@@ -29,7 +29,7 @@ _Side note:_ I actually use the library behind this utility as part of another s
 
 ## Installation
 
-The current version of `doing` is <!--VER-->1.0.67<!--END VER-->.
+The current version of `doing` is <!--VER-->1.0.68<!--END VER-->.
 
     $ [sudo] gem install doing
 
@@ -464,6 +464,7 @@ You can also include a `--no-date` switch to add `@done` without a finish date, 
 
 By default `doing finish` works on a single entry, the last entry or the most recent entry matching a `--tag` or `--search` query. Specifying `doing finish 10` would finish any unfinished entries within the last 10 entries. In the case of `--tag` or `--search` queries, the count serves as the maximum number of matches doing will act on, sorted in reverse date order (most recent first). A count of 0 will disable the limit entirely, acting on all matching entries.
 
+Both `finish` and `cancel` accept `--unfinished` as an argument. This causes them to act on the last entry not already marked @done, no matter how far back it's dated or how many @done entries come after it. You can use `doing finish --unfinished X -s SECTION` to finish the last X unfinished entries in SECTION.
 
 ##### Tagging and Autotagging
 

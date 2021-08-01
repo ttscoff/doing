@@ -6,6 +6,7 @@ class ::Hash
     tags = tags.split(/ *, */) if tags.is_a? String
     bool = bool.normalize_bool if bool.is_a? String
     item = self
+    tags.map! {|t| t.strip.sub(/^@/, '')}
     case bool
     when :and
       result = true
