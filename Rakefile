@@ -4,6 +4,7 @@ require 'rubygems/package_task'
 require 'rdoc'
 require 'rdoc/task'
 require 'rake/testtask'
+require 'open3'
 
 Rake::RDocTask.new do |rd|
   rd.main = 'README.md'
@@ -20,6 +21,13 @@ end
 Rake::TestTask.new do |t|
   t.libs << ['test', 'test/helpers']
   t.test_files = FileList['test/*_test.rb']
+  t.verbose = ENV['VERBOSE'] =~ /(true|1)/i ? true : false
+end
+
+desc 'Run one test verbosely'
+task :test_one, :test do |_, args|
+  args.with_defaults(test: '*')
+  puts `bundle exec rake test TESTOPTS="-v" TEST="test/doing_#{args[:test]}_test.rb"`
 end
 
 desc 'Install the gem in the current ruby'

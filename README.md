@@ -25,8 +25,6 @@ While I'm working, I have hourly reminders to record what I'm working on, and I 
 
 If there's something I want to look at later but doesn't need to be added to a task list or tracker, I can type `doing later check out the pinboard bookmarks from macdrifter`. When I get back to my computer --- or just need a refresher after a distraction --- I can type `doing last` to see what the last thing on my plate was. I can also type `doing recent` (or just `doing`) to get a list of the last few entries. `doing today` gives me everything since midnight for the current day, making it easy to see what I've accomplished over a sleepless night.
 
-_Side note:_ I actually use the library behind this utility as part of another script that mirrors entries in [Day One](http://dayoneapp.com) that have the tag `wwid`. I can use the hourly writing reminders and enter my stuff in the quick entry popup. Someday I'll get around to cleaning that up and putting it out there.
-
 ## Installation
 
 The current version of `doing` is <!--VER-->1.0.68<!--END VER-->.

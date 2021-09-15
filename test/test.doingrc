@@ -28,6 +28,9 @@ templates:
     template: "%shortdate: %title (%section)"
     wrap_width: 88
 views:
+  test:
+    template: "%date | DOING TEST: %title%note"
+    section: All
   done:
     date_format: "%Y-%m-%d %H:%M"
     template: "%date | %title%note"

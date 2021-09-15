@@ -368,7 +368,7 @@ command %i[done did] do |c|
 
       date = options[:took] ? finish_date - took : finish_date
     elsif options[:took]
-      finish_date = options[:back] ? date + took : nil
+      finish_date = date + took
     elsif options[:back]
       finish_date = date
     else

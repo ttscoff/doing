@@ -834,18 +834,18 @@ class WWID
               if opt[:sequential]
                 done_date = next_start - 1
                 next_start = item['date']
-              elsif opt[:back]
-                if opt[:back].is_a? Integer
-                  done_date = item['date'] + opt[:back]
-                else
-                  done_date = item['date'] + (opt[:back] - item['date'])
-                end
               elsif opt[:took]
                 if item['date'] + opt[:took] > Time.now
                   item['date'] = Time.now - opt[:took]
                   done_date = Time.now
                 else
                   done_date = item['date'] + opt[:took]
+                end
+              elsif opt[:back]
+                if opt[:back].is_a? Integer
+                  done_date = item['date'] + opt[:back]
+                else
+                  done_date = item['date'] + (opt[:back] - item['date'])
                 end
               else
                 done_date = Time.now

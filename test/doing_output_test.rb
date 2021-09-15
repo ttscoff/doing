@@ -76,6 +76,11 @@ class DoingOutputTest < Test::Unit::TestCase
     assert_count_entries(2, doing('today'), 'There should be 2 entries shown by `doing today`')
   end
 
+  def test_yesterday_command
+    doing('done', 'Adding an entry finished yesterday', '--took', '30m', '--back', 'yesterday 3pm')
+    assert_count_entries(1, doing('yesterday'), 'There should be 1 entry shown by `doing yesterday`')
+  end
+
   def test_sections_command
     result = doing('sections').uncolor.strip
     assert_match(/^Currently$/, result, 'Currently should be the only section shown')

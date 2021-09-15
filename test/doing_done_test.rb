@@ -116,18 +116,42 @@ class DoingDoneTest < Test::Unit::TestCase
                  'Finish time should be the same as start time')
   end
 
-  def test_done_took
-    now = Time.now
-    finish = (now - (30 * 60)).round_time(2)
-    doing('now', '--back', '1h', 'test interval format')
-    doing('done', '--took', '30m')
-    r = doing('show').uncolor.strip
-    d = r.match(ENTRY_DONE_REGEX)
-    assert(d, 'Entry should have done date')
-    end_time = Time.parse(d['ts']).round_time(2)
-    assert_equal(end_time, finish,
-                 'Finish time should be equal to the nearest minute')
-  end
+  def test_done_new_with_took
+      now = Time.now
+      finish = now.round_time(2)
+      start = (now - (30 * 60)).round_time(2)
+      doing('done', 'Started half an hour ago and just finished', '--took', '30m')
+      r = doing('show').uncolor.strip
+      t = r.match(ENTRY_TS_REGEX)
+      d = r.match(ENTRY_DONE_REGEX)
+      assert(d, 'Entry should have @done timestamp')
+      start_time = Time.parse(t['ts']).round_time(2)
+      end_time = Time.parse(d['ts']).round_time(2)
+      assert_equal(start, start_time,
+                   'Start time should be 30 minutes ago')
+      assert_equal(finish, end_time,
+                   'Finish time should be now')
+    end
+
+    def test_done_complete_with_took
+      now = Time.now
+      start = (now - (60 * 60)).round_time(2)
+      finish = (now - (30 * 60)).round_time(2)
+
+      doing('now', '--back', '1h', 'test interval format')
+      r = doing('show').uncolor.strip
+      d = r.match(ENTRY_TS_REGEX)
+      start_time = Time.parse(d['ts']).round_time(2)
+      assert_equal(start, start_time, 'Start time should be one hour ago')
+
+      doing('done', '--took', '30m')
+      r = doing('show').uncolor.strip
+      d = r.match(ENTRY_DONE_REGEX)
+      assert(d, 'Entry should have done date')
+      end_time = Time.parse(d['ts']).round_time(2)
+      assert_equal(end_time, finish,
+                   'Finish time should be 30 minutes ago')
+    end
 
   def test_done_back_took
     now = Time.now
