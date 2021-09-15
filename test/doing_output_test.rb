@@ -104,6 +104,13 @@ class DoingOutputTest < Test::Unit::TestCase
     assert_count_entries(2, result, 'There should be 2 entries')
   end
 
+  def test_template_command
+    result = doing('template', 'haml')
+    assert_match(/^!!!\s*\n%html/, result, 'Output should be a HAML template')
+    result = doing('template', 'css')
+    assert_match(/^body \{/, result, 'Output should be a CSS template')
+  end
+
   private
 
   def assert_count_entries(count, shown, message = 'Should be X entries shown')

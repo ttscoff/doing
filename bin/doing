@@ -245,7 +245,7 @@ command :template do |c|
   c.action do |_global_options, options, args|
     raise 'No type specified, use `doing template [HAML|CSS]`' if args.empty?
 
-    case options[:t]
+    case args[0]
     when /html|haml/i
       $stdout.puts wwid.haml_template
     when /css/i
