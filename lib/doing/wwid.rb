@@ -3,6 +3,7 @@
 require 'deep_merge'
 require 'open3'
 require 'pp'
+require 'shellwords'
 
 ##
 ## @brief      Main "What Was I Doing" methods
@@ -318,8 +319,8 @@ class WWID
 
     note = input_lines.length > 1 ? input_lines[1..-1] : []
     # If title line ends in a parenthetical, use that as the note
-    if note.empty? && title =~ /\(.*?\)$/
-      title.sub!(/\((.*?)\)$/) do
+    if note.empty? && title =~ /\s+\(.*?\)$/
+      title.sub!(/\s+\((.*?)\)$/) do
         m = Regexp.last_match
         note.push(m[1])
         ''
@@ -765,6 +766,129 @@ class WWID
     all_items.max_by { |item| item['date'] }
   end
 
+
+  ##
+  ## @brief      Display an interactive menu of entries
+  ##
+  ## @param      opt   (Hash) Additional options
+  ##
+  def interactive(opt = {})
+    raise "Select command requires that fzf be installed" unless exec_available('fzf')
+
+    section = opt[:section] ? guess_section(opt[:section]) : 'All'
+
+
+    if section =~ /^all$/i
+      combined = { 'items' => [] }
+      @content.each do |_k, v|
+        combined['items'] += v['items']
+      end
+      items = combined['items'].dup.sort_by { |item| item['date'] }.reverse
+    else
+      items = @content[section]['items']
+    end
+
+
+    options = items.map.with_index do |item, i|
+      out = [
+        i,
+        ') ',
+        item['date'],
+        ' | ',
+        item['title'],
+      ]
+      if opt[:section] =~ /^all/i
+        out.concat([
+          ' (',
+          item['section'],
+          ') '
+        ])
+      end
+      out.join('')
+    end
+
+    res = `echo #{Shellwords.escape(options.join("\n"))}|fzf -m`
+    selected = []
+    res.split(/\n/).each do |item|
+      idx = item.match(/^(\d+)\)/)[1].to_i
+      selected.push(items[idx])
+    end
+
+    if selected.empty?
+      @results.push("No selection")
+      return
+    end
+
+    if opt[:delete]
+      res = yn("Delete #{selected.size} items?", default_response: 'y')
+      if res
+        selected.each {|item| delete_item(item) }
+        write(@doing_file)
+      end
+      return
+    end
+
+    if opt[:flag]
+      tag = @config['marker_tag'] || 'flagged'
+      selected.map! {|item| tag_item(item, tag, date: false) }
+    end
+
+    if opt[:finish] || opt[:cancel]
+      tag = 'done'
+      selected.map! {|item| tag_item(item, tag, date: !opt[:cancel])}
+    end
+
+    if opt[:tag]
+      tag = opt[:tag]
+      selected.map! {|item| tag_item(item, tag, date: false)}
+    end
+
+    if opt[:archive] || opt[:move]
+      section = opt[:archive] ? 'Archive' : guess_section(opt[:move])
+      selected.map! {|item| move_item(item, section) }
+    end
+
+    write(@doing_file)
+
+    if opt[:editor]
+
+      editable_items = []
+
+      selected.each do |item|
+        editable = "#{item['date']} | #{item['title']}"
+        old_note = item['note'] ? item['note'].map(&:strip).join("\n") : nil
+        editable += "\n#{old_note}" unless old_note.nil?
+        editable_items << editable
+      end
+
+      new_items = fork_editor(editable_items.join("\n---\n") + "\n\n# You may delete entries, but leave all --- lines in place").split(/\n---\n/)
+
+      new_items.each_with_index do |new_item, i|
+        input_lines = new_item.split(/[\n\r]+/).delete_if {|line| line =~ /^#/ || line =~ /^\s*$/ }
+        title = input_lines[0]&.strip
+        if title.nil? || title =~ /^---$/ || title.strip.empty?
+          delete_item(selected[i])
+        else
+          note = input_lines.length > 1 ? input_lines[1..-1] : []
+
+          note.map!(&:strip)
+          note.delete_if { |line| line =~ /^\s*$/ || line =~ /^#/ }
+
+          date = title.match(/^([\d\-: ]+) \| /)[1]
+          title.sub!(/^([\d\-: ]+) \| /, '')
+
+          item = selected[i].dup
+          item['title'] = title
+          item['note'] = note
+          item['date'] = Time.parse(date)
+          update_item(selected[i], item)
+        end
+      end
+
+      write(@doing_file)
+    end
+  end
+
   ##
   ## @brief      Tag the last entry or X entries
   ##
@@ -904,6 +1028,71 @@ class WWID
     write(@doing_file)
   end
 
+  def move_item(item, section)
+    old_section = item['section']
+    new_item = item.dup
+    new_item['section'] = section
+
+    section_items = @content[old_section]['items']
+    section_items.delete(item)
+    @content[old_section]['items'] = section_items
+
+    archive_items = @content[section]['items']
+    archive_items.push(new_item)
+    # archive_items = archive_items.sort_by { |item| item['date'] }
+    @content[section]['items'] = archive_items
+
+    @results.push("Entry moved to #{section}: #{new_item['title']}")
+    return new_item
+  end
+
+  ##
+  ## @brief      Delete an item from the index
+  ##
+  ## @param      old_item
+  ##
+  def delete_item(old_item)
+    section = old_item['section']
+
+    section_items = @content[section]['items']
+    deleted = section_items.delete(old_item)
+    @results.push("Entry deleted: #{deleted['title']}")
+    @content[section]['items'] = section_items
+  end
+
+  ##
+  ## @brief      Tag an item from the index
+  ##
+  ## @param      old_item  (Item) The item to tag
+  ## @param      tag       (string) The tag to apply
+  ## @param      date      (Boolean) Include timestamp?
+  ##
+  def tag_item(old_item, tag, date: false)
+    title = old_item['title'].dup
+    done_date = Time.now
+    if title !~ /@#{tag}/
+      title.chomp!
+      if date
+        title += " @#{tag}(#{done_date.strftime('%F %R')})"
+      else
+        title += " @#{tag}"
+      end
+      new_item = old_item.dup
+      new_item['title'] = title
+      update_item(old_item, new_item)
+      return new_item
+    else
+      @results.push(%(Item already @#{tag}: "#{title}" in #{old_item['section']}))
+      return old_item
+    end
+  end
+
+  ##
+  ## @brief      Update an item in the index with a modified item
+  ##
+  ## @param      old_item  The old item
+  ## @param      new_item  The new item
+  ##
   def update_item(old_item, new_item)
     section = old_item['section']
 
@@ -2004,5 +2193,13 @@ EOS
     hours = (hours % 24).to_i
     minutes = (minutes % 60).to_i
     [days, hours, minutes]
+  end
+
+  def exec_available(cli)
+    if File.exists?(File.expand_path(cli))
+      File.executable?(File.expand_path(cli))
+    else
+      system "which #{cli}", :out => File::NULL, :err => File::NULL
+    end
   end
 end

@@ -256,6 +256,51 @@ command :template do |c|
   end
 end
 
+desc 'Display an interactive menu to perform operations (requires fzf)'
+long_desc 'Requires that `fzf` be installed and available in your path. <https://github.com/junegunn/fzf>
+
+List all entries and select with typeahead fuzzy matching. Multiple selections are allowed, hit tab to add the highlighted entry to the selection. Return processes the selected entries.'
+command :select do |c|
+  c.desc 'Select from a specific section'
+  c.arg_name 'SECTION'
+  c.flag %i[s section]
+
+  c.desc 'Tag selected entries'
+  c.arg_name 'TAG'
+  c.flag %i[t tag]
+
+  # c.desc 'Add @done to selected item(s), using start time of next item as the finish time'
+  # c.switch %i[a auto], negatable: false, default_value: false
+
+  c.desc 'Archive selected items'
+  c.switch %i[a archive], negatable: false, default_value: false
+
+  c.desc 'Move selected items to section'
+  c.arg_name 'SECTION'
+  c.flag %i[m move]
+
+  c.desc 'Cancel selected items (add @done without timestamp)'
+  c.switch %i[c cancel], negatable: false, default_value: false
+
+  c.desc 'Delete selected items'
+  c.switch %i[d delete], negatable: false, default_value: false
+
+  c.desc 'Edit selected item(s)'
+  c.switch %i[e editor], negatable: false, default_value: false
+
+  c.desc 'Add @done with current time to selected item(s)'
+  c.switch %i[f finish], negatable: false, default_value: false
+
+  c.desc 'Add flag to selected item(s)'
+  c.switch %i[flag], negatable: false, default_value: false
+
+  c.action do |_global_options, options, args|
+    section = options[:section] || 'All'
+    edit = options[:editor]
+    wwid.interactive(options)
+  end
+end
+
 desc 'Add an item to the Later section'
 arg_name 'ENTRY'
 command :later do |c|

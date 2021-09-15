@@ -1,3 +1,7 @@
+### 1.0.72
+
+- Add `doing select` to show menu of all tasks, searchable with fuzzy matching and the ability to perform certain tasks on multiple selections.
+
 ### 1.0.71
 
 - Fix for template command not working at all

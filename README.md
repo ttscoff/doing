@@ -27,7 +27,7 @@ If there's something I want to look at later but doesn't need to be added to a t
 
 ## Installation
 
-The current version of `doing` is <!--VER-->1.0.69<!--END VER-->.
+The current version of `doing` is <!--VER-->1.0.70<!--END VER-->.
 
     $ [sudo] gem install doing
 
@@ -616,6 +616,30 @@ Now you can run `doing import --type timing -s SECTION PATH`, where SECTION is t
 
     # Import to default section (Currently) and prefix entries with '[Imported]'
     doing import --prefix="[Imported]" "~/Desktop/All Activities.json"
+
+#### Interactive Usage
+
+If you have `fzf` installed (<https://github.com/junegunn/fzf>), you can use `doing select` to get a menu of all your items (or items in a given section) which can be searched with fuzzy matching. The menu allows multiple selections to be acted on directly.
+
+To use the menu, type a search string or use the arrow keys to navigate up and down. Press tab on an entry you'd like to perform an action on. A marker will show up on the left indicating the entry is selected. Repeat the process and select as many entries as needed. When you hit Return, the selection will be passed back to doing.
+
+Doing can perform several functions with this menu. Not all of doing's features are available, but the core functionality you'd need is there, plus you can open all selected entries in your editor, make changes to them, and when you save and close the entries are updated accordingly. This allows editing of everything from timestamps to tags to notes.
+
+Run `doing help select` for a list of options:
+
+    -a, --archive         - Archive selected items
+    -c, --cancel          - Cancel selected items (add @done without timestamp)
+    -d, --delete          - Delete selected items
+    -e, --editor          - Edit selected item(s)
+    -f, --finish          - Add @done with current time to selected item(s)
+    --flag                - Add flag to selected item(s)
+    -m, --move=SECTION    - Move selected items to section (default: none)
+    -s, --section=SECTION - Select from a specific section (default: none)
+    -t, --tag=TAG         - Tag selected entries (default: none)
+
+For example, `doing select -d -a` would present the menu, and then mark selected entries as @done (with timestamp) and move them to the Archive section.
+
+Multiple actions can be performed at once by combining options. You can also combine the `--editor` switch with any other options. Other actions will be performed first, then the entries --- with any modifications performed --- will be presented in the editor for tweaking.
 
 ---
 
