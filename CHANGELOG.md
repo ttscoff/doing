@@ -1,3 +1,7 @@
+### 1.0.71
+
+- Fix for template command not working at all
+
 ### 1.0.70
 
 - Fix for `doing done --took 30m` setting the wrong @done timestamp when completing previous item
