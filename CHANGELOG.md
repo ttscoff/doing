@@ -1,3 +1,7 @@
+### 1.0.70
+
+- Fix for `doing done --took 30m` setting the wrong @done timestamp when completing previous item
+
 ### 1.0.69
 
 - Add `--unfinished` option to finish and cancel commands
