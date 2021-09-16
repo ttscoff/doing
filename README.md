@@ -621,9 +621,9 @@ Now you can run `doing import --type timing -s SECTION PATH`, where SECTION is t
 
 If you have `fzf` installed (<https://github.com/junegunn/fzf>), you can use `doing select` to get a menu of all your items (or items in a given section) which can be searched with fuzzy matching. The menu allows multiple selections to be acted on directly.
 
-To use the menu, type a search string or use the arrow keys to navigate up and down. Press tab on an entry you'd like to perform an action on. A marker will show up on the left indicating the entry is selected. Repeat the process and select as many entries as needed. When you hit Return, the selection will be passed back to doing.
+To use the menu, type a search string or use the arrow keys to navigate up and down. Press tab on an entry you'd like to perform an action on. A marker will show up on the left indicating the entry is selected. Repeat the process and select as many entries as needed. When you hit Return, the selection will be passed back to doing. Use Control-A to select all visible entries.
 
-Doing can perform several functions with this menu. Not all of doing's features are available, but the core functionality you'd need is there, plus you can open all selected entries in your editor, make changes to them, and when you save and close the entries are updated accordingly. This allows editing of everything from timestamps to tags to notes.
+Doing can perform several functions with this menu. Not all of doing's features are available, but the core functionality you'd need is there, plus you can open the selected entries on one page in your text editor, make changes to them, and when you save and close the entries are updated accordingly. This allows editing of everything from timestamps to tags to notes.
 
 Run `doing help select` for a list of options:
 
@@ -640,6 +640,8 @@ Run `doing help select` for a list of options:
 For example, `doing select -d -a` would present the menu, and then mark selected entries as @done (with timestamp) and move them to the Archive section.
 
 Multiple actions can be performed at once by combining options. You can also combine the `--editor` switch with any other options. Other actions will be performed first, then the entries --- with any modifications performed --- will be presented in the editor for tweaking.
+
+**Note:** when using the `--editor` flag to open selections in your text editor, entries will be separated by `---` lines. These must remain in place for doing to track the changes. You can do anything you want to the entries, modify dates, change text, add notes, etc., as long as you leave the dividers in place. You can even delete an entry entirely, leaving the dividers around the missing line and the entry will be removed from your doing file when you save and exit the editor.
 
 ---
 

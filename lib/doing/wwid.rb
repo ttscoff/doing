@@ -807,7 +807,7 @@ class WWID
       out.join('')
     end
 
-    res = `echo #{Shellwords.escape(options.join("\n"))}|fzf -m`
+    res = `echo #{Shellwords.escape(options.join("\n"))}|fzf -m --bind ctrl-a:select-all`
     selected = []
     res.split(/\n/).each do |item|
       idx = item.match(/^(\d+)\)/)[1].to_i
@@ -861,11 +861,13 @@ class WWID
         editable_items << editable
       end
 
-      new_items = fork_editor(editable_items.join("\n---\n") + "\n\n# You may delete entries, but leave all --- lines in place").split(/\n---\n/)
+      new_items = fork_editor(editable_items.map(&:strip).join("\n---\n") + "\n\n# You may delete entries, but leave all divider lines in place").split(/\n---\n/)
 
       new_items.each_with_index do |new_item, i|
+
         input_lines = new_item.split(/[\n\r]+/).delete_if {|line| line =~ /^#/ || line =~ /^\s*$/ }
         title = input_lines[0]&.strip
+
         if title.nil? || title =~ /^---$/ || title.strip.empty?
           delete_item(selected[i])
         else
@@ -880,7 +882,7 @@ class WWID
           item = selected[i].dup
           item['title'] = title
           item['note'] = note
-          item['date'] = Time.parse(date)
+          item['date'] = Time.parse(date) || selected[i]['date']
           update_item(selected[i], item)
         end
       end
