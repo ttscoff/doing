@@ -1,6 +1,7 @@
 ### 1.0.74
 
 - Add --tag and --search flags to tag command to tag all entries matching search terms
+- Add since command, which is the same as `doing on tuesday to now` but `doing since tuesday` just feels more intuitive. 
 
 ### 1.0.73
 
