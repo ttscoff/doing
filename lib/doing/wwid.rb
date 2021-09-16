@@ -300,7 +300,7 @@ class WWID
       tmpfile.unlink
     end
 
-    input.split(/\n/).delete_if {|line| line =~ /^#/ }.join("\n").strip
+    input.split(/\n/).delete_if {|line| line =~ /^#/ }.join("\n")
   end
 
   #
@@ -860,15 +860,17 @@ class WWID
         editable += "\n#{old_note}" unless old_note.nil?
         editable_items << editable
       end
+      divider = "\n-----------\n"
+      input = editable_items.map(&:strip).join(divider) + "\n\n# You may delete entries, but leave all divider lines in place"
 
-      new_items = fork_editor(editable_items.map(&:strip).join("\n---\n") + "\n\n# You may delete entries, but leave all divider lines in place").split(/\n---\n/)
+      new_items = fork_editor(input).split(/#{divider}/)
 
       new_items.each_with_index do |new_item, i|
 
         input_lines = new_item.split(/[\n\r]+/).delete_if {|line| line =~ /^#/ || line =~ /^\s*$/ }
         title = input_lines[0]&.strip
 
-        if title.nil? || title =~ /^---$/ || title.strip.empty?
+        if title.nil? || title =~ /^#{divider.strip}$/ || title.strip.empty?
           delete_item(selected[i])
         else
           note = input_lines.length > 1 ? input_lines[1..-1] : []
