@@ -4,7 +4,6 @@ html
 *.sublime*
 .rake_tasks~
 .sass-cache
-Gemfile.lock
 helpfile.txt
 .doingrc
 .irb-history

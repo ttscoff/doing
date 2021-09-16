@@ -27,7 +27,7 @@ lib/templates/doing.css
   s.bindir = 'bin'
   s.executables << 'doing'
   s.add_development_dependency 'rake', '~> 13.0', '>= 13.0.1'
-  s.add_development_dependency 'rdoc', '~> 6.2.1'
+  s.add_development_dependency 'rdoc', '~> 6.3.1'
   s.add_development_dependency 'aruba', '~> 1.0.2'
   s.add_development_dependency 'test-unit'
   s.add_runtime_dependency('gli', '~> 2.19', '>= 2.19.2')
