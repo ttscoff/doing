@@ -1,3 +1,7 @@
+### 1.0.75
+
+- Refine editing multiple selections (doing select)
+
 ### 1.0.74
 
 - Add --tag and --search flags to tag command to tag all entries matching search terms
