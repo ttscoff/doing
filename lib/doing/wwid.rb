@@ -895,7 +895,7 @@ class WWID
   ## @param      opt   (Hash) Additional Options
   ##
   def tag_last(opt = {})
-    opt[:section] ||= @current_section
+    opt[:section] ||= nil
     opt[:count] ||= 1
     opt[:archive] ||= false
     opt[:tags] ||= ['done']
@@ -910,7 +910,11 @@ class WWID
     sec_arr = []
 
     if opt[:section].nil?
-      sec_arr = [@current_section]
+      if opt[:search] || opt[:tag]
+        sec_arr = sections
+      else
+        sec_arr = [@current_section]
+      end
     elsif opt[:section].instance_of?(String)
       if opt[:section] =~ /^all$/i
         if opt[:count] == 1
@@ -921,7 +925,11 @@ class WWID
           items = combined['items'].dup.sort_by { |item| item['date'] }.reverse
           sec_arr.push(items[0]['section'])
         elsif opt[:count] > 1
-          raise 'A count greater than one requires a section to be specified'
+          if opt[:search] || opt[:tag]
+            sec_arr = sections
+          else
+            raise 'A count greater than one requires a section to be specified'
+          end
         else
           sec_arr = sections
         end

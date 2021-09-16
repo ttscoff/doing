@@ -695,6 +695,9 @@ command :tag do |c|
   c.arg_name 'COUNT'
   c.flag %i[c count], default_value: 1
 
+  c.desc 'Don\'t ask permission to tag all entries when count is 0'
+  c.switch %i[force], negatable: false, default_value: false
+
   c.desc 'Include current date/time with tag'
   c.switch %i[d date], negatable: false, default_value: false
 
@@ -707,12 +710,48 @@ command :tag do |c|
   c.desc 'Autotag entries based on autotag configuration in ~/.doingrc'
   c.switch %i[a autotag], negatable: false, default_value: false
 
+  c.desc 'Tag the last X entries containing TAG.
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Tag entries matching search filter, surround with slashes for regex (e.g. "/query.*/")'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
+
   c.action do |_global_options, options, args|
     raise 'You must specify at least one tag' if args.empty? && !options[:a]
 
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    raise '--search and --tag cannot be used together' if options[:search] && options[:tag]
 
-    if options[:a]
+    section = 'All'
+
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    end
+
+
+    if options[:tag].nil?
+      search_tags = []
+    else
+      search_tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
+      options[:bool] = case options[:bool]
+                             when /(and|all)/i
+                              'AND'
+                             when /(any|or)/i
+                              'OR'
+                             when /(not|none)/i
+                              'NOT'
+                             else
+                              'AND'
+                             end
+    end
+
+    if options[:autotag]
       tags = []
     else
       tags = if args.join('') =~ /,/
@@ -724,10 +763,19 @@ command :tag do |c|
       tags.map! { |tag| tag.sub(/^@/, '').strip }
     end
 
-    count = options[:c].to_i
+    count = options[:count].to_i
 
-    if count.zero?
-      section_q = section == 'All' ? '' : " in section #{section}"
+    if count.zero? && !options[:force]
+      if options[:search]
+        section_q = ' matching your search terms'
+      elsif options[:tag]
+        section_q = ' matching your tag search'
+      elsif section == 'All'
+        section_q = ''
+      else
+        section_q = " in section #{section}"
+      end
+
 
       question = if options[:a]
                    "Are you sure you want to autotag all records#{section_q}"
@@ -741,12 +789,16 @@ command :tag do |c|
 
       raise 'Cancelled' unless res
     end
+
     opts = {
       autotag: options[:a],
       count: count,
       date: options[:date],
       remove: options[:r],
+      search: options[:search],
       section: section,
+      tag: search_tags,
+      tag_bool: options[:bool],
       tags: tags,
       unfinished: options[:unfinished]
     }

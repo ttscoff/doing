@@ -1,0 +1,660 @@
+[
+  {
+    "duration" : "0:05:43",
+    "endDate" : "2021-09-12T12:46:31Z",
+    "project" : "Development",
+    "startDate" : "2021-09-12T12:40:48Z"
+  },
+  {
+    "duration" : "0:09:17",
+    "endDate" : "2021-09-12T20:20:04Z",
+    "project" : "Development",
+    "startDate" : "2021-09-12T20:10:47Z"
+  },
+  {
+    "duration" : "0:17:12",
+    "endDate" : "2021-09-13T14:43:11Z",
+    "project" : "Development",
+    "startDate" : "2021-09-13T14:25:59Z"
+  },
+  {
+    "duration" : "0:05:01",
+    "endDate" : "2021-09-13T18:48:24Z",
+    "project" : "Development",
+    "startDate" : "2021-09-13T18:43:23Z"
+  },
+  {
+    "duration" : "0:13:00",
+    "endDate" : "2021-09-13T19:41:13Z",
+    "project" : "Development",
+    "startDate" : "2021-09-13T19:28:13Z"
+  },
+  {
+    "duration" : "0:41:20",
+    "endDate" : "2021-09-14T15:52:24Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T15:11:04Z"
+  },
+  {
+    "duration" : "0:11:18",
+    "endDate" : "2021-09-14T17:09:16Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T16:57:58Z"
+  },
+  {
+    "duration" : "0:11:11",
+    "endDate" : "2021-09-14T17:27:31Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T17:16:20Z"
+  },
+  {
+    "duration" : "0:05:21",
+    "endDate" : "2021-09-14T17:32:52Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T17:27:31Z"
+  },
+  {
+    "duration" : "0:45:04",
+    "endDate" : "2021-09-14T18:17:56Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T17:32:52Z"
+  },
+  {
+    "duration" : "0:06:35",
+    "endDate" : "2021-09-14T18:24:31Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T18:17:56Z"
+  },
+  {
+    "duration" : "0:27:25",
+    "endDate" : "2021-09-14T18:57:59Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T18:30:34Z"
+  },
+  {
+    "duration" : "0:10:29",
+    "endDate" : "2021-09-14T19:08:28Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T18:57:59Z"
+  },
+  {
+    "duration" : "0:18:02",
+    "endDate" : "2021-09-14T19:26:30Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T19:08:28Z"
+  },
+  {
+    "duration" : "0:06:23",
+    "endDate" : "2021-09-14T20:18:25Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T20:12:02Z"
+  },
+  {
+    "duration" : "0:07:25",
+    "endDate" : "2021-09-14T21:12:40Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T21:05:15Z"
+  },
+  {
+    "duration" : "0:07:38",
+    "endDate" : "2021-09-14T21:24:22Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T21:16:44Z"
+  },
+  {
+    "duration" : "0:06:23",
+    "endDate" : "2021-09-14T21:30:45Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T21:24:22Z"
+  },
+  {
+    "duration" : "0:08:12",
+    "endDate" : "2021-09-14T22:48:42Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T22:40:30Z"
+  },
+  {
+    "duration" : "0:24:07",
+    "endDate" : "2021-09-14T23:12:49Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T22:48:42Z"
+  },
+  {
+    "duration" : "0:12:42",
+    "endDate" : "2021-09-15T00:09:27Z",
+    "project" : "Development",
+    "startDate" : "2021-09-14T23:56:45Z"
+  },
+  {
+    "duration" : "0:06:23",
+    "endDate" : "2021-09-15T00:20:22Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T00:13:59Z"
+  },
+  {
+    "duration" : "0:42:03",
+    "endDate" : "2021-09-15T01:46:32Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T01:04:29Z"
+  },
+  {
+    "duration" : "0:05:23",
+    "endDate" : "2021-09-15T02:11:36Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T02:06:13Z"
+  },
+  {
+    "duration" : "0:17:30",
+    "endDate" : "2021-09-15T02:34:27Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T02:16:57Z"
+  },
+  {
+    "duration" : "0:12:54",
+    "endDate" : "2021-09-15T02:54:27Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T02:41:33Z"
+  },
+  {
+    "duration" : "0:16:57",
+    "endDate" : "2021-09-15T03:33:33Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T03:16:36Z"
+  },
+  {
+    "duration" : "0:11:17",
+    "endDate" : "2021-09-15T03:44:50Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T03:33:33Z"
+  },
+  {
+    "duration" : "0:05:32",
+    "endDate" : "2021-09-15T03:50:22Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T03:44:50Z"
+  },
+  {
+    "duration" : "1:12:23",
+    "endDate" : "2021-09-15T05:02:45Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T03:50:22Z"
+  },
+  {
+    "duration" : "1:26:13",
+    "endDate" : "2021-09-15T06:30:02Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T05:03:49Z"
+  },
+  {
+    "duration" : "0:10:38",
+    "endDate" : "2021-09-15T06:46:12Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T06:35:34Z"
+  },
+  {
+    "duration" : "0:12:30",
+    "endDate" : "2021-09-15T07:09:59Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T06:57:29Z"
+  },
+  {
+    "duration" : "0:38:14",
+    "endDate" : "2021-09-15T08:39:57Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T08:01:43Z"
+  },
+  {
+    "duration" : "1:58:42",
+    "endDate" : "2021-09-15T10:42:01Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T08:43:19Z"
+  },
+  {
+    "duration" : "1:12:15",
+    "endDate" : "2021-09-15T11:58:57Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T10:46:42Z"
+  },
+  {
+    "duration" : "0:09:13",
+    "endDate" : "2021-09-15T12:22:33Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T12:13:20Z"
+  },
+  {
+    "duration" : "0:07:18",
+    "endDate" : "2021-09-15T12:44:07Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T12:36:49Z"
+  },
+  {
+    "duration" : "0:08:13",
+    "endDate" : "2021-09-15T13:06:16Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T12:58:03Z"
+  },
+  {
+    "duration" : "0:10:28",
+    "endDate" : "2021-09-15T14:29:29Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T14:19:01Z"
+  },
+  {
+    "duration" : "0:05:16",
+    "endDate" : "2021-09-15T14:39:47Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T14:34:31Z"
+  },
+  {
+    "duration" : "0:20:33",
+    "endDate" : "2021-09-15T15:08:03Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T14:47:30Z"
+  },
+  {
+    "duration" : "0:05:42",
+    "endDate" : "2021-09-15T15:24:17Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T15:18:35Z"
+  },
+  {
+    "duration" : "0:18:01",
+    "endDate" : "2021-09-15T16:19:40Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T16:01:39Z"
+  },
+  {
+    "duration" : "0:20:32",
+    "endDate" : "2021-09-15T16:45:37Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T16:25:05Z"
+  },
+  {
+    "duration" : "0:10:48",
+    "endDate" : "2021-09-15T17:14:03Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T17:03:15Z"
+  },
+  {
+    "duration" : "0:19:55",
+    "endDate" : "2021-09-15T17:37:15Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T17:17:20Z"
+  },
+  {
+    "duration" : "0:13:50",
+    "endDate" : "2021-09-15T18:09:38Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T17:55:48Z"
+  },
+  {
+    "duration" : "0:36:55",
+    "endDate" : "2021-09-15T20:32:31Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T19:55:36Z"
+  },
+  {
+    "duration" : "0:05:41",
+    "endDate" : "2021-09-15T20:41:42Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T20:36:01Z"
+  },
+  {
+    "duration" : "0:05:24",
+    "endDate" : "2021-09-15T21:53:22Z",
+    "project" : "Development",
+    "startDate" : "2021-09-15T21:47:58Z"
+  },
+  {
+    "duration" : "0:19:10",
+    "endDate" : "2021-09-16T00:49:17Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T00:30:07Z"
+  },
+  {
+    "duration" : "0:07:32",
+    "endDate" : "2021-09-16T01:01:51Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T00:54:19Z"
+  },
+  {
+    "duration" : "0:05:27",
+    "endDate" : "2021-09-16T02:11:38Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T02:06:11Z"
+  },
+  {
+    "duration" : "0:07:23",
+    "endDate" : "2021-09-16T02:19:01Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T02:11:38Z"
+  },
+  {
+    "duration" : "0:08:36",
+    "endDate" : "2021-09-16T02:44:58Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T02:36:22Z"
+  },
+  {
+    "duration" : "0:26:04",
+    "endDate" : "2021-09-16T03:11:02Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T02:44:58Z"
+  },
+  {
+    "duration" : "0:06:52",
+    "endDate" : "2021-09-16T03:20:19Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T03:13:27Z"
+  },
+  {
+    "duration" : "1:44:54",
+    "endDate" : "2021-09-16T05:08:24Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T03:23:30Z"
+  },
+  {
+    "duration" : "0:10:41",
+    "endDate" : "2021-09-16T05:20:04Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T05:09:23Z"
+  },
+  {
+    "duration" : "0:24:13",
+    "endDate" : "2021-09-16T05:45:58Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T05:21:45Z"
+  },
+  {
+    "duration" : "0:07:44",
+    "endDate" : "2021-09-16T06:02:33Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T05:54:49Z"
+  },
+  {
+    "duration" : "0:09:59",
+    "endDate" : "2021-09-16T06:18:14Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T06:08:15Z"
+  },
+  {
+    "duration" : "0:18:30",
+    "endDate" : "2021-09-16T06:51:31Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T06:33:01Z"
+  },
+  {
+    "duration" : "0:13:27",
+    "endDate" : "2021-09-16T07:04:58Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T06:51:31Z"
+  },
+  {
+    "duration" : "1:11:07",
+    "endDate" : "2021-09-16T08:16:05Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T07:04:58Z"
+  },
+  {
+    "duration" : "0:12:11",
+    "endDate" : "2021-09-16T08:38:41Z",
+    "project" : "Development",
+    "startDate" : "2021-09-16T08:26:30Z"
+  },
+  {
+    "duration" : "0:05:53",
+    "endDate" : "2021-09-14T15:11:04Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-14T15:05:11Z"
+  },
+  {
+    "duration" : "0:18:13",
+    "endDate" : "2021-09-14T19:44:43Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-14T19:26:30Z"
+  },
+  {
+    "duration" : "0:06:08",
+    "endDate" : "2021-09-14T19:51:54Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-14T19:45:46Z"
+  },
+  {
+    "duration" : "0:12:22",
+    "endDate" : "2021-09-14T20:08:13Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-14T19:55:51Z"
+  },
+  {
+    "duration" : "0:26:54",
+    "endDate" : "2021-09-15T00:47:16Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T00:20:22Z"
+  },
+  {
+    "duration" : "0:07:45",
+    "endDate" : "2021-09-15T00:56:05Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T00:48:20Z"
+  },
+  {
+    "duration" : "0:05:24",
+    "endDate" : "2021-09-15T01:04:29Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T00:59:05Z"
+  },
+  {
+    "duration" : "0:11:39",
+    "endDate" : "2021-09-15T01:58:11Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T01:46:32Z"
+  },
+  {
+    "duration" : "0:07:02",
+    "endDate" : "2021-09-15T02:06:13Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T01:59:11Z"
+  },
+  {
+    "duration" : "0:07:06",
+    "endDate" : "2021-09-15T02:41:33Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T02:34:27Z"
+  },
+  {
+    "duration" : "0:05:32",
+    "endDate" : "2021-09-15T06:35:34Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T06:30:02Z"
+  },
+  {
+    "duration" : "0:11:17",
+    "endDate" : "2021-09-15T06:57:29Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T06:46:12Z"
+  },
+  {
+    "duration" : "0:39:26",
+    "endDate" : "2021-09-15T07:49:25Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T07:09:59Z"
+  },
+  {
+    "duration" : "0:10:02",
+    "endDate" : "2021-09-15T08:01:43Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T07:51:41Z"
+  },
+  {
+    "duration" : "0:22:23",
+    "endDate" : "2021-09-15T13:53:35Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T13:31:12Z"
+  },
+  {
+    "duration" : "0:08:24",
+    "endDate" : "2021-09-15T14:19:01Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T14:10:37Z"
+  },
+  {
+    "duration" : "0:05:02",
+    "endDate" : "2021-09-15T14:34:31Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T14:29:29Z"
+  },
+  {
+    "duration" : "0:05:25",
+    "endDate" : "2021-09-15T16:25:05Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T16:19:40Z"
+  },
+  {
+    "duration" : "0:57:32",
+    "endDate" : "2021-09-15T21:39:14Z",
+    "project" : "Oracle",
+    "startDate" : "2021-09-15T20:41:42Z"
+  },
+  {
+    "activityTitle" : "Zoom call",
+    "duration" : "0:58:49",
+    "endDate" : "2021-09-13T17:59:53Z",
+    "project" : "Meetings",
+    "startDate" : "2021-09-13T17:01:04Z"
+  },
+  {
+    "activityTitle" : "Zoom call",
+    "duration" : "0:32:45",
+    "endDate" : "2021-09-14T16:33:32Z",
+    "project" : "Meetings",
+    "startDate" : "2021-09-14T16:00:47Z"
+  },
+  {
+    "activityTitle" : "Zoom call",
+    "duration" : "0:24:00",
+    "endDate" : "2021-09-14T16:57:58Z",
+    "project" : "Meetings",
+    "startDate" : "2021-09-14T16:33:58Z"
+  },
+  {
+    "activityTitle" : "Zoom call",
+    "duration" : "0:30:09",
+    "endDate" : "2021-09-15T16:01:39Z",
+    "project" : "Meetings",
+    "startDate" : "2021-09-15T15:31:30Z"
+  },
+  {
+    "duration" : "0:13:35",
+    "endDate" : "2021-09-13T19:01:59Z",
+    "project" : "Bad Stuff",
+    "startDate" : "2021-09-13T18:48:24Z"
+  },
+  {
+    "duration" : "0:27:50",
+    "endDate" : "2021-09-14T22:15:20Z",
+    "project" : "Bad Stuff",
+    "startDate" : "2021-09-14T21:47:30Z"
+  },
+  {
+    "duration" : "0:14:09",
+    "endDate" : "2021-09-15T03:08:36Z",
+    "project" : "Bad Stuff",
+    "startDate" : "2021-09-15T02:54:27Z"
+  },
+  {
+    "duration" : "0:30:47",
+    "endDate" : "2021-09-15T19:45:27Z",
+    "project" : "Bad Stuff",
+    "startDate" : "2021-09-15T19:14:40Z"
+  },
+  {
+    "duration" : "0:06:16",
+    "endDate" : "2021-09-14T15:58:40Z",
+    "project" : "Web Browsing",
+    "startDate" : "2021-09-14T15:52:24Z"
+  },
+  {
+    "duration" : "0:07:04",
+    "endDate" : "2021-09-14T17:16:20Z",
+    "project" : "Web Browsing",
+    "startDate" : "2021-09-14T17:09:16Z"
+  },
+  {
+    "duration" : "0:10:32",
+    "endDate" : "2021-09-15T15:18:35Z",
+    "project" : "Web Browsing",
+    "startDate" : "2021-09-15T15:08:03Z"
+  },
+  {
+    "duration" : "0:05:41",
+    "endDate" : "2021-09-16T02:05:08Z",
+    "project" : "Web Browsing",
+    "startDate" : "2021-09-16T01:59:27Z"
+  },
+  {
+    "duration" : "0:12:43",
+    "endDate" : "2021-09-16T02:31:44Z",
+    "project" : "Web Browsing",
+    "startDate" : "2021-09-16T02:19:01Z"
+  },
+  {
+    "duration" : "0:21:59",
+    "endDate" : "2021-09-14T20:50:32Z",
+    "project" : "Bunch",
+    "startDate" : "2021-09-14T20:28:33Z"
+  },
+  {
+    "duration" : "0:12:53",
+    "endDate" : "2021-09-14T21:05:15Z",
+    "project" : "Bunch",
+    "startDate" : "2021-09-14T20:52:22Z"
+  },
+  {
+    "duration" : "0:05:42",
+    "endDate" : "2021-09-16T06:08:15Z",
+    "project" : "Bunch",
+    "startDate" : "2021-09-16T06:02:33Z"
+  },
+  {
+    "duration" : "0:06:22",
+    "endDate" : "2021-09-14T13:47:27Z",
+    "project" : "Communication",
+    "startDate" : "2021-09-14T13:41:05Z"
+  },
+  {
+    "duration" : "0:05:58",
+    "endDate" : "2021-09-14T18:30:34Z",
+    "project" : "Communication",
+    "startDate" : "2021-09-14T18:24:36Z"
+  },
+  {
+    "duration" : "0:07:29",
+    "endDate" : "2021-09-15T18:46:41Z",
+    "project" : "Communication",
+    "startDate" : "2021-09-15T18:39:12Z"
+  },
+  {
+    "duration" : "0:18:33",
+    "endDate" : "2021-09-15T17:55:48Z",
+    "project" : "BrettTerpstra.com ▸ Writing",
+    "startDate" : "2021-09-15T17:37:15Z"
+  },
+  {
+    "duration" : "0:11:39",
+    "endDate" : "2021-09-14T14:48:00Z",
+    "project" : "Oracle ▸ Communication",
+    "startDate" : "2021-09-14T14:36:21Z"
+  },
+  {
+    "duration" : "0:08:28",
+    "endDate" : "2021-09-15T13:17:51Z",
+    "project" : "File Management",
+    "startDate" : "2021-09-15T13:09:23Z"
+  },
+  {
+    "duration" : "0:06:29",
+    "endDate" : "2021-09-14T21:40:37Z",
+    "project" : "Office & Business",
+    "startDate" : "2021-09-14T21:34:08Z"
+  }
+]
