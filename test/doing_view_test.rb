@@ -26,14 +26,14 @@ class DoingViewTest < Test::Unit::TestCase
   end
 
   def test_views
-    views = doing('views').split(/\s+/).delete_if {|v| v.strip == ''}.map(&:strip)
-    assert_equal(3, views.length, 'Should have 3 views in configuration')
+    views = doing('views').strip.split(/\s+/).delete_if {|v| v.strip == ''}
+    assert_equal(3, views.length, 'Should have 3 views as defined in test configuration')
   end
 
   def test_view
     doing('now', 'Adding a test entry')
     entries = doing('view', 'test')
-    assert_count_entries(1, entries, '1 entry should be listed containing DOING TEST')
+    assert_count_entries(1, entries, '1 entry should be listed containing DOING TEST (added by the view)')
   end
 
   private

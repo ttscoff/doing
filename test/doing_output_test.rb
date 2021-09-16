@@ -28,6 +28,17 @@ class DoingOutputTest < Test::Unit::TestCase
     assert_match(/#{subject}\s*$/, doing('last'), 'last entry should be entry just added')
   end
 
+  def test_last_search_and_tag
+    unique_keyword = 'jumping jesus'
+    unique_tag = 'balloonpants'
+    doing('now', "Test new entry @#{unique_tag} sad monkey")
+    doing('now', "Test new entry @tag2 #{unique_keyword}")
+    doing('now', 'Test new entry @tag3 burly man')
+
+    assert_match(/#{unique_keyword}/, doing('last', '--search', unique_keyword), 'returned entry should contain unique keyword')
+    assert_match(/@#{unique_tag}/, doing('last', '--tag', unique_tag), 'returned entry should contain unique tag')
+  end
+
   def test_view_command
     subject = 'Test new entry @tag1'
     doing('done', subject)

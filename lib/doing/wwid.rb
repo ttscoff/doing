@@ -73,7 +73,7 @@ class WWID
     rescue StandardError
       @config = {}
       @local_config = {}
-      # raise "error reading config"
+      # exit_now! "error reading config"
     end
   end
 
@@ -158,7 +158,7 @@ class WWID
 
     # if ENV['DOING_DEBUG'].to_i == 3
     #   if @config['default_tags'].length > 0
-    #     raise "DEFAULT CONFIG CHANGED"
+    #     exit_now! "DEFAULT CONFIG CHANGED"
     #   end
     # end
 
@@ -293,7 +293,7 @@ class WWID
       if $?.exitstatus == 0
         input = IO.read(tmpfile.path)
       else
-        raise 'Cancelled'
+        exit_now! 'Cancelled'
       end
     ensure
       tmpfile.close
@@ -311,11 +311,11 @@ class WWID
   # @param      input  (String) The string to parse
   #
   def format_input(input)
-    raise 'No content in entry' if input.nil? || input.strip.empty?
+    exit_now! 'No content in entry' if input.nil? || input.strip.empty?
 
     input_lines = input.split(/[\n\r]+/).delete_if {|line| line =~ /^#/ || line =~ /^\s*$/ }
     title = input_lines[0]&.strip
-    raise 'No content in first line' if title.nil? || title.strip.empty?
+    exit_now! 'No content in first line' if title.nil? || title.strip.empty?
 
     note = input_lines.length > 1 ? input_lines[1..-1] : []
     # If title line ends in a parenthetical, use that as the note
@@ -346,7 +346,7 @@ class WWID
   #
   def chronify(input)
     now = Time.now
-    raise "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
+    exit_now! "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
 
     secs_ago = if input.match(/^(\d+)$/)
                  # plain number, assume minutes
@@ -438,7 +438,7 @@ class WWID
     end
     unless section || guessed
       alt = guess_view(frag, true)
-      raise "Did you mean `doing view #{alt}`?" if alt
+      exit_now! "Did you mean `doing view #{alt}`?" if alt
 
       res = yn("Section #{frag} not found, create it", default_response: false)
 
@@ -448,7 +448,7 @@ class WWID
         return frag.cap_first
       end
 
-      raise "Unknown section: #{frag}"
+      exit_now! "Unknown section: #{frag}"
     end
     section ? section.cap_first : guessed
   end
@@ -518,9 +518,9 @@ class WWID
     unless view || guessed
       alt = guess_section(frag, guessed: true)
       if alt
-        raise "Did you mean `doing show #{alt}`?"
+        exit_now! "Did you mean `doing show #{alt}`?"
       else
-        raise "Unknown view: #{frag}"
+        exit_now! "Unknown view: #{frag}"
       end
     end
     view
@@ -631,7 +631,7 @@ class WWID
 
     add_tags = opt[:tag] ? opt[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '@') }.join(' ') : ''
     prefix = opt[:prefix] ? opt[:prefix] : '[Timing.app]'
-    raise "File not found" unless File.exist?(File.expand_path(path))
+    exit_now! "File not found" unless File.exist?(File.expand_path(path))
 
     data = JSON.parse(IO.read(File.expand_path(path)))
     new_items = []
@@ -688,7 +688,7 @@ class WWID
       section = combined['items'].dup.sort_by { |item| item['date'] }.reverse[0]['section']
     end
 
-    raise "Section #{section} not found" unless @content.key?(section)
+    exit_now! "Section #{section} not found" unless @content.key?(section)
 
     last_item = @content[section]['items'].dup.sort_by { |item| item['date'] }.reverse[0]
     warn "Editing note for #{last_item['title']}"
@@ -773,7 +773,7 @@ class WWID
   ## @param      opt   (Hash) Additional options
   ##
   def interactive(opt = {})
-    raise "Select command requires that fzf be installed" unless exec_available('fzf')
+    exit_now! "Select command requires that fzf be installed" unless exec_available('fzf')
 
     section = opt[:section] ? guess_section(opt[:section]) : 'All'
 
@@ -928,7 +928,7 @@ class WWID
           if opt[:search] || opt[:tag]
             sec_arr = sections
           else
-            raise 'A count greater than one requires a section to be specified'
+            exit_now! 'A count greater than one requires a section to be specified'
           end
         else
           sec_arr = sections
@@ -1029,7 +1029,7 @@ class WWID
           @results.push('Archiving is skipped when operating on all entries') if (opt[:count]).zero?
         end
       else
-        raise "Section not found: #{section}"
+        exit_now! "Section not found: #{section}"
       end
     end
 
@@ -1199,7 +1199,7 @@ class WWID
       section = combined['items'].dup.sort_by { |item| item['date'] }.reverse[0]['section']
     end
 
-    raise "Section #{section} not found" unless @content.key?(section)
+    exit_now! "Section #{section} not found" unless @content.key?(section)
 
     # sort_section(opt[:section])
     items = @content[section]['items'].dup.sort_by { |item| item['date'] }.reverse
@@ -1435,7 +1435,7 @@ class WWID
       end
     end
 
-    raise 'Invalid section object' unless opt[:section].instance_of? Hash
+    exit_now! 'Invalid section object' unless opt[:section].instance_of? Hash
 
     items = opt[:section]['items'].sort_by { |item| item['date'] }
 
@@ -1485,7 +1485,7 @@ class WWID
 
     out = ''
 
-    raise 'Unknown output format' if opt[:output] && (opt[:output] !~ /^(template|html|csv|json|timeline)$/i)
+    exit_now! 'Unknown output format' if opt[:output] && (opt[:output] !~ /^(template|html|csv|json|timeline)$/i)
 
     case opt[:output]
     when /^csv$/i
@@ -1758,7 +1758,7 @@ class WWID
       do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label] })
       write(doing_file)
     else
-      raise 'Either source or destination does not exist'
+      exit_now! 'Either source or destination does not exist'
     end
   end
 

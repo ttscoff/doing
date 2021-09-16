@@ -79,7 +79,7 @@ command %i[now next] do |c|
     if options[:back]
       date = wwid.chronify(options[:back])
 
-      raise 'Unable to parse date string' if date.nil?
+      exit_now! 'Unable to parse date string' if date.nil?
     else
       date = Time.now
     end
@@ -87,13 +87,13 @@ command %i[now next] do |c|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero?)
-      raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = ''
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
 
-      raise 'No content' if input.empty?
+      exit_now! 'No content' if input.empty?
 
       title, note = wwid.format_input(input)
       note.push(options[:n]) if options[:n]
@@ -111,7 +111,7 @@ command %i[now next] do |c|
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
       wwid.write(wwid.doing_file)
     else
-      raise 'You must provide content when creating a new entry'
+      exit_now! 'You must provide content when creating a new entry'
     end
   end
 end
@@ -138,7 +138,7 @@ command :note do |c|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero? && !options[:r])
-      raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = !args.empty? ? args.join(' ') : ''
 
@@ -147,11 +147,11 @@ command :note do |c|
       input = prev_input + input
 
       input = wwid.fork_editor(input).strip
-      raise 'No content, cancelled' unless input
+      exit_now! 'No content, cancelled' unless input
 
       _title, note = wwid.format_input(input)
 
-      raise 'No note content' unless note
+      exit_now! 'No note content' unless note
 
       wwid.note_last(section, note, replace: true)
     elsif !args.empty?
@@ -165,7 +165,7 @@ command :note do |c|
     elsif options[:r]
       wwid.note_last(section, [], replace: true)
     else
-      raise 'You must provide content when adding a note'
+      exit_now! 'You must provide content when adding a note'
     end
     wwid.write(wwid.doing_file)
   end
@@ -196,7 +196,7 @@ command :meanwhile do |c|
     if options[:back]
       date = wwid.chronify(options[:back])
 
-      raise 'Unable to parse date string' if date.nil?
+      exit_now! 'Unable to parse date string' if date.nil?
     else
       date = Time.now
     end
@@ -205,7 +205,7 @@ command :meanwhile do |c|
     input = ''
 
     if options[:e]
-      raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
@@ -243,7 +243,7 @@ long_desc %(
 arg_name 'TYPE', must_match: /^(?:html|haml|css)/i
 command :template do |c|
   c.action do |_global_options, options, args|
-    raise 'No type specified, use `doing template [HAML|CSS]`' if args.empty?
+    exit_now! 'No type specified, use `doing template [HAML|CSS]`' if args.empty?
 
     case args[0]
     when /html|haml/i
@@ -251,7 +251,7 @@ command :template do |c|
     when /css/i
       $stdout.puts wwid.css_template
     else
-      raise 'Invalid type specified, must be HAML or CSS'
+      exit_now! 'Invalid type specified, must be HAML or CSS'
     end
   end
 end
@@ -322,17 +322,17 @@ command :later do |c|
   c.action do |_global_options, options, args|
     if options[:back]
       date = wwid.chronify(options[:back])
-      raise 'Unable to parse date string' if date.nil?
+      exit_now! 'Unable to parse date string' if date.nil?
     else
       date = Time.now
     end
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero?)
-      raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = args.empty? ? '' : args.join(' ')
       input = wwid.fork_editor(input).strip
-      raise 'No content' unless input && !input.empty?
+      exit_now! 'No content' unless input && !input.empty?
 
       title, note = wwid.format_input(input)
       note.push(options[:n]) if options[:n]
@@ -349,7 +349,7 @@ command :later do |c|
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
     else
-      raise 'You must provide content when creating a new entry'
+      exit_now! 'You must provide content when creating a new entry'
     end
   end
 end
@@ -397,19 +397,19 @@ command %i[done did] do |c|
 
     if options[:took]
       took = wwid.chronify_qty(options[:took])
-      raise 'Unable to parse date string for --took' if took.nil?
+      exit_now! 'Unable to parse date string for --took' if took.nil?
     end
 
     if options[:back]
       date = wwid.chronify(options[:back])
-      raise 'Unable to parse date string for --back' if date.nil?
+      exit_now! 'Unable to parse date string for --back' if date.nil?
     else
       date = options[:took] ? Time.now - took : Time.now
     end
 
     if options[:at]
       finish_date = wwid.chronify(options[:at])
-      raise 'Unable to parse date string for --at' if finish_date.nil?
+      exit_now! 'Unable to parse date string for --at' if finish_date.nil?
 
       date = options[:took] ? finish_date - took : finish_date
     elsif options[:took]
@@ -427,12 +427,12 @@ command %i[done did] do |c|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
     if options[:e]
-      raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = ''
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
-      raise 'No content' unless input && !input.empty?
+      exit_now! 'No content' unless input && !input.empty?
 
       title, note = wwid.format_input(input)
       title += " @done#{donedate}"
@@ -467,7 +467,7 @@ command %i[done did] do |c|
       wwid.add_item(title.cap_first, section.cap_first, { note: note, back: date })
       wwid.write(wwid.doing_file)
     else
-      raise 'You must provide content when creating a new entry'
+      exit_now! 'You must provide content when creating a new entry'
     end
   end
 end
@@ -513,9 +513,9 @@ command :cancel do |c|
                        end
     end
 
-    raise 'Only one argument allowed' if args.length > 1
+    exit_now! 'Only one argument allowed' if args.length > 1
 
-    raise 'Invalid argument (specify number of recent items to mark @done)' unless args.empty? || args[0] =~ /\d+/
+    exit_now! 'Invalid argument (specify number of recent items to mark @done)' unless args.empty? || args[0] =~ /\d+/
 
     count = args[0] ? args[0].to_i : 1
     opts = {
@@ -580,14 +580,14 @@ command :finish do |c|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
     unless options[:auto]
-      raise '--back and --took cannot be used together' if options[:back] && options[:took]
+      exit_now! '--back and --took cannot be used together' if options[:back] && options[:took]
 
-      raise '--search and --tag cannot be used together' if options[:search] && options[:tag]
+      exit_now! '--search and --tag cannot be used together' if options[:search] && options[:tag]
 
       if options[:back]
         date = wwid.chronify(options[:back])
 
-        raise 'Unable to parse date string' if date.nil?
+        exit_now! 'Unable to parse date string' if date.nil?
       elsif options[:took]
         date = wwid.chronify_qty(options[:took])
       else
@@ -611,9 +611,9 @@ command :finish do |c|
                              end
     end
 
-    raise 'Only one argument allowed' if args.length > 1
+    exit_now! 'Only one argument allowed' if args.length > 1
 
-    raise 'Invalid argument (specify number of recent items to mark @done)' unless args.length == 0 || args[0] =~ /\d+/
+    exit_now! 'Invalid argument (specify number of recent items to mark @done)' unless args.length == 0 || args[0] =~ /\d+/
 
     count = args[0] ? args[0].to_i : 1
     opts = {
@@ -724,9 +724,9 @@ command :tag do |c|
   c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
 
   c.action do |_global_options, options, args|
-    raise 'You must specify at least one tag' if args.empty? && !options[:a]
+    exit_now! 'You must specify at least one tag' if args.empty? && !options[:a]
 
-    raise '--search and --tag cannot be used together' if options[:search] && options[:tag]
+    exit_now! '--search and --tag cannot be used together' if options[:search] && options[:tag]
 
     section = 'All'
 
@@ -787,7 +787,7 @@ command :tag do |c|
 
       res = wwid.yn(question, default_response: false)
 
-      raise 'Cancelled' unless res
+      exit_now! 'Cancelled' unless res
     end
 
     opts = {
@@ -865,10 +865,10 @@ command :show do |c|
   c.flag %i[f from]
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true
+  c.switch %i[t times], default_value: true, negatable: true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: true
+  c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
@@ -897,7 +897,7 @@ command :show do |c|
         section = 'All'
       else
         section = wwid.guess_section(args[0])
-        raise "No such section: #{args[0]}" unless section
+        exit_now! "No such section: #{args[0]}" unless section
 
         args.shift
       end
@@ -987,10 +987,10 @@ command [:grep, :search] do |c|
   c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true
+  c.switch %i[t times], default_value: true, negatable: true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: true
+  c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
@@ -1034,10 +1034,10 @@ command :recent do |c|
   c.flag %i[s section], default_value: 'All'
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true
+  c.switch %i[t times], default_value: true, negatable: true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: true
+  c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
@@ -1074,10 +1074,10 @@ command :today do |c|
   c.flag %i[s section], default_value: 'All'
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true
+  c.switch %i[t times], default_value: true, negatable: true
 
   c.desc 'Show time totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: true
+  c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
@@ -1109,10 +1109,10 @@ command :on do |c|
   c.flag %i[s section], default_value: 'All'
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true
+  c.switch %i[t times], default_value: true, negatable: true
 
   c.desc 'Show time totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: true
+  c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
@@ -1152,6 +1152,55 @@ command :on do |c|
   end
 end
 
+desc 'List entries since a date'
+long_desc %(Date argument can be natural language and are always interpreted as being in the past. "thursday" would be interpreted as "last thursday,"
+and "2d" would be interpreted as "two days ago.")
+arg_name 'DATE_STRING'
+command :since do |c|
+  c.desc 'Section'
+  c.arg_name 'NAME'
+  c.flag %i[s section], default_value: 'All'
+
+  c.desc 'Show time intervals on @done tasks'
+  c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc 'Show time totals at the end of output'
+  c.switch [:totals], default_value: false, negatable: false
+
+  c.desc 'Sort tags by (name|time)'
+  default = 'time'
+  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+
+  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.arg_name 'FORMAT'
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
+
+  c.action do |_global_options, options, args|
+    exit_now! 'Missing date argument' if args.empty?
+
+    date_string = args.join(' ')
+
+    date_string += ' at midnight' unless date_string =~ /(\d:|\d *[ap]m?|midnight|noon)/i
+    date_string.sub!(/(day) (\d)/, '\1 at \2') if date_string =~ /day \d/
+
+    start = wwid.chronify(date_string)
+    finish = Time.now
+
+    exit_now! 'Unrecognized date string' unless start
+
+    message = "Date interpreted as #{start} through the current time"
+    wwid.results.push(message)
+
+    options[:t] = true if options[:totals]
+    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+
+    puts wwid.list_date([start, finish], options[:s], options[:t], options[:output],
+                        { totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+  end
+end
+
 desc 'List entries from yesterday'
 command :yesterday do |c|
   c.desc 'Specify a section'
@@ -1163,10 +1212,10 @@ command :yesterday do |c|
   c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true
+  c.switch %i[t times], default_value: true, negatable: true
 
   c.desc 'Show time totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: true
+  c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
@@ -1203,7 +1252,7 @@ command :last do |c|
   c.flag [:search]
 
   c.action do |_global_options, options, _args|
-    raise '--tag and --search cannot be used together' if options[:tag] && options[:search]
+    exit_now! '--tag and --search cannot be used together' if options[:tag] && options[:search]
 
     if options[:tag].nil?
       tags = []
@@ -1252,7 +1301,7 @@ desc 'Add a new section to the "doing" file'
 arg_name 'SECTION_NAME'
 command :add_section do |c|
   c.action do |_global_options, _options, args|
-    raise "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
+    exit_now! "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
 
     wwid.add_section(args[0].cap_first)
     wwid.write(wwid.doing_file)
@@ -1293,10 +1342,10 @@ command :view do |c|
   c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
 
   c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true
+  c.switch %i[t times], default_value: true, negatable: true
 
   c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: true
+  c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Include colors in output'
   c.switch [:color], default_value: true, negatable: true
@@ -1308,7 +1357,7 @@ command :view do |c|
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
   c.desc 'Only show items with recorded time intervals'
-  c.switch [:only_timed], default_value: false, negatable: true
+  c.switch [:only_timed], default_value: false, negatable: false
 
   c.action do |_global_options, options, args|
     title = if args.empty?
@@ -1380,7 +1429,7 @@ command :view do |c|
     elsif title.instance_of?(FalseClass)
       exit_now! 'Cancelled'
     else
-      raise "View #{title} not found in config"
+      exit_now! "View #{title} not found in config"
     end
   end
 end
@@ -1437,7 +1486,7 @@ command :archive do |c|
       tags = args.length > 1 ? args[1..].map { |t| t.sub(/^@/, '').strip } : []
     end
 
-    raise '--keep and --count can\'t be used together' if options[:keep] && options[:count]
+    exit_now! '--keep and --count can\'t be used together' if options[:keep] && options[:count]
 
     tags.concat(options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if options[:tag]
 
@@ -1488,7 +1537,7 @@ command :open do |c|
       elsif options[:b]
         system %(open -b "#{options[:b]}" "#{File.expand_path(wwid.doing_file)}")
       elsif options[:e]
-        raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+        exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
         system %($EDITOR "#{File.expand_path(wwid.doing_file)}")
       elsif wwid.config.key?('editor_app') && !wwid.config['editor_app'].nil?
@@ -1498,7 +1547,7 @@ command :open do |c|
       end
 
     else
-      raise 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       system %($EDITOR "#{File.expand_path(wwid.doing_file)}")
     end
@@ -1535,13 +1584,13 @@ command :config do |c|
           `open -b #{options[:b]} "#{wwid.config_file}"`
         end
       else
-        raise 'No EDITOR variable defined in environment' if options[:e].nil? && ENV['EDITOR'].nil?
+        exit_now! 'No EDITOR variable defined in environment' if options[:e].nil? && ENV['EDITOR'].nil?
 
         editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
         system %(#{editor} "#{wwid.config_file}")
       end
     else
-      raise 'No EDITOR variable defined in environment' if options[:e].nil? && ENV['EDITOR'].nil?
+      exit_now! 'No EDITOR variable defined in environment' if options[:e].nil? && ENV['EDITOR'].nil?
 
       editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
       system %(#{editor} "#{wwid.config_file}")
@@ -1594,7 +1643,7 @@ command :import do |c|
         wwid.write(wwid.doing_file)
       end
     else
-      raise 'Invalid import type'
+      exit_now! 'Invalid import type'
     end
   end
 end
