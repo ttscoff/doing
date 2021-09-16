@@ -1,3 +1,7 @@
+### 1.0.73
+
+- Fix for timeline output
+
 ### 1.0.72
 
 - Add `doing select` to show menu of all tasks, searchable with fuzzy matching and the ability to perform certain tasks on multiple selections.
