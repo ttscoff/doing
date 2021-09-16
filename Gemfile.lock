@@ -102,7 +102,7 @@ DEPENDENCIES
   doing!
   rake (~> 13.0, >= 13.0.1)
   rdoc (~> 6.3.1)
-  test-unit
+  test-unit (~> 3.4.4)
 
 BUNDLED WITH
    2.2.17
