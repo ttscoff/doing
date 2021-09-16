@@ -29,7 +29,7 @@ lib/templates/doing.css
   s.add_development_dependency 'rake', '~> 13.0', '>= 13.0.1'
   s.add_development_dependency 'rdoc', '~> 6.3.1'
   s.add_development_dependency 'aruba', '~> 1.0.2'
-  s.add_development_dependency 'test-unit'
+  s.add_development_dependency 'test-unit', '~> 3.4.4'
   s.add_runtime_dependency('gli', '~> 2.19', '>= 2.19.2')
   s.add_runtime_dependency('haml','~>5.0.0', '>= 5.0.0')
   s.add_runtime_dependency('chronic','~> 0.10', '>= 0.10.2')
