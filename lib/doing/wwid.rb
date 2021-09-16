@@ -1534,13 +1534,13 @@ class WWID
             'id' => index + 1,
             'content' => title.strip, #+ " #{note}"
             'title' => title.strip + " (#{'%02d:%02d:%02d' % fmt_time(interval)})",
-            'start' => i['date'].strftime('%F'),
+            'start' => i['date'].strftime('%F %T'),
             'type' => 'point'
           }
 
-          if interval && interval > 0
-            new_item['end'] = end_date.strftime('%F')
-            new_item['type'] = 'range' if interval > 3600 * 3
+          if interval && interval.to_i > 0
+            new_item['end'] = end_date.strftime('%F %T')
+            new_item['type'] = 'range' if interval.to_i > 3600 * 3
           end
           items_out.push(new_item)
         end
@@ -1556,8 +1556,8 @@ class WWID
                     <!doctype html>
                     <html>
                     <head>
-                      <link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
-                      <script src="http://visjs.org/dist/vis.js"></script>
+                      <link href="https://unpkg.com/vis-timeline@7.4.9/dist/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+                      <script src="https://unpkg.com/vis-timeline@7.4.9/dist/vis-timeline-graph2d.min.js"></script>
                     </head>
                     <body>
                       <div id="mytimeline"></div>
