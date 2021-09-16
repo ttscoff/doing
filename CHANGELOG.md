@@ -1,4 +1,4 @@
-### 1.0.75
+### 1.0.76
 
 - Refine editing multiple selections (doing select)
 

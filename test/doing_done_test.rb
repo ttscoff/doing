@@ -30,8 +30,8 @@ class DoingDoneTest < Test::Unit::TestCase
     r = doing('show').uncolor.strip
     m = r.match(ENTRY_DONE_REGEX)
     assert(m, "Entry should have @done timestamp")
-    now = Time.now.round_time(1)
-    assert_equal(Time.parse(m['ts']).round_time(1), now,
+    now = Time.now
+    assert_within_tolerance(Time.parse(m['ts']), now, message:
                  'Finished time should be equal to the nearest minute')
   end
 
@@ -61,8 +61,7 @@ class DoingDoneTest < Test::Unit::TestCase
     d = r.match(ENTRY_DONE_REGEX)
     assert(d, "#{r} should have @done timestamp")
     start = Time.parse(t['ts'])
-    assert_equal((start + (60 * 60)).round_time(2), Time.parse(d['ts']).round_time(2),
-                 'Finished time should be 60 minutes after start')
+    assert_within_tolerance((start + (60 * 60)), Time.parse(d['ts']), message: 'Finished time should be 60 minutes after start')
   end
 
   def test_finish_count
@@ -87,7 +86,7 @@ class DoingDoneTest < Test::Unit::TestCase
 
   def test_done_with_args
     subject = 'Test finished entry @tag1'
-    now = Time.now.round_time(1)
+    now = Time.now
     doing('done', subject)
     r = doing('show').uncolor.strip
     t = r.match(ENTRY_TS_REGEX)
@@ -96,66 +95,66 @@ class DoingDoneTest < Test::Unit::TestCase
     assert(d, "#{r} should have @done tag with timestamp")
 
     assert_equal(t['ts'], d['ts'], 'Timestamp and @done timestamp should match')
-    assert_equal(Time.parse(d['ts']).round_time(1), now,
-                 'Finished time should be equal to the nearest minute')
+    assert_within_tolerance(Time.parse(d['ts']), now,
+                            message: 'Finished time should be equal to the nearest minute')
   end
 
   def test_done_back
     now = Time.now
-    start = (now - (65 * 60)).round_time(2)
+    start = (now - (65 * 60))
     doing('done', '--back', '65m', 'Test entry')
     r = doing('show').uncolor.strip
     t = r.match(ENTRY_TS_REGEX)
     d = r.match(ENTRY_DONE_REGEX)
     assert(d, 'Entry should have @done timestamp')
-    start_time = Time.parse(t['ts']).round_time(2)
-    end_time = Time.parse(d['ts']).round_time(2)
-    assert_equal(start_time, start,
-                 'Start time should be equal to the nearest minute')
-    assert_equal(end_time, start,
-                 'Finish time should be the same as start time')
+    start_time = Time.parse(t['ts'])
+    end_time = Time.parse(d['ts'])
+    assert_within_tolerance(start_time, start,
+                 message: 'Start time should be equal to the nearest minute')
+    assert_within_tolerance(end_time, start,
+                 message: 'Finish time should be the same as start time')
   end
 
   def test_done_new_with_took
     now = Time.now
-    finish = now.round_time(2)
-    start = (now - (30 * 60)).round_time(2)
+    finish = now
+    start = (now - (30 * 60))
     doing('done', 'Started half an hour ago and just finished', '--took', '30m')
     r = doing('show').uncolor.strip
     t = r.match(ENTRY_TS_REGEX)
     d = r.match(ENTRY_DONE_REGEX)
     assert(d, 'Entry should have @done timestamp')
-    start_time = Time.parse(t['ts']).round_time(2)
-    end_time = Time.parse(d['ts']).round_time(2)
-    assert_equal(start, start_time,
-                 'Start time should be 30 minutes ago')
-    assert_equal(finish, end_time,
-                 'Finish time should be now')
+    start_time = Time.parse(t['ts'])
+    end_time = Time.parse(d['ts'])
+    assert_within_tolerance(start, start_time,
+                 message: 'Start time should be 30 minutes ago')
+    assert_within_tolerance(finish, end_time,
+                 message: 'Finish time should be now')
   end
 
   def test_done_complete_with_took
     now = Time.now
-    start = (now - (60 * 60)).round_time(2)
-    finish = (now - (30 * 60)).round_time(2)
+    start = (now - (60 * 60))
+    finish = (now - (30 * 60))
 
     doing('now', '--back', '1h', 'test interval format')
     r = doing('show').uncolor.strip
     d = r.match(ENTRY_TS_REGEX)
-    start_time = Time.parse(d['ts']).round_time(2)
-    assert_equal(start, start_time, 'Start time should be one hour ago')
+    start_time = Time.parse(d['ts'])
+    assert_within_tolerance(start, start_time, message: 'Start time should be one hour ago')
 
     doing('done', '--took', '30m')
     r = doing('show').uncolor.strip
     d = r.match(ENTRY_DONE_REGEX)
     assert(d, 'Entry should have done date')
-    end_time = Time.parse(d['ts']).round_time(2)
-    assert_equal(end_time, finish,
-                 'Finish time should be 30 minutes ago')
+    end_time = Time.parse(d['ts'])
+    assert_within_tolerance(end_time, finish,
+                 message: 'Finish time should be 30 minutes ago')
   end
 
   def test_done_back_took
     now = Time.now
-    start = (now - (30 * 60)).round_time(2)
+    start = (now - (30 * 60))
     finish = start + (10 * 60)
     doing('done', '--back', '30m', '--took', '10m', 'Test entry')
     r = doing('show').uncolor.strip
@@ -163,18 +162,22 @@ class DoingDoneTest < Test::Unit::TestCase
     d = r.match(ENTRY_DONE_REGEX)
     assert(t, "Entry should have timestamp")
     assert(d, 'Entry should have @done with timestamp')
-    start_time = Time.parse(t['ts']).round_time(2)
-    end_time = Time.parse(d['ts']).round_time(2)
-    assert_equal(start_time, start,
-                 'Start time should be equal to the nearest minute')
-    assert_equal(end_time, finish,
-                 'Finish time should be equal to the nearest minute')
+    start_time = Time.parse(t['ts'])
+    end_time = Time.parse(d['ts'])
+    assert_within_tolerance(start_time, start,
+                 message: 'Start time should be equal to the nearest minute')
+    assert_within_tolerance(end_time, finish,
+                 message: 'Finish time should be equal to the nearest minute')
   end
 
   private
 
   def assert_count_entries(count, shown, message = 'Should be X entries shown')
     assert_equal(count, shown.uncolor.strip.scan(ENTRY_REGEX).count, message)
+  end
+
+  def assert_within_tolerance(t1, t2, message: "Times should be within tolerance of each other", tolerance: 2)
+    assert(t1.close_enough?(t2, tolerance: tolerance), message)
   end
 
   def mktmpdir

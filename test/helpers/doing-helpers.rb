@@ -6,6 +6,16 @@ class Time
     t = self
     Time.at(t.to_i - (t.to_i % (min * 60)))
   end
+
+  def close_enough?(other_time, tolerance: 2)
+    t = self
+    if t > other_time
+      diff = t - other_time
+    else
+      diff = other_time - t
+    end
+    diff / 60 < tolerance
+  end
 end
 
 class String

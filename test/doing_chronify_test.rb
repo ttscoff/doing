@@ -31,8 +31,7 @@ class DoingChronifyTest < Test::Unit::TestCase
     doing('now', '--back', '20m', 'test interval format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
-    assert_equal(Time.parse(m['ts']).round_time(1), (now - (20 * 60)).round_time(1),
-                 'New entry should be equal to the nearest minute')
+    assert_within_tolerance(Time.parse(m['ts']), (now - (20 * 60)), tolerance: 2, message: 'New entry should be equal to the nearest minute')
   end
 
   def test_back_strftime
@@ -40,8 +39,7 @@ class DoingChronifyTest < Test::Unit::TestCase
     doing('now', '--back', ts, 'test strftime format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
-    assert_equal(Time.parse(m['ts']).round_time(1), Time.parse(ts).round_time(1),
-                 'New entry should be equal to the nearest minute')
+    assert_within_tolerance(Time.parse(m['ts']), Time.parse(ts), tolerance: 2, message: 'New entry should be equal to the nearest minute')
   end
 
   def test_back_semantic
@@ -54,6 +52,10 @@ class DoingChronifyTest < Test::Unit::TestCase
   end
 
   private
+
+  def assert_within_tolerance(t1, t2, message: "Times should be within tolerance of each other", tolerance: 2)
+    assert(t1.close_enough?(t2, tolerance: tolerance), message)
+  end
 
   def mktmpdir
     tmpdir = Dir.mktmpdir
