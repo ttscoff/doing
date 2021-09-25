@@ -772,15 +772,11 @@ class WWID
   ## @return     (String) The selected option
   ##
   def choose_from(options, prompt)
-    puts prompt
-    options.each_with_index do |section, i|
-      puts format('% 3d: %s', i + 1, section)
-    end
-    print "#{colors['green']}> #{colors['default']}"
-    num = STDIN.gets
-    return false if num =~ /^[a-z ]*$/i
+    fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
+    res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} --prompt "#{prompt}"`
+    return false if res.strip.size.zero?
 
-    options[num.to_i - 1]
+    res
   end
 
   ##
@@ -847,32 +843,32 @@ class WWID
     unless has_action
       action = choose_from(
                            [
-                            "add tag",
-                            "remove tag",
-                            "archive",
-                            "cancel",
-                            "delete",
-                            "edit",
-                            "finish",
-                            "flag",
-                            "move",
-                            "output format"
+                            'add tag',
+                            'remove tag',
+                            'archive',
+                            'cancel',
+                            'delete',
+                            'edit',
+                            'finish',
+                            'flag',
+                            'move',
+                            'output format'
                           ],
-                            'What do you want to do with the selected items?')
+                            'What do you want to do with the selected items? > ')
       case action
       when /(add|remove) tag/
-        print "Enter tag: "
+        print 'Enter tag: '
         tag = STDIN.gets
         return if tag =~ /^ *$/
         opt[:tag] = tag.strip
         opt[:remove] = true if action =~ /remove tag/
       when /output format/
-        output_format = choose_from(%w[doing taskpaper json timeline html csv], 'Which output format?')
+        output_format = choose_from(%w[doing taskpaper json timeline html csv], 'Which output format? > ')
         return if tag =~ /^ *$/
         opt[:output] = output_format.strip
-        res = yn("Save to file?", default_response: 'n')
+        res = yn('Save to file?', default_response: 'n')
         if res
-          print "File path/name: "
+          print 'File path/name: '
           filename = STDIN.gets.strip
           return if filename.empty?
           opt[:save_to] = filename
@@ -1507,14 +1503,7 @@ class WWID
   ## @return     (String) The selected section name
   ##
   def choose_section
-    sections.each_with_index do |section, i|
-      puts format('% 3d: %s', i + 1, section)
-    end
-    print "#{colors['green']}> #{colors['default']}"
-    num = STDIN.gets
-    return false if num =~ /^[a-z ]*$/i
-
-    sections[num.to_i - 1]
+    choose_from(sections, 'Choose a section > ').strip
   end
 
   ##
@@ -1532,14 +1521,7 @@ class WWID
   ## @return     (String) The selected view name
   ##
   def choose_view
-    views.each_with_index do |view, i|
-      puts format('% 3d: %s', i + 1, view)
-    end
-    print '> '
-    num = STDIN.gets
-    return false if num =~ /^[a-z ]*$/i
-
-    views[num.to_i - 1]
+    choose_from(views, 'Choose a view > ').strip
   end
 
   ##
