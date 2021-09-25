@@ -92,7 +92,7 @@ class ::String
   def link_urls(opt = {})
     opt[:format] ||= :html
     if opt[:format] == :html
-      gsub(%r{(?mi)((http|https)://)?([\w\-_]+(\.[\w\-_]+)+)([\w\-.,@?^=%&amp;:/~+#]*[\w\-@^=%&amp;/~+#])?}) do |_match|
+      gsub(%r{(?mi)((http|https)://)([\w\-_]+(\.[\w\-_]+)+)([\w\-.,@?^=%&amp;:/~+#]*[\w\-@^=%&amp;/~+#])?}) do |_match|
         m = Regexp.last_match
         proto = m[1].nil? ? 'http://' : ''
         %(<a href="#{proto}#{m[0]}" title="Link to #{m[0]}">[#{m[3]}]</a>)

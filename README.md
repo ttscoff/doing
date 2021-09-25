@@ -268,7 +268,7 @@ You can add additional custom views. Just nest them under the `views` key (inden
         count: 5
         wrap_width: 0
         date_format: '%F %_I:%M%P'
-        template: '%date | %title%note' 
+        template: '%date | %title%note'
 
 The `section` key is the default section to pull entries from. Count and section can be overridden at runtime with the `-c` and `-s` flags. Setting `section` to `All` will combine all sections in the output.
 
@@ -505,7 +505,7 @@ You can include a `transform` section in the autotag config which contains pairs
     transform:
     - (\w+)-\d+:$1
 
-This creates a search pattern looking for a string of word characters followed by a hyphen and one or more digits, e.g. `@projecttag-12`. Do not include the @ symbol in the pattern. The replacement (`$1`) indicates that the first matched group (in parenthesis) should be used to generate the new tag, resulting in `@projecttag` being added to the entry.
+This creates a search pattern looking for a string of word characters followed by a hyphen and one or more digits, e.g. `@projecttag-12`. Do not include the @ symbol in the pattern. The replacement (`$l`) indicates that the first matched group (in parenthesis) should be used to generate the new tag, resulting in `@projecttag` being added to the entry.
 
 ##### Annotating
 

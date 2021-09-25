@@ -462,7 +462,7 @@ class WWID
   ## @return     (Bool) yes or no
   ##
   def yn(question, default_response: false)
-    default = default_response ? 'y' : 'n'
+    default = default_response ? default_response : 'n'
 
     # if this isn't an interactive shell, answer default
     return default.downcase == 'y' unless $stdout.isatty
@@ -766,6 +766,22 @@ class WWID
     all_items.max_by { |item| item['date'] }
   end
 
+  ##
+  ## @brief      Generate a menu of options and allow user selection
+  ##
+  ## @return     (String) The selected option
+  ##
+  def choose_from(options, prompt)
+    puts prompt
+    options.each_with_index do |section, i|
+      puts format('% 3d: %s', i + 1, section)
+    end
+    print "#{colors['green']}> #{colors['default']}"
+    num = STDIN.gets
+    return false if num =~ /^[a-z ]*$/i
+
+    options[num.to_i - 1]
+  end
 
   ##
   ## @brief      Display an interactive menu of entries
@@ -773,7 +789,7 @@ class WWID
   ## @param      opt   (Hash) Additional options
   ##
   def interactive(opt = {})
-    exit_now! "Select command requires that fzf be installed" unless exec_available('fzf')
+    fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
 
     section = opt[:section] ? guess_section(opt[:section]) : 'All'
 
@@ -807,7 +823,7 @@ class WWID
       out.join('')
     end
 
-    res = `echo #{Shellwords.escape(options.join("\n"))}|fzf -m --bind ctrl-a:select-all`
+    res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} -m --bind ctrl-a:select-all -q "#{opt[:query]}"`
     selected = []
     res.split(/\n/).each do |item|
       idx = item.match(/^(\d+)\)/)[1].to_i
@@ -818,6 +834,59 @@ class WWID
       @results.push("No selection")
       return
     end
+
+    unless opt[:delete] || opt[:flag] || opt[:finish] || opt[:cancel] || opt[:tag] || opt[:archive] || opt[:output] || opt[:save_to]
+      action = choose_from(
+                           [
+                            "add tag",
+                            "remove tag",
+                            "archive",
+                            "cancel",
+                            "delete",
+                            "edit",
+                            "finish",
+                            "flag",
+                            "move",
+                            "output format"
+                          ],
+                            'What do you want to do with the selected items?')
+      case action
+      when /(add|remove) tag/
+        print "Enter tag: "
+        tag = STDIN.gets
+        return if tag =~ /^ *$/
+        opt[:tag] = tag.strip
+        opt[:remove] = true if action =~ /remove tag/
+      when /output format/
+        output_format = choose_from(%w[doing taskpaper json timeline html csv], 'Which output format?')
+        return if tag =~ /^ *$/
+        opt[:output] = output_format.strip
+        res = yn("Save to file?", default_response: 'n')
+        if res
+          print "File path/name: "
+          filename = STDIN.gets.strip
+          return if filename.empty?
+          opt[:save_to] = filename
+        end
+      when /archive/
+        opt[:archive] = true
+      when /delete/
+        opt[:delete] = true
+      when /edit/
+        opt[:editor] = true
+      when /finish/
+        opt[:finish] = true
+      when /cancel/
+        opt[:cancel] = true
+      when /move/
+        section = choose_section.strip
+        return if section =~ /^ *$/
+        opt[:move] = section.strip
+      when /flag/
+        opt[:flag] = true
+      end
+    end
+
 
     if opt[:delete]
       res = yn("Delete #{selected.size} items?", default_response: 'y')
@@ -830,17 +899,35 @@ class WWID
 
     if opt[:flag]
       tag = @config['marker_tag'] || 'flagged'
-      selected.map! {|item| tag_item(item, tag, date: false) }
+      selected.map! do |item|
+        if opt[:remove]
+          untag_item(item, tag)
+        else
+          tag_item(item, tag, date: false)
+        end
+      end
     end
 
     if opt[:finish] || opt[:cancel]
       tag = 'done'
-      selected.map! {|item| tag_item(item, tag, date: !opt[:cancel])}
+      selected.map! do |item|
+        if opt[:remove]
+          untag_item(item, tag)
+        else
+          tag_item(item, tag, date: !opt[:cancel])
+        end
+      end
     end
 
     if opt[:tag]
       tag = opt[:tag]
-      selected.map! {|item| tag_item(item, tag, date: false)}
+      selected.map! do |item|
+        if opt[:remove]
+          untag_item(item, tag)
+        else
+          tag_item(item, tag, date: false)
+        end
+      end
     end
 
     if opt[:archive] || opt[:move]
@@ -890,6 +977,40 @@ class WWID
       end
 
       write(@doing_file)
+    end
+
+    if opt[:output]
+      selected.map! do |item|
+        item['title'] = "#{item['title']} @project(#{item['section']})"
+        item
+      end
+
+      @content = {'Export' => {'original' => 'Export:', 'items' => selected}}
+      options = {section: 'Export'}
+
+      if opt[:output] !~ /(doing|taskpaper)/
+        options[:output] = opt[:output]
+      else
+        options[:template] = '- %date | %title%note'
+      end
+
+      output = list_section(options)
+
+      if opt[:save_to]
+        file = File.expand_path(opt[:save_to])
+        if File.exist?(file)
+          # Create a backup copy for the undo command
+          FileUtils.cp(file, "#{file}~")
+        end
+
+        File.open(file, 'w+') do |f|
+          f.puts output
+        end
+
+        @results.push("Export saved to #{file}")
+      else
+        puts output
+      end
     end
   end
 
@@ -1073,13 +1194,35 @@ class WWID
   end
 
   ##
+  ## @brief      Remove a tag on an item from the index
+  ##
+  ## @param      old_item  (Item) The item to tag
+  ## @param      tag       (string) The tag to remove
+  ##
+  def untag_item(old_item, tag)
+    title = old_item['title'].dup
+
+    if title =~ /@#{tag}/
+      title.chomp!
+      title.gsub!(/ +@#{tag}(\(.*?\))?/, '')
+      new_item = old_item.dup
+      new_item['title'] = title
+      update_item(old_item, new_item)
+      return new_item
+    else
+      @results.push(%(Item isn't tagged @#{tag}: "#{title}" in #{old_item['section']}))
+      return old_item
+    end
+  end
+
+  ##
   ## @brief      Tag an item from the index
   ##
   ## @param      old_item  (Item) The item to tag
   ## @param      tag       (string) The tag to apply
   ## @param      date      (Boolean) Include timestamp?
   ##
-  def tag_item(old_item, tag, date: false)
+  def tag_item(old_item, tag, remove: false, date: false)
     title = old_item['title'].dup
     done_date = Time.now
     if title !~ /@#{tag}/
@@ -1309,10 +1452,10 @@ class WWID
       if File.exist?(file)
         # Create a backup copy for the undo command
         FileUtils.cp(file, "#{file}~")
+      end
 
-        File.open(file, 'w+') do |f|
-          f.puts output
-        end
+      File.open(file, 'w+') do |f|
+        f.puts output
       end
 
       if @config.key?('run_after')
@@ -1526,13 +1669,16 @@ class WWID
         note ||= ''
 
         tags = []
+        attributes = {}
         skip_tags = %w[meanwhile done cancelled flagged]
         i['title'].scan(/@([^(\s]+)(?:\((.*?)\))?/).each do |tag|
           tags.push(tag[0]) unless skip_tags.include?(tag[0])
+          attributes[tag[0]] = tag[1] if tag[1]
         end
+
         if opt[:output] == 'json'
 
-          items_out << {
+          i = {
             date: i['date'],
             end_date: end_date,
             title: title.strip, #+ " #{note}"
@@ -1540,6 +1686,10 @@ class WWID
             time: '%02d:%02d:%02d' % fmt_time(interval),
             tags: tags
           }
+
+          attributes.each { |attr, val| i[attr.to_sym] = val }
+
+          items_out << i
 
         elsif opt[:output] == 'timeline'
           new_item = {
@@ -1644,7 +1794,7 @@ class WWID
 
       totals = opt[:totals] ? tag_times('html', opt[:sort_tags]) : ''
       engine = Haml::Engine.new(template)
-      puts engine.render(Object.new,
+      out = engine.render(Object.new,
                          { :@items => items_out, :@page_title => page_title, :@style => style, :@totals => totals })
     else
       items.each do |item|
@@ -1656,11 +1806,12 @@ class WWID
           reset = ''
         end
 
-        if (item.has_key?('note') && !item['note'].empty?) && @config[:include_notes]
+        if (item.key?('note') && !item['note'].empty?) && @config[:include_notes]
           note_lines = item['note'].delete_if do |line|
-                         line =~ /^\s*$/
-                       end.map { |line| "\t\t" + line.sub(/^\t*/, '').sub(/^-/, '—') + '  ' }
-          if opt[:wrap_width] && opt[:wrap_width] > 0
+            line =~ /^\s*$/
+          end
+          note_lines.map! { |line| "\t\t#{line.sub(/^\t*/, '').sub(/^-/, '—')}  " }
+          if opt[:wrap_width]&.positive?
             width = opt[:wrap_width]
             note_lines.map! do |line|
               line.strip.gsub(/(.{1,#{width}})(\s+|\Z)/, "\t\\1\n")
@@ -1673,7 +1824,7 @@ class WWID
         output = opt[:template].dup
 
         output.gsub!(/%[a-z]+/) do |m|
-          if colors.has_key?(m.sub(/^%/, ''))
+          if colors.key?(m.sub(/^%/, ''))
             colors[m.sub(/^%/, '')]
           else
             m

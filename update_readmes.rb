@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# Copies README.md contents into blog project
+# Updates <!--VER-->x.x.x<!--END VER--> with current version
+# On blog version, remove <!--GITHUB-->[contents]<!--END GITHUB-->
+# On blog version, uncomment <!--JEKYLL [contents]-->
+# On blog version, insert README contents into <!--README-->/<!--END README-->
 current_ver = `git ver`.strip
 readme_file = 'README.md'
 raise 'README not found' unless File.exist?(readme_file)

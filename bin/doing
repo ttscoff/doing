@@ -257,9 +257,9 @@ command :template do |c|
 end
 
 desc 'Display an interactive menu to perform operations (requires fzf)'
-long_desc 'Requires that `fzf` be installed and available in your path. <https://github.com/junegunn/fzf>
+long_desc 'List all entries and select with typeahead fuzzy matching.
 
-List all entries and select with typeahead fuzzy matching. Multiple selections are allowed, hit tab to add the highlighted entry to the selection. Return processes the selected entries.'
+Multiple selections are allowed, hit tab to add the highlighted entry to the selection. Return processes the selected entries.'
 command :select do |c|
   c.desc 'Select from a specific section'
   c.arg_name 'SECTION'
@@ -268,6 +268,9 @@ command :select do |c|
   c.desc 'Tag selected entries'
   c.arg_name 'TAG'
   c.flag %i[t tag]
+
+  c.desc 'Reverse -c, -f, --flag, and -t (remove instead of adding)'
+  c.switch %i[r remove], negatable: false
 
   # c.desc 'Add @done to selected item(s), using start time of next item as the finish time'
   # c.switch %i[a auto], negatable: false, default_value: false
@@ -278,6 +281,10 @@ command :select do |c|
   c.desc 'Move selected items to section'
   c.arg_name 'SECTION'
   c.flag %i[m move]
+
+  c.desc 'Initial search query for filtering'
+  c.arg_name 'QUERY'
+  c.flag %i[q query]
 
   c.desc 'Cancel selected items (add @done without timestamp)'
   c.switch %i[c cancel], negatable: false, default_value: false
@@ -294,9 +301,15 @@ command :select do |c|
   c.desc 'Add flag to selected item(s)'
   c.switch %i[flag], negatable: false, default_value: false
 
+  c.desc 'Save selected entries to file using --output format'
+  c.arg_name 'FILE'
+  c.flag %i[save_to]
+
+  c.desc 'Output format for export (doing|taskpaper|csv|html|json|template|timeline)'
+  c.arg_name 'FORMAT'
+  c.flag %i[o output], must_match: /^(?:doing|taskpaper|html|csv|json|template|timeline)$/i
+
   c.action do |_global_options, options, args|
-    section = options[:section] || 'All'
-    edit = options[:editor]
     wwid.interactive(options)
   end
 end
