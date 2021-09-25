@@ -1,3 +1,10 @@
+### 1.0.78
+
+- If no action is specified with select command, an interactive menu is
+presented
+- add output action select command with formatting and save options
+- Don't link urls in html output that don't have a protocol
+
 ### 1.0.76
 
 - Refine editing multiple selections (doing select)
