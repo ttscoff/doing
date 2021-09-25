@@ -27,7 +27,7 @@ If there's something I want to look at later but doesn't need to be added to a t
 
 ## Installation
 
-The current version of `doing` is <!--VER-->1.0.76<!--END VER-->.
+The current version of `doing` is <!--VER-->1.0.78<!--END VER-->.
 
     $ [sudo] gem install doing
 
@@ -624,6 +624,9 @@ If you have `fzf` installed (<https://github.com/junegunn/fzf>), you can use `do
 To use the menu, type a search string or use the arrow keys to navigate up and down. Press tab on an entry you'd like to perform an action on. A marker will show up on the left indicating the entry is selected. Repeat the process and select as many entries as needed. When you hit Return, the selection will be passed back to doing. Use Control-A to select all visible entries.
 
 Doing can perform several functions with this menu. Not all of doing's features are available, but the core functionality you'd need is there, plus you can open the selected entries on one page in your text editor, make changes to them, and when you save and close the entries are updated accordingly. This allows editing of everything from timestamps to tags to notes.
+
+If no actions are specified, an interactive menu of options will be
+presented.
 
 Run `doing help select` for a list of options:
 

@@ -1,0 +1,992 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "DOING" "1" "September 2021" "" ""
+.
+.SH "SYNOPSIS"
+\fBdoing [subcommand] [options]\fR
+.
+.SH "DESCRIPTION"
+\fBA command line tool for remembering what you were doing and tracking what you\'ve done\.\fR
+.
+.P
+doing is a basic CLI for adding and listing "what was I doing" reminders in a TaskPaper\-formatted \fIhttps://www\.taskpaper\.com\fR text file\. It allows for multiple sections/categories and flexible output formatting\.
+.
+.P
+Use \fBdoing help\fR to view options for any command\.
+.
+.SH "GLOBAL OPTIONS"
+.
+.nf
+
+\-\-config_file=arg    \- Use a specific configuration file (default: /Users/ttscoff/\.doingrc)
+\-f, \-\-doing_file=arg \- Specify a different doing_file (default: none)
+\-\-help               \- Show this message
+\-\-[no\-]notes         \- Output notes if included in the template (default: enabled)
+\-\-stdout             \- Send results report to STDOUT instead of STDERR
+\-\-version            \- Display the program version
+\-x, \-\-[no\-]noauto    \- Exclude auto tags and default tags
+.
+.fi
+.
+.SH "COMMANDS"
+.
+.nf
+
+add_section    \- Add a new section to the "doing" file
+again, resume \- Repeat last entry as new entry
+archive        \- Move entries between sections
+cancel         \- End last X entries with no time tracked
+choose         \- Select a section to display from a menu
+colors         \- List available color variables for configuration templates and views
+config         \- Edit the configuration file
+done, did    \- Add a completed item with @done(date)\. No argument finishes last entry\.
+finish         \- Mark last X entries as @done
+grep, search \- Search for entries
+help           \- Shows a list of commands or help for one command
+import         \- Import entries from an external source
+last           \- Show the last entry, optionally edit
+later          \- Add an item to the Later section
+mark, flag    \- Mark last entry as highlighted
+meanwhile      \- Finish any running @meanwhile tasks and optionally create a new one
+note           \- Add a note to the last entry
+now, next    \- Add an entry
+on             \- List entries for a date
+open           \- Open the "doing" file in an editor
+recent         \- List recent entries
+sections       \- List sections
+select         \- Display an interactive menu to perform operations (requires fzf)
+show           \- List all entries
+since          \- List entries since a date
+tag            \- Add tag(s) to last entry
+template       \- Output HTML and CSS templates for customization
+today          \- List entries from today
+undo           \- Undo the last change to the doing_file
+view           \- Display a user\-created view
+views          \- List available custom views
+yesterday      \- List entries from yesterday
+.
+.fi
+.
+.SH "CONFIGURATION"
+Run \fBdoing config\fR to open your \fB~/\.doingrc\fR file in the editor defined in the \fB$EDITOR\fR environment variable\. Set up your doing_file right away (where you want entries to be stored), and cover the rest after you\'ve read the docs\.
+.
+.P
+See the \fIsupport\fR section below for troubleshooting details\.
+.
+.SS "THE DOING FILE"
+The file that stores all of your entries is generated the first time you add an entry (with \fBdoing now\fR or \fBdoing later\fR)\. By default, the file is created in \fB~/what_was_i_doing\.md\fR, but you can modify this in the config file\.
+.
+.P
+The format of the "doing" file is TaskPaper\-compatible\. You can edit it by hand at any time (in TaskPaper or any text editor), but it uses a specific format for parsing, so be sure to maintain the dates and pipe characters\.
+.
+.P
+Notes are anything in the list without a leading hyphen and date\. They belong to the entry directly before them, and they should be indented one level beyond the parent item\.
+.
+.P
+When using the now and later commands on the command line, you can start the entry with a quote and hit return, then type the note and close the quote\. Anything after the first line will be turned into a TaskPaper\-compatible note for the task and can be displayed in templates using \fB%note\fR\.
+.
+.P
+Notes can be prevented from ever appearing in output with the global option \fB\-\-no\-notes\fR: \fBdoing \-\-no\-notes show all\fR\.
+.
+.P
+Auto tagging (adding tags listed in \.doingrc under autotag and default_tags) can be skipped for an entry with the \fB\-x\fR global option: \fBdoing \-x done skipping some automatic tagging\fR\.
+.
+.SS "CONFIGURATION OPTIONS"
+A basic configuration looks like this:
+.
+.IP "" 4
+.
+.nf
+
+\-\-\-
+doing_file: /Users/username/Dropbox/doing\.taskpaper
+current_section: Currently
+default_template: \'%date: %title%note\'
+default_date_format: \'%Y\-%m\-%d %H:%M\'
+marker_tag: flagged
+marker_color: yellow
+tags_color: boldcyan
+default_tags: []
+editor_app: TaskPaper
+config_editor_app: Sublime Text
+:include_notes: true
+views:
+  color:
+    date_format: \'%F %_I:%M%P\'
+    section: Currently
+    count: 10
+    wrap_width: 0
+    template: \'%boldblack%date %boldgreen| %boldwhite%title%default%note\'
+    order: desc
+templates:
+  default:
+    date_format: \'%Y\-%m\-%d %H:%M\'
+    template: \'%date | %title%note\'
+    wrap_width: 0
+  today:
+    date_format: \'%_I:%M%P\'
+    template: \'%date: %title%odnote\'
+    wrap_width: 0
+  last:
+    date_format: \'%_I:%M%P on %a\'
+    template: \'%title (at %date)%odnote\'
+    wrap_width: 0
+  recent:
+    date_format: \'%_I:%M%P\'
+    template: \'%date > %title%odnote\'
+    wrap_width: 50
+autotag:
+  whitelist:
+  \- coding
+  \- design
+  synonyms:
+    brainstorming:
+    \- thinking
+    \- idea
+html_template:
+  haml:
+  css:
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The config file is stored in \fB~/\.doingrc\fR, and a skeleton file is created on the first run\. Just run doing on its own to create the file\.
+.
+.SS "PER\-FOLDER CONFIGURATION"
+Any options found in a \fB\.doingrc\fR anywhere in the hierarchy between your current folder and your home folder will be appended to the base configuration, overriding or extending existing options\. This allows you to put a \fB\.doingrc\fR file into the base of a project and add specific configurations (such as default tags) when working in that project on the command line\. These can be cascaded, with the closest \fB\.doingrc\fR to your current directory taking precedence, though I\'m not sure why you\'d want to deal with that\.
+.
+.P
+Possible uses:
+.
+.IP "\(bu" 4
+Define custom HTML output on a per\-project basis using the html_template option for custom templates\. Customize time tracking reports based on project or client\.
+.
+.IP "\(bu" 4
+Define default_tags for a project so that every time you \fBdoing now\fR from within that project directory or its subfolders, it gets tagged with that project automatically\.
+.
+.IP "" 0
+.
+.P
+Any part of the configuration can be copied into these local files and modified\. You only need to include the parts you want to change or add\.
+.
+.SS "DOING FILE LOCATION"
+The one thing you\'ll probably want to adjust is the file that the notes are stored in\. That\'s the doing_file key:
+.
+.IP "" 4
+.
+.nf
+
+doing_file: /Users/username/Dropbox/nvALT2\.2/?? What was I doing\.md
+.
+.fi
+.
+.IP "" 0
+.
+.P
+I keep mine in my nvALT folder for quick access and syncing between machines\. If desired, you can give it a \fB\.taskpaper\fR extension to make it more recognizable to other applications\. (If you do that in nvALT, make sure to add taskpaper as a recognized extension in preferences)\.
+.
+.SS "CURRENT ACTIONS SECTION"
+You can rename the section that holds your current tasks\. By default, this is Currently, but if you have some other bright idea, feel free:
+.
+.IP "" 4
+.
+.nf
+
+current_section: Currently
+.
+.fi
+.
+.IP "" 0
+.
+.SS "DEFAULT EDITORS"
+The setting editor_app only applies to Mac OS X users\. It\'s the default application that the command \fBdoing open\fR will open your WWID file in\. Personally, I use \fBeditor_app: TaskPaper\fR\. If this is blank, it will be opened by whatever the system default is for the doing file extension (default is \fB\.md\fR), or you can use \fB\-a app_name\fR or \fB\-b bundle_id\fR to override\.
+.
+.P
+You can define a separate app to open the config file in when running \fBdoing config\fR\. The key for this is config_editor_app\.
+.
+.P
+In the case of the \fBdoing now \-e\fR command, your \fB$EDITOR\fR environment variable will be used to complete the entry text and notes\. Set it in your \fB~/\.bash_profile\fR or whatever is appropriate for your system:
+.
+.IP "" 4
+.
+.nf
+
+export EDITOR="mate \-w"
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The only requirements are that your editor be launchable from the command line and able to "wait\." In the case of Sublime Text and TextMate, just use \fB\-w\fR like this: \fBexport EDITOR="subl \-w"\fR\.
+.
+.SS "TEMPLATES"
+The config also contains templates for various command outputs\. Include placeholders by placing a % before the keyword\. The available tokens are:
+.
+.IP "\(bu" 4
+\fB%title\fR: the "what was I doing" entry line
+.
+.IP "\(bu" 4
+\fB%date\fR: the date based on the template\'s date_format setting
+.
+.IP "\(bu" 4
+\fB%shortdate\fR: a custom date formatter that removes the day/month/year from the entry if they match the current day/month/year
+.
+.IP "\(bu" 4
+\fB%note\fR: Any note in the entry will be included here, a newline and tabs are automatically added\.
+.
+.IP "\(bu" 4
+\fB%odnote\fR: The notes with a leading tab removed (outdented note)
+.
+.IP "\(bu" 4
+\fB%chompnote\fR: Notes on one line, beginning and trailing whitespace removed\.
+.
+.IP "\(bu" 4
+\fB%section\fR: The section/project the entry is currently in
+.
+.IP "\(bu" 4
+\fB%hr\fR: a horizontal rule (\fB\-\fR) the width of the terminal
+.
+.IP "\(bu" 4
+\fB%hr_under\fR: a horizontal rule (_) the width of the terminal
+.
+.IP "\(bu" 4
+\fB%n\fR: inserts a newline
+.
+.IP "\(bu" 4
+\fB%t\fR: inserts a tab
+.
+.IP "\(bu" 4
+.
+.IP "\(bu" 4
+you can prefix bg to affect background colors (\fB%bgyellow\fR)
+.
+.IP "\(bu" 4
+prefix bold and boldbg for strong colors (\fB%boldgreen\fR, \fB%boldbgblue\fR)
+.
+.IP "\(bu" 4
+there are some random special combo colors\. Use \fBdoing colors\fR to see the list
+.
+.IP "" 0
+
+.
+.IP "\(bu" 4
+\fB%interval\fR: when used with the \fB\-t\fR switch on the show command, it will display the time between a timestamp or \fI@start(date)\fR tag and the \fI@done(date)\fR tag, if it exists\. Otherwise, it will remain empty\.
+.
+.IP "" 0
+.
+.P
+Date formats are based on Ruby strftime \fIhttp://www\.ruby\-doc\.org/stdlib\-2\.1\.1/libdoc/date/rdoc/Date\.html#method\-i\-strftime\fR formatting\.
+.
+.P
+My normal template for the recent command looks like this:
+.
+.IP "" 4
+.
+.nf
+
+recent:
+  date_format: \'%_I:%M%P\'
+  template: \'%date > %title%odnote\'
+  wrap_width: 88
+.
+.fi
+.
+.IP "" 0
+.
+.P
+And it outputs:
+.
+.IP "" 4
+.
+.nf
+
+$ doing recent 3
+ 4:30am > Made my console script smarter\.\.\.
+    Checks first argument to see if it\'s a file, if it is, that\'s the log
+
+    Else, it checks the first argument for a "\.log" suffix and does a search in the user
+    application logs with find for it\.
+
+    Otherwise, system\.log\.
+
+    I also made an awesome Cope wrapper for it\.\.\.
+12:00pm > Working on doing again\.
+12:45pm > I think this thing (doing) is ready to document and distribute
+$
+.
+.fi
+.
+.IP "" 0
+.
+.P
+You can get pretty clever and include line breaks and other formatting inside of double quotes\. If you want multiline templates, just use \fB\en\fR in the template line, and after the next run it will be rewritten as proper YAML automatically\.
+.
+.P
+For example, this block:
+.
+.IP "" 4
+.
+.nf
+
+recent:
+  date_format: \'%_I:%M%P\'
+  template: "\en%hr\en%date\en > %title%odnote\en%hr_under"
+  wrap_width: 100
+.
+.fi
+.
+.IP "" 0
+.
+.P
+will rewrite to:
+.
+.IP "" 4
+.
+.nf
+
+recent:
+  date_format: \'%_I:%M%P\'
+  template: |2\-
+
+    %hr
+    %date
+     > %title%odnote
+    %hr_under
+  wrap_width: 100
+.
+.fi
+.
+.IP "" 0
+.
+.P
+and output my recent entries like this:
+.
+.IP "" 4
+.
+.nf
+
+$ doing recent 3
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ 4:30am
+ > Made my console script smarter\.\.\.
+    Checks first argument to see if it\'s a file, if it is, that\'s the log
+
+    Else, it checks the first argument for a "\.log" suffix and does a search in the user application
+    logs with find for it\.
+
+    Otherwise, system\.log\.
+
+    I also made an awesome Cope wrapper for it\.\.\.
+_______________________________________________________________________
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+12:00pm
+ > Working on doing again\.
+_______________________________________________________________________
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+12:45pm
+ > I think this thing (doing) is ready to document and distribute
+_______________________________________________________________________
+
+$
+.
+.fi
+.
+.IP "" 0
+.
+.SS "CUSTOM VIEWS"
+You can create your own "views" in the \fB~/\.doingrc\fR file and view them with \fBdoing view view_name\fR\. Just add a section like this:
+.
+.IP "" 4
+.
+.nf
+
+views:
+  old:
+    section: Old
+    count: 5
+    wrap_width: 0
+    date_format: \'%F %_I:%M%P\'
+    template: \'%date | %title%note\'
+    order: asc
+    tags: done finished cancelled
+    tags_bool: ANY
+.
+.fi
+.
+.IP "" 0
+.
+.P
+You can add additional custom views\. Just nest them under the views key (indented two spaces from the edge)\. Multiple views would look like this:
+.
+.IP "" 4
+.
+.nf
+
+views:
+  later:
+    section: Later
+    count: 5
+    wrap_width: 60
+    date_format: \'%F %_I:%M%P\'
+    template: \'%date | %title%note\'
+  old:
+    section: Old
+    count: 5
+    wrap_width: 0
+    date_format: \'%F %_I:%M%P\'
+    template: \'%date | %title%note\'
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The section key is the default section to pull entries from\. Count and section can be overridden at runtime with the \fB\-c\fR and \fB\-s\fR flags\. Setting section to All will combine all sections in the output\.
+.
+.P
+You can add new sections with \fBdoing add_section section_name\fR\. You can also create them on the fly by using the \fB\-s section_name\fR flag when running \fBdoing now\fR\. For example, \fBdoing now \-s Misc just a random side note\fR would create the "just a random side note" entry in a new section called "Misc," if Misc didn\'t already exist\.
+.
+.P
+The tags and tags_bool keys allow you to specify tags that the view is filtered by\. You can list multiple tags separated by spaces, and then use tags_bool to specify ALL, ANY, or NONE to determine how it handles the multiple tags\.
+.
+.P
+The order key defines the sort order of the output\. This is applied \fIafter\fR the tasks are retrieved and cut off at the maximum number specified in count\.
+.
+.P
+Regarding colors, you can use them to create very nice displays if you\'re outputting to a color terminal\. Example:
+.
+.IP "" 4
+.
+.nf
+
+color:
+  date_format: \'%F %_I:%M%P\'
+  section: Currently
+  count: 10
+  wrap_width: 0
+  template: \'%boldblack%date %boldgreen| %boldwhite%title%default%note\'
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Outputs:
+.
+.P
+.
+.P
+You can also specify a default output format for a view\. Most of the optional output formats override the template specification (html, csv, json)\. If the view command is used with the \fB\-o\fR flag, it will override what\'s specified in the file\.
+.
+.SS "COLORS"
+You can use the following colors in view templates\. Set a foreground color with a named color:
+.
+.IP "" 4
+.
+.nf
+
+%black
+%red
+%green
+%yellow
+%blue
+%magenta
+%cyan
+%white
+.
+.fi
+.
+.IP "" 0
+.
+.P
+You can also add a background color (\fB%bg[color]\fR) by placing one after the foreground color:
+.
+.IP "" 4
+.
+.nf
+
+%white%bgblack
+%black%bgred
+\.\.\.etc\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
+There are bold variants for both foreground and background colors
+.
+.IP "" 4
+.
+.nf
+
+%boldblack
+%boldred
+\.\.\. etc\.
+
+%boldbgblack
+%boldbgred
+\.\.\. etc\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
+And a few special colors you\'ll just have to try out to see (or just run \fBdoing colors\fR):
+.
+.IP "" 4
+.
+.nf
+
+%softpurple
+%hotpants
+%knightrider
+%flamingo
+%yeller
+%whiteboard
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Any time you use one of the foreground colors it will reset the bold and background settings to their default automatically\. You can force a reset to default terminal colors using \fB%default\fR\.
+.
+.SS "HTML TEMPLATES"
+For commands that provide an HTML output option, you can customize the templates used for markup and CSS\. The markup uses HAML \fIhttp://haml\.info/\fR, and the styles are pure CSS\.
+.
+.P
+To export the default configurations for customization, use \fBdoing templates \-\-type=[HAML|CSS]\fR\. This will output to STDOUT where you can pipe it to a file, e\.g\. \fBdoing templates \-\-type=HAML > my_template\.haml\fR\. You can modify the markup, the CSS, or both\.
+.
+.P
+Once you have either or both of the template files, edit \fB\.doingrc\fR and look for the \fBhtml_template:\fR section\. There are two subvalues, \fBhaml:\fR and \fBcss:\fR\. Add the path to the templates you want to use\. A tilde may be substituted for your home directory, e\.g\. \fBcss: ~/styles/doing\.css\fR\.
+.
+.SS "AUTOTAGGING"
+Keywords in your entries can trigger automatic tagging, just to make life easier\. There are three tools available: default tags, whitelisting, and synonym tagging\.
+.
+.P
+Default tags are tags that are applied to every entry\. You probably don\'t want to add these in the root configuration, but using a local \fB\.doingrc\fR in a project directory that defines default tags for that project allows anything added from that directory to be tagged automatically\. A local \fB\.doingrc\fR in my Marked development directory might contain:
+.
+.IP "" 4
+.
+.nf
+
+\-\-\-
+default_tags: [marked,coding]
+.
+.fi
+.
+.IP "" 0
+.
+.P
+And anything I enter while in the directory gets tagged with \fI@marked\fR and \fI@coding\fR\.
+.
+.P
+A whitelist is a list of words that should be converted directly into \fI@tags\fR\. If my whitelist contains "design" and I type \fBdoing now working on site design\fR, that\'s automatically converted to "working on site @design\."
+.
+.P
+Synonyms allow you to define keywords that will trigger their parent tag\. If I have a tag called \fI@design\fR, I can add "typography" as a synonym\. Then entering \fBdoing now working on site typography\fR will become "working on site typography @design\."
+.
+.P
+White lists and synonyms are defined like this:
+.
+.IP "" 4
+.
+.nf
+
+autotag:
+  synonyms:
+    design:
+    \- typography
+    \- layout
+    brainstorming
+    \- thinking
+    \- idea
+  whitelist:
+  \- brainstorming
+  \- coding
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Note that you can include a tag with synonyms in the whitelist as well to tag it directly when used\.
+.
+.SH "USAGE"
+.
+.nf
+
+doing [global options] command [command options] [arguments\.\.\.]
+.
+.fi
+.
+.SS "GLOBAL OPTIONS:"
+.
+.nf
+
+\-f, \-\-doing_file=arg \- Specify a different doing_file (default: none)
+\-\-help               \- Show this message
+\-\-[no\-]notes         \- Output notes if included in the template (default: enabled)
+\-\-stdout             \- Send results report to STDOUT instead of STDERR
+\-\-version            \- Display the program version
+\-x, \-\-[no\-]noauto    \- Exclude auto tags and default tags
+.
+.fi
+.
+.SS "COMMANDS:"
+.
+.nf
+
+help           \- Shows a list of commands and global options
+help [command] \- Shows help for any command (`doing help now`)
+.
+.fi
+.
+.P
+\fBAdding entries:\fR
+.
+.IP "" 4
+.
+.nf
+
+now, did      \- Add an entry
+later         \- Add an item to the Later section
+done          \- Add a completed item with @done(date)\. No argument finishes last entry\.
+meanwhile     \- Finish any @meanwhile tasks and optionally create a new one
+again, resume \- Duplicate the last entry as new entry (without @done tag)
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The \fBdoing now\fR command can accept \fB\-s section_name\fR to send the new entry straight to a non\-default section\. It also accepts \fB\-\-back=AMOUNT\fR to let you specify a start date in the past using "natural language\." For example, \fBdoing now \-\-back=25m ENTRY\fR or \fBdoing now \-\-back="yesterday 3:30pm" ENTRY\fR\.
+.
+.P
+If you want to use \fB\-\-back\fR with \fBdoing done\fR but want the end time to be different than the start time, you can either use \fB\-\-took\fR in addition, or just use \fB\-\-took\fR on its own as it will backdate the start time such that the end time is now and the duration is equal to the value of the \fB\-\-took\fR argument\.
+.
+.P
+You can finish the last unfinished task when starting a new one using \fBdoing now\fR with the \fB\-f\fR switch\. It will look for the last task not marked \fI@done\fR and add the \fI@done\fR tag with the start time of the new task (either the current time or what you specified with \fB\-\-back\fR)\.
+.
+.P
+\fBdoing done\fR is used to add an entry that you\'ve already completed\. Like now, you can specify a section with \fB\-s section_name\fR\. You can also skip straight to Archive with \fB\-a\fR\.
+.
+.P
+\fBdoing done\fR can also backdate entries using natural language with \fB\-\-back 15m\fR or \fB\-\-back "3/15 3pm"\fR\. That will modify the starting timestamp of the entry\. You can also use \fB\-\-took 1h20m\fR or \fB\-\-took 1:20\fR to set the finish date based on a "natural language" time interval\. If \fB\-\-took\fR is used without \fB\-\-back\fR, then the start date is adjusted (\fB\-\-took\fR interval is subtracted) so that the completion date is the current time\.
+.
+.P
+When used with \fBdoing done\fR, \fB\-\-back\fR and \fB\-\-took\fR allow time intervals to be accurately counted when entering items after the fact\. \fB\-\-took\fR is also available for the \fBdoing finish\fR command, but cannot be used in conjunction with \fB\-\-back\fR\. (In finish they both set the end date, and neither has priority\. \fB\-\-back\fR allows specific days/times, \fB\-\-took\fR uses time intervals\.)
+.
+.P
+All of these commands accept a \fB\-e\fR argument\. This opens your command line editor (as defined in the environment variable \fB$EDITOR\fR)\. Add your entry, save the temp file, and close it\. The new entry is added\. Anything after the first line is included as a note on the entry\.
+.
+.P
+\fBdoing again\fR (or \fBdoing resume\fR) will duplicate the last @done entry (most recently completed) with a new start date (and without the @done tag)\. To resume the last entry matching specific tags, use \fB\-\-tag=TAG\fR\. You can specify multiple tags by separating with a comma\. Multiple tags are combined with \'AND\' by default (all tags must exist on the entry to match), but you can use \fB\-\-bool=\fR to set it to \'OR\' or \'NOT\'\. By default the new entry will be added to the same section as the matching entry, but you can specify a section with \fB\-\-in=SECTION\fR\.
+.
+.P
+\fBdoing meanwhile\fR is a special command for creating and finishing tasks that may have other entries come before they\'re complete\. When you create an entry with \fBdoing meanwhile [entry text]\fR, it will automatically complete the last \fI@meanwhile\fR item (dated \fI@done\fR tag) and add the \fI@meanwhile\fR tag to the new item\. This allows time tracking on a more general basis, and still lets you keep track of the smaller things you do while working on an overarching project\. The meanwhile command accepts \fB\-\-back [time]\fR and will backdate the \fI@done\fR tag and start date of the new task at the same time\. Running meanwhile with no arguments will simply complete the last \fI@meanwhile\fR task\.
+.
+.P
+See \fBdoing help meanwhile\fR for more options\.
+.
+.P
+\fBModifying entries:\fR
+.
+.IP "" 4
+.
+.nf
+
+finish      \- Mark last X entries as @done
+cancel      \- Mark last X entries as @done without completion date
+tag         \- Tag last entry
+note        \- Add a note to the last entry
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBFinishing\fR
+.
+.P
+\fBdoing finish\fR by itself is the same as \fBdoing done\fR by itself\. It adds \fI@done(timestamp)\fR to the last entry\. It also accepts a numeric argument to complete X number of tasks back in history\. Add \fB\-a\fR to also archive the affected entries\.
+.
+.P
+\fBdoing finish\fR also provides an \fB\-\-auto\fR flag, which you can use to set the end time of any entry to 1 minute before the start time of the next\. Running a command such as \fBdoing finish \-\-auto 10\fR will go through the last 10 entries and sequentially update any without a \fI@done\fR tag with one set to the time just before the next entry in the list\.
+.
+.P
+As mentioned above, finish also accepts \fB\-\-back "2 hours"\fR (sets the finish date from time now minus interval) or \fB\-\-took 30m\fR (sets the finish date to time started plus interval) so you can accurately add times to completed tasks, even if you don\'t do it in the moment\.
+.
+.P
+Both done and finish accept an \fB\-\-archive\fR switch which immediately moves the completed entries to the Archive section with a \fB@from(Project)\fR tag\.
+.
+.P
+You can finish the last entry containing a specific tag or combination of tags using the \fB\-\-tag\fR flag\. Multiple tags are separated by commas\. By default tags are combined with an AND boolean, meaning the entry must contain all specified tags to be considered\. For example, to finish the last entry containing both "@work" and "@project1", you would use:
+.
+.IP "" 4
+.
+.nf
+
+doing finish \-\-tag=work,project1
+.
+.fi
+.
+.IP "" 0
+.
+.P
+You can change the boolean using \fB\-\-bool=OR\fR (last entry containing any of the specified tags) or \fB\-\-bool=NOT\fR (last entry containing none of the tags)\.
+.
+.P
+You can also include a \fB\-\-no\-date\fR switch to add \fB@done\fR without a finish date, meaning no time is tracked for the task\. \fBdoing cancel\fR is an alias for this\. Like finish, cancel accepts a count to act on the last X entries, as well as \fB\-\-archive\fR and \fB\-\-section\fR options\. cancel also accepts the \fB\-\-tag\fR and \fB\-\-bool\fR flags for tag filtering\.
+.
+.P
+\fBTagging and Autotagging\fR
+.
+.P
+tag adds one or more tags to the last entry, or specify a count with \fB\-c X\fR\. Tags are specified as basic arguments, separated by spaces\. For example:
+.
+.IP "" 4
+.
+.nf
+
+doing tag \-c 3 client cancelled
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\&\.\.\. will mark the last three entries as \fI@client @cancelled\fR\. Add \fB\-r\fR as a switch to remove the listed tags instead\.
+.
+.P
+You can optionally define keywords for common tasks and projects in your \fB\.doingrc\fR file\. When these keywords appear in an item title, they\'ll automatically be converted into @tags\. The whitelist tags are exact (but case insensitive) matches\.
+.
+.P
+You can also define synonyms, which will add a tag at the end based on keywords associated with it\. When defining synonym keys, be sure to indent but \fInot\fR hyphenate the keys themselves, while hyphenating the list of synonyms at the same indent level as their key\. See playing and writing in the example below for illustration\. Follow standard YAML syntax\.
+.
+.P
+To add autotagging, include a section like this in your \fB~/\.doingrc\fR file:
+.
+.IP "" 4
+.
+.nf
+
+autotag:
+  whitelist:
+  \- doing
+  \- mindmeister
+  \- marked
+  \- playing
+  \- working
+  \- writing
+  synonyms:
+    playing:
+    \- hacking
+    \- tweaking
+    \- toying
+    \- messing
+    writing:
+    \- blogging
+    \- posting
+    \- publishing
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBTag transformation\fR
+.
+.P
+You can include a transform section in the autotag config which contains pairs of regular expressions and replacement patterns separated by a colon\. These will be used to look at existing tags in the text and generate additional tags from them\. For example:
+.
+.P
+autotag: transform: \- (\ew+)\-\ed+:$1
+.
+.P
+This creates a search pattern looking for a string of word characters followed by a hyphen and one or more digits, e\.g\. \fB@projecttag\-12\fR\. Do not include the @ symbol in the pattern\. The replacement (\fB$1\fR) indicates that the first matched group (in parenthesis) should be used to generate the new tag, resulting in \fB@projecttag\fR being added to the entry\.
+.
+.P
+\fBAnnotating\fR
+.
+.P
+note lets you append a note to the last entry\. You can specify a section to grab the last entry from with \fB\-s section_name\fR\. \fB\-e\fR will open your \fB$EDITOR\fR for typing the note, but you can also just include it on the command line after any flags\. You can also pipe a note in on STDIN (\fBecho "fun stuff"|doing note\fR)\. If you don\'t use the \fB\-r\fR switch, new notes will be appended to the existing notes, and using the \fB\-e\fR switch will let you edit and add to an existing note\. The \fB\-r\fR switch will remove/replace a note; if there\'s new note text passed when using the \fB\-r\fR switch, it will replace any existing note\. If the \fB\-r\fR switch is used alone, any existing note will be removed\.
+.
+.P
+You can also add notes at the time of entry by using the \fB\-n\fR or \fB\-\-note\fR flag with \fBdoing now\fR, \fBdoing later\fR, or \fBdoing done\fR\. If you pass text to any of the creation commands which has multiple lines, everything after the first line break will become the note\.
+.
+.P
+If a string passed to now, later, or done has a parenthetical at the end, the parenthetical will be removed from the title and its contents added as a note\. So \fBdoing now Working on @project1 (Adding some unit tests)\fR would create an entry titled "Working on @project1" with a note "Adding some unit tests\." This is the equivalent of \fBdoing now Working on @project1 \-n "Adding some unit tests"\fR\.
+.
+.P
+\fBDisplaying entries:\fR
+.
+.IP "" 4
+.
+.nf
+
+show      \- List all entries
+recent    \- List recent entries
+today     \- List entries from today
+yesterday \- List entries from yesterday
+last      \- Show the last entry
+grep      \- Show entries matching text or pattern
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBdoing show\fR on its own will list all entries in the "Currently" section\. Add a section name as an argument to display that section instead\. Use "all" to display all entries from all sections\.
+.
+.P
+You can filter the show command by tags\. Simply list them after the section name (or all)\. The boolean defaults to ANY, meaning any entry that contains any of the listed tags will be shown\. You can use \fB\-b ALL\fR or \fB\-b NONE\fR to change the filtering behavior: \fBdoing show all done cancelled \-b NONE\fR will show all tasks from all sections that do not have either \fI@done\fR or \fI@cancelled\fR tags\.
+.
+.P
+Use \fB\-c X\fR to limit the displayed results\. Combine it with \fB\-a newest\fR or \fB\-a oldest\fR to choose which chronological end it trims from\. You can also set the sort order of the output with \fB\-s asc\fR or \fB\-s desc\fR\.
+.
+.P
+The show command can also show the time spent on a task if it has a \fI@done(date)\fR tag with the \fB\-t\fR option\. This requires that you include a \fB%interval\fR token in template \-> default in the config\. You can also include \fI@start(date)\fR tags, which override the timestamp when calculating the intervals\.
+.
+.P
+If you have a use for it, you can use \fB\-o csv\fR on the show or view commands to output the results as a comma\-separated CSV to STDOUT\. Redirect to a file to save it: \fBdoing show all done \-o csv > ~/Desktop/done\.csv\fR\. You can do the same with \fB\-o json\fR\.
+.
+.P
+\fBdoing yesterday\fR is great for stand\-ups (thanks to Sean Collins \fIhttps://github\.com/sc68cal\fR for that!)\. Note that you can show yesterday\'s activity from an alternate section by using the section name as an argument (e\.g\. \fBdoing yesterday archive\fR)\.
+.
+.P
+\fBdoing on\fR allows for full date ranges and filtering\. \fBdoing on saturday\fR, or \fBdoing on one month to today\fR will give you ranges\. You can use the same terms with the show command by adding the \fB\-f\fR or \fB\-\-from\fR flag\. \fBdoing show @done \-\-from "monday to friday"\fR will give you all of your completed items for the last week (assuming it\'s the weekend)\.
+.
+.P
+You can also show entries matching a search string with \fBdoing grep\fR (synonym \fBdoing search\fR)\. If you want to search with regular expressions or for an exact match, surround your search query with forward slashes, e\.g\. \fBdoing search /project name/\fR\. If you pass a search string without slashes, it\'s treated as a fuzzy search string, meaning matches can be found as long as the characters in the search string are in order and with no more than three other characters between each\. By default searches are across all sections, but you can limit it to one with the \fB\-s SECTION_NAME\fR flag\. Searches can be displayed with the default template, or output as HTML, CSV, or JSON\.
+.
+.P
+\fBModifying the last entry\fR
+.
+.P
+If you want to make a change to the last entry added, use \fBdoing last \-e\fR\. The \fB\-e\fR flag opens the last entry (including note) in your editor, and when you close your editor, your doing file will be updated with any changes you made to the entry\.
+.
+.P
+You can choose the last entry in a specific section by including the \fB\-s\fR flag, so \fBdoing last \-s Later \-e\fR would edit the most recent entry in the Later section\.
+.
+.P
+You can also use text search or a tag filter to get an entry earlier than the most recent one\. A tag search with \fBdoing last \-\-tag=project1 \-e\fR will edit the last entry tagged \fB@project1\fR\. Multiple tags can be combined with commas, and you can use \fB\-\-bool\fR to specify whether the search is AND (matches all tags given), OR (matches any tag given), or NOT (matches none of the tags)\.
+.
+.P
+You can edit the last entry that matches a search string with \fB\-\-search=QUERY\fR\. QUERY can either be a raw string, or you can surround it with slashes to search by regex (\fBdoing last \-\-search="/project\./" \-e\fR)\. If the string is raw text, fuzzy matching will be used, so the characters must be in order but can be separated by up to three other characters\.
+.
+.P
+Both \fB\-\-tag\fR and \fB\-\-search\fR can be constrained to a single section with \fB\-s SECTION\fR\.
+.
+.P
+\fBViews\fR
+.
+.IP "" 4
+.
+.nf
+
+view     \- Display a user\-created view
+views    \- List available custom views
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Display any of the custom views you make in \fB~/\.doingrc\fR with the view command\. Use \fBdoing views\fR to get a list of available views\. Any time a section or view is specified on the command line, fuzzy matching will be used to find the closest match\. Thus, lat will match Later, etc\.\.
+.
+.P
+\fBSections\fR
+.
+.IP "" 4
+.
+.nf
+
+sections    \- List sections
+choose      \- Select a section to display from a menu
+add_section \- Add a new section to the "doing" file
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBUTILITIES\fR
+.
+.IP "" 4
+.
+.nf
+
+archive  \- Move entries between sections
+open     \- Open the "doing" file in an editor (OS X)
+config   \- Edit the default configuration
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBARCHIVING\fR
+.
+.IP "" 4
+.
+.nf
+
+COMMAND OPTIONS
+    \-k, \-\-keep=arg \- Count to keep (ignored if archiving by tag) (default: 5)
+    \-t, \-\-to=arg   \- Move entries to (default: Archive)
+    \-b, \-\-bool=arg \- Tag boolean (default: AND)
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The archive command will move entries from one section (default: Currently) to another section (default: Archive)\.
+.
+.P
+\fBdoing archive\fR on its own will move all but the most recent 5 entries from currently into the archive\.
+.
+.P
+\fBdoing archive other_section\fR will archive from other_section to Archive\.
+.
+.P
+\fBdoing archive other_section \-t alternate\fR will move from other_section to alternate\. You can use the \fB\-k\fR flag on any of these to change the number of items to leave behind\. To move everything, use \fB\-k 0\fR\.
+.
+.P
+You can also use tags to archive\. You define the section first, and anything following it is treated as tags\. If your first argument starts with \fB@\fR, it will assume all sections and assume any following arguments are tags\.
+.
+.P
+By default, tag archiving uses an AND boolean, meaning all the tags listed must exist on the entry for it to be moved\. You can change this behavior with \fB\-b OR\fR or \fB\-b NONE\fR (ALL and ANY also work)\.
+.
+.P
+Example: Archive all Currently items for \fI@client\fR that are marked \fI@done\fR
+.
+.IP "" 4
+.
+.nf
+
+doing archive @client @done
+.
+.fi
+.
+.IP "" 0
+.
+.SH "EXTRAS"
+.
+.SS "SHELL COMPLETION"
+\fBBash:\fR See the file \fBdoing\.completion\.bash\fR \fIhttps://github\.com/ttscoff/doing/blob/master/doing\.completion\.bash\fR in the git repository for full bash completion\. Thanks to fcrespo82 \fIhttps://github\.com/fcrespo82\fR for getting it started \fIhttps://gist\.github\.com/fcrespo82/9609318\fR\.
+.
+.P
+\fBZsh:\fR See the file \fBdoing\.completion\.zsh\fR \fIhttps://github\.com/ttscoff/doing/blob/master/doing\.completion\.zsh\fR in the git repository for zsh completion\. Courtesy of Gabe Anzelini \fIhttps://github\.com/gabeanzelini\fR\.
+.
+.P
+\fBFish:\fR See the file \fBdoing\.fish\fR \fIhttps://github\.com/ttscoff/doing/blob/master/doing\.fish\fR in the git repository for Fish completion\. This is the least complete of all of the completions, but it will autocomplete the first level of subcommands, and your custom sections and views for the \fBdoing show\fR and \fBdoing view\fR commands\.

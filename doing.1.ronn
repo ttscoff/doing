@@ -313,7 +313,7 @@ And a few special colors you'll just have to try out to see (or just run `doing 
 
 Any time you use one of the foreground colors it will reset the bold and background settings to their default automatically. You can force a reset to default terminal colors using `%default`.
 
-### HTML Templates
+### HTML TEMPLATES
 
 For commands that provide an HTML output option, you can customize the templates used for markup and CSS. The markup uses [HAML](http://haml.info/), and the styles are pure CSS.
 
@@ -321,7 +321,7 @@ To export the default configurations for customization, use `doing templates --t
 
 Once you have either or both of the template files, edit `.doingrc` and look for the `html_template:` section. There are two subvalues, `haml:` and `css:`. Add the path to the templates you want to use. A tilde may be substituted for your home directory, e.g. `css: ~/styles/doing.css`.
 
-### Autotagging
+### AUTOTAGGING
 
 Keywords in your entries can trigger automatic tagging, just to make life easier. There are three tools available: default tags, whitelisting, and synonym tagging.
 
