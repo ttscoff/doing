@@ -823,7 +823,7 @@ class WWID
       out.join('')
     end
 
-    res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} -m --bind ctrl-a:select-all -q "#{opt[:query]}"`
+    res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} --header="Arrows to navigate, tab to mark for selection, enter to perform action" --prompt="Select entries to act on> " -m --bind ctrl-a:select-all -q "#{opt[:query]}"`
     selected = []
     res.split(/\n/).each do |item|
       idx = item.match(/^(\d+)\)/)[1].to_i
@@ -835,7 +835,16 @@ class WWID
       return
     end
 
-    unless opt[:delete] || opt[:flag] || opt[:finish] || opt[:cancel] || opt[:tag] || opt[:archive] || opt[:output] || opt[:save_to]
+    actions = %i[editor delete tag flag finish cancel tag archive output save_to]
+    has_action = false
+    actions.each do |a|
+      if opt[a]
+        has_action = true
+        break
+      end
+    end
+
+    unless has_action
       action = choose_from(
                            [
                             "add tag",
@@ -1199,19 +1208,24 @@ class WWID
   ## @param      old_item  (Item) The item to tag
   ## @param      tag       (string) The tag to remove
   ##
-  def untag_item(old_item, tag)
+  def untag_item(old_item, tags)
     title = old_item['title'].dup
+    if tags.is_a? ::String
+      tags = tags.split(/ *, */).map {|t| t.strip.gsub(/\*/,'[^ (]*') }
+    end
 
-    if title =~ /@#{tag}/
-      title.chomp!
-      title.gsub!(/ +@#{tag}(\(.*?\))?/, '')
-      new_item = old_item.dup
-      new_item['title'] = title
-      update_item(old_item, new_item)
-      return new_item
-    else
-      @results.push(%(Item isn't tagged @#{tag}: "#{title}" in #{old_item['section']}))
-      return old_item
+    tags.each do |tag|
+      if title =~ /@#{tag}/
+        title.chomp!
+        title.gsub!(/ +@#{tag}(\(.*?\))?/, '')
+        new_item = old_item.dup
+        new_item['title'] = title
+        update_item(old_item, new_item)
+        return new_item
+      else
+        @results.push(%(Item isn't tagged @#{tag}: "#{title}" in #{old_item['section']}))
+        return old_item
+      end
     end
   end
 
@@ -1222,23 +1236,29 @@ class WWID
   ## @param      tag       (string) The tag to apply
   ## @param      date      (Boolean) Include timestamp?
   ##
-  def tag_item(old_item, tag, remove: false, date: false)
+  def tag_item(old_item, tags, remove: false, date: false)
     title = old_item['title'].dup
+    if tags.is_a? ::String
+      tags = tags.split(/ *, */).map(&:strip)
+    end
+
     done_date = Time.now
-    if title !~ /@#{tag}/
-      title.chomp!
-      if date
-        title += " @#{tag}(#{done_date.strftime('%F %R')})"
+    tags.each do |tag|
+      if title !~ /@#{tag}/
+        title.chomp!
+        if date
+          title += " @#{tag}(#{done_date.strftime('%F %R')})"
+        else
+          title += " @#{tag}"
+        end
+        new_item = old_item.dup
+        new_item['title'] = title
+        update_item(old_item, new_item)
+        return new_item
       else
-        title += " @#{tag}"
+        @results.push(%(Item already @#{tag}: "#{title}" in #{old_item['section']}))
+        return old_item
       end
-      new_item = old_item.dup
-      new_item['title'] = title
-      update_item(old_item, new_item)
-      return new_item
-    else
-      @results.push(%(Item already @#{tag}: "#{title}" in #{old_item['section']}))
-      return old_item
     end
   end
 

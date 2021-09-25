@@ -19,6 +19,7 @@ lib/doing/wwid.rb
 lib/doing/helpers.rb
 lib/templates/doing.haml
 lib/templates/doing.css
+lib/helpers/fuzzyfilefinder
   )
   s.require_paths << 'lib'
 

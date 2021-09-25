@@ -621,7 +621,7 @@ Now you can run `doing import --type timing -s SECTION PATH`, where SECTION is t
 
 FuzzyFileFinder (`fzf`) is included with doing (<https://github.com/junegunn/fzf>), and you can use `doing select` to get a menu of all your items (or items in a given section) which can be searched with fuzzy matching. The menu allows multiple selections to be acted on directly.
 
-To use the menu, type a search string or use the arrow keys to navigate up and down. Press tab on an entry you'd like to perform an action on. A marker will show up on the left indicating the entry is selected. Repeat the process and select as many entries as needed. When you hit Return, the selection will be passed back to doing. Use Control-A to select all visible entries.
+To use the menu, type a search string or use the arrow keys to navigate up and down. Tip: searching is "fuzzy" by default, but you can start your search with a single quote (`'`) to force an exact match. Press tab on an entry you'd like to perform an action on. A marker will show up on the left indicating the entry is selected. Repeat the process and select as many entries as needed. When you hit Return, the selection will be passed back to doing. Use Control-A to select all visible entries.
 
 Doing can perform several functions with this menu. Not all of doing's features are available, but the core functionality you'd need is there, plus you can open the selected entries on one page in your text editor, make changes to them, and when you save and close the entries are updated accordingly. This allows editing of everything from timestamps to tags to notes.
 
@@ -637,7 +637,11 @@ Run `doing help select` for a list of options:
     -f, --finish          - Add @done with current time to selected item(s)
     --flag                - Add flag to selected item(s)
     -m, --move=SECTION    - Move selected items to section (default: none)
+    -o, --output=FORMAT   - Output format for export (doing|taskpaper|csv|html|json|template|timeline) (default: none)
+    -q, --query=QUERY     - Initial search query for filtering (default: none)
+    -r, --remove          - Reverse -c, -f, --flag, and -t (remove instead of adding)
     -s, --section=SECTION - Select from a specific section (default: none)
+    --save_to=FILE        - Save selected entries to file using --output format (default: none)
     -t, --tag=TAG         - Tag selected entries (default: none)
 
 For example, `doing select -d -a` would present the menu, and then mark selected entries as @done (with timestamp) and move them to the Archive section.
