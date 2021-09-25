@@ -1,3 +1,7 @@
+### 1.0.80
+
+- Convert all menus to fzf screens
+
 ### 1.0.79
 
 - Gem missing fzf
