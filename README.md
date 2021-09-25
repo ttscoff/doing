@@ -619,7 +619,7 @@ Now you can run `doing import --type timing -s SECTION PATH`, where SECTION is t
 
 #### Interactive Usage
 
-If you have `fzf` installed (<https://github.com/junegunn/fzf>), you can use `doing select` to get a menu of all your items (or items in a given section) which can be searched with fuzzy matching. The menu allows multiple selections to be acted on directly.
+FuzzyFileFinder (`fzf`) is included with doing (<https://github.com/junegunn/fzf>), and you can use `doing select` to get a menu of all your items (or items in a given section) which can be searched with fuzzy matching. The menu allows multiple selections to be acted on directly.
 
 To use the menu, type a search string or use the arrow keys to navigate up and down. Press tab on an entry you'd like to perform an action on. A marker will show up on the left indicating the entry is selected. Repeat the process and select as many entries as needed. When you hit Return, the selection will be passed back to doing. Use Control-A to select all visible entries.
 

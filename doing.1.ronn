@@ -3,19 +3,71 @@ doing(1) Command line time tracking
 
 ## SYNOPSIS
 
-`doing [subcommand] [options]`
+`doing [global options] command [command options] [arguments...]`
 
 ## DESCRIPTION
 
-**A command line tool for remembering what you were doing and tracking what you've done.**
+_A command line tool for remembering what you were doing and tracking what you've done._
 
 `doing` is a basic CLI for adding and listing "what was I doing" reminders in a [TaskPaper-formatted](https://www.taskpaper.com) text file. It allows for multiple sections/categories and flexible output formatting.
+
+## USAGE
+
+    doing [global options] command [command options] [arguments...]
+
+### GLOBAL OPTIONS:
+
+    -f, --doing_file=arg - Specify a different doing_file (default: none)
+    --help               - Show this message
+    --[no-]notes         - Output notes if included in the template (default: enabled)
+    --stdout             - Send results report to STDOUT instead of STDERR
+    --version            - Display the program version
+    -x, --[no-]noauto    - Exclude auto tags and default tags
+
+### COMMANDS:
+
+    help           - Shows a list of commands and global options
+    help [command] - Shows help for any command (`doing help now`)
+
+
+    add_section   - Add a new section to the "doing" file
+    again, resume - Repeat last entry as new entry
+    archive       - Move entries between sections
+    cancel        - End last X entries with no time tracked
+    choose        - Select a section to display from a menu
+    colors        - List available color variables for configuration templates and views
+    config        - Edit the configuration file
+    done, did     - Add a completed item with @done(date). No argument finishes last entry.
+    finish        - Mark last X entries as @done
+    grep, search  - Search for entries
+    import        - Import entries from an external source
+    last          - Show the last entry, optionally edit
+    later         - Add an item to the Later section
+    mark, flag    - Mark last entry as highlighted
+    meanwhile     - Finish any running @meanwhile tasks and optionally create a new one
+    note          - Add a note to the last entry
+    now, next     - Add an entry
+    on            - List entries for a date
+    open          - Open the "doing" file in an editor
+    recent        - List recent entries
+    sections      - List sections
+    select        - Display an interactive menu to perform operations (requires fzf)
+    show          - List all entries
+    since         - List entries since a date
+    tag           - Add tag(s) to last entry
+    template      - Output HTML and CSS templates for customization
+    today         - List entries from today
+    undo          - Undo the last change to the doing_file
+    view          - Display a user-created view
+    views         - List available custom views
+    yesterday     - List entries from yesterday
+
 
 ## CONFIGURATION
 
 Run `doing config` to open your `~/.doingrc` file in the editor defined in the `$EDITOR` environment variable. Set up your `doing_file` right away (where you want entries to be stored), and cover the rest after you've read the docs.
 
-See the [support](#support) section below for troubleshooting details.
+See the [SUPPORT](#SUPPORT) section below for troubleshooting details.
 
 ### THE DOING FILE
 
@@ -124,7 +176,7 @@ In the case of the `doing now -e` command, your `$EDITOR` environment variable w
 
 The only requirements are that your editor be launchable from the command line and able to "wait." In the case of Sublime Text and TextMate, just use `-w` like this: `export EDITOR="subl -w"`.
 
-### Templates
+### TEMPLATES
 
 The config also contains templates for various command outputs. Include placeholders by placing a % before the keyword. The available tokens are:
 
@@ -219,7 +271,7 @@ and output my recent entries like this:
 
     $ 
 
-### Custom views
+### CUSTOM VIEWS
 
 You can create your own "views" in the `~/.doingrc` file and view them with `doing view view_name`. Just add a section like this:
 
@@ -267,13 +319,10 @@ Regarding colors, you can use them to create very nice displays if you're output
       wrap_width: 0
       template: '%boldblack%date %boldgreen| %boldwhite%title%default%note'
 
-Outputs: 
-
-![](http://ckyp.us/XKpj+)
 
 You can also specify a default output format for a view. Most of the optional output formats override the template specification (`html`, `csv`, `json`). If the `view` command is used with the `-o` flag, it will override what's specified in the file.
 
-### Colors
+### COLORS
 
 You can use the following colors in view templates. Set a foreground color with a named color:
 
@@ -352,25 +401,9 @@ White lists and synonyms are defined like this:
 
 Note that you can include a tag with synonyms in the whitelist as well to tag it directly when used.
 
-## Usage
 
-    doing [global options] command [command options] [arguments...]
 
-### Global options:
-
-    -f, --doing_file=arg - Specify a different doing_file (default: none)
-    --help               - Show this message
-    --[no-]notes         - Output notes if included in the template (default: enabled)
-    --stdout             - Send results report to STDOUT instead of STDERR
-    --version            - Display the program version
-    -x, --[no-]noauto    - Exclude auto tags and default tags
-
-### Commands:
-
-    help           - Shows a list of commands and global options
-    help [command] - Shows help for any command (`doing help now`)
-
-#### Adding entries:
+_**Adding entries:**_
 
     now, did      - Add an entry
     later         - Add an item to the Later section
@@ -398,14 +431,14 @@ All of these commands accept a `-e` argument. This opens your command line edito
 
 See `doing help meanwhile` for more options.
 
-#### Modifying entries:
+_**Modifying entries:**_
 
     finish      - Mark last X entries as @done
     cancel      - Mark last X entries as @done without completion date
     tag         - Tag last entry
     note        - Add a note to the last entry
 
-##### Finishing
+_**Finishing**_
 
 `doing finish` by itself is the same as `doing done` by itself. It adds _@done(timestamp)_ to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add `-a` to also archive the affected entries.
 
@@ -424,7 +457,7 @@ You can change the boolean using `--bool=OR` (last entry containing any of the s
 You can also include a `--no-date` switch to add `@done` without a finish date, meaning no time is tracked for the task. `doing cancel` is an alias for this. Like `finish`, `cancel` accepts a count to act on the last X entries, as well as `--archive` and `--section` options. `cancel` also accepts the `--tag` and `--bool` flags for tag filtering.
 
 
-##### Tagging and Autotagging
+_**Tagging and Autotagging**_
 
 `tag` adds one or more tags to the last entry, or specify a count with `-c X`. Tags are specified as basic arguments, separated by spaces. For example:
 
@@ -457,7 +490,7 @@ To add autotagging, include a section like this in your `~/.doingrc` file:
         - posting
         - publishing
 
-###### Tag transformation
+_**Tag transformation**_
 
 You can include a `transform` section in the autotag config which contains pairs of regular expressions and replacement patterns separated by a colon. These will be used to look at existing tags in the text and generate additional tags from them. For example:
 
@@ -467,7 +500,7 @@ You can include a `transform` section in the autotag config which contains pairs
 
 This creates a search pattern looking for a string of word characters followed by a hyphen and one or more digits, e.g. `@projecttag-12`. Do not include the @ symbol in the pattern. The replacement (`$1`) indicates that the first matched group (in parenthesis) should be used to generate the new tag, resulting in `@projecttag` being added to the entry.
 
-##### Annotating
+_**Annotating**_
 
 `note` lets you append a note to the last entry. You can specify a section to grab the last entry from with `-s section_name`. `-e` will open your `$EDITOR` for typing the note, but you can also just include it on the command line after any flags. You can also pipe a note in on STDIN (`echo "fun stuff"|doing note`). If you don't use the `-r` switch, new notes will be appended to the existing notes, and using the `-e` switch will let you edit and add to an existing note. The `-r` switch will remove/replace a note; if there's new note text passed when using the `-r` switch, it will replace any existing note. If the `-r` switch is used alone, any existing note will be removed.
 
@@ -475,7 +508,7 @@ You can also add notes at the time of entry by using the `-n` or `--note` flag w
 
 If a string passed to `now`, `later`, or `done` has a parenthetical at the end, the parenthetical will be removed from the title and its contents added as a note. So `doing now Working on @project1 (Adding some unit tests)` would create an entry titled "Working on @project1" with a note "Adding some unit tests." This is the equivalent of `doing now Working on @project1 -n "Adding some unit tests"`.
 
-#### Displaying entries:
+_**Displaying entries:**_
 
     show      - List all entries
     recent    - List recent entries
@@ -500,7 +533,7 @@ If you have a use for it, you can use `-o csv` on the show or view commands to o
 
 You can also show entries matching a search string with `doing grep` (synonym `doing search`). If you want to search with regular expressions or for an exact match, surround your search query with forward slashes, e.g. `doing search /project name/`. If you pass a search string without slashes, it's treated as a fuzzy search string, meaning matches can be found as long as the characters in the search string are in order and with no more than three other characters between each. By default searches are across all sections, but you can limit it to one with the `-s SECTION_NAME` flag. Searches can be displayed with the default template, or output as HTML, CSV, or JSON.
 
-##### Modifying the last entry
+_**Modifying the last entry**_
 
 If you want to make a change to the last entry added, use `doing last -e`. The `-e` flag opens the last entry (including note) in your editor, and when you close your editor, your doing file will be updated with any changes you made to the entry.
 
@@ -512,26 +545,26 @@ You can edit the last entry that matches a search string with `--search=QUERY`. 
 
 Both `--tag` and `--search` can be constrained to a single section with `-s SECTION`.
 
-#### Views
+_**Views**_
 
     view     - Display a user-created view
     views    - List available custom views
 
 Display any of the custom views you make in `~/.doingrc` with the `view` command. Use `doing views` to get a list of available views. Any time a section or view is specified on the command line, fuzzy matching will be used to find the closest match. Thus, `lat` will match `Later`, etc..
 
-#### Sections
+_**Sections**_
 
     sections    - List sections
     choose      - Select a section to display from a menu
     add_section - Add a new section to the "doing" file
 
-#### Utilities
+_**Utilities**_
 
     archive  - Move entries between sections
     open     - Open the "doing" file in an editor (OS X)
     config   - Edit the default configuration
 
-#### Archiving
+_**Archiving**_
 
     COMMAND OPTIONS
         -k, --keep=arg - Count to keep (ignored if archiving by tag) (default: 5)
@@ -554,11 +587,10 @@ Example: Archive all Currently items for _@client_ that are marked _@done_
 
     doing archive @client @done
 
----
 
-## Extras
+## EXTRAS
 
-### Shell completion
+### SHELL COMPLETION
 
 __Bash:__ See the file [`doing.completion.bash`](https://github.com/ttscoff/doing/blob/master/doing.completion.bash) in the git repository for full bash completion. Thanks to [fcrespo82](https://github.com/fcrespo82) for getting it [started](https://gist.github.com/fcrespo82/9609318).
 

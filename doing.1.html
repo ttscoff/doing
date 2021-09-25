@@ -55,10 +55,8 @@
   <div class='man-navigation' style='display:none'>
     <a href="#SYNOPSIS">SYNOPSIS</a>
     <a href="#DESCRIPTION">DESCRIPTION</a>
-    <a href="#GLOBAL-OPTIONS">GLOBAL OPTIONS</a>
-    <a href="#COMMANDS">COMMANDS</a>
-    <a href="#CONFIGURATION">CONFIGURATION</a>
     <a href="#USAGE">USAGE</a>
+    <a href="#CONFIGURATION">CONFIGURATION</a>
     <a href="#EXTRAS">EXTRAS</a>
   </div>
 
@@ -71,20 +69,22 @@
   <h1>doing(1) Command line time tracking</h1>
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>doing [subcommand] [options]</code></p>
+<p><code>doing [global options] command [command options] [arguments...]</code></p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p><strong>A command line tool for remembering what you were doing and tracking what you've done.</strong></p>
+<p><em>A command line tool for remembering what you were doing and tracking what you've done.</em></p>
 
-<p>doing is a basic CLI for adding and listing "what was I doing" reminders in a <a href="https://www.taskpaper.com">TaskPaper-formatted</a> text file. It allows for multiple sections/categories and flexible output formatting.</p>
+<p><code>doing</code> is a basic CLI for adding and listing "what was I doing" reminders in a <a href="https://www.taskpaper.com">TaskPaper-formatted</a> text file. It allows for multiple sections/categories and flexible output formatting.</p>
 
-<p>Use <code>doing help</code> to view options for any command.</p>
+<h2 id="USAGE">USAGE</h2>
 
-<h2 id="GLOBAL-OPTIONS">GLOBAL OPTIONS</h2>
+<pre><code>doing [global options] command [command options] [arguments...]
+</code></pre>
 
-<pre><code>--config_file=arg    - Use a specific configuration file (default: /Users/ttscoff/.doingrc)
--f, --doing_file=arg - Specify a different doing_file (default: none)
+<h3 id="GLOBAL-OPTIONS-">GLOBAL OPTIONS:</h3>
+
+<pre><code>-f, --doing_file=arg - Specify a different doing_file (default: none)
 --help               - Show this message
 --[no-]notes         - Output notes if included in the template (default: enabled)
 --stdout             - Send results report to STDOUT instead of STDERR
@@ -92,47 +92,50 @@
 -x, --[no-]noauto    - Exclude auto tags and default tags
 </code></pre>
 
-<h2 id="COMMANDS">COMMANDS</h2>
+<h3 id="COMMANDS-">COMMANDS:</h3>
 
-<pre><code>add_section    - Add a new section to the "doing" file
+<pre><code>help           - Shows a list of commands and global options
+help [command] - Shows help for any command (`doing help now`)
+
+
+add_section   - Add a new section to the "doing" file
 again, resume - Repeat last entry as new entry
-archive        - Move entries between sections
-cancel         - End last X entries with no time tracked
-choose         - Select a section to display from a menu
-colors         - List available color variables for configuration templates and views
-config         - Edit the configuration file
-done, did    - Add a completed item with @done(date). No argument finishes last entry.
-finish         - Mark last X entries as @done
-grep, search - Search for entries
-help           - Shows a list of commands or help for one command
-import         - Import entries from an external source
-last           - Show the last entry, optionally edit
-later          - Add an item to the Later section
+archive       - Move entries between sections
+cancel        - End last X entries with no time tracked
+choose        - Select a section to display from a menu
+colors        - List available color variables for configuration templates and views
+config        - Edit the configuration file
+done, did     - Add a completed item with @done(date). No argument finishes last entry.
+finish        - Mark last X entries as @done
+grep, search  - Search for entries
+import        - Import entries from an external source
+last          - Show the last entry, optionally edit
+later         - Add an item to the Later section
 mark, flag    - Mark last entry as highlighted
-meanwhile      - Finish any running @meanwhile tasks and optionally create a new one
-note           - Add a note to the last entry
-now, next    - Add an entry
-on             - List entries for a date
-open           - Open the "doing" file in an editor
-recent         - List recent entries
-sections       - List sections
-select         - Display an interactive menu to perform operations (requires fzf)
-show           - List all entries
-since          - List entries since a date
-tag            - Add tag(s) to last entry
-template       - Output HTML and CSS templates for customization
-today          - List entries from today
-undo           - Undo the last change to the doing_file
-view           - Display a user-created view
-views          - List available custom views
-yesterday      - List entries from yesterday
+meanwhile     - Finish any running @meanwhile tasks and optionally create a new one
+note          - Add a note to the last entry
+now, next     - Add an entry
+on            - List entries for a date
+open          - Open the "doing" file in an editor
+recent        - List recent entries
+sections      - List sections
+select        - Display an interactive menu to perform operations (requires fzf)
+show          - List all entries
+since         - List entries since a date
+tag           - Add tag(s) to last entry
+template      - Output HTML and CSS templates for customization
+today         - List entries from today
+undo          - Undo the last change to the doing_file
+view          - Display a user-created view
+views         - List available custom views
+yesterday     - List entries from yesterday
 </code></pre>
 
 <h2 id="CONFIGURATION">CONFIGURATION</h2>
 
-<p>Run <code>doing config</code> to open your <code>~/.doingrc</code> file in the editor defined in the <code>$EDITOR</code> environment variable. Set up your doing_file right away (where you want entries to be stored), and cover the rest after you've read the docs.</p>
+<p>Run <code>doing config</code> to open your <code>~/.doingrc</code> file in the editor defined in the <code>$EDITOR</code> environment variable. Set up your <code>doing_file</code> right away (where you want entries to be stored), and cover the rest after you've read the docs.</p>
 
-<p>See the <a href="#support" data-bare-link="true">support</a> section below for troubleshooting details.</p>
+<p>See the <a href="#SUPPORT" data-bare-link="true">SUPPORT</a> section below for troubleshooting details.</p>
 
 <h3 id="THE-DOING-FILE">THE DOING FILE</h3>
 
@@ -142,11 +145,11 @@ yesterday      - List entries from yesterday
 
 <p>Notes are anything in the list without a leading hyphen and date. They belong to the entry directly before them, and they should be indented one level beyond the parent item.</p>
 
-<p>When using the now and later commands on the command line, you can start the entry with a quote and hit return, then type the note and close the quote. Anything after the first line will be turned into a TaskPaper-compatible note for the task and can be displayed in templates using <code>%note</code>.</p>
+<p>When using the <code>now</code> and <code>later</code> commands on the command line, you can start the entry with a quote and hit return, then type the note and close the quote. Anything after the first line will be turned into a TaskPaper-compatible note for the task and can be displayed in templates using <code>%note</code>.</p>
 
 <p>Notes can be prevented from ever appearing in output with the global option <code>--no-notes</code>: <code>doing --no-notes show all</code>.</p>
 
-<p>Auto tagging (adding tags listed in .doingrc under autotag and default_tags) can be skipped for an entry with the <code>-x</code> global option: <code>doing -x done skipping some automatic tagging</code>.</p>
+<p>Auto tagging (adding tags listed in .doingrc under <code>autotag</code> and <code>default_tags</code>) can be skipped for an entry with the <code>-x</code> global option: <code>doing -x done skipping some automatic tagging</code>.</p>
 
 <h3 id="CONFIGURATION-OPTIONS">CONFIGURATION OPTIONS</h3>
 
@@ -202,7 +205,7 @@ html_template:
   css:
 </code></pre>
 
-<p>The config file is stored in <code>~/.doingrc</code>, and a skeleton file is created on the first run. Just run doing on its own to create the file.</p>
+<p>The config file is stored in <code>~/.doingrc</code>, and a skeleton file is created on the first run. Just run <code>doing</code> on its own to create the file.</p>
 
 <h3 id="PER-FOLDER-CONFIGURATION">PER-FOLDER CONFIGURATION</h3>
 
@@ -212,7 +215,7 @@ html_template:
 
 <ul>
 <li>Define custom HTML output on a per-project basis using the html_template option for custom templates. Customize time tracking reports based on project or client.</li>
-<li>Define default_tags for a project so that every time you <code>doing now</code> from within that project directory or its subfolders, it gets tagged with that project automatically.</li>
+<li>Define <code>default_tags</code> for a project so that every time you <code>doing now</code> from within that project directory or its subfolders, it gets tagged with that project automatically.</li>
 </ul>
 
 
@@ -220,25 +223,25 @@ html_template:
 
 <h3 id="DOING-FILE-LOCATION">DOING FILE LOCATION</h3>
 
-<p>The one thing you'll probably want to adjust is the file that the notes are stored in. That's the doing_file key:</p>
+<p>The one thing you'll probably want to adjust is the file that the notes are stored in. That's the <code>doing_file</code> key:</p>
 
 <pre><code>doing_file: /Users/username/Dropbox/nvALT2.2/?? What was I doing.md
 </code></pre>
 
-<p>I keep mine in my nvALT folder for quick access and syncing between machines. If desired, you can give it a <code>.taskpaper</code> extension to make it more recognizable to other applications. (If you do that in nvALT, make sure to add taskpaper as a recognized extension in preferences).</p>
+<p>I keep mine in my nvALT folder for quick access and syncing between machines. If desired, you can give it a <code>.taskpaper</code> extension to make it more recognizable to other applications. (If you do that in nvALT, make sure to add <code>taskpaper</code> as a recognized extension in preferences).</p>
 
 <h3 id="CURRENT-ACTIONS-SECTION">CURRENT ACTIONS SECTION</h3>
 
-<p>You can rename the section that holds your current tasks. By default, this is Currently, but if you have some other bright idea, feel free:</p>
+<p>You can rename the section that holds your current tasks. By default, this is <code>Currently</code>, but if you have some other bright idea, feel free:</p>
 
 <pre><code>current_section: Currently
 </code></pre>
 
 <h3 id="DEFAULT-EDITORS">DEFAULT EDITORS</h3>
 
-<p>The setting editor_app only applies to Mac OS X users. It's the default application that the command <code>doing open</code> will open your WWID file in. Personally, I use <code>editor_app: TaskPaper</code>. If this is blank, it will be opened by whatever the system default is for the doing file extension (default is <code>.md</code>), or you can use <code>-a app_name</code> or <code>-b bundle_id</code> to override.</p>
+<p>The setting <code>editor_app</code> only applies to Mac OS X users. It's the default application that the command <code>doing open</code> will open your WWID file in. Personally, I use <code>editor_app: TaskPaper</code>. If this is blank, it will be opened by whatever the system default is for the doing file extension (default is <code>.md</code>), or you can use <code>-a app_name</code> or <code>-b bundle_id</code> to override.</p>
 
-<p>You can define a separate app to open the config file in when running <code>doing config</code>. The key for this is config_editor_app.</p>
+<p>You can define a separate app to open the config file in when running <code>doing config</code>. The key for this is <code>config_editor_app</code>.</p>
 
 <p>In the case of the <code>doing now -e</code> command, your <code>$EDITOR</code> environment variable will be used to complete the entry text and notes. Set it in your <code>~/.bash_profile</code> or whatever is appropriate for your system:</p>
 
@@ -253,31 +256,31 @@ html_template:
 
 <ul>
 <li><code>%title</code>: the "what was I doing" entry line</li>
-<li><code>%date</code>: the date based on the template's date_format setting</li>
+<li><code>%date</code>: the date based on the template's <code>date_format</code> setting</li>
 <li><code>%shortdate</code>: a custom date formatter that removes the day/month/year from the entry if they match the current day/month/year</li>
 <li><code>%note</code>: Any note in the entry will be included here, a newline and tabs are automatically added.</li>
 <li><code>%odnote</code>: The notes with a leading tab removed (outdented note)</li>
 <li><code>%chompnote</code>: Notes on one line, beginning and trailing whitespace removed.</li>
 <li><code>%section</code>: The section/project the entry is currently in</li>
 <li><code>%hr</code>: a horizontal rule (<code>-</code>) the width of the terminal</li>
-<li><code>%hr_under</code>: a horizontal rule (_) the width of the terminal</li>
+<li><code>%hr_under</code>: a horizontal rule (<code>_</code>) the width of the terminal</li>
 <li><code>%n</code>: inserts a newline</li>
 <li><code>%t</code>: inserts a tab</li>
-<li><code>%[color]</code>: color can be black, red, green, blue, yellow, magenta, cyan, or white
+<li><code>%[color]</code>: color can be <code>black</code>, <code>red</code>, <code>green</code>, <code>blue</code>, <code>yellow</code>, <code>magenta</code>, <code>cyan</code>, or <code>white</code>
 
 <ul>
-<li>you can prefix bg to affect background colors (<code>%bgyellow</code>)</li>
-<li>prefix bold and boldbg for strong colors (<code>%boldgreen</code>, <code>%boldbgblue</code>)</li>
+<li>you can prefix <code>bg</code> to affect background colors (<code>%bgyellow</code>)</li>
+<li>prefix <code>bold</code> and <code>boldbg</code> for strong colors (<code>%boldgreen</code>, <code>%boldbgblue</code>)</li>
 <li>there are some random special combo colors. Use <code>doing colors</code> to see the list</li>
 </ul>
 </li>
-<li><code>%interval</code>: when used with the <code>-t</code> switch on the show command, it will display the time between a timestamp or <em>@start(date)</em> tag and the <em>@done(date)</em> tag, if it exists. Otherwise, it will remain empty.</li>
+<li><code>%interval</code>: when used with the <code>-t</code> switch on the <code>show</code> command, it will display the time between a timestamp or <em>@start(date)</em> tag and the <em>@done(date)</em> tag, if it exists. Otherwise, it will remain empty.</li>
 </ul>
 
 
-<p>Date formats are based on Ruby <a href="http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime">strftime</a> formatting.</p>
+<p>Date formats are based on Ruby <a href="http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime"><code>strftime</code></a> formatting.</p>
 
-<p>My normal template for the recent command looks like this:</p>
+<p>My normal template for the <code>recent</code> command looks like this:</p>
 
 <pre><code>recent:
   date_format: '%_I:%M%P'
@@ -288,18 +291,18 @@ html_template:
 <p>And it outputs:</p>
 
 <pre><code>$ doing recent 3
- 4:30am &gt; Made my console script smarter...
+ 4:30am &gt; Made my `console` script smarter...
     Checks first argument to see if it's a file, if it is, that's the log
 
     Else, it checks the first argument for a ".log" suffix and does a search in the user
-    application logs with find for it.
+    application logs with `find` for it.
 
     Otherwise, system.log.
 
     I also made an awesome Cope wrapper for it...
-12:00pm &gt; Working on doing again.
+12:00pm &gt; Working on `doing` again.
 12:45pm &gt; I think this thing (doing) is ready to document and distribute
-$
+$ 
 </code></pre>
 
 <p>You can get pretty clever and include line breaks and other formatting inside of double quotes. If you want multiline templates, just use <code>\n</code> in the template line, and after the next run it will be rewritten as proper YAML automatically.</p>
@@ -330,11 +333,11 @@ $
 <pre><code>$ doing recent 3
 -----------------------------------------------------------------------
  4:30am
- &gt; Made my console script smarter...
+ &gt; Made my `console` script smarter...
     Checks first argument to see if it's a file, if it is, that's the log
 
     Else, it checks the first argument for a ".log" suffix and does a search in the user application
-    logs with find for it.
+    logs with `find` for it.
 
     Otherwise, system.log.
 
@@ -343,7 +346,7 @@ _______________________________________________________________________
 
 -----------------------------------------------------------------------
 12:00pm
- &gt; Working on doing again.
+ &gt; Working on `doing` again.
 _______________________________________________________________________
 
 -----------------------------------------------------------------------
@@ -351,7 +354,7 @@ _______________________________________________________________________
  &gt; I think this thing (doing) is ready to document and distribute
 _______________________________________________________________________
 
-$
+$ 
 </code></pre>
 
 <h3 id="CUSTOM-VIEWS">CUSTOM VIEWS</h3>
@@ -370,7 +373,7 @@ $
     tags_bool: ANY
 </code></pre>
 
-<p>You can add additional custom views. Just nest them under the views key (indented two spaces from the edge). Multiple views would look like this:</p>
+<p>You can add additional custom views. Just nest them under the <code>views</code> key (indented two spaces from the edge). Multiple views would look like this:</p>
 
 <pre><code>views:
   later:
@@ -384,16 +387,16 @@ $
     count: 5
     wrap_width: 0
     date_format: '%F %_I:%M%P'
-    template: '%date | %title%note'
+    template: '%date | %title%note' 
 </code></pre>
 
-<p>The section key is the default section to pull entries from. Count and section can be overridden at runtime with the <code>-c</code> and <code>-s</code> flags. Setting section to All will combine all sections in the output.</p>
+<p>The <code>section</code> key is the default section to pull entries from. Count and section can be overridden at runtime with the <code>-c</code> and <code>-s</code> flags. Setting <code>section</code> to <code>All</code> will combine all sections in the output.</p>
 
 <p>You can add new sections with <code>doing add_section section_name</code>. You can also create them on the fly by using the <code>-s section_name</code> flag when running <code>doing now</code>. For example, <code>doing now -s Misc just a random side note</code> would create the "just a random side note" entry in a new section called "Misc," if Misc didn't already exist.</p>
 
-<p>The tags and tags_bool keys allow you to specify tags that the view is filtered by. You can list multiple tags separated by spaces, and then use tags_bool to specify ALL, ANY, or NONE to determine how it handles the multiple tags.</p>
+<p>The <code>tags</code> and <code>tags_bool</code> keys allow you to specify tags that the view is filtered by. You can list multiple tags separated by spaces, and then use <code>tags_bool</code> to specify <code>ALL</code>, <code>ANY</code>, or <code>NONE</code> to determine how it handles the multiple tags.</p>
 
-<p>The order key defines the sort order of the output. This is applied <em>after</em> the tasks are retrieved and cut off at the maximum number specified in count.</p>
+<p>The <code>order</code> key defines the sort order of the output. This is applied <em>after</em> the tasks are retrieved and cut off at the maximum number specified in <code>count</code>.</p>
 
 <p>Regarding colors, you can use them to create very nice displays if you're outputting to a color terminal. Example:</p>
 
@@ -405,11 +408,7 @@ $
   template: '%boldblack%date %boldgreen| %boldwhite%title%default%note'
 </code></pre>
 
-<p>Outputs:</p>
-
-<p><img src="http://ckyp.us/XKpj+" alt="" /></p>
-
-<p>You can also specify a default output format for a view. Most of the optional output formats override the template specification (html, csv, json). If the view command is used with the <code>-o</code> flag, it will override what's specified in the file.</p>
+<p>You can also specify a default output format for a view. Most of the optional output formats override the template specification (<code>html</code>, <code>csv</code>, <code>json</code>). If the <code>view</code> command is used with the <code>-o</code> flag, it will override what's specified in the file.</p>
 
 <h3 id="COLORS">COLORS</h3>
 
@@ -496,28 +495,7 @@ default_tags: [marked,coding]
 
 <p>Note that you can include a tag with synonyms in the whitelist as well to tag it directly when used.</p>
 
-<h2 id="USAGE">USAGE</h2>
-
-<pre><code>doing [global options] command [command options] [arguments...]
-</code></pre>
-
-<h3 id="GLOBAL-OPTIONS-">GLOBAL OPTIONS:</h3>
-
-<pre><code>-f, --doing_file=arg - Specify a different doing_file (default: none)
---help               - Show this message
---[no-]notes         - Output notes if included in the template (default: enabled)
---stdout             - Send results report to STDOUT instead of STDERR
---version            - Display the program version
--x, --[no-]noauto    - Exclude auto tags and default tags
-</code></pre>
-
-<h3 id="COMMANDS-">COMMANDS:</h3>
-
-<pre><code>help           - Shows a list of commands and global options
-help [command] - Shows help for any command (`doing help now`)
-</code></pre>
-
-<p><strong>Adding entries:</strong></p>
+<p><em><strong>Adding entries:</strong></em></p>
 
 <pre><code>now, did      - Add an entry
 later         - Add an item to the Later section
@@ -532,21 +510,21 @@ again, resume - Duplicate the last entry as new entry (without @done tag)
 
 <p>You can finish the last unfinished task when starting a new one using <code>doing now</code> with the <code>-f</code> switch. It will look for the last task not marked <em>@done</em> and add the <em>@done</em> tag with the start time of the new task (either the current time or what you specified with <code>--back</code>).</p>
 
-<p><code>doing done</code> is used to add an entry that you've already completed. Like now, you can specify a section with <code>-s section_name</code>. You can also skip straight to Archive with <code>-a</code>.</p>
+<p><code>doing done</code> is used to add an entry that you've already completed. Like <code>now</code>, you can specify a section with <code>-s section_name</code>. You can also skip straight to Archive with <code>-a</code>.</p>
 
 <p><code>doing done</code> can also backdate entries using natural language with <code>--back 15m</code> or <code>--back "3/15 3pm"</code>. That will modify the starting timestamp of the entry. You can also use <code>--took 1h20m</code> or <code>--took 1:20</code> to set the finish date based on a "natural language" time interval. If <code>--took</code> is used without <code>--back</code>, then the start date is adjusted (<code>--took</code> interval is subtracted) so that the completion date is the current time.</p>
 
-<p>When used with <code>doing done</code>, <code>--back</code> and <code>--took</code> allow time intervals to be accurately counted when entering items after the fact. <code>--took</code> is also available for the <code>doing finish</code> command, but cannot be used in conjunction with <code>--back</code>. (In finish they both set the end date, and neither has priority. <code>--back</code> allows specific days/times, <code>--took</code> uses time intervals.)</p>
+<p>When used with <code>doing done</code>, <code>--back</code> and <code>--took</code> allow time intervals to be accurately counted when entering items after the fact. <code>--took</code> is also available for the <code>doing finish</code> command, but cannot be used in conjunction with <code>--back</code>. (In <code>finish</code> they both set the end date, and neither has priority. <code>--back</code> allows specific days/times, <code>--took</code> uses time intervals.)</p>
 
 <p>All of these commands accept a <code>-e</code> argument. This opens your command line editor (as defined in the environment variable <code>$EDITOR</code>). Add your entry, save the temp file, and close it. The new entry is added. Anything after the first line is included as a note on the entry.</p>
 
 <p><code>doing again</code> (or <code>doing resume</code>) will duplicate the last @done entry (most recently completed) with a new start date (and without the @done tag). To resume the last entry matching specific tags, use <code>--tag=TAG</code>. You can specify multiple tags by separating with a comma. Multiple tags are combined with 'AND' by default (all tags must exist on the entry to match), but you can use <code>--bool=</code> to set it to 'OR' or 'NOT'. By default the new entry will be added to the same section as the matching entry, but you can specify a section with <code>--in=SECTION</code>.</p>
 
-<p><code>doing meanwhile</code> is a special command for creating and finishing tasks that may have other entries come before they're complete. When you create an entry with <code>doing meanwhile [entry text]</code>, it will automatically complete the last <em>@meanwhile</em> item (dated <em>@done</em> tag) and add the <em>@meanwhile</em> tag to the new item. This allows time tracking on a more general basis, and still lets you keep track of the smaller things you do while working on an overarching project. The meanwhile command accepts <code>--back [time]</code> and will backdate the <em>@done</em> tag and start date of the new task at the same time. Running meanwhile with no arguments will simply complete the last <em>@meanwhile</em> task.</p>
+<p><code>doing meanwhile</code> is a special command for creating and finishing tasks that may have other entries come before they're complete. When you create an entry with <code>doing meanwhile [entry text]</code>, it will automatically complete the last <em>@meanwhile</em> item (dated <em>@done</em> tag) and add the <em>@meanwhile</em> tag to the new item. This allows time tracking on a more general basis, and still lets you keep track of the smaller things you do while working on an overarching project. The <code>meanwhile</code> command accepts <code>--back [time]</code> and will backdate the <em>@done</em> tag and start date of the new task at the same time. Running <code>meanwhile</code> with no arguments will simply complete the last <em>@meanwhile</em> task.</p>
 
 <p>See <code>doing help meanwhile</code> for more options.</p>
 
-<p><strong>Modifying entries:</strong></p>
+<p><em><strong>Modifying entries:</strong></em></p>
 
 <pre><code>finish      - Mark last X entries as @done
 cancel      - Mark last X entries as @done without completion date
@@ -554,15 +532,15 @@ tag         - Tag last entry
 note        - Add a note to the last entry
 </code></pre>
 
-<p><strong>Finishing</strong></p>
+<p><em><strong>Finishing</strong></em></p>
 
 <p><code>doing finish</code> by itself is the same as <code>doing done</code> by itself. It adds <em>@done(timestamp)</em> to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add <code>-a</code> to also archive the affected entries.</p>
 
 <p><code>doing finish</code> also provides an <code>--auto</code> flag, which you can use to set the end time of any entry to 1 minute before the start time of the next. Running a command such as <code>doing finish --auto 10</code> will go through the last 10 entries and sequentially update any without a <em>@done</em> tag with one set to the time just before the next entry in the list.</p>
 
-<p>As mentioned above, finish also accepts <code>--back "2 hours"</code> (sets the finish date from time now minus interval) or <code>--took 30m</code> (sets the finish date to time started plus interval) so you can accurately add times to completed tasks, even if you don't do it in the moment.</p>
+<p>As mentioned above, <code>finish</code> also accepts <code>--back "2 hours"</code> (sets the finish date from time now minus interval) or <code>--took 30m</code> (sets the finish date to time started plus interval) so you can accurately add times to completed tasks, even if you don't do it in the moment.</p>
 
-<p>Both done and finish accept an <code>--archive</code> switch which immediately moves the completed entries to the Archive section with a <code>@from(Project)</code> tag.</p>
+<p>Both <code>done</code> and <code>finish</code> accept an <code>--archive</code> switch which immediately moves the completed entries to the Archive section with a <code>@from(Project)</code> tag.</p>
 
 <p>You can finish the last entry containing a specific tag or combination of tags using the <code>--tag</code> flag. Multiple tags are separated by commas. By default tags are combined with an AND boolean, meaning the entry must contain all specified tags to be considered. For example, to finish the last entry containing both "@work" and "@project1", you would use:</p>
 
@@ -571,20 +549,20 @@ note        - Add a note to the last entry
 
 <p>You can change the boolean using <code>--bool=OR</code> (last entry containing any of the specified tags) or <code>--bool=NOT</code> (last entry containing none of the tags).</p>
 
-<p>You can also include a <code>--no-date</code> switch to add <code>@done</code> without a finish date, meaning no time is tracked for the task. <code>doing cancel</code> is an alias for this. Like finish, cancel accepts a count to act on the last X entries, as well as <code>--archive</code> and <code>--section</code> options. cancel also accepts the <code>--tag</code> and <code>--bool</code> flags for tag filtering.</p>
+<p>You can also include a <code>--no-date</code> switch to add <code>@done</code> without a finish date, meaning no time is tracked for the task. <code>doing cancel</code> is an alias for this. Like <code>finish</code>, <code>cancel</code> accepts a count to act on the last X entries, as well as <code>--archive</code> and <code>--section</code> options. <code>cancel</code> also accepts the <code>--tag</code> and <code>--bool</code> flags for tag filtering.</p>
 
-<p><strong>Tagging and Autotagging</strong></p>
+<p><em><strong>Tagging and Autotagging</strong></em></p>
 
-<p>tag adds one or more tags to the last entry, or specify a count with <code>-c X</code>. Tags are specified as basic arguments, separated by spaces. For example:</p>
+<p><code>tag</code> adds one or more tags to the last entry, or specify a count with <code>-c X</code>. Tags are specified as basic arguments, separated by spaces. For example:</p>
 
 <pre><code>doing tag -c 3 client cancelled
 </code></pre>
 
 <p>... will mark the last three entries as <em>@client @cancelled</em>. Add <code>-r</code> as a switch to remove the listed tags instead.</p>
 
-<p>You can optionally define keywords for common tasks and projects in your <code>.doingrc</code> file. When these keywords appear in an item title, they'll automatically be converted into @tags. The whitelist tags are exact (but case insensitive) matches.</p>
+<p>You can optionally define keywords for common tasks and projects in your <code>.doingrc</code> file. When these keywords appear in an item title, they'll automatically be converted into @tags. The <code>whitelist</code> tags are exact (but case insensitive) matches.</p>
 
-<p>You can also define synonyms, which will add a tag at the end based on keywords associated with it. When defining synonym keys, be sure to indent but <em>not</em> hyphenate the keys themselves, while hyphenating the list of synonyms at the same indent level as their key. See playing and writing in the example below for illustration. Follow standard YAML syntax.</p>
+<p>You can also define <code>synonyms</code>, which will add a tag at the end based on keywords associated with it. When defining <code>synonym</code> keys, be sure to indent but <em>not</em> hyphenate the keys themselves, while hyphenating the list of synonyms at the same indent level as their key. See <code>playing</code> and <code>writing</code> in the example below for illustration. Follow standard YAML syntax.</p>
 
 <p>To add autotagging, include a section like this in your <code>~/.doingrc</code> file:</p>
 
@@ -608,9 +586,9 @@ note        - Add a note to the last entry
     - publishing
 </code></pre>
 
-<p><strong>Tag transformation</strong></p>
+<p><em><strong>Tag transformation</strong></em></p>
 
-<p>You can include a transform section in the autotag config which contains pairs of regular expressions and replacement patterns separated by a colon. These will be used to look at existing tags in the text and generate additional tags from them. For example:</p>
+<p>You can include a <code>transform</code> section in the autotag config which contains pairs of regular expressions and replacement patterns separated by a colon. These will be used to look at existing tags in the text and generate additional tags from them. For example:</p>
 
 <p>  autotag:
     transform:
@@ -618,15 +596,15 @@ note        - Add a note to the last entry
 
 <p>This creates a search pattern looking for a string of word characters followed by a hyphen and one or more digits, e.g. <code>@projecttag-12</code>. Do not include the @ symbol in the pattern. The replacement (<code>$1</code>) indicates that the first matched group (in parenthesis) should be used to generate the new tag, resulting in <code>@projecttag</code> being added to the entry.</p>
 
-<p><strong>Annotating</strong></p>
+<p><em><strong>Annotating</strong></em></p>
 
-<p>note lets you append a note to the last entry. You can specify a section to grab the last entry from with <code>-s section_name</code>. <code>-e</code> will open your <code>$EDITOR</code> for typing the note, but you can also just include it on the command line after any flags. You can also pipe a note in on STDIN (<code>echo "fun stuff"|doing note</code>). If you don't use the <code>-r</code> switch, new notes will be appended to the existing notes, and using the <code>-e</code> switch will let you edit and add to an existing note. The <code>-r</code> switch will remove/replace a note; if there's new note text passed when using the <code>-r</code> switch, it will replace any existing note. If the <code>-r</code> switch is used alone, any existing note will be removed.</p>
+<p><code>note</code> lets you append a note to the last entry. You can specify a section to grab the last entry from with <code>-s section_name</code>. <code>-e</code> will open your <code>$EDITOR</code> for typing the note, but you can also just include it on the command line after any flags. You can also pipe a note in on STDIN (<code>echo "fun stuff"|doing note</code>). If you don't use the <code>-r</code> switch, new notes will be appended to the existing notes, and using the <code>-e</code> switch will let you edit and add to an existing note. The <code>-r</code> switch will remove/replace a note; if there's new note text passed when using the <code>-r</code> switch, it will replace any existing note. If the <code>-r</code> switch is used alone, any existing note will be removed.</p>
 
 <p>You can also add notes at the time of entry by using the <code>-n</code> or <code>--note</code> flag with <code>doing now</code>, <code>doing later</code>, or <code>doing done</code>. If you pass text to any of the creation commands which has multiple lines, everything after the first line break will become the note.</p>
 
-<p>If a string passed to now, later, or done has a parenthetical at the end, the parenthetical will be removed from the title and its contents added as a note. So <code>doing now Working on @project1 (Adding some unit tests)</code> would create an entry titled "Working on @project1" with a note "Adding some unit tests." This is the equivalent of <code>doing now Working on @project1 -n "Adding some unit tests"</code>.</p>
+<p>If a string passed to <code>now</code>, <code>later</code>, or <code>done</code> has a parenthetical at the end, the parenthetical will be removed from the title and its contents added as a note. So <code>doing now Working on @project1 (Adding some unit tests)</code> would create an entry titled "Working on @project1" with a note "Adding some unit tests." This is the equivalent of <code>doing now Working on @project1 -n "Adding some unit tests"</code>.</p>
 
-<p><strong>Displaying entries:</strong></p>
+<p><em><strong>Displaying entries:</strong></em></p>
 
 <pre><code>show      - List all entries
 recent    - List recent entries
@@ -638,55 +616,55 @@ grep      - Show entries matching text or pattern
 
 <p><code>doing show</code> on its own will list all entries in the "Currently" section. Add a section name as an argument to display that section instead. Use "all" to display all entries from all sections.</p>
 
-<p>You can filter the show command by tags. Simply list them after the section name (or all). The boolean defaults to ANY, meaning any entry that contains any of the listed tags will be shown. You can use <code>-b ALL</code> or <code>-b NONE</code> to change the filtering behavior: <code>doing show all done cancelled -b NONE</code> will show all tasks from all sections that do not have either <em>@done</em> or <em>@cancelled</em> tags.</p>
+<p>You can filter the <code>show</code> command by tags. Simply list them after the section name (or <code>all</code>). The boolean defaults to <code>ANY</code>, meaning any entry that contains any of the listed tags will be shown. You can use <code>-b ALL</code> or <code>-b NONE</code> to change the filtering behavior: <code>doing show all done cancelled -b NONE</code> will show all tasks from all sections that do not have either <em>@done</em> or <em>@cancelled</em> tags.</p>
 
 <p>Use <code>-c X</code> to limit the displayed results. Combine it with <code>-a newest</code> or <code>-a oldest</code> to choose which chronological end it trims from. You can also set the sort order of the output with <code>-s asc</code> or <code>-s desc</code>.</p>
 
-<p>The show command can also show the time spent on a task if it has a <em>@done(date)</em> tag with the <code>-t</code> option. This requires that you include a <code>%interval</code> token in template -> default in the config. You can also include <em>@start(date)</em> tags, which override the timestamp when calculating the intervals.</p>
+<p>The <code>show</code> command can also show the time spent on a task if it has a <em>@done(date)</em> tag with the <code>-t</code> option. This requires that you include a <code>%interval</code> token in template -> default in the config. You can also include <em>@start(date)</em> tags, which override the timestamp when calculating the intervals.</p>
 
 <p>If you have a use for it, you can use <code>-o csv</code> on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: <code>doing show all done -o csv &gt; ~/Desktop/done.csv</code>. You can do the same with <code>-o json</code>.</p>
 
 <p><code>doing yesterday</code> is great for stand-ups (thanks to <a href="https://github.com/sc68cal">Sean Collins</a> for that!). Note that you can show yesterday's activity from an alternate section by using the section name as an argument (e.g. <code>doing yesterday archive</code>).</p>
 
-<p><code>doing on</code> allows for full date ranges and filtering. <code>doing on saturday</code>, or <code>doing on one month to today</code> will give you ranges. You can use the same terms with the show command by adding the <code>-f</code> or <code>--from</code> flag. <code>doing show @done --from "monday to friday"</code> will give you all of your completed items for the last week (assuming it's the weekend).</p>
+<p><code>doing on</code> allows for full date ranges and filtering. <code>doing on saturday</code>, or <code>doing on one month to today</code> will give you ranges. You can use the same terms with the <code>show</code> command by adding the <code>-f</code> or <code>--from</code> flag. <code>doing show @done --from "monday to friday"</code> will give you all of your completed items for the last week (assuming it's the weekend).</p>
 
 <p>You can also show entries matching a search string with <code>doing grep</code> (synonym <code>doing search</code>). If you want to search with regular expressions or for an exact match, surround your search query with forward slashes, e.g. <code>doing search /project name/</code>. If you pass a search string without slashes, it's treated as a fuzzy search string, meaning matches can be found as long as the characters in the search string are in order and with no more than three other characters between each. By default searches are across all sections, but you can limit it to one with the <code>-s SECTION_NAME</code> flag. Searches can be displayed with the default template, or output as HTML, CSV, or JSON.</p>
 
-<p><strong>Modifying the last entry</strong></p>
+<p><em><strong>Modifying the last entry</strong></em></p>
 
 <p>If you want to make a change to the last entry added, use <code>doing last -e</code>. The <code>-e</code> flag opens the last entry (including note) in your editor, and when you close your editor, your doing file will be updated with any changes you made to the entry.</p>
 
 <p>You can choose the last entry in a specific section by including the <code>-s</code> flag, so <code>doing last -s Later -e</code> would edit the most recent entry in the Later section.</p>
 
-<p>You can also use text search or a tag filter to get an entry earlier than the most recent one. A tag search with <code>doing last --tag=project1 -e</code> will edit the last entry tagged <code>@project1</code>. Multiple tags can be combined with commas, and you can use <code>--bool</code> to specify whether the search is AND (matches all tags given), OR (matches any tag given), or NOT (matches none of the tags).</p>
+<p>You can also use text search or a tag filter to get an entry earlier than the most recent one. A tag search with <code>doing last --tag=project1 -e</code> will edit the last entry tagged <code>@project1</code>. Multiple tags can be combined with commas, and you can use <code>--bool</code> to specify whether the search is <code>AND</code> (matches all tags given), <code>OR</code> (matches any tag given), or <code>NOT</code> (matches none of the tags).</p>
 
-<p>You can edit the last entry that matches a search string with <code>--search=QUERY</code>. QUERY can either be a raw string, or you can surround it with slashes to search by regex (<code>doing last --search="/project./" -e</code>). If the string is raw text, fuzzy matching will be used, so the characters must be in order but can be separated by up to three other characters.</p>
+<p>You can edit the last entry that matches a search string with <code>--search=QUERY</code>. <code>QUERY</code> can either be a raw string, or you can surround it with slashes to search by regex (<code>doing last --search="/project./" -e</code>). If the string is raw text, fuzzy matching will be used, so the characters must be in order but can be separated by up to three other characters.</p>
 
 <p>Both <code>--tag</code> and <code>--search</code> can be constrained to a single section with <code>-s SECTION</code>.</p>
 
-<p><strong>Views</strong></p>
+<p><em><strong>Views</strong></em></p>
 
 <pre><code>view     - Display a user-created view
 views    - List available custom views
 </code></pre>
 
-<p>Display any of the custom views you make in <code>~/.doingrc</code> with the view command. Use <code>doing views</code> to get a list of available views. Any time a section or view is specified on the command line, fuzzy matching will be used to find the closest match. Thus, lat will match Later, etc..</p>
+<p>Display any of the custom views you make in <code>~/.doingrc</code> with the <code>view</code> command. Use <code>doing views</code> to get a list of available views. Any time a section or view is specified on the command line, fuzzy matching will be used to find the closest match. Thus, <code>lat</code> will match <code>Later</code>, etc..</p>
 
-<p><strong>Sections</strong></p>
+<p><em><strong>Sections</strong></em></p>
 
 <pre><code>sections    - List sections
 choose      - Select a section to display from a menu
 add_section - Add a new section to the "doing" file
 </code></pre>
 
-<p><strong>UTILITIES</strong></p>
+<p><em><strong>Utilities</strong></em></p>
 
 <pre><code>archive  - Move entries between sections
 open     - Open the "doing" file in an editor (OS X)
 config   - Edit the default configuration
 </code></pre>
 
-<p><strong>ARCHIVING</strong></p>
+<p><em><strong>Archiving</strong></em></p>
 
 <pre><code>COMMAND OPTIONS
     -k, --keep=arg - Count to keep (ignored if archiving by tag) (default: 5)
@@ -694,24 +672,22 @@ config   - Edit the default configuration
     -b, --bool=arg - Tag boolean (default: AND)
 </code></pre>
 
-<p>The archive command will move entries from one section (default: Currently) to another section (default: Archive).</p>
+<p>The <code>archive</code> command will move entries from one section (default: <code>Currently</code>) to another section (default: <code>Archive</code>).</p>
 
-<p><code>doing archive</code> on its own will move all but the most recent 5 entries from currently into the archive.</p>
+<p><code>doing archive</code> on its own will move all but the most recent 5 entries from <code>currently</code> into the archive.</p>
 
-<p><code>doing archive other_section</code> will archive from other_section to Archive.</p>
+<p><code>doing archive other_section</code> will archive from <code>other_section</code> to <code>Archive</code>.</p>
 
-<p><code>doing archive other_section -t alternate</code> will move from other_section to alternate. You can use the <code>-k</code> flag on any of these to change the number of items to leave behind. To move everything, use <code>-k 0</code>.</p>
+<p><code>doing archive other_section -t alternate</code> will move from <code>other_section</code> to <code>alternate</code>. You can use the <code>-k</code> flag on any of these to change the number of items to leave behind. To move everything, use <code>-k 0</code>.</p>
 
 <p>You can also use tags to archive. You define the section first, and anything following it is treated as tags. If your first argument starts with <code>@</code>, it will assume all sections and assume any following arguments are tags.</p>
 
-<p>By default, tag archiving uses an AND boolean, meaning all the tags listed must exist on the entry for it to be moved. You can change this behavior with <code>-b OR</code> or <code>-b NONE</code> (ALL and ANY also work).</p>
+<p>By default, tag archiving uses an <code>AND</code> boolean, meaning all the tags listed must exist on the entry for it to be moved. You can change this behavior with <code>-b OR</code> or <code>-b NONE</code> (<code>ALL</code> and <code>ANY</code> also work).</p>
 
 <p>Example: Archive all Currently items for <em>@client</em> that are marked <em>@done</em></p>
 
 <pre><code>doing archive @client @done
 </code></pre>
-
-<hr />
 
 <h2 id="EXTRAS">EXTRAS</h2>
 
