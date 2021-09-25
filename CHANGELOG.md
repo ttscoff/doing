@@ -1,3 +1,9 @@
+### 1.0.79
+
+- Gem missing fzf
+- Wildcard tag removal using `doing select -t "tag*" -r`
+- fzf menu display polish
+
 ### 1.0.78
 
 - If no action is specified with select command, an interactive menu is
