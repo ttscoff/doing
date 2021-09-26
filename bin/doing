@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -W1
 # frozen_string_literal: true
 
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
@@ -300,6 +300,9 @@ command :select do |c|
 
   c.desc 'Add flag to selected item(s)'
   c.switch %i[flag], negatable: false, default_value: false
+
+  c.desc 'Perform action without confirmation'
+  c.switch %i[force], negatable: false, default_value: false
 
   c.desc 'Save selected entries to file using --output format'
   c.arg_name 'FILE'
@@ -1306,7 +1309,8 @@ desc 'Select a section to display from a menu'
 command :choose do |c|
   c.action do |_global_options, _options, _args|
     section = wwid.choose_section
-    puts wwid.list_section({ section: section.cap_first, count: 0 })
+
+    puts wwid.list_section({ section: section.cap_first, count: 0 }) if section
   end
 end
 

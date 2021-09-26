@@ -1,6 +1,6 @@
 == doing - A CLI for a What Was I Doing system
 
-v1.0.60
+v1.0.81
 
 === Global Options
 === --config_file arg
@@ -57,7 +57,7 @@ Repeat last entry as new entry
 Boolean used to combine multiple tags
 
 [Default Value] AND
-[Must Match] (?i-mx:^(and|or|not)$)
+[Must Match] (?i-mx:and|all|any|or|not|none)
 
 
 ===== --in SECTION_NAME
@@ -106,15 +106,22 @@ Move entries between sections
 Tag boolean (AND|OR|NOT)
 
 [Default Value] AND
-[Must Match] (?i-mx:(and|or|not))
+[Must Match] (?i-mx:and|all|any|or|not|none)
 
 
-===== -k|--keep COUNT
+===== -k|--keep X
 
-Count to keep (ignored if archiving by tag)
+How many items to keep (ignored if archiving by tag or search)
 
-[Default Value] 5
+[Default Value] None
 [Must Match] (?-mix:^\d+$)
+
+
+===== --search QUERY
+
+Search filter
+
+[Default Value] None
 
 
 ===== -t|--to SECTION_NAME
@@ -131,6 +138,11 @@ Tag filter, combine multiple tags with a comma. Added for compatibility with oth
 [Default Value] None
 
 
+===== --[no-]label
+Label moved items with @from(SECTION_NAME)
+
+
+
 ==== Command: <tt>cancel  COUNT</tt>
 End last X entries with no time tracked
 
@@ -141,7 +153,7 @@ Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doin
 Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 [Default Value] AND
-[Must Match] (?i-mx:^(and|or|not)$)
+[Must Match] (?i-mx:and|all|any|or|not|none)
 
 
 ===== -s|--section NAME
@@ -160,6 +172,11 @@ Cancel the last X entries containing TAG. Separate multiple tags with comma (--t
 
 ===== -a|--archive
 Archive entries
+
+
+
+===== -u|--unfinished
+Cancel last entry (or entries) not already marked @done
 
 
 
@@ -275,7 +292,7 @@ Backdate completed date to date string [4pm|20m|2h|yesterday noon]
 Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 [Default Value] AND
-[Must Match] (?i-mx:^(and|or|not)$)
+[Must Match] (?i-mx:and|all|any|or|not|none)
 
 
 ===== -s|--section NAME
@@ -324,6 +341,11 @@ Include date
 
 
 
+===== -u|--unfinished
+Finish last entry (or entries) not already marked @done
+
+
+
 ==== Command: <tt>grep|search  SEARCH_PATTERN</tt>
 Search for entries
 
@@ -336,7 +358,7 @@ To search with regular expressions, single quote the string and surround with sl
 Output to export format (csv|html|json|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
 
 
 ===== -s|--section NAME
@@ -351,7 +373,7 @@ Section
 Sort tags by (name|time)
 
 [Default Value] name
-[Must Match] (?i-mx:^(name|time)$)
+[Must Match] (?i-mx:^(?:name|time)$)
 
 
 ===== --only_timed
@@ -364,7 +386,7 @@ Show time intervals on @done tasks
 
 
 
-===== --[no-]totals
+===== --totals
 Show intervals with totals at the end of output
 
 
@@ -379,6 +401,44 @@ List commands one per line, to assist with shell completion
 
 
 
+==== Command: <tt>import  PATH</tt>
+Import entries from an external source
+
+Imports entries from other sources. Currently only handles JSON reports exported from Timing.app.
+===== Options
+===== --prefix PREFIX
+
+Prefix entries with
+
+[Default Value] None
+
+
+===== -s|--section NAME
+
+Target section
+
+[Default Value] Currently
+
+
+===== --tag TAGS
+
+Tag all imported entries
+
+[Default Value] None
+
+
+===== --type TYPE
+
+Import type
+
+[Default Value] timing
+
+
+===== --[no-]overlap
+Allow entries that overlap existing times
+
+
+
 ==== Command: <tt>last </tt>
 Show the last entry, optionally edit
 
@@ -389,7 +449,7 @@ Show the last entry, optionally edit
 Tag boolean
 
 [Default Value] AND
-[Must Match] (?i-mx:(and|or|not))
+[Must Match] (?i-mx:and|all|any|or|not|none)
 
 
 ===== -s|--section NAME
@@ -463,6 +523,11 @@ Section
 
 ===== -r|--remove
 Remove mark
+
+
+
+===== -u|--unfinished
+Mark last entry not marked @done
 
 
 
@@ -574,7 +639,7 @@ it will create a range.
 Output to export format (csv|html|json|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
 
 
 ===== -s|--section NAME
@@ -589,7 +654,7 @@ Section
 Sort tags by (name|time)
 
 [Default Value] name
-[Must Match] (?i-mx:^(name|time)$)
+[Must Match] (?i-mx:^(?:name|time)$)
 
 
 ===== -t|--[no-]times
@@ -597,7 +662,7 @@ Show time intervals on @done tasks
 
 
 
-===== --[no-]totals
+===== --totals
 Show time totals at the end of output
 
 
@@ -643,7 +708,7 @@ Section
 Sort tags by (name|time)
 
 [Default Value] name
-[Must Match] (?i-mx:^(name|time)$)
+[Must Match] (?i-mx:^(?:name|time)$)
 
 
 ===== -t|--[no-]times
@@ -651,7 +716,7 @@ Show time intervals on @done tasks
 
 
 
-===== --[no-]totals
+===== --totals
 Show intervals with totals at the end of output
 
 
@@ -663,6 +728,96 @@ List sections
 ===== Options
 ===== -c|--[no-]column
 List in single column
+
+
+
+==== Command: <tt>select </tt>
+Display an interactive menu to perform operations (requires fzf)
+
+List all entries and select with typeahead fuzzy matching.
+
+Multiple selections are allowed, hit tab to add the highlighted entry to the selection. Return processes the selected entries.
+===== Options
+===== -m|--move SECTION
+
+Move selected items to section
+
+[Default Value] None
+
+
+===== -o|--output FORMAT
+
+Output format for export (doing|taskpaper|csv|html|json|template|timeline)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:doing|taskpaper|html|csv|json|template|timeline)$)
+
+
+===== -q|--query QUERY
+
+Initial search query for filtering
+
+[Default Value] None
+
+
+===== -s|--section SECTION
+
+Select from a specific section
+
+[Default Value] None
+
+
+===== --save_to FILE
+
+Save selected entries to file using --output format
+
+[Default Value] None
+
+
+===== -t|--tag TAG
+
+Tag selected entries
+
+[Default Value] None
+
+
+===== -a|--archive
+Archive selected items
+
+
+
+===== -c|--cancel
+Cancel selected items (add @done without timestamp)
+
+
+
+===== -d|--delete
+Delete selected items
+
+
+
+===== -e|--editor
+Edit selected item(s)
+
+
+
+===== -f|--finish
+Add @done with current time to selected item(s)
+
+
+
+===== --flag
+Add flag to selected item(s)
+
+
+
+===== --force
+Perform action without confirmation
+
+
+
+===== -r|--remove
+Reverse -c, -f, --flag, and -t (remove instead of adding)
 
 
 
@@ -681,10 +836,10 @@ Age (oldest/newest)
 
 ===== -b|--bool BOOLEAN
 
-Tag boolean (AND,OR,NONE)
+Tag boolean (AND,OR,NOT)
 
 [Default Value] OR
-[Must Match] (?i-mx:^(and|or|not)$)
+[Must Match] (?i-mx:and|all|any|or|not|none)
 
 
 ===== -c|--count MAX
@@ -708,7 +863,7 @@ Date range to show, or a single day to filter date on.
 Output to export format (csv|html|json|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
 
 
 ===== -s|--sort ORDER
@@ -716,7 +871,7 @@ Output to export format (csv|html|json|template|timeline)
 Sort order (asc/desc)
 
 [Default Value] ASC
-[Must Match] (?i-mx:^(a|d))
+[Must Match] (?i-mx:^[ad].*)
 
 
 ===== --tag TAG
@@ -731,7 +886,7 @@ Tag filter, combine multiple tags with a comma. Added for compatibility with oth
 Sort tags by (name|time)
 
 [Default Value] name
-[Must Match] (?i-mx:^(name|time))
+[Must Match] (?i-mx:^(?:name|time))
 
 
 ===== --only_timed
@@ -744,8 +899,47 @@ Show time intervals on @done tasks
 
 
 
-===== --[no-]totals
+===== --totals
 Show intervals with totals at the end of output
+
+
+
+==== Command: <tt>since  DATE_STRING</tt>
+List entries since a date
+
+Date argument can be natural language and are always interpreted as being in the past. "thursday" would be interpreted as "last thursday,"
+and "2d" would be interpreted as "two days ago."
+===== Options
+===== -o|--output FORMAT
+
+Output to export format (csv|html|json|template|timeline)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
+
+
+===== -s|--section NAME
+
+Section
+
+[Default Value] All
+
+
+===== --tag_sort KEY
+
+Sort tags by (name|time)
+
+[Default Value] name
+[Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== -t|--[no-]times
+Show time intervals on @done tasks
+
+
+
+===== --totals
+Show time totals at the end of output
 
 
 
@@ -754,6 +948,14 @@ Add tag(s) to last entry
 
 
 ===== Options
+===== --bool BOOLEAN
+
+Boolean (AND|OR|NOT) with which to combine multiple tag filters
+
+[Default Value] AND
+[Must Match] (?i-mx:and|all|any|or|not|none)
+
+
 ===== -c|--count COUNT
 
 How many recent entries to tag (0 for all)
@@ -768,6 +970,21 @@ Section
 [Default Value] All
 
 
+===== --search QUERY
+
+Tag entries matching search filter, surround with slashes for regex (e.g. "/query.*/")
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Tag the last X entries containing TAG.
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool
+
+[Default Value] None
+
+
 ===== -a|--autotag
 Autotag entries based on autotag configuration in ~/.doingrc
 
@@ -778,8 +995,18 @@ Include current date/time with tag
 
 
 
+===== --force
+Don't ask permission to tag all entries when count is 0
+
+
+
 ===== -r|--remove
 Remove given tag(s)
+
+
+
+===== -u|--unfinished
+Tag last entry (or entries) not marked @done
 
 
 
@@ -800,7 +1027,7 @@ List entries from today
 Output to export format (csv|html|json|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
 
 
 ===== -s|--section NAME
@@ -815,7 +1042,7 @@ Specify a section
 Sort tags by (name|time)
 
 [Default Value] name
-[Must Match] (?i-mx:^(name|time)$)
+[Must Match] (?i-mx:^(?:name|time)$)
 
 
 ===== -t|--[no-]times
@@ -823,7 +1050,7 @@ Show time intervals on @done tasks
 
 
 
-===== --[no-]totals
+===== --totals
 Show time totals at the end of output
 
 
@@ -858,7 +1085,7 @@ Count to display (override view settings)
 Output to export format (csv|html|json|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
 
 
 ===== -s|--section NAME
@@ -873,7 +1100,7 @@ Section (override view settings)
 Sort tags by (name|time)
 
 [Default Value] name
-[Must Match] (?i-mx:^(name|time)$)
+[Must Match] (?i-mx:^(?:name|time)$)
 
 
 ===== --[no-]color
@@ -881,7 +1108,7 @@ Include colors in output
 
 
 
-===== --[no-]only_timed
+===== --only_timed
 Only show items with recorded time intervals
 
 
@@ -891,7 +1118,7 @@ Show time intervals on @done tasks
 
 
 
-===== --[no-]totals
+===== --totals
 Show intervals with totals at the end of output
 
 
@@ -916,7 +1143,7 @@ List entries from yesterday
 Output to export format (csv|html|json|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
 
 
 ===== -s|--section NAME
@@ -931,7 +1158,7 @@ Specify a section
 Sort tags by (name|time)
 
 [Default Value] name
-[Must Match] (?i-mx:^(name|time)$)
+[Must Match] (?i-mx:^(?:name|time)$)
 
 
 ===== -t|--[no-]times
@@ -939,7 +1166,7 @@ Show time intervals on @done tasks
 
 
 
-===== --[no-]totals
+===== --totals
 Show time totals at the end of output
 
 

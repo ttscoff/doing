@@ -757,7 +757,7 @@ class WWID
       all_items.concat(@content[section]['items'].dup) if @content.key?(section)
     end
 
-    if opt[:tag] && opt[:tag].length.positive?
+    if opt[:tag]&.length
       all_items.select! { |item| item.has_tags?(opt[:tag], opt[:tag_bool]) }
     elsif opt[:search]&.length
       all_items.select! { |item| item.matches_search?(opt[:search]) }
@@ -771,9 +771,14 @@ class WWID
   ##
   ## @return     (String) The selected option
   ##
-  def choose_from(options, prompt)
+  def choose_from(options, prompt: 'Make a selection: ', multiple: false, fzf_args: [])
     fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
-    res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} --prompt "#{prompt}"`
+    fzf_args << '-1'
+    fzf_args << %(--prompt "#{prompt}")
+    fzf_args << '--multi' if multiple
+    header = "esc: cancel,#{multiple ? ' tab: multi-select, ctrl-a: select all,' : ''} return: confirm"
+    fzf_args << %(--header "#{header}")
+    res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
     return false if res.strip.size.zero?
 
     res
@@ -807,7 +812,7 @@ class WWID
         ') ',
         item['date'],
         ' | ',
-        item['title'],
+        item['title']
       ]
       if opt[:section] =~ /^all/i
         out.concat([
@@ -818,8 +823,15 @@ class WWID
       end
       out.join('')
     end
-
-    res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} --header="Arrows to navigate, tab to mark for selection, enter to perform action" --prompt="Select entries to act on> " -m --bind ctrl-a:select-all -q "#{opt[:query]}"`
+    fzf_args = [
+      %(--header="Arrows: navigate, tab: mark for selection, ctrl-a: select all, enter: commit"),
+      %(--prompt="Select entries to act on > "),
+      '-1',
+      '-m',
+      '--bind ctrl-a:select-all',
+      %(-q "#{opt[:query]}")
+    ]
+    res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
     selected = []
     res.split(/\n/).each do |item|
       idx = item.match(/^(\d+)\)/)[1].to_i
@@ -841,62 +853,71 @@ class WWID
     end
 
     unless has_action
-      action = choose_from(
-                           [
-                            'add tag',
-                            'remove tag',
-                            'archive',
-                            'cancel',
-                            'delete',
-                            'edit',
-                            'finish',
-                            'flag',
-                            'move',
-                            'output format'
-                          ],
-                            'What do you want to do with the selected items? > ')
-      case action
-      when /(add|remove) tag/
-        print 'Enter tag: '
-        tag = STDIN.gets
-        return if tag =~ /^ *$/
-        opt[:tag] = tag.strip
-        opt[:remove] = true if action =~ /remove tag/
-      when /output format/
-        output_format = choose_from(%w[doing taskpaper json timeline html csv], 'Which output format? > ')
-        return if tag =~ /^ *$/
-        opt[:output] = output_format.strip
-        res = yn('Save to file?', default_response: 'n')
-        if res
-          print 'File path/name: '
-          filename = STDIN.gets.strip
-          return if filename.empty?
-          opt[:save_to] = filename
+      choice = choose_from([
+                             'add tag',
+                             'remove tag',
+                             'cancel',
+                             'delete',
+                             'finish',
+                             'flag',
+                             'archive',
+                             'move',
+                             'edit',
+                             'output formatted'
+                           ],
+                           prompt: 'What do you want to do with the selected items? > ',
+                           multiple: true,
+                           fzf_args: ['--height=60%', '--tac', '--no-sort'])
+      return unless choice
+
+      to_do = choice.strip.split(/\n/)
+      to_do.each do |action|
+        case action
+        when /(add|remove) tag/
+          type = action =~ /^add/ ? 'add' : 'remove'
+          if opt[:tag]
+            warn "'add tag' and 'remove tag' can not be used together"
+            Process.exit 1
+          end
+          print "#{colors['yellow']}Tag to #{type}: #{colors['reset']}"
+          tag = STDIN.gets
+          return if tag =~ /^ *$/
+          opt[:tag] = tag.strip.sub(/^@/, '')
+          opt[:remove] = true if type == 'remove'
+        when /output formatted/
+          output_format = choose_from(%w[doing taskpaper json timeline html csv].sort, prompt: 'Which output format? > ', fzf_args: ['--height=60%', '--tac', '--no-sort'])
+          return if tag =~ /^ *$/
+          opt[:output] = output_format.strip
+          res = opt[:force] ? false : yn('Save to file?', default_response: 'n')
+          if res
+            print "#{colors['yellow']}File path/name: #{colors['reset']}"
+            filename = STDIN.gets.strip
+            return if filename.empty?
+            opt[:save_to] = filename
+          end
+        when /archive/
+          opt[:archive] = true
+        when /delete/
+          opt[:delete] = true
+        when /edit/
+          opt[:editor] = true
+        when /finish/
+          opt[:finish] = true
+        when /cancel/
+          opt[:cancel] = true
+        when /move/
+          section = choose_section.strip
+          opt[:move] = section.strip unless section =~ /^ *$/
+        when /flag/
+          opt[:flag] = true
         end
-      when /archive/
-        opt[:archive] = true
-      when /delete/
-        opt[:delete] = true
-      when /edit/
-        opt[:editor] = true
-      when /finish/
-        opt[:finish] = true
-      when /cancel/
-        opt[:cancel] = true
-      when /move/
-        section = choose_section.strip
-        return if section =~ /^ *$/
-        opt[:move] = section.strip
-      when /flag/
-        opt[:flag] = true
       end
     end
 
-
     if opt[:delete]
-      res = yn("Delete #{selected.size} items?", default_response: 'y')
+      res = opt[:force] ? true : yn("Delete #{selected.size} items?", default_response: 'y')
       if res
-        selected.each {|item| delete_item(item) }
+        selected.each { |item| delete_item(item) }
         write(@doing_file)
       end
       return
@@ -990,13 +1011,16 @@ class WWID
         item
       end
 
-      @content = {'Export' => {'original' => 'Export:', 'items' => selected}}
-      options = {section: 'Export'}
+      @content = { 'Export' => { 'original' => 'Export:', 'items' => selected } }
+      options = { section: 'Export' }
 
-      if opt[:output] !~ /(doing|taskpaper)/
-        options[:output] = opt[:output]
-      else
+      case opt[:output]
+      when /doing/
         options[:template] = '- %date | %title%note'
+      when /taskpaper/
+        options[:template] = '- %title @date(%date)%note'
+      else
+        options[:output] = opt[:output]
       end
 
       output = list_section(options)
@@ -1078,7 +1102,6 @@ class WWID
         count = (opt[:count]).zero? ? items.length : opt[:count]
         items.map! do |item|
           break if idx == count
-
           finished = opt[:unfinished] && item.has_tags?('done', :and)
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.has_tags?(opt[:tag], opt[:tag_bool])
           search_match = opt[:search].nil? || opt[:search].empty? ? true : item.matches_search?(opt[:search])
@@ -1503,7 +1526,8 @@ class WWID
   ## @return     (String) The selected section name
   ##
   def choose_section
-    choose_from(sections, 'Choose a section > ').strip
+    choice = choose_from(sections.sort, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
+    choice ? choice.strip : choice
   end
 
   ##
@@ -1521,7 +1545,8 @@ class WWID
   ## @return     (String) The selected view name
   ##
   def choose_view
-    choose_from(views, 'Choose a view > ').strip
+    choice = choose_from(views.sort, prompt: 'Choose a view > ', fzf_args: ['--height=60%'])
+    choice ? choice.strip : choice
   end
 
   ##

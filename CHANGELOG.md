@@ -1,3 +1,8 @@
+### 1.0.81
+
+- fzf menu improvements
+- allow multiple selections `doing select` action menu
+
 ### 1.0.80
 
 - Convert all menus to fzf screens
