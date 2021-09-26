@@ -1,3 +1,7 @@
+### 1.0.82
+
+- Bugfixes
+
 ### 1.0.81
 
 - fzf menu improvements
