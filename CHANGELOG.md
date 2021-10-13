@@ -1,3 +1,8 @@
+
+### 1.0.83
+
+- Fixes for `doing view` options, additional config keys for views
+
 ### 1.0.82
 
 - Bugfixes
