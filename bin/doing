@@ -1374,7 +1374,7 @@ command :view do |c|
 
   c.desc 'Tag sort direction (asc|desc)'
   c.arg_name 'DIRECTION'
-  c.flag [:tag_order], must_match: /^(?:[a|d])/i, default_value: 'asc'
+  c.flag [:tag_order], must_match: /^(?:a(?:sc)?|d(?:esc)?)$/i
 
   c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -1430,19 +1430,26 @@ command :view do |c|
                else
                  view.key?('totals') ? view['totals'] : false
                end
+
       options[:t] = true if totals
       options[:output]&.downcase!
-      options[:sort_tags] = if (options[:tag_sort] =~ /^n/i || view.key?('tag_sort') && view['tag_sort'] =~ /^n/i)
-                              true
+
+      options[:sort_tags] = if options[:tag_sort]
+                              options[:tag_sort] =~ /^n/i ? true : false
+                            elsif view.key?('tag_sort')
+                              view['tag_sort'] =~ /^n/i ? true : false
                             else
                               false
                             end
-      options[:tag_order] = if (options[:tag_order] =~ /^d/i || view.key?('tag_order') && view['tag_order'] =~ /^d/i)
-                              'desc'
-                            else
-                              'asc'
-                            end
 
+      tag_order = if options[:tag_order]
+                    options[:tag_order] =~ /^d/i ? 'desc' : 'asc'
+                  elsif view.key?('tag_order')
+                    view['tag_order'] =~ /^d/i ? 'desc' : 'asc'
+                  else
+                    'asc'
+                  end
+      warn "TAG ORDER: #{options[:tag_order]}"
       opts = {
         count: count,
         format: format,
@@ -1453,7 +1460,7 @@ command :view do |c|
         section: section,
         sort_tags: options[:sort_tags],
         tag_filter: tag_filter,
-        tag_order: options[:tag_order],
+        tag_order: tag_order,
         tags_color: tags_color,
         template: template,
         times: options[:t],

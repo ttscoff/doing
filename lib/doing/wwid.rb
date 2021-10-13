@@ -84,6 +84,7 @@ class WWID
   ##
   def configure(opt = {})
     @timers = {}
+    @recorded_items = []
     opt[:ignore_local] ||= false
 
     @config_file ||= File.join(@user_home, @default_config_file)
@@ -1569,21 +1570,21 @@ class WWID
   def list_section(opt = {})
     opt[:count] ||= 0
     count = opt[:count] - 1
-    opt[:section] ||= nil
-    opt[:format] ||= @default_date_format
-    opt[:template] ||= @default_template
     opt[:age] ||= 'newest'
-    opt[:order] ||= 'desc'
-    opt[:today] ||= false
-    opt[:tag_filter] ||= false
-    opt[:tags_color] ||= false
-    opt[:times] ||= false
-    opt[:totals] ||= false
-    opt[:sort_tags] ||= false
-    opt[:tag_order] ||= 'asc'
-    opt[:search] ||= false
-    opt[:only_timed] ||= false
     opt[:date_filter] ||= []
+    opt[:format] ||= @default_date_format
+    opt[:only_timed] ||= false
+    opt[:order] ||= 'desc'
+    opt[:search] ||= false
+    opt[:section] ||= nil
+    opt[:sort_tags] ||= false
+    opt[:tag_filter] ||= false
+    opt[:tag_order] ||= 'asc'
+    opt[:tags_color] ||= false
+    opt[:template] ||= @default_template
+    opt[:times] ||= false
+    opt[:today] ||= false
+    opt[:totals] ||= false
 
     # opt[:highlight] ||= true
     section = ''
@@ -1861,7 +1862,7 @@ class WWID
 
         output.sub!(/%date/, item['date'].strftime(opt[:format]))
 
-        interval = get_interval(item) if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+        interval = get_interval(item, record: true) if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
         interval ||= ''
         output.sub!(/%interval/, interval)
 
@@ -1911,6 +1912,7 @@ class WWID
 
         out += "#{output}\n"
       end
+
       out += tag_times(format: 'text', sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) if opt[:totals]
     end
     out
@@ -2337,6 +2339,7 @@ EOS
 
     if @interval_cache.keys.include? item['title']
       seconds = @interval_cache[item['title']]
+      record_tag_times(item, seconds) if record
       return seconds > 0 ? '%02d:%02d:%02d' % fmt_time(seconds) : false
     end
 
@@ -2355,14 +2358,7 @@ EOS
     seconds = (done - start).to_i
 
     if record
-      item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
-        k = m[0] == 'done' ? 'All' : m[0].downcase
-        if @timers.has_key?(k)
-          @timers[k] += seconds
-        else
-          @timers[k] = seconds
-        end
-      end
+      record_tag_times(item, seconds)
     end
 
     @interval_cache[item['title']] = seconds
@@ -2370,6 +2366,25 @@ EOS
     return seconds > 0 ? seconds : false unless formatted
 
     seconds > 0 ? '%02d:%02d:%02d' % fmt_time(seconds) : false
+  end
+
+  ##
+  ## @brief      Record times for item tags
+  ##
+  ## @param      item  The item
+  ##
+  def record_tag_times(item, seconds)
+    return if @recorded_items.include?(item)
+
+    item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
+      k = m[0] == 'done' ? 'All' : m[0].downcase
+      if @timers.key?(k)
+        @timers[k] += seconds
+      else
+        @timers[k] = seconds
+      end
+      @recorded_items.push(item)
+    end
   end
 
   ##

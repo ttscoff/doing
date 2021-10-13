@@ -19,6 +19,7 @@ class DoingViewTest < Test::Unit::TestCase
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
+    @import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
   end
 
   def teardown
@@ -27,7 +28,7 @@ class DoingViewTest < Test::Unit::TestCase
 
   def test_views
     views = doing('views').strip.split(/\s+/).delete_if {|v| v.strip == ''}
-    assert_equal(3, views.length, 'Should have 3 views as defined in test configuration')
+    assert_equal(5, views.length, 'Should have 3 views as defined in test configuration')
   end
 
   def test_view
@@ -36,7 +37,65 @@ class DoingViewTest < Test::Unit::TestCase
     assert_count_entries(1, entries, '1 entry should be listed containing DOING TEST (added by the view)')
   end
 
+  def test_view_from_config
+    doing('import', @import_file)
+    doing('done', '--no-date', 'Adding untimed entry')
+    result = doing('--stdout', 'view', 'test2')
+    assert_count_entries(6, result, '6 entries should be shown')
+    assert_matches([
+                   [/Tag Totals/, 'Should contain tag totals', false],
+                   [/untimed entry/, 'Should not show untimed entry', true],
+                   [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
+                   ], result)
+
+    result = doing('--stdout', 'view', 'test3')
+    assert_count_entries(6, result, '6 entries should be shown')
+    assert_matches([
+                   [/Tag Totals/, 'Should not contain tag totals', true],
+                   [/untimed entry/, 'Should show untimed entry', false],
+                   [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
+                   ], result)
+  end
+
+  def test_view_flag_override
+    doing('import', @import_file)
+    doing('done', '--no-date', 'Adding untimed entry')
+    result = doing('--stdout', 'view', '-c', '4', '--totals', '--only_timed', 'test3')
+    assert_count_entries(4, result, '4 entries should be shown')
+    assert_matches([
+                   [/Tag Totals/, 'Should contain tag totals', false],
+                   [/untimed entry/, 'Should not show untimed entry', true],
+                   [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
+                   ], result)
+
+    result = doing('--stdout', 'view', '--no-times', 'test3')
+    assert_matches([
+                   [/\d\d:\d\d:\d\d/, 'Entries should not contain intervals', true]
+                   ], result)
+  end
+
+  def test_view_tag_sort
+    doing('import', @import_file)
+    result = doing('--stdout', 'view', 'test2')
+    first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
+    assert_match(/development/, first_tag[1], 'First tag should be development')
+
+    result = doing('--stdout', 'view', '--tag_sort=name', '--tag_order=asc', 'test2')
+    first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
+    assert_match(/bunch/, first_tag[1], 'First tag should be bunch')
+  end
+
   private
+
+  def assert_matches(matches, shown)
+    matches.each do |regexp, msg, opt_refute|
+      if opt_refute
+        assert_no_match(regexp, shown, msg)
+      else
+        assert_match(regexp, shown, msg)
+      end
+    end
+  end
 
   def assert_count_entries(count, shown, message = 'Should be X entries shown')
     assert_equal(count, shown.uncolor.strip.scan(ENTRY_REGEX).count, message)

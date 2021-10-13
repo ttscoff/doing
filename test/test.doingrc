@@ -31,6 +31,24 @@ views:
   test:
     template: "%date | DOING TEST: %title%note"
     section: All
+  test2:
+    template: "%date | DOING TEST: %title%note %interval"
+    section: Currently
+    count: 6
+    order: desc
+    tag_sort: time
+    tag_order: desc
+    only_timed: true
+    totals: true
+  test3:
+    template: "%date | DOING TEST: %title%note %interval"
+    section: Currently
+    count: 6
+    order: desc
+    tag_sort: name
+    tag_order: asc
+    only_timed: false
+    totals: false
   done:
     date_format: "%Y-%m-%d %H:%M"
     template: "%date | %title%note"
