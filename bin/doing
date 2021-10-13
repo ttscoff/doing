@@ -1344,13 +1344,14 @@ command :colors do |c|
 end
 
 desc 'Display a user-created view'
+long_desc 'Command line options override associated view settings'
 arg_name 'VIEW_NAME'
 command :view do |c|
-  c.desc 'Section (override view settings)'
+  c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section]
 
-  c.desc 'Count to display (override view settings)'
+  c.desc 'Count to display'
   c.arg_name 'COUNT'
   c.flag %i[c count], must_match: /^\d+$/, type: Integer
 
@@ -1368,12 +1369,14 @@ command :view do |c|
   c.switch [:color], default_value: true, negatable: true
 
   c.desc 'Sort tags by (name|time)'
-  default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i
 
-  c.desc 'Only show items with recorded time intervals'
+  c.desc 'Tag sort direction (asc|desc)'
+  c.arg_name 'DIRECTION'
+  c.flag [:tag_order], must_match: /^(?:[a|d])/i, default_value: 'asc'
+
+  c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
 
   c.action do |_global_options, options, args|
@@ -1422,9 +1425,23 @@ command :view do |c|
                 end
       order = view.key?('order') ? view['order'] : 'asc'
 
-      options[:t] = true if options[:totals]
+      totals = if options[:totals]
+                 true
+               else
+                 view.key?('totals') ? view['totals'] : false
+               end
+      options[:t] = true if totals
       options[:output]&.downcase!
-      options[:sort_tags] = options[:tag_sort] =~ /^n/i
+      options[:sort_tags] = if (options[:tag_sort] =~ /^n/i || view.key?('tag_sort') && view['tag_sort'] =~ /^n/i)
+                              true
+                            else
+                              false
+                            end
+      options[:tag_order] = if (options[:tag_order] =~ /^d/i || view.key?('tag_order') && view['tag_order'] =~ /^d/i)
+                              'desc'
+                            else
+                              'asc'
+                            end
 
       opts = {
         count: count,
@@ -1436,10 +1453,11 @@ command :view do |c|
         section: section,
         sort_tags: options[:sort_tags],
         tag_filter: tag_filter,
+        tag_order: options[:tag_order],
         tags_color: tags_color,
         template: template,
         times: options[:t],
-        totals: options[:totals]
+        totals: totals
       }
 
       puts wwid.list_section(opts)

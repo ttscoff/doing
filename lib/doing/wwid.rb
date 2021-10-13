@@ -583,17 +583,17 @@ class WWID
   end
 
   def same_time?(item_a, item_b)
-    item_a['date'] == item_b['date'] ? get_interval(item_a, false) == get_interval(item_b, false) : false
+    item_a['date'] == item_b['date'] ? get_interval(item_a, formatted: false, record: false) == get_interval(item_b,  formatted: false, record: false) : false
   end
 
   def overlapping_time?(item_a, item_b)
     return true if same_time?(item_a, item_b)
 
     start_a = item_a['date']
-    interval = get_interval(item_a, false)
+    interval = get_interval(item_a, formatted: false, record: false)
     end_a = interval ? start_a + interval.to_i : start_a
     start_b = item_b['date']
-    interval = get_interval(item_b, false)
+    interval = get_interval(item_b,  formatted: false, record: false)
     end_b = interval ? start_b + interval.to_i : start_b
     (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
   end
@@ -1580,6 +1580,7 @@ class WWID
     opt[:times] ||= false
     opt[:totals] ||= false
     opt[:sort_tags] ||= false
+    opt[:tag_order] ||= 'asc'
     opt[:search] ||= false
     opt[:only_timed] ||= false
     opt[:date_filter] ||= []
@@ -1635,7 +1636,7 @@ class WWID
 
     if opt[:only_timed]
       items.delete_if do |item|
-        get_interval(item) == false
+        get_interval(item, record: false) == false
       end
     end
 
@@ -1670,7 +1671,7 @@ class WWID
           arr = i['note'].map { |line| line.strip }.delete_if { |e| e =~ /^\s*$/ }
           note = arr.join("\n") unless arr.nil?
         end
-        interval = get_interval(i, false) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+        interval = get_interval(i, formatted: false) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
         interval ||= 0
         output.push(CSV.generate_line([i['date'], i['title'], note, interval, i['section']]))
       end
@@ -1689,7 +1690,7 @@ class WWID
         end
         if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
           end_date = Time.parse(Regexp.last_match(1))
-          interval = get_interval(i, false)
+          interval = get_interval(i, formatted: false)
         end
         end_date ||= ''
         interval ||= 0
@@ -1738,7 +1739,7 @@ class WWID
         out = {
           'section' => section,
           'items' => items_out,
-          'timers' => tag_times('json', opt[:sort_tags])
+          'timers' => tag_times(format: 'json', sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order])
         }.to_json
       elsif opt[:output] == 'timeline'
         template = <<~EOTEMPLATE
@@ -1819,7 +1820,7 @@ class WWID
                 css_template
               end
 
-      totals = opt[:totals] ? tag_times('html', opt[:sort_tags]) : ''
+      totals = opt[:totals] ? tag_times(format: 'html', sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
       engine = Haml::Engine.new(template)
       out = engine.render(Object.new,
                          { :@items => items_out, :@page_title => page_title, :@style => style, :@totals => totals })
@@ -1910,7 +1911,7 @@ class WWID
 
         out += "#{output}\n"
       end
-      out += tag_times('text', opt[:sort_tags]) if opt[:totals]
+      out += tag_times(format: 'text', sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) if opt[:totals]
     end
     out
   end
@@ -2173,11 +2174,15 @@ class WWID
   end
 
   ##
-  ## @brief      Get total elapsed time for all tags in selection
+  ## @brief      Get total elapsed time for all tags in
+  ##             selection
   ##
-  ## @param      format  (String) return format (html, json, or text)
+  ## @param      format        (String) return format (html,
+  ##                           json, or text)
+  ## @param      sort_by_name  (Boolean) Sort by name if true, otherwise by time
+  ## @param      sort_order    (String) The sort order (asc or desc)
   ##
-  def tag_times(format = 'text', sort_by_name = false)
+  def tag_times(format: 'text', sort_by_name: false, sort_order: 'asc')
     return '' if @timers.empty?
 
     max = @timers.keys.sort_by { |k| k.length }.reverse[0].length + 1
@@ -2186,10 +2191,12 @@ class WWID
 
     tags_data = @timers.delete_if { |_k, v| v == 0 }
     sorted_tags_data = if sort_by_name
-                         tags_data.sort_by { |k, _v| k }.reverse
+                         tags_data.sort_by { |k, _v| k }
                        else
                          tags_data.sort_by { |_k, v| v }
                        end
+
+    sorted_tags_data.reverse! if sort_order =~ /^asc/i
 
     if format == 'html'
       output = <<EOS
@@ -2324,7 +2331,7 @@ EOS
   ## @param      item       (Hash) The entry
   ## @param      formatted  (Bool) Return human readable time (default seconds)
   ##
-  def get_interval(item, formatted = true)
+  def get_interval(item, formatted: true, record: true)
     done = nil
     start = nil
 
@@ -2336,7 +2343,7 @@ EOS
     if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
       done = Time.parse(Regexp.last_match(1))
     else
-      return nil
+      return false
     end
 
     start = if item['title'] =~ /@start\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
@@ -2347,18 +2354,20 @@ EOS
 
     seconds = (done - start).to_i
 
-    item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
-      k = m[0] == 'done' ? 'All' : m[0].downcase
-      if @timers.has_key?(k)
-        @timers[k] += seconds
-      else
-        @timers[k] = seconds
+    if record
+      item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
+        k = m[0] == 'done' ? 'All' : m[0].downcase
+        if @timers.has_key?(k)
+          @timers[k] += seconds
+        else
+          @timers[k] = seconds
+        end
       end
     end
 
     @interval_cache[item['title']] = seconds
 
-    return seconds unless formatted
+    return seconds > 0 ? seconds : false unless formatted
 
     seconds > 0 ? '%02d:%02d:%02d' % fmt_time(seconds) : false
   end

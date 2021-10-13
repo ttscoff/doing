@@ -245,7 +245,7 @@ You can create your own "views" in the `~/.doingrc` file and view them with `doi
 
     views:
       old:
-        section: Old
+        section: Archive
         count: 5
         wrap_width: 0
         date_format: '%F %_I:%M%P'
@@ -253,6 +253,10 @@ You can create your own "views" in the `~/.doingrc` file and view them with `doi
         order: asc
         tags: done finished cancelled
         tags_bool: ANY
+        only_timed: false
+        tag_sort: time
+        tag_order: asc
+        totals: true
 
 You can add additional custom views. Just nest them under the `views` key (indented two spaces from the edge). Multiple views would look like this:
 
@@ -276,7 +280,9 @@ You can add new sections with `doing add_section section_name`. You can also cre
 
 The `tags` and `tags_bool` keys allow you to specify tags that the view is filtered by. You can list multiple tags separated by spaces, and then use `tags_bool` to specify `ALL`, `ANY`, or `NONE` to determine how it handles the multiple tags.
 
-The `order` key defines the sort order of the output. This is applied _after_ the tasks are retrieved and cut off at the maximum number specified in `count`.
+The `order` key defines the sort order of the output (asc or desc). This is applied _after_ the tasks are retrieved and cut off at the maximum number specified in `count`.
+
+You can include tag timers and totals in the output with `totals: true`. Control tag output using `tag_sort` (name or title) and `tag_order` (asc or desc). You can also output only timed entries using `only_timed: true`. All of these options can be overridden using flags on the `doing view` command.
 
 Regarding colors, you can use them to create very nice displays if you're outputting to a color terminal. Example:
 
@@ -291,7 +297,7 @@ Outputs:
 
 ![](http://ckyp.us/XKpj+)
 
-You can also specify a default output format for a view. Most of the optional output formats override the template specification (`html`, `csv`, `json`). If the `view` command is used with the `-o` flag, it will override what's specified in the file.
+You can also specify a default output format for a view. Most of the optional output formats override the template specification (`html`, `csv`, `json`). If the `view` command is used with the `-o` flag, it will override what's specified for the view in the config.
 
 ### Colors
 
