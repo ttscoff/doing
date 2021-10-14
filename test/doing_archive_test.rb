@@ -65,6 +65,15 @@ class DoingArchiveTest < Test::Unit::TestCase
     assert_match(/Archived #{entries} items from #{@config['current_section']} to Testing/, result, "Should have archived #{entries} items to destination Testing")
   end
 
+  def test_rotate
+    rotate_file = @wwid_file.sub(/(\.\w+)$/, "_#{Time.now.strftime('%Y-%m-%d')}\\1")
+    doing('rotate', '--keep', '5')
+    assert(File.exist?(rotate_file), 'Rotate file should exist')
+    assert_count_entries(5, doing('show'), 'Should have 5 entries remaining')
+    res = doing_with_env({}, '--config_file', @config_file, '--doing_file', rotate_file, 'show')
+    assert_count_entries(3, res, 'Rotate file should have 3 entries')
+  end
+
   private
 
   def assert_matches(matches, shown)
