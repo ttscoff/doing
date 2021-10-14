@@ -2257,8 +2257,25 @@ class WWID
     opt[:totals] ||= false
     opt[:sort_tags] ||= false
     section = guess_section(section)
-    list_section({ section: section, count: 0, order: 'asc', yesterday: true, times: times,
-                   output: output, totals: opt[:totals], sort_tags: opt[:sort_tags] })
+    y = (Time.now - (60 * 60 * 24)).strftime('%Y-%m-%d')
+    opt[:after] = "#{y} #{opt[:after]}" if opt[:after]
+    opt[:before] = "#{y} #{opt[:before]}" if opt[:before]
+
+    options = {
+      after: opt[:after],
+      before: opt[:before],
+      count: 0,
+      order: 'asc',
+      output: output,
+      section: section,
+      sort_tags: opt[:sort_tags],
+      tag_order: opt[:tag_order],
+      times: times,
+      totals: opt[:totals],
+      yesterday: true
+    }
+
+    list_section(options)
   end
 
   ##

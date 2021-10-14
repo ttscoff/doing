@@ -1,3 +1,9 @@
+### 1.0.88
+
+- Add --before and --after time search to yesterday command
+- Add --before and --after date search to search/grep command
+- Add --tag_order to yesterday command
+
 ### 1.0.87
 
 - Add leading spaces to make %shortdate align properly, at least for the last week

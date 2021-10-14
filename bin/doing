@@ -1324,10 +1324,33 @@ command :yesterday do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
+  c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
+  c.arg_name 'TIME_STRING'
+  c.flag [:before]
+
+  c.desc 'View entries after specified time (e.g. 8am, 12:30pm, 15:00)'
+  c.arg_name 'TIME_STRING'
+  c.flag [:after]
+
+  c.desc 'Tag sort direction (asc|desc)'
+  c.arg_name 'DIRECTION'
+  c.flag [:tag_order], must_match: /^(?:a(?:sc)?|d(?:esc)?)$/i
+
   c.action do |_global_options, options, _args|
+    tag_order = if options[:tag_order]
+                  options[:tag_order] =~ /^d/i ? 'desc' : 'asc'
+                else
+                  'asc'
+                end
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-    puts wwid.yesterday(options[:s], options[:t], options[:o],
-                        { totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+    opt = {
+      after: options[:after],
+      before: options[:before],
+      sort_tags: options[:sort_tags],
+      tag_order: options[:tag_order],
+      totals: options[:totals]
+    }
+    puts wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
   end
 end
 
