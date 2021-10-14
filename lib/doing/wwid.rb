@@ -841,7 +841,6 @@ class WWID
     end
 
     res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
-    `echo '#{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}' >> test.txt`
     selected = []
     res.split(/\n/).each do |item|
       idx = item.match(/^(\d+)\)/)[1].to_i
@@ -886,8 +885,7 @@ class WWID
         when /(add|remove) tag/
           type = action =~ /^add/ ? 'add' : 'remove'
           if opt[:tag]
-            warn "'add tag' and 'remove tag' can not be used together"
-            Process.exit 1
+            exit_now! "'add tag' and 'remove tag' can not be used together"
           end
           print "#{colors['yellow']}Tag to #{type}: #{colors['reset']}"
           tag = STDIN.gets
@@ -1127,7 +1125,12 @@ class WWID
             else
               if opt[:sequential]
                 next_entry = next_item(item)
-                done_date = next_entry['date'] - 60 if next_entry
+
+                if next_entry.nil?
+                  done_date = Time.now
+                else
+                  done_date = next_entry['date'] - 60
+                end
               elsif opt[:took]
                 if item['date'] + opt[:took] > Time.now
                   item['date'] = Time.now - opt[:took]
@@ -1222,13 +1225,15 @@ class WWID
   ## @param      old_item
   ##
   def next_item(old_item)
-    section = old_item['section']
+    combined = { 'items' => [] }
+    @content.each do |_k, v|
+      combined['items'] += v['items']
+    end
+    items = combined['items'].dup.sort_by { |item| item['date'] }.reverse
+    idx = items.index(old_item)
 
-    section_items = @content[section]['items'].sort_by { |entry| entry['date'] }
-    idx = section_items.index(old_item)
-
-    if section_items.size > idx
-      section_items[idx + 1]
+    if idx > 0
+      items[idx - 1]
     else
       nil
     end

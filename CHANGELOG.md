@@ -1,3 +1,9 @@
+### 1.0.90
+
+- Minor fix for shell command in doing select
+- Fix for doing finish --auto when matched item is last in list
+- doing finish --auto now pulls from all sections, not just the section of the target entry
+
 ### 1.0.89
 
 - Pretty print JSON output

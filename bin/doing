@@ -604,7 +604,7 @@ command :finish do |c|
   c.switch %i[u unfinished], negatable: false, default_value: false
 
   c.desc %(Auto-generate finish dates from next entry's start time.
-  Automatically generate completion dates 1 minute before next start date.
+  Automatically generate completion dates 1 minute before next item (in any section) began.
   --auto overrides the --date and --back parameters.)
   c.switch [:auto], negatable: false, default_value: false
 
