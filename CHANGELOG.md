@@ -1,3 +1,7 @@
+### 1.0.87
+
+- Add leading spaces to make %shortdate align properly, at least for the last week
+
 ### 1.0.86
 
 - Add `count` config option for templates->recent

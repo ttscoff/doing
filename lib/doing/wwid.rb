@@ -1969,9 +1969,9 @@ class WWID
 
         output.sub!(/%shortdate/) do
           if item['date'] > Date.today.to_time
-            item['date'].strftime('%_I:%M%P')
+            item['date'].strftime('    %_I:%M%P')
           elsif item['date'] > (Date.today - 7).to_time
-            item['date'].strftime('%a %-I:%M%P')
+            item['date'].strftime('%a %_I:%M%P')
           elsif item['date'].year == Date.today.year
             item['date'].strftime('%b %d, %-I:%M%P')
           else
