@@ -817,7 +817,7 @@ class WWID
         ' | ',
         item['title']
       ]
-      if opt[:section] =~ /^all/i
+      if section =~ /^all/i
         out.concat([
           ' (',
           item['section'],
@@ -834,7 +834,14 @@ class WWID
       '--bind ctrl-a:select-all',
       %(-q "#{opt[:query]}")
     ]
+    if !opt[:menu]
+      exit_now! "Can't skip menu when no query is provided" unless opt[:query]
+
+      fzf_args.concat([%(--filter="#{opt[:query]}"), '--no-sort'])
+    end
+
     res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
+    `echo '#{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}' >> test.txt`
     selected = []
     res.split(/\n/).each do |item|
       idx = item.match(/^(\d+)\)/)[1].to_i
@@ -1856,11 +1863,11 @@ class WWID
         end
       end
       if opt[:output] == 'json'
-        out = {
+        puts JSON.pretty_generate({
           'section' => section,
           'items' => items_out,
           'timers' => tag_times(format: 'json', sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order])
-        }.to_json
+        })
       elsif opt[:output] == 'timeline'
         template = <<~EOTEMPLATE
                     <!doctype html>

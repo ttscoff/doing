@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'tempfile'
 require 'time'
-require 'json'
+require 'yaml'
 
 require 'doing-helpers'
 require 'test_helper'
@@ -20,16 +20,24 @@ class DoingShowTest < Test::Unit::TestCase
     @wwid_file = File.join(@basedir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
+    @config = YAML.load(IO.read(@config_file))
   end
 
   def teardown
     FileUtils.rm_rf(@tmpdirs)
   end
 
-  def test_show
-    doing('now', 'Adding a test entry')
-    entries = doing('show')
-    assert_count_entries(1, entries, '1 entry should be listed')
+  def test_show_command
+    subject = 'Test new entry @tag1'
+    doing('now', subject)
+    subject2 = 'Test new entry 2 @tag2'
+    doing('now', subject2)
+    result = doing('show').uncolor.strip
+    assert_count_entries(2, result, 'There should be 2 entries shown by `doing show`')
+    assert_match(/#{subject}\s*$/, result, 'doing show results should include test entry')
+    result = doing('show', '@tag1').uncolor.strip
+    assert_count_entries(1, result, 'There should be 1 entries shown by `doing show @tag1`')
+    assert_match(/#{subject}\s*$/, result, 'doing show @tag1 results should include test entry')
   end
 
   def test_show_tag_sort
@@ -47,6 +55,25 @@ class DoingShowTest < Test::Unit::TestCase
     doing('import', @import_file)
     result = doing('show', '--before', '9/14/2021', '--after', '9/12/2021')
     assert_count_entries(5, result, 'There should be 5 entries between specified dates')
+  end
+
+  def test_show_command_tag_boolean
+    subject = 'Test new entry @tag1'
+    doing('now', subject)
+    subject2 = 'Test new entry 2 @tag2'
+    doing('now', subject2)
+    subject3 = 'Test new entry 3 @tag1 @tag2 @tag3'
+    doing('now', subject3)
+
+    result = doing('show', '--tag', 'tag1,tag2', '--bool', 'and').uncolor.strip
+    assert_count_entries(1, result, 'There should be 1 entry shown with both @tag1 and @tag2')
+    assert_match(/#{subject3}\s*$/, result, 'doing show results should include entry with both @tag1 and @tag2')
+
+    result = doing('show', '--tag', 'tag1,tag2', '--bool', 'or').uncolor.strip
+    assert_count_entries(3, result, 'There should be 3 entries shown with either @tag1 or @tag2')
+    result = doing('show', '--tag', 'tag2', '--bool', 'not').uncolor.strip
+    assert_count_entries(1, result, 'There should be 1 entry shown without @tag2')
+    assert_match(/#{subject}\s*$/, result, 'doing show results should include entry without @tag2')
   end
 
   private

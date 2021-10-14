@@ -292,9 +292,12 @@ command :select do |c|
   c.arg_name 'SECTION'
   c.flag %i[m move]
 
-  c.desc 'Initial search query for filtering'
+  c.desc 'Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "\'search"'
   c.arg_name 'QUERY'
   c.flag %i[q query]
+
+  c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.'
+  c.switch %i[menu], negatable: true, default_value: true
 
   c.desc 'Cancel selected items (add @done without timestamp)'
   c.switch %i[c cancel], negatable: false, default_value: false
@@ -311,7 +314,7 @@ command :select do |c|
   c.desc 'Add flag to selected item(s)'
   c.switch %i[flag], negatable: false, default_value: false
 
-  c.desc 'Perform action without confirmation'
+  c.desc 'Perform action without confirmation.'
   c.switch %i[force], negatable: false, default_value: false
 
   c.desc 'Save selected entries to file using --output format'
@@ -323,6 +326,8 @@ command :select do |c|
   c.flag %i[o output], must_match: /^(?:doing|taskpaper|html|csv|json|template|timeline)$/i
 
   c.action do |_global_options, options, args|
+    exit_now! "--no-menu requires --query" if !options[:menu] && !options[:query]
+
     wwid.interactive(options)
   end
 end

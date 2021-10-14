@@ -26,12 +26,12 @@ class DoingViewTest < Test::Unit::TestCase
     FileUtils.rm_rf(@tmpdirs)
   end
 
-  def test_views
+  def test_views_command
     views = doing('views').strip.split(/\s+/).delete_if {|v| v.strip == ''}
     assert_equal(5, views.length, 'Should have 3 views as defined in test configuration')
   end
 
-  def test_view
+  def test_view_command
     doing('now', 'Adding a test entry')
     entries = doing('view', 'test')
     assert_count_entries(1, entries, '1 entry should be listed containing DOING TEST (added by the view)')

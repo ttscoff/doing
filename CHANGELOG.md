@@ -1,3 +1,8 @@
+### 1.0.89
+
+- Pretty print JSON output
+- --no-menu option for select command to use --query as a filter and act on matching entries without displaying menu
+
 ### 1.0.88
 
 - Add --before and --after time search to yesterday command
