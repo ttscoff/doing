@@ -27,7 +27,7 @@ If there's something I want to look at later but doesn't need to be added to a t
 
 ## Installation
 
-The current version of `doing` is <!--VER-->1.0.87<!--END VER-->.
+The current version of `doing` is <!--VER-->1.0.88<!--END VER-->.
 
     $ [sudo] gem install doing
 
