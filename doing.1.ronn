@@ -9,7 +9,7 @@ doing(1) Command line time tracking
 
 _A command line tool for remembering what you were doing and tracking what you've done._
 
-`doing` is a basic CLI for adding and listing "what was I doing" reminders in a [TaskPaper-formatted](https://www.taskpaper.com) text file. It allows for multiple sections/categories and flexible output formatting.
+`doing` is a basic CLI for adding and listing "what was I doing" reminders in a [TaskPaper-formatted](https://www.taskpaper.com) text file. It allows for multiple sections/categories, tag-based time tracking, and flexible output formatting.
 
 ## USAGE
 
