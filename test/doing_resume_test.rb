@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'tempfile'
 require 'time'
+require 'yaml'
 
 require 'doing-helpers'
 require 'test_helper'
@@ -17,6 +18,7 @@ class DoingResumeTest < Test::Unit::TestCase
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
+    @config = YAML.load(IO.read(@config_file))
   end
 
   def teardown
@@ -28,7 +30,7 @@ class DoingResumeTest < Test::Unit::TestCase
     doing('done', subject)
     result = doing('--stdout', 'again')
 
-    assert_match(/Added "#{subject}" to Currently/, result, 'Entry should be added again')
+    assert_match(/Added "#{subject}" to #{@config['current_section']}/, result, 'Entry should be added again')
   end
 
   def test_resume_tag

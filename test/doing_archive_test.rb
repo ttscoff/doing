@@ -2,11 +2,12 @@ require 'fileutils'
 require 'tempfile'
 require 'time'
 require 'json'
+require 'yaml'
 
 require 'doing-helpers'
 require 'test_helper'
 
-# Tests for entry modifying commands
+# Tests for archive commands
 class DoingArchiveTest < Test::Unit::TestCase
   include DoingHelpers
   ENTRY_REGEX = /^\d{4}-\d\d-\d\d \d\d:\d\d \|/.freeze
@@ -19,6 +20,7 @@ class DoingArchiveTest < Test::Unit::TestCase
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
+    @config = YAML.load(IO.read(@config_file))
     import_file = File.join(File.dirname(__FILE__), 'All Activities.json')
     doing('import', import_file)
   end
@@ -30,7 +32,7 @@ class DoingArchiveTest < Test::Unit::TestCase
   def test_archive
     entries = doing('show').scan(ENTRY_REGEX).count
     result = doing('--stdout', 'archive')
-    assert_match(/Archived #{entries} items from Currently to Archive/, result, "Should have archived #{entries} items")
+    assert_match(/Archived #{entries} items from #{@config['current_section']} to Archive/, result, "Should have archived #{entries} items")
   end
 
   def test_archive_tag
@@ -60,7 +62,7 @@ class DoingArchiveTest < Test::Unit::TestCase
     entries = doing('show').scan(ENTRY_REGEX).count
     doing('add_section', 'Testing')
     result = doing('--stdout', 'archive', '-t', 'Testing')
-    assert_match(/Archived #{entries} items from Currently to Testing/, result, "Should have archived #{entries} items to destination Testing")
+    assert_match(/Archived #{entries} items from #{@config['current_section']} to Testing/, result, "Should have archived #{entries} items to destination Testing")
   end
 
   private

@@ -2,10 +2,17 @@
 autotag:
   transform:
   - (deploy|merge)\s+@(\w+)-\d+:$1-$2 @dev @dev-$2
-  whitelist: []
-  synonyms: {}
+  whitelist:
+  - autotag
+  - overtired
+  synonyms:
+    bt:
+    - brettterpstra.com
+    terpzel:
+    - guntzel
+
 doing_file: "~/what_was_i_doing.md"
-current_section: Currently
+current_section: Lately
 editor_app: 
 html_template:
   haml: 
@@ -33,7 +40,7 @@ views:
     section: All
   test2:
     template: "%date | DOING TEST: %title%note %interval"
-    section: Currently
+    section: Lately
     count: 6
     order: desc
     tag_sort: time
@@ -42,7 +49,7 @@ views:
     totals: true
   test3:
     template: "%date | DOING TEST: %title%note %interval"
-    section: Currently
+    section: Lately
     count: 6
     order: desc
     tag_sort: name
@@ -62,7 +69,7 @@ views:
     date_format: "%F %_I:%M%P"
     template: "%boldblack%date %boldgreen| %boldwhite%title%default%note"
     wrap_width: 0
-    section: Currently
+    section: Lately
     count: 10
     order: asc
 marker_tag: flagged

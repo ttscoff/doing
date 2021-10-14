@@ -5,7 +5,7 @@ require 'time'
 require 'doing-helpers'
 require 'test_helper'
 
-# Tests for natural language date processing
+# Tests for done commands
 class DoingDoneTest < Test::Unit::TestCase
   include DoingHelpers
   ENTRY_REGEX = /^\d{4}-\d\d-\d\d \d\d:\d\d \|/.freeze
@@ -61,7 +61,40 @@ class DoingDoneTest < Test::Unit::TestCase
     d = r.match(ENTRY_DONE_REGEX)
     assert(d, "#{r} should have @done timestamp")
     start = Time.parse(t['ts'])
-    assert_within_tolerance((start + (60 * 60)), Time.parse(d['ts']), message: 'Finished time should be 60 minutes after start')
+    assert_within_tolerance((start + (60 * 60)), Time.parse(d['ts']),
+                            message: 'Finished time should be 60 minutes after start')
+  end
+
+  def test_done_at
+    today = Time.now
+    start_at = today.strftime('%Y-%m-%d 13:30 %Z')
+    finish_at = today.strftime('%Y-%m-%d 15:00 %Z')
+    doing('done', '--at', '3pm', '--took', '1:30', 'test semantic format')
+    last = doing('show', '-c', '1')
+    m = last.match(ENTRY_DONE_REGEX)
+    assert(m)
+    entry_time = Time.parse(m['ts']).strftime('%Y-%m-%d %H:%M %Z')
+    assert_equal(entry_time, finish_at, 'new entry has wrong finish time')
+    m = last.match(ENTRY_TS_REGEX)
+    assert(m)
+    entry_time = Time.parse(m['ts']).strftime('%Y-%m-%d %H:%M %Z')
+    assert_equal(entry_time, start_at, 'new entry has wrong start time')
+  end
+
+  def test_finish_at
+    start_at = Time.now.strftime('%Y-%m-%d 01:45 %Z')
+    finish_at = Time.now.strftime('%Y-%m-%d 02:15 %Z')
+    doing('now', '--back', '1:45am', 'test finish at')
+    doing('finish', '--at', '2:15am', '--search', 'test finish at')
+    last = doing('show')
+    m = last.match(ENTRY_DONE_REGEX)
+    assert(m)
+    entry_time = Time.parse(m['ts']).strftime('%Y-%m-%d %H:%M %Z')
+    assert_equal(entry_time, finish_at, 'new entry has wrong finish time')
+    m = last.match(ENTRY_TS_REGEX)
+    assert(m)
+    entry_time = Time.parse(m['ts']).strftime('%Y-%m-%d %H:%M %Z')
+    assert_equal(entry_time, start_at, 'new entry has wrong start time')
   end
 
   def test_finish_count

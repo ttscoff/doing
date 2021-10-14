@@ -2,11 +2,12 @@ require 'fileutils'
 require 'tempfile'
 require 'time'
 require 'json'
+require 'yaml'
 
 require 'doing-helpers'
 require 'test_helper'
 
-# Tests for entry modifying commands
+# Tests for import commands
 class DoingImportTest < Test::Unit::TestCase
   include DoingHelpers
   ENTRY_REGEX = /^\d{4}-\d\d-\d\d \d\d:\d\d \|/.freeze
@@ -33,6 +34,24 @@ class DoingImportTest < Test::Unit::TestCase
     assert_match(/Imported #{target} items/, result, "Should have imported #{target} entries")
     result = doing('--stdout', 'import', @import_file)
     assert_match(/Skipped #{target} items/, result, "Should have skipped #{target} duplicate entries")
+  end
+
+  def test_import_autotag
+    whitelist_word = 'overtired'
+    synonym_word = 'guntzel'
+    synonym_tag = 'terpzel'
+
+    json = JSON.parse(IO.read(@import_file))
+    whitelisted_entries = json.select { |entry| entry['activityTitle'] =~ /#{whitelist_word}/i }.length
+    synonym_entries = json.select { |entry| entry['activityTitle'] =~ /#{synonym_word}/i }.length
+
+    doing('import', '--autotag', @import_file)
+    whitelisted = doing('show', "@#{whitelist_word}")
+    assert_count_entries(whitelisted_entries, whitelisted,
+                         "Should have tagged #{whitelisted_entries} entries with @#{whitelist_word}")
+    synonyms = doing('show', "@#{synonym_tag}")
+    assert_count_entries(synonym_entries, synonyms,
+                         "Should have tagged #{synonym_entries} entries with @#{synonym_tag}")
   end
 
   def test_import_no_overlap

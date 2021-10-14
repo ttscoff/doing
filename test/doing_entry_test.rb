@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'tempfile'
 require 'time'
+require 'yaml'
 
 require 'doing-helpers'
 require 'test_helper'
@@ -18,6 +19,7 @@ class DoingEntryTest < Test::Unit::TestCase
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
+    @config = YAML.load(IO.read(@config_file))
   end
 
   def teardown
@@ -96,11 +98,11 @@ class DoingEntryTest < Test::Unit::TestCase
     result = doing('--stdout', 'archive', '--search', '/consuming.*?bagels/')
 
     assert_match(/Added section "Archive"/, result, 'Archive section should have been added')
-    assert_match(/Archived 1 items from Currently to Archive/, result, '1 item should have been archived')
+    assert_match(/Archived 1 items from #{@config['current_section']} to Archive/, result, '1 item should have been archived')
     assert_match(/consuming @bagels/i, doing('show', 'Archive'), 'Archive section should contain test entry')
 
     result = doing('--stdout', 'archive', '--search', 'eating')
-    assert_match(/Archived 6 items from Currently to Archive/, result, '6 items should have been archived')
+    assert_match(/Archived 6 items from #{@config['current_section']} to Archive/, result, '6 items should have been archived')
   end
 
   private

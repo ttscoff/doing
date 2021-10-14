@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'tempfile'
 require 'time'
+require 'yaml'
 
 require 'doing-helpers'
 require 'test_helper'
@@ -16,6 +17,7 @@ class DoingOutputTest < Test::Unit::TestCase
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
+    @config = YAML.load(IO.read(@config_file))
   end
 
   def teardown
@@ -94,7 +96,7 @@ class DoingOutputTest < Test::Unit::TestCase
 
   def test_sections_command
     result = doing('sections').uncolor.strip
-    assert_match(/^Currently$/, result, 'Currently should be the only section shown')
+    assert_match(/^#{@config['current_section']}$/, result, "#{@config['current_section']} should be the only section shown")
   end
 
   def test_recent_command

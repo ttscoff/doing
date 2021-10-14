@@ -55,7 +55,7 @@ arg_name 'ENTRY'
 command %i[now next] do |c|
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: wwid.current_section
+  c.flag %i[s section]
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch %i[e editor], negatable: false, default_value: false
@@ -84,7 +84,11 @@ command %i[now next] do |c|
       date = Time.now
     end
 
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      options[:section] = wwid.config['current_section']
+    end
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero?)
       exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
@@ -135,7 +139,9 @@ command :note do |c|
   c.switch %i[r remove], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    end
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero? && !options[:r])
       exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
@@ -176,7 +182,7 @@ arg_name 'ENTRY'
 command :meanwhile do |c|
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: wwid.current_section
+  c.flag %i[s section]
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch %i[e editor], negatable: false, default_value: false
@@ -201,7 +207,11 @@ command :meanwhile do |c|
       date = Time.now
     end
 
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      section = wwid.config['current_section']
+    end
     input = ''
 
     if options[:e]
@@ -308,7 +318,7 @@ command :select do |c|
   c.arg_name 'FILE'
   c.flag %i[save_to]
 
-  c.desc 'Output format for export (doing|taskpaper|csv|html|json|template|timeline)'
+  c.desc 'Output entries to format (doing|taskpaper|csv|html|json|template|timeline)'
   c.arg_name 'FORMAT'
   c.flag %i[o output], must_match: /^(?:doing|taskpaper|html|csv|json|template|timeline)$/i
 
@@ -399,7 +409,7 @@ command %i[done did] do |c|
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: wwid.current_section
+  c.flag %i[s section]
 
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch %i[e editor], negatable: false, default_value: false
@@ -440,7 +450,11 @@ command %i[done did] do |c|
       donedate = options[:date] ? "(#{finish_date.strftime('%F %R')})" : ''
     end
 
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      section = wwid.config['current_section']
+    end
 
     if options[:e]
       exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
@@ -497,7 +511,7 @@ command :cancel do |c|
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: wwid.current_section
+  c.flag %i[s section]
 
   c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2)'
   c.arg_name 'TAG'
@@ -511,7 +525,11 @@ command :cancel do |c|
   c.switch %i[u unfinished], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      section = wwid.config['current_section']
+    end
 
     if options[:tag].nil?
       tags = []
@@ -564,6 +582,10 @@ command :finish do |c|
   c.arg_name 'INTERVAL'
   c.flag %i[t took]
 
+  c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.)
+  c.arg_name 'DATE_STRING'
+  c.flag [:at]
+
   c.desc 'Finish the last X entries containing TAG.
   Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool'
   c.arg_name 'TAG'
@@ -590,17 +612,31 @@ command :finish do |c|
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: wwid.current_section
+  c.flag %i[s section]
 
   c.action do |_global_options, options, args|
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      section = wwid.config['current_section']
+    end
 
     unless options[:auto]
+      if options[:took]
+        took = wwid.chronify_qty(options[:took])
+        exit_now! 'Unable to parse date string for --took' if took.nil?
+      end
+
       exit_now! '--back and --took cannot be used together' if options[:back] && options[:took]
 
       exit_now! '--search and --tag cannot be used together' if options[:search] && options[:tag]
 
-      if options[:back]
+      if options[:at]
+        finish_date = wwid.chronify(options[:at])
+        exit_now! 'Unable to parse date string for --at' if finish_date.nil?
+
+        date = options[:took] ? finish_date - took : finish_date
+      elsif options[:back]
         date = wwid.chronify(options[:back])
 
         exit_now! 'Unable to parse date string' if date.nil?
@@ -826,7 +862,7 @@ desc 'Mark last entry as highlighted'
 command [:mark, :flag] do |c|
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: wwid.current_section
+  c.flag %i[s section]
 
   c.desc 'Remove mark'
   c.switch %i[r remove], negatable: false, default_value: false
@@ -1386,7 +1422,11 @@ command :view do |c|
               wwid.guess_view(args[0])
             end
 
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first if options[:s]
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      section = wwid.config['current_section']
+    end
 
     view = wwid.get_view(title)
     if view
@@ -1553,6 +1593,48 @@ command :archive do |c|
   end
 end
 
+desc 'Move entries to archive file'
+command :rotate do |c|
+  c.desc 'How many items to keep in each section (most recent)'
+  c.arg_name 'X'
+  c.flag %i[k keep], must_match: /^\d+$/, type: Integer
+
+  c.desc 'Section to rotate'
+  c.arg_name 'SECTION_NAME'
+  c.flag %i[s section], default_value: 'All'
+
+  c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Tag boolean (AND|OR|NOT)'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'AND'
+
+  c.desc 'Search filter'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  c.action do |_global_options, options, args|
+    if options[:section] && options[:section] !~ /^all$/i
+      options[:section] = wwid.guess_section(options[:section])
+    end
+
+    options[:bool] = case options[:bool]
+                     when /(and|all)/i
+                      'AND'
+                     when /(any|or)/i
+                      'OR'
+                     when /(not|none)/i
+                      'NOT'
+                     else
+                      'AND'
+                     end
+
+    wwid.rotate(options)
+  end
+end
+
 desc 'Open the "doing" file in an editor'
 long_desc "`doing open` defaults to using the editor_app setting in #{wwid.config_file} (#{wwid.config.key?('editor_app') ? wwid.config['editor_app'] : 'not set'})"
 command :open do |c|
@@ -1662,7 +1744,7 @@ command :import do |c|
 
   c.desc 'Target section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: wwid.current_section
+  c.flag %i[s section]
 
   c.desc 'Tag all imported entries'
   c.arg_name 'TAGS'
@@ -1680,7 +1762,11 @@ command :import do |c|
 
   c.action do |_global_options, options, args|
 
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      section = wwid.config['current_section']
+    end
 
     if options[:type] =~ /^tim/i
       args.each do |path|

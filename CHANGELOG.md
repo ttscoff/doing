@@ -1,3 +1,7 @@
+### 1.0.84
+
+- `rotate` command for archiving entries to new file
+- Fixed current_section config key not being honored in some commands
 
 ### 1.0.83
 

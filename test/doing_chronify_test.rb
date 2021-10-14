@@ -47,7 +47,7 @@ class DoingChronifyTest < Test::Unit::TestCase
     doing('now', '--back', 'yesterday 6:30pm', 'test semantic format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
-    entry_time = Time.parse(m['ts']).strftime('%Y-%m-%d 18:30 %Z')
+    entry_time = Time.parse(m['ts']).strftime('%Y-%m-%d %H:%M %Z')
     assert_equal(entry_time, yesterday, 'new entry is the wrong time')
   end
 

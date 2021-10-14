@@ -425,8 +425,8 @@ class WWID
   ## @param      guessed  (Boolean) already guessed and failed
   ##
   def guess_section(frag, guessed: false)
-    return 'All' if frag =~ /all/i
-
+    return 'All' if frag =~ /^all$/i
+    frag ||= @current_section
     sections.each { |section| return section.cap_first if frag.downcase == section.downcase }
     section = false
     re = frag.split('').join('.*?')
@@ -1523,6 +1523,77 @@ class WWID
   end
 
   ##
+  ## @brief      Rename doing file with date and start fresh one
+  ##
+  def rotate(opt = {})
+    count = opt[:keep] || 0
+    tags = []
+    tags.concat(opt[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if opt[:tag]
+    bool  = opt[:bool] || :and
+    sect = opt[:section] !~ /^all$/i ? guess_section(opt[:section]) : 'all'
+
+    if sect =~ /^all$/i
+      all_sections = sections.dup
+    else
+      all_sections = [sect]
+    end
+
+    counter = 0
+    new_content = {}
+
+
+    all_sections.each do |section|
+      items = @content[section]['items'].dup
+      new_content[section] = {}
+      new_content[section]['original'] = @content[section]['original']
+      new_content[section]['items'] = []
+
+      moved_items = []
+      if !tags.empty? || opt[:search]
+        items.delete_if do |item|
+          if ((!tags.empty? && item.has_tags?(tags, bool)) || (opt[:search] && item.matches_search?(opt[:search].to_s)))
+            moved_items.push(item)
+            counter += 1
+            true
+          else
+            false
+          end
+        end
+        @content[section]['items'] = items
+        new_content[section]['items'] = moved_items
+        @results.push("Rotated #{moved_items.length} items from #{section}")
+      else
+        new_content[section]['items'] = []
+        moved_items = []
+
+        count = items.length if items.length < count
+
+        if items.count > count
+          moved_items.concat(items[count..-1])
+        else
+          moved_items.concat(items)
+        end
+
+        @content[section]['items'] = if count.zero?
+                                       []
+                                     else
+                                       items[0..count - 1]
+                                     end
+        new_content[section]['items'] = moved_items
+
+        @results.push("Rotated #{items.length - count} items from #{section}")
+      end
+    end
+
+    write(@doing_file)
+
+    file = @doing_file.sub(/(\.\w+)$/, "_#{Time.now.strftime('%Y-%m-%d%H:%M')}\\1")
+    @content = new_content
+
+    write(file)
+  end
+
+  ##
   ## @brief      Generate a menu of sections and allow user selection
   ##
   ## @return     (String) The selected section name
@@ -1926,7 +1997,7 @@ class WWID
   ## @param      section      (String) The source section
   ## @param      options      (Hash) Options
   ##
-  def archive(section = 'Currently', options = {})
+  def archive(section = @current_section, options = {})
     count       = options[:keep] || 0
     destination = options[:destination] || 'Archive'
     tags        = options[:tags] || []
@@ -1985,7 +2056,7 @@ class WWID
           end
         end
         moved_items.each do |item|
-          if label && section != 'Currently'
+          if label && section != @current_section
             item['title'] =
               item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
           end
@@ -1998,7 +2069,7 @@ class WWID
         count = items.length if items.length < count
 
         items.map! do |item|
-          if label && section != 'Currently'
+          if label && section != @current_section
             item['title'] =
               item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
           end

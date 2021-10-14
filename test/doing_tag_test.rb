@@ -6,7 +6,7 @@ require 'json'
 require 'doing-helpers'
 require 'test_helper'
 
-# Tests for entry modifying commands
+# Tests for tagging commands
 class DoingTagTest < Test::Unit::TestCase
   include DoingHelpers
 
@@ -45,6 +45,13 @@ class DoingTagTest < Test::Unit::TestCase
     result = doing('show', '-c 1').strip
     assert_match(/@deploy-test\b/, result, 'should have added @deploy-test')
     assert_match(/@dev-test\b/, result, 'should have added @dev-test')
+  end
+
+  def test_tag_autotag
+    doing('now', 'this should autotag brettterpstra.com')
+    result = doing('show', '-c 1').strip
+    assert_match(/@autotag\b/, result, 'should have added @autotag from whitelist')
+    assert_match(/@bt\b/, result, 'should have added @bt from synonyms')
   end
 
   ##
