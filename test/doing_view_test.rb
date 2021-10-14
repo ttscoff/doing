@@ -85,6 +85,12 @@ class DoingViewTest < Test::Unit::TestCase
     assert_match(/bunch/, first_tag[1], 'First tag should be bunch')
   end
 
+  def test_view_date_limit
+    doing('import', @import_file)
+    result = doing('view', '--before', '9/14/2021', '--after', '9/12/2021', 'test2')
+    assert_count_entries(5, result, 'There should be 5 entries between specified dates')
+  end
+
   private
 
   def assert_matches(matches, shown)

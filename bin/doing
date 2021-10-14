@@ -936,6 +936,10 @@ command :show do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)/i, default_value: default
 
+  c.desc 'Tag sort direction (asc|desc)'
+  c.arg_name 'DIRECTION'
+  c.flag [:tag_order], must_match: /^(?:a(?:sc)?|d(?:esc)?)$/i
+
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
@@ -991,8 +995,8 @@ command :show do |c|
       }
     end
 
-    if options[:f]
-      date_string = options[:f]
+    if options[:from]
+      date_string = options[:from]
       if date_string =~ / (to|through|thru|(un)?til|-+) /
         dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
         start = wwid.chronify(dates[0])
@@ -1005,11 +1009,16 @@ command :show do |c|
       dates = [start, finish]
     end
 
-    options[:t] = true if options[:totals]
+    options[:times] = true if options[:totals]
 
     tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
 
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    tag_order = if options[:tag_order]
+                  options[:tag_order] =~ /^d/i ? 'desc' : 'asc'
+                else
+                  'asc'
+                end
     opts = {
       after: options[:after],
       age: options[:age],
@@ -1024,6 +1033,7 @@ command :show do |c|
       section: section,
       sort_tags: options[:sort_tags],
       tag_filter: tag_filter,
+      tag_order: tag_order,
       tags_color: tags_color,
       times: options[:t],
       totals: options[:totals]
