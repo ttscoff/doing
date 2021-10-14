@@ -333,10 +333,6 @@ command :later do |c|
   c.desc "Edit entry with #{ENV['EDITOR']}"
   c.switch %i[e editor], negatable: false, default_value: false
 
-  c.desc 'Edit entry with specified app'
-  c.arg_name 'APP'
-  c.flag %i[a app]
-
   c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
   c.arg_name 'DATE_STRING'
   c.flag %i[b back]
@@ -353,7 +349,7 @@ command :later do |c|
       date = Time.now
     end
 
-    if options[:e] || (args.empty? && $stdin.stat.size.zero?)
+    if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = args.empty? ? '' : args.join(' ')
@@ -456,7 +452,7 @@ command %i[done did] do |c|
       section = wwid.config['current_section']
     end
 
-    if options[:e]
+    if options[:editor]
       exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = ''
@@ -1321,7 +1317,7 @@ command :last do |c|
 
     end
 
-    if options[:e]
+    if options[:editor]
       wwid.edit_last(section: options[:s], options: { search: options[:search], tag: tags, tag_bool: options[:bool] })
     else
       puts wwid.last(times: true, section: options[:s],
@@ -1554,6 +1550,11 @@ command :archive do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Archive entries older than date
+    (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
+
   c.action do |_global_options, options, args|
     if args.empty?
       section = wwid.current_section
@@ -1583,6 +1584,7 @@ command :archive do |c|
                       'AND'
                      end
     opts = {
+      before: options[:before],
       bool: options[:bool],
       destination: options[:to],
       keep: options[:keep],
@@ -1615,6 +1617,11 @@ command :rotate do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Rotate entries older than date
+    (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
+
   c.action do |_global_options, options, args|
     if options[:section] && options[:section] !~ /^all$/i
       options[:section] = wwid.guess_section(options[:section])
@@ -1641,11 +1648,11 @@ command :open do |c|
   if `uname` =~ /Darwin/
     c.desc 'Open with app name'
     c.arg_name 'APP_NAME'
-    c.flag [:a]
+    c.flag %i[a app]
 
     c.desc 'Open with app bundle id'
     c.arg_name 'BUNDLE_ID'
-    c.flag [:b]
+    c.flag %i[b bundle_id]
   end
   c.desc "Open with $EDITOR (#{ENV['EDITOR']})"
   c.switch %i[e editor], negatable: false, default_value: false
@@ -1656,11 +1663,11 @@ command :open do |c|
       k.instance_of?(String) || v.nil? || v == false
     end
     if `uname` =~ /Darwin/
-      if options[:a]
+      if options[:app]
         system %(open -a "#{options[:a]}" "#{File.expand_path(wwid.doing_file)}")
-      elsif options[:b]
+      elsif options[:bundle_id]
         system %(open -b "#{options[:b]}" "#{File.expand_path(wwid.doing_file)}")
-      elsif options[:e]
+      elsif options[:editor]
         exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
         system %($EDITOR "#{File.expand_path(wwid.doing_file)}")

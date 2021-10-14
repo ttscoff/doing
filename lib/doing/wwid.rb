@@ -1100,7 +1100,6 @@ class WWID
         items = @content[section]['items'].dup.sort_by { |item| item['date'] }.reverse
         idx = 0
         done_date = Time.now
-        next_start = Time.now
         count = (opt[:count]).zero? ? items.length : opt[:count]
         items.map! do |item|
           break if idx == count
@@ -1119,8 +1118,8 @@ class WWID
               end
             else
               if opt[:sequential]
-                done_date = next_start - 1
-                next_start = item['date']
+                next_entry = next_item(item)
+                done_date = next_entry['date'] - 60 if next_entry
               elsif opt[:took]
                 if item['date'] + opt[:took] > Time.now
                   item['date'] = Time.now - opt[:took]
@@ -1207,6 +1206,24 @@ class WWID
 
     @results.push("Entry moved to #{section}: #{new_item['title']}")
     return new_item
+  end
+
+  ##
+  ## @brief      Get next item in the index
+  ##
+  ## @param      old_item
+  ##
+  def next_item(old_item)
+    section = old_item['section']
+
+    section_items = @content[section]['items'].sort_by { |entry| entry['date'] }
+    idx = section_items.index(old_item)
+
+    if section_items.size > idx
+      section_items[idx + 1]
+    else
+      nil
+    end
   end
 
   ##
@@ -1549,9 +1566,15 @@ class WWID
       new_content[section]['items'] = []
 
       moved_items = []
-      if !tags.empty? || opt[:search]
+      if !tags.empty? || opt[:search] || opt[:before]
+        if opt[:before]
+          time_string = opt[:before]
+          time_string += ' 12am' if time_string !~ /(\d+:\d+|\d+[ap])/
+          cutoff = chronify(time_string)
+        end
+
         items.delete_if do |item|
-          if ((!tags.empty? && item.has_tags?(tags, bool)) || (opt[:search] && item.matches_search?(opt[:search].to_s)))
+          if ((!tags.empty? && item.has_tags?(tags, bool)) || (opt[:search] && item.matches_search?(opt[:search].to_s)) || (opt[:before] && item['date'] < cutoff))
             moved_items.push(item)
             counter += 1
             true
@@ -2012,7 +2035,7 @@ class WWID
     destination = guess_section(destination)
 
     if sections.include?(destination) && (sections.include?(section) || archive_all)
-      do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label] })
+      do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label], before: options[:before] })
       write(doing_file)
     else
       exit_now! 'Either source or destination does not exist'
@@ -2045,9 +2068,15 @@ class WWID
       items = @content[section]['items'].dup
 
       moved_items = []
-      if !tags.empty? || opt[:search]
+      if !tags.empty? || opt[:search] || opt[:before]
+        if opt[:before]
+          time_string = opt[:before]
+          time_string += ' 12am' if time_string !~ /(\d+:\d+|\d+[ap])/
+          cutoff = chronify(time_string)
+        end
+
         items.delete_if do |item|
-          if (!tags.empty? && item.has_tags?(tags, bool) || (opt[:search] && item.matches_search?(opt[:search].to_s)))
+          if ((!tags.empty? && item.has_tags?(tags, bool)) || (opt[:search] && item.matches_search?(opt[:search].to_s)) || (opt[:before] && item['date'] < cutoff))
             moved_items.push(item)
             counter += 1
             true

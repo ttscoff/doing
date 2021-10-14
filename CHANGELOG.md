@@ -1,3 +1,8 @@
+### 1.0.85
+
+- Fix --auto for finish command
+- Add --before DATE_STRING to archive and rotate commands
+
 ### 1.0.84
 
 - `rotate` command for archiving entries to new file
