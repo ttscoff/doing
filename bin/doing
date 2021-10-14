@@ -1668,6 +1668,9 @@ command :import do |c|
   c.arg_name 'TAGS'
   c.flag :tag
 
+  c.desc 'Autotag entries'
+  c.switch :autotag, negatable: true, default_value: true
+
   c.desc 'Prefix entries with'
   c.arg_name 'PREFIX'
   c.flag :prefix
@@ -1681,7 +1684,14 @@ command :import do |c|
 
     if options[:type] =~ /^tim/i
       args.each do |path|
-        wwid.import_timing(path, { section: section, tag: options[:tag], prefix: options[:prefix], no_overlap: !options[:overlap] })
+        options = {
+          autotag: options[:autotag],
+          no_overlap: !options[:overlap],
+          prefix: options[:prefix],
+          section: section,
+          tag: options[:tag]
+        }
+        wwid.import_timing(path, options)
         wwid.write(wwid.doing_file)
       end
     else

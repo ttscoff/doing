@@ -627,6 +627,7 @@ class WWID
   def import_timing(path, opt = {})
     section = opt[:section] || @current_section
     opt[:no_overlap] ||= false
+    opt[:autotag] ||= @auto_tag
 
     add_section(section) unless @content.has_key?(section)
 
@@ -657,7 +658,7 @@ class WWID
           title += " @#{tag}"
         end
       end
-      title = autotag(title) if @auto_tag
+      title = autotag(title) if opt[:autotag]
       title += " @done(#{end_time.strftime('%Y-%m-%d %H:%M')})"
       title.gsub!(/ +/, ' ')
       title.strip!
