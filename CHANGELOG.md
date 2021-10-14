@@ -1,3 +1,7 @@
+### 1.0.86
+
+- Add `count` config option for templates->recent
+
 ### 1.0.85
 
 - Fix --auto for finish command

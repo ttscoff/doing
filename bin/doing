@@ -1097,7 +1097,12 @@ command :recent do |c|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
     unless global_options[:version]
-      count = args.empty? ? 10 : args[0].to_i
+      if wwid.config['templates']['recent'].key?('count')
+        config_count = wwid.config['templates']['recent']['count'].to_i
+      else
+        config_count = 10
+      end
+      count = args.empty? ? config_count : args[0].to_i
       options[:t] = true if options[:totals]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
       tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
