@@ -124,7 +124,8 @@ class WWID
     @config['templates']['recent'] ||= {
       'date_format' => '%_I:%M%P',
       'template' => '%shortdate: %title (%section)',
-      'wrap_width' => 88
+      'wrap_width' => 88,
+      'count' => 10
     }
     @config['views'] ||= {
       'done' => {

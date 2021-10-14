@@ -92,6 +92,7 @@ A basic configuration looks like this:
         date_format: '%_I:%M%P'
         template: '%date > %title%odnote'
         wrap_width: 50
+        count: 10
     autotag:
       whitelist:
       - coding
@@ -238,6 +239,8 @@ and output my recent entries like this:
     _______________________________________________________________________
 
     $ 
+
+The recent template can include a `count` key to specify the number of entries shown when run without an argument. Default is 10.
 
 ### Custom views
 
