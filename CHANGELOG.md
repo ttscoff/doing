@@ -1,6 +1,12 @@
 ### 1.0.87
 
 - Add leading spaces to make %shortdate align properly, at least for the last week
+- Add --tag, --bool, and --search to view command
+- Add --before and --after date search to view command
+- Add --before and --after date search to show command
+- Add --before and --after time search to today command
+- Add --search filter to show command
+- More alignment/formatting fixes for %shortdate
 
 ### 1.0.86
 

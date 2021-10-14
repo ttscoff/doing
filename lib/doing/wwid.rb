@@ -1742,6 +1742,24 @@ class WWID
       end
     end
 
+    if opt[:before]
+      time_string = opt[:before]
+      time_string += ' 12am' if time_string !~ /(\d+:\d+|\d+[ap])/
+      cutoff = chronify(time_string)
+      if cutoff
+        items.delete_if { |item| item['date'] >= cutoff }
+      end
+    end
+
+    if opt[:after]
+      time_string = opt[:after]
+      time_string += ' 11:59pm' if time_string !~ /(\d+:\d+|\d+[ap])/
+      cutoff = chronify(time_string)
+      if cutoff
+        items.delete_if { |item| item['date'] <= cutoff }
+      end
+    end
+
     if opt[:today]
       items.delete_if do |item|
         item['date'] < Date.today.to_time
@@ -1970,12 +1988,12 @@ class WWID
         output.sub!(/%shortdate/) do
           if item['date'] > Date.today.to_time
             item['date'].strftime('    %_I:%M%P')
-          elsif item['date'] > (Date.today - 7).to_time
+          elsif item['date'] > (Date.today - 6).to_time
             item['date'].strftime('%a %_I:%M%P')
           elsif item['date'].year == Date.today.year
-            item['date'].strftime('%b %d, %-I:%M%P')
+            item['date'].strftime('%m/%d %_I:%M%P')
           else
-            item['date'].strftime('%b %d %Y, %-I:%M%P')
+            item['date'].strftime('%m/%d/%Y %_I:%M%P')
           end
         end
 
@@ -2189,8 +2207,22 @@ class WWID
     opt[:sort_tags] ||= false
 
     cfg = @config['templates']['today']
-    list_section({ section: opt[:section], wrap_width: cfg['wrap_width'], count: 0,
-                   format: cfg['date_format'], template: cfg['template'], order: 'asc', today: true, times: times, output: output, totals: opt[:totals], sort_tags: opt[:sort_tags] })
+    options = {
+      after: opt[:after],
+      before: opt[:before],
+      count: 0,
+      format: cfg['date_format'],
+      order: 'asc',
+      output: output,
+      section: opt[:section],
+      sort_tags: opt[:sort_tags],
+      template: cfg['template'],
+      times: times,
+      today: true,
+      totals: opt[:totals],
+      wrap_width: cfg['wrap_width']
+    }
+    list_section(options)
   end
 
   ##

@@ -896,9 +896,21 @@ command :show do |c|
   c.arg_name 'MAX'
   c.flag %i[c count], default_value: 0
 
-  c.desc 'Age (oldest/newest)'
+  c.desc 'Age (oldest|newest)'
   c.arg_name 'AGE'
   c.flag %i[a age], default_value: 'newest'
+
+  c.desc 'View entries older than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
+
+  c.desc 'View entries newer than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:after]
+
+  c.desc 'Search filter, surround with slashes for regex (/query/)'
+  c.arg_name 'QUERY'
+  c.flag [:search]
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
@@ -999,13 +1011,16 @@ command :show do |c|
 
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
     opts = {
-      age: options[:a],
+      after: options[:after],
+      age: options[:age],
+      before: options[:before],
       count: options[:c].to_i,
       date_filter: dates,
       highlight: true,
       only_timed: options[:only_timed],
       order: options[:s],
       output: options[:output],
+      search: options[:search],
       section: section,
       sort_tags: options[:sort_tags],
       tag_filter: tag_filter,
@@ -1029,6 +1044,14 @@ command [:grep, :search] do |c|
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
+
+  c.desc 'Constrain search to entries older than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
+
+  c.desc 'Constrain search to entries newer than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:after]
 
   c.desc 'Output to export format (csv|html|json|template|timeline)'
   c.arg_name 'FORMAT'
@@ -1054,10 +1077,12 @@ command [:grep, :search] do |c|
 
     section = wwid.guess_section(options[:s]) if options[:s]
 
-    options[:t] = true if options[:totals]
+    options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     opts = {
+      after: options[:after],
+      before: options[:before],
       highlight: true,
       only_timed: options[:only_timed],
       output: options[:output],
@@ -1065,7 +1090,7 @@ command [:grep, :search] do |c|
       section: section,
       sort_tags: options[:sort_tags],
       tags_color: tags_color,
-      times: options[:t],
+      times: options[:times],
       totals: options[:totals]
     }
 
@@ -1142,12 +1167,25 @@ command :today do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
 
+  c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
+  c.arg_name 'TIME_STRING'
+  c.flag [:before]
+
+  c.desc 'View entries after specified time (e.g. 8am, 12:30pm, 15:00)'
+  c.arg_name 'TIME_STRING'
+  c.flag [:after]
+
   c.action do |_global_options, options, _args|
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-
-    puts wwid.today(options[:t], options[:output],
-                    { totals: options[:totals], section: options[:s], sort_tags: options[:sort_tags] }).chomp
+    opt = {
+      after: options[:after],
+      before: options[:before],
+      section: options[:section],
+      sort_tags: options[:sort_tags],
+      totals: options[:totals]
+    }
+    puts wwid.today(options[:times], options[:output], opt).chomp
   end
 end
 
@@ -1381,7 +1419,7 @@ command :colors do |c|
 end
 
 desc 'Display a user-created view'
-long_desc 'Command line options override associated view settings'
+long_desc 'Command line options override view configuration'
 arg_name 'VIEW_NAME'
 command :view do |c|
   c.desc 'Section'
@@ -1405,6 +1443,18 @@ command :view do |c|
   c.desc 'Include colors in output'
   c.switch [:color], default_value: true, negatable: true
 
+  c.desc 'Tag filter, combine multiple tags with a comma.'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Tag boolean (AND,OR,NOT)'
+  c.arg_name 'BOOLEAN'
+  c.flag %i[b bool], must_match: /(?:and|all|any|or|not|none)/i, default_value: 'OR'
+
+  c.desc 'Search filter, surround with slashes for regex (/query/)'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
   c.desc 'Sort tags by (name|time)'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i
@@ -1413,10 +1463,20 @@ command :view do |c|
   c.arg_name 'DIRECTION'
   c.flag [:tag_order], must_match: /^(?:a(?:sc)?|d(?:esc)?)$/i
 
+  c.desc 'View entries older than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
+
+  c.desc 'View entries newer than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:after]
+
   c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
 
   c.action do |_global_options, options, args|
+    exit_now! '--tag and --search cannot be used together' if options[:tag] && options[:search]
+
     title = if args.empty?
               wwid.choose_view
             else
@@ -1441,7 +1501,11 @@ command :view do |c|
       format = view.key?('date_format') ? view['date_format'] : nil
       tags_color = view.key?('tags_color') ? view['tags_color'] : nil
       tag_filter = false
-      if view.key?('tags') && !(view['tags'].nil? || view['tags'].empty?)
+      if options[:tag]
+        tag_filter = { 'tags' => [], 'bool' => 'OR' }
+        tag_filter['tags'] = options[:tag].gsub(/[, ]+/, ' ').split(' ').map(&:strip)
+        tag_filter['bool'] = options[:bool].normalize_bool
+      elsif view.key?('tags') && !(view['tags'].nil? || view['tags'].empty?)
         tag_filter = { 'tags' => [], 'bool' => 'OR' }
         tag_filter['tags'] = if view['tags'].instance_of?(Array)
                                view['tags'].map(&:strip)
@@ -1490,14 +1554,17 @@ command :view do |c|
                   else
                     'asc'
                   end
-      warn "TAG ORDER: #{options[:tag_order]}"
+
       opts = {
+        after: options[:after],
+        before: options[:before],
         count: count,
         format: format,
         highlight: options[:color],
         only_timed: only_timed,
         order: order,
-        output: options[:o],
+        output: options[:output],
+        search: options[:search],
         section: section,
         sort_tags: options[:sort_tags],
         tag_filter: tag_filter,
