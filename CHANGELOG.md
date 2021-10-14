@@ -2,6 +2,7 @@
 
 - Fix --auto for finish command
 - Add --before DATE_STRING to archive and rotate commands
+- Only create on rotate file per day, merge new entries into existing file
 
 ### 1.0.84
 

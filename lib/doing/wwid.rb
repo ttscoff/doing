@@ -1495,7 +1495,7 @@ class WWID
   ##
   ## @param      file  (String) The filepath to write to
   ##
-  def write(file = nil)
+  def write(file = nil, backup: true)
     output = @other_content_top ? "#{@other_content_top.join("\n")}\n" : ''
 
     @content.each do |title, section|
@@ -1507,7 +1507,7 @@ class WWID
       $stdout.puts output
     else
       file = File.expand_path(file)
-      if File.exist?(file)
+      if File.exist?(file) && backup
         # Create a backup copy for the undo command
         FileUtils.cp(file, "#{file}~")
       end
@@ -1610,10 +1610,15 @@ class WWID
 
     write(@doing_file)
 
-    file = @doing_file.sub(/(\.\w+)$/, "_#{Time.now.strftime('%Y-%m-%d%H:%M')}\\1")
-    @content = new_content
+    file = @doing_file.sub(/(\.\w+)$/, "_#{Time.now.strftime('%Y-%m-%d')}\\1")
+    if File.exist?(file)
+      init_doing_file(file)
+      @content.deep_merge(new_content)
+    else
+      @content = new_content
+    end
 
-    write(file)
+    write(file, backup: false)
   end
 
   ##
