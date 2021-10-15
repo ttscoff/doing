@@ -2,7 +2,7 @@
 
 **A command line tool for remembering what you were doing and tracking what you've done.**
 
-_If you're one of the rare people like me who find this useful, feel free to [buy me some coffee](http://brettterpstra.com/donate/)._
+_If you're one of the rarev people like me who find this useful, feel free to [buy me some coffee](http://brettterpstra.com/donate/)._
 
 ## Contents
 
