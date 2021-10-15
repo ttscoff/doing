@@ -12,3 +12,5 @@ vendor
 .tool-versions
 wwid.md
 COMMANDS.bak
+.gitsecret/keys/random_seed
+!*.secret
