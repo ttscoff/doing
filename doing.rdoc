@@ -1,6 +1,6 @@
 == doing - A CLI for a What Was I Doing system
 
-v1.0.81
+v1.0.90
 
 === Global Options
 === --config_file arg
@@ -101,6 +101,14 @@ Move entries between sections
 
 
 ===== Options
+===== --before DATE_STRING
+
+Archive entries older than date
+    (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)
+
+[Default Value] None
+
+
 ===== --bool BOOLEAN
 
 Tag boolean (AND|OR|NOT)
@@ -160,7 +168,7 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 Section
 
-[Default Value] Currently
+[Default Value] None
 
 
 ===== --tag TAG
@@ -243,7 +251,7 @@ Backdate start date by interval [4pm|20m|2h|yesterday noon]
 
 Section
 
-[Default Value] Currently
+[Default Value] None
 
 
 ===== -t|--took INTERVAL
@@ -280,6 +288,13 @@ Mark last X entries as @done
 
 Marks the last X entries with a @done tag and current date. Does not alter already completed entries.
 ===== Options
+===== --at DATE_STRING
+
+Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.
+
+[Default Value] None
+
+
 ===== -b|--back DATE_STRING
 
 Backdate completed date to date string [4pm|20m|2h|yesterday noon]
@@ -299,7 +314,7 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 Section
 
-[Default Value] Currently
+[Default Value] None
 
 
 ===== --search QUERY
@@ -331,7 +346,7 @@ Archive entries
 
 ===== --auto
 Auto-generate finish dates from next entry's start time.
-  Automatically generate completion dates 1 minute before next start date.
+  Automatically generate completion dates 1 minute before next item (in any section) began.
   --auto overrides the --date and --back parameters.
 
 
@@ -353,6 +368,20 @@ Search all sections (or limit to a single section) for entries matching text or 
 
 To search with regular expressions, single quote the string and surround with slashes: `doing search '/\bm.*?x\b/'`
 ===== Options
+===== --after DATE_STRING
+
+Constrain search to entries newer than date
+
+[Default Value] None
+
+
+===== --before DATE_STRING
+
+Constrain search to entries older than date
+
+[Default Value] None
+
+
 ===== -o|--output FORMAT
 
 Output to export format (csv|html|json|template|timeline)
@@ -417,7 +446,7 @@ Prefix entries with
 
 Target section
 
-[Default Value] Currently
+[Default Value] None
 
 
 ===== --tag TAGS
@@ -432,6 +461,11 @@ Tag all imported entries
 Import type
 
 [Default Value] timing
+
+
+===== --[no-]autotag
+Autotag entries
+
 
 
 ===== --[no-]overlap
@@ -483,13 +517,6 @@ Add an item to the Later section
 
 
 ===== Options
-===== -a|--app APP
-
-Edit entry with specified app
-
-[Default Value] None
-
-
 ===== -b|--back DATE_STRING
 
 Backdate start time to date string [4pm|20m|2h|yesterday noon]
@@ -518,7 +545,7 @@ Mark last entry as highlighted
 
 Section
 
-[Default Value] Currently
+[Default Value] None
 
 
 ===== -r|--remove
@@ -554,7 +581,7 @@ Note
 
 Section
 
-[Default Value] Currently
+[Default Value] None
 
 
 ===== -a|--[no-]archive
@@ -614,7 +641,7 @@ Note
 
 Section
 
-[Default Value] Currently
+[Default Value] None
 
 
 ===== -e|--editor
@@ -672,14 +699,14 @@ Open the "doing" file in an editor
 
 `doing open` defaults to using the editor_app setting in /Users/ttscoff/.doingrc (Taskpaper)
 ===== Options
-===== -a APP_NAME
+===== -a|--app APP_NAME
 
 Open with app name
 
 [Default Value] None
 
 
-===== -b BUNDLE_ID
+===== -b|--bundle_id BUNDLE_ID
 
 Open with app bundle id
 
@@ -721,6 +748,56 @@ Show intervals with totals at the end of output
 
 
 
+==== Command: <tt>rotate </tt>
+Move entries to archive file
+
+
+===== Options
+===== --before DATE_STRING
+
+Rotate entries older than date
+    (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)
+
+[Default Value] None
+
+
+===== --bool BOOLEAN
+
+Tag boolean (AND|OR|NOT)
+
+[Default Value] AND
+[Must Match] (?i-mx:and|all|any|or|not|none)
+
+
+===== -k|--keep X
+
+How many items to keep in each section (most recent)
+
+[Default Value] None
+[Must Match] (?-mix:^\d+$)
+
+
+===== -s|--section SECTION_NAME
+
+Section to rotate
+
+[Default Value] All
+
+
+===== --search QUERY
+
+Search filter
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
+
+[Default Value] None
+
+
 ==== Command: <tt>sections </tt>
 List sections
 
@@ -747,7 +824,7 @@ Move selected items to section
 
 ===== -o|--output FORMAT
 
-Output format for export (doing|taskpaper|csv|html|json|template|timeline)
+Output entries to format (doing|taskpaper|csv|html|json|template|timeline)
 
 [Default Value] None
 [Must Match] (?i-mx:^(?:doing|taskpaper|html|csv|json|template|timeline)$)
@@ -755,7 +832,7 @@ Output format for export (doing|taskpaper|csv|html|json|template|timeline)
 
 ===== -q|--query QUERY
 
-Initial search query for filtering
+Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "'search"
 
 [Default Value] None
 
@@ -812,7 +889,12 @@ Add flag to selected item(s)
 
 
 ===== --force
-Perform action without confirmation
+Perform action without confirmation.
+
+
+
+===== --[no-]menu
+Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.
 
 
 
@@ -829,9 +911,16 @@ The argument can be a section name, @tag(s) or both.
 ===== Options
 ===== -a|--age AGE
 
-Age (oldest/newest)
+Age (oldest|newest)
 
 [Default Value] newest
+
+
+===== --after DATE_STRING
+
+View entries newer than date
+
+[Default Value] None
 
 
 ===== -b|--bool BOOLEAN
@@ -840,6 +929,13 @@ Tag boolean (AND,OR,NOT)
 
 [Default Value] OR
 [Must Match] (?i-mx:and|all|any|or|not|none)
+
+
+===== --before DATE_STRING
+
+View entries older than date
+
+[Default Value] None
 
 
 ===== -c|--count MAX
@@ -874,11 +970,26 @@ Sort order (asc/desc)
 [Must Match] (?i-mx:^[ad].*)
 
 
+===== --search QUERY
+
+Search filter, surround with slashes for regex (/query/)
+
+[Default Value] None
+
+
 ===== --tag TAG
 
 Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
 
 [Default Value] None
+
+
+===== --tag_order DIRECTION
+
+Tag sort direction (asc|desc)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
 ===== --tag_sort KEY
@@ -1022,6 +1133,20 @@ List entries from today
 
 
 ===== Options
+===== --after TIME_STRING
+
+View entries after specified time (e.g. 8am, 12:30pm, 15:00)
+
+[Default Value] None
+
+
+===== --before TIME_STRING
+
+View entries before specified time (e.g. 8am, 12:30pm, 15:00)
+
+[Default Value] None
+
+
 ===== -o|--output FORMAT
 
 Output to export format (csv|html|json|template|timeline)
@@ -1070,11 +1195,33 @@ Specify alternate doing file
 ==== Command: <tt>view  VIEW_NAME</tt>
 Display a user-created view
 
-
+Command line options override view configuration
 ===== Options
+===== --after DATE_STRING
+
+View entries newer than date
+
+[Default Value] None
+
+
+===== -b|--bool BOOLEAN
+
+Tag boolean (AND,OR,NOT)
+
+[Default Value] OR
+[Must Match] (?i-mx:and|all|any|or|not|none)
+
+
+===== --before DATE_STRING
+
+View entries older than date
+
+[Default Value] None
+
+
 ===== -c|--count COUNT
 
-Count to display (override view settings)
+Count to display
 
 [Default Value] None
 [Must Match] (?-mix:^\d+$)
@@ -1090,16 +1237,38 @@ Output to export format (csv|html|json|template|timeline)
 
 ===== -s|--section NAME
 
-Section (override view settings)
+Section
 
 [Default Value] None
+
+
+===== --search QUERY
+
+Search filter, surround with slashes for regex (/query/)
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Tag filter, combine multiple tags with a comma.
+
+[Default Value] None
+
+
+===== --tag_order DIRECTION
+
+Tag sort direction (asc|desc)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
 ===== --tag_sort KEY
 
 Sort tags by (name|time)
 
-[Default Value] name
+[Default Value] None
 [Must Match] (?i-mx:^(?:name|time)$)
 
 
@@ -1109,7 +1278,7 @@ Include colors in output
 
 
 ===== --only_timed
-Only show items with recorded time intervals
+Only show items with recorded time intervals (override view settings)
 
 
 
@@ -1138,6 +1307,20 @@ List entries from yesterday
 
 
 ===== Options
+===== --after TIME_STRING
+
+View entries after specified time (e.g. 8am, 12:30pm, 15:00)
+
+[Default Value] None
+
+
+===== --before TIME_STRING
+
+View entries before specified time (e.g. 8am, 12:30pm, 15:00)
+
+[Default Value] None
+
+
 ===== -o|--output FORMAT
 
 Output to export format (csv|html|json|template|timeline)
@@ -1151,6 +1334,14 @@ Output to export format (csv|html|json|template|timeline)
 Specify a section
 
 [Default Value] All
+
+
+===== --tag_order DIRECTION
+
+Tag sort direction (asc|desc)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
 ===== --tag_sort KEY

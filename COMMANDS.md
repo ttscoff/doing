@@ -2,7 +2,7 @@
 
 A CLI for a What Was I Doing system
 
-*v1.0.81*
+*v1.0.90*
 
 ## Global Options
 
@@ -89,6 +89,11 @@ Repeat last entry matching tags. Combine multiple tags with a comma.
 
 #### Options
 
+##### `--before` DATE_STRING
+
+Archive entries older than date
+    (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)
+
 ##### `--bool` BOOLEAN
 
 Tag boolean (AND|OR|NOT)
@@ -142,8 +147,6 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 ##### `-s` | `--section` NAME
 
 Section
-
-*Default Value:* `Currently`
 
 ##### `--tag` TAG
 
@@ -214,8 +217,6 @@ Backdate start date by interval [4pm|20m|2h|yesterday noon]
 
 Section
 
-*Default Value:* `Currently`
-
 ##### `-t` | `--took` INTERVAL
 
 Set completion date to start date plus interval (XX[mhd] or HH:MM).
@@ -248,6 +249,10 @@ Remove @done tag
 
 #### Options
 
+##### `--at` DATE_STRING
+
+Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.
+
 ##### `-b` | `--back` DATE_STRING
 
 Backdate completed date to date string [4pm|20m|2h|yesterday noon]
@@ -263,8 +268,6 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 ##### `-s` | `--section` NAME
 
 Section
-
-*Default Value:* `Currently`
 
 ##### `--search` QUERY
 
@@ -286,7 +289,7 @@ Archive entries
 ##### `--auto`
 
 Auto-generate finish dates from next entry's start time.
-  Automatically generate completion dates 1 minute before next start date.
+  Automatically generate completion dates 1 minute before next item (in any section) began.
   --auto overrides the --date and --back parameters.
 
 ##### `--[no-]date`
@@ -308,6 +311,14 @@ Finish last entry (or entries) not already marked @done
 > To search with regular expressions, single quote the string and surround with slashes: `doing search '/\bm.*?x\b/'`
 
 #### Options
+
+##### `--after` DATE_STRING
+
+Constrain search to entries newer than date
+
+##### `--before` DATE_STRING
+
+Constrain search to entries older than date
 
 ##### `-o` | `--output` FORMAT
 
@@ -373,8 +384,6 @@ Prefix entries with
 
 Target section
 
-*Default Value:* `Currently`
-
 ##### `--tag` TAGS
 
 Tag all imported entries
@@ -384,6 +393,10 @@ Tag all imported entries
 Import type
 
 *Default Value:* `timing`
+
+##### `--[no-]autotag`
+
+Autotag entries
 
 ##### `--[no-]overlap`
 
@@ -431,10 +444,6 @@ Edit entry with /Users/ttscoff/scripts/editor.sh
 
 #### Options
 
-##### `-a` | `--app` APP
-
-Edit entry with specified app
-
 ##### `-b` | `--back` DATE_STRING
 
 Backdate start time to date string [4pm|20m|2h|yesterday noon]
@@ -458,8 +467,6 @@ Edit entry with /Users/ttscoff/scripts/editor.sh
 ##### `-s` | `--section` NAME
 
 Section
-
-*Default Value:* `Currently`
 
 ##### `-r`|`--remove`
 
@@ -488,8 +495,6 @@ Note
 ##### `-s` | `--section` NAME
 
 Section
-
-*Default Value:* `Currently`
 
 ##### `-a`|`--[no-]archive`
 
@@ -544,8 +549,6 @@ Note
 ##### `-s` | `--section` NAME
 
 Section
-
-*Default Value:* `Currently`
 
 ##### `-e`|`--editor`
 
@@ -605,11 +608,11 @@ Show time totals at the end of output
 
 #### Options
 
-##### `-a` APP_NAME
+##### `-a` | `--app` APP_NAME
 
 Open with app name
 
-##### `-b` BUNDLE_ID
+##### `-b` | `--bundle_id` BUNDLE_ID
 
 Open with app bundle id
 
@@ -649,6 +652,47 @@ Show intervals with totals at the end of output
 
 * * * * * *
 
+### `$ doing` <mark>`rotate`</mark> ``
+
+*Move entries to archive file*
+
+#### Options
+
+##### `--before` DATE_STRING
+
+Rotate entries older than date
+    (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)
+
+##### `--bool` BOOLEAN
+
+Tag boolean (AND|OR|NOT)
+
+*Default Value:* `AND`
+
+*Must Match:* `(?i-mx:and|all|any|or|not|none)`
+
+##### `-k` | `--keep` X
+
+How many items to keep in each section (most recent)
+
+*Must Match:* `(?-mix:^\d+$)`
+
+##### `-s` | `--section` SECTION_NAME
+
+Section to rotate
+
+*Default Value:* `All`
+
+##### `--search` QUERY
+
+Search filter
+
+##### `--tag` TAG
+
+Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
+
+* * * * * *
+
 ### `$ doing` <mark>`sections`</mark> ``
 
 *List sections*
@@ -677,13 +721,13 @@ Move selected items to section
 
 ##### `-o` | `--output` FORMAT
 
-Output format for export (doing|taskpaper|csv|html|json|template|timeline)
+Output entries to format (doing|taskpaper|csv|html|json|template|timeline)
 
 *Must Match:* `(?i-mx:^(?:doing|taskpaper|html|csv|json|template|timeline)$)`
 
 ##### `-q` | `--query` QUERY
 
-Initial search query for filtering
+Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "'search"
 
 ##### `-s` | `--section` SECTION
 
@@ -723,7 +767,11 @@ Add flag to selected item(s)
 
 ##### `--force`
 
-Perform action without confirmation
+Perform action without confirmation.
+
+##### `--[no-]menu`
+
+Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.
 
 ##### `-r`|`--remove`
 
@@ -742,9 +790,13 @@ Reverse -c, -f, --flag, and -t (remove instead of adding)
 
 ##### `-a` | `--age` AGE
 
-Age (oldest/newest)
+Age (oldest|newest)
 
 *Default Value:* `newest`
+
+##### `--after` DATE_STRING
+
+View entries newer than date
 
 ##### `-b` | `--bool` BOOLEAN
 
@@ -753,6 +805,10 @@ Tag boolean (AND,OR,NOT)
 *Default Value:* `OR`
 
 *Must Match:* `(?i-mx:and|all|any|or|not|none)`
+
+##### `--before` DATE_STRING
+
+View entries older than date
 
 ##### `-c` | `--count` MAX
 
@@ -780,9 +836,19 @@ Sort order (asc/desc)
 
 *Must Match:* `(?i-mx:^[ad].*)`
 
+##### `--search` QUERY
+
+Search filter, surround with slashes for regex (/query/)
+
 ##### `--tag` TAG
 
 Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
+
+##### `--tag_order` DIRECTION
+
+Tag sort direction (asc|desc)
+
+*Must Match:* `(?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)`
 
 ##### `--tag_sort` KEY
 
@@ -919,6 +985,14 @@ Tag last entry (or entries) not marked @done
 
 #### Options
 
+##### `--after` TIME_STRING
+
+View entries after specified time (e.g. 8am, 12:30pm, 15:00)
+
+##### `--before` TIME_STRING
+
+View entries before specified time (e.g. 8am, 12:30pm, 15:00)
+
 ##### `-o` | `--output` FORMAT
 
 Output to export format (csv|html|json|template|timeline)
@@ -965,11 +1039,29 @@ Specify alternate doing file
 
 *Display a user-created view*
 
+> Command line options override view configuration
+
 #### Options
+
+##### `--after` DATE_STRING
+
+View entries newer than date
+
+##### `-b` | `--bool` BOOLEAN
+
+Tag boolean (AND,OR,NOT)
+
+*Default Value:* `OR`
+
+*Must Match:* `(?i-mx:and|all|any|or|not|none)`
+
+##### `--before` DATE_STRING
+
+View entries older than date
 
 ##### `-c` | `--count` COUNT
 
-Count to display (override view settings)
+Count to display
 
 *Must Match:* `(?-mix:^\d+$)`
 
@@ -981,13 +1073,25 @@ Output to export format (csv|html|json|template|timeline)
 
 ##### `-s` | `--section` NAME
 
-Section (override view settings)
+Section
+
+##### `--search` QUERY
+
+Search filter, surround with slashes for regex (/query/)
+
+##### `--tag` TAG
+
+Tag filter, combine multiple tags with a comma.
+
+##### `--tag_order` DIRECTION
+
+Tag sort direction (asc|desc)
+
+*Must Match:* `(?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)`
 
 ##### `--tag_sort` KEY
 
 Sort tags by (name|time)
-
-*Default Value:* `name`
 
 *Must Match:* `(?i-mx:^(?:name|time)$)`
 
@@ -997,7 +1101,7 @@ Include colors in output
 
 ##### `--only_timed`
 
-Only show items with recorded time intervals
+Only show items with recorded time intervals (override view settings)
 
 ##### `-t`|`--[no-]times`
 
@@ -1027,6 +1131,14 @@ List in single column
 
 #### Options
 
+##### `--after` TIME_STRING
+
+View entries after specified time (e.g. 8am, 12:30pm, 15:00)
+
+##### `--before` TIME_STRING
+
+View entries before specified time (e.g. 8am, 12:30pm, 15:00)
+
 ##### `-o` | `--output` FORMAT
 
 Output to export format (csv|html|json|template|timeline)
@@ -1038,6 +1150,12 @@ Output to export format (csv|html|json|template|timeline)
 Specify a section
 
 *Default Value:* `All`
+
+##### `--tag_order` DIRECTION
+
+Tag sort direction (asc|desc)
+
+*Must Match:* `(?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)`
 
 ##### `--tag_sort` KEY
 
@@ -1059,5 +1177,5 @@ Show time totals at the end of output
 
 #### [Default Command] recent
 
-Documentation generated 2021-09-26 11:02
+Documentation generated 2021-10-15 05:03
 
