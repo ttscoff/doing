@@ -68,7 +68,7 @@
 - If no action is specified with select command, an interactive menu is
 presented
 - add output action select command with formatting and save options
-- Don't link urls in html output that don't have a protocol
+- Don't link URLs in html output that don't have a protocol
 
 ### 1.0.76
 
@@ -251,7 +251,7 @@ presented
 
 ### 1.0.44
 
-- Remove unneccessary console logging
+- Remove unnecessary console logging
 
 ### 1.0.43
 
@@ -443,7 +443,7 @@ Catching up on the changelog. Kind of. A lot has happened, mostly fixes.
 * Default to showing times #26, show totals even if no tags exist #27, fix indentation #29
 * Add section label to archived tasks automatically, excepting `Currently` section
 * Today outputs and backdate for finish
-* HTML styling and fix for 1.8.7 haml errors
+* HTML styling and fix for 1.8.7 HAML errors
 * Look, HTML output! (`--output html`)
 * Also, `--output csv`
 * let doing `archive` function on all sections

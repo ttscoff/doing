@@ -206,7 +206,7 @@ Use the config_editor_app defined in ~/.doingrc (Sublime Text)
 
 ##### `--at` DATE_STRING
 
-Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
+Set finish date to specific date/time (natural language parsed, e.g. --at=1:30pm).
   If used, ignores --back. Used with --took, backdates start date
 
 ##### `-b` | `--back` DATE_STRING
@@ -251,7 +251,7 @@ Remove @done tag
 
 ##### `--at` DATE_STRING
 
-Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.
+Set finish date to specific date/time (natural language parsed, e.g. --at=1:30pm). If used, ignores --back.
 
 ##### `-b` | `--back` DATE_STRING
 
@@ -604,7 +604,7 @@ Show time totals at the end of output
 
 *Open the "doing" file in an editor*
 
-> `doing open` defaults to using the editor_app setting in /Users/ttscoff/.doingrc (Taskpaper)
+> `doing open` defaults to using the editor_app setting in /Users/ttscoff/.doingrc (TaskPaper)
 
 #### Options
 
@@ -709,7 +709,7 @@ List in single column
 
 *Display an interactive menu to perform operations (requires fzf)*
 
-> List all entries and select with typeahead fuzzy matching.
+> List all entries and select with type-ahead fuzzy matching.
 > 
 > Multiple selections are allowed, hit tab to add the highlighted entry to the selection. Return processes the selected entries.
 

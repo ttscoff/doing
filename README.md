@@ -191,7 +191,7 @@ And it outputs:
     12:45pm > I think this thing (doing) is ready to document and distribute
     $ 
 
-You can get pretty clever and include line breaks and other formatting inside of double quotes. If you want multiline templates, just use `\n` in the template line, and after the next run it will be rewritten as proper YAML automatically.
+You can get pretty clever and include line breaks and other formatting inside of double quotes. If you want multi-line templates, just use `\n` in the template line, and after the next run it will be rewritten as proper YAML automatically.
 
 For example, this block:
 
@@ -348,7 +348,7 @@ For commands that provide an HTML output option, you can customize the templates
 
 To export the default configurations for customization, use `doing templates --type=[HAML|CSS]`. This will output to STDOUT where you can pipe it to a file, e.g. `doing templates --type=HAML > my_template.haml`. You can modify the markup, the CSS, or both.
 
-Once you have either or both of the template files, edit `.doingrc` and look for the `html_template:` section. There are two subvalues, `haml:` and `css:`. Add the path to the templates you want to use. A tilde may be substituted for your home directory, e.g. `css: ~/styles/doing.css`.
+Once you have either or both of the template files, edit `.doingrc` and look for the `html_template:` section. There are two sub-values, `haml:` and `css:`. Add the path to the templates you want to use. A tilde may be substituted for your home directory, e.g. `css: ~/styles/doing.css`.
 
 ### Autotagging
 
@@ -618,7 +618,7 @@ Doing can currently only import tasks from Timing.app reports. If you want to sy
 7. Include short entries if desired
 8. Export the report to a new file
 
-Now you can run `doing import --type timing -s SECTION PATH`, where SECTION is the name of the section you want to import the entries to (defauts to Currently), and PATH is the path to the JSON file. You can also add a tag (or tags) to all entries, or a custom prefix.
+Now you can run `doing import --type timing -s SECTION PATH`, where SECTION is the name of the section you want to import the entries to (defaults to Currently), and PATH is the path to the JSON file. You can also add a tag (or tags) to all entries, or a custom prefix.
 
 (`--type timing` is the only option right now, so it doesn't need to be included)
 
@@ -718,7 +718,7 @@ Ruby is rife with encoding inconsistencies across platforms and versions. Feel f
 ### Support
 
 
-As a free project, `doing` isn't heavily supported, but you can get support from myself and other users on GitHub. If you run into a replicatable bug in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message. To get a more verbose error message, try running `GLI_DEBUG=true doing [...]` for a full trace.
+As a free project, `doing` isn't heavily supported, but you can get support from myself and other users on GitHub. If you run into a replicable bug in your environment, please [post an issue](https://github.com/ttscoff/doing/issues) and include your platform, OS version, and the result of `ruby -v`, along with a copy/paste of the error message. To get a more verbose error message, try running `GLI_DEBUG=true doing [...]` for a full trace.
 
 Please try not to email me directly about GitHub projects.
 
