@@ -1,3 +1,10 @@
+### 1.0.91
+
+- "taskpaper" format available for all output options
+- "markdown" format available for all output commands (GFM-style task list, customizable template)
+- `--rename` option for tag command to replace tags
+- `--regex` option for tag command, for --remove and --rename
+
 ### 1.0.90
 
 - Minor fix for shell command in doing select

@@ -6,24 +6,6 @@ require 'pp'
 require 'shellwords'
 require 'erb'
 
-
-##
-## @brief      Creates Markdown export
-##
-class MarkdownExport
-  attr_accessor :items, :page_title, :totals
-
-  def initialize(page_title, items, totals)
-    @page_title = page_title
-    @items = items
-    @totals = totals
-  end
-
-  def get_binding
-    binding()
-  end
-end
-
 ##
 ## @brief      Main "What Was I Doing" methods
 ##
@@ -1054,8 +1036,6 @@ class WWID
       case opt[:output]
       when /doing/
         options[:template] = '- %date | %title%note'
-      when /taskpaper/
-        options[:template] = '- %title @date(%date)%note'
       else
         options[:output] = opt[:output]
       end
@@ -1193,6 +1173,7 @@ class WWID
                   else
                     rx_tag = tag.gsub(/\?/, '.').gsub(/\*/, '\S*?')
                   end
+
                   if title =~ / @#{rx_tag}\b/
                     rx = Regexp.new("(^| )@#{rx_tag}(\\([^)]*\\))?(?=\\b|$)", case_sensitive)
                     removed_tags = []
@@ -1200,6 +1181,8 @@ class WWID
                       removed_tags.push(mtch.strip.sub(/\(.*?\)$/, ''))
                       replacement
                     end
+
+                    title.dedup_tags!
 
                     @results.push(%(Removed #{removed_tags.join(', ')}: "#{title}" in #{section}))
                   end
@@ -1850,7 +1833,7 @@ class WWID
 
     out = ''
 
-    exit_now! 'Unknown output format' if opt[:output] && (opt[:output] !~ /^(template|html|csv|json|timeline|markdown|md)$/i)
+    exit_now! 'Unknown output format' if opt[:output] && (opt[:output] !~ /^(template|html|csv|json|timeline|markdown|md|taskpaper)$/i)
 
     case opt[:output]
     when /^csv$/i
@@ -2014,6 +1997,15 @@ class WWID
       engine = Haml::Engine.new(template)
       out = engine.render(Object.new,
                          { :@items => items_out, :@page_title => page_title, :@style => style, :@totals => totals })
+    when /^taskpaper$/i
+      options = opt
+      options[:highlight] = false
+      options[:wrap_width] = 0
+      options[:tags_color] = false
+      options[:output] = nil
+      options[:template] = '- %title @date(%date)%note'
+
+      out = list_section(options)
     when /^(md|markdown|gfm)$/i
       page_title = section
       all_items = []
@@ -2069,7 +2061,9 @@ class WWID
           note_lines = item['note'].delete_if do |line|
             line =~ /^\s*$/
           end
-          note_lines.map! { |line| "\t\t#{line.sub(/^\t*/, '').sub(/^-/, '—')}  " }
+          note_lines.map! { |line|
+            "\t#{line.sub(/^\t*(— )?/, '').sub(/^- /, '— ')}  "
+          }
           if opt[:wrap_width]&.positive?
             width = opt[:wrap_width]
             note_lines.map! do |line|

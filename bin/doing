@@ -323,9 +323,9 @@ command :select do |c|
   c.arg_name 'FILE'
   c.flag %i[save_to]
 
-  c.desc 'Output entries to format (doing|taskpaper|csv|html|json|template|timeline|markdown)'
+  c.desc 'Output entries to format (doing|taskpaper|csv|html|json|template|timeline|taskpaper|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:doing|taskpaper|html|csv|json|template|timeline|markdown|md)$/i
+  c.flag %i[o output], must_match: /^(?:doing|taskpaper|html|csv|json|template|timeline|taskpaper|markdown|md)$/i
 
   c.action do |_global_options, options, args|
     exit_now! "--no-menu requires --query" if !options[:menu] && !options[:query]
@@ -977,9 +977,9 @@ command :show do |c|
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
-  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|taskpaper|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|taskpaper|markdown|md)$/i
   c.action do |_global_options, options, args|
     tag_filter = false
     tags = []
@@ -1097,9 +1097,9 @@ command [:grep, :search] do |c|
   c.arg_name 'DATE_STRING'
   c.flag [:after]
 
-  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|taskpaper|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|taskpaper|markdown|md)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1207,9 +1207,9 @@ command :today do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
-  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|taskpaper|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|taskpaper|markdown|md)$/i
 
   c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
   c.arg_name 'TIME_STRING'
@@ -1255,9 +1255,9 @@ command :on do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
-  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|taskpaper|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|taskpaper|markdown|md)$/i
 
   c.action do |_global_options, options, args|
     exit_now! 'Missing date argument' if args.empty?
@@ -1308,9 +1308,9 @@ command :since do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
-  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|taskpaper|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|taskpaper|markdown|md)$/i
 
   c.action do |_global_options, options, args|
     exit_now! 'Missing date argument' if args.empty?
@@ -1342,9 +1342,9 @@ command :yesterday do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|taskpaper|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|taskpaper|markdown|md)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1497,9 +1497,9 @@ command :view do |c|
   c.arg_name 'COUNT'
   c.flag %i[c count], must_match: /^\d+$/, type: Integer
 
-  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|taskpaper|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|taskpaper|markdown|md)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true

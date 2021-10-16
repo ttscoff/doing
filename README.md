@@ -104,6 +104,7 @@ A basic configuration looks like this:
     html_template:
       haml: 
       css: 
+      markdown:
 
 
 The config file is stored in `~/.doingrc`, and a skeleton file is created on the first run. Just run `doing` on its own to create the file.
@@ -114,7 +115,7 @@ Any options found in a `.doingrc` anywhere in the hierarchy between your current
 
 Possible uses:
 
-- Define custom HTML output on a per-project basis using the html_template option for custom templates. Customize time tracking reports based on project or client.
+- Define custom HTML or Markdown output on a per-project basis using the html_template option for custom templates. Customize time tracking reports based on project or client.
 - Define `default_tags` for a project so that every time you `doing now` from within that project directory or its subfolders, it gets tagged with that project automatically.
 
 Any part of the configuration can be copied into these local files and modified. You only need to include the parts you want to change or add.
@@ -300,7 +301,7 @@ Outputs:
 
 ![](http://ckyp.us/XKpj+)
 
-You can also specify a default output format for a view. Most of the optional output formats override the template specification (`html`, `csv`, `json`). If the `view` command is used with the `-o` flag, it will override what's specified for the view in the config.
+You can also specify a default output format for a view. Most of the optional output formats override the template specification (`html`, `csv`, `json`, `markdown`). If the `view` command is used with the `-o` flag, it will override what's specified for the view in the config.
 
 ### Colors
 
@@ -342,13 +343,13 @@ And a few special colors you'll just have to try out to see (or just run `doing 
 
 Any time you use one of the foreground colors it will reset the bold and background settings to their default automatically. You can force a reset to default terminal colors using `%default`.
 
-### HTML Templates
+### HTML/Markdown Templates
 
-For commands that provide an HTML output option, you can customize the templates used for markup and CSS. The markup uses [HAML](http://haml.info/), and the styles are pure CSS.
+For commands that provide an HTML or Markdown output option, you can customize the templates used for markup and CSS. The HTML markup uses [HAML](http://haml.info/), and the styles are pure CSS. The Markdown template uses Ruby ERB templating.
 
-To export the default configurations for customization, use `doing templates --type=[HAML|CSS]`. This will output to STDOUT where you can pipe it to a file, e.g. `doing templates --type=HAML > my_template.haml`. You can modify the markup, the CSS, or both.
+To export the default configurations for customization, use `doing templates --type=[HAML|CSS|MARKDOWN]`. This will output to STDOUT where you can pipe it to a file, e.g. `doing templates --type=HAML > my_template.haml`. You can modify the markup, the CSS, or both.
 
-Once you have either or both of the template files, edit `.doingrc` and look for the `html_template:` section. There are two sub-values, `haml:` and `css:`. Add the path to the templates you want to use. A tilde may be substituted for your home directory, e.g. `css: ~/styles/doing.css`.
+Once you have a template file prepared, edit `.doingrc` and look for the `html_template:` section. There are three sub-values, `haml:`, `css:`, and `markdown:`. Add the template paths to the appropriate keys. A tilde may be substituted for your home directory, e.g. `css: ~/styles/doing.css`.
 
 ### Autotagging
 
@@ -549,7 +550,7 @@ All of the display commands (view, show, today, yesterday, search) support date 
 
 `doing on` allows for full date ranges and filtering. `doing on saturday`, or `doing on one month to today` will give you ranges. You can use the same terms with the `show` command by adding the `-f` or `--from` flag. `doing show @done --from "monday to friday"` will give you all of your completed items for the last week (assuming it's the weekend). There's also `doing since` a simple alias for `doing on PAST_DATE to now`, e.g. `doing since monday`.
 
-You can also show entries matching a search string with `doing grep` (synonym `doing search`). If you want to search with regular expressions or for an exact match, surround your search query with forward slashes, e.g. `doing search /project name/`. If you pass a search string without slashes, it's treated as a fuzzy search string, meaning matches can be found as long as the characters in the search string are in order and with no more than three other characters between each. By default searches are across all sections, but you can limit it to one with the `-s SECTION_NAME` flag. Searches can be displayed with the default template, or output as HTML, CSV, or JSON.
+You can also show entries matching a search string with `doing grep` (synonym `doing search`). If you want to search with regular expressions or for an exact match, surround your search query with forward slashes, e.g. `doing search /project name/`. If you pass a search string without slashes, it's treated as a fuzzy search string, meaning matches can be found as long as the characters in the search string are in order and with no more than three other characters between each. By default searches are across all sections, but you can limit it to one with the `-s SECTION_NAME` flag. Searches can be displayed with the default template, or output as HTML, Markdown, CSV, or JSON.
 
 ##### Modifying the last entry
 
