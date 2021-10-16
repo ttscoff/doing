@@ -1,3 +1,7 @@
+### 1.0.92
+
+- Gemfile error
+
 ### 1.0.91
 
 - "taskpaper" format available for all output options

@@ -17,6 +17,7 @@ lib/doing/version.rb
 lib/doing.rb
 lib/doing/wwid.rb
 lib/doing/helpers.rb
+lib/doing/markdown_export.rb
 lib/templates/doing.haml
 lib/templates/doing.css
 lib/helpers/fuzzyfilefinder
