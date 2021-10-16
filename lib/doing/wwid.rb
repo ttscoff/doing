@@ -1850,8 +1850,11 @@ class WWID
       end
       out = output.join('')
     when /^(json|timeline)/i
+      return if items.nil?
+
       items_out = []
-      max = items[-1]['date'].strftime('%F')
+      last_date = items[-1]['date'] + (60 * 60 * 24)
+      max = last_date.strftime('%F')
       min = items[0]['date'].strftime('%F')
       items.each_with_index do |i, index|
         if String.method_defined? :force_encoding
@@ -1898,13 +1901,19 @@ class WWID
             'content' => title.strip, #+ " #{note}"
             'title' => title.strip + " (#{'%02d:%02d:%02d' % fmt_time(interval)})",
             'start' => i['date'].strftime('%F %T'),
-            'type' => 'point'
+            'type' => 'box',
+            'style' => 'color:#4c566b;background-color:#d8dee9;'
           }
+
 
           if interval && interval.to_i > 0
             new_item['end'] = end_date.strftime('%F %T')
-            new_item['type'] = 'range' if interval.to_i > 3600 * 3
+            if interval.to_i > 3600
+              new_item['type'] = 'range'
+              new_item['style'] = 'color:white;background-color:#a2bf8a;'
+            end
           end
+          new_item['style'] = 'color:white;background-color:#f7921e;' if i.has_tags?(@config['marker_tag'])
           items_out.push(new_item)
         end
       end
