@@ -47,6 +47,8 @@ class DoingOutputTest < Test::Unit::TestCase
     assert_match(/^!!!\s*\n%html/, result, 'Output should be a HAML template')
     result = doing('template', 'css')
     assert_match(/^body \{/, result, 'Output should be a CSS template')
+    result = doing('template', 'markdown')
+    assert_match(/^# <%=/, result, 'Output should be an ERB template')
   end
 
   private
