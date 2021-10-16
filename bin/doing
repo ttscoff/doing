@@ -243,23 +243,25 @@ command :meanwhile do |c|
   end
 end
 
-desc 'Output HTML and CSS templates for customization'
+desc 'Output HTML, CSS, and Markdown (ERB) templates for customization'
 long_desc %(
   Templates are printed to STDOUT for piping to a file.
   Save them and use them in the configuration file under html_template.
 
   Example `doing template HAML > ~/styles/my_doing.haml`
 )
-arg_name 'TYPE', must_match: /^(?:html|haml|css)/i
+arg_name 'TYPE', must_match: /^(?:html|haml|css|markdown|md|erb)/i
 command :template do |c|
   c.action do |_global_options, options, args|
-    exit_now! 'No type specified, use `doing template [HAML|CSS]`' if args.empty?
+    exit_now! 'No type specified, use `doing template [HAML|CSS|MARKDOWN]`' if args.empty?
 
     case args[0]
     when /html|haml/i
       $stdout.puts wwid.haml_template
     when /css/i
       $stdout.puts wwid.css_template
+    when /markdown|md|erb/i
+      $stdout.puts wwid.markdown_template
     else
       exit_now! 'Invalid type specified, must be HAML or CSS'
     end
@@ -321,9 +323,9 @@ command :select do |c|
   c.arg_name 'FILE'
   c.flag %i[save_to]
 
-  c.desc 'Output entries to format (doing|taskpaper|csv|html|json|template|timeline)'
+  c.desc 'Output entries to format (doing|taskpaper|csv|html|json|template|timeline|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:doing|taskpaper|html|csv|json|template|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:doing|taskpaper|html|csv|json|template|timeline|markdown|md)$/i
 
   c.action do |_global_options, options, args|
     exit_now! "--no-menu requires --query" if !options[:menu] && !options[:query]
@@ -738,6 +740,19 @@ command [:again, :resume] do |c|
 end
 
 desc 'Add tag(s) to last entry'
+long_desc 'Add (or remove) tags from the last entry, or from multiple entries
+          (with `--count`), entries matching a search (with `--search), or entries
+          containing another tag (with `--tag`).
+
+          When removing tags with `-r`, wildcards are allowed (`*` to match
+          multiple characters, `?` to match a single character). With `--regex`,
+          regular expressions will be interpreted instead of wildcards.
+
+          For all tag removals the match is case insensitive by default, but if
+          the tag search string contains any uppercase letters, the match will
+          become case sensitive automatically.
+
+          Tag name arguments do not need to be prefixed with @.'
 arg_name 'TAG', :multiple
 command :tag do |c|
   c.desc 'Section'
@@ -748,6 +763,10 @@ command :tag do |c|
   c.arg_name 'COUNT'
   c.flag %i[c count], default_value: 1
 
+  c.desc 'Replace existing tag with tag argument, wildcards (*,?) allowed, or use with --regex'
+  c.arg_name 'ORIG_TAG'
+  c.flag %i[rename]
+
   c.desc 'Don\'t ask permission to tag all entries when count is 0'
   c.switch %i[force], negatable: false, default_value: false
 
@@ -756,6 +775,9 @@ command :tag do |c|
 
   c.desc 'Remove given tag(s)'
   c.switch %i[r remove], negatable: false, default_value: false
+
+  c.desc 'Interpret tag string as regular expression (with --remove)'
+  c.switch %i[regex], negatable: false, default_value: false
 
   c.desc 'Tag last entry (or entries) not marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
@@ -843,19 +865,26 @@ command :tag do |c|
       exit_now! 'Cancelled' unless res
     end
 
-    opts = {
-      autotag: options[:a],
-      count: count,
-      date: options[:date],
-      remove: options[:r],
-      search: options[:search],
-      section: section,
-      tag: search_tags,
-      tag_bool: options[:bool],
-      tags: tags,
-      unfinished: options[:unfinished]
-    }
-    wwid.tag_last(opts)
+    options[:count] = count
+    options[:section] = section
+    options[:tag] = search_tags
+    options[:tags] = tags
+    options[:tag_bool] = options[:bool]
+
+    # opts = {
+    #   autotag: options[:a],
+    #   count: count,
+    #   date: options[:date],
+    #   iregex: options[:iregex]
+    #   remove: options[:r],
+    #   search: options[:search],
+    #   section: section,
+    #   tag: search_tags,
+    #   tag_bool: options[:bool],
+    #   tags: tags,
+    #   unfinished: options[:unfinished]
+    # }
+    wwid.tag_last(options)
   end
 end
 
@@ -948,9 +977,9 @@ command :show do |c|
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
-  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
   c.action do |_global_options, options, args|
     tag_filter = false
     tags = []
@@ -1068,9 +1097,9 @@ command [:grep, :search] do |c|
   c.arg_name 'DATE_STRING'
   c.flag [:after]
 
-  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1178,9 +1207,9 @@ command :today do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
-  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
 
   c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
   c.arg_name 'TIME_STRING'
@@ -1226,9 +1255,9 @@ command :on do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
-  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
 
   c.action do |_global_options, options, args|
     exit_now! 'Missing date argument' if args.empty?
@@ -1279,9 +1308,9 @@ command :since do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
-  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
 
   c.action do |_global_options, options, args|
     exit_now! 'Missing date argument' if args.empty?
@@ -1313,9 +1342,9 @@ command :yesterday do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1468,9 +1497,9 @@ command :view do |c|
   c.arg_name 'COUNT'
   c.flag %i[c count], must_match: /^\d+$/, type: Integer
 
-  c.desc 'Output to export format (csv|html|json|template|timeline)'
+  c.desc 'Output to export format (csv|html|json|template|timeline|markdown)'
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline)$/i
+  c.flag %i[o output], must_match: /^(?:template|html|csv|json|timeline|markdown|md)$/i
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1932,6 +1961,7 @@ end
 post do |global, _command, _options, _args|
   # Use skips_post before a command to skip this
   # block on that command only
+
   if global[:stdout]
     $stdout.print wwid.results.join("\n")
   else

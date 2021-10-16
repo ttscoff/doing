@@ -1,4 +1,21 @@
 ##
+## @brief      Date helpers
+##
+class ::Time
+  def relative_date
+    if self > Date.today.to_time
+      strftime('    %_I:%M%P')
+    elsif self > (Date.today - 6).to_time
+      strftime('%a %_I:%M%P')
+    elsif self.year == Date.today.year
+      strftime('%m/%d %_I:%M%P')
+    else
+      strftime('%m/%d/%Y %_I:%M%P')
+    end
+  end
+end
+
+##
 ## @brief      Hash helpers
 ##
 class ::Hash
@@ -85,28 +102,81 @@ class ::String
 
 
   ##
+  ## @brief      Remove duplicate tags, leaving only first occurrence
+  ##
+  ## @return     Deduplicated string
+  ##
+  def dedup_tags!
+    replace dedup_tags
+  end
+
+  def dedup_tags
+    item = self.dup
+    tags = item.scan(/(?<=^| )(\@(\S+?)(\([^)]+\))?)(?=\b|$)/).uniq
+    tags.each do |tag|
+      found = false
+      item.gsub!(/( |^)#{tag[0]}\b/) do |m|
+        if found
+          ''
+        else
+          found = true
+          m
+        end
+      end
+    end
+    item
+  end
+
+  ##
   ## @brief      Turn raw urls into HTML links
   ##
   ## @param      opt   (Hash) Additional Options
   ##
+  def link_urls!(opt = {})
+    replace link_urls(opt)
+  end
+
   def link_urls(opt = {})
     opt[:format] ||= :html
-    if opt[:format] == :html
-      gsub(%r{(?mi)((http|https)://)([\w\-_]+(\.[\w\-_]+)+)([\w\-.,@?^=%&amp;:/~+#]*[\w\-@^=%&amp;/~+#])?}) do |_match|
+    str = self.dup
+
+    if :format == :markdown
+      # Remove <self-linked> formatting
+      str.gsub!(/<(.*?)>/) do |match|
         m = Regexp.last_match
-        proto = m[1].nil? ? 'http://' : ''
-        %(<a href="#{proto}#{m[0]}" title="Link to #{m[0]}">[#{m[3]}]</a>)
-      end.gsub(/<(\w+:.*?)>/) do |match|
-        m = Regexp.last_match
-        if m[1] =~ /<a href/
-          match
+        if m[1] =~ /^https?:/
+          m[1]
         else
-          %(<a href="#{m[1]}" title="Link to #{m[1]}">[link]</a>)
+          match
         end
       end
-    else
-      self
     end
+
+    # Replace qualified urls
+    str.gsub!(%r{(?mi)(?<!["'\[(\\])((http|https)://)([\w\-_]+(\.[\w\-_]+)+)([\w\-.,@?^=%&amp;:/~+#]*[\w\-@^=%&amp;/~+#])?}) do |_match|
+      m = Regexp.last_match
+      proto = m[1].nil? ? 'http://' : ''
+      case opt[:format]
+      when :html
+        %(<a href="#{proto}#{m[0]}" title="Link to #{m[0]}">[#{m[3]}]</a>)
+      when :markdown
+        "[#{m[0]}](#{proto}#{m[0]})"
+      else
+        m[0]
+      end
+    end
+
+    # Clean up unlinked <urls>
+    str.gsub!(/<(\w+:.*?)>/) do |match|
+      m = Regexp.last_match
+      if m[1] =~ /<a href/
+        match
+      else
+        %(<a href="#{m[1]}" title="Link to #{m[1]}">[link]</a>)
+      end
+    end
+
+    str
   end
 end
 

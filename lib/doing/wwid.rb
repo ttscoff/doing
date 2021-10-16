@@ -4,6 +4,25 @@ require 'deep_merge'
 require 'open3'
 require 'pp'
 require 'shellwords'
+require 'erb'
+
+
+##
+## @brief      Creates Markdown export
+##
+class MarkdownExport
+  attr_accessor :items, :page_title, :totals
+
+  def initialize(page_title, items, totals)
+    @page_title = page_title
+    @items = items
+    @totals = totals
+  end
+
+  def get_binding
+    binding()
+  end
+end
 
 ##
 ## @brief      Main "What Was I Doing" methods
@@ -104,6 +123,7 @@ class WWID
     @config['html_template'] ||= {}
     @config['html_template']['haml'] ||= nil
     @config['html_template']['css'] ||= nil
+    @config['html_template']['markdown'] ||= nil
 
     @config['templates'] ||= {}
     @config['templates']['default'] ||= {
@@ -231,6 +251,15 @@ class WWID
         # end
       end
     end
+  end
+
+  ##
+  ## @brief      Return the contents of the ERB template for Markdown output
+  ##
+  ## @return     (String) ERB template
+  ##
+  def markdown_template
+    IO.read(File.join(File.dirname(__FILE__), '../templates/doing-markdown.erb'))
   end
 
   ##
@@ -1151,10 +1180,28 @@ class WWID
               title = item['title']
               opt[:tags].each do |tag|
                 tag = tag.strip
-                if opt[:remove]
-                  if title =~ /@#{tag}\b/
-                    title.gsub!(/(^| )@#{tag}(\([^)]*\))?/, '')
-                    @results.push(%(Removed @#{tag}: "#{title}" in #{section}))
+                if opt[:remove] || opt[:rename]
+                  case_sensitive = tag !~ /[A-Z]/
+                  replacement = ''
+                  if opt[:rename]
+                    replacement = tag
+                    tag = opt[:rename]
+                  end
+
+                  if opt[:regex]
+                    rx_tag = tag.gsub(/\./, '\S')
+                  else
+                    rx_tag = tag.gsub(/\?/, '.').gsub(/\*/, '\S*?')
+                  end
+                  if title =~ / @#{rx_tag}\b/
+                    rx = Regexp.new("(^| )@#{rx_tag}(\\([^)]*\\))?(?=\\b|$)", case_sensitive)
+                    removed_tags = []
+                    title.gsub!(rx) do |mtch|
+                      removed_tags.push(mtch.strip.sub(/\(.*?\)$/, ''))
+                      replacement
+                    end
+
+                    @results.push(%(Removed #{removed_tags.join(', ')}: "#{title}" in #{section}))
                   end
                 elsif title !~ /@#{tag}/
                   title.chomp!
@@ -1201,6 +1248,15 @@ class WWID
     write(@doing_file)
   end
 
+  ##
+  ## @brief      Move item from current section to
+  ##             destination section
+  ##
+  ## @param      item     The item
+  ## @param      section  The destination section
+  ##
+  ## @return     Updated item
+  ##
   def move_item(item, section)
     old_section = item['section']
     new_item = item.dup
@@ -1701,11 +1757,13 @@ class WWID
 
     # opt[:highlight] ||= true
     section = ''
+    is_single = true
     if opt[:section].nil?
       section = choose_section
       opt[:section] = @content[section]
     elsif opt[:section].instance_of?(String)
       if opt[:section] =~ /^all$/i
+        is_single = false
         combined = { 'items' => [] }
         @content.each do |_k, v|
           combined['items'] += v['items']
@@ -1792,7 +1850,7 @@ class WWID
 
     out = ''
 
-    exit_now! 'Unknown output format' if opt[:output] && (opt[:output] !~ /^(template|html|csv|json|timeline)$/i)
+    exit_now! 'Unknown output format' if opt[:output] && (opt[:output] !~ /^(template|html|csv|json|timeline|markdown|md)$/i)
 
     case opt[:output]
     when /^csv$/i
@@ -1871,7 +1929,7 @@ class WWID
         puts JSON.pretty_generate({
           'section' => section,
           'items' => items_out,
-          'timers' => tag_times(format: 'json', sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order])
+          'timers' => tag_times(format: :json, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order])
         })
       elsif opt[:output] == 'timeline'
         template = <<~EOTEMPLATE
@@ -1952,10 +2010,51 @@ class WWID
                 css_template
               end
 
-      totals = opt[:totals] ? tag_times(format: 'html', sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+      totals = opt[:totals] ? tag_times(format: :html, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
       engine = Haml::Engine.new(template)
       out = engine.render(Object.new,
                          { :@items => items_out, :@page_title => page_title, :@style => style, :@totals => totals })
+    when /^(md|markdown|gfm)$/i
+      page_title = section
+      all_items = []
+      items.each do |i|
+        if String.method_defined? :force_encoding
+          title = i['title'].force_encoding('utf-8').link_urls({format: :markdown})
+          note = i['note'].map { |line| line.force_encoding('utf-8').strip.link_urls({format: :markdown}) } if i['note']
+        else
+          title = i['title'].link_urls({format: :markdown})
+          note = i['note'].map { |line| line.strip.link_urls({format: :markdown}) } if i['note']
+        end
+
+        title = "#{title} @project(#{i['section']})" unless is_single
+
+        interval = get_interval(i) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+        interval ||= false
+
+        done = i['title'] =~ /(?<= |^)@done/ ? 'x' : ' '
+
+        all_items << {
+          date: i['date'].strftime('%a %-I:%M%p'),
+          shortdate: i['date'].relative_date,
+          done: done,
+          note: note,
+          section: i['section'],
+          time: interval,
+          title: title.strip
+        }
+      end
+
+      template = if @config['html_template']['markdown'] && File.exist?(File.expand_path(@config['html_template']['markdown']))
+                   IO.read(File.expand_path(@config['html_template']['markdown']))
+                 else
+                   markdown_template
+                 end
+
+      totals = opt[:totals] ? tag_times(format: :markdown, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+
+      mdx = MarkdownExport.new(page_title, all_items, totals)
+      engine = ERB.new(template)
+      out = engine.result(mdx.get_binding)
     else
       items.each do |item|
         if opt[:highlight] && item['title'] =~ /@#{@config['marker_tag']}\b/i
@@ -1998,15 +2097,7 @@ class WWID
         output.sub!(/%interval/, interval)
 
         output.sub!(/%shortdate/) do
-          if item['date'] > Date.today.to_time
-            item['date'].strftime('    %_I:%M%P')
-          elsif item['date'] > (Date.today - 6).to_time
-            item['date'].strftime('%a %_I:%M%P')
-          elsif item['date'].year == Date.today.year
-            item['date'].strftime('%m/%d %_I:%M%P')
-          else
-            item['date'].strftime('%m/%d/%Y %_I:%M%P')
-          end
+          item['date'].relative_date
         end
 
         output.sub!(/%title/) do |_m|
@@ -2044,7 +2135,7 @@ class WWID
         out += "#{output}\n"
       end
 
-      out += tag_times(format: 'text', sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) if opt[:totals]
+      out += tag_times(format: :text, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) if opt[:totals]
     end
     out
   end
@@ -2352,7 +2443,7 @@ class WWID
   ## @param      sort_by_name  (Boolean) Sort by name if true, otherwise by time
   ## @param      sort_order    (String) The sort order (asc or desc)
   ##
-  def tag_times(format: 'text', sort_by_name: false, sort_order: 'asc')
+  def tag_times(format: :text, sort_by_name: false, sort_order: 'asc')
     return '' if @timers.empty?
 
     max = @timers.keys.sort_by { |k| k.length }.reverse[0].length + 1
@@ -2367,8 +2458,9 @@ class WWID
                        end
 
     sorted_tags_data.reverse! if sort_order =~ /^asc/i
+    case format
+    when :html
 
-    if format == 'html'
       output = <<EOS
         <table>
         <caption id="tagtotals">Tag Totals</caption>
@@ -2403,7 +2495,20 @@ EOS
       </table>
 EOS
       output + tail
-    elsif format == 'json'
+    when :markdown
+      pad = sorted_tags_data.map {|k, v| k }.group_by(&:size).max.last[0].length
+      output = <<-EOS
+| #{' ' * (pad - 7) }project | time     |
+| #{'-' * (pad - 1)}: | :------- |
+      EOS
+      sorted_tags_data.reverse.each do |k, v|
+        if v > 0
+          output += "| #{' ' * (pad - k.length)}#{k} | #{'%02d:%02d:%02d' % fmt_time(v)} |\n"
+        end
+      end
+      tail = "[Tag Totals]"
+      output + tail
+    when :json
       output = []
       sorted_tags_data.reverse.each do |k, v|
         output << {
