@@ -79,7 +79,9 @@ class DoingOutputTest < Test::Unit::TestCase
 
   def test_user_plugin
     result = doing('--stdout', 'import', '--type', 'tester', @import_file)
-    assert_match(/Test Import Plugin Ran/, result, 'Test plugin should output success message')
+    assert_match(/Test with path/, result, 'Test plugin should output success message')
+    result = doing('--stdout', 'import', '--type', 'tester')
+    assert_match(/Test with no paths/, result, 'Test plugin should output success message')
   end
 
   def test_sections_command

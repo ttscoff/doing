@@ -1,7 +1,12 @@
 ---
+html_template:
+  css:
+  haml:
+  markdown:
+  tester:
 autotag:
   transform:
-  - (deploy|merge)\s+@(\w+)-\d+:$1-$2 @dev @dev-$2
+  - "(deploy|merge)\\s+@(\\w+)-\\d+:$1-$2 @dev @dev-$2"
   whitelist:
   - autotag
   - overtired
@@ -10,13 +15,9 @@ autotag:
     - brettterpstra.com
     terpzel:
     - guntzel
-
 doing_file: "~/what_was_i_doing.md"
 current_section: Lately
-editor_app: 
-html_template:
-  haml: 
-  css: 
+editor_app:
 templates:
   default:
     date_format: "%Y-%m-%d %H:%M"
@@ -76,3 +77,6 @@ marker_tag: flagged
 marker_color: red
 default_tags: []
 :include_notes: true
+config_editor_app:
+tag_sort: time
+plugin_path: "test/plugins"

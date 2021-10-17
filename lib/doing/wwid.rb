@@ -12,8 +12,8 @@ module Doing
   ## @brief      Main "What Was I Doing" methods
   ##
   class WWID
-    attr_accessor :content, :sections, :current_section, :doing_file, :config, :user_home, :default_config_file,
-                  :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :plugins
+    attr_accessor :content, :current_section, :doing_file, :config, :user_home, :default_config_file,
+                  :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items
 
     include Doing::Util
     ##
@@ -35,7 +35,6 @@ module Doing
     ## @return     (String) A file path
     ##
     def find_local_config
-      config = {}
       dir = Dir.pwd
 
       local_config_files = []
@@ -105,6 +104,7 @@ module Doing
       @config['current_section'] ||= 'Currently'
       @config['config_editor_app'] ||= nil
       @config['editor_app'] ||= nil
+      @config['plugin_path'] ||= nil
 
       # @config['html_template'] ||= {}
       # @config['html_template']['haml'] ||= nil
@@ -169,15 +169,7 @@ module Doing
       #     exit_now! "DEFAULT CONFIG CHANGED"
       #   end
       # end
-
-      File.open(@config_file, 'w') { |yf| YAML.dump(@config, yf) } unless File.exist?(@config_file)
-
-      @config = @local_config.deep_merge(@config)
-
-      @current_section = @config['current_section']
-      @default_template = @config['templates']['default']['template']
-      @default_date_format = @config['templates']['default']['date_format']
-
+      @plugins = nil
       plugin_config = {}
 
       plugins.each do |type, plugins|
@@ -189,6 +181,16 @@ module Doing
       end
 
       @config = plugin_config.deep_merge(@config)
+
+      if !File.exist?(@config_file) || opt[:rewrite]
+        File.open(@config_file, 'w') { |yf| YAML.dump(@config, yf) }
+      end
+
+      @config = @local_config.deep_merge(@config)
+
+      @current_section = @config['current_section']
+      @default_template = @config['templates']['default']['template']
+      @default_date_format = @config['templates']['default']['date_format']
     end
 
     ##
@@ -1549,7 +1551,7 @@ module Doing
         end
 
         if @config.key?('run_after')
-          stdout, stderr, status = Open3.capture3(@config['run_after'])
+          _, _, status = Open3.capture3(@config['run_after'])
           if status.exitstatus.positive?
             warn "Error running #{@config['run_after']}"
             warn stderr
@@ -2378,7 +2380,7 @@ EOS
     def fmt_time(seconds)
       return [0, 0, 0] if seconds.nil?
 
-      if seconds =~ /(\d+):(\d+):(\d+)/
+      if seconds.class == String && seconds =~ /(\d+):(\d+):(\d+)/
         h = Regexp.last_match(1)
         m = Regexp.last_match(2)
         s = Regexp.last_match(3)

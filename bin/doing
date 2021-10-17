@@ -1734,6 +1734,9 @@ command :config do |c|
   c.arg_name 'EDITOR'
   c.flag %i[e editor], default_value: nil
 
+  c.desc 'Update config file with missing configuration options'
+  c.switch %i[u update], default_value: false, negatable: false
+
   if `uname` =~ /Darwin/
     c.desc 'Application to use'
     c.arg_name 'APP_NAME'
@@ -1748,6 +1751,12 @@ command :config do |c|
   end
 
   c.action do |_global_options, options, _args|
+    if options[:update]
+      wwid.configure({rewrite: true, ignore_local: true})
+      wwid.results.push("Config file rewritten: #{wwid.config_file}")
+      return
+    end
+
     if `uname` =~ /Darwin/
       if options[:x]
         `open -a "#{wwid.config['config_editor_app']}" "#{wwid.config_file}"`
@@ -1863,6 +1872,7 @@ end
 pre do |global, _command, _options, _args|
   if global[:config_file] && global[:config_file] != wwid.config_file
     wwid.config_file = global[:config_file]
+    wwid.config = nil
     wwid.configure({ ignore_local: true })
     # wwid.results.push("Override config file #{wwid.config_file}")
   # else

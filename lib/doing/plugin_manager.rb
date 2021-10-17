@@ -19,6 +19,7 @@ module Doing
     ## @brief      Load plugins from plugins folder
     ##
     def self.load_plugins(add_dir = nil)
+      add_dir ||= '~/.config/doing/plugins'
       plugins_path(add_dir).each do |plugin_search_path|
         Dir.glob(File.join(plugin_search_path, '**', '*.rb')).each do |plugin|
           require plugin
@@ -32,20 +33,21 @@ module Doing
     #
     # Returns an Array of plugin search paths
     def self.plugins_path(add_dir = nil)
-      paths = [
-        File.join(File.dirname(__FILE__), 'plugins'),
-        File.join(@user_home, '.config', 'doing', 'plugins'),
-        File.join(@user_home, '.config', 'baddir')
-      ]
+      paths = Array(File.join(File.dirname(__FILE__), 'plugins'))
       paths << File.join(add_dir) if add_dir
       paths.map { |d| File.expand_path(d) }
     end
 
-    def self.register(name, type, klass)
-      settings = klass.settings
+    def self.register(title, type, klass)
+      settings = if klass.respond_to? :settings
+                    klass.settings
+                  else
+                    { trigger: title, config: {}}
+                  end
+
       @plugins[type] ||= {}
-      @plugins[type][name] = {
-        trigger: settings[:trigger],
+      @plugins[type][title] = {
+        trigger: settings[:trigger] || title,
         class: klass,
         config: settings[:config] || {}
       }
