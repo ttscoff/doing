@@ -5,6 +5,10 @@ module Doing
     def self.settings
       {
         trigger: 'html?|web(?:page)?',
+        templates: [
+          { name: 'html', trigger: 'h[ta]ml?|web' },
+          { name: 'css', trigger: 'css|styl(?:e|us)' }
+        ],
         config: {
           'html_template' => {
             'css' => nil,
@@ -12,6 +16,14 @@ module Doing
           }
         }
       }
+    end
+
+    def self.template(trigger)
+      if trigger =~ /^(css|sty)/
+        IO.read(File.join(File.dirname(__FILE__), '../../../templates/doing.css'))
+      else
+        IO.read(File.join(File.dirname(__FILE__), '../../../templates/doing.haml'))
+      end
     end
 
     def self.render(wwid, items, variables: {})
@@ -49,13 +61,13 @@ module Doing
       template = if wwid.config['html_template']['haml'] && File.exist?(File.expand_path(wwid.config['html_template']['haml']))
                    IO.read(File.expand_path(wwid.config['html_template']['haml']))
                  else
-                   wwid.haml_template
+                   self.template('html')
                  end
 
       style = if wwid.config['html_template']['css'] && File.exist?(File.expand_path(wwid.config['html_template']['css']))
                 IO.read(File.expand_path(wwid.config['html_template']['css']))
               else
-                wwid.css_template
+                self.template('css')
               end
 
       totals = opt[:totals] ? wwid.tag_times(format: :html, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''

@@ -49,6 +49,7 @@ module Doing
       @plugins[type][title] = {
         trigger: settings[:trigger] || title,
         class: klass,
+        templates: settings[:templates] || nil,
         config: settings[:config] || {}
       }
 

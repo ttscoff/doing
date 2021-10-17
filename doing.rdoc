@@ -1,6 +1,6 @@
 == doing - A CLI for a What Was I Doing system
 
-v1.0.90
+v1.0.94
 
 === Global Options
 === --config_file arg
@@ -57,7 +57,7 @@ Repeat last entry as new entry
 Boolean used to combine multiple tags
 
 [Default Value] AND
-[Must Match] (?i-mx:and|all|any|or|not|none)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
 ===== --in SECTION_NAME
@@ -114,7 +114,7 @@ Archive entries older than date
 Tag boolean (AND|OR|NOT)
 
 [Default Value] AND
-[Must Match] (?i-mx:and|all|any|or|not|none)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
 ===== -k|--keep X
@@ -161,7 +161,7 @@ Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doin
 Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 [Default Value] AND
-[Must Match] (?i-mx:and|all|any|or|not|none)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
 ===== -s|--section NAME
@@ -220,6 +220,11 @@ Application bundle id to use
 Editor to use
 
 [Default Value] None
+
+
+===== -u|--update
+Update config file with missing configuration options
+
 
 
 ===== -x
@@ -307,7 +312,7 @@ Backdate completed date to date string [4pm|20m|2h|yesterday noon]
 Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 [Default Value] AND
-[Must Match] (?i-mx:and|all|any|or|not|none)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
 ===== -s|--section NAME
@@ -384,10 +389,10 @@ Constrain search to entries older than date
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|json|template|timeline)
+Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
 
 
 ===== -s|--section NAME
@@ -435,6 +440,23 @@ Import entries from an external source
 
 Imports entries from other sources. Currently only handles JSON reports exported from Timing.app.
 ===== Options
+===== --end DAYS
+
+Import entries before X days ago, ignoring newer entries. Only valid if import plugin has implemented date range filtering.
+
+[Default Value] 0
+[Must Match] (?-mix:^\d+$)
+
+
+===== -f|--from DATE_OR_RANGE
+
+Date range to import. Date range argument should be quoted. Date specifications can be natural language.
+    To specify a range, use "to" or "through": `--from "monday to friday"` or `--from 10/1 to 10/31`.
+    Has no effect unless the import plugin has implemented date range filtering.
+
+[Default Value] None
+
+
 ===== --prefix PREFIX
 
 Prefix entries with
@@ -447,6 +469,14 @@ Prefix entries with
 Target section
 
 [Default Value] None
+
+
+===== --start DAYS
+
+Import entries after X days ago, ignoring older entries. Only valid if import plugin has implemented date range filtering.
+
+[Default Value] 30
+[Must Match] (?-mix:^\d+$)
 
 
 ===== --tag TAGS
@@ -483,7 +513,7 @@ Show the last entry, optionally edit
 Tag boolean
 
 [Default Value] AND
-[Must Match] (?i-mx:and|all|any|or|not|none)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
 ===== -s|--section NAME
@@ -663,10 +693,10 @@ it will create a range.
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|json|template|timeline)
+Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
 
 
 ===== -s|--section NAME
@@ -766,7 +796,7 @@ Rotate entries older than date
 Tag boolean (AND|OR|NOT)
 
 [Default Value] AND
-[Must Match] (?i-mx:and|all|any|or|not|none)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
 ===== -k|--keep X
@@ -824,10 +854,10 @@ Move selected items to section
 
 ===== -o|--output FORMAT
 
-Output entries to format (doing|taskpaper|csv|html|json|template|timeline)
+Output entries to format (csv|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:doing|taskpaper|html|csv|json|template|timeline)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
 
 
 ===== -q|--query QUERY
@@ -928,7 +958,7 @@ View entries newer than date
 Tag boolean (AND,OR,NOT)
 
 [Default Value] OR
-[Must Match] (?i-mx:and|all|any|or|not|none)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
 ===== --before DATE_STRING
@@ -956,18 +986,18 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|json|template|timeline)
+Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
 
 
 ===== -s|--sort ORDER
 
 Sort order (asc/desc)
 
-[Default Value] ASC
-[Must Match] (?i-mx:^[ad].*)
+[Default Value] asc
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
 ===== --search QUERY
@@ -988,7 +1018,7 @@ Tag filter, combine multiple tags with a comma. Added for compatibility with oth
 
 Tag sort direction (asc|desc)
 
-[Default Value] None
+[Default Value] asc
 [Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
@@ -1023,10 +1053,10 @@ and "2d" would be interpreted as "two days ago."
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|json|template|timeline)
+Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
 
 
 ===== -s|--section NAME
@@ -1057,14 +1087,26 @@ Show time totals at the end of output
 ==== Command: <tt>tag  TAG...</tt>
 Add tag(s) to last entry
 
+Add (or remove) tags from the last entry, or from multiple entries
+          (with `--count`), entries matching a search (with `--search), or entries
+          containing another tag (with `--tag`).
 
+          When removing tags with `-r`, wildcards are allowed (`*` to match
+          multiple characters, `?` to match a single character). With `--regex`,
+          regular expressions will be interpreted instead of wildcards.
+
+          For all tag removals the match is case insensitive by default, but if
+          the tag search string contains any uppercase letters, the match will
+          become case sensitive automatically.
+
+          Tag name arguments do not need to be prefixed with @.
 ===== Options
 ===== --bool BOOLEAN
 
 Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 [Default Value] AND
-[Must Match] (?i-mx:and|all|any|or|not|none)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
 ===== -c|--count COUNT
@@ -1072,6 +1114,13 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 How many recent entries to tag (0 for all)
 
 [Default Value] 1
+
+
+===== --rename ORIG_TAG
+
+Replace existing tag with tag argument, wildcards (*,?) allowed, or use with --regex
+
+[Default Value] None
 
 
 ===== -s|--section SECTION_NAME
@@ -1116,13 +1165,18 @@ Remove given tag(s)
 
 
 
+===== --regex
+Interpret tag string as regular expression (with --remove)
+
+
+
 ===== -u|--unfinished
 Tag last entry (or entries) not marked @done
 
 
 
 ==== Command: <tt>template  TYPE</tt>
-Output HTML and CSS templates for customization
+Output HTML, CSS, and Markdown (ERB) templates for customization
 
 Templates are printed to STDOUT for piping to a file.
   Save them and use them in the configuration file under html_template.
@@ -1149,10 +1203,10 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|json|template|timeline)
+Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
 
 
 ===== -s|--section NAME
@@ -1209,7 +1263,7 @@ View entries newer than date
 Tag boolean (AND,OR,NOT)
 
 [Default Value] OR
-[Must Match] (?i-mx:and|all|any|or|not|none)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
 ===== --before DATE_STRING
@@ -1229,10 +1283,10 @@ Count to display
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|json|template|timeline)
+Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
 
 
 ===== -s|--section NAME
@@ -1323,10 +1377,10 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|json|template|timeline)
+Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:template|html|csv|json|timeline)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
 
 
 ===== -s|--section NAME
@@ -1340,7 +1394,7 @@ Specify a section
 
 Tag sort direction (asc|desc)
 
-[Default Value] None
+[Default Value] asc
 [Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 

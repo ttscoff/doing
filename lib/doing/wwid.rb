@@ -254,33 +254,6 @@ module Doing
     end
 
     ##
-    ## @brief      Return the contents of the ERB template for Markdown output
-    ##
-    ## @return     (String) ERB template
-    ##
-    def markdown_template
-      IO.read(File.join(File.dirname(__FILE__), '../templates/doing-markdown.erb'))
-    end
-
-    ##
-    ## @brief      Return the contents of the HAML template for HTML output
-    ##
-    ## @return     (String) HAML template
-    ##
-    def haml_template
-      IO.read(File.join(File.dirname(__FILE__), '../templates/doing.haml'))
-    end
-
-    ##
-    ## @brief      Return the contents of the CSS template for HTML output
-    ##
-    ## @return     (String) CSS template
-    ##
-    def css_template
-      IO.read(File.join(File.dirname(__FILE__), '../templates/doing.css'))
-    end
-
-    ##
     ## @brief      Create a new doing file
     ##
     def create(filename = nil)
@@ -1852,6 +1825,42 @@ module Doing
         pattern << options[:trigger]
       end
       Regexp.new("^(?:#{pattern.join('|')})$", true)
+    end
+
+    def plugin_templates(type: :export)
+      templates = []
+      plugs = plugins[type].clone
+      plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
+        options[:templates].each do |t|
+          templates << t[:name]
+        end
+      end
+
+      templates
+    end
+
+    def template_regex(type: :export)
+      pattern = []
+      plugs = plugins[type].clone
+      plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
+        options[:templates].each do |t|
+          pattern << t[:trigger]
+        end
+      end
+      Regexp.new("^(?:#{pattern.join('|')})$", true)
+    end
+
+    def template_for_trigger(trigger, type: :export)
+      plugs = plugins[type].clone
+      plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
+        options[:templates].each do |t|
+          if trigger =~ /^(?:#{t[:trigger]})$/
+            puts options
+            return options[:class].template(trigger)
+          end
+        end
+      end
+      exit_now! "No template type matched \"#{trigger}\""
     end
 
     ##

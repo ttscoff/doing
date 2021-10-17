@@ -254,23 +254,33 @@ long_desc %(
   Templates are printed to STDOUT for piping to a file.
   Save them and use them in the configuration file under html_template.
 
-  Example `doing template HAML > ~/styles/my_doing.haml`
+  Example `doing template haml > ~/styles/my_doing.haml`
 )
-arg_name 'TYPE', must_match: /^(?:html|haml|css|markdown|md|erb)/i
+arg_name 'TYPE', must_match: wwid.template_regex
 command :template do |c|
-  c.action do |_global_options, options, args|
-    exit_now! 'No type specified, use `doing template [HAML|CSS|MARKDOWN]`' if args.empty?
+  c.desc 'List all available templates'
+  c.switch %i[l list]
 
-    case args[0]
-    when /html|haml/i
-      $stdout.puts wwid.haml_template
-    when /css/i
-      $stdout.puts wwid.css_template
-    when /markdown|md|erb/i
-      $stdout.puts wwid.markdown_template
-    else
-      exit_now! 'Invalid type specified, must be HAML or CSS'
+  c.action do |_global_options, options, args|
+    if options[:list]
+      $stdout.puts "Available templates: #{wwid.plugin_templates.join(', ')}"
+      return
     end
+
+    exit_now! "No type specified, use `doing template [#{wwid.plugin_templates.join('|')}]`" if args.empty?
+
+    $stdout.puts wwid.template_for_trigger(args[0])
+
+    # case args[0]
+    # when /html|haml/i
+    #   $stdout.puts wwid.haml_template
+    # when /css/i
+    #   $stdout.puts wwid.css_template
+    # when /markdown|md|erb/i
+    #   $stdout.puts wwid.markdown_template
+    # else
+    #   exit_now! 'Invalid type specified, must be HAML or CSS'
+    # end
   end
 end
 

@@ -21,10 +21,15 @@ module Doing
     def self.settings
       {
         trigger: 'markdown|mk?d|gfm',
+        templates: [{ name: 'markdown', trigger: 'mk?d|markdown' }],
         config: {
           'html_template' => { 'markdown' => nil }
         }
       }
+    end
+
+    def self.template(_trigger)
+      IO.read(File.join(File.dirname(__FILE__), '../../../templates/doing-markdown.erb'))
     end
 
     def self.render(wwid, items, variables: {})
@@ -63,7 +68,7 @@ module Doing
       template = if wwid.config['html_template']['markdown'] && File.exist?(File.expand_path(wwid.config['html_template']['markdown']))
                    IO.read(File.expand_path(wwid.config['html_template']['markdown']))
                  else
-                   wwid.markdown_template
+                   self.template(nil)
                  end
 
       totals = opt[:totals] ? wwid.tag_times(format: :markdown, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
