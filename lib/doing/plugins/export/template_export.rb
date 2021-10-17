@@ -1,28 +1,23 @@
-$wwid.register_plugin({
-  name: 'template',
-  type: :export,
-  class: 'TemplateExport',
-  trigger: 'template'
-})
+# frozen_string_literal: true
 
 class TemplateExport
-  include Util
+  include Doing::Util
 
-  def render(items, variables: {})
+  def render(wwid, items, variables: {})
     return if items.nil?
 
     opt = variables[:options]
     out = ''
     items.each do |item|
-      if opt[:highlight] && item['title'] =~ /@#{$wwid.config['marker_tag']}\b/i
-        flag = $wwid.colors[$wwid.config['marker_color']]
-        reset = $wwid.colors['default']
+      if opt[:highlight] && item['title'] =~ /@#{wwid.config['marker_tag']}\b/i
+        flag = wwid.colors[wwid.config['marker_color']]
+        reset = wwid.colors['default']
       else
         flag = ''
         reset = ''
       end
 
-      if (item.key?('note') && !item['note'].empty?) && $wwid.config[:include_notes]
+      if (item.key?('note') && !item['note'].empty?) && wwid.config[:include_notes]
         note_lines = item['note'].delete_if do |line|
           line =~ /^\s*$/
         end
@@ -42,8 +37,8 @@ class TemplateExport
       output = opt[:template].dup
 
       output.gsub!(/%[a-z]+/) do |m|
-        if $wwid.colors.key?(m.sub(/^%/, ''))
-          $wwid.colors[m.sub(/^%/, '')]
+        if wwid.colors.key?(m.sub(/^%/, ''))
+          wwid.colors[m.sub(/^%/, '')]
         else
           m
         end
@@ -51,7 +46,7 @@ class TemplateExport
 
       output.sub!(/%date/, item['date'].strftime(opt[:format]))
 
-      interval = get_interval(item, record: true) if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+      interval = wwid.get_interval(item, record: true) if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
       interval ||= ''
       output.sub!(/%interval/, interval)
 
@@ -74,9 +69,9 @@ class TemplateExport
         last_color = if escapes.length > 0
                        escapes[-1][0]
                      else
-                       $wwid.colors['default']
+                       wwid.colors['default']
                      end
-        output.gsub!(/(\s|m)(@[^ (]+)/, "\\1#{$wwid.colors[opt[:tags_color]]}\\2#{last_color}")
+        output.gsub!(/(\s|m)(@[^ (]+)/, "\\1#{wwid.colors[opt[:tags_color]]}\\2#{last_color}")
       end
       output.sub!(/%note/, note)
       output.sub!(/%odnote/, note.gsub(/^\t*/, ''))
@@ -94,7 +89,14 @@ class TemplateExport
       out += "#{output}\n"
     end
 
-    out += tag_times(format: :text, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) if opt[:totals]
+    out += wwid.tag_times(format: :text, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) if opt[:totals]
     out
   end
 end
+
+Doing::Plugins.register_plugin({
+  name: 'template',
+  type: :export,
+  class: 'TemplateExport',
+  trigger: 'template'
+})

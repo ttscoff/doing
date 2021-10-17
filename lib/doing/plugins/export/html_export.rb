@@ -1,20 +1,7 @@
-$wwid.register_plugin({
-  name: 'html',
-  type: :export,
-  class: 'HTMLExport',
-  trigger: 'html?|web(?:page)?',
-  config: {
-    'html_template' => {
-      'css' => nil,
-      'haml' => nil
-    }
-  }
-})
-
 class HTMLExport
-  include Util
+  include Doing::Util
 
-  def render(items, variables: {})
+  def render(wwid, items, variables: {})
     return if items.nil?
 
     opt = variables[:options]
@@ -34,7 +21,7 @@ class HTMLExport
         note = i['note'].map { |line| line.strip.link_urls } if i['note']
       end
 
-      interval = get_interval(i) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+      interval = wwid.get_interval(i) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
       interval ||= false
 
       items_out << {
@@ -46,21 +33,34 @@ class HTMLExport
       }
     end
 
-    template = if $wwid.config['html_template']['haml'] && File.exist?(File.expand_path($wwid.config['html_template']['haml']))
-                 IO.read(File.expand_path($wwid.config['html_template']['haml']))
+    template = if wwid.config['html_template']['haml'] && File.exist?(File.expand_path(wwid.config['html_template']['haml']))
+                 IO.read(File.expand_path(wwid.config['html_template']['haml']))
                else
-                 $wwid.haml_template
+                 wwid.haml_template
                end
 
-    style = if $wwid.config['html_template']['css'] && File.exist?(File.expand_path($wwid.config['html_template']['css']))
-              IO.read(File.expand_path($wwid.config['html_template']['css']))
+    style = if wwid.config['html_template']['css'] && File.exist?(File.expand_path(wwid.config['html_template']['css']))
+              IO.read(File.expand_path(wwid.config['html_template']['css']))
             else
-              $wwid.css_template
+              wwid.css_template
             end
 
-    totals = opt[:totals] ? tag_times(format: :html, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+    totals = opt[:totals] ? wwid.tag_times(format: :html, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
     engine = Haml::Engine.new(template)
     @out = engine.render(Object.new,
                        { :@items => items_out, :@page_title => variables[:page_title], :@style => style, :@totals => totals })
   end
 end
+
+Doing::Plugins.register_plugin({
+  name: 'html',
+  type: :export,
+  class: 'HTMLExport',
+  trigger: 'html?|web(?:page)?',
+  config: {
+    'html_template' => {
+      'css' => nil,
+      'haml' => nil
+    }
+  }
+})

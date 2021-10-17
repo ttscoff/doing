@@ -1,25 +1,20 @@
-$wwid.register_plugin({
-  name: 'timing',
-  type: :import,
-  class: 'TimingImport',
-  trigger: 'tim(?:ing)?'
-})
+# frozen_string_literal: true
 
 class TimingImport
-  include Util
+  include Doing::Util
   ##
   ## @brief      Imports a Timing report
   ##
   ## @param      path     (String) Path to JSON report file
   ## @param      options      (Hash) Additional Options
   ##
-  def import(path, options: {})
+  def import(wwid, path, options: {})
+    require 'pp'
     exit_now! 'Path to JSON report required' if path.nil?
-    section = options[:section] || $wwid.current_section
+    section = options[:section] || wwid.current_section
     options[:no_overlap] ||= false
-    options[:autotag] ||= $wwid.auto_tag
-
-    add_section(section) unless $wwid.content.has_key?(section)
+    options[:autotag] ||= wwid.auto_tag
+    wwid.add_section(section) unless wwid.content.has_key?(section)
 
     add_tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '@') } : []
     prefix = options[:prefix] ? options[:prefix] : '[Timing.app]'
@@ -49,7 +44,7 @@ class TimingImport
           title += " @#{tag}"
         end
       end
-      title = $wwid.autotag(title) if options[:autotag]
+      title = wwid.autotag(title) if options[:autotag]
       title += " @done(#{end_time.strftime('%Y-%m-%d %H:%M')})"
       title.gsub!(/ +/, ' ')
       title.strip!
@@ -58,10 +53,17 @@ class TimingImport
       new_items.push(new_entry)
     end
     total = new_items.count
-    new_items = $wwid.dedup(new_items, options[:no_overlap])
+    new_items = wwid.dedup(new_items, options[:no_overlap])
     dups = total - new_items.count
-    $wwid.results.push(%(Skipped #{dups} items with overlapping times)) if dups > 0
-    $wwid.content[section]['items'].concat(new_items)
-    $wwid.results.push(%(Imported #{new_items.count} items to #{section}))
+    wwid.results.push(%(Skipped #{dups} items with overlapping times)) if dups > 0
+    wwid.content[section]['items'].concat(new_items)
+    wwid.results.push(%(Imported #{new_items.count} items to #{section}))
   end
 end
+
+Doing::Plugins.register_plugin({
+  name: 'timing',
+  type: :import,
+  class: 'TimingImport',
+  trigger: 'tim(?:ing)?'
+})

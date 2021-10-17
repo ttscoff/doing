@@ -1,14 +1,9 @@
-$wwid.register_plugin({
-  name: 'timeline',
-  type: :export,
-  class: 'JSONExport',
-  trigger: 'json|time(?:line)?'
-})
+# frozen_string_literal: true
 
 class JSONExport
-  include Util
+  include Doing::Util
 
-  def render(items, variables: {})
+  def render(wwid, items, variables: {})
     return if items.nil?
 
     opt = variables[:options]
@@ -32,7 +27,7 @@ class JSONExport
       end
       if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
         end_date = Time.parse(Regexp.last_match(1))
-        interval = get_interval(i, formatted: false)
+        interval = wwid.get_interval(i, formatted: false)
       end
       end_date ||= ''
       interval ||= 0
@@ -79,7 +74,7 @@ class JSONExport
             new_item['style'] = 'color:white;background-color:#a2bf8a;'
           end
         end
-        new_item['style'] = 'color:white;background-color:#f7921e;' if i.has_tags?($wwid.config['marker_tag'])
+        new_item['style'] = 'color:white;background-color:#f7921e;' if i.has_tags?(wwid.config['marker_tag'])
         items_out.push(new_item)
       end
     end
@@ -87,7 +82,7 @@ class JSONExport
       JSON.pretty_generate({
         'section' => variables[:page_title],
         'items' => items_out,
-        'timers' => tag_times(format: :json, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order])
+        'timers' => wwid.tag_times(format: :json, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order])
       })
     elsif opt[:output] == 'timeline'
       template = <<~EOTEMPLATE
@@ -129,3 +124,10 @@ class JSONExport
     end
   end
 end
+
+Doing::Plugins.register_plugin({
+  name: 'timeline',
+  type: :export,
+  class: 'JSONExport',
+  trigger: 'json|time(?:line)?'
+})

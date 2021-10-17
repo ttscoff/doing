@@ -1,14 +1,9 @@
-$wwid.register_plugin({
-  name: 'taskpaper',
-  type: :export,
-  class: 'TaskPaperExport',
-  trigger: 'task(?:paper)?|tp'
-})
+# frozen_string_literal: true
 
 class TaskPaperExport
-  include Util
+  include Doing::Util
 
-  def render(items, variables: {})
+  def render(wwid, items, variables: {})
     return if items.nil?
 
     options = variables[:options]
@@ -19,7 +14,13 @@ class TaskPaperExport
     options[:output] = 'template'
     options[:template] = '- %title @date(%date)%note'
 
-    @out = $wwid.list_section(options)
+    @out = wwid.list_section(options)
   end
 end
 
+Doing::Plugins.register_plugin({
+  name: 'taskpaper',
+  type: :export,
+  class: 'TaskPaperExport',
+  trigger: 'task(?:paper)?|tp'
+})

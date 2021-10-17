@@ -103,7 +103,7 @@ class ::String
   ## @return     Symbol :and, :or, or :not
   ##
   def normalize_bool!
-    replace normalize_bool
+    replace normalize_boolm
   end
 
   def normalize_bool(default = :and)

@@ -1,14 +1,7 @@
-$wwid.register_plugin({
-  name: 'csv',
-  type: :export,
-  class: 'CSVExport',
-  trigger: 'csv'
-})
-
 class CSVExport
-  include Util
+  include Doing::Util
 
-  def render(items, variables: {})
+  def render(wwid, items, variables: {})
     return if items.nil?
 
     opt = variables[:options]
@@ -20,10 +13,17 @@ class CSVExport
         arr = i['note'].map { |line| line.strip }.delete_if { |e| e =~ /^\s*$/ }
         note = arr.join("\n") unless arr.nil?
       end
-      interval = get_interval(i, formatted: false) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+      interval = wwid.get_interval(i, formatted: false) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
       interval ||= 0
       output.push(CSV.generate_line([i['date'], i['title'], note, interval, i['section']]))
     end
     output.join('')
   end
 end
+
+Doing::Plugins.register_plugin({
+  name: 'csv',
+  type: :export,
+  class: 'CSVExport',
+  trigger: 'csv'
+})

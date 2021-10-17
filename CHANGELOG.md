@@ -1,6 +1,8 @@
 ### 1.0.94
 
+- Refactor import and export options as plugins
 - Improved timeline output formatting
+- Calendar.app import plugin
 
 ### 1.0.93
 

@@ -11,4 +11,11 @@ require 'json'
 require 'doing/helpers'
 require 'doing/util'
 require 'doing/wwid'
+require 'doing/plugin_manager'
 # require 'doing/markdown_document_listener'
+
+module Doing
+  class << self
+
+  end
+end

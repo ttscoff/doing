@@ -23,39 +23,10 @@ include GLI::App
 version Doing::VERSION
 hide_commands_without_desc true
 
-REGEX_BOOL = /^(?:and|all|any|or|not|none)$/i.freeze
-REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i.freeze
+REGEX_BOOL = /^(?:and|all|any|or|not|none)$/i
+REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
 
-
-wwid = WWID.new
-
-pre do |global, _command, _options, _args|
-  if global[:config_file] && global[:config_file] != wwid.config_file
-    wwid.config_file = global[:config_file]
-    wwid.configure({ ignore_local: true })
-    # wwid.results.push("Override config file #{wwid.config_file}")
-  # else
-  #   wwid.configure
-  end
-
-  if global[:doing_file]
-    wwid.init_doing_file(global[:doing_file])
-  else
-    wwid.init_doing_file
-  end
-
-  wwid.auto_tag = !global[:noauto]
-
-  wwid.config[:include_notes] = false unless global[:notes]
-
-  $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
-
-  # Return true to proceed; false to abort and not call the
-  # chosen command
-  # Use skips_pre before a command to skip this block
-  # on that command only
-  true
-end
+wwid = Doing::WWID.new
 
 wwid.user_home = if Dir.respond_to?('home')
                    Dir.home
@@ -63,9 +34,7 @@ wwid.user_home = if Dir.respond_to?('home')
                    File.expand_path('~')
                  end
 
-$wwid = wwid
 wwid.configure
-
 
 program_desc 'A CLI for a What Was I Doing system'
 
@@ -124,7 +93,7 @@ command %i[now next] do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      options[:section] = wwid.config['current_section']
+      options[:section] = wwid.current_section
     end
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero?)
@@ -247,7 +216,7 @@ command :meanwhile do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = wwid.current_section
     end
     input = ''
 
@@ -493,7 +462,7 @@ command %i[done did] do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = wwid.current_section
     end
 
     if options[:editor]
@@ -568,7 +537,7 @@ command :cancel do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = wwid.current_section
     end
 
     if options[:tag].nil?
@@ -648,7 +617,7 @@ command :finish do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = wwid.current_section
     end
 
     unless options[:auto]
@@ -1520,7 +1489,7 @@ command :view do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = wwid.current_section
     end
 
     view = wwid.get_view(title)
@@ -1669,24 +1638,11 @@ command :archive do |c|
 
     tags.concat(options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if options[:tag]
 
-    options[:bool] = case options[:bool]
-                     when /(and|all)/i
-                      'AND'
-                     when /(any|or)/i
-                      'OR'
-                     when /(not|none)/i
-                      'NOT'
-                     else
-                      'AND'
-                     end
-    opts = {
-      before: options[:before],
-      bool: options[:bool],
-      destination: options[:to],
-      keep: options[:keep],
-      search: options[:search],
-      tags: tags
-    }
+    opts = options
+    opts[:bool] = options[:bool].normalize_bool
+    opts[:destination] = options[:to]
+    opts[:tags] = tags
+
     wwid.archive(section, opts)
   end
 end
@@ -1851,9 +1807,21 @@ command :import do |c|
   c.arg_name 'PREFIX'
   c.flag :prefix
 
-  c.desc 'Limit starting date of entries (days before today)'
+  c.desc 'Import entries after X days ago, ignoring older entries. Only valid if import plugin has implemented date range filtering.'
   c.arg_name 'DAYS'
-  c.flag %i[l limit], default_value: 30
+  c.flag %i[start], must_match: /^\d+$/, default_value: 30
+
+  c.desc 'Import entries before X days ago, ignoring newer entries. Only valid if import plugin has implemented date range filtering.'
+  c.arg_name 'DAYS'
+  c.flag %i[end], must_match: /^\d+$/, default_value: 0
+
+  c.desc %(
+    Date range to import. Date range argument should be quoted. Date specifications can be natural language.
+    To specify a range, use "to" or "through": `--from "monday to friday"` or `--from 10/1 to 10/31`.
+    Has no effect unless the import plugin has implemented date range filtering.
+  )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag %i[f from]
 
   c.desc 'Allow entries that overlap existing times'
   c.switch [:overlap], negatable: true
@@ -1863,19 +1831,61 @@ command :import do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = wwid.current_section
+    end
+
+    if options[:from]
+      date_string = options[:from]
+      if date_string =~ / (to|through|thru|(un)?til|-+) /
+        dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
+        start = wwid.chronify(dates[0])
+        finish = wwid.chronify(dates[2])
+      else
+        start = wwid.chronify(date_string)
+        finish = false
+      end
+      exit_now! 'Unrecognized date string' unless start
+      dates = [start, finish]
     end
 
     if options[:type] =~ wwid.plugin_regex(type: :import)
       options[:no_overlap] = !options[:overlap]
       options[:section] = section
-
+      options[:date_filter] = dates
       wwid.import(args, options)
       wwid.write(wwid.doing_file)
     else
       exit_now! 'Invalid import type'
     end
   end
+end
+
+pre do |global, _command, _options, _args|
+  if global[:config_file] && global[:config_file] != wwid.config_file
+    wwid.config_file = global[:config_file]
+    wwid.configure({ ignore_local: true })
+    # wwid.results.push("Override config file #{wwid.config_file}")
+  # else
+  #   wwid.configure
+  end
+
+  if global[:doing_file]
+    wwid.init_doing_file(global[:doing_file])
+  else
+    wwid.init_doing_file
+  end
+
+  wwid.auto_tag = !global[:noauto]
+
+  wwid.config[:include_notes] = false unless global[:notes]
+
+  $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
+
+  # Return true to proceed; false to abort and not call the
+  # chosen command
+  # Use skips_pre before a command to skip this block
+  # on that command only
+  true
 end
 
 post do |global, _command, _options, _args|
@@ -1885,7 +1895,9 @@ post do |global, _command, _options, _args|
   if global[:stdout]
     $stdout.print wwid.results.join("\n")
   else
-    warn wwid.results.join("\n")
+    wwid.results.each do |msg|
+      warn "#{wwid.colors['yellow']}> #{wwid.colors['boldwhite']}#{msg}#{wwid.colors['default']}"
+    end
   end
 end
 

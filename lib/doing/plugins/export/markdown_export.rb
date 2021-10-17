@@ -1,12 +1,4 @@
-$wwid.register_plugin({
-  name: 'markdown',
-  type: :export,
-  class: 'MarkdownExport',
-  trigger: 'markdown|md|gfm',
-  config: {
-    'html_template' => { 'markdown' => nil }
-  }
-})
+# frozen_string_literal: true
 
 class MarkdownRenderer
   attr_accessor :items, :page_title, :totals
@@ -23,9 +15,9 @@ class MarkdownRenderer
 end
 
 class MarkdownExport
-  include Util
+  include Doing::Util
 
-  def render(items, variables: {})
+  def render(wwid, items, variables: {})
     return if items.nil?
 
     opt = variables[:options]
@@ -42,7 +34,7 @@ class MarkdownExport
 
       title = "#{title} @project(#{i['section']})" unless variables[:is_single]
 
-      interval = get_interval(i, record: false) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+      interval = wwid.get_interval(i, record: false) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
       interval ||= false
 
       done = i['title'] =~ /(?<= |^)@done/ ? 'x' : ' '
@@ -58,16 +50,26 @@ class MarkdownExport
       }
     end
 
-    template = if $wwid.config['html_template']['markdown'] && File.exist?(File.expand_path($wwid.config['html_template']['markdown']))
-                 IO.read(File.expand_path($wwid.config['html_template']['markdown']))
+    template = if wwid.config['html_template']['markdown'] && File.exist?(File.expand_path(wwid.config['html_template']['markdown']))
+                 IO.read(File.expand_path(wwid.config['html_template']['markdown']))
                else
-                 $wwid.markdown_template
+                 wwid.markdown_template
                end
 
-    totals = opt[:totals] ? $wwid.tag_times(format: :markdown, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+    totals = opt[:totals] ? wwid.tag_times(format: :markdown, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
 
     mdx = MarkdownRenderer.new(variables[:page_title], all_items, totals)
     engine = ERB.new(template)
     @out = engine.result(mdx.get_binding)
   end
 end
+
+Doing::Plugins.register_plugin({
+  name: 'markdown',
+  type: :export,
+  class: 'MarkdownExport',
+  trigger: 'markdown|md|gfm',
+  config: {
+    'html_template' => { 'markdown' => nil }
+  }
+})
