@@ -1,3 +1,7 @@
+### 1.0.94
+
+- Improved timeline output formatting
+
 ### 1.0.93
 
 - Gemfile error

@@ -36,6 +36,10 @@ class DoingImportTest < Test::Unit::TestCase
     assert_match(/Skipped #{target} items/, result, "Should have skipped #{target} duplicate entries")
   end
 
+  def test_import_no_arg
+    assert_raises(RuntimeError) { doing('import', '--type', 'timing') }
+  end
+
   def test_import_autotag
     whitelist_word = 'overtired'
     synonym_word = 'guntzel'

@@ -6,12 +6,15 @@ require 'pp'
 require 'shellwords'
 require 'erb'
 
+
 ##
 ## @brief      Main "What Was I Doing" methods
 ##
 class WWID
   attr_accessor :content, :sections, :current_section, :doing_file, :config, :user_home, :default_config_file,
-                :config_file, :results, :auto_tag
+                :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :plugins
+
+  include Util
 
   ##
   ## @brief      Initializes the object.
@@ -23,6 +26,45 @@ class WWID
     @interval_cache = {}
     @results = []
     @auto_tag = true
+    @plugins = {}
+  end
+
+  ##
+  ## @brief      Load plugins from plugins folder
+  ##
+  def load_plugins
+    plugins_dir = File.join(File.dirname(__FILE__), 'plugins', '**', '*.rb')
+    Dir.glob(plugins_dir).each do |plugin|
+      require plugin
+    end
+
+    user_plugins = File.join(@user_home, '.config', 'doing', 'plugins')
+    if File.directory?(user_plugins)
+      plugins_dir = File.join(user_plugins, '**', '*.rb')
+
+      Dir.glob(plugins_dir).each do |plugin|
+        require plugin
+      end
+    end
+
+    @plugins.each do |type, plugins|
+      plugins.each do |_, plugin|
+        if plugin.key?(:config)
+          @config = plugin[:config].deep_merge(@config)
+        end
+      end
+    end
+  end
+
+  ##
+  ## @brief      Register a plugin
+  ##
+  ## @param      opt   The plugin options
+  ##
+  def register_plugin(opt)
+    @plugins[opt[:type]] ||= {}
+    @plugins[opt[:type]][opt[:name]] = { class: opt[:class], trigger: opt[:trigger] }
+    @plugins[opt[:type]][opt[:name]][:config] = opt[:config] if opt.key?(:config)
   end
 
   ##
@@ -102,10 +144,10 @@ class WWID
     @config['config_editor_app'] ||= nil
     @config['editor_app'] ||= nil
 
-    @config['html_template'] ||= {}
-    @config['html_template']['haml'] ||= nil
-    @config['html_template']['css'] ||= nil
-    @config['html_template']['markdown'] ||= nil
+    # @config['html_template'] ||= {}
+    # @config['html_template']['haml'] ||= nil
+    # @config['html_template']['css'] ||= nil
+    # @config['html_template']['markdown'] ||= nil
 
     @config['templates'] ||= {}
     @config['templates']['default'] ||= {
@@ -630,60 +672,25 @@ class WWID
   end
 
   ##
-  ## @brief      Imports a Timing report
+  ## @brief      Imports external entries
   ##
   ## @param      path     (String) Path to JSON report file
-  ## @param      section  (String) The section to add to
   ## @param      opt      (Hash) Additional Options
   ##
-  def import_timing(path, opt = {})
-    section = opt[:section] || @current_section
-    opt[:no_overlap] ||= false
-    opt[:autotag] ||= @auto_tag
-
-    add_section(section) unless @content.has_key?(section)
-
-    add_tags = opt[:tag] ? opt[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '@') }.join(' ') : ''
-    prefix = opt[:prefix] ? opt[:prefix] : '[Timing.app]'
-    exit_now! "File not found" unless File.exist?(File.expand_path(path))
-
-    data = JSON.parse(IO.read(File.expand_path(path)))
-    new_items = []
-    data.each do |entry|
-      # Only process task entries
-      next if entry.key?('activityType') && entry['activityType'] != 'Task'
-      # Only process entries with a start and end date
-      next unless entry.key?('startDate') && entry.key?('endDate')
-
-      # Round down seconds and convert UTC to local time
-      start_time = Time.parse(entry['startDate'].sub(/:\d\dZ$/, ':00Z')).getlocal
-      end_time = Time.parse(entry['endDate'].sub(/:\d\dZ$/, ':00Z')).getlocal
-      next unless start_time && end_time
-
-      tags = entry['project'].split(/ ▸ /).map {|proj| proj.gsub(/[^a-z0-9]+/i, '').downcase }
-      title = "#{prefix} "
-      title += entry.key?('activityTitle') && entry['activityTitle'] != '(Untitled Task)' ? entry['activityTitle'] : 'Working on'
-      tags.each do |tag|
-        if title =~ /\b#{tag}\b/i
-          title.sub!(/\b#{tag}\b/i, "@#{tag}")
+  def import(paths, opt = {})
+    load_plugins if @plugins.empty?
+    @plugins[:import].each do |_, options|
+      if opt[:type] =~ /^(#{options[:trigger]})$/i
+        if paths.count.positive?
+          paths.each do |path|
+            Object.const_get(options[:class]).new.import(path, options: opt)
+          end
         else
-          title += " @#{tag}"
+          Object.const_get(options[:class]).new.import(nil, options: opt)
         end
+        break
       end
-      title = autotag(title) if opt[:autotag]
-      title += " @done(#{end_time.strftime('%Y-%m-%d %H:%M')})"
-      title.gsub!(/ +/, ' ')
-      title.strip!
-      new_entry = { 'title' => title, 'date' => start_time, 'section' => section }
-      new_entry['note'] = entry['notes'].split(/\n/).map(&:chomp) if entry.key?('notes')
-      new_items.push(new_entry)
     end
-    total = new_items.count
-    new_items = dedup(new_items, opt[:no_overlap])
-    dups = total - new_items.count
-    @results.push(%(Skipped #{dups} items with overlapping times)) if dups > 0
-    @content[section]['items'].concat(new_items)
-    @results.push(%(Imported #{new_items.count} items to #{section}))
   end
 
   ##
@@ -1831,316 +1838,38 @@ class WWID
 
     items.reverse! if opt[:order] =~ /^a/i
 
-    out = ''
+    out = nil
 
-    exit_now! 'Unknown output format' if opt[:output] && (opt[:output] !~ /^(template|html|csv|json|timeline|markdown|md|taskpaper)$/i)
+    opt[:output] = 'template' unless opt[:output]
 
-    case opt[:output]
-    when /^csv$/i
-      output = [CSV.generate_line(%w[date title note timer section])]
-      items.each do |i|
-        note = ''
-        if i['note']
-          arr = i['note'].map { |line| line.strip }.delete_if { |e| e =~ /^\s*$/ }
-          note = arr.join("\n") unless arr.nil?
-        end
-        interval = get_interval(i, formatted: false) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
-        interval ||= 0
-        output.push(CSV.generate_line([i['date'], i['title'], note, interval, i['section']]))
+    exit_now! 'Unknown output format' unless opt[:output] =~ plugin_regex(type: :export)
+
+    # exporter = WWIDExport.new(section, items, is_single, opt, self)
+    export_options = { page_title: section, is_single: is_single, options: opt }
+
+    load_plugins if @plugins.empty?
+    @plugins[:export].each do |_, options|
+      if opt[:output] =~ /^(#{options[:trigger]})$/i
+        out = Object.const_get(options[:class]).new.render(items, variables: export_options)
+        break
       end
-      out = output.join('')
-    when /^(json|timeline)/i
-      return if items.nil?
-
-      items_out = []
-      last_date = items[-1]['date'] + (60 * 60 * 24)
-      max = last_date.strftime('%F')
-      min = items[0]['date'].strftime('%F')
-      items.each_with_index do |i, index|
-        if String.method_defined? :force_encoding
-          title = i['title'].force_encoding('utf-8')
-          note = i['note'].map { |line| line.force_encoding('utf-8').strip } if i['note']
-        else
-          title = i['title']
-          note = i['note'].map { |line| line.strip } if i['note']
-        end
-        if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
-          end_date = Time.parse(Regexp.last_match(1))
-          interval = get_interval(i, formatted: false)
-        end
-        end_date ||= ''
-        interval ||= 0
-        note ||= ''
-
-        tags = []
-        attributes = {}
-        skip_tags = %w[meanwhile done cancelled flagged]
-        i['title'].scan(/@([^(\s]+)(?:\((.*?)\))?/).each do |tag|
-          tags.push(tag[0]) unless skip_tags.include?(tag[0])
-          attributes[tag[0]] = tag[1] if tag[1]
-        end
-
-        if opt[:output] == 'json'
-
-          i = {
-            date: i['date'],
-            end_date: end_date,
-            title: title.strip, #+ " #{note}"
-            note: note.instance_of?(Array) ? note.map(&:strip).join("\n") : note,
-            time: '%02d:%02d:%02d' % fmt_time(interval),
-            tags: tags
-          }
-
-          attributes.each { |attr, val| i[attr.to_sym] = val }
-
-          items_out << i
-
-        elsif opt[:output] == 'timeline'
-          new_item = {
-            'id' => index + 1,
-            'content' => title.strip, #+ " #{note}"
-            'title' => title.strip + " (#{'%02d:%02d:%02d' % fmt_time(interval)})",
-            'start' => i['date'].strftime('%F %T'),
-            'type' => 'box',
-            'style' => 'color:#4c566b;background-color:#d8dee9;'
-          }
-
-
-          if interval && interval.to_i > 0
-            new_item['end'] = end_date.strftime('%F %T')
-            if interval.to_i > 3600
-              new_item['type'] = 'range'
-              new_item['style'] = 'color:white;background-color:#a2bf8a;'
-            end
-          end
-          new_item['style'] = 'color:white;background-color:#f7921e;' if i.has_tags?(@config['marker_tag'])
-          items_out.push(new_item)
-        end
-      end
-      if opt[:output] == 'json'
-        puts JSON.pretty_generate({
-          'section' => section,
-          'items' => items_out,
-          'timers' => tag_times(format: :json, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order])
-        })
-      elsif opt[:output] == 'timeline'
-        template = <<~EOTEMPLATE
-                    <!doctype html>
-                    <html>
-                    <head>
-                      <link href="https://unpkg.com/vis-timeline@7.4.9/dist/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
-                      <script src="https://unpkg.com/vis-timeline@7.4.9/dist/vis-timeline-graph2d.min.js"></script>
-                    </head>
-                    <body>
-                      <div id="mytimeline"></div>
-          #{'          '}
-                      <script type="text/javascript">
-                        // DOM element where the Timeline will be attached
-                        var container = document.getElementById('mytimeline');
-          #{'          '}
-                        // Create a DataSet with data (enables two way data binding)
-                        var data = new vis.DataSet(#{items_out.to_json});
-          #{'          '}
-                        // Configuration for the Timeline
-                        var options = {
-                          width: '100%',
-                          height: '800px',
-                          margin: {
-                            item: 20
-                          },
-                          stack: true,
-                          min: '#{min}',
-                          max: '#{max}'
-                        };
-          #{'          '}
-                        // Create a Timeline
-                        var timeline = new vis.Timeline(container, data, options);
-                      </script>
-                    </body>
-                    </html>
-        EOTEMPLATE
-        return template
-      end
-    when /^html$/i
-      page_title = section
-      items_out = []
-      items.each do |i|
-        # if i.has_key?('note')
-        #   note = '<span class="note">' + i['note'].map{|n| n.strip }.join('<br>') + '</span>'
-        # else
-        #   note = ''
-        # end
-        if String.method_defined? :force_encoding
-          title = i['title'].force_encoding('utf-8').link_urls
-          note = i['note'].map { |line| line.force_encoding('utf-8').strip.link_urls } if i['note']
-        else
-          title = i['title'].link_urls
-          note = i['note'].map { |line| line.strip.link_urls } if i['note']
-        end
-
-        interval = get_interval(i) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
-        interval ||= false
-
-        items_out << {
-          date: i['date'].strftime('%a %-I:%M%p'),
-          title: title.gsub(/(@[^ (]+(\(.*?\))?)/im, '<span class="tag">\1</span>').strip, #+ " #{note}"
-          note: note,
-          time: interval,
-          section: i['section']
-        }
-      end
-
-      template = if @config['html_template']['haml'] && File.exist?(File.expand_path(@config['html_template']['haml']))
-                   IO.read(File.expand_path(@config['html_template']['haml']))
-                 else
-                   haml_template
-                 end
-
-      style = if @config['html_template']['css'] && File.exist?(File.expand_path(@config['html_template']['css']))
-                IO.read(File.expand_path(@config['html_template']['css']))
-              else
-                css_template
-              end
-
-      totals = opt[:totals] ? tag_times(format: :html, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
-      engine = Haml::Engine.new(template)
-      out = engine.render(Object.new,
-                         { :@items => items_out, :@page_title => page_title, :@style => style, :@totals => totals })
-    when /^taskpaper$/i
-      options = opt
-      options[:highlight] = false
-      options[:wrap_width] = 0
-      options[:tags_color] = false
-      options[:output] = nil
-      options[:template] = '- %title @date(%date)%note'
-
-      out = list_section(options)
-    when /^(md|markdown|gfm)$/i
-      page_title = section
-      all_items = []
-      items.each do |i|
-        if String.method_defined? :force_encoding
-          title = i['title'].force_encoding('utf-8').link_urls({format: :markdown})
-          note = i['note'].map { |line| line.force_encoding('utf-8').strip.link_urls({format: :markdown}) } if i['note']
-        else
-          title = i['title'].link_urls({format: :markdown})
-          note = i['note'].map { |line| line.strip.link_urls({format: :markdown}) } if i['note']
-        end
-
-        title = "#{title} @project(#{i['section']})" unless is_single
-
-        interval = get_interval(i) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
-        interval ||= false
-
-        done = i['title'] =~ /(?<= |^)@done/ ? 'x' : ' '
-
-        all_items << {
-          date: i['date'].strftime('%a %-I:%M%p'),
-          shortdate: i['date'].relative_date,
-          done: done,
-          note: note,
-          section: i['section'],
-          time: interval,
-          title: title.strip
-        }
-      end
-
-      template = if @config['html_template']['markdown'] && File.exist?(File.expand_path(@config['html_template']['markdown']))
-                   IO.read(File.expand_path(@config['html_template']['markdown']))
-                 else
-                   markdown_template
-                 end
-
-      totals = opt[:totals] ? tag_times(format: :markdown, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
-
-      mdx = MarkdownExport.new(page_title, all_items, totals)
-      engine = ERB.new(template)
-      out = engine.result(mdx.get_binding)
-    else
-      items.each do |item|
-        if opt[:highlight] && item['title'] =~ /@#{@config['marker_tag']}\b/i
-          flag = colors[@config['marker_color']]
-          reset = colors['default']
-        else
-          flag = ''
-          reset = ''
-        end
-
-        if (item.key?('note') && !item['note'].empty?) && @config[:include_notes]
-          note_lines = item['note'].delete_if do |line|
-            line =~ /^\s*$/
-          end
-          note_lines.map! { |line|
-            "\t#{line.sub(/^\t*(— )?/, '').sub(/^- /, '— ')}  "
-          }
-          if opt[:wrap_width]&.positive?
-            width = opt[:wrap_width]
-            note_lines.map! do |line|
-              line.strip.gsub(/(.{1,#{width}})(\s+|\Z)/, "\t\\1\n")
-            end
-          end
-          note = "\n#{note_lines.join("\n").chomp}"
-        else
-          note = ''
-        end
-        output = opt[:template].dup
-
-        output.gsub!(/%[a-z]+/) do |m|
-          if colors.key?(m.sub(/^%/, ''))
-            colors[m.sub(/^%/, '')]
-          else
-            m
-          end
-        end
-
-        output.sub!(/%date/, item['date'].strftime(opt[:format]))
-
-        interval = get_interval(item, record: true) if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
-        interval ||= ''
-        output.sub!(/%interval/, interval)
-
-        output.sub!(/%shortdate/) do
-          item['date'].relative_date
-        end
-
-        output.sub!(/%title/) do |_m|
-          if opt[:wrap_width] && opt[:wrap_width] > 0
-            flag + item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").chomp + reset
-          else
-            flag + item['title'].chomp + reset
-          end
-        end
-
-        output.sub!(/%section/, item['section']) if item['section']
-
-        if opt[:tags_color]
-          escapes = output.scan(/(\e\[[\d;]+m)[^\e]+@/)
-          last_color = if escapes.length > 0
-                         escapes[-1][0]
-                       else
-                         colors['default']
-                       end
-          output.gsub!(/(\s|m)(@[^ (]+)/, "\\1#{colors[opt[:tags_color]]}\\2#{last_color}")
-        end
-        output.sub!(/%note/, note)
-        output.sub!(/%odnote/, note.gsub(/^\t*/, ''))
-        output.sub!(/%chompnote/, note.gsub(/\n+/, ' ').gsub(/(^\s*|\s*$)/, '').gsub(/\s+/, ' '))
-        output.gsub!(/%hr(_under)?/) do |_m|
-          o = ''
-          `tput cols`.to_i.times do
-            o += Regexp.last_match(1).nil? ? '-' : '_'
-          end
-          o
-        end
-        output.gsub!(/%n/, "\n")
-        output.gsub!(/%t/, "\t")
-
-        out += "#{output}\n"
-      end
-
-      out += tag_times(format: :text, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) if opt[:totals]
     end
+
     out
+  end
+
+  def plugin_names(type: :export)
+    load_plugins if @plugins.empty?
+    @plugins[type].keys.sort.join('|')
+  end
+
+  def plugin_regex(type: :export)
+    pattern = []
+    load_plugins if @plugins.empty?
+    @plugins[type].each do |_, options|
+      pattern << options[:trigger]
+    end
+    Regexp.new("^(?:#{pattern.join('|')})$", true)
   end
 
   ##
@@ -2437,106 +2166,6 @@ class WWID
     list_section(opts)
   end
 
-  ##
-  ## @brief      Get total elapsed time for all tags in
-  ##             selection
-  ##
-  ## @param      format        (String) return format (html,
-  ##                           json, or text)
-  ## @param      sort_by_name  (Boolean) Sort by name if true, otherwise by time
-  ## @param      sort_order    (String) The sort order (asc or desc)
-  ##
-  def tag_times(format: :text, sort_by_name: false, sort_order: 'asc')
-    return '' if @timers.empty?
-
-    max = @timers.keys.sort_by { |k| k.length }.reverse[0].length + 1
-
-    total = @timers.delete('All')
-
-    tags_data = @timers.delete_if { |_k, v| v == 0 }
-    sorted_tags_data = if sort_by_name
-                         tags_data.sort_by { |k, _v| k }
-                       else
-                         tags_data.sort_by { |_k, v| v }
-                       end
-
-    sorted_tags_data.reverse! if sort_order =~ /^asc/i
-    case format
-    when :html
-
-      output = <<EOS
-        <table>
-        <caption id="tagtotals">Tag Totals</caption>
-        <colgroup>
-        <col style="text-align:left;"/>
-        <col style="text-align:left;"/>
-        </colgroup>
-        <thead>
-        <tr>
-          <th style="text-align:left;">project</th>
-          <th style="text-align:left;">time</th>
-        </tr>
-        </thead>
-        <tbody>
-EOS
-      sorted_tags_data.reverse.each do |k, v|
-        if v > 0
-          output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{'%02d:%02d:%02d' % fmt_time(v)}</td></tr>\n"
-        end
-      end
-      tail = <<EOS
-      <tr>
-        <td style="text-align:left;" colspan="2"></td>
-      </tr>
-      </tbody>
-      <tfoot>
-      <tr>
-        <td style="text-align:left;"><strong>Total</strong></td>
-        <td style="text-align:left;">#{'%02d:%02d:%02d' % fmt_time(total)}</td>
-      </tr>
-      </tfoot>
-      </table>
-EOS
-      output + tail
-    when :markdown
-      pad = sorted_tags_data.map {|k, v| k }.group_by(&:size).max.last[0].length
-      output = <<-EOS
-| #{' ' * (pad - 7) }project | time     |
-| #{'-' * (pad - 1)}: | :------- |
-      EOS
-      sorted_tags_data.reverse.each do |k, v|
-        if v > 0
-          output += "| #{' ' * (pad - k.length)}#{k} | #{'%02d:%02d:%02d' % fmt_time(v)} |\n"
-        end
-      end
-      tail = "[Tag Totals]"
-      output + tail
-    when :json
-      output = []
-      sorted_tags_data.reverse.each do |k, v|
-        output << {
-          'tag' => k,
-          'seconds' => v,
-          'formatted' => '%02d:%02d:%02d' % fmt_time(v)
-        }
-      end
-      output
-    else
-      output = []
-      sorted_tags_data.reverse.each do |k, v|
-        spacer = ''
-        (max - k.length).times do
-          spacer += ' '
-        end
-        output.push("#{k}:#{spacer}#{'%02d:%02d:%02d' % fmt_time(v)}")
-      end
-
-      output = output.empty? ? '' : "\n--- Tag Totals ---\n" + output.join("\n")
-      output += "\n\nTotal tracked: #{'%02d:%02d:%02d' % fmt_time(total)}\n"
-      output
-    end
-  end
-
   # @brief Uses 'autotag' configuration to turn keywords into tags for time tracking.
   # Does not repeat tags in a title, and only converts the first instance of an
   # untagged keyword
@@ -2598,98 +2227,6 @@ EOS
       text + ' ' + tags
     else
       text
-    end
-  end
-
-  private
-
-  ##
-  ## @brief      Gets the interval between entry's start date and @done date
-  ##
-  ## @param      item       (Hash) The entry
-  ## @param      formatted  (Bool) Return human readable time (default seconds)
-  ##
-  def get_interval(item, formatted: true, record: true)
-    done = nil
-    start = nil
-
-    if @interval_cache.keys.include? item['title']
-      seconds = @interval_cache[item['title']]
-      record_tag_times(item, seconds) if record
-      return seconds > 0 ? '%02d:%02d:%02d' % fmt_time(seconds) : false
-    end
-
-    if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
-      done = Time.parse(Regexp.last_match(1))
-    else
-      return false
-    end
-
-    start = if item['title'] =~ /@start\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
-              Time.parse(Regexp.last_match(1))
-            else
-              item['date']
-            end
-
-    seconds = (done - start).to_i
-
-    if record
-      record_tag_times(item, seconds)
-    end
-
-    @interval_cache[item['title']] = seconds
-
-    return seconds > 0 ? seconds : false unless formatted
-
-    seconds > 0 ? '%02d:%02d:%02d' % fmt_time(seconds) : false
-  end
-
-  ##
-  ## @brief      Record times for item tags
-  ##
-  ## @param      item  The item
-  ##
-  def record_tag_times(item, seconds)
-    return if @recorded_items.include?(item)
-
-    item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
-      k = m[0] == 'done' ? 'All' : m[0].downcase
-      if @timers.key?(k)
-        @timers[k] += seconds
-      else
-        @timers[k] = seconds
-      end
-      @recorded_items.push(item)
-    end
-  end
-
-  ##
-  ## @brief      Format human readable time from seconds
-  ##
-  ## @param      seconds  The seconds
-  ##
-  def fmt_time(seconds)
-    return [0, 0, 0] if seconds.nil?
-
-    if seconds =~ /(\d+):(\d+):(\d+)/
-      h = Regexp.last_match(1)
-      m = Regexp.last_match(2)
-      s = Regexp.last_match(3)
-      seconds = (h.to_i * 60 * 60) + (m.to_i * 60) + s.to_i
-    end
-    minutes = (seconds / 60).to_i
-    hours = (minutes / 60).to_i
-    days = (hours / 24).to_i
-    hours = (hours % 24).to_i
-    minutes = (minutes % 60).to_i
-    [days, hours, minutes]
-  end
-
-  def exec_available(cli)
-    if File.exists?(File.expand_path(cli))
-      File.executable?(File.expand_path(cli))
-    else
-      system "which #{cli}", :out => File::NULL, :err => File::NULL
     end
   end
 end

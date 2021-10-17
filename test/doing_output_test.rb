@@ -2,6 +2,7 @@ require 'fileutils'
 require 'tempfile'
 require 'time'
 require 'yaml'
+require 'json'
 
 require 'doing-helpers'
 require 'test_helper'
@@ -25,6 +26,60 @@ class DoingOutputTest < Test::Unit::TestCase
 
   def teardown
     FileUtils.rm_rf(@tmpdirs)
+  end
+
+  def test_invalid_output_format
+    doing('import', @import_file)
+    assert_raises(RuntimeError) { doing('show', '-c', '10', '-o', 'falafel') }
+  end
+
+  def test_markdown_output
+    doing('import', @import_file)
+    result = doing('show', '-c', '10', '-o', 'markdown')
+    md_rx = /^- \[x?\] (.*?)( \[\*\*\d\d:\d\d:\d\d\*\*\])?/
+    assert_equal(10, result.scan(md_rx).count, 'There should be 10 Markdown-formatted entries shown')
+  end
+
+  def test_taskpaper_output
+    doing('import', @import_file)
+    result = doing('show', '-c', '10', '-o', 'taskpaper')
+    md_rx = /^- \S.*?@date\(\d\d\d\d-\d\d-\d\d \d\d:\d\d\)$/
+    assert_equal(10, result.scan(md_rx).count, 'There should be 10 TaskPaper-formatted entries shown')
+  end
+
+  def test_csv_output
+    doing('import', @import_file)
+    result = doing('show', '-c', '10', '-o', 'csv')
+    md_rx = /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s-\d{4},.*?,.*?,\d+,[^,]+$/
+    assert_equal(10, result.scan(md_rx).count, 'There should be 10 CSV-formatted entries shown')
+  end
+
+  def test_html_output
+    doing('import', @import_file)
+    result = doing('show', '-c', '10', '-o', 'html')
+    md_rx = /^<div class='entry'>$/
+    assert_equal(10, result.scan(md_rx).count, 'There should be 10 HTML-formatted entries shown')
+  end
+
+  def test_timeline_output
+    doing('import', @import_file)
+    result = doing('show', '-c', '10', '-o', 'timeline')
+    md_rx = /"start":"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"/
+    assert_equal(10, result.scan(md_rx).count, 'There should be 10 JSON-formatted entries shown')
+    assert_match(/var timeline = new vis.Timeline/, result, 'Output should contain Vis script')
+  end
+
+  def test_json_output
+    doing('import', @import_file)
+    result = doing('show', '-c', '10', '-o', 'json')
+    data = JSON.parse(result)
+    assert(data, 'Output should be JSON parseable')
+    assert_equal(10, data['items'].count, 'There should be 10 items in JSON data')
+  end
+
+  def test_user_plugin
+    result = doing('--stdout', 'import', '--type', 'tester', @import_file)
+    assert_match(/Test Import Plugin Ran/, result, 'Test plugin should output success message')
   end
 
   def test_sections_command

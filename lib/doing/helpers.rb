@@ -77,6 +77,25 @@ class ::String
     end
   end
 
+  ##
+  ## @brief      Convert a sort order string to a qualified type
+  ##
+  ## @return     (String) 'asc' or 'desc'
+  ##
+  def normalize_order!
+    replace normalize_order
+  end
+
+  def normalize_order(default = 'asc')
+    case self
+    when /^a/i
+      'asc'
+    when /^d/i
+      'desc'
+    else
+      default
+    end
+  end
 
   ##
   ## @brief      Convert a boolean string to a symbol
@@ -99,7 +118,6 @@ class ::String
       default.is_a?(Symbol) ? default : default.normalize_bool
     end
   end
-
 
   ##
   ## @brief      Remove duplicate tags, leaving only first occurrence

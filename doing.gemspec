@@ -11,21 +11,15 @@ spec = Gem::Specification.new do |s|
   s.description = 'A tool for managing a TaskPaper-like file of recent activites. Perfect for the late-night hacker on too much caffeine to remember what they accomplished at 2 in the morning.'
   s.license = 'MIT'
 # Add your other files here if you make them
-  s.files = %w(
-bin/doing
-lib/doing/version.rb
-lib/doing.rb
-lib/doing/wwid.rb
-lib/doing/helpers.rb
-lib/doing/markdown_export.rb
-lib/templates/doing.haml
-lib/templates/doing.css
-lib/helpers/fuzzyfilefinder
-  )
+  s.files = Dir.chdir(File.expand_path('..', __FILE__)) do
+      `git ls-files -z`.split("\x0").reject { |f|
+          f.strip =~ /^((test|spec|features)\/|\.git|buildnotes)/
+      }
+  end
   s.require_paths << 'lib'
 
   s.extra_rdoc_files = ['README.md']
-  s.rdoc_options << '--title' << 'doing' << '--main' << 'README.md' << '--markup' << 'markdown' << '-ri'
+  s.rdoc_options << '--title' << 'doing' << '--main' << 'README.md' << '--markup' << 'markdown'
   s.bindir = 'bin'
   s.executables << 'doing'
   s.add_development_dependency 'rake', '~> 13.0', '>= 13.0.1'
