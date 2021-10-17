@@ -180,8 +180,7 @@ module Doing
 
       plugin_config = {}
 
-      @plugins ||= load_plugins
-      @plugins.each do |type, plugins|
+      plugins.each do |type, plugins|
         plugins.each do |_, plugin|
           if plugin.key?(:config)
             plugin_config.deep_merge(plugin[:config])
@@ -653,18 +652,17 @@ module Doing
     ## @param      opt      (Hash) Additional Options
     ##
     def import(paths, opt = {})
-      @plugins ||= load_plugins
-      @plugins[:import].each do |_, options|
-        if opt[:type] =~ /^(#{options[:trigger]})$/i
-          if paths.count.positive?
-            paths.each do |path|
-              Object.const_get(options[:class]).new.import(self, path, options: opt)
-            end
-          else
-            Object.const_get(options[:class]).new.import(self, nil, options: opt)
+      plugins[:import].each do |_, options|
+        next unless opt[:type] =~ /^(#{options[:trigger]})$/i
+
+        if paths.count.positive?
+          paths.each do |path|
+            options[:class].import(self, path, options: opt)
           end
-          break
+        else
+          options[:class].import(self, nil, options: opt)
         end
+        break
       end
     end
 
@@ -1822,15 +1820,18 @@ module Doing
       # exporter = WWIDExport.new(section, items, is_single, opt, self)
       export_options = { page_title: section, is_single: is_single, options: opt }
 
-      @plugins ||= load_plugins
-      @plugins[:export].each do |_, options|
-        if opt[:output] =~ /^(#{options[:trigger]})$/i
-          out = Object.const_get(options[:class]).new.render(self, items, variables: export_options)
-          break
-        end
+      plugins[:export].each do |_, options|
+        next unless opt[:output] =~ /^(#{options[:trigger]})$/i
+
+        out = options[:class].render(self, items, variables: export_options)
+        break
       end
 
       out
+    end
+
+    def plugins
+      @plugins ||= load_plugins
     end
 
     def load_plugins
@@ -1840,14 +1841,12 @@ module Doing
     end
 
     def plugin_names(type: :export)
-      @plugins ||= load_plugins
-      @plugins[type].keys.sort.join('|')
+      plugins[type].keys.sort.join('|')
     end
 
     def plugin_regex(type: :export)
       pattern = []
-      @plugins ||= load_plugins
-      @plugins[type].each do |_, options|
+      plugins[type].each do |_, options|
         pattern << options[:trigger]
       end
       Regexp.new("^(?:#{pattern.join('|')})$", true)
@@ -2368,6 +2367,41 @@ EOS
           @timers[k] = seconds
         end
         @recorded_items.push(item)
+      end
+    end
+
+    ##
+    ## @brief      Format human readable time from seconds
+    ##
+    ## @param      seconds  The seconds
+    ##
+    def fmt_time(seconds)
+      return [0, 0, 0] if seconds.nil?
+
+      if seconds =~ /(\d+):(\d+):(\d+)/
+        h = Regexp.last_match(1)
+        m = Regexp.last_match(2)
+        s = Regexp.last_match(3)
+        seconds = (h.to_i * 60 * 60) + (m.to_i * 60) + s.to_i
+      end
+      minutes = (seconds / 60).to_i
+      hours = (minutes / 60).to_i
+      days = (hours / 24).to_i
+      hours = (hours % 24).to_i
+      minutes = (minutes % 60).to_i
+      [days, hours, minutes]
+    end
+
+    ##
+    ## @brief      Test if command line tool is available
+    ##
+    ## @param      cli   The cli
+    ##
+    def exec_available(cli)
+      if File.exist?(File.expand_path(cli))
+        File.executable?(File.expand_path(cli))
+      else
+        system "which #{cli}", out: File::NULL, err: File::NULL
       end
     end
   end

@@ -37,10 +37,29 @@ module Doing
         File.join(@user_home, '.config', 'doing', 'plugins'),
         File.join(@user_home, '.config', 'baddir')
       ]
-      if add_dir
-        paths << File.join(add_dir)
-      end
+      paths << File.join(add_dir) if add_dir
       paths.map { |d| File.expand_path(d) }
+    end
+
+    def self.register(name, type, klass)
+      settings = klass.settings
+      @plugins[type] ||= {}
+      @plugins[type][name] = {
+        trigger: settings[:trigger],
+        class: klass,
+        config: settings[:config] || {}
+      }
+
+      validate_plugin(type, klass)
+    end
+
+    def self.validate_plugin(type, klass)
+      case type
+      when :import
+        raise Uncallable, 'Import plugins must respond to :import' unless klass.respond_to? :import
+      when :export
+        raise Uncallable, 'Export plugins must respond to :render' unless klass.respond_to? :render
+      end
     end
 
     ##
