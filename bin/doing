@@ -1851,6 +1851,10 @@ command :import do |c|
   c.arg_name 'PREFIX'
   c.flag :prefix
 
+  c.desc 'Limit starting date of entries (days before today)'
+  c.arg_name 'DAYS'
+  c.flag %i[l limit], default_value: 30
+
   c.desc 'Allow entries that overlap existing times'
   c.switch [:overlap], negatable: true
 
@@ -1863,14 +1867,9 @@ command :import do |c|
     end
 
     if options[:type] =~ wwid.plugin_regex(type: :import)
-      options = {
-        autotag: options[:autotag],
-        no_overlap: !options[:overlap],
-        prefix: options[:prefix],
-        section: section,
-        tag: options[:tag],
-        type: options[:type]
-      }
+      options[:no_overlap] = !options[:overlap]
+      options[:section] = section
+
       wwid.import(args, options)
       wwid.write(wwid.doing_file)
     else
