@@ -81,6 +81,7 @@ module Doing
           output.gsub!(/(\s|m)(@[^ (]+)/, "\\1#{wwid.colors[opt[:tags_color]]}\\2#{last_color}")
         end
         output.sub!(/%note/, note)
+        output.sub!(/%idnote/, note.split(/\n/).map {|l| "\t#{l}"}.join("\n"))
         output.sub!(/%odnote/, note.gsub(/^\t*/, ''))
         output.sub!(/%chompnote/, note.gsub(/\n+/, ' ').gsub(/(^\s*|\s*$)/, '').gsub(/\s+/, ' '))
         output.gsub!(/%hr(_under)?/) do |_m|

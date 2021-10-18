@@ -1507,7 +1507,7 @@ module Doing
 
       @content.each do |title, section|
         output += "#{section['original']}\n"
-        output += list_section({ section: title, template: "\t- %date | %title%note", highlight: false })
+        output += list_section({ section: title, template: "\t- %date | %title%idnote", highlight: false })
       end
       output += @other_content_bottom.join("\n") unless @other_content_bottom.nil?
       if file.nil?

@@ -3,6 +3,7 @@
 - Refactor import and export options as plugins
 - Improved timeline output formatting
 - Calendar.app import plugin
+- `doing config --update` flag to update existing config with new keys when available
 
 ### 1.0.93
 
