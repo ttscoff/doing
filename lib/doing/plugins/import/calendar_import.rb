@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# title: Calendar.app Import
+# description: Import entries from a Calendar.app calendar
+# author: Brett Terpstra
+# url: https://brettterpstra.com
 require 'json'
 
 module Doing
@@ -23,7 +27,7 @@ module Doing
       options[:no_overlap] ||= false
       options[:autotag] ||= wwid.auto_tag
 
-      wwid.add_section(section) unless wwid.content.has_key?(section)
+      wwid.add_section(section) unless wwid.content.key?(section)
 
       tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '@') } : []
       prefix = options[:prefix] || '[Calendar.app]'
@@ -62,7 +66,7 @@ module Doing
       total = new_items.count
       new_items = wwid.dedup(new_items, options[:no_overlap])
       dups = total - new_items.count
-      wwid.results.push(%(Skipped #{dups} items with overlapping times)) if dups > 0
+      wwid.results.push(%(Skipped #{dups} items with overlapping times)) if dups.positive?
       wwid.content[section]['items'].concat(new_items)
       wwid.results.push(%(Imported #{new_items.count} items to #{section}))
     end

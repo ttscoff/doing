@@ -1,6 +1,9 @@
 ### 1.0.94
 
-- Refactor import and export options as plugins
+- New plugin architecture
+- Refactor existing import and export options as plugins
+- Add %idnote template placeholder for "indented note" (entire note
+- Fix regression where notes stored in doing file were
 - Improved timeline output formatting
 - Calendar.app import plugin
 - `doing config --update` flag to update existing config with new keys when available

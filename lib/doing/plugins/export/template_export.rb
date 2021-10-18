@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# title: Template Export
+# description: Default export option using configured template placeholders
+# author: Brett Terpstra
+# url: https://brettterpstra.com
 module Doing
   class TemplateExport
     include Doing::Util

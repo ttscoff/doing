@@ -2298,10 +2298,11 @@ EOS
       when :json
         output = []
         sorted_tags_data.reverse.each do |k, v|
+          d, h, m = fmt_time(v)
           output << {
             'tag' => k,
             'seconds' => v,
-            'formatted' => '%02d:%02d:%02d' % fmt_time(v)
+            'formatted' => format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
           }
         end
         output
@@ -2312,20 +2313,44 @@ EOS
           (max - k.length).times do
             spacer += ' '
           end
-          output.push("#{k}:#{spacer}#{'%02d:%02d:%02d' % fmt_time(v)}")
+          d, h, m = fmt_time(v)
+          output.push("#{k}:#{spacer}#{format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)}")
         end
 
-        output = output.empty? ? '' : "\n--- Tag Totals ---\n" + output.join("\n")
-        output += "\n\nTotal tracked: #{'%02d:%02d:%02d' % fmt_time(total)}\n"
+        output = output.empty? ? '' : "\n--- Tag Totals ---\n#{output.join("\n")}"
+        d, h, m = fmt_time(total)
+        output += "\n\nTotal tracked: #{format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)}\n"
         output
       end
     end
 
     ##
-    ## @brief      Gets the interval between entry's start date and @done date
+    ## @brief      Gets the entry finish date from the @done
+    ##             tag
+    ##
+    ## @param      item  (Hash) The entry
+    ##
+    ## @return     (Date) finish date or nil if empty
+    ##
+    def get_end_date(item)
+      return Time.parse(Regexp.last_match(1)) if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
+
+      nil
+    end
+
+    ##
+    ## @brief      Gets the interval between entry's start
+    ##             date and @done date
     ##
     ## @param      item       (Hash) The entry
-    ## @param      formatted  (Bool) Return human readable time (default seconds)
+    ## @param      formatted  (Bool) Return human readable
+    ##                        time (default seconds)
+    ## @param      record     (Bool) Add the interval to the
+    ##                        total for each tag
+    ##
+    ## @return     Interval in seconds, or [d, h, m] array if
+    ##             formatted is true. False if no end date or
+    ##             interval is 0
     ##
     def get_interval(item, formatted: true, record: true)
       done = nil
@@ -2337,11 +2362,8 @@ EOS
         return seconds > 0 ? '%02d:%02d:%02d' % fmt_time(seconds) : false
       end
 
-      if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
-        done = Time.parse(Regexp.last_match(1))
-      else
-        return false
-      end
+      done = get_end_date(item)
+      return false if done.nil?
 
       start = if item['title'] =~ /@start\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
                 Time.parse(Regexp.last_match(1))

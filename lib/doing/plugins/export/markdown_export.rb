@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# title: Markdown Export
+# description: Export GFM-style task list
+# author: Brett Terpstra
+# url: https://brettterpstra.com
 module Doing
   class MarkdownRenderer
     attr_accessor :items, :page_title, :totals

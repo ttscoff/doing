@@ -1,4 +1,13 @@
+# frozen_string_literal: true
+
+# title: CSV Export
+# description: Export CSV formatted data with header row
+# author: Brett Terpstra
+# url: https://brettterpstra.com
 module Doing
+  ##
+  ## @brief      CSV Export
+  ##
   class CSVExport
     include Doing::Util
 
@@ -13,18 +22,24 @@ module Doing
 
       opt = variables[:options]
 
-      output = [CSV.generate_line(%w[date title note timer section])]
+      output = [CSV.generate_line(%w[start end title note timer section])]
       items.each do |i|
-        note = ''
-        if i['note']
-          arr = i['note'].map { |line| line.strip }.delete_if { |e| e =~ /^\s*$/ }
-          note = arr.join("\n") unless arr.nil?
-        end
-        interval = wwid.get_interval(i, formatted: false) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
-        interval ||= 0
-        output.push(CSV.generate_line([i['date'], i['title'], note, interval, i['section']]))
+        note = format_note(i['note'])
+        end_date = wwid.get_end_date(i)
+        interval = end_date && opt[:times] ? wwid.get_interval(i, formatted: false) : 0
+        output.push(CSV.generate_line([i['date'], end_date, i['title'], note, interval, i['section']]))
       end
       output.join('')
+    end
+
+    def self.format_note(note)
+      out = ''
+      if note
+        arr = note.map(&:strip).delete_if { |e| e =~ /^\s*$/ }
+        out = arr.join("\n") unless arr.empty?
+      end
+
+      out
     end
 
     Doing::Plugins.register 'csv', :export, self

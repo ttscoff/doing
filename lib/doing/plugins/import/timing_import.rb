@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# title: Timing.app Import
+# description: Import entries from a Timing.app report (JSON)
+# author: Brett Terpstra
+# url: https://brettterpstra.com
 module Doing
   class TimingImport
     include Doing::Util

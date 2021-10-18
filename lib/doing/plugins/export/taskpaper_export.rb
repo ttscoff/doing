@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# title: TaskPaper Export
+# description: Export TaskPaper-friendly data
+# author: Brett Terpstra
+# url: https://brettterpstra.com
 module Doing
   class TaskPaperExport
     include Doing::Util

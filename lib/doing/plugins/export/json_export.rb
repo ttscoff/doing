@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# title: JSON Export
+# description: Export JSON-formatted data, including entry durations and tag totals
+# author: Brett Terpstra
+# url: https://brettterpstra.com
 module Doing
   class JSONExport
     include Doing::Util
@@ -32,12 +36,9 @@ module Doing
           title = i['title']
           note = i['note'].map { |line| line.strip } if i['note']
         end
-        if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
-          end_date = Time.parse(Regexp.last_match(1))
-          interval = wwid.get_interval(i, formatted: false)
-        end
-        end_date ||= ''
-        interval ||= 0
+
+        end_date = wwid.get_end_date(i) || ''
+        interval = wwid.get_interval(i, formatted: false) || 0
         note ||= ''
 
         tags = []

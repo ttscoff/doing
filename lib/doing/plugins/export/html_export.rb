@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
+# title: HTML Export
+# description: Export styled HTML view of data
+# author: Brett Terpstra
+# url: https://brettterpstra.com
 module Doing
   class HTMLExport
     include Doing::Util
