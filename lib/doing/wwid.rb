@@ -236,7 +236,7 @@ module Doing
           current = 0
         elsif line =~ /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/
           date = Time.parse(Regexp.last_match(1))
-          title = Regexp.last_match(2)
+          title = Regexp.last_match(2).strip
           @content[section]['items'].push({ 'title' => title, 'date' => date, 'section' => section })
           current += 1
         elsif current.zero?
@@ -1503,33 +1503,47 @@ module Doing
     ## @param      file  (String) The filepath to write to
     ##
     def write(file = nil, backup: true)
+      output = wrapped_content
+
+      if file.nil?
+        $stdout.puts output
+      else
+        write_to_file(file, output, backup: backup)
+        run_after if @config.key?('run_after')
+      end
+    end
+
+    def wrapped_content
       output = @other_content_top ? "#{@other_content_top.join("\n")}\n" : ''
 
       @content.each do |title, section|
         output += "#{section['original']}\n"
-        output += list_section({ section: title, template: "\t- %date | %title%idnote", highlight: false })
+        output += list_section({ section: title, template: "\t- %date | %title%t2note", highlight: false })
       end
-      output += @other_content_bottom.join("\n") unless @other_content_bottom.nil?
-      if file.nil?
-        $stdout.puts output
-      else
-        file = File.expand_path(file)
-        if File.exist?(file) && backup
-          # Create a backup copy for the undo command
-          FileUtils.cp(file, "#{file}~")
-        end
 
-        File.open(file, 'w+') do |f|
-          f.puts output
-        end
+      output + @other_content_bottom.join("\n") unless @other_content_bottom.nil?
+    end
 
-        if @config.key?('run_after')
-          _, _, status = Open3.capture3(@config['run_after'])
-          if status.exitstatus.positive?
-            warn "Error running #{@config['run_after']}"
-            warn stderr
-          end
-        end
+    def write_to_file(file, content, backup: true)
+      file = File.expand_path(file)
+
+      if File.exist?(file) && backup
+        # Create a backup copy for the undo command
+        FileUtils.cp(file, "#{file}~")
+      end
+
+      File.open(file, 'w+') do |f|
+        f.puts content
+      end
+    end
+
+    def run_after
+      return unless @config.key?('run_after')
+
+      _, _, status = Open3.capture3(@config['run_after'])
+      if status.exitstatus.positive?
+        warn "Error running #{@config['run_after']}"
+        warn stderr
       end
     end
 

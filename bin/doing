@@ -1000,28 +1000,19 @@ command :show do |c|
 
     tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
 
-    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    opt = options.dup
 
-    opts = {
-      after: options[:after],
-      age: options[:age],
-      before: options[:before],
-      count: options[:c].to_i,
-      date_filter: dates,
-      highlight: true,
-      only_timed: options[:only_timed],
-      order: options[:sort].normalize_order,
-      output: options[:output],
-      search: options[:search],
-      section: section,
-      sort_tags: options[:sort_tags],
-      tag_filter: tag_filter,
-      tag_order: options[:tag_order].normalize_order,
-      tags_color: tags_color,
-      times: options[:t],
-      totals: options[:totals]
-    }
-    puts wwid.list_section(opts)
+    opt[:sort_tags] = options[:tag_sort] =~ /^n/i
+    opt[:count] = options[:count].to_i
+    opt[:date_filter] = dates
+    opt[:highlight] = true
+    opt[:order] = options[:sort].normalize_order
+    opt[:section] = section
+    opt[:tag_filter] = tag_filter
+    opt[:tag_order] = options[:tag_order].normalize_order
+    opt[:tags_color] = tags_color
+
+    puts wwid.list_section(opt)
   end
 end
 

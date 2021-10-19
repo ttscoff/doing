@@ -153,8 +153,10 @@ The config also contains templates for various command outputs. Include placehol
 - `%title`: the "what was I doing" entry line
 - `%date`: the date based on the template's `date_format` setting
 - `%shortdate`: a custom date formatter that removes the day/month/year from the entry if they match the current day/month/year
-- `%note`: Any note in the entry will be included here, a newline and tabs are automatically added.
-- `%odnote`: The notes with a leading tab removed (outdented note)
+- `%note`: Any note in the entry will be included here. A linebreak is included before, and each line is indented one tab.
+- `%idnote`: The notes with an extra leading tab (indented note)
+- `%odnote`: The notes with leading tab removed (outdented note)
+- `%>_3: note`: Custom note formatting, see below
 - `%chompnote`: Notes on one line, beginning and trailing whitespace removed.
 - `%section`: The section/project the entry is currently in
 - `%hr`: a horizontal rule (`-`) the width of the terminal
@@ -168,6 +170,36 @@ The config also contains templates for various command outputs. Include placehol
 - `%interval`: when used with the `-t` switch on the `show` command, it will display the time between a timestamp or _@start(date)_ tag and the _@done(date)_ tag, if it exists. Otherwise, it will remain empty.
 
 Date formats are based on Ruby [`strftime`](http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime) formatting. You can try it out [here](http://strftime.net).
+
+#### Formatted Notes
+
+In addition to the static placeholders for inserting notes (`%note`, `%idnote`, `%odnote`), you can also provide custom formatting. A format string looks like `%^> 8: note`. Here's now it works:
+
+There are three parts, all of them optional.
+    
+    %(^>)( 8)(: )note
+
+1. The first part must start with `^` (caret, Shift-6) followed by 1 character. This is a marker character that will go at the beginning of the line, before any indent.
+2. The second part is a space character followed by a number. The space can be an actual space or an underscore to represent a space. If it's a "t", then tabs will be used. Any other non-alphanumeric character will be used as is. The number after it specifies how many of the character to insert. To indent by two tabs, you would use `%t2note`.
+3. The last part is one character followed by an optional space (or underscore). This is a line prefix that will be prepended to every line of the note, after the indent.
+
+`%^> 11: note` displays notes as:
+
+    Mon 12:16pm | Adding flexible padding to note indent @doing
+    >           : This is a note
+    >           : with a couple of lines
+
+You can use any combination of the parts:
+
+`%: note` outputs:
+
+    Mon 12:16pm | Adding flexible padding to note indent @doing
+    : This is a note
+    : with a couple of lines
+
+And `%t2note` is the same as `%idnote`, just the note indented by two tabs.
+
+### Examples
 
 My normal template for the `recent` command looks like this:
 
