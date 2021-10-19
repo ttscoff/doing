@@ -987,7 +987,7 @@ command :show do |c|
       if date_string =~ / (to|through|thru|(un)?til|-+) /
         dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
         start = wwid.chronify(dates[0])
-        finish = wwid.chronify(dates[2])
+        finish = wwid.chronify(dates[2], future: true)
       else
         start = wwid.chronify(date_string)
         finish = false
@@ -1207,7 +1207,7 @@ command :on do |c|
     if date_string =~ / (to|through|thru) /
       dates = date_string.split(/ (to|through|thru) /)
       start = wwid.chronify(dates[0])
-      finish = wwid.chronify(dates[2])
+      finish = wwid.chronify(dates[2], future: true)
     else
       start = wwid.chronify(date_string)
       finish = false
@@ -1556,6 +1556,28 @@ command :view do |c|
                             else
                               false
                             end
+      if view.key?('after') && !options[:after]
+        options[:after] = view['after']
+      end
+
+      if view.key?('before') && !options[:before]
+        options[:before] = view['before']
+      end
+
+      if view.key?('from')
+        date_string = view['from']
+        if date_string =~ / (to|through|thru|(un)?til|-+) /
+          dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
+          start = wwid.chronify(dates[0])
+          finish = wwid.chronify(dates[2], future: true)
+        else
+          start = wwid.chronify(date_string)
+          finish = false
+        end
+        exit_now! 'Unrecognized date string' unless start
+        dates = [start, finish]
+      end
+
       opts = options
       opts[:output] = output_format
       opts[:count] = count
@@ -1570,6 +1592,7 @@ command :view do |c|
       opts[:template] = template
       opts[:totals] = totals
       opts[:page_title] = page_title
+      opts[:date_filter] = dates
 
       puts wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
@@ -1851,7 +1874,7 @@ command :import do |c|
       if date_string =~ / (to|through|thru|(un)?til|-+) /
         dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
         start = wwid.chronify(dates[0])
-        finish = wwid.chronify(dates[2])
+        finish = wwid.chronify(dates[2], future: true)
       else
         start = wwid.chronify(date_string)
         finish = false

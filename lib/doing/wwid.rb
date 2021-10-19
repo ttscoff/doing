@@ -348,7 +348,7 @@ module Doing
     #
     # @return     (DateTime) result
     #
-    def chronify(input)
+    def chronify(input, future: false)
       now = Time.now
       exit_now! "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
 
@@ -365,7 +365,7 @@ module Doing
       if secs_ago
         now - secs_ago
       else
-        Chronic.parse(input, { context: :past, ambiguous_time_range: 8 })
+        Chronic.parse(input, { context: future ? :future : :past, ambiguous_time_range: 8 })
       end
     end
 
