@@ -1495,6 +1495,7 @@ command :view do |c|
 
     view = wwid.get_view(title)
     if view
+      page_title = view.key?('title') ? view['title'] : title.cap_first
       only_timed = if (view.key?('only_timed') && view['only_timed']) || options[:only_timed]
                      true
                    else
@@ -1568,6 +1569,7 @@ command :view do |c|
       opts[:tags_color] = tags_color
       opts[:template] = template
       opts[:totals] = totals
+      opts[:page_title] = page_title
 
       puts wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)

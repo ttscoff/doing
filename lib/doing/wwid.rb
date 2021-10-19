@@ -1720,10 +1720,10 @@ module Doing
           @content.each do |_k, v|
             combined['items'] += v['items']
           end
-          section = if opt[:tag_filter] && opt[:tag_filter]['bool'].normalize_bool != :not
-                      opt[:tag_filter]['tags'].map do |tag|
-                        "@#{tag}"
-                      end.join(' + ')
+          section = if opt[:page_title]
+                      opt[:page_title]
+                    elsif opt[:tag_filter] && opt[:tag_filter]['bool'].normalize_bool != :not
+                      opt[:tag_filter]['tags'].map { |tag| "@#{tag}" }.join(' + ')
                     else
                       'doing'
                     end

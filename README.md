@@ -307,6 +307,7 @@ You can add additional custom views. Just nest them under the `views` key (inden
 
     views:
       later:
+        title: Stuff to do later
         section: Later
         count: 5
         wrap_width: 60
@@ -318,6 +319,8 @@ You can add additional custom views. Just nest them under the `views` key (inden
         wrap_width: 0
         date_format: '%F %_I:%M%P'
         template: '%date | %title%note'
+
+The `title` key is optional, it only affects output options like HTML where there's a page title shown. If it's missing, the title will be generated from an appropriate combination of section or tag filters.
 
 The `section` key is the default section to pull entries from. Count and section can be overridden at runtime with the `-c` and `-s` flags. Setting `section` to `All` will combine all sections in the output.
 
