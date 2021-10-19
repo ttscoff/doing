@@ -1,12 +1,17 @@
 ### 1.0.94
 
-- New plugin architecture
-- Refactor existing import and export options as plugins
-- Add %idnote template placeholder for "indented note" (entire note
-- Fix regression where notes stored in doing file were
-- Improved timeline output formatting
-- Calendar.app import plugin
-- `doing config --update` flag to update existing config with new keys when available
+#### NEW
+
+- (loosely printf-esque) formatting options for `%note` template placeholder
+- Add %idnote template placeholder for "indented note" (entire note indented one tab)
+- `doing config --update` will add newly added config keys to your existing config file (handy with plugins that define their own config keys)
+- Import calendar events from Calendar.app on macOS
+
+#### IMPROVED
+
+- Fix regression where notes stored in doing file were outdented, breaking TaskPaper compatibility
+- Major plugin architecture refactoring
+- Timeline output formatting
 
 ### 1.0.93
 
