@@ -199,6 +199,14 @@ You can use any combination of the parts:
 
 And `%t2note` is the same as `%idnote`, just the note indented by two tabs.
 
+Here's how a formatted note can look. This line in a template:
+
+    template: "%blue%shortdate %boldgreen│ %boldwhite%title %cyan(%section) %yellow%interval%default%white%_12┃ note%default"
+
+Renders the view as:
+
+![](img/doing-show-note-formatting-800.jpg)
+
 ### Examples
 
 My normal template for the `recent` command looks like this:
