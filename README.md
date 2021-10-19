@@ -331,7 +331,7 @@ Regarding colors, you can use them to create very nice displays if you're output
 
 Outputs: 
 
-![](http://ckyp.us/XKpj+)
+![](img/doing-colors.jpg)
 
 You can also specify a default output format for a view. Most of the optional output formats override the template specification (`html`, `csv`, `json`, `markdown`). If the `view` command is used with the `-o` flag, it will override what's specified for the view in the config.
 
