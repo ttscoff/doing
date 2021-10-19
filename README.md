@@ -201,11 +201,12 @@ And `%t2note` is the same as `%idnote`, just the note indented by two tabs.
 
 Here's how a formatted note can look. This line in a template:
 
-    template: "%blue%shortdate %boldgreen│ %boldwhite%title %cyan(%section) %yellow%interval%default%white%_12┃ note%default"
+    template: "%blue%shortdate %boldgreen??? %boldwhite%title %cyan(%section) %yellow%interval%default%white%_12??? note%default"
 
 Renders the view as:
 
-![](img/doing-show-note-formatting-800.jpg)
+<!--GITHUB-->![](img/doing-show-note-formatting-800.jpg)<!--END GITHUB-->
+<!--JEKYLL {% img aligncenter /uploads/2021/10/doing-show-note-formatting-800.jpg 800 149 "Note formatting" %} -->
 
 ### Examples
 
@@ -339,7 +340,8 @@ Regarding colors, you can use them to create very nice displays if you're output
 
 Outputs: 
 
-![](img/doing-colors.jpg)
+<!--GITHUB-->![](img/doing-colors.jpg)<!--END GITHUB-->
+<!--JEKYLL {% img aligncenter /uploads/2021/10/doing-colors.jpg 928 127 "Doing color output" %} -->
 
 You can also specify a default output format for a view. Most of the optional output formats override the template specification (`html`, `csv`, `json`, `markdown`). If the `view` command is used with the `-o` flag, it will override what's specified for the view in the config.
 
