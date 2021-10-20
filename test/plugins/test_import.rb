@@ -4,7 +4,6 @@ module Doing
 
     def self.settings
       {
-        config: { 'export_templates' => { 'tester' => nil } },
         type: :import,
         trigger: 'tester'
       }

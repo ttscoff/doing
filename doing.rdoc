@@ -389,10 +389,10 @@ Constrain search to entries older than date
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -408,6 +408,11 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== -i|--interactive
+Display an interactive menu of results to perform further operations
+
 
 
 ===== --only_timed
@@ -693,10 +698,10 @@ it will create a range.
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -854,10 +859,10 @@ Move selected items to section
 
 ===== -o|--output FORMAT
 
-Output entries to format (csv|html|markdown|say|taskpaper|template|timeline)
+Output entries to format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -q|--query QUERY
@@ -986,10 +991,10 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--sort ORDER
@@ -1053,10 +1058,10 @@ and "2d" would be interpreted as "two days ago."
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -1181,7 +1186,13 @@ Output HTML, CSS, and Markdown (ERB) templates for customization
 Templates are printed to STDOUT for piping to a file.
   Save them and use them in the configuration file under html_template.
 
-  Example `doing template HAML > ~/styles/my_doing.haml`
+  Example `doing template haml > ~/styles/my_doing.haml`
+===== Options
+===== -l|--[no-]list
+List all available templates
+
+
+
 ==== Command: <tt>today </tt>
 List entries from today
 
@@ -1203,10 +1214,10 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -1283,10 +1294,10 @@ Count to display
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -1377,10 +1388,10 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|sayit)$)
+[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME

@@ -1837,7 +1837,7 @@ module Doing
 
       items = target_section['items'].sort_by { |item| item['date'] }
 
-      items = filter_items(items, opt: opt)
+      items = filter_items(items, opt: opt).reverse
 
       items.reverse! if opt[:order] =~ /^d/i
 
