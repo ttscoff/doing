@@ -119,6 +119,14 @@ class ::String
     end
   end
 
+  def normalize_trigger!
+    replace normalize_trigger
+  end
+
+  def normalize_trigger
+    gsub(/\((?!\?:)/, '(?:').downcase
+  end
+
   ##
   ## @brief      Remove duplicate tags, leaving only first occurrence
   ##

@@ -4,7 +4,7 @@ module Doing
 
     def self.settings
       {
-        config: { 'html_template' => { 'tester' => nil } },
+        config: { 'export_templates' => { 'tester' => nil } },
         type: :import,
         trigger: 'tester'
       }

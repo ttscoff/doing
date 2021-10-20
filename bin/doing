@@ -667,8 +667,9 @@ command :finish do |c|
     exit_now! 'Invalid argument (specify number of recent items to mark @done)' unless args.length == 0 || args[0] =~ /\d+/
 
     count = args[0] ? args[0].to_i : 1
+
     opts = {
-      archive: options[:a],
+      archive: options[:archive],
       back: date,
       count: count,
       date: options[:date],
@@ -680,6 +681,7 @@ command :finish do |c|
       tags: ['done'],
       unfinished: options[:unfinished]
     }
+
     wwid.tag_last(opts)
   end
 end
@@ -1008,6 +1010,7 @@ command :show do |c|
     opt[:highlight] = true
     opt[:order] = options[:sort].normalize_order
     opt[:section] = section
+    opt[:tag] = nil
     opt[:tag_filter] = tag_filter
     opt[:tag_order] = options[:tag_order].normalize_order
     opt[:tags_color] = tags_color
@@ -1024,7 +1027,7 @@ long_desc <<~'EODESC'
 EODESC
 
 arg_name 'SEARCH_PATTERN'
-command [:grep, :search] do |c|
+command %i[grep search] do |c|
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -1056,6 +1059,9 @@ command [:grep, :search] do |c|
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
+  c.desc 'Display an interactive menu of results to perform further operations'
+  c.switch %i[i interactive], default_value: false, negatable: false
+
   c.action do |_global_options, options, args|
     tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
 
@@ -1063,22 +1069,12 @@ command [:grep, :search] do |c|
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    options[:highlight] = true
+    options[:search] = args.join(' ')
+    options[:section] = section
+    options[:tags_color] = tags_color
 
-    opts = {
-      after: options[:after],
-      before: options[:before],
-      highlight: true,
-      only_timed: options[:only_timed],
-      output: options[:output],
-      search: args.join(' '),
-      section: section,
-      sort_tags: options[:sort_tags],
-      tags_color: tags_color,
-      times: options[:times],
-      totals: options[:totals]
-    }
-
-    puts wwid.list_section(opts)
+    puts wwid.list_section(options)
   end
 end
 
@@ -1399,7 +1395,7 @@ command :add_section do |c|
   c.action do |_global_options, _options, args|
     exit_now! "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
 
-    wwid.add_section(args[0].cap_first)
+    wwid.add_section(args.join(' ').cap_first)
     wwid.write(wwid.doing_file)
   end
 end

@@ -25,10 +25,7 @@ module Doing
     def self.settings
       {
         trigger: 'markdown|mk?d|gfm',
-        templates: [{ name: 'markdown', trigger: 'mk?d|markdown' }],
-        config: {
-          'html_template' => { 'markdown' => nil }
-        }
+        templates: [{ name: 'markdown', trigger: 'mk?d|markdown' }]
       }
     end
 
@@ -69,8 +66,8 @@ module Doing
         }
       end
 
-      template = if wwid.config['html_template']['markdown'] && File.exist?(File.expand_path(wwid.config['html_template']['markdown']))
-                   IO.read(File.expand_path(wwid.config['html_template']['markdown']))
+      template = if wwid.config['export_templates']['markdown'] && File.exist?(File.expand_path(wwid.config['export_templates']['markdown']))
+                   IO.read(File.expand_path(wwid.config['export_templates']['markdown']))
                  else
                    self.template(nil)
                  end

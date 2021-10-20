@@ -10,7 +10,7 @@ module Doing
 
     def self.settings
       {
-        trigger: 'template'
+        trigger: 'template|doing'
       }
     end
 
@@ -120,6 +120,6 @@ module Doing
       out
     end
 
-    Doing::Plugins.register 'template', :export, self
+    Doing::Plugins.register ['template', 'doing'], :export, self
   end
 end

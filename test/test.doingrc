@@ -1,9 +1,8 @@
 ---
-html_template:
-  css:
-  haml:
-  markdown:
-  tester:
+plugins:
+  plugin_path: test/plugins
+  say:
+    say_voice: Fiona
 autotag:
   transform:
   - "(deploy|merge)\\s+@(\\w+)-\\d+:$1-$2 @dev @dev-$2"
@@ -79,4 +78,17 @@ default_tags: []
 :include_notes: true
 config_editor_app:
 tag_sort: time
-plugin_path: "test/plugins"
+export_templates:
+  css:
+  haml:
+  markdown:
+  tester:
+  calendar:
+  timing:
+  csv:
+  html:
+  timeline:
+  taskpaper:
+  template:
+  doing:
+  say:

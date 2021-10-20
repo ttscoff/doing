@@ -12,15 +12,9 @@ module Doing
       {
         trigger: 'html?|web(?:page)?',
         templates: [
-          { name: 'html', trigger: 'h[ta]ml?|web' },
+          { name: 'haml', trigger: 'h[ta]ml?|web' },
           { name: 'css', trigger: 'css|styl(?:e|us)' }
-        ],
-        config: {
-          'html_template' => {
-            'css' => nil,
-            'haml' => nil
-          }
-        }
+        ]
       }
     end
 
@@ -64,14 +58,14 @@ module Doing
         }
       end
 
-      template = if wwid.config['html_template']['haml'] && File.exist?(File.expand_path(wwid.config['html_template']['haml']))
-                   IO.read(File.expand_path(wwid.config['html_template']['haml']))
+      template = if wwid.config['export_templates']['haml'] && File.exist?(File.expand_path(wwid.config['export_templates']['haml']))
+                   IO.read(File.expand_path(wwid.config['export_templates']['haml']))
                  else
                    self.template('html')
                  end
 
-      style = if wwid.config['html_template']['css'] && File.exist?(File.expand_path(wwid.config['html_template']['css']))
-                IO.read(File.expand_path(wwid.config['html_template']['css']))
+      style = if wwid.config['export_templates']['css'] && File.exist?(File.expand_path(wwid.config['export_templates']['css']))
+                IO.read(File.expand_path(wwid.config['export_templates']['css']))
               else
                 self.template('css')
               end

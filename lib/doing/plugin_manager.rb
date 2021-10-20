@@ -38,16 +38,30 @@ module Doing
       paths.map { |d| File.expand_path(d) }
     end
 
+    ##
+    ## @brief      Register a plugin
+    ##
+    ## @param      [String|Array] title  The name of the plugin (can be an array of names)
+    ## @param      type   The plugin type (:import, :export)
+    ## @param      klass  The class responding to :render or :import
+    ##
+    ## @return     Success boolean
+    ##
     def self.register(title, type, klass)
+      if title.is_a?(Array)
+        title.each { |t| register(t, type, klass) }
+        return
+      end
+
       settings = if klass.respond_to? :settings
                     klass.settings
                   else
-                    { trigger: title, config: {}}
+                    { trigger: title.normalize_trigger, config: {}}
                   end
 
       @plugins[type] ||= {}
       @plugins[type][title] = {
-        trigger: settings[:trigger] || title,
+        trigger: settings[:trigger].normalize_trigger || title.normalize_trigger,
         class: klass,
         templates: settings[:templates] || nil,
         config: settings[:config] || {}
@@ -60,8 +74,12 @@ module Doing
       case type
       when :import
         raise Uncallable, 'Import plugins must respond to :import' unless klass.respond_to? :import
+        false
       when :export
         raise Uncallable, 'Export plugins must respond to :render' unless klass.respond_to? :render
+        false
+      else
+        true
       end
     end
 

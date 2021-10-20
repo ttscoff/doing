@@ -8,6 +8,7 @@ $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'doing/plugin_manager'
 require 'doing/util'
 require 'doing/wwid'
+require 'doing/helpers'
 # require 'gli'
 
 # Tests for archive commands
@@ -37,7 +38,7 @@ class DoingUtilTest < Test::Unit::TestCase
   end
 
   def test_format_time
-    item = @wwid.content[@wwid.current_section]['items'][-1]
+    item = @wwid.content[@wwid.current_section]['items'][0]
     interval = @wwid.get_interval(item, formatted: false, record: false)
     assert_equal(360, interval, 'Interval should match')
     res = @wwid.fmt_time(interval)
