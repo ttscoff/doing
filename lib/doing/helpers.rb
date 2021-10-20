@@ -19,6 +19,19 @@ end
 ## @brief      Hash helpers
 ##
 class ::Hash
+  def item_equal?(other_item)
+    item = self
+    return false if item['title'].strip != other_item['title'].strip
+
+    return false if item['date'] != other_item['date']
+
+    item['note'] ||= []
+    other_item['note'] ||= []
+    return false if item['note'].normalized_note != other_item['note'].normalized_note
+
+    true
+  end
+
   def has_tags?(tags, bool = :and)
     tags = tags.split(/ *, */) if tags.is_a? String
     bool = bool.normalize_bool if bool.is_a? String
@@ -71,6 +84,31 @@ end
 ## @brief      String helpers
 ##
 class ::String
+  ##
+  ## @brief      Truncate to nearest word
+  ##
+  ## @param      len   The length
+  ##
+  def truncate(len, ellipsis: '...')
+    return self if length <= len
+
+    total = 0
+    res = []
+
+    split(/ /).each do |word|
+      break if total + 1 + word.length > len
+
+      total += 1 + word.length
+      res.push(word)
+    end
+    res.join(' ') + ellipsis
+  end
+
+  ##
+  ## @brief      Capitalize on the first character on string
+  ##
+  ## @return     Capitalized string
+  ##
   def cap_first
     sub(/^\w/) do |m|
       m.upcase
@@ -203,6 +241,14 @@ class ::String
     end
 
     str
+  end
+end
+
+class ::Array
+  def normalized_note
+    map do |line|
+      line.strip
+    end
   end
 end
 

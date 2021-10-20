@@ -882,11 +882,12 @@ module Doing
     end
 
     def choose_from_items(items, opt = {}, include_section: false)
+      pad = items.length.to_s.length
       options = items.map.with_index do |item, i|
         out = [
-          i,
+          format("%#{pad}d", i),
           ') ',
-          item['date'].strftime('%Y-%m-%d %H:%M'),
+          format('%13s', item['date'].relative_date),
           ' | ',
           item['title']
         ]
@@ -918,7 +919,7 @@ module Doing
       res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
       selected = []
       res.split(/\n/).each do |item|
-        idx = item.match(/^(\d+)\)/)[1].to_i
+        idx = item.match(/^ *(\d+)\)/)[1].to_i
         selected.push(items[idx])
       end
 
@@ -950,6 +951,7 @@ module Doing
                              ],
                              prompt: 'What do you want to do with the selected items? > ',
                              multiple: true,
+                             sorted: false,
                              fzf_args: ['--height=60%', '--tac', '--no-sort'])
         return unless choice
 
@@ -1428,8 +1430,10 @@ module Doing
       section_items = @content[section]['items']
       s_idx = section_items.index(old_item)
 
+      return if section_items[s_idx].item_equal?(new_item)
+
       section_items[s_idx] = new_item
-      @results.push("Entry updated: #{section_items[s_idx]['title']}")
+      @results.push("Entry updated: #{section_items[s_idx]['title'].truncate(60)}")
       @content[section]['items'] = section_items
     end
 
@@ -1846,8 +1850,14 @@ module Doing
 
       if opt[:interactive]
         opt[:menu] = !opt[:force]
-        opt[:query] = opt[:search]
+        opt[:query] = '' # opt[:search]
         selected = choose_from_items(items, opt)
+
+        if selected.empty?
+          @results.push('No selection')
+          return
+        end
+
         act_on(selected, opt)
         return
       end
