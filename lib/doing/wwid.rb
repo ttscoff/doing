@@ -742,13 +742,14 @@ module Doing
     ##
     ## @return     (String) The selected option
     ##
-    def choose_from(options, prompt: 'Make a selection: ', multiple: false, fzf_args: [])
+    def choose_from(options, prompt: 'Make a selection: ', multiple: false, sorted: true, fzf_args: [])
       fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
       # fzf_args << '-1' # User is expecting a menu, and even if only one it seves as confirmation
       fzf_args << %(--prompt "#{prompt}")
       fzf_args << '--multi' if multiple
       header = "esc: cancel,#{multiple ? ' tab: multi-select, ctrl-a: select all,' : ''} return: confirm"
       fzf_args << %(--header "#{header}")
+      options.sort! if sorted
       res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
       return false if res.strip.size.zero?
 
@@ -885,7 +886,7 @@ module Doing
         out = [
           i,
           ') ',
-          item['date'],
+          item['date'].strftime('%Y-%m-%d %H:%M'),
           ' | ',
           item['title']
         ]
