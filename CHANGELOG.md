@@ -2,6 +2,7 @@
 
 #### NEW
 
+- --interactive mode to act on results of `doing grep`
 - (loosely printf-esque) formatting options for `%note` template placeholder
 - Add %idnote template placeholder for "indented note" (entire note indented one tab)
 - `doing config --update` will add newly added config keys to your existing config file (handy with plugins that define their own config keys)
@@ -9,9 +10,16 @@
 
 #### IMPROVED
 
+- Select menu item formatting
+- If an edited item has no changes, don't update/output notification - Don't start with query when using grep --interactive
+- When accepting a date filter, allow end date to be in the future
 - Fix regression where notes stored in doing file were outdented, breaking TaskPaper compatibility
 - Major plugin architecture refactoring
 - Timeline output formatting
+
+#### FIXED
+
+- Multi-word unquoted arguments to add_section being truncated
 
 ### 1.0.93
 
