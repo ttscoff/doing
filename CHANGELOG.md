@@ -2,6 +2,7 @@
 
 #### NEW
 
+- Printf formatting for title and date
 - --interactive mode to act on results of `doing grep`
 - (loosely printf-esque) formatting options for `%note` template placeholder
 - Add %idnote template placeholder for "indented note" (entire note indented one tab)
@@ -10,6 +11,7 @@
 
 #### IMPROVED
 
+- Output wrapping for terminal display
 - Select menu item formatting
 - If an edited item has no changes, don't update/output notification - Don't start with query when using grep --interactive
 - When accepting a date filter, allow end date to be in the future
@@ -19,6 +21,8 @@
 
 #### FIXED
 
+- Handling of arbitrary times in natural language dates
+- Show --from with date span
 - Multi-word unquoted arguments to add_section being truncated
 
 ### 1.0.93
