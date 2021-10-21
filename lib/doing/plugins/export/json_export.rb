@@ -25,26 +25,26 @@ module Doing
                         'json'
                       end
       items_out = []
-      last_date = items[-1]['date'] + (60 * 60 * 24)
+      last_date = items[-1].date + (60 * 60 * 24)
       max = last_date.strftime('%F')
-      min = items[0]['date'].strftime('%F')
+      min = items[0].date.strftime('%F')
       items.each_with_index do |i, index|
         if String.method_defined? :force_encoding
-          title = i['title'].force_encoding('utf-8')
-          note = i['note'].map { |line| line.force_encoding('utf-8').strip } if i['note']
+          title = i.title.force_encoding('utf-8')
+          note = i.note.map { |line| line.force_encoding('utf-8').strip } if i.note
         else
-          title = i['title']
-          note = i['note'].map { |line| line.strip } if i['note']
+          title = i.title
+          note = i.note.map { |line| line.strip } if i.note
         end
 
-        end_date = wwid.get_end_date(i) || ''
+        end_date = wwid.i.end_date || ''
         interval = wwid.get_interval(i, formatted: false) || 0
         note ||= ''
 
         tags = []
         attributes = {}
         skip_tags = %w[meanwhile done cancelled flagged]
-        i['title'].scan(/@([^(\s]+)(?:\((.*?)\))?/).each do |tag|
+        i.title.scan(/@([^(\s]+)(?:\((.*?)\))?/).each do |tag|
           tags.push(tag[0]) unless skip_tags.include?(tag[0])
           attributes[tag[0]] = tag[1] if tag[1]
         end
@@ -52,10 +52,10 @@ module Doing
         if opt[:output] == 'json'
 
           i = {
-            date: i['date'],
+            date: i.date,
             end_date: end_date,
             title: title.strip, #+ " #{note}"
-            note: note.instance_of?(Array) ? note.map(&:strip).join("\n") : note,
+            note: note.instance_of?(Array) ? note.to_s : note,
             time: '%02d:%02d:%02d' % wwid.fmt_time(interval),
             tags: tags
           }
@@ -69,7 +69,7 @@ module Doing
             'id' => index + 1,
             'content' => title.strip, #+ " #{note}"
             'title' => title.strip + " (#{'%02d:%02d:%02d' % wwid.fmt_time(interval)})",
-            'start' => i['date'].strftime('%F %T'),
+            'start' => i.date.strftime('%F %T'),
             'type' => 'box',
             'style' => 'color:#4c566b;background-color:#d8dee9;'
           }
@@ -82,7 +82,7 @@ module Doing
               new_item['style'] = 'color:white;background-color:#a2bf8a;'
             end
           end
-          new_item['style'] = 'color:white;background-color:#f7921e;' if i.has_tags?(wwid.config['marker_tag'])
+          new_item['style'] = 'color:white;background-color:#f7921e;' if i.tags?(wwid.config['marker_tag'])
           items_out.push(new_item)
         end
       end

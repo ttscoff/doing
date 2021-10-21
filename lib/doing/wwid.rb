@@ -238,7 +238,8 @@ module Doing
         elsif line =~ /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/
           date = Time.parse(Regexp.last_match(1))
           title = Regexp.last_match(2).strip
-          @content[section]['items'].push({ 'title' => title, 'date' => date, 'section' => section })
+          item = Item.new(date, title, section)
+          @content[section]['items'].push(item)
           current += 1
         elsif current.zero?
           # if content[section]['items'].length - 1 == current
@@ -246,9 +247,10 @@ module Doing
         elsif line =~ /^\S/
           @other_content_bottom.push(line)
         else
-          @content[section]['items'][current - 1]['note'] = [] unless @content[section]['items'][current - 1].key? 'note'
+          prev_item = @content[section]['items'][current - 1]
+          prev_item.note = Note.new unless prev_item.note
 
-          @content[section]['items'][current - 1]['note'].push(line.chomp)
+          prev_item.note.push(line.chomp)
           # end
         end
       end
@@ -305,7 +307,7 @@ module Doing
         tmpfile.unlink
       end
 
-      input.split(/\n/).delete_if {|line| line =~ /^#/ }.join("\n")
+      input.split(/\n/).delete_if(&:ignore?).join("\n")
     end
 
     #
@@ -318,11 +320,12 @@ module Doing
     def format_input(input)
       exit_now! 'No content in entry' if input.nil? || input.strip.empty?
 
-      input_lines = input.split(/[\n\r]+/).delete_if {|line| line =~ /^#/ || line =~ /^\s*$/ }
+      input_lines = input.split(/[\n\r]+/).delete_if(&:ignore?)
       title = input_lines[0]&.strip
       exit_now! 'No content in first line' if title.nil? || title.strip.empty?
 
-      note = input_lines.length > 1 ? input_lines[1..-1] : []
+      note = Note.new
+      note.append(input_lines[1..-1]) if input_lines.length > 1
       # If title line ends in a parenthetical, use that as the note
       if note.empty? && title =~ /\s+\(.*?\)$/
         title.sub!(/\s+\((.*?)\)$/) do
@@ -332,8 +335,8 @@ module Doing
         end
       end
 
-      note.map!(&:strip)
-      note.delete_if { |line| line =~ /^\s*$/ || line =~ /^#/ }
+      note.strip_lines!
+      note.compress
 
       [title, note]
     end
@@ -570,35 +573,35 @@ module Doing
         end
       end
       title.gsub!(/ +/, ' ')
-      entry = { 'title' => title.strip, 'date' => opt[:back] }
-      entry['note'] = opt[:note].map(&:chomp) unless opt[:note].join('').strip == ''
+      entry = Item.new(opt[:back], title.strip, section)
+      entry.note = opt[:note].map(&:chomp) unless opt[:note].join('').strip == ''
       items = @content[section]['items']
       if opt[:timed]
         items.reverse!
         items.each_with_index do |i, x|
-          next if i['title'] =~ / @done/
+          next if i.title =~ / @done/
 
-          items[x]['title'] = "#{i['title']} @done(#{opt[:back].strftime('%F %R')})"
+          items[x].title = "#{i.title} @done(#{opt[:back].strftime('%F %R')})"
           break
         end
         items.reverse!
       end
       items.push(entry)
       @content[section]['items'] = items
-      @results.push(%(Added "#{entry['title']}" to #{section}))
+      @results.push(%(Added "#{entry.title}" to #{section}))
     end
 
     def same_time?(item_a, item_b)
-      item_a['date'] == item_b['date'] ? get_interval(item_a, formatted: false, record: false) == get_interval(item_b,  formatted: false, record: false) : false
+      item_a.date == item_b.date ? get_interval(item_a, formatted: false, record: false) == get_interval(item_b,  formatted: false, record: false) : false
     end
 
     def overlapping_time?(item_a, item_b)
       return true if same_time?(item_a, item_b)
 
-      start_a = item_a['date']
+      start_a = item_a.date
       interval = get_interval(item_a, formatted: false, record: false)
       end_a = interval ? start_a + interval.to_i : start_a
-      start_b = item_b['date']
+      start_b = item_b.date
       interval = get_interval(item_b,  formatted: false, record: false)
       end_b = interval ? start_b + interval.to_i : start_b
       (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
@@ -617,7 +620,7 @@ module Doing
           duped = no_overlap ? overlapping_time?(item, comp) : same_time?(item, comp)
           break if duped
         end
-        # warn "Skipping overlapping entry: #{item['title']}" if duped
+        # warn "Skipping overlapping entry: #{item.title}" if duped
         duped
       end
     end
@@ -656,16 +659,16 @@ module Doing
         @content.each do |_k, v|
           combined['items'] += v['items']
         end
-        section = combined['items'].dup.sort_by { |item| item['date'] }.reverse[0]['section']
+        section = combined['items'].dup.sort_by { |item| item.date }.reverse[0].section
       end
 
       exit_now! "Section #{section} not found" unless @content.key?(section)
 
-      last_item = @content[section]['items'].dup.sort_by { |item| item['date'] }.reverse[0]
-      warn "Editing note for #{last_item['title']}"
+      last_item = @content[section]['items'].dup.sort_by { |item| item.date }.reverse[0]
+      warn "Editing note for #{last_item.title}"
       note = ''
-      note = last_item['note'].map(&:strip).join("\n") unless last_item['note'].nil?
-      "#{last_item['title']}\n# EDIT BELOW THIS LINE ------------\n#{note}"
+      note = last_item.note.to_s unless last_item.note.nil?
+      "#{last_item.title}\n# EDIT BELOW THIS LINE ------------\n#{note}"
     end
 
     ##
@@ -684,14 +687,14 @@ module Doing
         @results.push(%(No previous entry found))
         return
       end
-      unless last.has_tags?(['done'], 'ALL')
+      unless last.tags?(['done'], 'ALL')
         new_item = last.dup
-        new_item['title'] += " @done(#{Time.now.strftime('%F %R')})"
+        new_item.title += " @done(#{Time.now.strftime('%F %R')})"
         update_item(last, new_item)
       end
       # Remove @done tag
-      title = last['title'].sub(/\s*@done(\(.*?\))?/, '').chomp
-      section = opt[:in].nil? ? last['section'] : guess_section(opt[:in])
+      title = last.title.sub(/\s*@done(\(.*?\))?/, '').chomp
+      section = opt[:in].nil? ? last.section : guess_section(opt[:in])
       @auto_tag = false
       add_item(title, section, { note: opt[:note], back: opt[:date], timed: true })
       write(@doing_file)
@@ -716,8 +719,8 @@ module Doing
           @content.each do |_k, v|
             combined['items'] += v['items']
           end
-          items = combined['items'].dup.sort_by { |item| item['date'] }.reverse
-          sec_arr.push(items[0]['section'])
+          items = combined['items'].dup.sort_by { |item| item.date }.reverse
+          sec_arr.push(items[0].section)
         else
           sec_arr = [guess_section(opt[:section])]
         end
@@ -729,12 +732,12 @@ module Doing
       end
 
       if opt[:tag]&.length
-        all_items.select! { |item| item.has_tags?(opt[:tag], opt[:tag_bool]) }
+        all_items.select! { |item| item.tags?(opt[:tag], opt[:tag_bool]) }
       elsif opt[:search]&.length
-        all_items.select! { |item| item.matches_search?(opt[:search]) }
+        all_items.select! { |item| item.search(opt[:search]) }
       end
 
-      all_items.max_by { |item| item['date'] }
+      all_items.max_by { |item| item.date }
     end
 
     ##
@@ -771,22 +774,22 @@ module Doing
         end
       end
 
-      items.sort_by! { |item| item['date'] }.reverse
+      items.sort_by! { |item| item.date }.reverse
 
       filtered_items = items.select do |item|
         keep = true
-        finished = opt[:unfinished] && item.has_tags?('done', :and)
+        finished = opt[:unfinished] && item.tags?('done', :and)
         keep = false if finished
 
         if opt[:tag]
           puts opt[:tag]
           puts opt[:tag_bool]
-          tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.has_tags?(opt[:tag], opt[:tag_bool])
+          tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
           keep = false unless tag_match
         end
 
         if opt[:search]
-          search_match = opt[:search].nil? || opt[:search].empty? ? true : item.matches_search?(opt[:search])
+          search_match = opt[:search].nil? || opt[:search].empty? ? true : item.search(opt[:search])
           keep = false unless search_match
         end
 
@@ -794,9 +797,9 @@ module Doing
           start_date = opt[:date_filter][0]
           end_date = opt[:date_filter][1]
           in_date_range = if end_date
-                            item['date'] >= start_date && item['date'] <= end_date
+                            item.date >= start_date && item.date <= end_date
                           else
-                            item['date'].strftime('%F') == start_date.strftime('%F')
+                            item.date.strftime('%F') == start_date.strftime('%F')
                           end
           keep = false unless in_date_range
         end
@@ -807,7 +810,7 @@ module Doing
         end
 
         if opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
-          filter_match = item.has_tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
+          filter_match = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
           keep = false unless filter_match
         end
 
@@ -816,7 +819,7 @@ module Doing
           time_string += ' 12am' if time_string !~ /(\d+:\d+|\d+[ap])/
           cutoff = chronify(time_string, future: true)
           if cutoff
-            keep = false if item['date'] >= cutoff
+            keep = false if item.date >= cutoff
           end
         end
 
@@ -825,14 +828,14 @@ module Doing
           time_string += ' 11:59pm' if time_string !~ /(\d+:\d+|\d+[ap])/
           cutoff = chronify(time_string)
           if cutoff
-            keep = false if item['date'] <= cutoff
+            keep = false if item.date <= cutoff
           end
         end
 
         if opt[:today]
-          keep = false if item['date'] < Date.today.to_time
+          keep = false if item.date < Date.today.to_time
         elsif opt[:yesterday]
-          keep = false if item['date'] <= Date.today.prev_day.to_time || item['date'] >= Date.today.to_time
+          keep = false if item.date <= Date.today.prev_day.to_time || item.date >= Date.today.to_time
         end
 
         keep
@@ -866,7 +869,7 @@ module Doing
         @content.each do |_k, v|
           combined['items'] += v['items']
         end
-        items = combined['items'].dup.sort_by { |item| item['date'] }.reverse
+        items = combined['items'].dup.sort_by { |item| item.date }.reverse
       else
         items = @content[section]['items']
       end
@@ -887,14 +890,14 @@ module Doing
         out = [
           format("%#{pad}d", i),
           ') ',
-          format('%13s', item['date'].relative_date),
+          format('%13s', item.date.relative_date),
           ' | ',
-          item['title']
+          item.title
         ]
         if include_section
           out.concat([
             ' (',
-            item['section'],
+            item.section,
             ') '
           ])
         end
@@ -1056,8 +1059,8 @@ module Doing
         editable_items = []
 
         items.each do |item|
-          editable = "#{item['date']} | #{item['title']}"
-          old_note = item['note'] ? item['note'].map(&:strip).join("\n") : nil
+          editable = "#{item.date} | #{item.title}"
+          old_note = item.note ? item.note.to_s : nil
           editable += "\n#{old_note}" unless old_note.nil?
           editable_items << editable
         end
@@ -1068,7 +1071,7 @@ module Doing
 
         new_items.each_with_index do |new_item, i|
 
-          input_lines = new_item.split(/[\n\r]+/).delete_if {|line| line =~ /^#/ || line =~ /^\s*$/ }
+          input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
           title = input_lines[0]&.strip
 
           if title.nil? || title =~ /^#{divider.strip}$/ || title.strip.empty?
@@ -1077,15 +1080,15 @@ module Doing
             note = input_lines.length > 1 ? input_lines[1..-1] : []
 
             note.map!(&:strip)
-            note.delete_if { |line| line =~ /^\s*$/ || line =~ /^#/ }
+            note.delete_if(&:ignore?)
 
             date = title.match(/^([\d\-: ]+) \| /)[1]
             title.sub!(/^([\d\-: ]+) \| /, '')
 
             item = items[i].dup
-            item['title'] = title
-            item['note'] = note
-            item['date'] = Time.parse(date) || items[i]['date']
+            item.title = title
+            item.note = note
+            item.date = Time.parse(date) || items[i].date
             update_item(items[i], item)
           end
         end
@@ -1095,7 +1098,7 @@ module Doing
 
       if opt[:output]
         items.map! do |item|
-          item['title'] = "#{item['title']} @project(#{item['section']})"
+          item.title = "#{item.title} @project(#{item.section})"
           item
         end
 
@@ -1160,8 +1163,8 @@ module Doing
             @content.each do |_k, v|
               combined['items'] += v['items']
             end
-            items = combined['items'].dup.sort_by { |item| item['date'] }.reverse
-            sec_arr.push(items[0]['section'])
+            items = combined['items'].dup.sort_by { |item| item.date }.reverse
+            sec_arr.push(items[0].section)
           elsif opt[:count] > 1
             if opt[:search] || opt[:tag]
               sec_arr = sections
@@ -1178,24 +1181,24 @@ module Doing
 
       sec_arr.each do |section|
         if @content.key?(section)
-          items = @content[section]['items'].dup.sort_by { |item| item['date'] }.reverse
+          items = @content[section]['items'].dup.sort_by { |item| item.date }.reverse
           idx = 0
           done_date = Time.now
           count = (opt[:count]).zero? ? items.length : opt[:count]
           items.map! do |item|
             break if idx == count
-            finished = opt[:unfinished] && item.has_tags?('done', :and)
-            tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.has_tags?(opt[:tag], opt[:tag_bool])
-            search_match = opt[:search].nil? || opt[:search].empty? ? true : item.matches_search?(opt[:search])
+            finished = opt[:unfinished] && item.tags?('done', :and)
+            tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
+            search_match = opt[:search].nil? || opt[:search].empty? ? true : item.search(opt[:search])
 
             if tag_match && search_match && !finished
               if opt[:autotag]
-                new_title = autotag(item['title']) if @auto_tag
-                if new_title == item['title']
+                new_title = autotag(item.title) if @auto_tag
+                if new_title == item.title
                   @results.push(%(Autotag: No changes))
                 else
                   @results.push("Tags updated: #{new_title}")
-                  item['title'] = new_title
+                  item.title = new_title
                 end
               else
                 if opt[:sequential]
@@ -1204,26 +1207,26 @@ module Doing
                   if next_entry.nil?
                     done_date = Time.now
                   else
-                    done_date = next_entry['date'] - 60
+                    done_date = next_entry.date - 60
                   end
                 elsif opt[:took]
-                  if item['date'] + opt[:took] > Time.now
-                    item['date'] = Time.now - opt[:took]
+                  if item.date + opt[:took] > Time.now
+                    item.date = Time.now - opt[:took]
                     done_date = Time.now
                   else
-                    done_date = item['date'] + opt[:took]
+                    done_date = item.date + opt[:took]
                   end
                 elsif opt[:back]
                   if opt[:back].is_a? Integer
-                    done_date = item['date'] + opt[:back]
+                    done_date = item.date + opt[:back]
                   else
-                    done_date = item['date'] + (opt[:back] - item['date'])
+                    done_date = item.date + (opt[:back] - item.date)
                   end
                 else
                   done_date = Time.now
                 end
 
-                title = item['title']
+                title = item.title
                 opt[:tags].each do |tag|
                   tag = tag.strip
                   if opt[:remove] || opt[:rename]
@@ -1262,7 +1265,7 @@ module Doing
                     @results.push(%(Added @#{tag}: "#{title}" in #{section}))
                   end
                 end
-                item['title'] = title
+                item.title = title
               end
 
               idx += 1
@@ -1276,7 +1279,7 @@ module Doing
           if opt[:archive] && section != 'Archive' && (opt[:count]).positive?
             # concat [count] items from [section] and archive section
             archived = @content[section]['items'][0..opt[:count] - 1].map do |i|
-              i['title'].sub!(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{i['section']})")
+              i.title.sub!(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{i.section})")
               i
             end.concat(@content['Archive']['items'])
             # slice [count] items off of [section] items
@@ -1307,9 +1310,9 @@ module Doing
     ## @return     Updated item
     ##
     def move_item(item, section)
-      old_section = item['section']
+      old_section = item.section
       new_item = item.dup
-      new_item['section'] = section
+      new_item.section = section
 
       section_items = @content[old_section]['items']
       section_items.delete(item)
@@ -1317,10 +1320,10 @@ module Doing
 
       archive_items = @content[section]['items']
       archive_items.push(new_item)
-      # archive_items = archive_items.sort_by { |item| item['date'] }
+      # archive_items = archive_items.sort_by { |item| item.date }
       @content[section]['items'] = archive_items
 
-      @results.push("Entry moved to #{section}: #{new_item['title']}")
+      @results.push("Entry moved to #{section}: #{new_item.title}")
       return new_item
     end
 
@@ -1334,7 +1337,7 @@ module Doing
       @content.each do |_k, v|
         combined['items'] += v['items']
       end
-      items = combined['items'].dup.sort_by { |item| item['date'] }.reverse
+      items = combined['items'].dup.sort_by { |item| item.date }.reverse
       idx = items.index(old_item)
 
       if idx > 0
@@ -1350,11 +1353,11 @@ module Doing
     ## @param      old_item
     ##
     def delete_item(old_item)
-      section = old_item['section']
+      section = old_item.section
 
       section_items = @content[section]['items']
       deleted = section_items.delete(old_item)
-      @results.push("Entry deleted: #{deleted['title']}")
+      @results.push("Entry deleted: #{deleted.title}")
       @content[section]['items'] = section_items
     end
 
@@ -1365,7 +1368,7 @@ module Doing
     ## @param      tag       (string) The tag to remove
     ##
     def untag_item(old_item, tags)
-      title = old_item['title'].dup
+      title = old_item.title.dup
       if tags.is_a? ::String
         tags = tags.split(/ *, */).map {|t| t.strip.gsub(/\*/,'[^ (]*') }
       end
@@ -1375,11 +1378,11 @@ module Doing
           title.chomp!
           title.gsub!(/ +@#{tag}(\(.*?\))?/, '')
           new_item = old_item.dup
-          new_item['title'] = title
+          new_item.title = title
           update_item(old_item, new_item)
           return new_item
         else
-          @results.push(%(Item isn't tagged @#{tag}: "#{title}" in #{old_item['section']}))
+          @results.push(%(Item isn't tagged @#{tag}: "#{title}" in #{old_item.section}))
           return old_item
         end
       end
@@ -1393,7 +1396,7 @@ module Doing
     ## @param      date      (Boolean) Include timestamp?
     ##
     def tag_item(old_item, tags, remove: false, date: false)
-      title = old_item['title'].dup
+      title = old_item.title.dup
       if tags.is_a? ::String
         tags = tags.split(/ *, */).map(&:strip)
       end
@@ -1408,11 +1411,11 @@ module Doing
             title += " @#{tag}"
           end
           new_item = old_item.dup
-          new_item['title'] = title
+          new_item.title = title
           update_item(old_item, new_item)
           return new_item
         else
-          @results.push(%(Item already @#{tag}: "#{title}" in #{old_item['section']}))
+          @results.push(%(Item already @#{tag}: "#{title}" in #{old_item.section}))
           return old_item
         end
       end
@@ -1425,15 +1428,15 @@ module Doing
     ## @param      new_item  The new item
     ##
     def update_item(old_item, new_item)
-      section = old_item['section']
+      section = old_item.section
 
       section_items = @content[section]['items']
       s_idx = section_items.index(old_item)
 
-      return if section_items[s_idx].item_equal?(new_item)
+      return if section_items[s_idx].equal?(new_item)
 
       section_items[s_idx] = new_item
-      @results.push("Entry updated: #{section_items[s_idx]['title'].truncate(60)}")
+      @results.push("Entry updated: #{section_items[s_idx].title.truncate(60)}")
       @content[section]['items'] = section_items
     end
 
@@ -1450,25 +1453,25 @@ module Doing
         @content.each do |_k, v|
           items.concat(v['items'])
         end
-        # section = combined['items'].dup.sort_by { |item| item['date'] }.reverse[0]['section']
+        # section = combined['items'].dup.sort_by { |item| item.date }.reverse[0].section
       else
         items = @content[section]['items']
       end
 
-      items = items.sort_by { |item| item['date'] }.reverse
+      items = items.sort_by { |item| item.date }.reverse
 
       idx = nil
 
       if options[:tag] && !options[:tag].empty?
         items.each_with_index do |item, i|
-          if item.has_tags?(options[:tag], options[:tag_bool])
+          if item.tags?(options[:tag], options[:tag_bool])
             idx = i
             break
           end
         end
       elsif options[:search]
         items.each_with_index do |item, i|
-          if item.matches_search?(options[:search])
+          if item.search(options[:search])
             idx = i
             break
           end
@@ -1482,25 +1485,25 @@ module Doing
         return
       end
 
-      section = items[idx]['section']
+      section = items[idx].section
 
       section_items = @content[section]['items']
       s_idx = section_items.index(items[idx])
 
-      current_item = section_items[s_idx]['title']
-      old_note = section_items[s_idx]['note'] ? section_items[s_idx]['note'].map(&:strip).join("\n") : nil
+      current_item = section_items[s_idx].title
+      old_note = section_items[s_idx].note ? section_items[s_idx].note.to_s : nil
       current_item += "\n#{old_note}" unless old_note.nil?
       new_item = fork_editor(current_item)
       title, note = format_input(new_item)
 
       if title.nil? || title.empty?
         @results.push('No content provided')
-      elsif title == section_items[s_idx]['title'] && note == old_note
+      elsif title == section_items[s_idx].title && note == old_note
         @results.push('No change in content')
       else
-        section_items[s_idx]['title'] = title
-        section_items[s_idx]['note'] = note
-        @results.push("Entry edited: #{section_items[s_idx]['title']}")
+        section_items[s_idx].title = title
+        section_items[s_idx].note = note
+        @results.push("Entry edited: #{section_items[s_idx].title}")
         @content[section]['items'] = section_items
         write(@doing_file)
       end
@@ -1514,6 +1517,7 @@ module Doing
     ## @param      replace  (Bool) Should replace existing note
     ##
     def note_last(section, note, replace: false)
+      note.split!("\n") if note.is_a?(String)
       section = guess_section(section)
 
       if section =~ /^all$/i
@@ -1521,19 +1525,19 @@ module Doing
         @content.each do |_k, v|
           combined['items'] += v['items']
         end
-        section = combined['items'].dup.sort_by { |item| item['date'] }.reverse[0]['section']
+        section = combined['items'].dup.sort_by { |item| item.date }.reverse[0].section
       end
 
       exit_now! "Section #{section} not found" unless @content.key?(section)
 
       # sort_section(opt[:section])
-      items = @content[section]['items'].dup.sort_by { |item| item['date'] }.reverse
+      items = @content[section]['items'].dup.sort_by { |item| item.date }.reverse
 
-      current_note = items[0]['note']
-      current_note = [] if current_note.nil?
-      title = items[0]['title']
+      current_note = items[0].note
+      current_note ||= Note.new
+      title = items[0].title
       if replace
-        items[0]['note'] = note
+        items[0].note = Note.new.append(note)
         if note.empty? && !current_note.empty?
           @results.push(%(Removed note from "#{title}"))
         elsif !current_note.empty? && !note.empty?
@@ -1543,11 +1547,11 @@ module Doing
         else
           @results.push(%(Entry "#{title}" has no note))
         end
-      elsif current_note.instance_of?(Array)
-        items[0]['note'] = current_note.concat(note)
+      elsif current_note.instance_of?(Note)
+        items[0].note.append(note)
         @results.push(%(Added note to "#{title}")) unless note.empty?
       else
-        items[0]['note'] = note
+        items[0].note.append_string(note)
         @results.push(%(Added note to "#{title}")) unless note.empty?
       end
 
@@ -1579,22 +1583,22 @@ module Doing
 
       found_items = 0
       @content[opt[:section]]['items'].each_with_index do |item, i|
-        next unless item['title'] =~ /@#{tag}/
+        next unless item.title =~ /@#{tag}/
 
-        title = item['title'].gsub(/(^| )@(#{tag}|done)(\([^)]*\))?/, '')
+        title = item.title.gsub(/(^| )@(#{tag}|done)(\([^)]*\))?/, '')
         title += " @done(#{opt[:back].strftime('%F %R')})"
 
-        @content[opt[:section]]['items'][i]['title'] = title
+        @content[opt[:section]]['items'][i].title = title
         found_items += 1
 
         if opt[:archive] && opt[:section] != 'Archive'
-          @results.push(%(Completed and archived "#{@content[opt[:section]]['items'][i]['title']}"))
+          @results.push(%(Completed and archived "#{@content[opt[:section]]['items'][i].title}"))
           archive_item = @content[opt[:section]]['items'][i]
-          archive_item['title'] = i['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{i['section']})")
+          archive_item.title = i.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{i.section})")
           @content['Archive']['items'].push(archive_item)
           @content[opt[:section]]['items'].delete_at(i)
         else
-          @results.push(%(Completed "#{@content[opt[:section]]['items'][i]['title']}"))
+          @results.push(%(Completed "#{@content[opt[:section]]['items'][i].title}"))
         end
       end
 
@@ -1631,7 +1635,7 @@ module Doing
 
       @content.each do |title, section|
         output += "#{section['original']}\n"
-        output += list_section({ section: title, template: "\t- %date | %title%t2note", highlight: false })
+        output += list_section({ section: title, template: "\t- %date | %title%t2note", highlight: false, wrap_width: 0 })
       end
 
       output + @other_content_bottom.join("\n") unless @other_content_bottom.nil?
@@ -1708,7 +1712,7 @@ module Doing
           end
 
           items.delete_if do |item|
-            if ((!tags.empty? && item.has_tags?(tags, bool)) || (opt[:search] && item.matches_search?(opt[:search].to_s)) || (opt[:before] && item['date'] < cutoff))
+            if ((!tags.empty? && item.tags?(tags, bool)) || (opt[:search] && item.search(opt[:search].to_s)) || (opt[:before] && item.date < cutoff))
               moved_items.push(item)
               counter += 1
               true
@@ -1748,8 +1752,10 @@ module Doing
       if File.exist?(file)
         init_doing_file(file)
         @content.deep_merge(new_content)
+        @results.push("Added entries to existing file: #{file}")
       else
         @content = new_content
+        @results.push("Created new file: #{file}")
       end
 
       write(file, backup: false)
@@ -1803,7 +1809,6 @@ module Doing
     ##
     def list_section(opt = {})
       opt[:count] ||= 0
-      count = opt[:count] - 1
       opt[:age] ||= 'newest'
       opt[:format] ||= @default_date_format
       opt[:order] ||= 'desc'
@@ -1840,7 +1845,7 @@ module Doing
 
       exit_now! 'Invalid section object' unless target_section.instance_of? Hash
 
-      items = target_section['items'].sort_by { |item| item['date'] }
+      items = target_section['items'].sort_by { |item| item.date }
 
       items = filter_items(items, opt: opt).reverse
 
@@ -1862,7 +1867,9 @@ module Doing
         return
       end
 
-      opt[:output] = 'template' unless opt[:output]
+      opt[:output] ||= 'template'
+
+      opt[:wrap_width] ||= @config['templates']['default']['wrap_width']
 
       exit_now! 'Unknown output format' unless opt[:output] =~ plugin_regex(type: :export)
 
@@ -2021,7 +2028,7 @@ module Doing
           end
 
           items.delete_if do |item|
-            if ((!tags.empty? && item.has_tags?(tags, bool)) || (opt[:search] && item.matches_search?(opt[:search].to_s)) || (opt[:before] && item['date'] < cutoff))
+            if ((!tags.empty? && item.tags?(tags, bool)) || (opt[:search] && item.search(opt[:search].to_s)) || (opt[:before] && item.date < cutoff))
               moved_items.push(item)
               counter += 1
               true
@@ -2031,8 +2038,8 @@ module Doing
           end
           moved_items.each do |item|
             if label && section != @current_section
-              item['title'] =
-                item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+              item.title =
+                item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
             end
           end
 
@@ -2044,8 +2051,8 @@ module Doing
 
           items.map! do |item|
             if label && section != @current_section
-              item['title'] =
-                item['title'].sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+              item.title =
+                item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
             end
             item
           end
@@ -2420,20 +2427,6 @@ EOS
     end
 
     ##
-    ## @brief      Gets the entry finish date from the @done
-    ##             tag
-    ##
-    ## @param      item  (Hash) The entry
-    ##
-    ## @return     (Date) finish date or nil if empty
-    ##
-    def get_end_date(item)
-      return Time.parse(Regexp.last_match(1)) if item['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
-
-      nil
-    end
-
-    ##
     ## @brief      Gets the interval between entry's start
     ##             date and @done date
     ##
@@ -2448,35 +2441,15 @@ EOS
     ##             interval is 0
     ##
     def get_interval(item, formatted: true, record: true)
-      done = nil
-      start = nil
-
-      if @interval_cache.keys.include? item['title']
-        seconds = @interval_cache[item['title']]
+      if item.interval
+        seconds = item.interval
         record_tag_times(item, seconds) if record
-        return seconds > 0 ? '%02d:%02d:%02d' % fmt_time(seconds) : false
+        return seconds.positive? ? seconds : false unless formatted
+
+        return seconds.positive? ? format('%02d:%02d:%02d', *fmt_time(seconds)) : false
       end
 
-      done = get_end_date(item)
-      return false if done.nil?
-
-      start = if item['title'] =~ /@start\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
-                Time.parse(Regexp.last_match(1))
-              else
-                item['date']
-              end
-
-      seconds = (done - start).to_i
-
-      if record
-        record_tag_times(item, seconds)
-      end
-
-      @interval_cache[item['title']] = seconds
-
-      return seconds > 0 ? seconds : false unless formatted
-
-      seconds > 0 ? '%02d:%02d:%02d' % fmt_time(seconds) : false
+      false
     end
 
     ##
@@ -2487,7 +2460,7 @@ EOS
     def record_tag_times(item, seconds)
       return if @recorded_items.include?(item)
 
-      item['title'].scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
+      item.title.scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
         k = m[0] == 'done' ? 'All' : m[0].downcase
         if @timers.key?(k)
           @timers[k] += seconds

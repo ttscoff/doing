@@ -24,10 +24,10 @@ module Doing
 
       output = [CSV.generate_line(%w[start end title note timer section])]
       items.each do |i|
-        note = format_note(i['note'])
-        end_date = wwid.get_end_date(i)
+        note = format_note(i.note)
+        end_date = wwid.i.end_date
         interval = end_date && opt[:times] ? wwid.get_interval(i, formatted: false) : 0
-        output.push(CSV.generate_line([i['date'], end_date, i['title'], note, interval, i['section']]))
+        output.push(CSV.generate_line([i.date, end_date, i.title, note, interval, i.section]))
       end
       output.join('')
     end

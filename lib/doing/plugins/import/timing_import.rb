@@ -59,9 +59,9 @@ module Doing
         title += " @done(#{end_time.strftime('%Y-%m-%d %H:%M')})"
         title.gsub!(/ +/, ' ')
         title.strip!
-        new_entry = { 'title' => title, 'date' => start_time, 'section' => section }
-        new_entry['note'] = entry['notes'].split(/\n/).map(&:chomp) if entry.key?('notes')
-        new_items.push(new_entry)
+        new_item = Item.new(start_time, title, section)
+        new_item.note.append_string(entry['notes']) if entry.key?('notes')
+        new_items.push(new_item)
       end
       total = new_items.count
       new_items = wwid.dedup(new_items, options[:no_overlap])

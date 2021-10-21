@@ -150,9 +150,9 @@ The only requirements are that your editor be launchable from the command line a
 
 The config also contains templates for various command outputs. Include placeholders by placing a % before the keyword. The available tokens are:
 
-- `%title`: the "what was I doing" entry line
+- `%title`: the "what was I doing" entry line. See below for additional format options
 - `%date`: the date based on the template's `date_format` setting
-- `%shortdate`: a custom date formatter that removes the day/month/year from the entry if they match the current day/month/year
+- `%shortdate`: a custom date format for "relative" dates (see below)
 - `%note`: Any note in the entry will be included here. A linebreak is included before, and each line is indented one tab.
 - `%idnote`: The notes with an extra leading tab (indented note)
 - `%odnote`: The notes with leading tab removed (outdented note)
@@ -171,7 +171,29 @@ The config also contains templates for various command outputs. Include placehol
 
 Date formats are based on Ruby [`strftime`](http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime) formatting. You can try it out [here](http://strftime.net).
 
-#### Formatted Notes
+#### Date Formatting
+
+`%date` uses the template's `date_format` string, or the default date format set in the config.
+
+The `%shortdate` placeholder inserts a relative date. If the entry date is from today, it only shows the time in 12 hour format (`3:00pm`). If it's within the last week, it shows the abbreviated day name and the time (`Wed 12:00pm`). If it's within the last year, it shows the month/day and time (`10/12  3:30pm`). If it's from a previous year, it shows month/day/year and time (`10/01/2020 4:30pm`). I know this formatting is very US-centric. If anyone complains I'll figure out how to localize it better.
+
+You can include an integer inside a `%date` placeholder (also works with `%shortdate`) to indicate a width to pad to, e.g. `%20date` or `%15shortdate`. If the number is present, spaces are added to the left side of the date string (based on template) to bring the total characters to that width.
+
+If the number is negative, padding will be added on the right side.
+
+With an ISO date format, `%20date` produces `   2020-07-19  13:30`. `%-20date` produces `2020-07-19  13:30   `.
+
+#### Title Formatting
+
+The `%title` placeholder accepts some formatting options. The first is a wrap width, specified as `%60title`, where `60` is the number of characters at which to wrap the title. This overrides the `wrap_width` setting if provided in the template. The title will be wrapped to new lines, but anything after the title in the template will stay on the first line. The wrap lines will automatically be indented to the character position of the `%` in `%title`.
+
+If you specify a negative width, it becomes a minimum width. If the title is less than that width, it will be padded on the right. Titles longer than the minimum width will be left as is.
+
+The second parameter is the indent, which is an indent character followed by a number. By default, wrapped lines are indented 2 spaces. You can control this by using a space or underscore, or a "t" for tab, followed by a number. The placeholder `%60_4title` would wrap lines at 60 characters, and indent the wrapped lines an additional 4 spaces. To remove indent, use `%60_0`.
+
+You can use either or both parameters, but the width must come before the indent if both are used.
+
+#### Note Formatting
 
 In addition to the static placeholders for inserting notes (`%note`, `%idnote`, `%odnote`), you can also provide custom formatting. A format string looks like `%^> 8: note`. Here's now it works:
 

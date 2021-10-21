@@ -5,10 +5,15 @@ require 'doing-helpers'
 require 'test_helper'
 
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
+require 'doing/string'
+require 'doing/array'
+require 'doing/symbol'
+require 'doing/time'
+require 'doing/item'
+require 'doing/note'
 require 'doing/plugin_manager'
 require 'doing/util'
 require 'doing/wwid'
-require 'doing/helpers'
 # require 'gli'
 
 # Tests for archive commands
@@ -40,9 +45,19 @@ class DoingUtilTest < Test::Unit::TestCase
   def test_format_time
     item = @wwid.content[@wwid.current_section]['items'][0]
     interval = @wwid.get_interval(item, formatted: false, record: false)
-    assert_equal(360, interval, 'Interval should match')
+    assert_equal(720, interval, 'Interval should match')
+    minutes = interval / 60 % 60
     res = @wwid.fmt_time(interval)
-    assert_equal([0,0,6], res, 'Interval array should match')
+    assert_equal(minutes, res[2], 'Interval array should match')
+  end
+
+  def test_link_urls
+    res = 'Raw https://brettterpstra.com url'.link_urls
+    assert_match(%r{<a href="https://brettterpstra.com" title="Link to brettterpstra.com">\[brettterpstra.com\]</a>}, res, 'Raw URL should be linked matching syntax')
+    res = 'Quoted "https://brettterpstra.com" url'.link_urls
+    assert_no_match(/<a href/, res, 'Quoted URL should not be linked')
+    res = 'Markdown [test](https://brettterpstra.com) url'.link_urls
+    assert_no_match(/<a href/, res, 'Markdown URL should not be linked')
   end
 
   private

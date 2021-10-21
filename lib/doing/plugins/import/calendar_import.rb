@@ -60,7 +60,7 @@ module Doing
         title.gsub!(/ +/, ' ')
         title.strip!
         new_entry = { 'title' => title, 'date' => start_time, 'section' => section }
-        new_entry['note'] = entry['notes'].split(/\n/).map(&:chomp) if entry.key?('notes')
+        new_entry.note = entry['notes'].split(/\n/).map(&:chomp) if entry.key?('notes')
         new_items.push(new_entry)
       end
       total = new_items.count

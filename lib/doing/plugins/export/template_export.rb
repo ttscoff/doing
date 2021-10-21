@@ -18,9 +18,10 @@ module Doing
       return if items.nil?
 
       opt = variables[:options]
+
       out = ''
       items.each do |item|
-        if opt[:highlight] && item['title'] =~ /@#{wwid.config['marker_tag']}\b/i
+        if opt[:highlight] && item.title =~ /@#{wwid.config['marker_tag']}\b/i
           flag = wwid.colors[wwid.config['marker_color']]
           reset = wwid.colors['default']
         else
@@ -28,12 +29,14 @@ module Doing
           reset = ''
         end
 
-        if (item.key?('note') && !item['note'].empty?) && wwid.config[:include_notes]
-          note = item['note'].map(&:strip).delete_if(&:empty?)
-          note.map! { |line| "#{line.sub(/^\t*(— )?/, '').sub(/^- /, '— ')}  " }
+        if (!item.note.empty?) && wwid.config[:include_notes]
+          note = item.note.map(&:strip).delete_if(&:empty?)
+          note.map! { |line| "#{line.sub(/^\t*/, '')}  " }
+
           if opt[:wrap_width]&.positive?
             width = opt[:wrap_width]
-            note.map! { |line| line.strip.gsub(/(.{1,#{width}})(\s+|\Z)/, "\\1\n") }
+            note.map! { |line| line.chomp.gsub(/(.{1,#{width}})(\s+|\Z)/, "\\1\n") }
+            note = note.join("\n").split(/\n/).delete_if(&:empty?)
           end
         else
           note = []
@@ -48,26 +51,42 @@ module Doing
           end
         end
 
-        output.sub!(/%date/, item['date'].strftime(opt[:format]))
+        output.sub!(/%(\d+)?date/) do
+          pad = Regexp.last_match(1).to_i
+          format("%#{pad}s", item.date.strftime(opt[:format]))
+        end
 
         interval = wwid.get_interval(item, record: true) if opt[:times]
         interval ||= ''
         output.sub!(/%interval/, interval)
 
-        output.sub!(/%shortdate/) do
-          item['date'].relative_date
+        output.sub!(/%(\d+)?shortdate/) do
+          pad = Regexp.last_match(1) || 13
+          format("%#{pad}s", item.date.relative_date)
         end
 
-        output.sub!(/%title/) do |_m|
-          if opt[:wrap_width]&.positive?
-            flag + item['title'].gsub(/(.{1,#{opt[:wrap_width]}})(\s+|\Z)/, "\\1\n\t ").chomp + reset
+        output.sub!(/%section/, item.section) if item.section
+
+        title_offset = output.uncolor.match(/%(-?\d+)?([ _t]\d+)?title/).begin(0)
+        output.sub!(/%(-?\d+)?(([ _t])(\d+))?title(.*?)$/) do
+          m = Regexp.last_match
+          pad = m[1].to_i
+          indent = ''
+          if m[2]
+            char = m[3] =~ /t/ ? "\t" : " "
+            indent = char * m[4].to_i
+          end
+          after = m[5]
+          if opt[:wrap_width]&.positive? || pad.positive?
+            width = pad.positive? ? pad : opt[:wrap_width]
+            item.title.wrap(width, pad: pad, indent: indent, offset: title_offset, prefix: flag, after: after, reset: reset)
+            # flag + item.title.gsub(/(.{#{opt[:wrap_width]}})(?=\s+|\Z)/, "\\1\n ").sub(/\s*$/, '') + reset
           else
-            flag + item['title'].chomp + reset
+            format("%s%#{pad}s%s%s", flag, item.title.sub(/\s*$/, ''), reset, after)
           end
         end
 
-        output.sub!(/%section/, item['section']) if item['section']
-
+        # output.sub!(/(?i-m)^([\s\S]*?)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)([\s\S]*?)$/, '\1\3\2')
         if opt[:tags_color]
           escapes = output.scan(/(\e\[[\d;]+m)[^\e]+@/)
           last_color = if !escapes.empty?

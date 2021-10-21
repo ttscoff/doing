@@ -34,27 +34,27 @@ module Doing
       items_out = []
       items.each do |i|
         # if i.has_key?('note')
-        #   note = '<span class="note">' + i['note'].map{|n| n.strip }.join('<br>') + '</span>'
+        #   note = '<span class="note">' + i.note.map{|n| n.strip }.join('<br>') + '</span>'
         # else
         #   note = ''
         # end
         if String.method_defined? :force_encoding
-          title = i['title'].force_encoding('utf-8').link_urls
-          note = i['note'].map { |line| line.force_encoding('utf-8').strip.link_urls } if i['note']
+          title = i.title.force_encoding('utf-8').link_urls
+          note = i.note.map { |line| line.force_encoding('utf-8').strip.link_urls } if i.note
         else
-          title = i['title'].link_urls
-          note = i['note'].map { |line| line.strip.link_urls } if i['note']
+          title = i.title.link_urls
+          note = i.note.map { |line| line.strip.link_urls } if i.note
         end
 
-        interval = wwid.get_interval(i) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+        interval = wwid.get_interval(i) if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
         interval ||= false
 
         items_out << {
-          date: i['date'].strftime('%a %-I:%M%p'),
+          date: i.date.strftime('%a %-I:%M%p'),
           title: title.gsub(/(@[^ (]+(\(.*?\))?)/im, '<span class="tag">\1</span>').strip, #+ " #{note}"
           note: note,
           time: interval,
-          section: i['section']
+          section: i.section
         }
       end
 

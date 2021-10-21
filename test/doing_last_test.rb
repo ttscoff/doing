@@ -27,7 +27,7 @@ class DoingLastTest < Test::Unit::TestCase
     subject = 'Test new entry @tag1'
     doing('import', @import_file)
     doing('now', subject)
-    assert_match(/#{subject}\s*$/, doing('last'), 'last entry should be entry just added')
+    assert_match(/#{subject} \(at .*?\)\s*$/, doing('last'), 'last entry should be entry just added')
   end
 
   def test_last_search_and_tag

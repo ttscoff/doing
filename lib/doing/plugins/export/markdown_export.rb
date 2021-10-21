@@ -41,26 +41,26 @@ module Doing
       all_items = []
       items.each do |i|
         if String.method_defined? :force_encoding
-          title = i['title'].force_encoding('utf-8').link_urls({format: :markdown})
-          note = i['note'].map { |line| line.force_encoding('utf-8').strip.link_urls({format: :markdown}) } if i['note']
+          title = i.title.force_encoding('utf-8').link_urls({format: :markdown})
+          note = i.note.map { |line| line.force_encoding('utf-8').strip.link_urls({format: :markdown}) } if i.note
         else
-          title = i['title'].link_urls({format: :markdown})
-          note = i['note'].map { |line| line.strip.link_urls({format: :markdown}) } if i['note']
+          title = i.title.link_urls({format: :markdown})
+          note = i.note.map { |line| line.strip.link_urls({format: :markdown}) } if i.note
         end
 
-        title = "#{title} @project(#{i['section']})" unless variables[:is_single]
+        title = "#{title} @project(#{i.section})" unless variables[:is_single]
 
-        interval = wwid.get_interval(i, record: false) if i['title'] =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+        interval = wwid.get_interval(i, record: false) if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
         interval ||= false
 
-        done = i['title'] =~ /(?<= |^)@done/ ? 'x' : ' '
+        done = i.title =~ /(?<= |^)@done/ ? 'x' : ' '
 
         all_items << {
-          date: i['date'].strftime('%a %-I:%M%p'),
-          shortdate: i['date'].relative_date,
+          date: i.date.strftime('%a %-I:%M%p'),
+          shortdate: i.date.relative_date,
           done: done,
           note: note,
-          section: i['section'],
+          section: i.section,
           time: interval,
           title: title.strip
         }
