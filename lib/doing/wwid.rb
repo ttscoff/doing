@@ -592,17 +592,17 @@ module Doing
     end
 
     def same_time?(item_a, item_b)
-      item_a.date == item_b.date ? get_interval(item_a, formatted: false, record: false) == get_interval(item_b,  formatted: false, record: false) : false
+      item_a.date == item_b.date ? item_a.interval == item_b.interval : false
     end
 
     def overlapping_time?(item_a, item_b)
       return true if same_time?(item_a, item_b)
 
       start_a = item_a.date
-      interval = get_interval(item_a, formatted: false, record: false)
+      interval = item_a.interval
       end_a = interval ? start_a + interval.to_i : start_a
       start_b = item_b.date
-      interval = get_interval(item_b,  formatted: false, record: false)
+      interval = item_b.interval
       end_b = interval ? start_b + interval.to_i : start_b
       (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
     end
@@ -806,8 +806,7 @@ module Doing
         end
 
         if opt[:only_timed]
-          has_time = get_interval(item, record: false)
-          keep = false unless has_time
+          keep = false unless item.interval
         end
 
         if opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
@@ -2455,8 +2454,8 @@ EOS
     ## @param      item  The item
     ##
     def record_tag_times(item, seconds)
-      return if @recorded_items.include?(item)
-
+      item_hash = "#{item.date.strftime('%s')}#{item.title}#{item.section}"
+      return if @recorded_items.include?(item_hash)
       item.title.scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
         k = m[0] == 'done' ? 'All' : m[0].downcase
         if @timers.key?(k)
@@ -2464,7 +2463,7 @@ EOS
         else
           @timers[k] = seconds
         end
-        @recorded_items.push(item)
+        @recorded_items.push(item_hash)
       end
     end
 

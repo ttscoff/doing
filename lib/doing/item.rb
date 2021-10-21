@@ -77,7 +77,8 @@ module Doing
 
       start = @date
 
-      (done - start).to_i
+      t = (done - start).to_i
+      t > 0 ? t : nil
     end
 
     def all_tags?(tags)

@@ -57,6 +57,7 @@ module Doing
         end
 
         interval = wwid.get_interval(item, record: true) if opt[:times]
+
         interval ||= ''
         output.sub!(/%interval/, interval)
 

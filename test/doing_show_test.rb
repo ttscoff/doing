@@ -121,6 +121,15 @@ class DoingShowTest < Test::Unit::TestCase
     assert(last < finish, 'Last entry should be before end cutoff')
   end
 
+  def test_show_tag_times
+    doing('import', @import_file)
+    result = doing('--stdout', 'show', '--count', '0', '--totals')
+    totals = result.split(/--- Tag Totals ---/)
+    assert(totals[1], 'should have tag totals')
+    tags = totals[1].scan(/^\w+:\s+\d{2}:\d{2}:\d{2}$/).count
+    assert_equal(11, tags, 'Should be 11 tags listed')
+  end
+
   def test_show_tag_sort
     doing('import', @import_file)
     result = doing('--stdout', 'show', '--totals')
