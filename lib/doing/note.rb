@@ -32,7 +32,7 @@ module Doing
     end
 
     def to_s
-      map(&:strip).join("\n")
+      compress.strip_lines.join("\n")
     end
 
 

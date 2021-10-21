@@ -13,7 +13,7 @@ module Doing
   ##
   class WWID
     attr_accessor :content, :current_section, :doing_file, :config, :user_home, :default_config_file,
-                  :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items
+                  :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :verbose
 
     include Doing::Util
     ##
@@ -236,7 +236,7 @@ module Doing
           @content[section]['items'] = []
           current = 0
         elsif line =~ /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/
-          date = Time.parse(Regexp.last_match(1))
+          date = Regexp.last_match(1).strip
           title = Regexp.last_match(2).strip
           item = Item.new(date, title, section)
           @content[section]['items'].push(item)
@@ -544,13 +544,13 @@ module Doing
     ##
     def add_item(title, section = nil, opt = {})
       section ||= @current_section
-      add_section(section) unless @content.has_key?(section)
+      add_section(section) unless @content.key?(section)
       opt[:date] ||= Time.now
       opt[:note] ||= []
       opt[:back] ||= Time.now
       opt[:timed] ||= false
 
-      opt[:note] = [opt[:note]] if opt[:note].instance_of?(String)
+      opt[:note] = opt[:note].lines if opt[:note].is_a?(String)
 
       title = [title.strip.cap_first]
       title = title.join(' ')
@@ -2500,6 +2500,12 @@ EOS
         File.executable?(File.expand_path(cli))
       else
         system "which #{cli}", out: File::NULL, err: File::NULL
+      end
+    end
+
+    def debug(msg)
+      if @verbose
+        @results.push(msg)
       end
     end
   end

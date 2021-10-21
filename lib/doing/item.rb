@@ -4,17 +4,23 @@ module Doing
   ##
   ## @brief      This class describes a single WWID item
   ##
-  class Item
+  class Item < Hash
     attr_accessor :date, :title, :section, :note
 
     def initialize(date, title, section, note = nil)
-      @date = date
+      super()
+
+      @date = date.is_a?(Time) ? date : Time.parse(date)
       @title = title
       @section = section
       @note = Note.new
 
       @note.append_string(note) if note
     end
+
+    # def date=(new_date)
+    #   @date = new_date.is_a?(Time) ? new_date : Time.parse(new_date)
+    # end
 
     def interval
       @interval ||= calc_interval

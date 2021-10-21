@@ -50,6 +50,9 @@ switch [:stdout], default_value: false, negatable: false
 desc 'Exclude auto tags and default tags'
 switch %i[x noauto], default_value: false
 
+desc 'Output debug messages'
+switch %i[d debug], default_value: false, negatable: false
+
 desc 'Use a specific configuration file'
 flag [:config_file], default_value: wwid.config_file
 
@@ -1900,6 +1903,7 @@ pre do |global, _command, _options, _args|
   # else
   #   wwid.configure
   end
+  wwid.verbose = global[:debug]
 
   if global[:doing_file]
     wwid.init_doing_file(global[:doing_file])
