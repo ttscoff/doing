@@ -29,7 +29,7 @@ module Doing
 
       wwid.add_section(section) unless wwid.content.key?(section)
 
-      tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '@') } : []
+      tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '') } : []
       prefix = options[:prefix] || '[Calendar.app]'
 
       script = File.join(File.dirname(__FILE__), 'cal_to_json.scpt')

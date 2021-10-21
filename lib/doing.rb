@@ -1,4 +1,6 @@
-require 'doing/version.rb'
+# frozen_string_literal: true
+
+require 'doing/version'
 require 'time'
 require 'date'
 require 'yaml'

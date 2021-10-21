@@ -1254,16 +1254,15 @@ command :since do |c|
 
     date_string = args.join(' ')
 
-    date_string += ' at midnight' unless date_string =~ /(\d:|\d *[ap]m?|midnight|noon)/i
-    date_string.sub!(/(day) (\d)/, '\1 at \2') if date_string =~ /day \d/
+    date_string.sub!(/(day) (\d)/, '\1 at \2')
+    date_string.sub!(/(\d+)d( ago)?/, '\1 days ago')
 
     start = wwid.chronify(date_string, guess: :begin)
     finish = Time.now
 
     exit_now! 'Unrecognized date string' unless start
 
-    message = "Date interpreted as #{start} through the current time"
-    wwid.results.push(message)
+    wwid.debug("Date interpreted as #{start} through the current time")
 
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i

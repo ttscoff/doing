@@ -39,9 +39,10 @@ class DoingDayTest < Test::Unit::TestCase
     subject1 = 'Adding an entry finished yesterday'
     subject2 = 'Today should not show up'
     subject3 = 'Neither should 2 days ago'
-    doing('done', subject1, '--took', '30m', '--back', 'yesterday 3pm')
+
+    doing('done', '--took', '30m', '--back', 'yesterday 3pm', subject1)
     doing('now', subject2)
-    doing('done', subject3, '--back', '48h')
+    doing('done', '--back', '48h', subject3)
     res = doing('yesterday')
     assert_count_entries(1, res, 'There should be 1 entry shown by `doing yesterday`')
     assert_no_match(/#{subject2}/, res, 'Entry from today should not be shown')
@@ -49,15 +50,28 @@ class DoingDayTest < Test::Unit::TestCase
   end
 
   def test_since_command
-    subject1 = 'Adding an entry finished yesterday'
-    subject2 = 'Adding an entry from today'
-    subject3 = 'An entry from 2 days ago'
-    doing('done', subject1, '--took', '30m', '--back', 'yesterday 3pm')
-    doing('now', subject2)
-    doing('done', subject3, '--back', '48h')
+    today = 'Adding an entry from today'
+    yesterday3 = 'Adding an entry finished yesterday at 3'
+    yesterday4 = 'Adding an entry finished yesterday at 4'
+    twodays = 'Adding an entry from 2 days ago'
+    threedays = 'Adding an entry at 1pm 3 days ago'
+
+    doing('done', today)
+    doing('done', '--back', 'yesterday 3pm', yesterday3)
+    doing('done', '--at', 'yesterday 4pm', yesterday4)
+    doing('done', '--back', '48h', twodays)
+    doing('done', '--at', '3 days ago at 1pm', threedays)
+
     res = doing('since', 'yesterday')
-    assert_count_entries(2, res, 'There should be 1 entry shown by `doing since yesterday`')
-    assert_no_match(/#{subject3}/, res, 'Entry from 2 days ago should not be shown')
+    assert_count_entries(3, res, 'There should be 3 entries shown')
+    assert_no_match(/#{twodays}/, res, 'Entry from 2 days ago should not be shown')
+
+    res = doing('since', 'yesterday 3:30pm')
+    assert_count_entries(2, res, 'There should be 2 entries shown')
+    assert_no_match(/#{yesterday3}/, res, 'Entry from 2 days ago should not be shown')
+
+    res = doing('since', '4d')
+    assert_count_entries(5, res, 'There should be 5 entries in the last 4 days')
   end
 
   def test_on_command
