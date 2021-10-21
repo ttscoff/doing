@@ -230,6 +230,15 @@ Renders the view as:
 <!--GITHUB-->![](img/doing-show-note-formatting-800.jpg)<!--END GITHUB-->
 <!--JEKYLL {% img aligncenter /uploads/2021/10/doing-show-note-formatting-800.jpg 800 149 "Note formatting" %} -->
 
+
+Here's an example with wrapping and indent applied to title as well.
+
+    template: %blue%shortdate %boldgreen│ %boldwhite%80_4title %cyan(%section) %yellow%interval%default%white%_14┃_note%default
+
+<!--GITHUB-->![](img/doing-printf-wrap-800.jpg)<!--END GITHUB-->
+<!--JEKYLL {% img aligncenter /uploads/2021/10/doing-printf-wrap.jpg 1682 576 "doing-printf-wrap.jpg" %} -->
+
+
 ### Examples
 
 My normal template for the `recent` command looks like this:

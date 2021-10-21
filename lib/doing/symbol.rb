@@ -6,7 +6,7 @@ module Doing
   ##
   class ::Symbol
     def normalize_bool!
-      replace normalize_bool
+      to_s.normalize_bool
     end
 
     def normalize_bool

@@ -37,7 +37,7 @@ module Doing
           note = i.note.map { |line| line.strip } if i.note
         end
 
-        end_date = wwid.i.end_date || ''
+        end_date = i.end_date || ''
         interval = wwid.get_interval(i, formatted: false) || 0
         note ||= ''
 

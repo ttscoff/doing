@@ -1,32 +1,7 @@
 require 'open3'
 require 'time'
-
-class Time
-  def round_time(min = 1)
-    t = self
-    Time.at(t.to_i - (t.to_i % (min * 60)))
-  end
-
-  def close_enough?(other_time, tolerance: 2)
-    t = self
-    if t > other_time
-      diff = t - other_time
-    else
-      diff = other_time - t
-    end
-    diff / 60 < tolerance
-  end
-end
-
-class String
-  def uncolor
-    gsub(/\\e\[[\d;]+m/,'')
-  end
-
-  def uncolor!
-    replace uncolor
-  end
-end
+$LOAD_PATH.unshift File.join(__dir__, '..', '..', 'lib')
+require 'doing/string'
 
 module DoingHelpers
   DOING_EXEC = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'doing')
@@ -48,5 +23,37 @@ module DoingHelpers
     end
 
     out
+  end
+
+  def assert_count_entries(count, shown, message = 'Should be X entries shown')
+    assert_equal(count, shown.uncolor.strip.scan(/^\d{4}-\d\d-\d\d \d\d:\d\d \|/).count, message)
+  end
+
+  def get_start_date(string)
+    date_str = string.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}) *\|/)
+
+    return false unless date_str
+
+    Time.parse(date_str[1])
+  end
+
+  ##
+  ## @brief      Time helpers
+  ##
+  class ::Time
+    def round_time(min = 1)
+      t = self
+      Time.at(t.to_i - (t.to_i % (min * 60)))
+    end
+
+    def close_enough?(other_time, tolerance: 2)
+      t = self
+      diff = if t > other_time
+               t - other_time
+             else
+               other_time - t
+             end
+      diff / 60 < tolerance
+    end
   end
 end

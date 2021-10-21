@@ -119,7 +119,7 @@ module Doing
     ## @return     Symbol :and, :or, or :not
     ##
     def normalize_bool!
-      replace normalize_boolm
+      replace normalize_bool
     end
 
     def normalize_bool(default = :and)

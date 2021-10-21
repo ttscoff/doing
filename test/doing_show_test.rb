@@ -40,6 +40,87 @@ class DoingShowTest < Test::Unit::TestCase
     assert_match(/#{subject}\s*$/, result, 'doing show @tag1 results should include test entry')
   end
 
+  def first_last_times(res)
+    entries = res.strip.split(/\n/)
+    first = get_start_date(entries.first.strip)
+    last = get_start_date(entries.last.strip)
+    [first, last]
+  end
+
+  def test_show_sort
+    doing('import', '--type', 'timing', @import_file)
+    res = doing('show')
+    first, last = first_last_times(res)
+    assert(first < last, 'Default sort should have first entry earlier than last')
+
+    res = doing('show', '--sort', 'asc')
+    first, last = first_last_times(res)
+    assert(first < last, 'First entry should be earlier than last')
+
+    res = doing('show', '--sort', 'desc')
+    first, last = first_last_times(res)
+    assert(first > last, 'First entry should be later than last')
+  end
+
+  def test_show_age
+    doing('import', '--type', 'timing', @import_file)
+    res = doing('show', '--count', '0')
+    oldest, newest = first_last_times(res)
+
+    res = doing('show', '--age', 'oldest', '--count', '5')
+    first, last = first_last_times(res)
+    assert(first == oldest, 'First entry shown should be the oldest entry')
+    assert(last < newest, 'Last entry shown should be older than newest')
+
+    res = doing('show', '--age', 'newest', '--count', '5')
+    first, last = first_last_times(res)
+    assert(last == newest, 'Last entry shown should be the newest entry')
+    assert(first > oldest, 'First entry shown should be newer than oldest')
+  end
+
+  def test_show_from
+    doing('import', '--type', 'timing', @import_file)
+    raw = IO.read(@wwid_file)
+    date_matches = raw.scan(/^\t+- 2021-09-15/).count
+    res = doing('show', '--from', '9/15')
+    assert_count_entries(date_matches, res, "There should be #{date_matches} entries shown")
+  end
+
+  def test_show_from_range
+    doing('import', '--type', 'timing', @import_file)
+    raw = IO.read(@wwid_file)
+    date_matches = raw.scan(/^\t+- 2021-09-1[456]/).count
+    res = doing('show', '--from', 'sept 14 2021 to sept 16 2021')
+    assert_count_entries(date_matches, res, "There should be #{date_matches} entries shown")
+  end
+
+  def test_show_before
+    doing('import', '--type', 'timing', @import_file)
+    res = doing('show', '--before', '9/16/21')
+    first, last = first_last_times(res)
+    cutoff = Time.parse('2021-09-17 00:00:00')
+    assert(last < cutoff, 'Last date should be before cutoff')
+  end
+
+  def test_show_after
+    doing('import', '--type', 'timing', @import_file)
+    res = doing('show', '--after', '9/15/21')
+    first, last = first_last_times(res)
+    cutoff = Time.parse('2021-09-16 00:00:00')
+    assert(first > cutoff, 'Last date should be after cutoff')
+  end
+
+  def test_show_before_after
+    doing('import', @import_file)
+    start = Time.parse('2021-09-13 00:00:00')
+    finish = Time.parse('2021-09-14 00:00:00')
+    result = doing('show', '--before', '9/14/2021', '--after', '9/12/2021')
+    assert_count_entries(5, result, 'There should be 5 entries between specified dates')
+    first, last = first_last_times(result)
+    assert(first > start, 'First entry should be after start cutoff')
+    assert(last < finish, 'Last entry should be before end cutoff')
+  end
+
   def test_show_tag_sort
     doing('import', @import_file)
     result = doing('--stdout', 'show', '--totals')
@@ -49,12 +130,6 @@ class DoingShowTest < Test::Unit::TestCase
     result = doing('--stdout', 'show', '--tag_sort=name', '--tag_order=desc', '--totals')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/writing/, first_tag[1], 'First tag should be writing')
-  end
-
-  def test_show_date_limit
-    doing('import', @import_file)
-    result = doing('show', '--before', '9/14/2021', '--after', '9/12/2021')
-    assert_count_entries(5, result, 'There should be 5 entries between specified dates')
   end
 
   def test_show_command_tag_boolean

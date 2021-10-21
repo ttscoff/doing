@@ -38,7 +38,7 @@ module Doing
 
     def tags?(tags, bool = :and)
       tags = split_tags(tags)
-      bool.normalize_bool!
+      bool = bool.normalize_bool
 
       case bool
       when :and

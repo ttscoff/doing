@@ -352,7 +352,7 @@ module Doing
     #
     # @return     (DateTime) result
     #
-    def chronify(input, future: false)
+    def chronify(input, future: false, guess: :begin)
       now = Time.now
       exit_now! "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
 
@@ -369,7 +369,7 @@ module Doing
       if secs_ago
         now - secs_ago
       else
-        Chronic.parse(input, { context: future ? :future : :past, ambiguous_time_range: 8 })
+        Chronic.parse(input, { guess: guess, context: future ? :future : :past, ambiguous_time_range: 8 })
       end
     end
 
@@ -796,6 +796,7 @@ module Doing
         if opt[:date_filter]&.length == 2
           start_date = opt[:date_filter][0]
           end_date = opt[:date_filter][1]
+
           in_date_range = if end_date
                             item.date >= start_date && item.date <= end_date
                           else
@@ -816,8 +817,7 @@ module Doing
 
         if opt[:before]
           time_string = opt[:before]
-          time_string += ' 12am' if time_string !~ /(\d+:\d+|\d+[ap])/
-          cutoff = chronify(time_string, future: true)
+          cutoff = chronify(time_string, guess: :begin)
           if cutoff
             keep = false if item.date >= cutoff
           end
@@ -825,8 +825,7 @@ module Doing
 
         if opt[:after]
           time_string = opt[:after]
-          time_string += ' 11:59pm' if time_string !~ /(\d+:\d+|\d+[ap])/
-          cutoff = chronify(time_string)
+          cutoff = chronify(time_string, guess: :end)
           if cutoff
             keep = false if item.date <= cutoff
           end
@@ -847,8 +846,8 @@ module Doing
                 opt[:count]
               end
 
-      if opt[:age] =~ /oldest/i
-        filtered_items.slice(0, count)
+      if opt[:age] =~ /^o/i
+        filtered_items.slice(0, count).reverse
       else
         filtered_items.reverse.slice(0, count)
       end
@@ -1707,8 +1706,7 @@ module Doing
         if !tags.empty? || opt[:search] || opt[:before]
           if opt[:before]
             time_string = opt[:before]
-            time_string += ' 12am' if time_string !~ /(\d+:\d+|\d+[ap])/
-            cutoff = chronify(time_string, future: true)
+            cutoff = chronify(time_string, guess: :begin)
           end
 
           items.delete_if do |item|
@@ -2023,8 +2021,7 @@ module Doing
         if !tags.empty? || opt[:search] || opt[:before]
           if opt[:before]
             time_string = opt[:before]
-            time_string += ' 12am' if time_string !~ /(\d+:\d+|\d+[ap])/
-            cutoff = chronify(time_string, future: true)
+            cutoff = chronify(time_string, guess: :begin)
           end
 
           items.delete_if do |item|

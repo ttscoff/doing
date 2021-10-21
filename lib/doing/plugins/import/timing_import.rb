@@ -27,7 +27,7 @@ module Doing
       options[:autotag] ||= wwid.auto_tag
       wwid.add_section(section) unless wwid.content.key?(section)
 
-      add_tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '@') } : []
+      add_tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '') } : []
       prefix = options[:prefix] || '[Timing.app]'
       exit_now! 'File not found' unless File.exist?(File.expand_path(path))
 

@@ -28,12 +28,36 @@ class DoingDayTest < Test::Unit::TestCase
     doing('done', subject)
     subject2 = 'Test new entry 2 @tag2'
     doing('now', subject2)
-    assert_count_entries(2, doing('today'), 'There should be 2 entries shown by `doing today`')
+    subject3 = 'Yesterday should not show up'
+    doing('done', '--back', '24h', subject3)
+    res = doing('today')
+    assert_count_entries(2, res, 'There should be 2 entries shown by `doing today`')
+    assert_no_match(/#{subject3}/, res, 'Entry from yesterday should not be shown')
   end
 
   def test_yesterday_command
-    doing('done', 'Adding an entry finished yesterday', '--took', '30m', '--back', 'yesterday 3pm')
-    assert_count_entries(1, doing('yesterday'), 'There should be 1 entry shown by `doing yesterday`')
+    subject1 = 'Adding an entry finished yesterday'
+    subject2 = 'Today should not show up'
+    subject3 = 'Neither should 2 days ago'
+    doing('done', subject1, '--took', '30m', '--back', 'yesterday 3pm')
+    doing('now', subject2)
+    doing('done', subject3, '--back', '48h')
+    res = doing('yesterday')
+    assert_count_entries(1, res, 'There should be 1 entry shown by `doing yesterday`')
+    assert_no_match(/#{subject2}/, res, 'Entry from today should not be shown')
+    assert_no_match(/#{subject3}/, res, 'Entry from 2 days ago should not be shown')
+  end
+
+  def test_since_command
+    subject1 = 'Adding an entry finished yesterday'
+    subject2 = 'Adding an entry from today'
+    subject3 = 'An entry from 2 days ago'
+    doing('done', subject1, '--took', '30m', '--back', 'yesterday 3pm')
+    doing('now', subject2)
+    doing('done', subject3, '--back', '48h')
+    res = doing('since', 'yesterday')
+    assert_count_entries(2, res, 'There should be 1 entry shown by `doing since yesterday`')
+    assert_no_match(/#{subject3}/, res, 'Entry from 2 days ago should not be shown')
   end
 
   def test_on_command
