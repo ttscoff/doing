@@ -9,16 +9,14 @@ require 'erb'
 
 module Doing
   ##
-  ## @brief      Main "What Was I Doing" methods
-  ##
+  # Main "What Was I Doing" methods
   class WWID
     attr_accessor :content, :current_section, :doing_file, :config, :user_home, :default_config_file,
-                  :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :verbose
+                  :config_file, :results, :auto_tag, :interval_cache, :recorded_items, :verbose
 
     include Doing::Util
     ##
-    ## @brief      Initializes the object.
-    ##
+    # Initializes the object.
     def initialize
       @content = {}
       @doingrc_needs_update = false
@@ -30,10 +28,9 @@ module Doing
     end
 
     ##
-    ## @brief      Finds a project-specific configuration file
-    ##
-    ## @return     (String) A file path
-    ##
+    # Finds a project-specific configuration file
+    #
+    # returns: (String) A file path
     def find_local_config
       dir = Dir.pwd
 
@@ -49,8 +46,7 @@ module Doing
     end
 
     ##
-    ## @brief      Reads a configuration.
-    ##
+    # Reads a configuration.
     def read_config(opt = {})
       @config_file ||= if Dir.respond_to?('home')
                          File.join(Dir.home, @default_config_file)
@@ -82,10 +78,9 @@ module Doing
     end
 
     ##
-    ## @brief      Read user configuration and merge with defaults
-    ##
-    ## @param      opt   (Hash) Additional Options
-    ##
+    # Read user configuration and merge with defaults
+    #
+    # param: +opt+ (Object) Additional Options
     def configure(opt = {})
       @timers = {}
       @recorded_items = []
@@ -195,10 +190,9 @@ module Doing
     end
 
     ##
-    ## @brief      Initializes the doing file.
-    ##
-    ## @param      path  (String) Override path to a doing file, optional
-    ##
+    # Initializes the doing file.
+    #
+    # param: +path+ (String) Override path to a doing file, optional
     def init_doing_file(path = nil)
       @doing_file = File.expand_path(@config['doing_file'])
 
@@ -257,8 +251,7 @@ module Doing
     end
 
     ##
-    ## @brief      Create a new doing file
-    ##
+    # Create a new doing file
     def create(filename = nil)
       filename = @doing_file if filename.nil?
       return if File.exist?(filename) && File.stat(filename).size.positive?
@@ -269,10 +262,9 @@ module Doing
     end
 
     ##
-    ## @brief      Create a process for an editor and wait for the file handle to return
-    ##
-    ## @param      input  (String) Text input for editor
-    ##
+    # Create a process for an editor and wait for the file handle to return
+    #
+    # param: +input+ (String) Text input for editor
     def fork_editor(input = '')
       tmpfile = Tempfile.new(['doing', '.md'])
 
@@ -310,13 +302,12 @@ module Doing
       input.split(/\n/).delete_if(&:ignore?).join("\n")
     end
 
+    ##
+    # Takes a multi-line string and formats it as an entry
     #
-    # @brief      Takes a multi-line string and formats it as an entry
+    # param: +input+ (String) The string to parse
     #
-    # @return     (Array) [(String)title, (Array)note]
-    #
-    # @param      input  (String) The string to parse
-    #
+    # returns: (Array) [(String)title, (Array)note]
     def format_input(input)
       exit_now! 'No content in entry' if input.nil? || input.strip.empty?
 
@@ -341,17 +332,17 @@ module Doing
       [title, note]
     end
 
+    ##
+    # Converts input string into a Time object when input takes on the
+    # following formats:
     #
-    # @brief      Converts input string into a Time object when input takes on the
-    #             following formats:
-    #             - interval format e.g. '1d2h30m', '45m' etc.
-    #             - a semantic phrase e.g. 'yesterday 5:30pm'
-    #             - a strftime e.g. '2016-03-15 15:32:04 PDT'
+    # - interval format e.g. '1d2h30m', '45m' etc.
+    # - a semantic phrase e.g. 'yesterday 5:30pm'
+    # - a strftime e.g. '2016-03-15 15:32:04 PDT'
     #
-    # @param      input  (String) String to chronify
+    # param: +input+ (String) String to chronify
     #
-    # @return     (DateTime) result
-    #
+    # returns: (DateTime) result
     def chronify(input, future: false, guess: :begin)
       now = Time.now
       exit_now! "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
@@ -373,15 +364,12 @@ module Doing
       end
     end
 
+    ##
+    # Converts simple strings into seconds that can be added to a Time object
     #
-    # @brief      Converts simple strings into seconds that can be added to a Time
-    #             object
+    # param: +qty+ (String) HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m, 1.5d, 1h20m, etc.)
     #
-    # @param      qty   (String) HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m,
-    #                   1.5d, 1h20m, etc.)
-    #
-    # @return     (Integer) seconds
-    #
+    # returns: (Number) seconds
     def chronify_qty(qty)
       minutes = 0
       case qty.strip
@@ -407,30 +395,28 @@ module Doing
     end
 
     ##
-    ## @brief      List sections
-    ##
-    ## @return     (Array) section titles
-    ##
+    # List sections
+    #
+    # returns: (Array) section titles
     def sections
       @content.keys
     end
 
     ##
-    ## @brief      Adds a section.
-    ##
-    ## @param      title  (String) The new section title
-    ##
+    # Adds a section.
+    #
+    # param: +title+ (String) The new section title
     def add_section(title)
       @content[title.cap_first] = { 'original' => "#{title}:", 'items' => [] }
       @results.push(%(Added section "#{title.cap_first}"))
     end
 
     ##
-    ## @brief      Attempt to match a string with an existing section
-    ##
-    ## @param      frag     (String) The user-provided string
-    ## @param      guessed  (Boolean) already guessed and failed
-    ##
+    # Attempt to match a string with an existing section
+    #
+    # param: +frag+ (String) The user-provided string
+    #
+    # param: +guessed+ (Boolean) already guessed and failed
     def guess_section(frag, guessed: false)
       return 'All' if frag =~ /^all$/i
       frag ||= @current_section
@@ -463,13 +449,13 @@ module Doing
     end
 
     ##
-    ## @brief      Ask a yes or no question in the terminal
-    ##
-    ## @param      question     (String) The question to ask
-    ## @param      default      (Bool)   default response if no input
-    ##
-    ## @return     (Bool) yes or no
-    ##
+    # Ask a yes or no question in the terminal
+    #
+    # param: +question+ (String) The question to ask
+    #
+    # param: +default+ (Boolean)   default response if no input
+    #
+    # returns: (Boolean) yes or no
     def yn(question, default_response: false)
       default = default_response ? default_response : 'n'
 
@@ -508,11 +494,11 @@ module Doing
     end
 
     ##
-    ## @brief      Attempt to match a string with an existing view
-    ##
-    ## @param      frag     (String) The user-provided string
-    ## @param      guessed  (Boolean) already guessed
-    ##
+    # Attempt to match a string with an existing view
+    #
+    # param: +frag+ (String) The user-provided string
+    #
+    # param: +guessed+ (Boolean) already guessed
     def guess_view(frag, guessed = false)
       views.each { |view| return view if frag.downcase == view.downcase }
       view = false
@@ -536,12 +522,13 @@ module Doing
     end
 
     ##
-    ## @brief      Adds an entry
-    ##
-    ## @param      title    (String) The entry title
-    ## @param      section  (String) The section to add to
-    ## @param      opt      (Hash) Additional Options {:date, :note, :back, :timed}
-    ##
+    # Adds an entry
+    #
+    # param: +title+ (String) The entry title
+    #
+    # param: +section+ (String) The section to add to
+    #
+    # param: +opt+ (Object) Additional Options {:date, :note, :back, :timed}
     def add_item(title, section = nil, opt = {})
       section ||= @current_section
       add_section(section) unless @content.key?(section)
@@ -626,11 +613,11 @@ module Doing
     end
 
     ##
-    ## @brief      Imports external entries
-    ##
-    ## @param      path     (String) Path to JSON report file
-    ## @param      opt      (Hash) Additional Options
-    ##
+    # Imports external entries
+    #
+    # param: +path+ (String) Path to JSON report file
+    #
+    # param: +opt+ (Object) Additional Options
     def import(paths, opt = {})
       plugins[:import].each do |_, options|
         next unless opt[:type] =~ /^(#{options[:trigger].normalize_trigger})$/i
@@ -647,11 +634,9 @@ module Doing
     end
 
     ##
-    ## @brief      Return the content of the last note for a given section
-    ##
-    ## @param      section  (String) The section to retrieve from, default
-    ##                      All
-    ##
+    # Return the content of the last note for a given section
+    #
+    # param: +section+ (String) The section to retrieve from, default All
     def last_note(section = 'All')
       section = guess_section(section)
       if section =~ /^all$/i
@@ -672,10 +657,9 @@ module Doing
     end
 
     ##
-    ## @brief      Restart the last entry
-    ##
-    ## @param      opt   (Hash) Additional Options
-    ##
+    # Restart the last entry
+    #
+    # param: +opt+ (Object) Additional Options
     def restart_last(opt = {})
       opt[:section] ||= 'all'
       opt[:note] ||= []
@@ -701,10 +685,9 @@ module Doing
     end
 
     ##
-    ## @brief      Get the last entry
-    ##
-    ## @param      opt   (Hash) Additional Options
-    ##
+    # Get the last entry
+    #
+    # param: +opt+ (Object) Additional Options
     def last_entry(opt = {})
       opt[:tag_bool] ||= :and
       opt[:section] ||= @current_section
@@ -741,10 +724,9 @@ module Doing
     end
 
     ##
-    ## @brief      Generate a menu of options and allow user selection
-    ##
-    ## @return     (String) The selected option
-    ##
+    # Generate a menu of options and allow user selection
+    #
+    # returns: (String) The selected option
     def choose_from(options, prompt: 'Make a selection: ', multiple: false, sorted: true, fzf_args: [])
       fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
       # fzf_args << '-1' # User is expecting a menu, and even if only one it seves as confirmation
@@ -854,10 +836,9 @@ module Doing
     end
 
     ##
-    ## @brief      Display an interactive menu of entries
-    ##
-    ## @param      opt   (Hash) Additional options
-    ##
+    # Display an interactive menu of entries
+    #
+    # param: +opt+ (Object) Additional options
     def interactive(opt = {})
       section = opt[:section] ? guess_section(opt[:section]) : 'All'
       opt[:query] = opt[:search] if opt[:search] && !opt[:query]
@@ -1131,10 +1112,9 @@ module Doing
     end
 
     ##
-    ## @brief      Tag the last entry or X entries
-    ##
-    ## @param      opt   (Hash) Additional Options
-    ##
+    # Tag the last entry or X entries
+    #
+    # param: +opt+ (Object) Additional Options
     def tag_last(opt = {})
       opt[:count] ||= 1
       opt[:archive] ||= false
@@ -1299,14 +1279,13 @@ module Doing
     end
 
     ##
-    ## @brief      Move item from current section to
-    ##             destination section
-    ##
-    ## @param      item     The item
-    ## @param      section  The destination section
-    ##
-    ## @return     Updated item
-    ##
+    # Move item from current section to destination section
+    #
+    # param: +item+ The item
+    #
+    # param: +section+ The destination section
+    #
+    # returns: Updated item
     def move_item(item, section)
       old_section = item.section
       new_item = item.dup
@@ -1326,11 +1305,9 @@ module Doing
     end
 
     ##
-    ## @brief      Get next item in the index
-    ##
-    ## @param      old_item
-    ##
-    def next_item(old_item)
+    # Get next item in the index
+    #
+    # param: +old_item+    def next_item(old_item)
       combined = { 'items' => [] }
       @content.each do |_k, v|
         combined['items'] += v['items']
@@ -1346,11 +1323,9 @@ module Doing
     end
 
     ##
-    ## @brief      Delete an item from the index
-    ##
-    ## @param      old_item
-    ##
-    def delete_item(old_item)
+    # Delete an item from the index
+    #
+    # param: +old_item+    def delete_item(old_item)
       section = old_item.section
 
       section_items = @content[section]['items']
@@ -1360,11 +1335,11 @@ module Doing
     end
 
     ##
-    ## @brief      Remove a tag on an item from the index
-    ##
-    ## @param      old_item  (Item) The item to tag
-    ## @param      tag       (string) The tag to remove
-    ##
+    # Remove a tag on an item from the index
+    #
+    # param: +old_item+ (Item) The item to tag
+    #
+    # param: +tag+ (string) The tag to remove
     def untag_item(old_item, tags)
       title = old_item.title.dup
       if tags.is_a? ::String
@@ -1387,12 +1362,13 @@ module Doing
     end
 
     ##
-    ## @brief      Tag an item from the index
-    ##
-    ## @param      old_item  (Item) The item to tag
-    ## @param      tag       (string) The tag to apply
-    ## @param      date      (Boolean) Include timestamp?
-    ##
+    # Tag an item from the index
+    #
+    # param: +old_item+ (Item) The item to tag
+    #
+    # param: +tag+ (string) The tag to apply
+    #
+    # param: +date+ (Boolean) Include timestamp?
     def tag_item(old_item, tags, remove: false, date: false)
       title = old_item.title.dup
       if tags.is_a? ::String
@@ -1420,11 +1396,11 @@ module Doing
     end
 
     ##
-    ## @brief      Update an item in the index with a modified item
-    ##
-    ## @param      old_item  The old item
-    ## @param      new_item  The new item
-    ##
+    # Update an item in the index with a modified item
+    #
+    # param: +old_item+ The old item
+    #
+    # param: +new_item+ The new item
     def update_item(old_item, new_item)
       section = old_item.section
 
@@ -1439,10 +1415,9 @@ module Doing
     end
 
     ##
-    ## @brief      Edit the last entry
-    ##
-    ## @param      section  (String) The section, default "All"
-    ##
+    # Edit the last entry
+    #
+    # param: +section+ (String) The section, default "All"
     def edit_last(section: 'All', options: {})
       section = guess_section(section)
 
@@ -1508,12 +1483,13 @@ module Doing
     end
 
     ##
-    ## @brief      Add a note to the last entry in a section
-    ##
-    ## @param      section  (String) The section, default "All"
-    ## @param      note     (String) The note to add
-    ## @param      replace  (Bool) Should replace existing note
-    ##
+    # Add a note to the last entry in a section
+    #
+    # param: +section+ (String) The section, default "All"
+    #
+    # param: +note+ (String) The note to add
+    #
+    # param: +replace+ (Boolean) Should replace existing note
     def note_last(section, note, replace: false)
       note.split!("\n") if note.is_a?(String)
       section = guess_section(section)
@@ -1558,15 +1534,11 @@ module Doing
     end
 
     ##
-    ## @brief      Accepts one tag and the raw text of a new item if the passed tag
-    ##             is on any item, it's replaced with @done. if new_item is not
-    ##             nil, it's tagged with the passed tag and inserted. This is for
-    ##             use where only one instance of a given tag should exist
-    ##             (@meanwhile)
-    ##
-    ## @param      tag   (String) Tag to replace
-    ## @param      opt   (Hash) Additional Options
-    ##
+    # Accepts one tag and the raw text of a new item if the passed tag use where only one instance of a given tag should exist (@meanwhile)
+    #
+    # param: +tag+ (String) Tag to replace
+    #
+    # param: +opt+ (Object) Additional Options
     def stop_start(target_tag, opt = {})
       tag = target_tag.dup
       opt[:section] ||= @current_section
@@ -1613,10 +1585,9 @@ module Doing
     end
 
     ##
-    ## @brief      Write content to file or STDOUT
-    ##
-    ## @param      file  (String) The filepath to write to
-    ##
+    # Write content to file or STDOUT
+    #
+    # param: +file+ (String) The filepath to write to
     def write(file = nil, backup: true)
       output = wrapped_content
 
@@ -1663,10 +1634,9 @@ module Doing
     end
 
     ##
-    ## @brief      Restore a backed up version of a file
-    ##
-    ## @param      file  (String) The filepath to restore
-    ##
+    # Restore a backed up version of a file
+    #
+    # param: +file+ (String) The filepath to restore
     def restore_backup(file)
       if File.exist?(file + '~')
         puts file + '~'
@@ -1676,8 +1646,7 @@ module Doing
     end
 
     ##
-    ## @brief      Rename doing file with date and start fresh one
-    ##
+    # Rename doing file with date and start fresh one
     def rotate(opt = {})
       count = opt[:keep] || 0
       tags = []
@@ -1759,39 +1728,35 @@ module Doing
     end
 
     ##
-    ## @brief      Generate a menu of sections and allow user selection
-    ##
-    ## @return     (String) The selected section name
-    ##
+    # Generate a menu of sections and allow user selection
+    #
+    # returns: (String) The selected section name
     def choose_section
       choice = choose_from(sections.sort, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
       choice ? choice.strip : choice
     end
 
     ##
-    ## @brief      List available views
-    ##
-    ## @return     (Array) View names
-    ##
+    # List available views
+    #
+    # returns: (Array) View names
     def views
       @config.has_key?('views') ? @config['views'].keys : []
     end
 
     ##
-    ## @brief      Generate a menu of views and allow user selection
-    ##
-    ## @return     (String) The selected view name
-    ##
+    # Generate a menu of views and allow user selection
+    #
+    # returns: (String) The selected view name
     def choose_view
       choice = choose_from(views.sort, prompt: 'Choose a view > ', fzf_args: ['--height=60%'])
       choice ? choice.strip : choice
     end
 
     ##
-    ## @brief      Gets a view from configuration
-    ##
-    ## @param      title  (String) The title of the view to retrieve
-    ##
+    # Gets a view from configuration
+    #
+    # param: +title+ (String) The title of the view to retrieve
     def get_view(title)
       return @config['views'][title] if @config['views'].has_key?(title)
 
@@ -1799,11 +1764,9 @@ module Doing
     end
 
     ##
-    ## @brief      Overachieving function for displaying contents of a section.
-    ##             This is a fucking mess. I mean, Jesus Christ.
-    ##
-    ## @param      opt   (Hash) Additional Options
-    ##
+    # Overachieving function for displaying contents of a section. This is a fucking mess. I mean, Jesus Christ.
+    #
+    # param: +opt+ (Object) Additional Options
     def list_section(opt = {})
       opt[:count] ||= 0
       opt[:age] ||= 'newest'
@@ -1896,24 +1859,23 @@ module Doing
     end
 
     ##
-    ## @brief      Return array of available plugin names
-    ##
-    ## @param      type  Plugin type (:import, :export)
-    ##
-    ## @returns    [Array<String>] plugin names
-    ##
+    # Return array of available plugin names
+    #
+    # param: +type+ Plugin type (:import, :export)
+    #
+    # returns: (Array<String>) plugin names
     def available_plugins(type: :export)
       plugins[type].keys.sort
     end
 
     ##
-    ## @brief      Return string version of plugin names
-    ##
-    ## @param      type       Plugin type (:import, :export)
-    ## @param      separator  The separator to join names with
-    ##
-    ## @return     [String]   Plugin names
-    ##
+    # Return string version of plugin names
+    #
+    # param: +type+ Plugin type (:import, :export)
+    #
+    # param: +separator+ The separator to join names with
+    #
+    # returns: (String)   Plugin names
     def plugin_names(type: :export, separator: '|')
       available_plugins.join(separator)
     end
@@ -1963,12 +1925,11 @@ module Doing
     end
 
     ##
-    ## @brief      Move entries from a section to Archive or other specified
-    ##             section
-    ##
-    ## @param      section      (String) The source section
-    ## @param      options      (Hash) Options
-    ##
+    # Move entries from a section to Archive or other specified section
+    #
+    # param: +section+ (String) The source section
+    #
+    # param: +options+ (Object) Options
     def archive(section = @current_section, options = {})
       count       = options[:keep] || 0
       destination = options[:destination] || 'Archive'
@@ -1992,12 +1953,13 @@ module Doing
     end
 
     ##
-    ## @brief      Helper function, performs the actual archiving
-    ##
-    ## @param      section      (String) The source section
-    ## @param      destination  (String) The destination section
-    ## @param      opt          (Hash) Additional Options
-    ##
+    # Helper function, performs the actual archiving
+    #
+    # param: +section+ (String) The source section
+    #
+    # param: +destination+ (String) The destination section
+    #
+    # param: +opt+ (Object) Additional Options
     def do_archive(sect, destination, opt = {})
       count = opt[:count] || 0
       tags  = opt[:tags] || []
@@ -2071,10 +2033,9 @@ module Doing
     end
 
     ##
-    ## @brief      A dictionary of colors
-    ##
-    ## @return     (String) ANSI escape sequence
-    ##
+    # A dictionary of colors
+    #
+    # returns: (String) ANSI escape sequence
     def colors
       color = {}
       color['black'] = "\033[0;0;30m"
@@ -2120,12 +2081,13 @@ module Doing
     end
 
     ##
-    ## @brief      Show all entries from the current day
-    ##
-    ## @param      times   (Boolean) show times
-    ## @param      output  (String) output format
-    ## @param      opt     (Hash) Options
-    ##
+    # Show all entries from the current day
+    #
+    # param: +times+ (Boolean) show times
+    #
+    # param: +output+ (String) output format
+    #
+    # param: +opt+ (Object) Options
     def today(times = true, output = nil, opt = {})
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
@@ -2150,14 +2112,17 @@ module Doing
     end
 
     ##
-    ## @brief      Display entries within a date range
-    ##
-    ## @param      dates    (Array) [start, end]
-    ## @param      section  (String) The section
-    ## @param      times    (Bool) Show times
-    ## @param      output   (String) Output format
-    ## @param      opt      (Hash) Additional Options
-    ##
+    # Display entries within a date range
+    #
+    # param: +dates+ (Array) [start, end]
+    #
+    # param: +section+ (String) The section
+    #
+    # param: +times+ (Boolean) Show times
+    #
+    # param: +output+ (String) Output format
+    #
+    # param: +opt+ (Object) Additional Options
     def list_date(dates, section, times = nil, output = nil, opt = {})
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
@@ -2170,13 +2135,15 @@ module Doing
     end
 
     ##
-    ## @brief      Show entries from the previous day
-    ##
-    ## @param      section  (String) The section
-    ## @param      times    (Bool) Show times
-    ## @param      output   (String) Output format
-    ## @param      opt      (Hash) Additional Options
-    ##
+    # Show entries from the previous day
+    #
+    # param: +section+ (String) The section
+    #
+    # param: +times+ (Boolean) Show times
+    #
+    # param: +output+ (String) Output format
+    #
+    # param: +opt+ (Object) Additional Options
     def yesterday(section, times = nil, output = nil, opt = {})
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
@@ -2203,12 +2170,13 @@ module Doing
     end
 
     ##
-    ## @brief      Show recent entries
-    ##
-    ## @param      count    (Integer) The number to show
-    ## @param      section  (String) The section to show from, default Currently
-    ## @param      opt      (Hash) Additional Options
-    ##
+    # Show recent entries
+    #
+    # param: +count+ (Number) The number to show
+    #
+    # param: +section+ (String) The section to show from, default Currently
+    #
+    # param: +opt+ (Object) Additional Options
     def recent(count = 10, section = nil, opt = {})
       times = opt[:t] || true
       opt[:totals] ||= false
@@ -2225,11 +2193,11 @@ module Doing
     end
 
     ##
-    ## @brief      Show the last entry
-    ##
-    ## @param      times    (Bool) Show times
-    ## @param      section  (String) Section to pull from, default Currently
-    ##
+    # Show the last entry
+    #
+    # param: +times+ (Boolean) Show times
+    #
+    # param: +section+ (String) Section to pull from, default Currently
     def last(times: true, section: nil, options: {})
       section = section.nil? || section =~ /all/i ? 'All' : guess_section(section)
       cfg = @config['templates']['last']
@@ -2259,8 +2227,7 @@ module Doing
     # Does not repeat tags in a title, and only converts the first instance of an
     # untagged keyword
     #
-    # @param      text  (String) The text to tag
-    #
+    # param: +text+ (String) The text to tag
     def autotag(text)
       return unless text
       return text unless @auto_tag
@@ -2320,14 +2287,13 @@ module Doing
     end
 
     ##
-    ## @brief      Get total elapsed time for all tags in
-    ##             selection
-    ##
-    ## @param      format        (String) return format (html,
-    ##                           json, or text)
-    ## @param      sort_by_name  (Boolean) Sort by name if true, otherwise by time
-    ## @param      sort_order    (String) The sort order (asc or desc)
-    ##
+    # Get total elapsed time for all tags in selection
+    #
+    # param: +format+ (String) return format (html, json, or text)
+    #
+    # param: +sort_by_name+ (Boolean) Sort by name if true, otherwise by time
+    #
+    # param: +sort_order+ (String) The sort order (asc or desc)
     def tag_times(format: :text, sort_by_name: false, sort_order: 'asc')
       return '' if @timers.empty?
 
@@ -2423,19 +2389,15 @@ EOS
     end
 
     ##
-    ## @brief      Gets the interval between entry's start
-    ##             date and @done date
-    ##
-    ## @param      item       (Hash) The entry
-    ## @param      formatted  (Bool) Return human readable
-    ##                        time (default seconds)
-    ## @param      record     (Bool) Add the interval to the
-    ##                        total for each tag
-    ##
-    ## @return     Interval in seconds, or [d, h, m] array if
-    ##             formatted is true. False if no end date or
-    ##             interval is 0
-    ##
+    # Gets the interval between entry's start date and @done date
+    #
+    # param: +item+ (Object) The entry
+    #
+    # param: +formatted+ (Boolean) Return human readable time (default seconds)
+    #
+    # param: +record+ (Boolean) Add the interval to the total for each tag
+    #
+    # returns: Interval in seconds, or [d, h, m] array if formatted is true. False if no end date or interval is 0
     def get_interval(item, formatted: true, record: true)
       if item.interval
         seconds = item.interval
@@ -2449,10 +2411,9 @@ EOS
     end
 
     ##
-    ## @brief      Record times for item tags
-    ##
-    ## @param      item  The item
-    ##
+    # Record times for item tags
+    #
+    # param: +item+ The item
     def record_tag_times(item, seconds)
       item_hash = "#{item.date.strftime('%s')}#{item.title}#{item.section}"
       return if @recorded_items.include?(item_hash)
@@ -2468,10 +2429,9 @@ EOS
     end
 
     ##
-    ## @brief      Format human readable time from seconds
-    ##
-    ## @param      seconds  The seconds
-    ##
+    # Format human readable time from seconds
+    #
+    # param: +seconds+ The seconds
     def fmt_time(seconds)
       return [0, 0, 0] if seconds.nil?
 
@@ -2490,10 +2450,9 @@ EOS
     end
 
     ##
-    ## @brief      Test if command line tool is available
-    ##
-    ## @param      cli   The cli
-    ##
+    # Test if command line tool is available
+    #
+    # param: +cli+ The cli
     def exec_available(cli)
       if File.exist?(File.expand_path(cli))
         File.executable?(File.expand_path(cli))

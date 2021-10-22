@@ -393,7 +393,7 @@ You can use the following colors in view templates. Set a foreground color with 
     %white
 
 You can also add a background color (`%bg[color]`) by placing one after the foreground color:
-
+  
     %white%bgblack
     %black%bgred
     ...etc.
