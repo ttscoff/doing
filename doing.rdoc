@@ -1,6 +1,6 @@
 == doing - A CLI for a What Was I Doing system
 
-v1.0.94
+v2.0.0
 
 === Global Options
 === --config_file arg
@@ -15,6 +15,11 @@ Use a specific configuration file
 Specify a different doing_file
 
 [Default Value] None
+
+
+=== -d|--debug
+Output debug messages
+
 
 
 === --help
