@@ -146,8 +146,12 @@ module Doing
         interval = i.interval
 
         if interval
+          took = '. You finished on '
+          finished_at = i.end_date
+          took += finished_at.strftime('%A %B %e at %I:%M%p')
+
           d, h, m = wwid.fmt_time(interval)
-          took = ' and it took'
+          took += ' and it took'
           took += " #{d.to_i} days" if d.to_i.positive?
           took += " #{h.to_i} hours" if h.to_i.positive?
           took += " #{m.to_i} minutes" if m.to_i.positive?
