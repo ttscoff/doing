@@ -48,6 +48,16 @@ class DoingEntryTest < Test::Unit::TestCase
     assert_raises(RuntimeError) { doing('now', '--section') }
   end
 
+  def test_guess_section
+    doing('add_section', 'Test Section')
+    res = doing('--stdout', 'show', 'Test').strip
+    assert_match(/Assuming you meant Test Section/, res, 'Should have guessed Test Section')
+  end
+
+  def test_invalid_section
+    assert_raises(RuntimeError, 'Should be invalid section') { doing('--default', 'show', 'Invalid Section') }
+  end
+
   def test_add_section
     doing('add_section', 'Test Section')
     assert_match(/^Test Section$/, doing('sections', '-c'), 'should have added section')
@@ -75,6 +85,11 @@ class DoingEntryTest < Test::Unit::TestCase
     doing('now', 'Test entry')
     doing('cancel')
     assert_match(/@done$/, doing('show'), 'should have @done tag with no timestamp')
+  end
+
+  def test_cancel_multiple_args
+    doing('now', 'Test entry')
+    assert_raises(RuntimeError, 'Multiple arguments should cause error') { doing('cancel', '1', 'arg2') }
   end
 
   def test_archive_entry

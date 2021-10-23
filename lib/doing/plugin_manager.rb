@@ -3,7 +3,6 @@
 module Doing
   # Plugin handling
   module Plugins
-    Uncallable = Class.new(RuntimeError)
 
     @user_home = if Dir.respond_to?('home')
                    Dir.home
@@ -54,6 +53,9 @@ module Doing
     def self.register(title, type, klass)
       validate_plugin(type, klass)
 
+      available_types = %i[import export]
+      raise Errors::InvalidPluginType, "Invalid plugin type" unless available_types.include?(type)
+
       if title.is_a?(Array)
         title.each { |t| register(t, type, klass) }
         return
@@ -77,11 +79,11 @@ module Doing
     def self.validate_plugin(type, klass)
       case type
       when :import
-        raise Uncallable, 'Import plugins must respond to :import' unless klass.respond_to? :import
+        raise Errors::PluginUncallable, 'Import plugins must respond to :import' unless klass.respond_to? :import
 
         false
       when :export
-        raise Uncallable, 'Export plugins must respond to :render' unless klass.respond_to? :render
+        raise Errors::PluginUncallable, 'Export plugins must respond to :render' unless klass.respond_to? :render
 
         false
       else

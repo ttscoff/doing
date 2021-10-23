@@ -4,11 +4,11 @@ module Doing
   ##
   ## @brief      This class describes a single WWID item
   ##
-  class Item < Hash
+  class Item
     attr_accessor :date, :title, :section, :note
 
     def initialize(date, title, section, note = nil)
-      super()
+      # super()
 
       @date = date.is_a?(Time) ? date : Time.parse(date)
       @title = title
@@ -62,11 +62,14 @@ module Doing
                 when %r{^/.*?/$}
                   search.sub(%r{/(.*?)/}, '\1')
                 when /^'/
+                  case_sensitive = true
                   search.sub(/^'(.*?)'?$/, '\1')
                 else
+                  case_sensitive = true if search =~ /[A-Z]/
                   search.split('').join('.{0,3}')
                 end
-      text =~ /#{pattern}/i
+      rx = Regexp.new(pattern, !case_sensitive)
+      text =~ rx
     end
 
     private

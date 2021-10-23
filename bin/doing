@@ -19,6 +19,7 @@ if class_exists? 'Encoding'
   Encoding.default_internal = Encoding::UTF_8 if Encoding.respond_to?('default_internal')
 end
 
+include Doing::Errors
 include GLI::App
 version Doing::VERSION
 hide_commands_without_desc true
@@ -47,8 +48,11 @@ switch [:notes], default_value: true, negatable: true
 desc 'Send results report to STDOUT instead of STDERR'
 switch [:stdout], default_value: false, negatable: false
 
+desc 'Answer yes/no menus with default option'
+switch [:default], default_value: false
+
 desc 'Exclude auto tags and default tags'
-switch %i[x noauto], default_value: false
+switch %i[x noauto], default_value: false, negatable: false
 
 desc 'Output debug messages'
 switch %i[d debug], default_value: false, negatable: false
@@ -264,9 +268,16 @@ command :template do |c|
   c.desc 'List all available templates'
   c.switch %i[l list]
 
+  c.desc 'List in single column for completion'
+  c.switch %i[c]
+
   c.action do |_global_options, options, args|
-    if options[:list]
-      $stdout.puts "Available templates: #{wwid.plugin_templates.join(', ')}"
+    if options[:list] || options[:c]
+      if options[:c]
+        $stdout.print wwid.plugin_templates.join("\n")
+      else
+        $stdout.puts "Available templates: #{wwid.plugin_templates.join(', ')}"
+      end
       return
     end
 
@@ -603,7 +614,7 @@ command :finish do |c|
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Finish the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/")'
+  c.desc 'Finish the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
 
@@ -690,8 +701,8 @@ command :finish do |c|
 end
 
 desc 'Repeat last entry as new entry'
-command [:again, :resume] do |c|
-  c.desc 'Section'
+command %i[again resume] do |c|
+  c.desc 'Get last entry from a specific section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
@@ -704,7 +715,7 @@ command [:again, :resume] do |c|
   c.flag [:tag]
 
   c.desc 'Repeat last entry matching search. Surround with
-  slashes for regex (e.g. "/query/").'
+  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
   c.arg_name 'QUERY'
   c.flag [:search]
 
@@ -712,27 +723,26 @@ command [:again, :resume] do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
+  c.desc "Edit duplicated entry with #{ENV['EDITOR']} before adding"
+  c.switch %i[e editor], negatable: false, default_value: false
+
   c.desc 'Note'
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
   c.action do |_global_options, options, _args|
     tags = options[:tag].nil? ? [] : options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }
-    opts = {
-      in: options[:in],
-      note: options[:n],
-      search: options[:search],
-      section: options[:s],
-      tag: tags,
-      tag_bool: options[:bool].normalize_bool
-    }
+    opts = options
+    opts[:tag] = tags
+    opts[:tag_bool] = options[:bool].normalize_bool
+
     wwid.restart_last(opts)
   end
 end
 
 desc 'Add tag(s) to last entry'
 long_desc 'Add (or remove) tags from the last entry, or from multiple entries
-          (with `--count`), entries matching a search (with `--search), or entries
+          (with `--count`), entries matching a search (with `--search`), or entries
           containing another tag (with `--tag`).
 
           When removing tags with `-r`, wildcards are allowed (`*` to match
@@ -910,7 +920,7 @@ command :show do |c|
   c.arg_name 'DATE_STRING'
   c.flag [:after]
 
-  c.desc 'Search filter, surround with slashes for regex (/query/)'
+  c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
 
@@ -1069,7 +1079,7 @@ command %i[grep search] do |c|
   c.action do |_global_options, options, args|
     tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
 
-    section = wwid.guess_section(options[:s]) if options[:s]
+    section = wwid.guess_section(options[:section]) if options[:section]
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -1341,7 +1351,7 @@ command :last do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
-  c.desc 'Search filter, surround with slashes for regex (/query/)'
+  c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
 
@@ -1421,6 +1431,38 @@ command :colors do |c|
   end
 end
 
+desc 'List installed plugins'
+long_desc %(Lists available plugins, including user-installed plugins.
+
+Export plugins are available with the `--output` flag on commands that support it.
+
+Import plugins are available using `doing import --type PLUGIN`.
+)
+command :plugins do |c|
+  c.desc 'List plugins of type (import, export)'
+  c.arg_name 'TYPE'
+  c.flag %i[t type], must_match: /^[iea].*$/i, default_value: 'all'
+
+  c.desc 'List in single column for completion'
+  c.switch %i[c column], default_value: false
+
+  c.action do |_global_options, options, _args|
+    separator = options[:column] ? "\n" : "\t"
+    case options[:type]
+    when /^i/
+      puts wwid.plugin_names(type: :import, separator: separator)
+    when /^e/
+      puts wwid.plugin_names(type: :export, separator: separator)
+    else
+      print 'Import plugins: '
+      puts wwid.plugin_names(type: :import, separator: ', ')
+      print 'Export plugins: '
+      puts wwid.plugin_names(type: :export, separator: ', ')
+    end
+  end
+
+end
+
 desc 'Display a user-created view'
 long_desc 'Command line options override view configuration'
 arg_name 'VIEW_NAME'
@@ -1454,7 +1496,7 @@ command :view do |c|
   c.arg_name 'BOOLEAN'
   c.flag %i[b bool], must_match: REGEX_BOOL, default_value: 'OR'
 
-  c.desc 'Search filter, surround with slashes for regex (/query/)'
+  c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
 
@@ -1819,12 +1861,19 @@ command :undo do |c|
 end
 
 desc 'Import entries from an external source'
-long_desc 'Imports entries from other sources. Currently only handles JSON reports exported from Timing.app.'
+long_desc "Imports entries from other sources. Available plugins: #{wwid.plugin_names(type: :import, separator: ', ')}"
 arg_name 'PATH'
 command :import do |c|
-  c.desc 'Import type'
+  c.desc "Import type (#{wwid.plugin_names(type: :import)})"
   c.arg_name 'TYPE'
-  c.flag :type, default_value: 'timing'
+  c.flag :type, default_value: 'doing', must_match: wwid.plugin_regex(type: :import)
+
+  c.desc 'Only import items matching search. Surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  c.desc 'Only import items with recorded time intervals'
+  c.switch [:only_timed], default_value: false, negatable: false
 
   c.desc 'Target section'
   c.arg_name 'NAME'
@@ -1841,13 +1890,13 @@ command :import do |c|
   c.arg_name 'PREFIX'
   c.flag :prefix
 
-  c.desc 'Import entries after X days ago, ignoring older entries. Only valid if import plugin has implemented date range filtering.'
-  c.arg_name 'DAYS'
-  c.flag %i[start], must_match: /^\d+$/, default_value: 30
+  c.desc 'Import entries older than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
 
-  c.desc 'Import entries before X days ago, ignoring newer entries. Only valid if import plugin has implemented date range filtering.'
-  c.arg_name 'DAYS'
-  c.flag %i[end], must_match: /^\d+$/, default_value: 0
+  c.desc 'Import entries newer than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:after]
 
   c.desc %(
     Date range to import. Date range argument should be quoted. Date specifications can be natural language.
@@ -1863,9 +1912,7 @@ command :import do |c|
   c.action do |_global_options, options, args|
 
     if options[:section]
-      section = wwid.guess_section(options[:section]) || options[:section].cap_first
-    else
-      section = wwid.current_section
+      options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
 
     if options[:from]
@@ -1884,7 +1931,6 @@ command :import do |c|
 
     if options[:type] =~ wwid.plugin_regex(type: :import)
       options[:no_overlap] = !options[:overlap]
-      options[:section] = section
       options[:date_filter] = dates
       wwid.import(args, options)
       wwid.write(wwid.doing_file)
@@ -1895,6 +1941,9 @@ command :import do |c|
 end
 
 pre do |global, _command, _options, _args|
+  wwid.stdout = global[:stdout]
+  wwid.default_option = global[:default]
+
   if global[:config_file] && global[:config_file] != wwid.config_file
     wwid.config_file = global[:config_file]
     wwid.config = nil
@@ -1927,14 +1976,18 @@ end
 post do |global, _command, _options, _args|
   # Use skips_post before a command to skip this
   # block on that command only
-
+  results = wwid.results.map(&:strip).delete_if(&:empty?)
   if global[:stdout]
-    $stdout.print wwid.results.join("\n")
+    $stdout.print results.join("\n")
   else
-    wwid.results.each do |msg|
+    results.each do |msg|
       warn "#{wwid.colors['yellow']}> #{wwid.colors['boldwhite']}#{msg}#{wwid.colors['default']}"
     end
   end
+end
+
+around do |global_options, command, options, arguments, code|
+  code.call
 end
 
 on_error do |_exception|

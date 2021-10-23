@@ -47,10 +47,18 @@ class DoingArchiveTest < Test::Unit::TestCase
 
   def test_archive_search
     entries = doing('show').scan(ENTRY_REGEX).count
+
     result = doing('--stdout', 'archive', '--search', 'Overtired 446')
+    assert_no_match(/Archived 2 items/, result, 'Case sensitive search should have been triggered and failed')
+
+    result = doing('--stdout', 'archive', '--search', 'overtired 446')
     assert_match(/Archived 2 items/, result, 'Should have archived 2 items')
-    assert_count_entries(entries - 2, doing('show'), 'Currently should have #{entries - 2} items')
-    assert_count_entries(2, doing('show', 'archive'), 'Archive should have 2 items')
+
+    result = doing('--stdout', 'archive', '--search', '/cont.*?ion/')
+    assert_match(/Archived 1 items/, result, 'Regex search should have matched 1 items')
+
+    assert_count_entries(entries - 3, doing('show'), "Current section should have 3 fewer items items")
+    assert_count_entries(3, doing('show', 'archive'), 'Archive should have 3 items')
   end
 
   def test_archive_keep

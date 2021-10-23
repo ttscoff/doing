@@ -136,23 +136,28 @@ module Doing
       # or :map to generate output.
       i = items[-1]
 
-      # Format the item. Items are a hash with 3 keys: date,
-      # title, and section (parent section) Start time is in
-      # item.date. The wwid object has some methods for
-      # calculation and formatting, including
-      # wwid.item.end_date to convert the @done
-      # timestamp to an end date.
-      interval = wwid.get_interval(i, formatted: true) if wwid.i.end_date && opt[:times]
-      if interval
-        d, h, m = interval.split(/:/)
-        took = ' and it took'
-        took += " #{d.to_i} days" if d.to_i.positive?
-        took += " #{h.to_i} hours" if h.to_i.positive?
-        took += " #{m.to_i} minutes" if m.to_i.positive?
+      # Format the item. Items are a hash with 4 keys: date,
+      # title, section (parent section), and note. Start
+      # time is in item.date. The wwid object has some
+      # methods for calculation and formatting, including
+      # wwid.item.end_date to convert the @done timestamp to
+      # an end date.
+      if opt[:times]
+        interval = i.interval
+
+        if interval
+          d, h, m = wwid.fmt_time(interval)
+          took = ' and it took'
+          took += " #{d.to_i} days" if d.to_i.positive?
+          took += " #{h.to_i} hours" if h.to_i.positive?
+          took += " #{m.to_i} minutes" if m.to_i.positive?
+        end
       end
+
       date = i.date.strftime('%A %B %e at %I:%M%p')
       title = i.title.gsub(/@/, 'hashtag ')
       tpl = template('say')
+
       if wwid.config['export_templates'].key?('say')
         cfg_tpl = wwid.config['export_templates']['say']
         tpl = cfg_tpl unless cfg_tpl.nil? || cfg_tpl.empty?
@@ -170,10 +175,11 @@ module Doing
       # command runs, add to the wwid.results array. Results
       # are provided on STDERR unless doing is run with
       # `--stdout`
-      wwid.results.push([['Spoke the last entry. Did you hear it?', 0], 0])
+      wwid.results.push('Spoke the last entry. Did you hear it?')
 
       # This export runs a command for fun, most plugins won't
-      `say -v #{wwid.config['say_voice']} "#{output}"`
+      voice = wwid.config['plugins']['say']['say_voice'] || 'Alex'
+      `say -v "#{voice}" "#{output}"`
 
       # Return the result (don't output to terminal with puts or print)
       output

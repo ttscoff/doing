@@ -2,6 +2,7 @@ require 'open3'
 require 'time'
 $LOAD_PATH.unshift File.join(__dir__, '..', '..', 'lib')
 require 'doing/string'
+require 'doing/errors'
 
 module DoingHelpers
   DOING_EXEC = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'doing')

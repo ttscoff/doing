@@ -13,7 +13,7 @@ module Doing
   ##
   class WWID
     attr_accessor :content, :current_section, :doing_file, :config, :user_home, :default_config_file,
-                  :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :verbose
+                  :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :verbose, :default_option, :stdout
 
     include Doing::Util
     ##
@@ -318,11 +318,11 @@ module Doing
     # @param      input  (String) The string to parse
     #
     def format_input(input)
-      exit_now! 'No content in entry' if input.nil? || input.strip.empty?
+      raise Errors::EmptyInput, 'No content in entry' if input.nil? || input.strip.empty?
 
       input_lines = input.split(/[\n\r]+/).delete_if(&:ignore?)
       title = input_lines[0]&.strip
-      exit_now! 'No content in first line' if title.nil? || title.strip.empty?
+      raise Errors::EmptyInput, 'No content in first line' if title.nil? || title.strip.empty?
 
       note = Note.new
       note.append(input_lines[1..-1]) if input_lines.length > 1
@@ -354,7 +354,7 @@ module Doing
     #
     def chronify(input, future: false, guess: :begin)
       now = Time.now
-      exit_now! "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
+      raise Errors::InvalidTimeExpression, "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
 
       secs_ago = if input.match(/^(\d+)$/)
                    # plain number, assume minutes
@@ -441,15 +441,18 @@ module Doing
       sections.each do |sect|
         next unless sect =~ /#{re}/i
 
-        warn "Assuming you meant #{sect}"
+        warn2 "Assuming you meant #{sect}"
         section = sect
         break
       end
       unless section || guessed
-        alt = guess_view(frag, true)
-        exit_now! "Did you mean `doing view #{alt}`?" if alt
+        alt = guess_view(frag, guessed: true)
+        if alt
+          meant_view = yn("Did you mean `doing view #{alt}`?", default_response: 'n')
+          exit_now! "Run again with `doing view #{alt}`" if meant_view
+        end
 
-        res = yn("Section #{frag} not found, create it", default_response: false)
+        res = yn("Section #{frag} not found, create it", default_response: 'n')
 
         if res
           add_section(frag.cap_first)
@@ -457,7 +460,7 @@ module Doing
           return frag.cap_first
         end
 
-        exit_now! "Unknown section: #{frag}"
+        raise Errors::InvalidSection, "Unknown section: #{frag}"
       end
       section ? section.cap_first : guessed
     end
@@ -471,10 +474,12 @@ module Doing
     ## @return     (Bool) yes or no
     ##
     def yn(question, default_response: false)
-      default = default_response ? default_response : 'n'
+      default ||= 'n'
+      # if global --default is set, answer default
+      return default =~ /y/i if @default_option
 
       # if this isn't an interactive shell, answer default
-      return default.downcase == 'y' unless $stdout.isatty
+      return default =~ /y/i unless $stdout.isatty
 
       # clear the buffer
       if ARGV&.length
@@ -513,24 +518,22 @@ module Doing
     ## @param      frag     (String) The user-provided string
     ## @param      guessed  (Boolean) already guessed
     ##
-    def guess_view(frag, guessed = false)
+    def guess_view(frag, guessed: false)
       views.each { |view| return view if frag.downcase == view.downcase }
       view = false
       re = frag.split('').join('.*?')
       views.each do |v|
         next unless v =~ /#{re}/i
 
-        warn "Assuming you meant #{v}"
+        warn2 "Assuming you meant #{v}"
         view = v
         break
       end
       unless view || guessed
-        alt = guess_section(frag, guessed: true)
-        if alt
-          exit_now! "Did you mean `doing show #{alt}`?"
-        else
-          exit_now! "Unknown view: #{frag}"
-        end
+        exit_now! "Did you mean `doing show #{alt}`?" if guess_section(frag, guessed: true)
+
+        raise Errors::InvalidView "Unknown view: #{frag}"
+
       end
       view
     end
@@ -620,7 +623,7 @@ module Doing
           duped = no_overlap ? overlapping_time?(item, comp) : same_time?(item, comp)
           break if duped
         end
-        # warn "Skipping overlapping entry: #{item.title}" if duped
+        # warn2 "Skipping overlapping entry: #{item.title}" if duped
         duped
       end
     end
@@ -654,6 +657,7 @@ module Doing
     ##
     def last_note(section = 'All')
       section = guess_section(section)
+
       if section =~ /^all$/i
         combined = { 'items' => [] }
         @content.each do |_k, v|
@@ -662,10 +666,12 @@ module Doing
         section = combined['items'].dup.sort_by { |item| item.date }.reverse[0].section
       end
 
-      exit_now! "Section #{section} not found" unless @content.key?(section)
+      raise Errors::InvalidSection, "Section #{section} not found" unless @content.key?(section)
 
-      last_item = @content[section]['items'].dup.sort_by { |item| item.date }.reverse[0]
-      warn "Editing note for #{last_item.title}"
+      last_item = @content[section]['items'].dup.sort_by(&:date).reverse[0]
+      raise Errors::NoEntryError, 'No entry found' unless last_item
+
+      warn2 "Editing note for #{last_item.title}"
       note = ''
       note = last_item.note.to_s unless last_item.note.nil?
       "#{last_item.title}\n# EDIT BELOW THIS LINE ------------\n#{note}"
@@ -687,7 +693,7 @@ module Doing
         @results.push(%(No previous entry found))
         return
       end
-      unless last.tags?(['done'], 'ALL')
+      unless last.tags?(['done'], :all)
         new_item = last.dup
         new_item.title += " @done(#{Time.now.strftime('%F %R')})"
         update_item(last, new_item)
@@ -696,7 +702,22 @@ module Doing
       title = last.title.sub(/\s*@done(\(.*?\))?/, '').chomp
       section = opt[:in].nil? ? last.section : guess_section(opt[:in])
       @auto_tag = false
-      add_item(title, section, { note: opt[:note], back: opt[:date], timed: true })
+
+      note = opt[:note]
+
+      if opt[:editor]
+        to_edit = title
+        to_edit += "\n#{note.to_s}" unless note.empty?
+        new_item = fork_editor(to_edit)
+        title, note = format_input(new_item)
+
+        if title.nil? || title.empty?
+          @results.push('No content provided')
+          return
+        end
+      end
+
+      add_item(title, section, { note: note, back: opt[:date], timed: true })
       write(@doing_file)
     end
 
@@ -781,19 +802,19 @@ module Doing
         finished = opt[:unfinished] && item.tags?('done', :and)
         keep = false if finished
 
-        if opt[:tag]
+        if keep && opt[:tag]
           puts opt[:tag]
           puts opt[:tag_bool]
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
           keep = false unless tag_match
         end
 
-        if opt[:search]
+        if keep && opt[:search]
           search_match = opt[:search].nil? || opt[:search].empty? ? true : item.search(opt[:search])
           keep = false unless search_match
         end
 
-        if opt[:date_filter]&.length == 2
+        if keep && opt[:date_filter]&.length == 2
           start_date = opt[:date_filter][0]
           end_date = opt[:date_filter][1]
 
@@ -805,16 +826,16 @@ module Doing
           keep = false unless in_date_range
         end
 
-        if opt[:only_timed]
+        if keep && opt[:only_timed]
           keep = false unless item.interval
         end
 
-        if opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
+        if keep && opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
           filter_match = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
           keep = false unless filter_match
         end
 
-        if opt[:before]
+        if keep && opt[:before]
           time_string = opt[:before]
           cutoff = chronify(time_string, guess: :begin)
           if cutoff
@@ -822,7 +843,7 @@ module Doing
           end
         end
 
-        if opt[:after]
+        if keep && opt[:after]
           time_string = opt[:after]
           cutoff = chronify(time_string, guess: :end)
           if cutoff
@@ -830,19 +851,21 @@ module Doing
           end
         end
 
-        if opt[:today]
+        if keep && opt[:today]
           keep = false if item.date < Date.today.to_time
-        elsif opt[:yesterday]
+        elsif keep && opt[:yesterday]
           keep = false if item.date <= Date.today.prev_day.to_time || item.date >= Date.today.to_time
         end
 
         keep
       end
 
-      count = if opt[:count].zero? || opt[:count] >= filtered_items.length
+      count = if opt[:count] && (opt[:count].zero? || opt[:count] >= filtered_items.length)
                 filtered_items.length
-              else
+              elsif opt[:count]
                 opt[:count]
+              else
+                0
               end
 
       if opt[:age] =~ /^o/i
@@ -912,7 +935,7 @@ module Doing
         %(-q "#{opt[:query]}")
       ]
       if !opt[:menu]
-        exit_now! "Can't skip menu when no query is provided" unless opt[:query]
+        raise Errors::InvalidArgument, "Can't skip menu when no query is provided" unless opt[:query]
 
         fzf_args.concat([%(--filter="#{opt[:query]}"), '--no-sort'])
       end
@@ -961,7 +984,7 @@ module Doing
           case action
           when /(add|remove) tag/
             type = action =~ /^add/ ? 'add' : 'remove'
-            exit_now! "'add tag' and 'remove tag' can not be used together" if opt[:tag]
+            raise Errors::InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
 
             print "#{colors['yellow']}Tag to #{type}: #{colors['reset']}"
             tag = $stdin.gets
@@ -1167,7 +1190,7 @@ module Doing
             if opt[:search] || opt[:tag]
               sec_arr = sections
             else
-              exit_now! 'A count greater than one requires a section to be specified'
+              raise Errors::InvalidArgument, 'A count greater than one requires a section to be specified'
             end
           else
             sec_arr = sections
@@ -1291,7 +1314,7 @@ module Doing
             @results.push('Archiving is skipped when operating on all entries') if (opt[:count]).zero?
           end
         else
-          exit_now! "Section not found: #{section}"
+          raise Errors::InvalidSection, "Section not found: #{section}"
         end
       end
 
@@ -1526,7 +1549,7 @@ module Doing
         section = combined['items'].dup.sort_by { |item| item.date }.reverse[0].section
       end
 
-      exit_now! "Section #{section} not found" unless @content.key?(section)
+      raise Errors::InvalidSection, "Section #{section} not found" unless @content.key?(section)
 
       # sort_section(opt[:section])
       items = @content[section]['items'].dup.sort_by { |item| item.date }.reverse
@@ -1657,8 +1680,8 @@ module Doing
 
       _, _, status = Open3.capture3(@config['run_after'])
       if status.exitstatus.positive?
-        warn "Error running #{@config['run_after']}"
-        warn stderr
+        warn2 "Error running #{@config['run_after']}"
+        warn2 stderr
       end
     end
 
@@ -1840,7 +1863,7 @@ module Doing
         end
       end
 
-      exit_now! 'Invalid section object' unless target_section.instance_of? Hash
+      raise Errors::InvalidSection, 'Invalid section object' unless target_section.instance_of? Hash
 
       items = target_section['items'].sort_by { |item| item.date }
 
@@ -1853,7 +1876,7 @@ module Doing
       if opt[:interactive]
         opt[:menu] = !opt[:force]
         opt[:query] = '' # opt[:search]
-        selected = choose_from_items(items, opt)
+        selected = choose_from_items(items, opt, include_section: opt[:section] =~ /^all$/i )
 
         if selected.empty?
           @results.push('No selection')
@@ -1868,7 +1891,7 @@ module Doing
 
       opt[:wrap_width] ||= @config['templates']['default']['wrap_width']
 
-      exit_now! 'Unknown output format' unless opt[:output] =~ plugin_regex(type: :export)
+      raise Errors::InvalidArgument, 'Unknown output format' unless opt[:output] =~ plugin_regex(type: :export)
 
       # exporter = WWIDExport.new(section, items, is_single, opt, self)
       export_options = { page_title: section, is_single: is_single, options: opt }
@@ -1915,7 +1938,7 @@ module Doing
     ## @return     [String]   Plugin names
     ##
     def plugin_names(type: :export, separator: '|')
-      available_plugins.join(separator)
+      available_plugins(type: type).join(separator)
     end
 
     def plugin_regex(type: :export)
@@ -1954,12 +1977,11 @@ module Doing
       plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
         options[:templates].each do |t|
           if trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
-            puts options
             return options[:class].template(trigger)
           end
         end
       end
-      exit_now! "No template type matched \"#{trigger}\""
+      raise Errors::InvalidArgument, "No template type matched \"#{trigger}\""
     end
 
     ##
@@ -1987,7 +2009,7 @@ module Doing
         do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label], before: options[:before] })
         write(doing_file)
       else
-        exit_now! 'Either source or destination does not exist'
+        raise Errors::InvalidArgument, 'Either source or destination does not exist'
       end
     end
 
@@ -2503,8 +2525,14 @@ EOS
     end
 
     def debug(msg)
-      if @verbose
-        @results.push(msg)
+      @results.push(msg) if @verbose == 4
+    end
+
+    def warn2(msg)
+      if @stdout
+        $stdout.puts msg.uncolor
+      else
+        warn msg
       end
     end
   end
