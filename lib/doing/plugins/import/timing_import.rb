@@ -64,6 +64,8 @@ module Doing
         new_items.push(new_item)
       end
       total = new_items.count
+      skipped = data.count - total
+      wwid.results.push(%(Skipped #{skipped} items, invalid type or no time interval)) if skipped.positive?
       new_items = wwid.dedup(new_items, options[:no_overlap])
       dups = total - new_items.count
       wwid.results.push(%(Skipped #{dups} items with overlapping times)) if dups.positive?

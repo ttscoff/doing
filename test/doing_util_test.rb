@@ -30,7 +30,7 @@ class DoingUtilTest < Test::Unit::TestCase
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @config = YAML.load(IO.read(@config_file))
     import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
-    doing('import', import_file)
+    doing('import', '--type', 'timing', import_file)
     @wwid = WWID.new
     @wwid.config_file = @config_file
 

@@ -35,7 +35,7 @@ class DoingImportTest < Test::Unit::TestCase
     target = json.count
     result = doing('--stdout', 'import', '--type', 'timing', @timing_import_file)
     assert_match(/Imported #{target} items/, result, "Should have imported #{target} entries")
-    result = doing('--stdout', 'import', @timing_import_file)
+    result = doing('--stdout', 'import', '--type', 'timing', @timing_import_file)
     assert_match(/Skipped #{target} items/, result, "Should have skipped #{target} duplicate entries")
   end
 
@@ -76,7 +76,7 @@ class DoingImportTest < Test::Unit::TestCase
     result = doing('--stdout', 'import', '--type', 'doing', @doing_import_file)
     assert_match(/Imported 126 items/, result, "Should have imported 126 entries")
     result = doing('--stdout', 'import', '--type', 'doing', @doing_import_file)
-    assert_match(/Skipped 126 items/, result, "Should have skipped 126 duplicate entries")
+    assert_match(/Skipped 126 duplicate items/, result, "Should have skipped 126 duplicate entries")
   end
 
   def test_doing_import_no_overlap
@@ -84,6 +84,13 @@ class DoingImportTest < Test::Unit::TestCase
     result = doing('--stdout', 'import', '--type', 'doing', '--no-overlap', @doing_import_file)
     assert_match(/Skipped 1 items/, result, "Should have skipped 1 duplicate entries")
     assert_match(/Imported 125 items/, result, "Should have imported 125 entries")
+  end
+
+  def test_user_plugin
+    result = doing('--stdout', 'import', '--type', 'tester', @doing_import_file)
+    assert_match(/Test with path/, result, 'Test plugin should output success message')
+    result = doing('--stdout', 'import', '--type', 'tester')
+    assert_match(/Test with no paths/, result, 'Test plugin should output success message')
   end
 
   private

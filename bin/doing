@@ -26,6 +26,7 @@ hide_commands_without_desc true
 
 REGEX_BOOL = /^(?:and|all|any|or|not|none)$/i
 REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
+InvalidExportType = Class.new(RuntimeError)
 
 wwid = Doing::WWID.new
 
@@ -355,9 +356,11 @@ command :select do |c|
 
   c.desc "Output entries to format (#{wwid.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: wwid.plugin_regex
+  c.flag %i[o output]
 
   c.action do |_global_options, options, args|
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+
     exit_now! "--no-menu requires --query" if !options[:menu] && !options[:query]
 
     wwid.interactive(options)
@@ -957,8 +960,10 @@ command :show do |c|
 
   c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: wwid.plugin_regex
+  c.flag %i[o output]
   c.action do |_global_options, options, args|
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+
     tag_filter = false
     tags = []
     if args.length.positive?
@@ -1056,7 +1061,7 @@ command %i[grep search] do |c|
 
   c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: wwid.plugin_regex
+  c.flag %i[o output]
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1077,6 +1082,8 @@ command %i[grep search] do |c|
   c.switch %i[i interactive], default_value: false, negatable: false
 
   c.action do |_global_options, options, args|
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+
     tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
 
     section = wwid.guess_section(options[:section]) if options[:section]
@@ -1159,7 +1166,7 @@ command :today do |c|
 
   c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: wwid.plugin_regex
+  c.flag %i[o output]
 
   c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
   c.arg_name 'TIME_STRING'
@@ -1170,6 +1177,8 @@ command :today do |c|
   c.flag [:after]
 
   c.action do |_global_options, options, _args|
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt = {
@@ -1207,9 +1216,11 @@ command :on do |c|
 
   c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: wwid.plugin_regex
+  c.flag %i[o output]
 
   c.action do |_global_options, options, args|
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+
     exit_now! 'Missing date argument' if args.empty?
 
     date_string = args.join(' ')
@@ -1260,9 +1271,11 @@ command :since do |c|
 
   c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: wwid.plugin_regex
+  c.flag %i[o output]
 
   c.action do |_global_options, options, args|
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+
     exit_now! 'Missing date argument' if args.empty?
 
     date_string = args.join(' ')
@@ -1293,7 +1306,7 @@ command :yesterday do |c|
 
   c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: wwid.plugin_regex
+  c.flag %i[o output]
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1320,6 +1333,7 @@ command :yesterday do |c|
   c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
 
   c.action do |_global_options, options, _args|
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
 
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
@@ -1477,7 +1491,7 @@ command :view do |c|
 
   c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
-  c.flag %i[o output], must_match: wwid.plugin_regex
+  c.flag %i[o output]
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1520,6 +1534,8 @@ command :view do |c|
   c.switch [:only_timed], default_value: false, negatable: false
 
   c.action do |_global_options, options, args|
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+
     exit_now! '--tag and --search cannot be used together' if options[:tag] && options[:search]
 
     title = if args.empty?
@@ -1866,7 +1882,7 @@ arg_name 'PATH'
 command :import do |c|
   c.desc "Import type (#{wwid.plugin_names(type: :import)})"
   c.arg_name 'TYPE'
-  c.flag :type, default_value: 'doing', must_match: wwid.plugin_regex(type: :import)
+  c.flag :type, default_value: 'doing'
 
   c.desc 'Only import items matching search. Surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'

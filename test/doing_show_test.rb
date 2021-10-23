@@ -111,7 +111,7 @@ class DoingShowTest < Test::Unit::TestCase
   end
 
   def test_show_before_after
-    doing('import', @import_file)
+    doing('import', '--type', 'timing', @import_file)
     start = Time.parse('2021-09-13 00:00:00')
     finish = Time.parse('2021-09-14 00:00:00')
     result = doing('show', '--before', '9/14/2021', '--after', '9/12/2021')
@@ -122,7 +122,7 @@ class DoingShowTest < Test::Unit::TestCase
   end
 
   def test_show_tag_times
-    doing('import', @import_file)
+    doing('import', '--type', 'timing', @import_file)
     result = doing('--stdout', 'show', '--count', '0', '--totals')
     totals = result.split(/--- Tag Totals ---/)
     assert(totals[1], 'should have tag totals')
@@ -131,7 +131,7 @@ class DoingShowTest < Test::Unit::TestCase
   end
 
   def test_show_tag_sort
-    doing('import', @import_file)
+    doing('import', '--type', 'timing', @import_file)
     result = doing('--stdout', 'show', '--totals')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/badstuff/, first_tag[1], 'First tag should be badstuff')

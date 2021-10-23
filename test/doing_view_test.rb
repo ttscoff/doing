@@ -38,7 +38,7 @@ class DoingViewTest < Test::Unit::TestCase
   end
 
   def test_view_from_config
-    doing('import', @import_file)
+    doing('import', '--type', 'timing', @import_file)
     doing('done', '--no-date', 'Adding untimed entry')
     result = doing('--stdout', 'view', 'test2')
     assert_count_entries(6, result, '6 entries should be shown')
@@ -58,7 +58,7 @@ class DoingViewTest < Test::Unit::TestCase
   end
 
   def test_view_flag_override
-    doing('import', @import_file)
+    doing('import', '--type', 'timing', @import_file)
     doing('done', '--no-date', 'Adding untimed entry')
     result = doing('--stdout', 'view', '-c', '4', '--totals', '--only_timed', 'test3')
     assert_count_entries(4, result, '4 entries should be shown')
@@ -75,7 +75,7 @@ class DoingViewTest < Test::Unit::TestCase
   end
 
   def test_view_tag_sort
-    doing('import', @import_file)
+    doing('import', '--type', 'timing', @import_file)
     result = doing('--stdout', 'view', 'test2')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/development/, first_tag[1], 'First tag should be development')
@@ -86,7 +86,7 @@ class DoingViewTest < Test::Unit::TestCase
   end
 
   def test_view_date_limit
-    doing('import', @import_file)
+    doing('import', '--type', 'timing', @import_file)
     result = doing('view', '--before', '9/14/2021', '--after', '9/12/2021', 'test2')
     assert_count_entries(5, result, 'There should be 5 entries between specified dates')
   end

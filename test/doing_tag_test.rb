@@ -69,7 +69,7 @@ class DoingTagTest < Test::Unit::TestCase
     end
     target = matches.size
 
-    doing('import', @import_file)
+    doing('import', '--type', 'timing', @import_file)
     # Add a tag to items matching search term
     result = doing('--stdout', 'tag', '--search', search_term, '-c', '0', '--force', test_tag)
     assert_equal(target, result.strip.split(/\n/).size, 'The number of affected items should be the same as were in the imported file')

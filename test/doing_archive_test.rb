@@ -22,7 +22,7 @@ class DoingArchiveTest < Test::Unit::TestCase
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @config = YAML.load(IO.read(@config_file))
     import_file = File.join(File.dirname(__FILE__), 'All Activities.json')
-    doing('import', import_file)
+    doing('import', '--type', 'timing', import_file)
   end
 
   def teardown
