@@ -30,7 +30,11 @@ Pressing Spacebar and typing allows you to add a new entry to currently. You an 
 
 Point of interest, the LaunchBar Action makes use of the `-o json` flag for outputting JSON to the action's script for parsing.
 
-<!--GITHUB-->See the [doing project on BrettTerpstra.com](https://brettterpstra.com/projects/doing/) for the download.<!--END GITHUB-->
+<!--GITHUB-->
+
+See the [doing project on BrettTerpstra.com](https://brettterpstra.com/projects/doing/) for the download.
+
+<!--END GITHUB-->
 <!--JEKYLL
 {% download 117 %} 
 -->
