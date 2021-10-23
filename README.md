@@ -43,6 +43,8 @@ Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/b
 
 <!--END README-->
 
+---
+
 PayPal link: [paypal.me/ttscoff](https://paypal.me/ttscoff)
 
 ## Changelog
