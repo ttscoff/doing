@@ -1480,7 +1480,7 @@ command :plugins do |c|
     when /^e/
       puts Doing::Plugins.plugin_names(type: :export, separator: separator)
     else
-      print 'Import pluginis: '
+      print 'Import plugins: '
       puts Doing::Plugins.plugin_names(type: :import, separator: ', ')
       print 'Export plugins: '
       puts Doing::Plugins.plugin_names(type: :export, separator: ', ')
