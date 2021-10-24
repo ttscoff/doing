@@ -10,7 +10,7 @@ A CLI for a What Was I Doing system
 
 Use a specific configuration file
 
-*Default Value:* `/Users/ttscoff/.doingrc`
+*Default Value:* `~/.doingrc`
 
 ### `-f` | `--doing_file` arg
 
@@ -233,7 +233,7 @@ Include date
 
 ##### `-e`|`--editor`
 
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with $EDITOR
 
 ##### `-r`|`--remove`
 
@@ -434,7 +434,7 @@ Tag filter, combine multiple tags with a comma.
 
 ##### `-e`|`--editor`
 
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with $EDITOR
 
 * * * * * *
 
@@ -454,7 +454,7 @@ Note
 
 ##### `-e`|`--editor`
 
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with $EDITOR
 
 * * * * * *
 
@@ -502,7 +502,7 @@ Archive previous @meanwhile entry
 
 ##### `-e`|`--editor`
 
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with $EDITOR
 
 * * * * * *
 
@@ -524,7 +524,7 @@ Section
 
 ##### `-e`|`--editor`
 
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with $EDITOR
 
 ##### `-r`|`--remove`
 
@@ -552,7 +552,7 @@ Section
 
 ##### `-e`|`--editor`
 
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with $EDITOR
 
 ##### `-f`|`--finish_last`
 
@@ -604,7 +604,7 @@ Show time totals at the end of output
 
 *Open the "doing" file in an editor*
 
-> `doing open` defaults to using the editor_app setting in /Users/ttscoff/.doingrc (TaskPaper)
+> `doing open` defaults to using the editor_app setting in ~/.doingrc (TaskPaper)
 
 #### Options
 
@@ -618,7 +618,7 @@ Open with app bundle id
 
 ##### `-e`|`--editor`
 
-Open with $EDITOR (/Users/ttscoff/scripts/editor.sh)
+Open with $EDITOR ($EDITOR)
 
 * * * * * *
 

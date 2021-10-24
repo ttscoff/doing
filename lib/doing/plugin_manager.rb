@@ -15,6 +15,10 @@ module Doing
       export: {}
     }
 
+    def self.plugins
+      @plugins
+    end
+
     ##
     # Load plugins from plugins folder
     #
@@ -89,6 +93,72 @@ module Doing
       else
         true
       end
+    end
+
+    ##
+    ## @brief      Return array of available plugin names
+    ##
+    ## @param      type  Plugin type (:import, :export)
+    ##
+    ## @returns    [Array<String>] plugin names
+    ##
+    def self.available_plugins(type: :export)
+      @plugins[type].keys.sort
+    end
+
+    ##
+    ## @brief      Return string version of plugin names
+    ##
+    ## @param      type       Plugin type (:import, :export)
+    ## @param      separator  The separator to join names with
+    ##
+    ## @return     [String]   Plugin names
+    ##
+    def self.plugin_names(type: :export, separator: '|')
+      available_plugins(type: type).join(separator)
+    end
+
+    def self.plugin_regex(type: :export)
+      pattern = []
+      @plugins[type].each do |_, options|
+        pattern << options[:trigger].normalize_trigger
+      end
+      Regexp.new("^(?:#{pattern.join('|')})$", true)
+    end
+
+    def self.plugin_templates(type: :export)
+      templates = []
+      plugs = @plugins[type].clone
+      plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
+        options[:templates].each do |t|
+          templates << t[:name]
+        end
+      end
+
+      templates
+    end
+
+    def self.template_regex(type: :export)
+      pattern = []
+      plugs = @plugins[type].clone
+      plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
+        options[:templates].each do |t|
+          pattern << t[:trigger].normalize_trigger
+        end
+      end
+      Regexp.new("^(?:#{pattern.join('|')})$", true)
+    end
+
+    def self.template_for_trigger(trigger, type: :export)
+      plugs = @plugins[type].clone
+      plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
+        options[:templates].each do |t|
+          if trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
+            return options[:class].template(trigger)
+          end
+        end
+      end
+      raise Errors::InvalidArgument, "No template type matched \"#{trigger}\""
     end
   end
 end

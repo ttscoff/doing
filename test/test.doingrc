@@ -1,6 +1,8 @@
 ---
 plugins:
   plugin_path: test/plugins
+  trizzer:
+    trizzle: test value from config
   say:
     say_voice: Fiona
 autotag:
@@ -91,3 +93,5 @@ export_templates:
   template:
   doing:
   say:
+  trizzer:
+tag_sort: name

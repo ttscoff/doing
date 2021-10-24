@@ -70,7 +70,7 @@ switch %i[x noauto], default_value: false, negatable: false
 desc 'Output debug messages'
 switch %i[d debug], default_value: false, negatable: false
 
-desc 'Use a specific configuration file'
+desc 'Use a specific configuration file. Deprecated, set $DOING_CONFIG instead.'
 flag [:config_file], default_value: wwid.config_file
 
 desc 'Specify a different doing_file'
@@ -276,7 +276,7 @@ long_desc %(
 
   Example `doing template haml > ~/styles/my_doing.haml`
 )
-arg_name 'TYPE', must_match: wwid.template_regex
+arg_name 'TYPE', must_match: Doing::Plugins.template_regex
 command :template do |c|
   c.desc 'List all available templates'
   c.switch %i[l list]
@@ -287,16 +287,16 @@ command :template do |c|
   c.action do |_global_options, options, args|
     if options[:list] || options[:c]
       if options[:c]
-        $stdout.print wwid.plugin_templates.join("\n")
+        $stdout.print Doing::Plugins.plugin_templates.join("\n")
       else
-        $stdout.puts "Available templates: #{wwid.plugin_templates.join(', ')}"
+        $stdout.puts "Available templates: #{Doing::Plugins.plugin_templates.join(', ')}"
       end
       return
     end
 
-    exit_now! "No type specified, use `doing template [#{wwid.plugin_templates.join('|')}]`" if args.empty?
+    exit_now! "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" if args.empty?
 
-    $stdout.puts wwid.template_for_trigger(args[0])
+    $stdout.puts Doing::Plugins.template_for_trigger(args[0])
 
     # case args[0]
     # when /html|haml/i
@@ -366,12 +366,12 @@ command :select do |c|
   c.arg_name 'FILE'
   c.flag %i[save_to]
 
-  c.desc "Output entries to format (#{wwid.plugin_names(type: :export)})"
+  c.desc "Output entries to format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     exit_now! "--no-menu requires --query" if !options[:menu] && !options[:query]
 
@@ -970,11 +970,11 @@ command :show do |c|
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
-  c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
+  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     tag_filter = false
     tags = []
@@ -1071,7 +1071,7 @@ command %i[grep search] do |c|
   c.arg_name 'DATE_STRING'
   c.flag [:after]
 
-  c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
+  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
@@ -1094,7 +1094,7 @@ command %i[grep search] do |c|
   c.switch %i[i interactive], default_value: false, negatable: false
 
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
 
@@ -1176,7 +1176,7 @@ command :today do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
-  c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
+  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
@@ -1189,7 +1189,7 @@ command :today do |c|
   c.flag [:after]
 
   c.action do |_global_options, options, _args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -1226,12 +1226,12 @@ command :on do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
-  c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
+  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     exit_now! 'Missing date argument' if args.empty?
 
@@ -1281,12 +1281,12 @@ command :since do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
-  c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
+  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     exit_now! 'Missing date argument' if args.empty?
 
@@ -1316,7 +1316,7 @@ command :yesterday do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
+  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
@@ -1345,7 +1345,7 @@ command :yesterday do |c|
   c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
 
   c.action do |_global_options, options, _args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
@@ -1476,14 +1476,14 @@ command :plugins do |c|
     separator = options[:column] ? "\n" : "\t"
     case options[:type]
     when /^i/
-      puts wwid.plugin_names(type: :import, separator: separator)
+      puts Doing::Plugins.plugin_names(type: :import, separator: separator)
     when /^e/
-      puts wwid.plugin_names(type: :export, separator: separator)
+      puts Doing::Plugins.plugin_names(type: :export, separator: separator)
     else
-      print 'Import plugins: '
-      puts wwid.plugin_names(type: :import, separator: ', ')
+      print 'Import pluginis: '
+      puts Doing::Plugins.plugin_names(type: :import, separator: ', ')
       print 'Export plugins: '
-      puts wwid.plugin_names(type: :export, separator: ', ')
+      puts Doing::Plugins.plugin_names(type: :export, separator: ', ')
     end
   end
 
@@ -1501,7 +1501,7 @@ command :view do |c|
   c.arg_name 'COUNT'
   c.flag %i[c count], must_match: /^\d+$/, type: Integer
 
-  c.desc "Output to export format (#{wwid.plugin_names(type: :export)})"
+  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
@@ -1546,7 +1546,7 @@ command :view do |c|
   c.switch [:only_timed], default_value: false, negatable: false
 
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ wwid.plugin_regex(type: :export)
+    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     exit_now! '--tag and --search cannot be used together' if options[:tag] && options[:search]
 
@@ -1889,10 +1889,10 @@ command :undo do |c|
 end
 
 desc 'Import entries from an external source'
-long_desc "Imports entries from other sources. Available plugins: #{wwid.plugin_names(type: :import, separator: ', ')}"
+long_desc "Imports entries from other sources. Available plugins: #{Doing::Plugins.plugin_names(type: :import, separator: ', ')}"
 arg_name 'PATH'
 command :import do |c|
-  c.desc "Import type (#{wwid.plugin_names(type: :import)})"
+  c.desc "Import type (#{Doing::Plugins.plugin_names(type: :import)})"
   c.arg_name 'TYPE'
   c.flag :type, default_value: 'doing'
 
@@ -1957,7 +1957,7 @@ command :import do |c|
       dates = [start, finish]
     end
 
-    if options[:type] =~ wwid.plugin_regex(type: :import)
+    if options[:type] =~ Doing::Plugins.plugin_regex(type: :import)
       options[:no_overlap] = !options[:overlap]
       options[:date_filter] = dates
       wwid.import(args, options)
@@ -1997,8 +1997,8 @@ around do |global, command, options, arguments, code|
 
   if global[:config_file] && global[:config_file] != wwid.config_file
     c = wwid.colors
-    warn format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', c['yeller'], c['default'], c['boldred'])
-    warn format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  c['red'], c['boldwhite'], c['default'])
+    wwid.results.push(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', c['flamingo'], c['default'], c['boldred']))
+    wwid.results.push(format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  c['red'], c['boldwhite'], c['default']))
     wwid.config_file = global[:config_file]
     wwid.config = nil
     wwid.configure({ ignore_local: true })

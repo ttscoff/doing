@@ -26,7 +26,6 @@ module Doing
       @interval_cache = {}
       @results = []
       @auto_tag = true
-      @plugins = nil
     end
 
     ##
@@ -173,21 +172,23 @@ module Doing
       #     exit_now! "DEFAULT CONFIG CHANGED"
       #   end
       # end
-      @plugins = nil
+
       plugin_config = { 'plugin_path' => nil }
 
-      plugins.each do |_type, plugins|
+      load_plugins
+
+      Doing::Plugins.plugins.each do |_type, plugins|
         plugins.each do |title, plugin|
           plugin_config[title] = plugin[:config] if plugin.key?(:config) && !plugin[:config].empty?
           @config['export_templates'][title] ||= nil if plugin.key?(:templates)
         end
       end
 
-      @config = { 'plugins' => plugin_config }.deep_merge(@config)
+      @config.deep_merge({ 'plugins' => plugin_config })
 
       File.open(@config_file, 'w') { |yf| YAML.dump(@config, yf) } if !File.exist?(@config_file) || opt[:rewrite]
 
-      @config = @local_config.deep_merge(@config)
+      @config.deep_merge(@local_config)
 
       @current_section = @config['current_section']
       @default_template = @config['templates']['default']['template']
@@ -635,7 +636,7 @@ module Doing
     ## @param      opt      (Hash) Additional Options
     ##
     def import(paths, opt = {})
-      plugins[:import].each do |_, options|
+      Doing::Plugins.plugins[:import].each do |_, options|
         next unless opt[:type] =~ /^(#{options[:trigger].normalize_trigger})$/i
 
         if paths.count.positive?
@@ -1891,12 +1892,12 @@ module Doing
 
       opt[:wrap_width] ||= @config['templates']['default']['wrap_width']
 
-      raise Errors::InvalidArgument, 'Unknown output format' unless opt[:output] =~ plugin_regex(type: :export)
+      raise Errors::InvalidArgument, 'Unknown output format' unless opt[:output] =~ Doing::Plugins.plugin_regex(type: :export)
 
       # exporter = WWIDExport.new(section, items, is_single, opt, self)
       export_options = { page_title: section, is_single: is_single, options: opt }
 
-      plugins[:export].each do |_, options|
+      Doing::Plugins.plugins[:export].each do |_, options|
         next unless opt[:output] =~ /^(#{options[:trigger].normalize_trigger})$/i
 
         out = options[:class].render(self, items, variables: export_options)
@@ -1906,82 +1907,12 @@ module Doing
       out
     end
 
-    def plugins
-      @plugins ||= load_plugins
-    end
-
     def load_plugins
       if @config.key?('plugins') && @config['plugins']['plugin_path']
         add_dir = @config['plugins']['plugin_path']
       end
 
       Doing::Plugins.load_plugins(add_dir)
-    end
-
-    ##
-    ## @brief      Return array of available plugin names
-    ##
-    ## @param      type  Plugin type (:import, :export)
-    ##
-    ## @returns    [Array<String>] plugin names
-    ##
-    def available_plugins(type: :export)
-      plugins[type].keys.sort
-    end
-
-    ##
-    ## @brief      Return string version of plugin names
-    ##
-    ## @param      type       Plugin type (:import, :export)
-    ## @param      separator  The separator to join names with
-    ##
-    ## @return     [String]   Plugin names
-    ##
-    def plugin_names(type: :export, separator: '|')
-      available_plugins(type: type).join(separator)
-    end
-
-    def plugin_regex(type: :export)
-      pattern = []
-      plugins[type].each do |_, options|
-        pattern << options[:trigger].normalize_trigger
-      end
-      Regexp.new("^(?:#{pattern.join('|')})$", true)
-    end
-
-    def plugin_templates(type: :export)
-      templates = []
-      plugs = plugins[type].clone
-      plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
-        options[:templates].each do |t|
-          templates << t[:name]
-        end
-      end
-
-      templates
-    end
-
-    def template_regex(type: :export)
-      pattern = []
-      plugs = plugins[type].clone
-      plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
-        options[:templates].each do |t|
-          pattern << t[:trigger].normalize_trigger
-        end
-      end
-      Regexp.new("^(?:#{pattern.join('|')})$", true)
-    end
-
-    def template_for_trigger(trigger, type: :export)
-      plugs = plugins[type].clone
-      plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
-        options[:templates].each do |t|
-          if trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
-            return options[:class].template(trigger)
-          end
-        end
-      end
-      raise Errors::InvalidArgument, "No template type matched \"#{trigger}\""
     end
 
     ##

@@ -77,6 +77,12 @@ class DoingOutputTest < Test::Unit::TestCase
     assert_equal(10, data['items'].count, 'There should be 10 items in JSON data')
   end
 
+  def test_user_export_plugin
+    doing('import', '--type', 'timing', @import_file)
+    result = doing('--stdout', 'show', '-c', '10', '-o', 'trizzer')
+    assert_match(/TEST PLUGIN\. On/, result)
+  end
+
   def test_sections_command
     result = doing('sections').uncolor.strip
     assert_match(/^#{@config['current_section']}$/, result, "#{@config['current_section']} should be the only section shown")
