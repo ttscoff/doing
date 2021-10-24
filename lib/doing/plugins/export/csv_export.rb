@@ -29,8 +29,8 @@ module Doing
         interval = end_date && opt[:times] ? wwid.get_interval(i, formatted: false) : 0
         output.push(CSV.generate_line([i.date, end_date, i.title, note, interval, i.section]))
       end
-      output.join('')
       Doing.logger.debug('CSV Export:', "#{items.count} items output to CSV")
+      output.join('')
     end
 
     def self.format_note(note)

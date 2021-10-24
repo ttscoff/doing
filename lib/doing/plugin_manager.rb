@@ -77,6 +77,7 @@ module Doing
           templates: settings[:templates] || nil,
           config: settings[:config] || {}
         }
+        Doing.logger.debug('Plugin Manager:', "Registered #{type.to_s} plugin \"#{title}\"")
       end
 
       def validate_plugin(type, klass)

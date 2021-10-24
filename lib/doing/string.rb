@@ -6,6 +6,15 @@ module Doing
   ##
   class ::String
     include Doing::Color
+    def truthy?
+      if self =~ /^(0|f(alse)?|n(o)?)$/i
+        false
+      else
+        true
+      end
+    end
+
+
     ##
     ## @brief      Test if line should be ignored
     ##

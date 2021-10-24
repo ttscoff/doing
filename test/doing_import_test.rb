@@ -33,10 +33,10 @@ class DoingImportTest < Test::Unit::TestCase
   def test_timing_import
     json = JSON.parse(IO.read(@timing_import_file))
     target = json.count
-    result = doing('--stdout', 'import', '--type', 'timing', @timing_import_file)
-    assert_match(/Imported #{target} items/, result, "Should have imported #{target} entries")
-    result = doing('--stdout', 'import', '--type', 'timing', @timing_import_file)
-    assert_match(/Skipped #{target} items/, result, "Should have skipped #{target} duplicate entries")
+    result = doing('--stdout', '--verbose', 'import', '--type', 'timing', @timing_import_file)
+    assert_match(/Imported: #{target} items/, result, "Should have imported #{target} entries")
+    result = doing('--stdout', '--verbose', 'import', '--type', 'timing', @timing_import_file)
+    assert_match(/Skipped: #{target} items/, result, "Should have skipped #{target} duplicate entries")
   end
 
   def test_timing_import_no_arg
@@ -65,25 +65,25 @@ class DoingImportTest < Test::Unit::TestCase
     json = JSON.parse(IO.read(@timing_import_file))
     target = json.count
     doing('done', '--back="2021-07-22 11:20"', '--took="30m"', 'Testing overlapping entry')
-    result = doing('--stdout', 'import', '--type', 'timing', '--no-overlap', @timing_import_file)
-    assert_match(/Skipped 1 items/, result, "Should have skipped #{target} duplicate entries")
-    assert_match(/Imported #{target - 1} items/, result, "Should have imported #{target - 1} entries")
+    result = doing('--stdout', '--verbose', 'import', '--type', 'timing', '--no-overlap', @timing_import_file)
+    assert_match(/Skipped: 1 items/, result, "Should have skipped #{target} duplicate entries")
+    assert_match(/Imported: #{target - 1} items/, result, "Should have imported #{target - 1} entries")
   end
 
   ## Doing Import
 
   def test_doing_import
-    result = doing('--stdout', 'import', '--type', 'doing', @doing_import_file)
-    assert_match(/Imported 126 items/, result, "Should have imported 126 entries")
-    result = doing('--stdout', 'import', '--type', 'doing', @doing_import_file)
-    assert_match(/Skipped 126 duplicate items/, result, "Should have skipped 126 duplicate entries")
+    result = doing('--stdout', '--verbose', 'import', '--type', 'doing', @doing_import_file)
+    assert_match(/Imported: 126 items/, result, "Should have imported 126 entries")
+    result = doing('--stdout', '--verbose', 'import', '--type', 'doing', @doing_import_file)
+    assert_match(/Skipped: 126 duplicate items/, result, "Should have skipped 126 duplicate entries")
   end
 
   def test_doing_import_no_overlap
     doing('done', '--back="2021-10-08 13:00"', '--took="30m"', 'Testing overlapping entry')
-    result = doing('--stdout', 'import', '--type', 'doing', '--no-overlap', @doing_import_file)
-    assert_match(/Skipped 1 items/, result, "Should have skipped 1 duplicate entries")
-    assert_match(/Imported 125 items/, result, "Should have imported 125 entries")
+    result = doing('--stdout', '--verbose', 'import', '--type', 'doing', '--no-overlap', @doing_import_file)
+    assert_match(/Skipped: 1 items/, result, "Should have skipped 1 duplicate entries")
+    assert_match(/Imported: 125 items/, result, "Should have imported 125 entries")
   end
 
   def test_user_plugin
@@ -115,10 +115,6 @@ class DoingImportTest < Test::Unit::TestCase
     @tmpdirs.push(tmpdir)
 
     tmpdir
-  end
-
-  def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
   end
 end
 

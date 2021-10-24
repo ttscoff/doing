@@ -53,6 +53,17 @@ else
   wwid.configure
 end
 
+if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DOING_VERBOSE']
+  if ENV['DOING_QUIET'] && ENV['DOING_QUIET'].truthy?
+    Doing.logger.log_level = :error
+  elsif (ENV['DOING_DEBUG'] && ENV['DOING_DEBUG'].truthy?)
+    Doing.logger.log_level = :debug
+  elsif ENV['DOING_LOG_LEVEL']
+    Doing.logger.log_level = ENV['DOING_LOG_LEVEL']
+  end
+end
+
+
 program_desc 'A CLI for a What Was I Doing system'
 
 default_command :recent

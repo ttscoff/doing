@@ -36,6 +36,23 @@ module Doing
     # @return     nothing
     #
     def log_level=(level)
+      level ||= 'info'
+      level = level.to_s
+      if level.is_a?(String) && level =~ /^([ewid]\w+|[0123])$/
+        level = case level
+                when /^[e0]/
+                  :error
+                when /^[w1]/
+                  :warn
+                when /^[i2]/
+                  :info
+                when /^[d3]/
+                  :debug
+                end
+      else
+        level = level.downcase.to_sym
+      end
+
       @level = level
     end
 
@@ -45,8 +62,8 @@ module Doing
       elsif options[:verbose] || options[:debug]
         self.log_level = :debug
       end
-      log_now :debug, 'Logging at level:', LOG_LEVELS.key(@level).to_s
-      log_now :debug, 'Doing Version:', Doing::VERSION
+      log_now :debug, 'Logging at level:', @level.to_s
+      # log_now :debug, 'Doing Version:', Doing::VERSION
     end
 
     #

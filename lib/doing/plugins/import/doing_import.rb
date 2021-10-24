@@ -74,18 +74,18 @@ module Doing
       end
 
       dups = new_items.count - imported.count
-      Doing.logger.info(%(Skipped #{dups} duplicate items)) if dups.positive?
+      Doing.logger.info('Skipped:', %(#{dups} duplicate items)) if dups.positive?
 
       imported = wwid.dedup(imported, !options[:overlap])
       overlaps = new_items.count - imported.count - dups
-      Doing.logger.info(%(Skipped #{overlaps} items with overlapping times)) if overlaps.positive?
+      Doing.logger.debug('Skipped:', "#{overlaps} items with overlapping times") if overlaps.positive?
 
       imported.each do |item|
         wwid.add_section(item.section) unless wwid.content.key?(item.section)
         wwid.content[item.section]['items'].push(item)
       end
 
-      Doing.logger.info(%(Imported #{imported.count} items))
+      Doing.logger.info('Imported:', "#{imported.count} items")
     end
 
     def self.duplicate?(item)
