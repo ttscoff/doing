@@ -19,14 +19,16 @@ if class_exists? 'Encoding'
   Encoding.default_internal = Encoding::UTF_8 if Encoding.respond_to?('default_internal')
 end
 
-include Doing::Errors
 include GLI::App
+include Doing::Errors
 version Doing::VERSION
 hide_commands_without_desc true
 
 REGEX_BOOL = /^(?:and|all|any|or|not|none)$/i
 REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
+
 InvalidExportType = Class.new(RuntimeError)
+MissingConfigFile = Class.new(RuntimeError)
 
 wwid = Doing::WWID.new
 
@@ -36,7 +38,17 @@ wwid.user_home = if Dir.respond_to?('home')
                    File.expand_path('~')
                  end
 
-wwid.configure
+
+if ENV['DOING_CONFIG']
+  cf = File.expand_path(ENV['DOING_CONFIG'])
+  raise MissingConfigFile, "$DOING_CONFIG not found (#{ENV['DOING_CONFIG']})" unless File.exist?(cf)
+
+  wwid.config_file = cf
+  wwid.config = nil
+  wwid.configure({ ignore_local: true })
+else
+  wwid.configure
+end
 
 program_desc 'A CLI for a What Was I Doing system'
 
@@ -947,7 +959,7 @@ command :show do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
+  default = wwid.config['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)/i, default_value: default
 
@@ -1071,7 +1083,7 @@ command %i[grep search] do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
+  default = wwid.config['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1115,7 +1127,7 @@ command :recent do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
+  default = wwid.config['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1160,7 +1172,7 @@ command :today do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
+  default = wwid.config['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1210,7 +1222,7 @@ command :on do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
+  default = wwid.config['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1265,7 +1277,7 @@ command :since do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
+  default = wwid.config['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1316,7 +1328,7 @@ command :yesterday do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] if wwid.config.key?('tag_sort')
+  default = wwid.config['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1957,29 +1969,6 @@ command :import do |c|
 end
 
 pre do |global, _command, _options, _args|
-  wwid.stdout = global[:stdout]
-  wwid.default_option = global[:default]
-
-  if global[:config_file] && global[:config_file] != wwid.config_file
-    wwid.config_file = global[:config_file]
-    wwid.config = nil
-    wwid.configure({ ignore_local: true })
-    # wwid.results.push("Override config file #{wwid.config_file}")
-  # else
-  #   wwid.configure
-  end
-  wwid.verbose = global[:debug]
-
-  if global[:doing_file]
-    wwid.init_doing_file(global[:doing_file])
-  else
-    wwid.init_doing_file
-  end
-
-  wwid.auto_tag = !global[:noauto]
-
-  wwid.config[:include_notes] = false unless global[:notes]
-
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
 
   # Return true to proceed; false to abort and not call the
@@ -2002,7 +1991,33 @@ post do |global, _command, _options, _args|
   end
 end
 
-around do |global_options, command, options, arguments, code|
+around do |global, command, options, arguments, code|
+  wwid.stdout = global[:stdout]
+  wwid.default_option = global[:default]
+
+  if global[:config_file] && global[:config_file] != wwid.config_file
+    c = wwid.colors
+    warn format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', c['yeller'], c['default'], c['boldred'])
+    warn format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  c['red'], c['boldwhite'], c['default'])
+    wwid.config_file = global[:config_file]
+    wwid.config = nil
+    wwid.configure({ ignore_local: true })
+    # wwid.results.push("Override config file #{wwid.config_file}")
+  # else
+  #   wwid.configure
+  end
+  wwid.verbose = global[:debug]
+
+  if global[:doing_file]
+    wwid.init_doing_file(global[:doing_file])
+  else
+    wwid.init_doing_file
+  end
+
+  wwid.auto_tag = !global[:noauto]
+
+  wwid.config[:include_notes] = false unless global[:notes]
+
   code.call
 end
 

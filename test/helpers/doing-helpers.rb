@@ -6,6 +6,7 @@ require 'doing/errors'
 
 module DoingHelpers
   DOING_EXEC = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'doing')
+  TEST_CONFIG = File.join(File.dirname(__FILE__), '..', 'test.doingrc')
 
   def trunc_minutes(ts)
     ts.to_i / 60 * 60

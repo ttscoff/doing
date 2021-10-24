@@ -77,7 +77,6 @@ marker_color: red
 default_tags: []
 :include_notes: true
 config_editor_app:
-tag_sort: time
 export_templates:
   css:
   haml:

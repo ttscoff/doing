@@ -29,6 +29,8 @@ input.gsub!(/^([^:`\n#*](.*?))$/, "\\1\n")
 input.gsub!(/\n{3,}/, "\n\n")
 input.gsub!(/^(: .*?)\n\n(:.*?)$/, "\\1\n\\2")
 input.gsub!(/^\[Default Command\] (.*?)$/, '## Default Command: [`\1`](#\1)')
+input.gsub!(/\/Users\/ttscoff\/scripts\/editor.sh/, '$EDITOR')
+input.gsub!(/\/Users\/ttscoff/, '~')
 puts %(---
 layout: page
 title: "Doing - All Commands"

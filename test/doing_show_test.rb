@@ -97,7 +97,7 @@ class DoingShowTest < Test::Unit::TestCase
   def test_show_before
     doing('import', '--type', 'timing', @import_file)
     res = doing('show', '--before', '9/16/21')
-    first, last = first_last_times(res)
+    _, last = first_last_times(res)
     cutoff = Time.parse('2021-09-17 00:00:00')
     assert(last < cutoff, 'Last date should be before cutoff')
   end
@@ -105,7 +105,7 @@ class DoingShowTest < Test::Unit::TestCase
   def test_show_after
     doing('import', '--type', 'timing', @import_file)
     res = doing('show', '--after', '9/15/21')
-    first, last = first_last_times(res)
+    first, _ = first_last_times(res)
     cutoff = Time.parse('2021-09-16 00:00:00')
     assert(first > cutoff, 'Last date should be after cutoff')
   end
@@ -132,10 +132,19 @@ class DoingShowTest < Test::Unit::TestCase
 
   def test_show_tag_sort
     doing('import', '--type', 'timing', @import_file)
+    # Default sort should be name, ascending
     result = doing('--stdout', 'show', '--totals')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/badstuff/, first_tag[1], 'First tag should be badstuff')
-
+    # Tag sort by time descending
+    result = doing('--stdout', 'show', '--tag_sort=time', '--tag_order=desc', '--totals')
+    first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
+    assert_match(/development/, first_tag[1], 'First tag should be development')
+    # Tag sort by name ascending
+    result = doing('--stdout', 'show', '--tag_sort=name', '--tag_order=asc', '--totals')
+    first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
+    assert_match(/badstuff/, first_tag[1], 'First tag should be badstuff')
+    # Tag sort by name descending
     result = doing('--stdout', 'show', '--tag_sort=name', '--tag_order=desc', '--totals')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/writing/, first_tag[1], 'First tag should be writing')
@@ -184,7 +193,7 @@ class DoingShowTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({}, '--config_file', @config_file, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
   end
 end
 

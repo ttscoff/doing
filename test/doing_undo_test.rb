@@ -49,7 +49,7 @@ class DoingUndoTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({}, '--config_file', @config_file, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
   end
 end
 

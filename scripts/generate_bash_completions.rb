@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-$LOAD_PATH.unshift File.join(__dir__, 'lib')
+$LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'doing/cli_status'
 
 require 'shellwords'
@@ -32,10 +32,11 @@ class BashCompletions
     out = []
     logic = []
     need_export = []
-    processing = []
+    # processing = []
 
     @commands.each_with_index do |cmd, i|
-      processing << cmd[:commands].first
+      # processing << cmd[:commands].first
+      processing = cmd[:commands]
       progress('Processing subcommand options', i, @commands.count, processing)
 
       data = get_help_sections(cmd[:commands].first)
@@ -192,7 +193,8 @@ class BashCompletions
   end
 
   def initialize
-    data = get_help_sections()
+    status('Generating Bash completions', reset: false)
+    data = get_help_sections
     @global_options = parse_options(data[:global_options])
     @commands = parse_commands(data[:commands])
   end

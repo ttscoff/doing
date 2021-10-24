@@ -14,15 +14,8 @@ module Status
     $stderr.print format("#{esc['kill']}#{esc['boldyellow']}> #{esc['boldgreen']}%s #{esc['white']}[#{esc['boldwhite']}%#{@commands.count.to_s.length}d#{esc['boldblack']}/#{esc['boldyellow']}%d#{esc['white']}]: #{esc['boldcyan']}%s#{esc['default']}\r", msg, idx, total, tail)
   end
 
-  def status(msg, tail = [])
-    status_width = format('> %s: ', msg).length
-    max_width = cols - status_width
-    if tail.is_a? Array
-      tail.shift while tail.join(', ').length + 3 > max_width
-      tail = tail.join(', ')
-    end
-    tail.ltrunc!(max_width)
-    $stderr.print format("#{esc['kill']}#{esc['boldyellow']}> #{esc['boldgreen']}%s: #{esc['boldcyan']}%s#{esc['default']}\r", msg, tail)
+  def status(msg, reset: true)
+    $stderr.print format("#{esc['kill']}#{esc['boldyellow']}> #{esc['whiteboard']}%s#{esc['default']}%s", msg, reset ? "\r" : "\n")
   end
 
   def esc

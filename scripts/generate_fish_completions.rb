@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-$LOAD_PATH.unshift File.join(__dir__, 'lib')
+$LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'doing/cli_status'
 
 require 'shellwords'
@@ -133,9 +133,10 @@ class FishCompletions
 
   def generate_subcommand_completions
     out = []
-    processing = []
+    # processing = []
     @commands.each_with_index do |cmd, i|
-      processing << cmd[:commands].first
+      # processing << cmd[:commands].first
+      processing = cmd[:commands]
       progress('Processing subcommands', i, @commands.count, processing)
       out << "complete -xc doing -n '__fish_doing_needs_command' -a '#{cmd[:commands].join(' ')}' -d #{Shellwords.escape(cmd[:description])}"
     end
@@ -147,10 +148,11 @@ class FishCompletions
 
     out = []
     need_export = []
-    processing = []
+    # processing = []
 
     @commands.each_with_index do |cmd, i|
-      processing << cmd[:commands].first
+      # processing << cmd[:commands].first
+      processing = cmd[:commands]
       progress('Processing subcommand options', i, @commands.count, processing)
 
       data = get_help_sections(cmd[:commands].first)
@@ -181,7 +183,8 @@ class FishCompletions
   end
 
   def initialize
-    data = get_help_sections()
+    status('Generating Fish completions', reset: false)
+    data = get_help_sections
     @global_options = parse_options(data[:global_options])
     @commands = parse_commands(data[:commands])
   end
