@@ -50,7 +50,7 @@ class DoingEntryTest < Test::Unit::TestCase
 
   def test_guess_section
     doing('add_section', 'Test Section')
-    res = doing('--stdout', 'show', 'Test').strip
+    res = doing('--stdout', '--verbose', 'show', 'Test').strip
     assert_match(/Assuming you meant Test Section/, res, 'Should have guessed Test Section')
   end
 
@@ -75,8 +75,8 @@ class DoingEntryTest < Test::Unit::TestCase
     subject = 'Test later entry'
     result = doing('--stdout', 'later', subject)
     assert_matches([
-      [/Added section "Later"/, 'should have added Later section'],
-      [/Added "#{subject}" to Later/, 'should have added entry to Later section']
+      [/Added section: "Later"/, 'should have added Later section'],
+      [/Entry added: "#{subject}" to Later/, 'should have added entry to Later section']
     ], result)
     assert_count_entries(1, doing('show', 'later'), 'There should be one later entry')
   end
@@ -97,7 +97,7 @@ class DoingEntryTest < Test::Unit::TestCase
     doing('done', subject)
     result = doing('--stdout', 'archive')
 
-    assert_match(/Added section "Archive"/, result, 'Archive section should have been added')
+    assert_match(/Added section: "Archive"/, result, 'Archive section should have been added')
     assert_match(/#{subject}/, doing('show', 'Archive'), 'Archive section should contain test entry')
   end
 
@@ -112,12 +112,12 @@ class DoingEntryTest < Test::Unit::TestCase
 
     result = doing('--stdout', 'archive', '--search', '/consuming.*?bagels/')
 
-    assert_match(/Added section "Archive"/, result, 'Archive section should have been added')
-    assert_match(/Archived 1 items from #{@config['current_section']} to Archive/, result, '1 item should have been archived')
+    assert_match(/Added section: "Archive"/, result, 'Archive section should have been added')
+    assert_match(/Archived: 1 items from #{@config['current_section']} to Archive/, result, '1 item should have been archived')
     assert_match(/consuming @bagels/i, doing('show', 'Archive'), 'Archive section should contain test entry')
 
     result = doing('--stdout', 'archive', '--search', 'eating')
-    assert_match(/Archived 6 items from #{@config['current_section']} to Archive/, result, '6 items should have been archived')
+    assert_match(/Archived: 6 items from #{@config['current_section']} to Archive/, result, '6 items should have been archived')
   end
 
   private
@@ -144,7 +144,7 @@ class DoingEntryTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({}, '--config_file', @config_file, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
   end
 end
 

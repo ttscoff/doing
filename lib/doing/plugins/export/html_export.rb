@@ -72,6 +72,7 @@ module Doing
 
       totals = opt[:totals] ? wwid.tag_times(format: :html, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
       engine = Haml::Engine.new(template)
+      Doing.logger.debug('HTML Export:', "#{items_out.count} items output to HTML")
       @out = engine.render(Object.new,
                          { :@items => items_out, :@page_title => variables[:page_title], :@style => style, :@totals => totals })
     end

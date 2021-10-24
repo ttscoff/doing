@@ -103,7 +103,7 @@ module Doing
                when /^e(x(p(o(r(t)?)?)?)?)?$/
                  :export
                else
-                 raise Errors::InvalidPluginType, 'Invalid plugin type' unless available_types.include?(type)
+                 raise Errors::InvalidPluginType, 'Invalid plugin type'
                end
 
         type.to_sym
@@ -116,7 +116,9 @@ module Doing
       ##
       def list_plugins(options = {})
         separator = options[:column] ? "\n" : "\t"
-        case valid_type(options[:type])
+        type = options[:type].nil? || options[:type] =~ /all/i ? 'all' : [valid_type(options[:type])]
+
+        case type
         when :import
           puts plugin_names(type: :import, separator: separator)
         when :export

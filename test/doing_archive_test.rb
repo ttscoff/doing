@@ -32,15 +32,15 @@ class DoingArchiveTest < Test::Unit::TestCase
   def test_archive
     entries = doing('show').scan(ENTRY_REGEX).count
     result = doing('--stdout', 'archive')
-    assert_match(/Archived #{entries} items from #{@config['current_section']} to Archive/, result, "Should have archived #{entries} items")
+    assert_match(/Archived: #{entries} items from #{@config['current_section']} to Archive/, result, "Should have archived #{entries} items")
   end
 
   def test_archive_tag
     entries = doing('show').scan(ENTRY_REGEX).count
     result = doing('--stdout', 'archive', '--tag', 'podcasting')
-    assert_match(/Archived 2 items/, result, "Should have archived 2 items")
+    assert_match(/Archived: 2 items/, result, "Should have archived 2 items")
     result = doing('--stdout', 'archive', '--tag', 'writing,bunch', '--bool', 'or')
-    assert_match(/Archived 3 items/, result, "Should have archived 3 items")
+    assert_match(/Archived: 3 items/, result, "Should have archived 3 items")
     assert_count_entries(5, doing('show', 'archive'), 'Archive should contain 5 items')
     assert_count_entries(entries - 5, doing('show'), "Currently shoud contain #{entries - 5} items")
   end
@@ -49,13 +49,13 @@ class DoingArchiveTest < Test::Unit::TestCase
     entries = doing('show').scan(ENTRY_REGEX).count
 
     result = doing('--stdout', 'archive', '--search', 'Overtired 446')
-    assert_no_match(/Archived 2 items/, result, 'Case sensitive search should have been triggered and failed')
+    assert_no_match(/Archived: 2 items/, result, 'Case sensitive search should have been triggered and failed')
 
     result = doing('--stdout', 'archive', '--search', 'overtired 446')
-    assert_match(/Archived 2 items/, result, 'Should have archived 2 items')
+    assert_match(/Archived: 2 items/, result, 'Should have archived 2 items')
 
     result = doing('--stdout', 'archive', '--search', '/cont.*?ion/')
-    assert_match(/Archived 1 items/, result, 'Regex search should have matched 1 items')
+    assert_match(/Archived: 1 items/, result, 'Regex search should have matched 1 items')
 
     assert_count_entries(entries - 3, doing('show'), "Current section should have 3 fewer items items")
     assert_count_entries(3, doing('show', 'archive'), 'Archive should have 3 items')
@@ -63,14 +63,14 @@ class DoingArchiveTest < Test::Unit::TestCase
 
   def test_archive_keep
     result = doing('--stdout', 'archive', '--keep', '5')
-    assert_match(/Archived 3 items/, result, "Should have archived 3 items")
+    assert_match(/Archived: 3 items/, result, "Should have archived 3 items")
   end
 
   def test_archive_destination
     entries = doing('show').scan(ENTRY_REGEX).count
     doing('add_section', 'Testing')
     result = doing('--stdout', 'archive', '-t', 'Testing')
-    assert_match(/Archived #{entries} items from #{@config['current_section']} to Testing/, result, "Should have archived #{entries} items to destination Testing")
+    assert_match(/Archived: #{entries} items from #{@config['current_section']} to Testing/, result, "Should have archived #{entries} items to destination Testing")
   end
 
   def test_rotate
@@ -78,7 +78,7 @@ class DoingArchiveTest < Test::Unit::TestCase
     doing('rotate', '--keep', '5')
     assert(File.exist?(rotate_file), 'Rotate file should exist')
     assert_count_entries(5, doing('show'), 'Should have 5 entries remaining')
-    res = doing_with_env({}, '--config_file', @config_file, '--doing_file', rotate_file, 'show')
+    res = doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', rotate_file, 'show')
     assert_count_entries(3, res, 'Rotate file should have 3 entries')
   end
 

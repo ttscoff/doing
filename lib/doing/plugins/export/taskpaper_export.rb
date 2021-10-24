@@ -25,6 +25,7 @@ module Doing
       options[:output] = 'template'
       options[:template] = '- %title @date(%date)%note'
 
+      Doing.logger.debug('TaskPaper Export:', "#{items.count} items output to TaskPaper format")
       @out = wwid.list_section(options)
     end
 

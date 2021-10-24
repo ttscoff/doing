@@ -65,12 +65,12 @@ module Doing
       end
       total = new_items.count
       skipped = data.count - total
-      wwid.results.push(%(Skipped #{skipped} items, invalid type or no time interval)) if skipped.positive?
+      Doing.logger.info(%(Skipped #{skipped} items, invalid type or no time interval)) if skipped.positive?
       new_items = wwid.dedup(new_items, options[:no_overlap])
       dups = total - new_items.count
-      wwid.results.push(%(Skipped #{dups} items with overlapping times)) if dups.positive?
+      Doing.logger.info(%(Skipped #{dups} items with overlapping times)) if dups.positive?
       wwid.content[section]['items'].concat(new_items)
-      wwid.results.push(%(Imported #{new_items.count} items to #{section}))
+      Doing.logger.info(%(Imported #{new_items.count} items to #{section}))
     end
 
     Doing::Plugins.register 'timing', :import, self

@@ -21,7 +21,7 @@ end
 
 include GLI::App
 include Doing::Errors
-include Doing::Color
+
 version Doing::VERSION
 hide_commands_without_desc true
 
@@ -71,10 +71,13 @@ desc 'Exclude auto tags and default tags'
 switch %i[x noauto], default_value: false, negatable: false
 
 desc 'Colored output'
-switch %i[c color], default_value: true
+switch %i[color], default_value: true
 
-desc 'Output debug messages'
-switch %i[d debug], default_value: false, negatable: false
+desc 'Silence info messages'
+switch %i[q quiet], default_value: false, negatable: false
+
+desc 'Verbose output'
+switch %i[verbose debug], default_value: false, negatable: false
 
 desc 'Use a specific configuration file. Deprecated, set $DOING_CONFIG instead.'
 flag [:config_file], default_value: wwid.config_file
@@ -1256,7 +1259,7 @@ command :on do |c|
 
     message = "Date interpreted as #{start}"
     message += " to #{finish}" if finish
-    Doing.logger.info(message)
+    Doing.logger.debug(message)
 
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -1306,7 +1309,7 @@ command :since do |c|
 
     exit_now! 'Unrecognized date string' unless start
 
-    wwid.debug("Date interpreted as #{start} through the current time")
+    Doing.logger.debug("Date interpreted as #{start} through the current time")
 
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -1822,6 +1825,14 @@ command :config do |c|
   c.arg_name 'EDITOR'
   c.flag %i[e editor], default_value: nil
 
+  c.desc 'Show a config key value. Separate key paths with colons or dots, e.g. "export_templates.html". Use . to output the entire config.'
+  c.arg_name 'KEY'
+  c.flag %i[d dump]
+
+  c.desc 'Format for --dump (json|yaml|raw)'
+  c.arg_name 'FORMAT'
+  c.flag %i[o output], default_value: 'yaml', must_match: /^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$/
+
   c.desc 'Update config file with missing configuration options'
   c.switch %i[u update], default_value: false, negatable: false
 
@@ -1841,7 +1852,31 @@ command :config do |c|
   c.action do |_global_options, options, _args|
     if options[:update]
       wwid.configure({rewrite: true, ignore_local: true})
-      Doing.logger.info("Config file rewritten: #{wwid.config_file}")
+      Doing.logger.warn("Config file rewritten: #{wwid.config_file}")
+      return
+    end
+
+    if options[:dump]
+      cfg = wwid.config
+      unless options[:dump] == '.'
+        path = options[:dump].split(/[:.]/)
+        path.each do |p|
+          if cfg.key?(p)
+            cfg = cfg[p]
+          else
+            $stdout.puts "Error: key #{options[:dump]} not found"
+            return
+          end
+        end
+      end
+      $stdout.puts case options[:output]
+                   when /^j/
+                     JSON.pretty_generate(cfg)
+                   when /^r/
+                     cfg
+                   else
+                     YAML.dump(cfg)
+                   end
       return
     end
 
@@ -1979,23 +2014,21 @@ end
 post do |global, _command, _options, _args|
   # Use skips_post before a command to skip this
   # block on that command only
-  results = wwid.results.map(&:strip).delete_if(&:empty?)
-  if global[:stdout]
-    $stdout.print results.join("\n")
-  else
-    results.each do |msg|
-      warn "#{colors.yellow}> #{colors.boldwhite}#{msg}#{colors.default}"
-    end
-  end
+  Doing.logger.output_results
 end
 
 around do |global, command, options, arguments, code|
-  wwid.stdout = global[:stdout]
+  Doing.logger.adjust_verbosity(global)
+
+  if global[:stdout]
+    Doing.logger.logdev = $stdout
+  end
+
   wwid.default_option = global[:default]
 
   if global[:config_file] && global[:config_file] != wwid.config_file
-    Doing.logger.warn(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', flamingo, default, boldred))
-    Doing.logger.warn(format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  red, boldwhite, default))
+    Doing.logger.warn(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', colors.flamingo, colors.default, colors.boldred))
+    Doing.logger.warn(format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  colors.red, colors.boldwhite, colors.default))
     wwid.config_file = global[:config_file]
     wwid.config = nil
     wwid.configure({ ignore_local: true })
@@ -2003,7 +2036,6 @@ around do |global, command, options, arguments, code|
   # else
   #   wwid.configure
   end
-  wwid.verbose = global[:debug]
 
   if global[:doing_file]
     wwid.init_doing_file(global[:doing_file])

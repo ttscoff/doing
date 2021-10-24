@@ -30,6 +30,7 @@ module Doing
         output.push(CSV.generate_line([i.date, end_date, i.title, note, interval, i.section]))
       end
       output.join('')
+      Doing.logger.debug('CSV Export:', "#{items.count} items output to CSV")
     end
 
     def self.format_note(note)

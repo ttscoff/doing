@@ -40,16 +40,16 @@ class DoingDoneTest < Test::Unit::TestCase
     doing('now', 'Another new entry @tag2')
     doing('finish', '--tag', 'tag1')
     t1 = doing('show', '@tag1').uncolor.strip
-    assert_match(ENTRY_DONE_REGEX, t1, "@tag1 entry should have @done timestamp")
+    assert_match(ENTRY_DONE_REGEX, t1, '@tag1 entry should have @done timestamp')
     t2 = doing('show', '@tag2').uncolor.strip
-    assert_no_match(ENTRY_DONE_REGEX, t2, "@tag2 entry should not have @done timestamp")
+    assert_no_match(ENTRY_DONE_REGEX, t2, '@tag2 entry should not have @done timestamp')
   end
 
   def test_finish_unfinished
     doing('now', '--back=15m', 'Adding an unfinished entry')
     doing('done', 'Adding a finished entry')
     result = doing('--stdout', 'finish', '--unfinished')
-    assert_match(/Added @done: "Adding an unfinished entry/, result, "Earlier unfinished task should be marked @done")
+    assert_match(/Added tag: @done to "Adding an unfinished entry/, result, 'Earlier unfinished task should be marked @done')
   end
 
   def test_finish_took
@@ -221,6 +221,6 @@ class DoingDoneTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({}, '--config_file', @config_file, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
   end
 end

@@ -11,11 +11,11 @@ module Doing
 
     def self.import(wwid, path, options: {})
       if path.nil?
-        wwid.results.push('Test with no paths')
+        Doing.logger.info('Test with no paths')
       else
-        wwid.results.push("Test with path: #{path}")
+        Doing.logger.info("Test with path: #{path}")
       end
-      wwid.results.push('Test Import Plugin Ran')
+      Doing.logger.info('Test Import Plugin Ran')
     end
 
     Doing::Plugins.register 'tester', :import, self

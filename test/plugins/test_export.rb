@@ -54,7 +54,7 @@ module Doing
       output.gsub!(/%content/, content)
 
       value = wwid.config['plugins']['trizzer']['trizzle'] || 'NO CONFIG'
-      wwid.results.push("Test export plugin complete. Config value: #{value}")
+      Doing.logger.info("Test export plugin complete. Config value: #{value}")
 
       output
     end

@@ -5,7 +5,9 @@ module Doing
   ## @brief      Log adapter
   ##
   class LogAdapter
-    attr_reader :writer, :messages, :level
+    attr_writer :logdev
+
+    attr_reader :messages, :level, :results
 
     LOG_LEVELS = {
       debug: ::Logger::DEBUG,
@@ -17,12 +19,12 @@ module Doing
     #
     # @brief      Create a new instance of a log writer
     #
-    # @param      writer  Logger compatible instance
     # @param      level   (optional, symbol) the log level
     #
-    def initialize(writer, level = :info)
+    def initialize(level = :info)
       @messages = []
-      @writer = writer
+      @results = []
+      @logdev = $stderr
       self.log_level = level
     end
 
@@ -34,21 +36,17 @@ module Doing
     # @return     nothing
     #
     def log_level=(level)
-      writer.level = level if level.is_a?(Integer) && level.between?(0, 3)
-      writer.level = LOG_LEVELS[level] || raise(ArgumentError, 'unknown log level')
-
       @level = level
     end
 
     def adjust_verbosity(options = {})
-      # Quiet always wins.
       if options[:quiet]
         self.log_level = :error
-      elsif options[:verbose]
+      elsif options[:verbose] || options[:debug]
         self.log_level = :debug
       end
-      debug 'Logging at level:', LOG_LEVELS.key(writer.level).to_s
-      debug 'Doing Version:', Doing::VERSION
+      log_now :debug, 'Logging at level:', LOG_LEVELS.key(@level).to_s
+      log_now :debug, 'Doing Version:', Doing::VERSION
     end
 
     #
@@ -183,14 +181,54 @@ module Doing
     # @param      block             a block containing the
     #                               message (optional)
     #
-    # @return     false if the message was not written, otherwise
-    #             returns the value of calling the appropriate
-    #             writer method, e.g. writer.info.
+    # @return     false if the message was not written
     #
     def write(level_of_message, topic, message = nil, &block)
       return false unless write_message?(level_of_message)
 
-      writer.public_send(level_of_message, message(topic, message, &block))
+      @results << { level: level_of_message, message: message(topic, message, &block) }
+      true
+    end
+
+    def log_now(level, topic, message = nil, &block)
+      return false unless write_message?(level)
+
+      if @logdev == $stdout
+        @logdev.puts message(topic, message, &block)
+      else
+        @logdev.puts color_message(level, topic, message, &block)
+      end
+    end
+
+    def color_message(level, topic, message = nil, &block)
+      colors = Doing::Color
+      message = message(topic, message, &block)
+      case level
+      when :debug
+        prefix = '> '.softpurple
+        message = message.white
+      when :warn
+        prefix = '> '.boldyellow
+        message = message.yellow
+      when :error
+        prefix = '!!'.boldred
+        message = message.red
+      else
+        prefix = '  '
+        message = message.boldwhite
+      end
+
+      "#{prefix} #{message}#{colors.default}"
+    end
+
+    def output_results
+      if @logdev == $stdout
+        $stdout.print @results.map {|res| res[:message].uncolor }.join("\n")
+      else
+        @results.each do |msg|
+          @logdev.puts color_message(msg[:level], msg[:message])
+        end
+      end
     end
   end
 end

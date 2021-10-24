@@ -176,10 +176,16 @@ module Doing
       # warn "Saying: #{output}"
 
       # To provide results on the command line after the
-      # command runs, add to the wwid.results array. Results
-      # are provided on STDERR unless doing is run with
-      # `--stdout`
-      wwid.results.push('Spoke the last entry. Did you hear it?')
+      # command runs, use Doing.logger, which responds to
+      # :debug, :info, :warn, and :error. e.g.:
+      #
+      # Doing.logger.info("This plugin has run")
+      # Doing.logger.error("This message will be displayed even if run in --quiet mode.")
+      #
+      # Results are
+      # provided on STDERR unless doing is run with
+      # `--stdout` or non-interactively.
+      Doing.logger.info('Spoke the last entry. Did you hear it?')
 
       # This export runs a command for fun, most plugins won't
       voice = wwid.config['plugins']['say']['say_voice'] || 'Alex'

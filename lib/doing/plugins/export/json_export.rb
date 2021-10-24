@@ -87,6 +87,7 @@ module Doing
         end
       end
       if opt[:output] == 'json'
+        Doing.logger.debug('JSON Export:', "#{items_out.count} items output to JSON")
         JSON.pretty_generate({
           'section' => variables[:page_title],
           'items' => items_out,
@@ -128,6 +129,7 @@ module Doing
                     </body>
                     </html>
         EOTEMPLATE
+        Doing.logger.debug('Timeline Export:', "#{items_out.count} items output to Timeline")
         template
       end
     end

@@ -1,6 +1,7 @@
 require 'open3'
 require 'time'
 $LOAD_PATH.unshift File.join(__dir__, '..', '..', 'lib')
+require 'doing/colors'
 require 'doing/string'
 require 'doing/errors'
 

@@ -13,7 +13,7 @@ module Doing
   ##
   class WWID
     attr_accessor :content, :current_section, :doing_file, :config, :user_home, :default_config_file,
-                  :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :verbose, :default_option, :stdout
+                  :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :default_option, :stdout
 
     # include Doing::Util
 
@@ -424,7 +424,7 @@ module Doing
     ##
     def add_section(title)
       @content[title.cap_first] = { 'original' => "#{title}:", 'items' => [] }
-      @results.push(%(Added section "#{title.cap_first}"))
+      Doing.logger.info('Added section:', %("#{title.cap_first}"))
     end
 
     ##
@@ -443,7 +443,7 @@ module Doing
       sections.each do |sect|
         next unless sect =~ /#{re}/i
 
-        warn2 "Assuming you meant #{sect}"
+        Doing.logger.log_now(:debug, "Assuming you meant #{sect}")
         section = sect
         break
       end
@@ -532,7 +532,7 @@ module Doing
       views.each do |v|
         next unless v =~ /#{re}/i
 
-        warn2 "Assuming you meant #{v}"
+        Doing.logger.log_now(:debug, "Assuming you meant #{v}")
         view = v
         break
       end
@@ -598,7 +598,7 @@ module Doing
       end
       items.push(entry)
       @content[section]['items'] = items
-      @results.push(%(Added "#{entry.title}" to #{section}))
+      Doing.logger.info('Entry added:', %("#{entry.title}" to #{section}))
     end
 
     def same_time?(item_a, item_b)
@@ -630,7 +630,7 @@ module Doing
           duped = no_overlap ? overlapping_time?(item, comp) : same_time?(item, comp)
           break if duped
         end
-        # warn2 "Skipping overlapping entry: #{item.title}" if duped
+        Doing.logger.log_now(:debug, 'Skipping:', "overlapping entry: #{item.title}") if duped
         duped
       end
     end
@@ -678,7 +678,7 @@ module Doing
       last_item = @content[section]['items'].dup.sort_by(&:date).reverse[0]
       raise Errors::NoEntryError, 'No entry found' unless last_item
 
-      warn2 "Editing note for #{last_item.title}"
+      Doing.logger.log_now(:info, 'Editing note:', last_item.title)
       note = ''
       note = last_item.note.to_s unless last_item.note.nil?
       "#{last_item.title}\n# EDIT BELOW THIS LINE ------------\n#{note}"
@@ -697,7 +697,7 @@ module Doing
 
       last = last_entry(opt)
       if last.nil?
-        @results.push(%(No previous entry found))
+        Doing.logger.debug('Skipping:', 'No previous entry found')
         return
       end
       unless last.tags?(['done'], :all)
@@ -719,7 +719,7 @@ module Doing
         title, note = format_input(new_item)
 
         if title.nil? || title.empty?
-          @results.push('No content provided')
+          Doing.logger.debug('Skipping:', 'No content provided')
           return
         end
       end
@@ -905,7 +905,7 @@ module Doing
       selection = choose_from_items(items, opt, include_section: section =~ /^all$/i)
 
       if selection.empty?
-        @results.push('No selection')
+        Doing.logger.debug('Skipping:', 'No selection')
         return
       end
 
@@ -1153,7 +1153,7 @@ module Doing
             f.puts output
           end
 
-          @results.push("Export saved to #{file}")
+          Doing.logger.info('File written:', file)
         else
           puts output
         end
@@ -1223,9 +1223,9 @@ module Doing
               if opt[:autotag]
                 new_title = autotag(item.title) if @auto_tag
                 if new_title == item.title
-                  @results.push(%(Autotag: No changes))
+                  Doing.logger.debug('Autotag:', 'No changes')
                 else
-                  @results.push("Tags updated: #{new_title}")
+                  Doing.logger.info('Tags updated:', new_title)
                   item.title = new_title
                 end
               else
@@ -1281,7 +1281,7 @@ module Doing
 
                       title.dedup_tags!
 
-                      @results.push(%(Removed #{removed_tags.join(', ')}: "#{title}" in #{section}))
+                      Doing.logger.info('Removed tags:', %(#{removed_tags.map(&:cyan).join(', ')} from "#{title}" in #{section}))
                     end
                   elsif title !~ /@#{tag}/
                     title.chomp!
@@ -1290,7 +1290,8 @@ module Doing
                              else
                                " @#{tag}"
                              end
-                    @results.push(%(Added @#{tag}: "#{title}" in #{section}))
+                    logtag = "@#{tag}".cyan
+                    Doing.logger.info('Added tag:', %(#{logtag} to "#{title}" in #{section}))
                   end
                 end
                 item.title = title
@@ -1316,9 +1317,9 @@ module Doing
             @content['Archive']['items'] = archived
             # log it
             result = opt[:count] == 1 ? '1 entry' : "#{opt[:count]} entries"
-            @results.push("Archived #{result} from #{section}")
+            Doing.logger.info('Archived:', "#{result} from #{section}")
           elsif opt[:archive] && (opt[:count]).zero?
-            @results.push('Archiving is skipped when operating on all entries') if (opt[:count]).zero?
+            Doing.logger.warn('Archiving is skipped when operating on all entries') if (opt[:count]).zero?
           end
         else
           raise Errors::InvalidSection, "Section not found: #{section}"
@@ -1351,7 +1352,7 @@ module Doing
       # archive_items = archive_items.sort_by { |item| item.date }
       @content[section]['items'] = archive_items
 
-      @results.push("Entry moved to #{section}: #{new_item.title}")
+      Doing.logger.info('Entry moved:', "to #{section}: #{new_item.title}")
       return new_item
     end
 
@@ -1385,7 +1386,7 @@ module Doing
 
       section_items = @content[section]['items']
       deleted = section_items.delete(old_item)
-      @results.push("Entry deleted: #{deleted.title}")
+      Doing.logger.info('Entry deleted:', deleted.title)
       @content[section]['items'] = section_items
     end
 
@@ -1410,7 +1411,7 @@ module Doing
           update_item(old_item, new_item)
           return new_item
         else
-          @results.push(%(Item isn't tagged @#{tag}: "#{title}" in #{old_item.section}))
+          Doing.logger.debug('Skipping:', %(Item isn't tagged @#{tag}: "#{title}" in #{old_item.section}))
           return old_item
         end
       end
@@ -1443,7 +1444,7 @@ module Doing
           update_item(old_item, new_item)
           return new_item
         else
-          @results.push(%(Item already @#{tag}: "#{title}" in #{old_item.section}))
+          Doing.logger.debug('Skipping:', %(Item already @#{tag}: "#{title}" in #{old_item.section}))
           return old_item
         end
       end
@@ -1464,7 +1465,7 @@ module Doing
       return if section_items[s_idx].equal?(new_item)
 
       section_items[s_idx] = new_item
-      @results.push("Entry updated: #{section_items[s_idx].title.truncate(60)}")
+      Doing.logger.info('Entry updated:', section_items[s_idx].title.truncate(60))
       @content[section]['items'] = section_items
     end
 
@@ -1509,7 +1510,7 @@ module Doing
       end
 
       if idx.nil?
-        @results.push('No entries found')
+        Doing.logger.debug('Skipping:', 'No entries found')
         return
       end
 
@@ -1525,13 +1526,13 @@ module Doing
       title, note = format_input(new_item)
 
       if title.nil? || title.empty?
-        @results.push('No content provided')
+        Doing.logger.debug('Skipping:', 'No content provided')
       elsif title == section_items[s_idx].title && note == old_note
-        @results.push('No change in content')
+        Doing.logger.debug('Skipping:', 'No change in content')
       else
         section_items[s_idx].title = title
         section_items[s_idx].note = note
-        @results.push("Entry edited: #{section_items[s_idx].title}")
+        Doing.logger.info('Entry edited:', section_items[s_idx].title)
         @content[section]['items'] = section_items
         write(@doing_file)
       end
@@ -1567,20 +1568,20 @@ module Doing
       if replace
         items[0].note = Note.new.append(note)
         if note.empty? && !current_note.empty?
-          @results.push(%(Removed note from "#{title}"))
+          Doing.logger.info('Removed note:', title)
         elsif !current_note.empty? && !note.empty?
-          @results.push(%(Replaced note from "#{title}"))
+          Doing.logger.info('Replaced note:', title)
         elsif !note.empty?
-          @results.push(%(Added note to "#{title}"))
+          Doing.logger.info('Added note:', title)
         else
-          @results.push(%(Entry "#{title}" has no note))
+          Doing.logger.debug('Skipping:', %(Entry "#{title}" has no note))
         end
       elsif current_note.instance_of?(Note)
         items[0].note.append(note)
-        @results.push(%(Added note to "#{title}")) unless note.empty?
+        Doing.logger.info('Added note:', title) unless note.empty?
       else
         items[0].note.append_string(note)
-        @results.push(%(Added note to "#{title}")) unless note.empty?
+        Doing.logger.info('Added note:', title) unless note.empty?
       end
 
       @content[section]['items'] = items
@@ -1620,17 +1621,17 @@ module Doing
         found_items += 1
 
         if opt[:archive] && opt[:section] != 'Archive'
-          @results.push(%(Completed and archived "#{@content[opt[:section]]['items'][i].title}"))
+          Doing.logger.info('Completed/archived:', @content[opt[:section]]['items'][i].title)
           archive_item = @content[opt[:section]]['items'][i]
           archive_item.title = i.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{i.section})")
           @content['Archive']['items'].push(archive_item)
           @content[opt[:section]]['items'].delete_at(i)
         else
-          @results.push(%(Completed "#{@content[opt[:section]]['items'][i].title}"))
+          Doing.logger.info('Completed:', @content[opt[:section]]['items'][i].title)
         end
       end
 
-      @results.push("No active @#{tag} tasks found.") if found_items == 0
+      Doing.logger.debug('Skipping:', "No active @#{tag} tasks found.") if found_items.zero?
 
       if opt[:new_item]
         title, note = format_input(opt[:new_item])
@@ -1685,11 +1686,11 @@ module Doing
     def run_after
       return unless @config.key?('run_after')
 
-      _, _, status = Open3.capture3(@config['run_after'])
-      if status.exitstatus.positive?
-        warn2 "Error running #{@config['run_after']}"
-        warn2 stderr
-      end
+      _, stderr, status = Open3.capture3(@config['run_after'])
+      return unless status.exitstatus.positive?
+
+      Doing.logger.log_now(:error, 'Script error:', "Error running #{@config['run_after']}")
+      Doing.logger.log_now(:error, 'STDERR output:', stderr)
     end
 
     ##
@@ -1698,10 +1699,11 @@ module Doing
     ## @param      file  (String) The filepath to restore
     ##
     def restore_backup(file)
-      if File.exist?(file + '~')
-        puts file + '~'
-        FileUtils.cp(file + '~', file)
-        @results.push("Restored #{file}")
+      if File.exist?("#{file}~")
+        FileUtils.cp("#{file}~", file)
+        Doing.logger.warn('File update:', "Restored #{file}")
+      else
+        Doing.logger.error('Restore error:', 'No backup file found')
       end
     end
 
@@ -1709,7 +1711,7 @@ module Doing
     ## @brief      Rename doing file with date and start fresh one
     ##
     def rotate(opt = {})
-      count = opt[:keep] || 0
+      keep = opt[:keep] || 0
       tags = []
       tags.concat(opt[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if opt[:tag]
       bool  = opt[:bool] || :and
@@ -1749,12 +1751,12 @@ module Doing
           end
           @content[section]['items'] = items
           new_content[section]['items'] = moved_items
-          @results.push("Rotated #{moved_items.length} items from #{section}")
+          Doing.logger.warn('Rotated:', "#{moved_items.length} items from #{section}")
         else
           new_content[section]['items'] = []
           moved_items = []
 
-          count = items.length if items.length < count
+          count = items.length < keep ? items.length : keep
 
           if items.count > count
             moved_items.concat(items[count..-1])
@@ -1769,7 +1771,7 @@ module Doing
                                        end
           new_content[section]['items'] = moved_items
 
-          @results.push("Rotated #{items.length - count} items from #{section}")
+          Doing.logger.warn('Rotated:', "#{items.length - count} items from #{section}")
         end
       end
 
@@ -1779,10 +1781,10 @@ module Doing
       if File.exist?(file)
         init_doing_file(file)
         @content.deep_merge(new_content)
-        @results.push("Added entries to existing file: #{file}")
+        Doing.logger.warn('File update:', "Added entries to existing file: #{file}")
       else
         @content = new_content
-        @results.push("Created new file: #{file}")
+        Doing.logger.warn('File update:', "Created new file: #{file}")
       end
 
       write(file, backup: false)
@@ -1886,7 +1888,7 @@ module Doing
         selected = choose_from_items(items, opt, include_section: opt[:section] =~ /^all$/i )
 
         if selected.empty?
-          @results.push('No selection')
+          Doing.logger.debug('Skipping:', 'No selection')
           return
         end
 
@@ -2000,7 +2002,7 @@ module Doing
 
           @content[section]['items'] = items
           @content[destination]['items'].concat(moved_items)
-          @results.push("Archived #{moved_items.length} items from #{section} to #{destination}")
+          Doing.logger.info('Archived:', "#{moved_items.length} items from #{section} to #{destination}")
         else
           count = items.length if items.length < count
 
@@ -2024,7 +2026,7 @@ module Doing
                                          items[0..count - 1]
                                        end
 
-          @results.push("Archived #{items.length - count} items from #{section} to #{destination}")
+          Doing.logger.info('Archived:', "#{items.length - count} items from #{section} to #{destination}")
         end
       end
     end
@@ -2219,11 +2221,11 @@ module Doing
           end
         end
       end
-      @results.push("Whitelisted tags: #{whitelisted.join(', ')}") if whitelisted.length > 0
-      if tail_tags.length > 0
-        tags = tail_tags.uniq.map { |t| '@' + t }.join(' ')
-        @results.push("Synonym tags: #{tags}")
-        text + ' ' + tags
+      Doing.logger.debug('Autotag:', "Whitelisted tags: #{whitelisted.join(', ')}") unless whitelisted.empty?
+      if !tail_tags.empty?
+        tags = tail_tags.uniq.map { |t| "@#{t}" }.join(' ')
+        Doing.logger.debug('Autotag:', "Synonym tags: #{tags}")
+        "#{text} #{tags}"
       else
         text
       end
@@ -2409,18 +2411,6 @@ EOS
         File.executable?(File.expand_path(cli))
       else
         system "which #{cli}", out: File::NULL, err: File::NULL
-      end
-    end
-
-    def debug(msg)
-      @results.push(msg) if @verbose == 4
-    end
-
-    def warn2(msg)
-      if @stdout
-        $stdout.puts msg.uncolor
-      else
-        warn msg
       end
     end
   end
