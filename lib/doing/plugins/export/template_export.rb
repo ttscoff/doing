@@ -6,6 +6,7 @@
 # url: https://brettterpstra.com
 module Doing
   class TemplateExport
+    include Doing::Color
     include Doing::Util
 
     def self.settings
@@ -22,8 +23,8 @@ module Doing
       out = ''
       items.each do |item|
         if opt[:highlight] && item.title =~ /@#{wwid.config['marker_tag']}\b/i
-          flag = wwid.colors[wwid.config['marker_color']]
-          reset = wwid.colors['default']
+          flag = Doing::Color.send(wwid.config['marker_color'])
+          reset = Doing::Color.default
         else
           flag = ''
           reset = ''
@@ -44,8 +45,8 @@ module Doing
         output = opt[:template].dup
 
         output.gsub!(/%[a-z]+/) do |m|
-          if wwid.colors.key?(m.sub(/^%/, ''))
-            wwid.colors[m.sub(/^%/, '')]
+          if Doing::Color.respond_to?(m.sub(/^%/, ''))
+            Doing::Color.send(m.sub(/^%/, ''))
           else
             m
           end
@@ -68,7 +69,7 @@ module Doing
 
         output.sub!(/%section/, item.section) if item.section
 
-        title_offset = output.uncolor.match(/%(-?\d+)?([ _t]\d+)?title/).begin(0)
+        title_offset = Doing::Color.uncolor(output).match(/%(-?\d+)?([ _t]\d+)?title/).begin(0)
         output.sub!(/%(-?\d+)?(([ _t])(\d+))?title(.*?)$/) do
           m = Regexp.last_match
           pad = m[1].to_i
@@ -93,9 +94,9 @@ module Doing
           last_color = if !escapes.empty?
                          escapes[-1][0]
                        else
-                         wwid.colors['default']
+                         Doing::Color.default
                        end
-          output.gsub!(/(\s|m)(@[^ (]+)/, "\\1#{wwid.colors[opt[:tags_color]]}\\2#{last_color}")
+          output.gsub!(/(\s|m)(@[^ (]+)/, "\\1#{Doing::Color.send(opt[:tags_color])}\\2#{last_color}")
         end
 
         if note.empty?

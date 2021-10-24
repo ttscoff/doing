@@ -21,8 +21,10 @@ end
 
 include GLI::App
 include Doing::Errors
+include Doing::Color
 version Doing::VERSION
 hide_commands_without_desc true
+
 
 REGEX_BOOL = /^(?:and|all|any|or|not|none)$/i
 REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
@@ -30,6 +32,7 @@ REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
 InvalidExportType = Class.new(RuntimeError)
 MissingConfigFile = Class.new(RuntimeError)
 
+colors = Doing::Color
 wwid = Doing::WWID.new
 
 wwid.user_home = if Dir.respond_to?('home')
@@ -66,6 +69,9 @@ switch [:default], default_value: false
 
 desc 'Exclude auto tags and default tags'
 switch %i[x noauto], default_value: false, negatable: false
+
+desc 'Colored output'
+switch %i[c color], default_value: true
 
 desc 'Output debug messages'
 switch %i[d debug], default_value: false, negatable: false
@@ -1250,7 +1256,7 @@ command :on do |c|
 
     message = "Date interpreted as #{start}"
     message += " to #{finish}" if finish
-    wwid.results.push(message)
+    Doing.logger.info(message)
 
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -1442,14 +1448,13 @@ end
 desc 'List available color variables for configuration templates and views'
 command :colors do |c|
   c.action do |_global_options, _options, _args|
-    clrs = wwid.colors
     bgs = []
     fgs = []
-    clrs.each do |k, v|
-      if k =~ /bg/
-        bgs.push("#{v}    #{clrs['default']} <-- #{k}")
+    colors::attributes.each do |color|
+      if color.to_s =~ /bg/
+        bgs.push("#{colors.send(color, "    ")}#{colors.default} <-- #{color.to_s}")
       else
-        fgs.push("#{v}XXXX#{clrs['default']} <-- #{k}")
+        fgs.push("#{colors.send(color, "XXXX")}#{colors.default} <-- #{color.to_s}")
       end
     end
     puts fgs.join("\n")
@@ -1473,20 +1478,8 @@ command :plugins do |c|
   c.switch %i[c column], default_value: false
 
   c.action do |_global_options, options, _args|
-    separator = options[:column] ? "\n" : "\t"
-    case options[:type]
-    when /^i/
-      puts Doing::Plugins.plugin_names(type: :import, separator: separator)
-    when /^e/
-      puts Doing::Plugins.plugin_names(type: :export, separator: separator)
-    else
-      print 'Import plugins: '
-      puts Doing::Plugins.plugin_names(type: :import, separator: ', ')
-      print 'Export plugins: '
-      puts Doing::Plugins.plugin_names(type: :export, separator: ', ')
-    end
+    Doing::Plugins.list_plugins(options)
   end
-
 end
 
 desc 'Display a user-created view'
@@ -1848,7 +1841,7 @@ command :config do |c|
   c.action do |_global_options, options, _args|
     if options[:update]
       wwid.configure({rewrite: true, ignore_local: true})
-      wwid.results.push("Config file rewritten: #{wwid.config_file}")
+      Doing.logger.info("Config file rewritten: #{wwid.config_file}")
       return
     end
 
@@ -1971,6 +1964,11 @@ end
 pre do |global, _command, _options, _args|
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
 
+  unless STDOUT.isatty
+    Doing::Color::coloring = false
+  else
+    Doing::Color::coloring = global[:color]
+  end
   # Return true to proceed; false to abort and not call the
   # chosen command
   # Use skips_pre before a command to skip this block
@@ -1986,7 +1984,7 @@ post do |global, _command, _options, _args|
     $stdout.print results.join("\n")
   else
     results.each do |msg|
-      warn "#{wwid.colors['yellow']}> #{wwid.colors['boldwhite']}#{msg}#{wwid.colors['default']}"
+      warn "#{colors.yellow}> #{colors.boldwhite}#{msg}#{colors.default}"
     end
   end
 end
@@ -1996,13 +1994,12 @@ around do |global, command, options, arguments, code|
   wwid.default_option = global[:default]
 
   if global[:config_file] && global[:config_file] != wwid.config_file
-    c = wwid.colors
-    wwid.results.push(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', c['flamingo'], c['default'], c['boldred']))
-    wwid.results.push(format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  c['red'], c['boldwhite'], c['default']))
+    Doing.logger.warn(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', flamingo, default, boldred))
+    Doing.logger.warn(format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  red, boldwhite, default))
     wwid.config_file = global[:config_file]
     wwid.config = nil
     wwid.configure({ ignore_local: true })
-    # wwid.results.push("Override config file #{wwid.config_file}")
+    # Doing.logger.info("Override config file #{wwid.config_file}")
   # else
   #   wwid.configure
   end

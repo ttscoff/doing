@@ -56,7 +56,8 @@ module Doing
       # returns: Success boolean
       #
       def register(title, type, klass)
-        validate_plugin(type, klass)
+        type = validate_plugin(type, klass)
+        return unless type
 
         if title.is_a?(Array)
           title.each { |t| register(t, type, klass) }
@@ -84,13 +85,47 @@ module Doing
         when :import
           raise Errors::PluginUncallable, 'Import plugins must respond to :import' unless klass.respond_to? :import
 
-          false
         when :export
           raise Errors::PluginUncallable, 'Export plugins must respond to :render' unless klass.respond_to? :render
 
-          false
+        end
+
+        type
+      end
+
+      def valid_type(type, default: nil)
+        type ||= default
+
+        t = type.to_s
+        type = case t
+               when /^i(m(p(o(r(t)?)?)?)?)?$/
+                 :import
+               when /^e(x(p(o(r(t)?)?)?)?)?$/
+                 :export
+               else
+                 raise Errors::InvalidPluginType, 'Invalid plugin type' unless available_types.include?(type)
+               end
+
+        type.to_sym
+      end
+
+      ##
+      ## @brief      List available plugins to stdout
+      ##
+      ## @param      options  { type, separator }
+      ##
+      def list_plugins(options = {})
+        separator = options[:column] ? "\n" : "\t"
+        case valid_type(options[:type])
+        when :import
+          puts plugin_names(type: :import, separator: separator)
+        when :export
+          puts plugin_names(type: :export, separator: separator)
         else
-          true
+          print 'Import plugins: '
+          puts plugin_names(type: :import, separator: ', ')
+          print 'Export plugins: '
+          puts plugin_names(type: :export, separator: ', ')
         end
       end
 
@@ -157,14 +192,6 @@ module Doing
           end
         end
         Regexp.new("^(?:#{pattern.join('|')})$", true)
-      end
-
-      def valid_type(type)
-        available_types = %i[import export]
-        type = type.to_sym
-        raise Errors::InvalidPluginType, 'Invalid plugin type' unless available_types.include?(type)
-
-        type
       end
 
       def template_for_trigger(trigger, type: :export)

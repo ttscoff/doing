@@ -15,7 +15,8 @@ module Doing
     attr_accessor :content, :current_section, :doing_file, :config, :user_home, :default_config_file,
                   :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :verbose, :default_option, :stdout
 
-    include Doing::Util
+    # include Doing::Util
+
     ##
     ## @brief      Initializes the object.
     ##
@@ -475,12 +476,17 @@ module Doing
     ## @return     (Bool) yes or no
     ##
     def yn(question, default_response: false)
-      default ||= 'n'
+      if default_response.is_a?(String)
+        default = default_response =~ /y/i ? true : false
+      else
+        default = default_response
+      end
+
       # if global --default is set, answer default
-      return default =~ /y/i if @default_option
+      return default if @default_option
 
       # if this isn't an interactive shell, answer default
-      return default =~ /y/i unless $stdout.isatty
+      return default unless $stdout.isatty
 
       # clear the buffer
       if ARGV&.length
@@ -490,13 +496,13 @@ module Doing
       end
       system 'stty cbreak'
 
-      cw = colors['white']
-      cbw = colors['boldwhite']
-      cbg = colors['boldgreen']
-      cd = colors['default']
+      cw = Color.white
+      cbw = Color.boldwhite
+      cbg = Color.boldgreen
+      cd = Color.default
 
-      options = if default
-                  default =~ /y/i ? "#{cw}[#{cbg}Y#{cw}/#{cbw}n#{cw}]#{cd}" : "#{cw}[#{cbw}y#{cw}/#{cbg}N#{cw}]#{cd}"
+      options = unless default.nil?
+                  "#{cw}[#{default ? "#{cbg}Y#{cw}/#{cbw}n" : "#{cbw}y#{cw}/#{cbg}N"}#{cw}]#{cd}"
                 else
                   "#{cw}[#{cbw}y#{cw}/#{cbw}n#{cw}]#{cd}"
                 end
@@ -508,9 +514,9 @@ module Doing
       res.chomp!
       res.downcase!
 
-      res = default.downcase if res == ''
+      return default if res.empty?
 
-      res =~ /y/i
+      res =~ /y/i ? true : false
     end
 
     ##
@@ -987,7 +993,7 @@ module Doing
             type = action =~ /^add/ ? 'add' : 'remove'
             raise Errors::InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
 
-            print "#{colors['yellow']}Tag to #{type}: #{colors['reset']}"
+            print "#{Color.yellow}Tag to #{type}: #{Color.reset}"
             tag = $stdin.gets
             next if tag =~ /^ *$/
 
@@ -1002,7 +1008,7 @@ module Doing
             opt[:output] = output_format.strip
             res = opt[:force] ? false : yn('Save to file?', default_response: 'n')
             if res
-              print "#{colors['yellow']}File path/name: #{colors['reset']}"
+              print "#{Color.yellow}File path/name: #{Color.reset}"
               filename = $stdin.gets.strip
               next if filename.empty?
 
@@ -2021,55 +2027,6 @@ module Doing
           @results.push("Archived #{items.length - count} items from #{section} to #{destination}")
         end
       end
-    end
-
-    ##
-    ## @brief      A dictionary of colors
-    ##
-    ## @return     (String) ANSI escape sequence
-    ##
-    def colors
-      color = {}
-      color['black'] = "\033[0;0;30m"
-      color['red'] = "\033[0;0;31m"
-      color['green'] = "\033[0;0;32m"
-      color['yellow'] = "\033[0;0;33m"
-      color['blue'] = "\033[0;0;34m"
-      color['magenta'] = "\033[0;0;35m"
-      color['cyan'] = "\033[0;0;36m"
-      color['white'] = "\033[0;0;37m"
-      color['bgblack'] = "\033[40m"
-      color['bgred'] = "\033[41m"
-      color['bggreen'] = "\033[42m"
-      color['bgyellow'] = "\033[43m"
-      color['bgblue'] = "\033[44m"
-      color['bgmagenta'] = "\033[45m"
-      color['bgcyan'] = "\033[46m"
-      color['bgwhite'] = "\033[47m"
-      color['boldblack'] = "\033[1;30m"
-      color['boldred'] = "\033[1;31m"
-      color['boldgreen'] = "\033[0;1;32m"
-      color['boldyellow'] = "\033[0;1;33m"
-      color['boldblue'] = "\033[0;1;34m"
-      color['boldmagenta'] = "\033[0;1;35m"
-      color['boldcyan'] = "\033[0;1;36m"
-      color['boldwhite'] = "\033[0;1;37m"
-      color['boldbgblack'] = "\033[1;40m"
-      color['boldbgred'] = "\033[1;41m"
-      color['boldbggreen'] = "\033[1;42m"
-      color['boldbgyellow'] = "\033[1;43m"
-      color['boldbgblue'] = "\033[1;44m"
-      color['boldbgmagenta'] = "\033[1;45m"
-      color['boldbgcyan'] = "\033[1;46m"
-      color['boldbgwhite'] = "\033[1;47m"
-      color['softpurple'] = "\033[0;35;40m"
-      color['hotpants'] = "\033[7;34;40m"
-      color['knightrider'] = "\033[7;30;40m"
-      color['flamingo'] = "\033[7;31;47m"
-      color['yeller'] = "\033[1;37;43m"
-      color['whiteboard'] = "\033[1;30;47m"
-      color['default'] = "\033[0;39m"
-      color
     end
 
     ##

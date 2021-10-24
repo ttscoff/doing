@@ -5,6 +5,7 @@ module Doing
   ## @brief      String helpers
   ##
   class ::String
+    include Doing::Color
     ##
     ## @brief      Test if line should be ignored
     ##

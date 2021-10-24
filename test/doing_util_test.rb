@@ -5,6 +5,7 @@ require 'doing-helpers'
 require 'test_helper'
 
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
+require 'doing/colors'
 require 'doing/string'
 require 'doing/array'
 require 'doing/symbol'
