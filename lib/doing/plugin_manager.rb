@@ -56,7 +56,7 @@ module Doing
       # returns: Success boolean
       #
       def register(title, type, klass)
-        type = validate_plugin(type, klass)
+        type = validate_plugin(title, type, klass)
         return unless type
 
         if title.is_a?(Array)
@@ -77,17 +77,19 @@ module Doing
           templates: settings[:templates] || nil,
           config: settings[:config] || {}
         }
-        Doing.logger.debug('Plugin Manager:', "Registered #{type.to_s} plugin \"#{title}\"")
+
+        Doing.logger.debug('Plugin Manager:', "Registered #{type.to_s} plugin \"#{title}\"") if ENV['DOING_PLUGIN_DEBUG']
+
       end
 
-      def validate_plugin(type, klass)
+      def validate_plugin(title, type, klass)
         type = valid_type(type)
         case type
         when :import
-          raise Errors::PluginUncallable, 'Import plugins must respond to :import' unless klass.respond_to? :import
+          raise Errors::PluginUncallable.new('Import plugins must respond to :import', type: type, plugin: title) unless klass.respond_to? :import
 
         when :export
-          raise Errors::PluginUncallable, 'Export plugins must respond to :render' unless klass.respond_to? :render
+          raise Errors::PluginUncallable.new('Export plugins must respond to :render', type: type, plugin: title) unless klass.respond_to? :render
 
         end
 

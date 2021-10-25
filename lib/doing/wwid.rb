@@ -12,6 +12,8 @@ module Doing
   ## @brief      Main "What Was I Doing" methods
   ##
   class WWID
+    attr_reader   :additional_configs
+
     attr_accessor :content, :current_section, :doing_file, :config, :user_home, :default_config_file,
                   :config_file, :results, :auto_tag, :timers, :interval_cache, :recorded_items, :default_option, :stdout
 
@@ -58,7 +60,7 @@ module Doing
                          File.join(File.expand_path('~'), @default_config_file)
                        end
 
-      additional_configs = if opt[:ignore_local]
+      @additional_configs = if opt[:ignore_local]
                              []
                            else
                              find_local_config
@@ -68,7 +70,7 @@ module Doing
         @local_config = {}
 
         @config = YAML.load_file(@config_file) || {} if File.exist?(@config_file)
-        additional_configs.each do |cfg|
+        @additional_configs.each do |cfg|
           new_config = YAML.load_file(cfg) || {} if cfg
           @local_config = @local_config.deep_merge(new_config)
         end
@@ -78,6 +80,12 @@ module Doing
         @config = {}
         @local_config = {}
         # exit_now! "error reading config"
+      end
+
+      @additional_configs.delete(@config_file)
+
+      if @additional_configs && @additional_configs.count.positive?
+        Doing.logger.debug('Configuration:', "Local config files found: #{@additional_configs.map { |p| p.sub(/^#{@user_home}/, '~') }.join(', ')}")
       end
     end
 
@@ -194,6 +202,8 @@ module Doing
       @current_section = @config['current_section']
       @default_template = @config['templates']['default']['template']
       @default_date_format = @config['templates']['default']['date_format']
+
+      Doing::Hooks.trigger :post_config, @config
     end
 
     ##
@@ -256,6 +266,7 @@ module Doing
           # end
         end
       end
+      Doing::Hooks.trigger :post_read, @content
     end
 
     ##
@@ -789,8 +800,6 @@ module Doing
         keep = false if finished
 
         if keep && opt[:tag]
-          puts opt[:tag]
-          puts opt[:tag_bool]
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
           keep = false unless tag_match
         end
@@ -1147,154 +1156,101 @@ module Doing
       opt[:autotag] ||= false
       opt[:back] ||= false
       opt[:unfinished] ||= false
+      opt[:section] = opt[:section] ? guess_section(opt[:section]) : 'All'
 
-      sec_arr = []
+      items = filter_items([], opt: opt)
 
-      if opt[:section].nil?
-        sec_arr = if opt[:search] || opt[:tag]
-                     sections
-                  else
-                    [@current_section]
-                  end
-      elsif opt[:section].instance_of?(String)
-        if opt[:section] =~ /^all$/i
-          if opt[:count] == 1
-            combined = { 'items' => [] }
-            @content.each do |_k, v|
-              combined['items'] += v['items']
-            end
-            items = combined['items'].dup.sort_by { |item| item.date }.reverse
-            sec_arr.push(items[0].section)
-          elsif opt[:count] > 1
-            if opt[:search] || opt[:tag]
-              sec_arr = sections
+      items.each do |old_item|
+        item = old_item.dup
+        if opt[:autotag]
+          new_title = autotag(item.title) if @auto_tag
+          if new_title == item.title
+            Doing.logger.debug('Autotag:', 'No changes')
+          else
+            Doing.logger.info('Tags updated:', new_title)
+            item.title = new_title
+          end
+        else
+          if opt[:sequential]
+            next_entry = next_item(item)
+
+            if next_entry.nil?
+              done_date = Time.now
             else
-              raise Errors::InvalidArgument, 'A count greater than one requires a section to be specified'
+              done_date = next_entry.date - 60
+            end
+          elsif opt[:took]
+            if item.date + opt[:took] > Time.now
+              item.date = Time.now - opt[:took]
+              done_date = Time.now
+            else
+              done_date = item.date + opt[:took]
+            end
+          elsif opt[:back]
+            if opt[:back].is_a? Integer
+              done_date = item.date + opt[:back]
+            else
+              done_date = item.date + (opt[:back] - item.date)
             end
           else
-            sec_arr = sections
+            done_date = Time.now
           end
-        else
-          sec_arr = [guess_section(opt[:section])]
-        end
-      end
 
-      sec_arr.each do |section|
-        if @content.key?(section)
-          items = @content[section]['items'].dup.sort_by { |item| item.date }.reverse
-          idx = 0
-          done_date = Time.now
-          count = (opt[:count]).zero? ? items.length : opt[:count]
-          items.map! do |item|
-            break if idx == count
-            finished = opt[:unfinished] && item.tags?('done', :and)
-            tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
-            search_match = opt[:search].nil? || opt[:search].empty? ? true : item.search(opt[:search])
-
-            if tag_match && search_match && !finished
-              if opt[:autotag]
-                new_title = autotag(item.title) if @auto_tag
-                if new_title == item.title
-                  Doing.logger.debug('Autotag:', 'No changes')
-                else
-                  Doing.logger.info('Tags updated:', new_title)
-                  item.title = new_title
-                end
-              else
-                if opt[:sequential]
-                  next_entry = next_item(item)
-
-                  if next_entry.nil?
-                    done_date = Time.now
-                  else
-                    done_date = next_entry.date - 60
-                  end
-                elsif opt[:took]
-                  if item.date + opt[:took] > Time.now
-                    item.date = Time.now - opt[:took]
-                    done_date = Time.now
-                  else
-                    done_date = item.date + opt[:took]
-                  end
-                elsif opt[:back]
-                  if opt[:back].is_a? Integer
-                    done_date = item.date + opt[:back]
-                  else
-                    done_date = item.date + (opt[:back] - item.date)
-                  end
-                else
-                  done_date = Time.now
-                end
-
-                title = item.title
-                opt[:tags].each do |tag|
-                  tag = tag.strip
-                  if opt[:remove] || opt[:rename]
-                    case_sensitive = tag !~ /[A-Z]/
-                    replacement = ''
-                    if opt[:rename]
-                      replacement = tag
-                      tag = opt[:rename]
-                    end
-
-                    if opt[:regex]
-                      rx_tag = tag.gsub(/\./, '\S')
-                    else
-                      rx_tag = tag.gsub(/\?/, '.').gsub(/\*/, '\S*?')
-                    end
-
-                    if title =~ / @#{rx_tag}\b/
-                      rx = Regexp.new("(^| )@#{rx_tag}(\\([^)]*\\))?(?=\\b|$)", case_sensitive)
-                      removed_tags = []
-                      title.gsub!(rx) do |mtch|
-                        removed_tags.push(mtch.strip.sub(/\(.*?\)$/, ''))
-                        replacement
-                      end
-
-                      title.dedup_tags!
-
-                      Doing.logger.info('Removed tags:', %(#{removed_tags.map(&:cyan).join(', ')} from "#{title}" in #{section}))
-                    end
-                  elsif title !~ /@#{tag}/
-                    title.chomp!
-                    title += if opt[:date]
-                               " @#{tag}(#{done_date.strftime('%F %R')})"
-                             else
-                               " @#{tag}"
-                             end
-                    logtag = "@#{tag}".cyan
-                    Doing.logger.info('Added tag:', %(#{logtag} to "#{title}" in #{section}))
-                  end
-                end
-                item.title = title
+          title = item.title
+          opt[:tags].each do |tag|
+            tag = tag.strip
+            if opt[:remove] || opt[:rename]
+              case_sensitive = tag !~ /[A-Z]/
+              replacement = ''
+              if opt[:rename]
+                replacement = tag
+                tag = opt[:rename]
               end
 
-              idx += 1
+              if opt[:regex]
+                rx_tag = tag.gsub(/\./, '\S')
+              else
+                rx_tag = tag.gsub(/\?/, '.').gsub(/\*/, '\S*?')
+              end
+
+              if title =~ / @#{rx_tag}\b/
+                rx = Regexp.new("(^| )@#{rx_tag}(\\([^)]*\\))?(?=\\b|$)", case_sensitive)
+                removed_tags = []
+                title.gsub!(rx) do |mtch|
+                  removed_tags.push(mtch.strip.sub(/\(.*?\)$/, ''))
+                  replacement
+                end
+
+                title.dedup_tags!
+
+                Doing.logger.info('Removed tags:', %(#{removed_tags.map(&:cyan).join(', ')} from "#{title}" in #{opt[:section]}))
+              end
+            else
+              if title !~ /@#{tag}/
+                title.chomp!
+                title += if opt[:date]
+                           " @#{tag}(#{done_date.strftime('%F %R')})"
+                         else
+                           " @#{tag}"
+                         end
+                logtag = "@#{tag}".cyan
+                Doing.logger.info('Added tag:', %(#{logtag} to "#{title}" in #{opt[:section]}))
+              else
+                Doing.logger.debug('Skipped tag:', %("#{title}" already tagged #{logtag} in #{opt[:section]}))
+              end
             end
-
-            item
           end
+          item.title = title
+        end
 
-          @content[section]['items'] = items
-
-          if opt[:archive] && section != 'Archive' && (opt[:count]).positive?
-            # concat [count] items from [section] and archive section
-            archived = @content[section]['items'][0..opt[:count] - 1].map do |i|
-              i.title.sub!(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{i.section})")
-              i
-            end.concat(@content['Archive']['items'])
-            # slice [count] items off of [section] items
-            @content[opt[:section]]['items'] = @content[opt[:section]]['items'][opt[:count]..-1]
-            # overwrite archive section with concatenated array
-            @content['Archive']['items'] = archived
-            # log it
-            result = opt[:count] == 1 ? '1 entry' : "#{opt[:count]} entries"
-            Doing.logger.info('Archived:', "#{result} from #{section}")
-          elsif opt[:archive] && (opt[:count]).zero?
-            Doing.logger.warn('Archiving is skipped when operating on all entries') if (opt[:count]).zero?
-          end
+        if opt[:archive] && opt[:section] != 'Archive' && (opt[:count]).positive?
+          @content[item.section]['items'].delete(old_item)
+          item.title = item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{item.section})")
+          item.section = 'Archive'
+          @content['Archive']['items'].push(item)
         else
-          raise Errors::InvalidSection, "Section not found: #{section}"
+          Doing.logger.warn('Archiving is skipped when operating on all entries') if opt[:archive] && opt[:count].zero?
+          update_item(old_item, item)
         end
       end
 
@@ -1666,6 +1622,8 @@ module Doing
       File.open(file, 'w+') do |f|
         f.puts content
       end
+
+      Doing::Hooks.trigger :post_write, file
     end
 
     def run_after

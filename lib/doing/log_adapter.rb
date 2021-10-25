@@ -151,6 +151,9 @@ module Doing
 
       message = yield if block_given?
       message = message.to_s.gsub(/\s+/, ' ')
+
+      return "#{topic}" if topic && message.strip.empty?
+
       topic = formatted_topic(topic, colon: block_given?)
       out = topic + message
       messages << out
@@ -182,7 +185,7 @@ module Doing
     # @return     whether the message should be written.
     #
     def write_message?(level_of_message)
-      LOG_LEVELS.fetch(level) <= LOG_LEVELS.fetch(level_of_message)
+      LOG_LEVELS.fetch(@level) <= LOG_LEVELS.fetch(level_of_message)
     end
 
     #
@@ -201,8 +204,6 @@ module Doing
     # @return     false if the message was not written
     #
     def write(level_of_message, topic, message = nil, &block)
-      return false unless write_message?(level_of_message)
-
       @results << { level: level_of_message, message: message(topic, message, &block) }
       true
     end
@@ -248,10 +249,12 @@ module Doing
     end
 
     def output_results
+      results = @results.select { |msg| write_message?(msg[:level]) }
+
       if @logdev == $stdout
-        $stdout.print @results.map {|res| res[:message].uncolor }.join("\n")
+        $stdout.print results.map {|res| res[:message].uncolor }.join("\n")
       else
-        @results.each do |msg|
+        results.each do |msg|
           @logdev.puts color_message(msg[:level], msg[:message])
         end
       end

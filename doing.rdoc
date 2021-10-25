@@ -5,7 +5,7 @@ v2.0.0
 === Global Options
 === --config_file arg
 
-Use a specific configuration file
+Use a specific configuration file. Deprecated, set $DOING_CONFIG instead.
 
 [Default Value] /Users/ttscoff/.doingrc
 
@@ -17,8 +17,13 @@ Specify a different doing_file
 [Default Value] None
 
 
-=== -d|--debug
-Output debug messages
+=== --[no-]color
+Colored output
+
+
+
+=== --[no-]default
+Answer yes/no menus with default option
 
 
 
@@ -32,8 +37,18 @@ Output notes if included in the template
 
 
 
+=== -q|--quiet
+Silence info messages
+
+
+
 === --stdout
 Send results report to STDOUT instead of STDERR
+
+
+
+=== --verbose|--debug
+Verbose output
 
 
 
@@ -42,7 +57,7 @@ Display the program version
 
 
 
-=== -x|--[no-]noauto
+=== -x|--noauto
 Exclude auto tags and default tags
 
 
@@ -81,7 +96,7 @@ Note
 
 ===== -s|--section NAME
 
-Section
+Get last entry from a specific section
 
 [Default Value] All
 
@@ -89,7 +104,7 @@ Section
 ===== --search QUERY
 
 Repeat last entry matching search. Surround with
-  slashes for regex (e.g. "/query/").
+  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("'query").
 
 [Default Value] None
 
@@ -99,6 +114,11 @@ Repeat last entry matching search. Surround with
 Repeat last entry matching tags. Combine multiple tags with a comma.
 
 [Default Value] None
+
+
+===== -e|--editor
+Edit duplicated entry with /Users/ttscoff/scripts/editor.sh before adding
+
 
 
 ==== Command: <tt>archive  SECTION_NAME</tt>
@@ -220,11 +240,26 @@ Application bundle id to use
 [Default Value] None
 
 
+===== -d|--dump KEY
+
+Show a config key value. Separate key paths with colons or dots, e.g. "export_templates.html". Use . to output the entire config.
+
+[Default Value] None
+
+
 ===== -e|--editor EDITOR
 
 Editor to use
 
 [Default Value] None
+
+
+===== -o|--output FORMAT
+
+Format for --dump (json|yaml|raw)
+
+[Default Value] yaml
+[Must Match] (?-mix:^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$)
 
 
 ===== -u|--update
@@ -329,7 +364,7 @@ Section
 
 ===== --search QUERY
 
-Finish the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/")
+Finish the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("'query")
 
 [Default Value] None
 
@@ -397,7 +432,6 @@ Constrain search to entries older than date
 Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -448,14 +482,20 @@ List commands one per line, to assist with shell completion
 ==== Command: <tt>import  PATH</tt>
 Import entries from an external source
 
-Imports entries from other sources. Currently only handles JSON reports exported from Timing.app.
+Imports entries from other sources. Available plugins: calendar, doing, timing
 ===== Options
-===== --end DAYS
+===== --after DATE_STRING
 
-Import entries before X days ago, ignoring newer entries. Only valid if import plugin has implemented date range filtering.
+Import entries newer than date
 
-[Default Value] 0
-[Must Match] (?-mix:^\d+$)
+[Default Value] None
+
+
+===== --before DATE_STRING
+
+Import entries older than date
+
+[Default Value] None
 
 
 ===== -f|--from DATE_OR_RANGE
@@ -481,12 +521,11 @@ Target section
 [Default Value] None
 
 
-===== --start DAYS
+===== --search QUERY
 
-Import entries after X days ago, ignoring older entries. Only valid if import plugin has implemented date range filtering.
+Only import items matching search. Surround with slashes for regex (/query/), start with single quote for exact match ("'query")
 
-[Default Value] 30
-[Must Match] (?-mix:^\d+$)
+[Default Value] None
 
 
 ===== --tag TAGS
@@ -498,13 +537,18 @@ Tag all imported entries
 
 ===== --type TYPE
 
-Import type
+Import type (calendar|doing|timing)
 
-[Default Value] timing
+[Default Value] doing
 
 
 ===== --[no-]autotag
 Autotag entries
+
+
+
+===== --only_timed
+Only import items with recorded time intervals
 
 
 
@@ -535,7 +579,7 @@ Specify a section
 
 ===== --search QUERY
 
-Search filter, surround with slashes for regex (/query/)
+Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("'query")
 
 [Default Value] None
 
@@ -577,24 +621,64 @@ Edit entry with /Users/ttscoff/scripts/editor.sh
 
 
 ==== Command: <tt>mark|flag </tt>
-Mark last entry as highlighted
+Mark last entry as flagged
 
 
 ===== Options
-===== -s|--section NAME
+===== --bool BOOLEAN
+
+Boolean (AND|OR|NOT) with which to combine multiple tag filters
+
+[Default Value] AND
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+
+
+===== -c|--count COUNT
+
+How many recent entries to tag (0 for all)
+
+[Default Value] 1
+
+
+===== -s|--section SECTION_NAME
 
 Section
+
+[Default Value] All
+
+
+===== --search QUERY
+
+Flag the last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("'query")
 
 [Default Value] None
 
 
+===== --tag TAG
+
+Flag the last entry containing TAG.
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool
+
+[Default Value] None
+
+
+===== -d|--date
+Include current date/time with tag
+
+
+
+===== --force
+Don't ask permission to flag all entries when count is 0
+
+
+
 ===== -r|--remove
-Remove mark
+Remove flag
 
 
 
 ===== -u|--unfinished
-Mark last entry not marked @done
+Flag last entry (or entries) not marked @done
 
 
 
@@ -637,15 +721,39 @@ Edit entry with /Users/ttscoff/scripts/editor.sh
 ==== Command: <tt>note  NOTE_TEXT</tt>
 Add a note to the last entry
 
-If -r is provided with no other arguments, the last note is removed. If new content is specified through arguments or STDIN, any previous note will be replaced with the new one.
+If -r is provided with no other arguments, the last note is removed.
+  If new content is specified through arguments or STDIN, any previous
+  note will be replaced with the new one.
 
   Use -e to load the last entry in a text editor where you can append a note.
 ===== Options
+===== --bool BOOLEAN
+
+Boolean (AND|OR|NOT) with which to combine multiple tag filters
+
+[Default Value] AND
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+
+
 ===== -s|--section NAME
 
 Section
 
 [Default Value] All
+
+
+===== --search QUERY
+
+Add/remove note from last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("'query")
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Add/remove note from last entry matching tag
+
+[Default Value] None
 
 
 ===== -e|--editor
@@ -706,7 +814,6 @@ it will create a range.
 Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -755,6 +862,28 @@ Open with app bundle id
 
 ===== -e|--editor
 Open with $EDITOR (/Users/ttscoff/scripts/editor.sh)
+
+
+
+==== Command: <tt>plugins </tt>
+List installed plugins
+
+Lists available plugins, including user-installed plugins.
+
+Export plugins are available with the `--output` flag on commands that support it.
+
+Import plugins are available using `doing import --type PLUGIN`.
+===== Options
+===== -t|--type TYPE
+
+List plugins of type (import, export)
+
+[Default Value] all
+[Must Match] (?i-mx:^[iea].*$)
+
+
+===== -c|--[no-]column
+List in single column for completion
 
 
 
@@ -849,11 +978,13 @@ List in single column
 
 
 ==== Command: <tt>select </tt>
-Display an interactive menu to perform operations (requires fzf)
+Display an interactive menu to perform operations
 
 List all entries and select with typeahead fuzzy matching.
 
-Multiple selections are allowed, hit tab to add the highlighted entry to the selection. Return processes the selected entries.
+Multiple selections are allowed, hit tab to add the highlighted entry to the
+selection, and use ctrl-a to select all visible items. Return processes the
+selected entries.
 ===== Options
 ===== -m|--move SECTION
 
@@ -867,10 +998,9 @@ Move selected items to section
 Output entries to format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
-===== -q|--query QUERY
+===== -q|--query|--search QUERY
 
 Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "'search"
 
@@ -999,7 +1129,6 @@ Date range to show, or a single day to filter date on.
 Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--sort ORDER
@@ -1012,7 +1141,7 @@ Sort order (asc/desc)
 
 ===== --search QUERY
 
-Search filter, surround with slashes for regex (/query/)
+Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("'query")
 
 [Default Value] None
 
@@ -1066,7 +1195,6 @@ and "2d" would be interpreted as "two days ago."
 Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -1098,7 +1226,7 @@ Show time totals at the end of output
 Add tag(s) to last entry
 
 Add (or remove) tags from the last entry, or from multiple entries
-          (with `--count`), entries matching a search (with `--search), or entries
+          (with `--count`), entries matching a search (with `--search`), or entries
           containing another tag (with `--tag`).
 
           When removing tags with `-r`, wildcards are allowed (`*` to match
@@ -1142,7 +1270,7 @@ Section
 
 ===== --search QUERY
 
-Tag entries matching search filter, surround with slashes for regex (e.g. "/query.*/")
+Tag entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("'query")
 
 [Default Value] None
 
@@ -1193,6 +1321,11 @@ Templates are printed to STDOUT for piping to a file.
 
   Example `doing template haml > ~/styles/my_doing.haml`
 ===== Options
+===== -c
+List in single column for completion
+
+
+
 ===== -l|--[no-]list
 List all available templates
 
@@ -1222,7 +1355,6 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -1302,7 +1434,6 @@ Count to display
 Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME
@@ -1314,7 +1445,7 @@ Section
 
 ===== --search QUERY
 
-Search filter, surround with slashes for regex (/query/)
+Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("'query")
 
 [Default Value] None
 
@@ -1396,7 +1527,6 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:csv|html?|web(?:page)?|json|time(?:line)?|markdown|mk?d|gfm|task(?:paper)?|tp|template|doing|template|doing|say(?:it)?)$)
 
 
 ===== -s|--section NAME

@@ -37,6 +37,11 @@ class DoingViewTest < Test::Unit::TestCase
     assert_count_entries(1, entries, '1 entry should be listed containing DOING TEST (added by the view)')
   end
 
+  def test_view_guess
+    res = doing('--stdout', '--verbose', 'view', 'col').strip
+    assert_match(/Assuming "color"/, res, 'Should have guessed color')
+  end
+
   def test_view_from_config
     doing('import', '--type', 'timing', @import_file)
     doing('done', '--no-date', 'Adding untimed entry')

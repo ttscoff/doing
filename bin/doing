@@ -41,6 +41,20 @@ wwid.user_home = if Dir.respond_to?('home')
                    File.expand_path('~')
                  end
 
+Doing.logger.log_level = :info
+
+if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DOING_VERBOSE'] || ENV['DOING_PLUGIN_DEBUG']
+  # Quiet always wins
+  if ENV['DOING_QUIET'] && ENV['DOING_QUIET'].truthy?
+    Doing.logger.log_level = :error
+  elsif (ENV['DOING_PLUGIN_DEBUG'] && ENV['DOING_PLUGIN_DEBUG'].truthy?)
+    Doing.logger.log_level = :debug
+  elsif (ENV['DOING_DEBUG'] && ENV['DOING_DEBUG'].truthy?)
+    Doing.logger.log_level = :debug
+  elsif ENV['DOING_LOG_LEVEL']
+    Doing.logger.log_level = ENV['DOING_LOG_LEVEL']
+  end
+end
 
 if ENV['DOING_CONFIG']
   cf = File.expand_path(ENV['DOING_CONFIG'])
@@ -52,17 +66,6 @@ if ENV['DOING_CONFIG']
 else
   wwid.configure
 end
-
-if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DOING_VERBOSE']
-  if ENV['DOING_QUIET'] && ENV['DOING_QUIET'].truthy?
-    Doing.logger.log_level = :error
-  elsif (ENV['DOING_DEBUG'] && ENV['DOING_DEBUG'].truthy?)
-    Doing.logger.log_level = :debug
-  elsif ENV['DOING_LOG_LEVEL']
-    Doing.logger.log_level = ENV['DOING_LOG_LEVEL']
-  end
-end
-
 
 program_desc 'A CLI for a What Was I Doing system'
 
@@ -688,6 +691,9 @@ command :finish do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
+  c.desc 'Remove done tag'
+  c.switch %i[r remove], negatable: false, default_value: false
+
   c.desc 'Finish last entry (or entries) not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
 
@@ -704,12 +710,6 @@ command :finish do |c|
   c.flag %i[s section]
 
   c.action do |_global_options, options, args|
-    if options[:section]
-      section = wwid.guess_section(options[:section]) || options[:section].cap_first
-    else
-      section = wwid.current_section
-    end
-
     unless options[:auto]
       if options[:took]
         took = wwid.chronify_qty(options[:took])
@@ -754,12 +754,13 @@ command :finish do |c|
       count: count,
       date: options[:date],
       search: options[:search],
-      section: section,
+      section: options[:section],
       sequential: options[:auto],
       tag: tags,
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],
-      unfinished: options[:unfinished]
+      unfinished: options[:unfinished],
+      remove: options[:remove]
     }
 
     wwid.tag_last(opts)
@@ -1966,46 +1967,61 @@ command :config do |c|
       cfg = wwid.config
       unless options[:dump] == '.'
         path = options[:dump].split(/[:.]/)
-        path.each do |p|
-          if cfg.key?(p)
-            cfg = cfg[p]
-          else
-            $stdout.puts "Error: key #{options[:dump]} not found"
-            return
-          end
-        end
+        cfg = cfg.dig(*path)
       end
-      $stdout.puts case options[:output]
-                   when /^j/
-                     JSON.pretty_generate(cfg)
-                   when /^r/
-                     cfg
-                   else
-                     YAML.dump(cfg)
-                   end
+
+      if cfg
+        $stdout.puts case options[:output]
+                     when /^j/
+                       JSON.pretty_generate(cfg)
+                     when /^r/
+                       cfg
+                     else
+                       if cfg.is_a?(String)
+                         cfg
+                       else
+                         YAML.dump(cfg)
+                       end
+                     end
+      else
+        Doing.logger.log_now(:error, 'Config:', "Key #{options[:dump]} not found")
+      end
+
       return
+    end
+
+    if wwid.additional_configs.count.positive?
+      choices = [wwid.config_file]
+      choices.concat(wwid.additional_configs)
+      res = wwid.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to edit > ')
+
+      raise Doing::Errors::UserCancelled, 'Cancelled' unless res
+
+      config_file = res.strip || wwid.config_file
+    else
+      config_file = wwid.config_file
     end
 
     if `uname` =~ /Darwin/
       if options[:x]
-        `open -a "#{wwid.config['config_editor_app']}" "#{wwid.config_file}"`
+        `open -a "#{wwid.config['config_editor_app']}" "#{config_file}"`
       elsif options[:a] || options[:b]
         if options[:a]
-          `open -a "#{options[:a]}" "#{wwid.config_file}"`
+          `open -a "#{options[:a]}" "#{config_file}"`
         elsif options[:b]
-          `open -b #{options[:b]} "#{wwid.config_file}"`
+          `open -b #{options[:b]} "#{config_file}"`
         end
       else
         raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if options[:e].nil? && ENV['EDITOR'].nil?
 
         editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
-        system %(#{editor} "#{wwid.config_file}")
+        system %(#{editor} "#{config_file}")
       end
     else
       raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if options[:e].nil? && ENV['EDITOR'].nil?
 
       editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
-      system %(#{editor} "#{wwid.config_file}")
+      system %(#{editor} "#{config_file}")
     end
   end
 end
@@ -2104,17 +2120,26 @@ end
 
 pre do |global, _command, _options, _args|
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
-
   unless STDOUT.isatty
     Doing::Color::coloring = false
   else
     Doing::Color::coloring = global[:color]
   end
+
   # Return true to proceed; false to abort and not call the
   # chosen command
   # Use skips_pre before a command to skip this block
   # on that command only
   true
+end
+
+on_error do |exception|
+  if exception.kind_of?(SystemExit)
+    false
+  else
+    Doing.logger.output_results
+    true
+  end
 end
 
 post do |global, _command, _options, _args|
@@ -2154,11 +2179,6 @@ around do |global, command, options, arguments, code|
   wwid.config[:include_notes] = false unless global[:notes]
 
   code.call
-end
-
-on_error do |_exception|
-  # puts exception.message
-  true
 end
 
 exit run(ARGV)

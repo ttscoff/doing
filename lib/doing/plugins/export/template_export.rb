@@ -131,7 +131,7 @@ module Doing
 
         out += "#{output}\n"
       end
-      Doing.logger.debug('Template Export:', "#{items.count} items output to template #{opt[:template]}")
+      # Doing.logger.debug('Template Export:', "#{items.count} items output to template #{opt[:template]}")
       out += wwid.tag_times(format: :text, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) if opt[:totals]
       out
     end

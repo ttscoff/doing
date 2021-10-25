@@ -2,22 +2,69 @@
 
 module Doing
   module Errors
-    PluginException = Class.new(::RuntimeError)
 
+    class UserCancelled < ::StandardError
+      def initialize(msg='Cancelled')
+        Doing.logger.log_now(:info, msg)
+        Process.exit 0
+      end
+    end
+
+    class DoingStandardError < ::StandardError
+      def initialize(msg='')
+        Doing.logger.output_results
+
+        super
+      end
+    end
+
+    class DoingRuntimeError < ::RuntimeError
+      def initialize(msg='')
+        Doing.logger.output_results
+
+        super
+      end
+    end
+
+    class PluginException < ::StandardError
+      attr_reader :plugin
+
+      def initialize(msg = 'Plugin error', type: nil, plugin: nil)
+        @plugin = plugin || 'Uknown Plugin'
+
+        type ||= 'Unknown'
+        @type = case type.to_s
+                when /^i/
+                  'Import plugin'
+                when /^e/
+                  'Export plugin'
+                else
+                  type.to_s
+                end
+
+        msg = "(#{@type}: #{@plugin}) #{msg}"
+
+        Doing.logger.error('Plugin Error:', msg)
+        Doing.logger.output_results
+        Process.exit 1
+      end
+    end
+
+    HookUnavailable = Class.new(PluginException)
     InvalidPluginType = Class.new(PluginException)
     PluginUncallable = Class.new(PluginException)
 
-    InvalidArgument = Class.new(RuntimeError)
-    MissingArgument = Class.new(RuntimeError)
-    MissingFile = Class.new(RuntimeError)
-    MissingEditor = Class.new(RuntimeError)
+    InvalidArgument = Class.new(DoingRuntimeError)
+    MissingArgument = Class.new(DoingRuntimeError)
+    MissingFile = Class.new(DoingRuntimeError)
+    MissingEditor = Class.new(DoingRuntimeError)
 
-    NoEntryError = Class.new(RuntimeError)
-    EmptyInput = Class.new(RuntimeError)
+    NoEntryError = Class.new(DoingRuntimeError)
+    EmptyInput = Class.new(DoingRuntimeError)
 
-    InvalidTimeExpression = Class.new(RuntimeError)
-    InvalidSection = Class.new(RuntimeError)
-    InvalidView = Class.new(RuntimeError)
+    InvalidTimeExpression = Class.new(DoingRuntimeError)
+    InvalidSection = Class.new(DoingRuntimeError)
+    InvalidView = Class.new(DoingRuntimeError)
 
     # FatalException = Class.new(::RuntimeError)
     # InvalidPluginName = Class.new(FatalException)
