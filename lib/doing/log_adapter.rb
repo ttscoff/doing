@@ -235,7 +235,7 @@ module Doing
         message = message.boldwhite
       end
 
-      "#{prefix} #{message}#{colors.default}"
+      "#{prefix} #{message.highlight_tags}#{colors.default}"
     end
 
     def output_results

@@ -15,7 +15,13 @@ module Doing
       @section = section
       @note = Note.new
 
-      @note.append_string(note) if note
+      if note
+        if @note.is_a?(String)
+          @note.append_string(note)
+        elsif @note.is_a?(Array)
+          @note.append(note)
+        end
+      end
     end
 
     # def date=(new_date)
@@ -57,7 +63,7 @@ module Doing
     end
 
     def search(search)
-      text = @title + @note.join(' ')
+      text = @title + @note.to_s
       pattern = case search.strip
                 when %r{^/.*?/$}
                   search.sub(%r{/(.*?)/}, '\1')
@@ -69,6 +75,7 @@ module Doing
                   search.split('').join('.{0,3}')
                 end
       rx = Regexp.new(pattern, !case_sensitive)
+
       text =~ rx
     end
 

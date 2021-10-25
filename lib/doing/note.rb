@@ -11,7 +11,7 @@ module Doing
     end
 
     def append_string(input)
-      concat(input.split(/\n/).map(&:chomp))
+      concat(input.split(/\n/).map(&:strip))
       replace compress
     end
 

@@ -116,5 +116,9 @@ class DoingImportTest < Test::Unit::TestCase
 
     tmpdir
   end
+
+  def doing(*args)
+    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+  end
 end
 

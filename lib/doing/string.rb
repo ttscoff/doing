@@ -14,6 +14,20 @@ module Doing
       end
     end
 
+    def highlight_tags!(color = 'yellow')
+      replace highlight_tags(color)
+    end
+
+    def highlight_tags(color = 'yellow')
+      escapes = scan(/(\e\[[\d;]+m)[^\e]+@/)
+      tag_color = Doing::Color.send(color)
+      last_color = if !escapes.empty?
+                     escapes[-1][0]
+                   else
+                     Doing::Color.default
+                   end
+      gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{last_color}")
+    end
 
     ##
     ## @brief      Test if line should be ignored

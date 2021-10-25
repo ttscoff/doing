@@ -5,14 +5,7 @@ require 'doing-helpers'
 require 'test_helper'
 
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
-require 'doing/array'
-require 'doing/symbol'
-require 'doing/time'
-require 'doing/item'
-require 'doing/note'
-require 'doing/plugin_manager'
-require 'doing/util'
-require 'doing/wwid'
+require 'doing'
 # require 'gli'
 
 # Tests for archive commands

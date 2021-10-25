@@ -90,13 +90,7 @@ module Doing
 
         # output.sub!(/(?i-m)^([\s\S]*?)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)([\s\S]*?)$/, '\1\3\2')
         if opt[:tags_color]
-          escapes = output.scan(/(\e\[[\d;]+m)[^\e]+@/)
-          last_color = if !escapes.empty?
-                         escapes[-1][0]
-                       else
-                         Doing::Color.default
-                       end
-          output.gsub!(/(\s|m)(@[^ (]+)/, "\\1#{Doing::Color.send(opt[:tags_color])}\\2#{last_color}")
+          output.highlight_tags!(opt[:tags_color])
         end
 
         if note.empty?

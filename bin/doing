@@ -168,7 +168,9 @@ end
 
 desc 'Add a note to the last entry'
 long_desc %(
-  If -r is provided with no other arguments, the last note is removed. If new content is specified through arguments or STDIN, any previous note will be replaced with the new one.
+  If -r is provided with no other arguments, the last note is removed.
+  If new content is specified through arguments or STDIN, any previous
+  note will be replaced with the new one.
 
   Use -e to load the last entry in a text editor where you can append a note.
 )
@@ -184,41 +186,68 @@ command :note do |c|
   c.desc "Replace/Remove last entry's note (default append)"
   c.switch %i[r remove], negatable: false, default_value: false
 
+  c.desc 'Add/remove note from last entry matching tag'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Add/remove note from last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
+
   c.action do |_global_options, options, args|
     if options[:section]
-      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+      options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
+
+
+    options[:tag_bool] = options[:bool].normalize_bool
+
+    last_entry = wwid.last_entry(options)
+
+    unless last_entry
+      Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
+      return
+    end
+
+    last_note = last_entry.note || Doing::Note.new
+    new_note = Doing::Note.new
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero? && !options[:r])
       exit_now! 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
 
       input = !args.empty? ? args.join(' ') : ''
 
-      prev_input = wwid.last_note(section) || ''
-      prev_input = prev_input.join("\n") if prev_input.instance_of?(Array)
-      input = prev_input + input
+      if options[:remove]
+        prev_input = Doing::Note.new
+      else
+        prev_input = last_entry.note || Doing::Note.new
+      end
 
-      input = wwid.fork_editor(input).strip
-      exit_now! 'No content, cancelled' unless input
+      input = prev_input.append_string(input)
 
+      input = wwid.fork_editor([last_entry.title, '### Edit below this line', input.to_s].join("\n")).strip
       _title, note = wwid.format_input(input)
-
-      exit_now! 'No note content' unless note
-
-      wwid.note_last(section, note, replace: true)
+      options[:remove] = true
+      new_note.append(note)
     elsif !args.empty?
-      title, note = wwid.format_input(args.join(' '))
-      note.insert(0, title)
-      wwid.note_last(section, note, replace: options[:r])
+      new_note.append_string(args.join(' '))
     elsif $stdin.stat.size.positive?
-      title, note = wwid.format_input($stdin.read)
-      note.insert(0, title)
-      wwid.note_last(section, note, replace: options[:r])
-    elsif options[:r]
-      wwid.note_last(section, [], replace: true)
+      new_note.append_string($stdin.read)
     else
-      exit_now! 'You must provide content when adding a note'
+      exit_now! 'You must provide content when adding a note' unless options[:remove]
     end
+
+    unless options[:remove]
+      new_note = last_note.append(new_note)
+    end
+
+    new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
+
+    wwid.update_item(last_entry, new_entry)
     wwid.write(wwid.doing_file)
   end
 end
@@ -331,10 +360,12 @@ command :template do |c|
   end
 end
 
-desc 'Display an interactive menu to perform operations (requires fzf)'
+desc 'Display an interactive menu to perform operations'
 long_desc 'List all entries and select with typeahead fuzzy matching.
 
-Multiple selections are allowed, hit tab to add the highlighted entry to the selection. Return processes the selected entries.'
+Multiple selections are allowed, hit tab to add the highlighted entry to the
+selection, and use ctrl-a to select all visible items. Return processes the
+selected entries.'
 command :select do |c|
   c.desc 'Select from a specific section'
   c.arg_name 'SECTION'
@@ -359,7 +390,7 @@ command :select do |c|
 
   c.desc 'Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "\'search"'
   c.arg_name 'QUERY'
-  c.flag %i[q query]
+  c.flag %i[q query search]
 
   c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.'
   c.switch %i[menu], negatable: true, default_value: true

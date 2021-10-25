@@ -252,7 +252,7 @@ module Doing
           prev_item = @content[section]['items'][current - 1]
           prev_item.note = Note.new unless prev_item.note
 
-          prev_item.note.push(line.chomp)
+          prev_item.note.append_string(line)
           # end
         end
       end
@@ -332,7 +332,7 @@ module Doing
       if note.empty? && title =~ /\s+\(.*?\)$/
         title.sub!(/\s+\((.*?)\)$/) do
           m = Regexp.last_match
-          note.push(m[1])
+          note.append_string(m[1])
           ''
         end
       end
@@ -737,33 +737,9 @@ module Doing
       opt[:tag_bool] ||= :and
       opt[:section] ||= @current_section
 
-      sec_arr = []
+      all_items = filter_items([], opt: opt)
 
-      if opt[:section].nil?
-        sec_arr = [@current_section]
-      elsif opt[:section].instance_of?(String)
-        if opt[:section] =~ /^all$/i
-          combined = { 'items' => [] }
-          @content.each do |_k, v|
-            combined['items'] += v['items']
-          end
-          items = combined['items'].dup.sort_by { |item| item.date }.reverse
-          sec_arr.push(items[0].section)
-        else
-          sec_arr = [guess_section(opt[:section])]
-        end
-      end
-
-      all_items = []
-      sec_arr.each do |section|
-        all_items.concat(@content[section]['items'].dup) if @content.key?(section)
-      end
-
-      if opt[:tag]&.length
-        all_items.select! { |item| item.tags?(opt[:tag], opt[:tag_bool]) }
-      elsif opt[:search]&.length
-        all_items.select! { |item| item.search(opt[:search]) }
-      end
+      Doing.logger.debug('Filtered:', "Parameters matched #{all_items.count} entries")
 
       all_items.max_by { |item| item.date }
     end
@@ -803,7 +779,6 @@ module Doing
       end
 
       items.sort_by! { |item| item.date }.reverse
-
       filtered_items = items.select do |item|
         keep = true
         finished = opt[:unfinished] && item.tags?('done', :and)
@@ -866,14 +841,7 @@ module Doing
 
         keep
       end
-
-      count = if opt[:count] && (opt[:count].zero? || opt[:count] >= filtered_items.length)
-                filtered_items.length
-              elsif opt[:count]
-                opt[:count]
-              else
-                0
-              end
+      count = opt[:count] && opt[:count].positive? ? opt[:count] : filtered_items.length
 
       if opt[:age] =~ /^o/i
         filtered_items.slice(0, count).reverse
@@ -1546,7 +1514,15 @@ module Doing
     ## @param      replace  (Bool) Should replace existing note
     ##
     def note_last(section, note, replace: false)
-      note.split!("\n") if note.is_a?(String)
+      new_note = Note.new
+      if note.is_a?(Array)
+        new_note.append(note)
+      else
+        new_note.append_string(note)
+      end
+
+      new_note.compress!
+
       section = guess_section(section)
 
       if section =~ /^all$/i
@@ -1562,19 +1538,24 @@ module Doing
       # sort_section(opt[:section])
       items = @content[section]['items'].dup.sort_by { |item| item.date }.reverse
 
-      current_note = items[0].note
+      current_note = items[0].note.compress.strip_lines
       current_note ||= Note.new
       title = items[0].title
+
       if replace
-        items[0].note = Note.new.append(note)
-        if note.empty? && !current_note.empty?
-          Doing.logger.info('Removed note:', title)
-        elsif !current_note.empty? && !note.empty?
-          Doing.logger.info('Replaced note:', title)
-        elsif !note.empty?
-          Doing.logger.info('Added note:', title)
+        if current_note == new_note
+          Doing.logger.debug('Skipped:', 'No change')
         else
-          Doing.logger.debug('Skipping:', %(Entry "#{title}" has no note))
+          items[0].note = new_note
+          if note.empty? && !current_note.empty?
+            Doing.logger.info('Removed note:', title)
+          elsif !current_note.empty? && !note.empty?
+            Doing.logger.info('Replaced note:', title)
+          elsif !note.empty?
+            Doing.logger.info('Added note:', title)
+          else
+            Doing.logger.debug('Skipping:', %(Entry "#{title}" has no note))
+          end
         end
       elsif current_note.instance_of?(Note)
         items[0].note.append(note)
