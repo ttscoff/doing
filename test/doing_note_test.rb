@@ -7,7 +7,7 @@ require 'doing-helpers'
 require 'test_helper'
 
 # Tests for entry modifying commands
-class DoingLastTest < Test::Unit::TestCase
+class DoingNoteTest < Test::Unit::TestCase
   include DoingHelpers
 
   def setup

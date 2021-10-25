@@ -1,29 +1,44 @@
-### 1.0.94
+### 2.0.0
 
 #### NEW
 
-- Printf formatting for title and date
-- --interactive mode to act on results of `doing grep`
-- (loosely printf-esque) formatting options for `%note` template placeholder
-- Add %idnote template placeholder for "indented note" (entire note indented one tab)
-- `doing config --update` will add newly added config keys to your existing config file (handy with plugins that define their own config keys)
 - Import calendar events from Calendar.app on macOS
+- `doing config --update` will add newly added config keys to your existing config file (handy with plugins that define their own config keys)
+- Add %idnote template placeholder for "indented note" (entire note indented one tab)
+- (loosely printf-esque) formatting options for `%note` template placeholder
+- --interactive mode to act on results of `doing grep`
+- Printf formatting for title and date
+- Doing import plugin
+- Plugins command to list plugins
+- --dump option for `doing config` to output a key.path config key as JSON, YAML, or raw output
+- --no-color global flag
+- Log levels, with --quiet and --verbose global flags
+- Convert CLI messaging to Logger-based system
+- Use DOING_DEBUG, DOING_QUIET, or DOING_LOG_LEVEL environment variables to specify log levels before configuration is read
 
 #### IMPROVED
 
-- Output wrapping for terminal display
-- Select menu item formatting
-- If an edited item has no changes, don't update/output notification - Don't start with query when using grep --interactive
-- When accepting a date filter, allow end date to be in the future
-- Fix regression where notes stored in doing file were outdented, breaking TaskPaper compatibility
-- Major plugin architecture refactoring
 - Timeline output formatting
+- Major plugin architecture refactoring
+- Fix regression where notes stored in doing file were outdented, breaking TaskPaper compatibility
+- When accepting a date filter, allow end date to be in the future
+- If an edited item has no changes, don't update/output notification - Don't start with query when using grep --interactive
+- Select menu item formatting
+- Output wrapping for terminal display
+- Redirect warn to STDOUT when run with --stdout
+- Fish autocomplete
+- `--config_file` global flag deprected, now uses $DOING_CONFIG environment variable so that config overrides can be available before the initial configuration is run
+- When --stdout or not a TTY, no color or output formatting
+- Highlight tags when showing results. Because it looks nice.
+- --tag and --search for `doing note`
 
 #### FIXED
 
-- Handling of arbitrary times in natural language dates
-- Show --from with date span
 - Multi-word unquoted arguments to add_section being truncated
+- Show --from with date span
+- Handling of arbitrary times in natural language dates
+- Backward scope of since command with arbitrary times
+- `doing rotate --keep` wasn't respecting keep value
 
 ### 1.0.93
 
