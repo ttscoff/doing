@@ -220,22 +220,31 @@ module Doing
     def color_message(level, topic, message = nil, &block)
       colors = Doing::Color
       message = message(topic, message, &block)
+      prefix = '  '
+      topic_fg = colors.boldcyan
+      message_fg = colors.boldwhite
+
       case level
       when :debug
         prefix = '> '.softpurple
-        message = message.white
+        topic_fg = colors.softpurple
+        message_fg = colors.white
       when :warn
         prefix = '> '.boldyellow
-        message = message.yellow
+        topic_fg = colors.boldyellow
+        message_fg = colors.yellow
       when :error
         prefix = '!!'.boldred
-        message = message.red
-      else
-        prefix = '  '
-        message = message.boldwhite
+        topic_fg = colors.flamingo
+        message_fg = colors.red
       end
 
-      "#{prefix} #{message.highlight_tags}#{colors.default}"
+      message.sub!(/^(\s*\S.*?): (.*?)$/) do
+        m = Regexp.last_match
+        "#{topic_fg}#{m[1]}#{colors.reset}: #{message_fg}#{m[2]}"
+      end
+
+      "#{prefix} #{message.highlight_tags}#{colors.reset}"
     end
 
     def output_results

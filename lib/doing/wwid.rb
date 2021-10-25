@@ -433,7 +433,7 @@ module Doing
     ## @param      frag     (String) The user-provided string
     ## @param      guessed  (Boolean) already guessed and failed
     ##
-    def guess_section(frag, guessed: false)
+    def guess_section(frag, guessed: false, suggest: false)
       return 'All' if frag =~ /^all$/i
       frag ||= @current_section
 
@@ -443,15 +443,18 @@ module Doing
       sections.each do |sect|
         next unless sect =~ /#{re}/i
 
-        Doing.logger.log_now(:debug, "Assuming you meant #{sect}")
+        Doing.logger.debug('Section match:', %(Assuming "#{sect}" from "#{frag}"))
         section = sect
         break
       end
+
+      return section if suggest
+
       unless section || guessed
-        alt = guess_view(frag, guessed: true)
+        alt = guess_view(frag, guessed: true, suggest: true)
         if alt
           meant_view = yn("Did you mean `doing view #{alt}`?", default_response: 'n')
-          exit_now! "Run again with `doing view #{alt}`" if meant_view
+          raise Errors::InvalidSection, "Run again with `doing view #{alt}`" if meant_view
         end
 
         res = yn("Section #{frag} not found, create it", default_response: 'n')
@@ -525,21 +528,22 @@ module Doing
     ## @param      frag     (String) The user-provided string
     ## @param      guessed  (Boolean) already guessed
     ##
-    def guess_view(frag, guessed: false)
+    def guess_view(frag, guessed: false, suggest: false)
       views.each { |view| return view if frag.downcase == view.downcase }
       view = false
       re = frag.split('').join('.*?')
       views.each do |v|
         next unless v =~ /#{re}/i
 
-        Doing.logger.log_now(:debug, "Assuming you meant #{v}")
+        Doing.logger.debug('View match:', %(Assuming "#{v}" from "#{frag}"))
         view = v
         break
       end
       unless view || guessed
-        exit_now! "Did you mean `doing show #{alt}`?" if guess_section(frag, guessed: true)
+        guess = guess_section(frag, guessed: true, suggest: true)
+        exit_now! "Did you mean `doing show #{guess}`?" if guess
 
-        raise Errors::InvalidView "Unknown view: #{frag}"
+        raise Errors::InvalidView, "Unknown view: #{frag}"
 
       end
       view
