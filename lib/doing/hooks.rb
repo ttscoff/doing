@@ -34,7 +34,7 @@ module Doing
 
       raise Doing::Errors::PluginUncallable, 'Hooks must respond to :call' unless block.respond_to? :call
 
-      Doing.logger.debug('Hooks:', "Registered #{event} hook") if ENV['DOING_PLUGIN_DEBUG']
+      Doing.logger.debug('Hook Manager:', "Registered #{event} hook") if ENV['DOING_PLUGIN_DEBUG']
 
       insert_hook event, priority, &block
     end
