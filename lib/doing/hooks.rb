@@ -7,6 +7,7 @@ module Doing
 
     @registry = {
       post_config: [],
+      post_local_config: [],
       post_read: [],
       post_write: []
     }

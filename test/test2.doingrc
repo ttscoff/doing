@@ -5,10 +5,10 @@ plugins:
     trizzle: test value from config
   say:
     say_voice: Fiona
-default_tags: []
+default_tags: [defaulttag]
 autotag:
   transform:
-  - "(deploy|merge)\\s+@(\\w+)-\\d+:$1-$2 @dev @dev-$2"
+  - (deploy|merge)\s+@(\w+)-\d+:$1-$2 @dev @dev-$2
   whitelist:
   - autotag
   - overtired

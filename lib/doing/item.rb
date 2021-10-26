@@ -8,20 +8,10 @@ module Doing
     attr_accessor :date, :title, :section, :note
 
     def initialize(date, title, section, note = nil)
-      # super()
-
       @date = date.is_a?(Time) ? date : Time.parse(date)
       @title = title
       @section = section
-      @note = Note.new
-
-      if note
-        if @note.is_a?(String)
-          @note.append_string(note)
-        elsif @note.is_a?(Array)
-          @note.append(note)
-        end
-      end
+      @note = Note.new(note)
     end
 
     # def date=(new_date)
@@ -41,11 +31,13 @@ module Doing
 
       return false if @date != other.date
 
-      @note ||= Note.new
-      other.note ||= Note.new
-      return false if @note.strip_lines != other.note.strip_lines
+      return false unless @note.equal?(other.note)
 
       true
+    end
+
+    def tag(tag, value: nil, remove: false)
+      @title.add_tag!(tag, value: value, remove: remove)
     end
 
     def tags?(tags, bool = :and)

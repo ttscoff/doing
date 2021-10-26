@@ -244,13 +244,14 @@ command :note do |c|
       raise Doing::Errors::EmptyInput, 'You must provide content when adding a note' unless options[:remove]
     end
 
-    unless options[:remove]
-      new_note = last_note.add(new_note)
+    if last_note.equal?(new_note)
+      Doing.logger.debug('Skipped:', 'No note change')
+    else
+      last_note.add(new_note, replace: options[:remove])
+      Doing.logger.info('Entry updated:', last_entry.title)
     end
+    # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
 
-    new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
-
-    wwid.update_item(last_entry, new_entry)
     wwid.write(wwid.doing_file)
   end
 end
@@ -522,6 +523,7 @@ command %i[done did] do |c|
 
   c.action do |_global_options, options, args|
     took = 0
+    donedate = nil
 
     if options[:took]
       took = wwid.chronify_qty(options[:took])
@@ -548,8 +550,8 @@ command %i[done did] do |c|
       finish_date = Time.now
     end
 
-    if finish_date
-      donedate = options[:date] ? "(#{finish_date.strftime('%F %R')})" : ''
+    if options[:date]
+      donedate = finish_date.strftime('%F %R')
     end
 
     if options[:section]
@@ -567,7 +569,7 @@ command %i[done did] do |c|
       raise Doing::Errors::EmptyInput, 'No content' unless input && !input.empty?
 
       title, note = wwid.format_input(input)
-      title += " @done#{donedate}"
+      title.tag!('done', value: donedate)
       section = 'Archive' if options[:a]
       wwid.add_item(title.cap_first, section.cap_first, { note: note, back: date })
       wwid.write(wwid.doing_file)
@@ -588,13 +590,13 @@ command %i[done did] do |c|
     elsif !args.empty?
       title, note = wwid.format_input(args.join(' '))
       title.chomp!
-      title += " @done#{donedate}"
+      title.tag!('done', value: donedate)
       section = 'Archive' if options[:a]
       wwid.add_item(title.cap_first, section.cap_first, { note: note, back: date })
       wwid.write(wwid.doing_file)
     elsif $stdin.stat.size.positive?
       title, note = wwid.format_input($stdin.read)
-      title += " @done#{donedate}"
+      title.tag!('done', value: donedate)
       section = options[:a] ? 'Archive' : section
       wwid.add_item(title.cap_first, section.cap_first, { note: note, back: date })
       wwid.write(wwid.doing_file)
@@ -636,7 +638,7 @@ command :cancel do |c|
     if options[:tag].nil?
       tags = []
     else
-      tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
+      tags = options[:tag].to_tags
     end
 
     raise Doing::Errors::InvalidArgument, 'Only one argument allowed' if args.length > 1
@@ -739,7 +741,7 @@ command :finish do |c|
     if options[:tag].nil?
       tags = []
     else
-      tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
+      tags = options[:tag].to_tags
     end
 
     raise Doing::Errors::InvalidArgument, 'Only one argument allowed' if args.length > 1
@@ -798,7 +800,7 @@ command %i[again resume] do |c|
   c.flag %i[n note]
 
   c.action do |_global_options, options, _args|
-    tags = options[:tag].nil? ? [] : options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }
+    tags = options[:tag].nil? ? [] : options[:tag].to_tags
     opts = options
     opts[:tag] = tags
     opts[:tag_bool] = options[:bool].normalize_bool
@@ -881,7 +883,7 @@ command :tag do |c|
     if options[:tag].nil?
       search_tags = []
     else
-      search_tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
+      search_tags = options[:tag].to_tags
     end
 
     if options[:autotag]
@@ -982,7 +984,7 @@ command [:mark, :flag] do |c|
     if options[:tag].nil?
       search_tags = []
     else
-      search_tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
+      search_tags = options[:tag].to_tags
     end
 
     count = options[:count].to_i
@@ -1121,7 +1123,7 @@ command :show do |c|
       section = wwid.current_section
     end
 
-    tags.concat(options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if options[:tag]
+    tags.concat(options[:tag].to_tags) if options[:tag]
 
     unless tags.empty?
       tag_filter = {
@@ -1503,7 +1505,7 @@ command :last do |c|
     if options[:tag].nil?
       tags = []
     else
-      tags = options[:tag].split(/ *, */).map { |t| t.strip.sub(/^@/, '') }
+      tags = options[:tag].to_tags
       options[:bool] = case options[:bool]
                        when /(any|or)/i
                         :or
@@ -1834,7 +1836,7 @@ command :archive do |c|
 
     raise Doing::Errors::InvalidArgument, '--keep and --count can not be used together' if options[:keep] && options[:count]
 
-    tags.concat(options[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if options[:tag]
+    tags.concat(options[:tag].to_tags) if options[:tag]
 
     opts = options
     opts[:bool] = options[:bool].normalize_bool

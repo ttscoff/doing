@@ -15,6 +15,7 @@
 - Log levels, with --quiet and --verbose global flags
 - Convert CLI messaging to Logger-based system
 - Use DOING_DEBUG, DOING_QUIET, or DOING_LOG_LEVEL environment variables to specify log levels before configuration is read
+- Hooks, register plugins to run based on events
 
 #### IMPROVED
 
@@ -31,6 +32,10 @@
 - When --stdout or not a TTY, no color or output formatting
 - Highlight tags when showing results. Because it looks nice.
 - --tag and --search for `doing note`
+- View/section fuzzy guessing
+- Error reporting
+- If `doing config` finds local doingrc files, offers a menu for editing
+- More filtering options for `doing finish`
 
 #### FIXED
 

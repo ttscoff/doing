@@ -15,12 +15,19 @@ class DoingTagTest < Test::Unit::TestCase
     @result = ''
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
-    @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
+    @config_file = File.join(File.dirname(__FILE__), 'test2.doingrc')
     @import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
   end
 
   def teardown
     FileUtils.rm_rf(@tmpdirs)
+  end
+
+  def test_default_tags
+    # Default tag defined in config
+    subject = 'Test new entry'
+    doing('now', subject)
+    assert_match(/@defaulttag(?=[ (]|$)/, doing('last').uncolor, "should have added @defaulttag to last entry")
   end
 
   def test_tag_entry
@@ -78,7 +85,7 @@ class DoingTagTest < Test::Unit::TestCase
     assert_equal(target, result.scan(/Added tag:/).size, 'The number of affected items should be the same as the number of search results')
     # Remove the first tag from items matching a tag search for the second tag
     result = doing('--stdout', 'tag', '--tag', test_tag_2, '-r', '-c', '0', '--force', test_tag)
-    assert_equal(target, result.scan(/Removed tags:/).size, 'The number of affected items should be the same as the tag results')
+    assert_equal(target, result.scan(/Removed tag:/).size, 'The number of affected items should be the same as the tag results')
   end
 
   def test_tag_date

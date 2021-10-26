@@ -11,7 +11,8 @@ module Doing
       add(note) if note
     end
 
-    def add(note)
+    def add(note, replace: false)
+      clear if replace
       if note.is_a?(String)
         append_string(note)
       elsif note.is_a?(Array)
@@ -49,6 +50,10 @@ module Doing
       compress.strip_lines.join("\n")
     end
 
+    def equal?(other)
+      return false unless other.is_a?(Note)
 
+      to_s == other.to_s
+    end
   end
 end

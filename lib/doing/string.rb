@@ -59,6 +59,10 @@ module Doing
       res.join(' ') + ellipsis
     end
 
+    def truncate!(len, ellipsis: '...')
+      replace truncate(len, ellipsis: ellipsis)
+    end
+
     ##
     ## @brief      Remove color escape codes
     ##
@@ -167,6 +171,78 @@ module Doing
       gsub(/\((?!\?:)/, '(?:').downcase
     end
 
+    def to_tags
+      gsub(/ *, */, ' ').gsub(/ +/, ' ').split(/ /).sort.uniq.map { |t| t.strip.sub(/^@/, '') }
+    end
+
+    def add_tags!(tags, remove: false)
+      replace add_tags(tags, remove: remove)
+    end
+
+    def add_tags(tags, remove: false)
+      title = self.dup
+      tags = tags.to_tags if tags.is_a?(String)
+      tags.each { |tag| title.tag!(tag, remove: remove) }
+      title
+    end
+
+    def tag!(tag, value: nil, remove: false, rename_to: nil, regex: false)
+      replace tag(tag, value: value, remove: remove, rename_to: rename_to, regex: regex)
+    end
+
+    def tag(tag, value: nil, remove: false, rename_to: nil, regex: false)
+      title = dup
+      title.chomp!
+      tag = tag.sub(/^@?/, '')
+      case_sensitive = tag !~ /[A-Z]/
+
+      rx_tag = if regex
+                 tag.gsub(/\./, '\S')
+               else
+                 tag.gsub(/\?/, '.').gsub(/\*/, '\S*?')
+               end
+
+      if remove || rename_to
+        return title unless title =~ /#{rx_tag}(?=[ (]|$)/
+
+        rx = Regexp.new("(^| )@#{rx_tag}(\\([^)]*\\))?(?= |$)", case_sensitive)
+        if title =~ rx
+          title.gsub!(rx) do
+            m = Regexp.last_match
+            rename_to ? "#{m[1]}@#{rename_to}#{m[2]}" : m[1]
+          end
+
+          title.dedup_tags!
+          title.chomp!
+
+          f = "@#{tag}".cyan
+          if rename_to
+            t = "@#{rename_to}".cyan
+            Doing.logger.info('Renamed tag:', %(#{f} to #{t} in "#{title}"))
+          else
+            Doing.logger.info('Removed tag:', %(#{f} from "#{title}"))
+          end
+        else
+          t = "@#{tag}".cyan
+          Doing.logger.debug('Skipped:', "Not tagged #{t}")
+        end
+      else
+        if title =~ /@#{tag}(?=[ (]|$)/
+          Doing.logger.debug('Skipped:', "Already tagged #{('@' + tag).cyan}")
+          return title
+        else
+          add = tag
+          add += "(#{value})" unless value.nil?
+          title += " @#{add}"
+
+          title.dedup_tags!
+          title.chomp!
+          Doing.logger.info('Added tag:', %(#{('@' + tag).cyan} to "#{title}"))
+        end
+      end
+      title
+    end
+
     ##
     ## @brief      Remove duplicate tags, leaving only first occurrence
     ##
@@ -177,11 +253,11 @@ module Doing
     end
 
     def dedup_tags
-      item = self.dup
-      tags = item.scan(/(?<=^| )(\@(\S+?)(\([^)]+\))?)(?=\b|$)/).uniq
+      title = dup
+      tags = title.scan(/(?<=^| )(@(\S+?)(\([^)]+\))?)(?= |$)/).uniq
       tags.each do |tag|
         found = false
-        item.gsub!(/( |^)#{tag[0]}\b/) do |m|
+        title.gsub!(/( |^)#{tag[1]}(\([^)]+\))?(?= |$)/) do |m|
           if found
             ''
           else
@@ -190,7 +266,7 @@ module Doing
           end
         end
       end
-      item
+      title
     end
 
     ##

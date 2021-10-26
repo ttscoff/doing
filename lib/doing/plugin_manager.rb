@@ -24,7 +24,6 @@ module Doing
       # Load plugins from plugins folder
       #
       def load_plugins(add_dir = nil)
-        add_dir ||= '~/.config/doing/plugins'
         plugins_path(add_dir).each do |plugin_search_path|
           Dir.glob(File.join(plugin_search_path, '**', '*.rb')).sort.each do |plugin|
             require plugin

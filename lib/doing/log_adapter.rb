@@ -5,7 +5,7 @@ module Doing
   ## @brief      Log adapter
   ##
   class LogAdapter
-    attr_writer :logdev
+    attr_writer :logdev, :max_length
 
     attr_reader :messages, :level, :results
 
@@ -25,6 +25,7 @@ module Doing
       @messages = []
       @results = []
       @logdev = $stderr
+      @max_length = `tput cols`.strip.to_i || 85
       self.log_level = level
     end
 
@@ -156,6 +157,7 @@ module Doing
 
       topic = formatted_topic(topic, colon: block_given?)
       out = topic + message
+      out.truncate!(@max_length) if @max_length.positive?
       messages << out
       out
     end

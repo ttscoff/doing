@@ -69,7 +69,7 @@ module Doing
       new_items = wwid.dedup(new_items, options[:no_overlap])
       dups = total - new_items.count
       Doing.logger.debug('Skipped:' , %(#{dups} items with overlapping times)) if dups.positive?
-      wwid.content[section]['items'].concat(new_items)
+      wwid.content[section][:items].concat(new_items)
       Doing.logger.info('Imported:', %(#{new_items.count} items to #{section}))
     end
 
