@@ -72,13 +72,13 @@ class DoingTagTest < Test::Unit::TestCase
     doing('import', '--type', 'timing', @import_file)
     # Add a tag to items matching search term
     result = doing('--stdout', 'tag', '--search', search_term, '-c', '0', '--force', test_tag)
-    assert_equal(target, result.strip.split(/\n/).size, 'The number of affected items should be the same as were in the imported file')
+    assert_equal(target, result.scan(/Added tag:/).size, 'The number of affected items should be the same as were in the imported file')
     # Add a second tag to items matching a tag search for previous tag
     result = doing('--stdout', 'tag', '--tag', test_tag, '-c', '0', '--force', test_tag_2)
-    assert_equal(target, result.strip.split(/\n/).size, 'The number of affected items should be the same as the number of search results')
+    assert_equal(target, result.scan(/Added tag:/).size, 'The number of affected items should be the same as the number of search results')
     # Remove the first tag from items matching a tag search for the second tag
     result = doing('--stdout', 'tag', '--tag', test_tag_2, '-r', '-c', '0', '--force', test_tag)
-    assert_equal(target, result.strip.split(/\n/).size, 'The number of affected items should be the same as the tag results')
+    assert_equal(target, result.scan(/Removed tags:/).size, 'The number of affected items should be the same as the tag results')
   end
 
   def test_tag_date
