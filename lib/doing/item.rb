@@ -36,8 +36,8 @@ module Doing
       true
     end
 
-    def tag(tag, value: nil, remove: false)
-      @title.add_tag!(tag, value: value, remove: remove)
+    def tag(tag, value: nil, remove: false, rename_to: nil, regex: false)
+      @title.tag!(tag, value: value, remove: remove, rename_to: rename_to, regex: regex)
     end
 
     def tags?(tags, bool = :and)

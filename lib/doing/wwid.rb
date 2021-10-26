@@ -354,6 +354,8 @@ module Doing
     ##
     ## @param      input  (String) The string to parse
     ##
+    ## @return     (Array) [(String)title, (Note)note]
+    ##
     def format_input(input)
       raise Errors::EmptyInput, 'No content in entry' if input.nil? || input.strip.empty?
 
@@ -799,6 +801,28 @@ module Doing
       res
     end
 
+    ##
+    ## @brief      Filter items based on search criteria
+    ##
+    ## @param      items  (Array) The items to filter (if empty, filters all items)
+    ## @param      opt    (Hash) The filter parameters
+    ##
+    ## Available filter options in opt object
+    ##
+    ## - +:section+ (String)
+    ## - +:unfinished+ (Boolean)
+    ## - +:tag+ (Array or comma-separated string)
+    ## - +:tag_bool+ (:and, :or, :not)
+    ## - +:search+ (string, optional regex with //)
+    ## - +:date_filter+ (Array[(Time)start, (Time)end])
+    ## - +:only_timed+ (Boolean)
+    ## - +:before+ (Date/Time string, unparsed)
+    ## - +:after+ (Date/Time string, unparsed)
+    ## - +:today+ (Boolean)
+    ## - +:yesterday+ (Boolean)
+    ## - +:count+ (Number to return)
+    ## - +:age+ (String, 'old' or 'new')
+    ##
     def filter_items(items = [], opt: {})
       if items.empty?
         section = opt[:section] ? guess_section(opt[:section]) : 'All'
@@ -1219,6 +1243,10 @@ module Doing
           end
         end
 
+        if opt[:note]
+          item.note.add(opt[:note])
+        end
+
         if opt[:archive] && opt[:section] != 'Archive' && (opt[:count]).positive?
           move_item(item, 'Archive', label: true)
         else
@@ -1336,12 +1364,20 @@ module Doing
       section = old_item.section
 
       section_items = @content[section][:items]
-      s_idx = section_items.index(old_item)
+      s_idx = section_items.index {|item|
+        item.equal?(old_item)
+      }
+
+      unless s_idx
+        Doing.logger.error('Fail to update:', 'Could not find item in index')
+        raise Errors::ItemNotFound, 'Unable to find item in index, did it mutate?'
+      end
 
       return if section_items[s_idx].equal?(new_item)
 
       section_items[s_idx] = new_item
       logger.info('Entry updated:', section_items[s_idx].title.truncate(60))
+      new_item
     end
 
     ##

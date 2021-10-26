@@ -26,6 +26,26 @@ module Doing
       end
     end
 
+    class NoResults < ::StandardError
+      def initialize(msg='No results')
+        Doing.logger.output_results
+        Process.exit 0
+
+      end
+    end
+
+    class DoingNoTraceError < ::StandardError
+      def initialize(msg = nil, level = nil)
+        level ||= :error
+        Doing.logger.output_results
+        if msg
+          Doing.logger.log_now(level, msg)
+        end
+
+        Process.exit 1
+      end
+    end
+
     class PluginException < ::StandardError
       attr_reader :plugin
 
@@ -66,6 +86,7 @@ module Doing
     InvalidSection = Class.new(DoingRuntimeError)
     InvalidView = Class.new(DoingRuntimeError)
 
+    ItemNotFound = Class.new(DoingRuntimeError)
     # FatalException = Class.new(::RuntimeError)
     # InvalidPluginName = Class.new(FatalException)
   end
