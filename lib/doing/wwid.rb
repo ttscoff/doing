@@ -262,7 +262,7 @@ module Doing
           prev_item = @content[section]['items'][current - 1]
           prev_item.note = Note.new unless prev_item.note
 
-          prev_item.note.append_string(line)
+          prev_item.note.add(line)
           # end
         end
       end
@@ -338,12 +338,12 @@ module Doing
       raise Errors::EmptyInput, 'No content in first line' if title.nil? || title.strip.empty?
 
       note = Note.new
-      note.append(input_lines[1..-1]) if input_lines.length > 1
+      note.add(input_lines[1..-1]) if input_lines.length > 1
       # If title line ends in a parenthetical, use that as the note
       if note.empty? && title =~ /\s+\(.*?\)$/
         title.sub!(/\s+\((.*?)\)$/) do
           m = Regexp.last_match
-          note.append_string(m[1])
+          note.add(m[1])
           ''
         end
       end
@@ -1474,12 +1474,7 @@ module Doing
     ## @param      replace  (Bool) Should replace existing note
     ##
     def note_last(section, note, replace: false)
-      new_note = Note.new
-      if note.is_a?(Array)
-        new_note.append(note)
-      else
-        new_note.append_string(note)
-      end
+      new_note = Note.new(note)
 
       new_note.compress!
 
@@ -1518,10 +1513,10 @@ module Doing
           end
         end
       elsif current_note.instance_of?(Note)
-        items[0].note.append(note)
+        items[0].note.add(note)
         Doing.logger.info('Added note:', title) unless note.empty?
       else
-        items[0].note.append_string(note)
+        items[0].note.add_string(note)
         Doing.logger.info('Added note:', title) unless note.empty?
       end
 

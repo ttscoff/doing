@@ -230,22 +230,22 @@ command :note do |c|
         prev_input = last_entry.note || Doing::Note.new
       end
 
-      input = prev_input.append_string(input)
+      input = prev_input.add(input)
 
       input = wwid.fork_editor([last_entry.title, '### Edit below this line', input.to_s].join("\n")).strip
       _title, note = wwid.format_input(input)
       options[:remove] = true
-      new_note.append(note)
+      new_note.add(note)
     elsif !args.empty?
-      new_note.append_string(args.join(' '))
+      new_note.add(args.join(' '))
     elsif $stdin.stat.size.positive?
-      new_note.append_string($stdin.read)
+      new_note.add($stdin.read)
     else
       raise Doing::Errors::EmptyInput, 'You must provide content when adding a note' unless options[:remove]
     end
 
     unless options[:remove]
-      new_note = last_note.append(new_note)
+      new_note = last_note.add(new_note)
     end
 
     new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)

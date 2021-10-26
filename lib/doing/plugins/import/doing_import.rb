@@ -131,7 +131,7 @@ module Doing
           prev_item = items[current - 1]
           prev_item.note = Note.new unless prev_item.note
 
-          prev_item.note.append_string(line)
+          prev_item.note.add(line)
           # end
         end
       end

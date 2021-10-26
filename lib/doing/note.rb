@@ -5,6 +5,20 @@ module Doing
   ## @brief      This class describes an item note.
   ##
   class Note < Array
+    def initialize(note = [])
+      super()
+
+      add(note) if note
+    end
+
+    def add(note)
+      if note.is_a?(String)
+        append_string(note)
+      elsif note.is_a?(Array)
+        append(note)
+      end
+    end
+
     def append(lines)
       concat(lines)
       replace compress

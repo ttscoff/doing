@@ -60,7 +60,7 @@ module Doing
         title.gsub!(/ +/, ' ')
         title.strip!
         new_item = Item.new(start_time, title, section)
-        new_item.note.append_string(entry['notes']) if entry.key?('notes')
+        new_item.note.add(entry['notes']) if entry.key?('notes')
         new_items.push(new_item)
       end
       total = new_items.count
