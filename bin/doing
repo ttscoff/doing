@@ -1209,7 +1209,7 @@ command :show do |c|
     opt[:tag_order] = options[:tag_order].normalize_order
     opt[:tags_color] = tags_color
 
-    puts wwid.list_section(opt)
+    Doing::Pager.page wwid.list_section(opt)
   end
 end
 
@@ -1270,7 +1270,7 @@ command %i[grep search] do |c|
     options[:section] = section
     options[:tags_color] = tags_color
 
-    puts wwid.list_section(options)
+    Doing::Pager.page wwid.list_section(options)
   end
 end
 
@@ -1363,7 +1363,7 @@ command :today do |c|
       sort_tags: options[:sort_tags],
       totals: options[:totals]
     }
-    puts wwid.today(options[:times], options[:output], opt).chomp
+    Doing::Pager.page wwid.today(options[:times], options[:output], opt).chomp
   end
 end
 
@@ -1418,7 +1418,7 @@ command :on do |c|
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_date([start, finish], options[:s], options[:t], options[:output],
+    Doing::Pager.page wwid.list_date([start, finish], options[:s], options[:t], options[:output],
                         { totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
@@ -1468,7 +1468,7 @@ command :since do |c|
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    puts wwid.list_date([start, finish], options[:s], options[:t], options[:output],
+    Doing::Pager.page wwid.list_date([start, finish], options[:s], options[:t], options[:output],
                         { totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
@@ -1519,7 +1519,7 @@ command :yesterday do |c|
       tag_order: options[:tag_order].normalize_order,
       totals: options[:totals]
     }
-    puts wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
+    Doing::Pager.page wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
   end
 end
 
@@ -1587,7 +1587,7 @@ command :choose do |c|
   c.action do |_global_options, _options, _args|
     section = wwid.choose_section
 
-    puts wwid.list_section({ section: section.cap_first, count: 0 }) if section
+    Doing::Pager.page wwid.list_section({ section: section.cap_first, count: 0 }) if section
   end
 end
 
@@ -1614,8 +1614,10 @@ command :colors do |c|
         fgs.push("#{colors.send(color, "XXXX")}#{colors.default} <-- #{color.to_s}")
       end
     end
-    puts fgs.join("\n")
-    puts bgs.join("\n")
+    out = []
+    out << fgs.join("\n")
+    out << bgs.join("\n")
+    Doing::Pager.page out.join("\n")
   end
 end
 
@@ -1813,7 +1815,7 @@ command :view do |c|
       opts[:page_title] = page_title
       opts[:date_filter] = dates
 
-      puts wwid.list_section(opts)
+      Doing::Pager.page wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
       exit_now! 'Cancelled'
     else
@@ -2185,12 +2187,14 @@ pre do |global, _command, _options, _args|
 end
 
 on_error do |exception|
-  if exception.kind_of?(SystemExit)
-    false
-  else
-    Doing.logger.output_results
-    true
-  end
+  # if exception.kind_of?(SystemExit)
+  #   false
+  # else
+  #   p exception.inspect
+  #   Doing.logger.output_results
+  #   true
+  # end
+  false
 end
 
 post do |global, _command, _options, _args|
@@ -2200,7 +2204,7 @@ post do |global, _command, _options, _args|
 end
 
 around do |global, command, options, arguments, code|
-  Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{wwid.config['paginate']}, Pager: #{Doing::Pager.paginate}")
+  # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{wwid.config['paginate']}, Pager: #{Doing::Pager.paginate}")
   Doing.logger.adjust_verbosity(global)
 
   if global[:stdout]

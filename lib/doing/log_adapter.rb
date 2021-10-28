@@ -213,11 +213,11 @@ module Doing
     def log_now(level, topic, message = nil, &block)
       return false unless write_message?(level)
 
-      if @logdev == $stdout
-        @logdev.puts message(topic, message, &block)
-      else
-        @logdev.puts color_message(level, topic, message, &block)
-      end
+      # if @logdev == $stdout
+      #   @logdev.puts message(topic, message, &block)
+      # else
+      #   @logdev.puts color_message(level, topic, message, &block)
+      # end
     end
 
     def color_message(level, topic, message = nil, &block)
@@ -251,7 +251,7 @@ module Doing
     end
 
     def output_results
-      results = @results.select { |msg| write_message?(msg[:level]) }
+      results = @results.select { |msg| write_message?(msg[:level]) }.uniq
 
       if @logdev == $stdout
         $stdout.print results.map {|res| res[:message].uncolor }.join("\n")

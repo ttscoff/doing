@@ -97,15 +97,7 @@ module Doing
       @additional_configs.delete(@config_file)
 
       if @additional_configs && @additional_configs.count.positive?
-        logger.debug('Configuration:') do
-          out = @additional_configs.delete_if { |c|
-            c == @config_file
-          }.map { |p|
-            p.sub(/^#{@user_home}/, '~')
-          }.join(', ')
-          "Local configs found: #{out}"
-        end
-        # logger.debug('Configuration:', "Local config files found: #{@additional_configs.map { |p| p.sub(/^#{@user_home}/, '~') }.join(', ')}")
+        logger.debug('Configuration:', "Local config files found: #{@additional_configs.map { |p| p.sub(/^#{@user_home}/, '~') }.join(', ')}")
       end
     end
 
@@ -1181,7 +1173,7 @@ module Doing
 
           logger.info('File written:', file)
         else
-          puts output
+          Doing::Pager.page output
         end
       end
     end

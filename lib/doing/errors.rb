@@ -10,6 +10,13 @@ module Doing
       end
     end
 
+    class EmptyInput < ::StandardError
+      def initialize(msg='No input')
+        Doing.logger.log_now(:warn, 'Exited:', 'Input empty')
+        Process.exit 1
+      end
+    end
+
     class DoingStandardError < ::StandardError
       def initialize(msg='')
         Doing.logger.output_results
@@ -81,7 +88,6 @@ module Doing
     NonInteractive = Class.new(StandardError)
 
     NoEntryError = Class.new(DoingRuntimeError)
-    EmptyInput = Class.new(UserCancelled)
 
     InvalidTimeExpression = Class.new(DoingRuntimeError)
     InvalidSection = Class.new(DoingRuntimeError)
