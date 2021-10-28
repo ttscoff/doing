@@ -1,6 +1,6 @@
 module Doing
   class Configuration < Hash
-    attr_accessor :default_config_file, :config_file
+    attr_accessor :default_config_file, :config_file, :config
     attr_reader :additional_configs, :current_section, :default_template, :default_date_format
 
     def default_config_file
@@ -25,17 +25,17 @@ module Doing
           'date_format' => '%Y-%m-%d %H:%M',
           'template' => '%date | %title%note',
           'wrap_width' => 0
-        }
+        },
         'today' => {
           'date_format' => '%_I:%M%P',
           'template' => '%date: %title %interval%note',
           'wrap_width' => 0
-        }
+        },
         'last' => {
           'date_format' => '%-I:%M%P on %a',
           'template' => '%title (at %date)%odnote',
           'wrap_width' => 88
-        }
+        },
         'recent' => {
           'date_format' => '%_I:%M%P',
           'template' => '%shortdate: %title (%section)',
@@ -98,16 +98,7 @@ module Doing
     end
 
     def safe_load_file(filename)
-      case File.extname(filename)
-      when /\.toml/i
-        Jekyll::External.require_with_graceful_fail('tomlrb') unless defined?(Tomlrb)
-        Tomlrb.load_file(filename)
-      when /\.ya?ml/i
-        SafeYAML.load_file(filename) || {}
-      else
-        raise ArgumentError,
-              "No parser for '#{filename}' is available. Use a .y(a)ml or .toml file instead."
-      end
+      YAML.load_file(filename) || {}
     end
 
     def user_home
@@ -122,18 +113,18 @@ module Doing
     ## @brief      Reads a configuration.
     ##
     def read_config(opt = {})
-      @config_file ||= File.join(user_home, @default_config_file)
+      @config_file ||= File.join(user_home, default_config_file)
 
       @additional_configs = if opt[:ignore_local]
                              []
                            else
                              find_local_config
                            end
-
       begin
         @local_config = {}
 
         @config = safe_load_file(@config_file) || {} if File.exist?(@config_file)
+
 
         if @config.key?('html_template')
           @config['export_templates'].deep_merge(@config['html_template'])
@@ -170,7 +161,7 @@ module Doing
       local_config_files = []
 
       while dir != '/' && (dir =~ %r{[A-Z]:/}).nil?
-        local_config_files.push(File.join(dir, @default_config_file)) if File.exist? File.join(dir, @default_config_file)
+        local_config_files.push(File.join(dir, default_config_file)) if File.exist? File.join(dir, default_config_file)
 
         dir = File.dirname(dir)
       end
@@ -186,7 +177,7 @@ module Doing
     def configure(opt = {})
       opt[:ignore_local] ||= false
 
-      @config_file ||= File.join(user_home, @default_config_file)
+      @config_file ||= File.join(user_home, default_config_file)
 
       read_config({ ignore_local: opt[:ignore_local] })
 
