@@ -25,6 +25,7 @@ require 'doing/log_adapter'
 require 'doing/errors'
 require 'doing/hooks'
 require 'doing/plugin_manager'
+require 'doing/pager'
 # require 'doing/markdown_document_listener'
 
 # Main doing module

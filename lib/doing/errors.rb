@@ -5,8 +5,8 @@ module Doing
 
     class UserCancelled < ::StandardError
       def initialize(msg='Cancelled')
-        Doing.logger.log_now(:info, msg)
-        Process.exit 0
+        Doing.logger.log_now(:warn, 'Exited:', msg)
+        Process.exit 1
       end
     end
 
@@ -78,9 +78,10 @@ module Doing
     MissingArgument = Class.new(DoingRuntimeError)
     MissingFile = Class.new(DoingRuntimeError)
     MissingEditor = Class.new(DoingRuntimeError)
+    NonInteractive = Class.new(StandardError)
 
     NoEntryError = Class.new(DoingRuntimeError)
-    EmptyInput = Class.new(DoingRuntimeError)
+    EmptyInput = Class.new(UserCancelled)
 
     InvalidTimeExpression = Class.new(DoingRuntimeError)
     InvalidSection = Class.new(DoingRuntimeError)

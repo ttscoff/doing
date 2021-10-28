@@ -84,11 +84,13 @@ class NoteEditorTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_EDITOR_TEST' => 'true', 'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
   end
 
   def doing_env(env, *args)
-    doing_with_env(env, '--config_file', @config_file, '--doing_file', @wwid_file, *args)
+    env['DOING_CONFIG'] = @config_file
+    env['DOING_EDITOR_TEST'] = 'true'
+    doing_with_env(env, '--doing_file', @wwid_file, *args)
   end
 
   def mktmpdir

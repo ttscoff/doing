@@ -97,7 +97,15 @@ module Doing
       @additional_configs.delete(@config_file)
 
       if @additional_configs && @additional_configs.count.positive?
-        logger.debug('Configuration:', "Local config files found: #{@additional_configs.map { |p| p.sub(/^#{@user_home}/, '~') }.join(', ')}")
+        logger.debug('Configuration:') do
+          out = @additional_configs.delete_if { |c|
+            c == @config_file
+          }.map { |p|
+            p.sub(/^#{@user_home}/, '~')
+          }.join(', ')
+          "Local configs found: #{out}"
+        end
+        # logger.debug('Configuration:', "Local config files found: #{@additional_configs.map { |p| p.sub(/^#{@user_home}/, '~') }.join(', ')}")
       end
     end
 
@@ -122,6 +130,7 @@ module Doing
       @config['current_section'] ||= 'Currently'
       @config['config_editor_app'] ||= nil
       @config['editor_app'] ||= nil
+      @config['paginate'] ||= false
 
       @config['templates'] ||= {}
       @config['templates']['default'] ||= {
@@ -311,6 +320,10 @@ module Doing
     ## @param      input  (String) Text input for editor
     ##
     def fork_editor(input = '')
+      # raise Errors::NonInteractive, 'Non-interactive terminal' unless $stdout.isatty || ENV['DOING_EDITOR_TEST']
+
+      raise Errors::MissingEditor, 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+
       tmpfile = Tempfile.new(['doing', '.md'])
 
       File.open(tmpfile.path, 'w+') do |f|
@@ -2228,19 +2241,6 @@ EOS
       hours = (hours % 24).to_i
       minutes = (minutes % 60).to_i
       [days, hours, minutes]
-    end
-
-    ##
-    ## @brief      Test if command line tool is available
-    ##
-    ## @param      cli   (String) The name or path of the cli
-    ##
-    def exec_available(cli)
-      if File.exist?(File.expand_path(cli))
-        File.executable?(File.expand_path(cli))
-      else
-        system "which #{cli}", out: File::NULL, err: File::NULL
-      end
     end
 
     private

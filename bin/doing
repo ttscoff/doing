@@ -77,6 +77,9 @@ switch [:notes], default_value: true, negatable: true
 desc 'Send results report to STDOUT instead of STDERR'
 switch [:stdout], default_value: false, negatable: false
 
+desc 'Use a pager when output is longer than screen'
+switch %i[p pager], default_value: wwid.config['paginate']
+
 desc 'Answer yes/no menus with default option'
 switch [:default], default_value: false
 
@@ -1312,7 +1315,7 @@ command :recent do |c|
         totals: options[:totals]
       }
 
-      puts wwid.recent(count, section.cap_first, opts)
+      Doing::Pager::page wwid.recent(count, section.cap_first, opts)
 
     end
   end
@@ -1541,7 +1544,7 @@ command :last do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.action do |_global_options, options, _args|
+  c.action do |global_options, options, _args|
     raise Doing::Errors::InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
 
     if options[:tag].nil?
@@ -1562,7 +1565,7 @@ command :last do |c|
     if options[:editor]
       wwid.edit_last(section: options[:s], options: { search: options[:search], tag: tags, tag_bool: options[:bool] })
     else
-      puts wwid.last(times: true, section: options[:s],
+      Doing::Pager::page wwid.last(times: true, section: options[:s],
                      options: { search: options[:search], tag: tags, tag_bool: options[:bool] }).strip
     end
   end
@@ -2163,9 +2166,13 @@ command :import do |c|
 end
 
 pre do |global, _command, _options, _args|
+  # global[:pager] ||= wwid.config['paginate']
+
+  Doing::Pager.paginate = global[:pager]
+
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
   unless STDOUT.isatty
-    Doing::Color::coloring = false
+    Doing::Color::coloring = global[:pager] ? global[:color] : false
   else
     Doing::Color::coloring = global[:color]
   end
@@ -2193,6 +2200,7 @@ post do |global, _command, _options, _args|
 end
 
 around do |global, command, options, arguments, code|
+  Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{wwid.config['paginate']}, Pager: #{Doing::Pager.paginate}")
   Doing.logger.adjust_verbosity(global)
 
   if global[:stdout]
