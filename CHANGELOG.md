@@ -16,6 +16,7 @@
 - Convert CLI messaging to Logger-based system
 - Use DOING_DEBUG, DOING_QUIET, or DOING_LOG_LEVEL environment variables to specify log levels before configuration is read
 - Hooks, register plugins to run based on events
+- --[no-]pager and paginate: config option to enable paging output
 
 #### IMPROVED
 
@@ -28,7 +29,7 @@
 - Output wrapping for terminal display
 - Redirect warn to STDOUT when run with --stdout
 - Fish autocomplete
-- `--config_file` global flag deprected, now uses $DOING_CONFIG environment variable so that config overrides can be available before the initial configuration is run
+- `--config_file` global flag deprecated, now uses $DOING_CONFIG environment variable so that config overrides can be available before the initial configuration is run
 - When --stdout or not a TTY, no color or output formatting
 - Highlight tags when showing results. Because it looks nice.
 - --tag and --search for `doing note`
@@ -36,6 +37,8 @@
 - Error reporting
 - If `doing config` finds local doingrc files, offers a menu for editing
 - More filtering options for `doing finish`
+- Doing done accepts --unfinished flag to finish last entry not marked @done (instead of last entry)
+- Doing done accepts --note flag to append a note when completing an entry
 
 #### FIXED
 
