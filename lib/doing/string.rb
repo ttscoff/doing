@@ -237,9 +237,9 @@ module Doing
           f = "@#{tag}".cyan
           if rename_to
             t = "@#{rename_to}".cyan
-            Doing.logger.info('Renamed tag:', %(#{f} to #{t} in "#{title}"))
+            # Doing.logger.debug('Renamed tag:', %(#{f} to #{t} in "#{title}"))
           else
-            Doing.logger.info('Removed tag:', %(#{f} from "#{title}"))
+            # Doing.logger.debug('Removed tag:', %(#{f} from "#{title}"))
           end
         else
           t = "@#{tag}".cyan
@@ -256,7 +256,7 @@ module Doing
 
           title.dedup_tags!
           title.chomp!
-          Doing.logger.info('Added tag:', %(#{('@' + tag).cyan} to "#{title}"))
+          # Doing.logger.debug('Added tag:', %(#{('@' + tag).cyan} to "#{title}"))
         end
       end
       title
