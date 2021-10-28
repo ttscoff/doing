@@ -25,7 +25,7 @@ module Doing
       @messages = []
       @results = []
       @logdev = $stderr
-      @max_length = `tput cols`.strip.to_i || 85
+      @max_length = `tput cols`.strip.to_i - 5 || 85
       self.log_level = level
     end
 
@@ -156,6 +156,7 @@ module Doing
       return "#{topic}" if topic && message.strip.empty?
 
       topic = formatted_topic(topic, colon: block_given?)
+      message.truncmiddle!(@max_length - 25)
       out = topic + message
       out.truncate!(@max_length) if @max_length.positive?
       messages << out

@@ -64,6 +64,25 @@ module Doing
     end
 
     ##
+    ## @brief      Truncate string in the middle
+    ##
+    ## @param      len       The length
+    ## @param      ellipsis  The ellipsis
+    ##
+    def truncmiddle(len, ellipsis: '...')
+      return self if length <= len
+      len -= (ellipsis.length / 2).to_i
+      total = length
+      half = total / 2
+      cut = (total - len) / 2
+      sub(/(.{#{half - cut}}).*?(.{#{half - cut}})$/, "\\1#{ellipsis}\\2")
+    end
+
+    def truncmiddle!(len, ellipsis: '...')
+      replace truncmiddle(len, ellipsis: ellipsis)
+    end
+
+    ##
     ## @brief      Remove color escape codes
     ##
     ## @return     clean string

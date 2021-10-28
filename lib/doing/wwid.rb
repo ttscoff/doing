@@ -1528,7 +1528,7 @@ module Doing
     def restore_backup(file)
       if File.exist?("#{file}~")
         FileUtils.cp("#{file}~", file)
-        logger.warn('File update:', "Restored #{file}")
+        logger.warn('File update:', "Restored #{file.sub(/^#{@user_home}/, '~')}")
       else
         logger.error('Restore error:', 'No backup file found')
       end
