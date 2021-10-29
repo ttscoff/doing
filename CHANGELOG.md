@@ -1,4 +1,4 @@
-### 2.0.0
+### 2.0.0pre1
 
 #### NEW
 
@@ -17,6 +17,7 @@
 - Use DOING_DEBUG, DOING_QUIET, or DOING_LOG_LEVEL environment variables to specify log levels before configuration is read
 - Hooks, register plugins to run based on events
 - --[no-]pager and paginate: config option to enable paging output
+- Never_finish and never_time config options to prevent items matching tags/sections from ever receiving @done (never_finish) or @done timestamp (never_time) - More configuration refactoring
 
 #### IMPROVED
 
@@ -29,7 +30,7 @@
 - Output wrapping for terminal display
 - Redirect warn to STDOUT when run with --stdout
 - Fish autocomplete
-- `--config_file` global flag deprecated, now uses $DOING_CONFIG environment variable so that config overrides can be available before the initial configuration is run
+- `--config_file` global flag deprected, now uses $DOING_CONFIG environment variable so that config overrides can be available before the initial configuration is run
 - When --stdout or not a TTY, no color or output formatting
 - Highlight tags when showing results. Because it looks nice.
 - --tag and --search for `doing note`

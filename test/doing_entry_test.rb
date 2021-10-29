@@ -50,7 +50,7 @@ class DoingEntryTest < Test::Unit::TestCase
 
   def test_guess_section
     doing('add_section', 'Test Section')
-    res = doing('--stdout', '--verbose', 'show', 'Test').strip
+    res = doing('--stdout', '--debug', 'show', 'Test').strip
     assert_match(/Assuming "Test Section"/, res, 'Should have guessed Test Section')
   end
 

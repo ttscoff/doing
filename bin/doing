@@ -88,7 +88,7 @@ desc 'Silence info messages'
 switch %i[q quiet], default_value: false, negatable: false
 
 desc 'Verbose output'
-switch %i[verbose debug], default_value: false, negatable: false
+switch %i[debug], default_value: false, negatable: false
 
 desc 'Use a specific configuration file. Deprecated, set $DOING_CONFIG instead.'
 flag [:config_file], default_value: config.config_file

@@ -38,7 +38,7 @@ class DoingViewTest < Test::Unit::TestCase
   end
 
   def test_view_guess
-    res = doing('--stdout', '--verbose', 'view', 'col').strip
+    res = doing('--stdout', '--debug', 'view', 'col').strip
     assert_match(/Assuming "color"/, res, 'Should have guessed color')
   end
 
