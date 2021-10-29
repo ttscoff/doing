@@ -6,11 +6,7 @@ module Doing
     class << self
 
       def user_home
-        @user_home ||= if Dir.respond_to?('home')
-                         Dir.home
-                       else
-                         File.expand_path('~')
-                       end
+        @user_home ||= Util.user_home
       end
 
       def plugins
@@ -77,19 +73,20 @@ module Doing
           config: settings[:config] || {}
         }
 
-        Doing.logger.debug('Plugin Manager:', "Registered #{type.to_s} plugin \"#{title}\"") if ENV['DOING_PLUGIN_DEBUG']
+        return unless ENV['DOING_PLUGIN_DEBUG']
+
+        Doing.logger.debug('Plugin Manager:', "Registered #{type} plugin \"#{title}\"")
 
       end
 
       def validate_plugin(title, type, klass)
         type = valid_type(type)
-        case type
-        when :import
-          raise Errors::PluginUncallable.new('Import plugins must respond to :import', type: type, plugin: title) unless klass.respond_to? :import
+        if type == :import && !klass.respond_to?(:import)
+          raise Errors::PluginUncallable.new('Import plugins must respond to :import', type: type, plugin: title)
+        end
 
-        when :export
-          raise Errors::PluginUncallable.new('Export plugins must respond to :render', type: type, plugin: title) unless klass.respond_to? :render
-
+        if type == :export && !klass.respond_to?(:render)
+          raise Errors::PluginUncallable.new('Export plugins must respond to :render', type: type, plugin: title)
         end
 
         type

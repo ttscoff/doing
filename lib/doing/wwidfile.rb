@@ -106,7 +106,7 @@ module Doing
     ##
     def guess_section(frag, guessed: false, suggest: false)
       return 'All' if frag =~ /^all$/i
-      frag ||= WWID.current_section
+      frag ||= wwid.config['current_section']
 
       @sections.each { |sect| return sect[:title].cap_first if frag.downcase == sect[:title].downcase }
 

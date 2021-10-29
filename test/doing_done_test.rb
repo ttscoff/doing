@@ -49,7 +49,7 @@ class DoingDoneTest < Test::Unit::TestCase
     doing('now', '--back=15m', 'Adding an unfinished entry')
     doing('done', 'Adding a finished entry')
     result = doing('--stdout', 'finish', '--unfinished')
-    assert_match(/Added tag: @done to "Adding an unfinished/, result, 'Earlier unfinished task should be marked @done')
+    assert_match(/Added tags: @done to "Adding an unfi/, result, 'Earlier unfinished task should be marked @done')
   end
 
   def test_finish_took
@@ -106,6 +106,22 @@ class DoingDoneTest < Test::Unit::TestCase
     doing('finish', '3')
     assert_count_entries(4, doing('show'), 'Should be 4 total entries')
     assert_count_entries(3, doing('show', '@done'), 'Should be 3 done entries')
+  end
+
+  def test_finish_never_finish
+    subject = 'Test finish entry @neverfinish'
+    doing('now', subject)
+    doing('finish')
+    assert_no_match(/@done/, doing('last'), 'Should not be tagged @done')
+  end
+
+  def test_finish_never_time
+    subject = 'Test finish entry @nevertime'
+    doing('now', subject)
+    doing('finish')
+    res = doing('last')
+    assert_match(/@done/, res, 'Entry should be @done')
+    assert_no_match(/@done\(\d+/, res, '@done should not have timestamp')
   end
 
   def test_done_no_args

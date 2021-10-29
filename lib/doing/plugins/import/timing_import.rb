@@ -22,7 +22,7 @@ module Doing
     ##
     def self.import(wwid, path, options: {})
       exit_now! 'Path to JSON report required' if path.nil?
-      section = options[:section] || wwid.current_section
+      section = options[:section] || wwid.config['current_section']
       options[:no_overlap] ||= false
       options[:autotag] ||= wwid.auto_tag
       wwid.add_section(section) unless wwid.content.key?(section)

@@ -36,6 +36,22 @@ module Doing
       true
     end
 
+    def same_time?(item_b)
+      date == item_b.date ? interval == item_b.interval : false
+    end
+
+    def overlapping_time?(item_b)
+      return true if same_time?(item_b)
+
+      start_a = date
+      interval = interval
+      end_a = interval ? start_a + interval.to_i : start_a
+      start_b = item_b.date
+      interval = item_b.interval
+      end_b = interval ? start_b + interval.to_i : start_b
+      (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
+    end
+
     def tag(tag, value: nil, remove: false, rename_to: nil, regex: false)
       @title.tag!(tag, value: value, remove: remove, rename_to: rename_to, regex: regex)
     end
@@ -71,7 +87,30 @@ module Doing
       text =~ rx
     end
 
+    def should_finish?(config)
+      should?('never_finish', config)
+    end
+
+    def should_time?(config)
+      should?('never_time', config)
+    end
+
     private
+
+    def should?(key, config)
+
+      return true unless config[key].is_a?(Array)
+
+      config[key].each do |tag|
+        if tag =~ /^@/
+          return false if tags?(tag.sub(/^@/, '').downcase)
+        else
+          return false if section.downcase == tag.downcase
+        end
+      end
+
+      true
+    end
 
     def calc_interval
       done = end_date

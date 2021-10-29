@@ -65,7 +65,7 @@ module Doing
         title.gsub!(/ +/, ' ')
         title.strip!
         section = options[:section] || item.section
-        section ||= wwid.current_section
+        section ||= wwid.config['current_section']
 
         new_item = Item.new(item.date, title, section)
         new_item.note = item.note

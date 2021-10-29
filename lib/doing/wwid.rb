@@ -14,7 +14,7 @@ module Doing
   class WWID
     attr_reader   :additional_configs, :current_section, :doing_file, :content
 
-    attr_accessor :config, :user_home, :config_file, :auto_tag, :default_option
+    attr_accessor :config, :config_file, :auto_tag, :default_option
 
     # include Util
 
@@ -28,6 +28,7 @@ module Doing
       @doingrc_needs_update = false
       @default_config_file = '.doingrc'
       @auto_tag = true
+      @user_home = Util.user_home
     end
 
     ##
@@ -40,195 +41,7 @@ module Doing
     ## Example: debug('Hooks', 'Hook 1 triggered')
     ##
     def logger
-      @log ||= Doing.logger
-    end
-
-    ##
-    ## @brief      Finds a project-specific configuration file
-    ##
-    ## @return     (String) A file path
-    ##
-    def find_local_config
-      dir = Dir.pwd
-
-      local_config_files = []
-
-      while dir != '/' && (dir =~ %r{[A-Z]:/}).nil?
-        local_config_files.push(File.join(dir, @default_config_file)) if File.exist? File.join(dir, @default_config_file)
-
-        dir = File.dirname(dir)
-      end
-
-      local_config_files
-    end
-
-    ##
-    ## @brief      Reads a configuration.
-    ##
-    def read_config(opt = {})
-      @config_file ||= if Dir.respond_to?('home')
-                         File.join(Dir.home, @default_config_file)
-                       else
-                         File.join(File.expand_path('~'), @default_config_file)
-                       end
-
-      @additional_configs = if opt[:ignore_local]
-                             []
-                           else
-                             find_local_config
-                           end
-
-      begin
-        @local_config = {}
-
-        @config = YAML.load_file(@config_file) || {} if File.exist?(@config_file)
-        @additional_configs.each do |cfg|
-          new_config = YAML.load_file(cfg) || {} if cfg
-          @local_config = @local_config.deep_merge(new_config)
-        end
-
-        # @config.deep_merge(@local_config)
-      rescue StandardError
-        @config = {}
-        @local_config = {}
-        # exit_now! "error reading config"
-      end
-
-      @additional_configs.delete(@config_file)
-
-      if @additional_configs && @additional_configs.count.positive?
-        logger.debug('Configuration:', "Local config files found: #{@additional_configs.map { |p| p.sub(/^#{@user_home}/, '~') }.join(', ')}")
-      end
-    end
-
-    ##
-    ## @brief      Read user configuration and merge with defaults
-    ##
-    ## @param      opt   (Hash) Additional Options
-    ##
-    def configure(opt = {})
-      opt[:ignore_local] ||= false
-
-      @config_file ||= File.join(@user_home, @default_config_file)
-
-      read_config({ ignore_local: opt[:ignore_local] })
-
-      @config = {} if @config.nil?
-
-      @config['autotag'] ||= {}
-      @config['autotag']['whitelist'] ||= []
-      @config['autotag']['synonyms'] ||= {}
-      @config['doing_file'] ||= '~/what_was_i_doing.md'
-      @config['current_section'] ||= 'Currently'
-      @config['config_editor_app'] ||= nil
-      @config['editor_app'] ||= nil
-      @config['paginate'] ||= false
-
-      @config['templates'] ||= {}
-      @config['templates']['default'] ||= {
-        'date_format' => '%Y-%m-%d %H:%M',
-        'template' => '%date | %title%note',
-        'wrap_width' => 0
-      }
-      @config['templates']['today'] ||= {
-        'date_format' => '%_I:%M%P',
-        'template' => '%date: %title %interval%note',
-        'wrap_width' => 0
-      }
-      @config['templates']['last'] ||= {
-        'date_format' => '%-I:%M%P on %a',
-        'template' => '%title (at %date)%odnote',
-        'wrap_width' => 88
-      }
-      @config['templates']['recent'] ||= {
-        'date_format' => '%_I:%M%P',
-        'template' => '%shortdate: %title (%section)',
-        'wrap_width' => 88,
-        'count' => 10
-      }
-
-      @config['export_templates'] ||= {}
-
-      if @config.key?('html_template')
-        @config['export_templates'].deep_merge(@config['html_template'])
-        @config.delete('html_template')
-      else
-        @config['export_templates'] ||= {}
-      end
-
-      @config['views'] ||= {
-        'done' => {
-          'date_format' => '%_I:%M%P',
-          'template' => '%date | %title%note',
-          'wrap_width' => 0,
-          'section' => 'All',
-          'count' => 0,
-          'order' => 'desc',
-          'tags' => 'done complete cancelled',
-          'tags_bool' => 'OR'
-        },
-        'color' => {
-          'date_format' => '%F %_I:%M%P',
-          'template' => '%boldblack%date %boldgreen| %boldwhite%title%default%note',
-          'wrap_width' => 0,
-          'section' => 'Currently',
-          'count' => 10,
-          'order' => 'asc'
-        }
-      }
-      @config['marker_tag'] ||= 'flagged'
-      @config['marker_color'] ||= 'red'
-      @config['default_tags'] ||= []
-      @config['tag_sort'] ||= 'name'
-
-      @current_section = config['current_section']
-      @default_template = config['templates']['default']['template']
-      @default_date_format = config['templates']['default']['date_format']
-
-      @config[:include_notes] ||= true
-
-      # if ENV['DOING_DEBUG'].to_i == 3
-      #   if @config['default_tags'].length > 0
-      #     exit_now! "DEFAULT CONFIG CHANGED"
-      #   end
-      # end
-
-      plugin_config = { 'plugin_path' => nil }
-
-      load_plugins
-
-      Plugins.plugins.each do |_type, plugins|
-        plugins.each do |title, plugin|
-          plugin_config[title] = plugin[:config] if plugin.key?(:config) && !plugin[:config].empty?
-          @config['export_templates'][title] ||= nil if plugin.key?(:templates)
-        end
-      end
-
-      @config.deep_merge({ 'plugins' => plugin_config })
-
-      write_config if !File.exist?(@config_file) || opt[:rewrite]
-
-      Hooks.trigger :post_config, self
-
-      @config.deep_merge(@local_config)
-
-      Hooks.trigger :post_local_config, self
-
-      @current_section = @config['current_section']
-      @default_template = @config['templates']['default']['template']
-      @default_date_format = @config['templates']['default']['date_format']
-
-    end
-
-    ##
-    ## @brief      Write current configuration to file
-    ##
-    ## @param      file    The file
-    ## @param      backup  The backup
-    ##
-    def write_config(file = nil, backup: false)
-      file ||= @config_file
-      write_to_file(file, YAML.dump(@config), backup: backup)
+      @logger ||= Doing.logger
     end
 
     ##
@@ -237,22 +50,20 @@ module Doing
     ## @param      path  (String) Override path to a doing file, optional
     ##
     def init_doing_file(path = nil)
-      @doing_file = File.expand_path(@config['doing_file'])
+      @doing_file =  File.expand_path(@config['doing_file'])
 
-      input = path
-
-      if input.nil?
+      if path.nil?
         create(@doing_file) unless File.exist?(@doing_file)
         input = IO.read(@doing_file)
         input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
-      elsif File.exist?(File.expand_path(input)) && File.file?(File.expand_path(input)) && File.stat(File.expand_path(input)).size.positive?
-        @doing_file = File.expand_path(input)
-        input = IO.read(File.expand_path(input))
+      elsif File.exist?(File.expand_path(path)) && File.file?(File.expand_path(path)) && File.stat(File.expand_path(path)).size.positive?
+        @doing_file = File.expand_path(path)
+        input = IO.read(File.expand_path(path))
         input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
-      elsif input.length < 256
-        @doing_file = File.expand_path(input)
-        create(input)
-        input = IO.read(File.expand_path(input))
+      elsif path.length < 256
+        @doing_file = File.expand_path(path)
+        create(path)
+        input = IO.read(File.expand_path(path))
         input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
       end
 
@@ -302,7 +113,7 @@ module Doing
       return if File.exist?(filename) && File.stat(filename).size.positive?
 
       File.open(filename, 'w+') do |f|
-        f.puts "#{@current_section}:"
+        f.puts "#{@config['current_section']}:"
       end
     end
 
@@ -482,7 +293,7 @@ module Doing
     ##
     def guess_section(frag, guessed: false, suggest: false)
       return 'All' if frag =~ /^all$/i
-      frag ||= @current_section
+      frag ||= @config['current_section']
 
       sections.each { |sect| return sect.cap_first if frag.downcase == sect.downcase }
       section = false
@@ -604,7 +415,7 @@ module Doing
     ## @param      opt      (Hash) Additional Options {:date, :note, :back, :timed}
     ##
     def add_item(title, section = nil, opt = {})
-      section ||= @current_section
+      section ||= @config['current_section']
       add_section(section) unless @content.key?(section)
       opt[:date] ||= Time.now
       opt[:note] ||= []
@@ -635,25 +446,10 @@ module Doing
         end
         items.reverse!
       end
+
       items.push(entry)
 
       logger.info('Entry added:', %("#{entry.title}" to #{section}))
-    end
-
-    def same_time?(item_a, item_b)
-      item_a.date == item_b.date ? item_a.interval == item_b.interval : false
-    end
-
-    def overlapping_time?(item_a, item_b)
-      return true if same_time?(item_a, item_b)
-
-      start_a = item_a.date
-      interval = item_a.interval
-      end_a = interval ? start_a + interval.to_i : start_a
-      start_b = item_b.date
-      interval = item_b.interval
-      end_b = interval ? start_b + interval.to_i : start_b
-      (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
     end
 
     ##
@@ -672,7 +468,7 @@ module Doing
       items.delete_if do |item|
         duped = false
         combined.each do |comp|
-          duped = no_overlap ? overlapping_time?(item, comp) : same_time?(item, comp)
+          duped = no_overlap ? item.overlapping_time?(comp) : item.same_time?(comp)
           break if duped
         end
         logger.log_now(:debug, 'Skipped:', "overlapping entry: #{item.title}") if duped
@@ -746,7 +542,13 @@ module Doing
         return
       end
 
-      last.title.tag!('done', value: Time.now.strftime('%F %R'))
+      if last.should_finish?(@config)
+        if last.should_time?(@config)
+          last.title.tag!('done', value: Time.now.strftime('%F %R'))
+        else
+          last.title.tag!('done')
+        end
+      end
 
       # Remove @done tag
       title = last.title.sub(/\s*@done(\(.*?\))?/, '').chomp
@@ -778,7 +580,7 @@ module Doing
     ##
     def last_entry(opt = {})
       opt[:tag_bool] ||= :and
-      opt[:section] ||= @current_section
+      opt[:section] ||= @config['current_section']
 
       all_items = filter_items([], opt: opt)
 
@@ -1083,7 +885,10 @@ module Doing
       if opt[:finish] || opt[:cancel]
         tag = 'done'
         items.map! do |item|
-          tag_item(item, tag, date: !opt[:cancel], remove: opt[:remove])
+          if item.should_finish?(@config)
+            should_date = !opt[:cancel] && item.should_time?(@config)
+            tag_item(item, tag, date: should_date, remove: opt[:remove])
+          end
         end
       end
 
@@ -1179,6 +984,49 @@ module Doing
     end
 
     ##
+    ## @brief      Tag an item from the index
+    ##
+    ## @param      item    (Item) The item to tag
+    ## @param      tags    (string) The tag to apply
+    ## @param      remove  (Boolean) remove tags
+    ## @param      date    (Boolean) Include timestamp?
+    ##
+    def tag_item(item, tags, remove: false, date: false)
+      added = []
+      removed = []
+
+      tags = tags.to_tags if tags.is_a? ::String
+
+      done_date = Time.now
+
+      tags.each do |tag|
+        bool = remove ? :and : :not
+        if item.tags?(tag, bool)
+          item.tag(tag, remove: remove, value: date ? done_date.strftime('%F %R') : nil)
+          remove ? removed.push(tag) : added.push(tag)
+        else
+          logger.debug('Skipped:', %(Item #{remove ? 'not' : 'already' } @#{tag}: "#{title}" in #{item.section}))
+        end
+      end
+
+      if added.empty?
+        logger.debug('No tags added:', %("#{item.title}" in #{item.section}))
+      else
+        did_add = added.map { |t| "@#{t}".cyan }.join(', ')
+        logger.info('Added tags:', %(#{did_add} to "#{item.title}" in #{item.section}))
+      end
+
+      if removed.empty?
+        logger.debug('No tags removed:', %("#{item.title}" in #{item.section}))
+      else
+        did_remove = removed.map { |t| "@#{t}".cyan }.join(', ')
+        logger.info('Removed tags:', %(#{did_remove} from "#{item.title}" in #{item.section}))
+      end
+
+      item
+    end
+
+    ##
     ## @brief      Tag the last entry or X entries
     ##
     ## @param      opt   (Hash) Additional Options
@@ -1198,6 +1046,9 @@ module Doing
       items = filter_items([], opt: opt)
 
       items.each do |item|
+        added = []
+        removed = []
+
         if opt[:autotag]
           new_title = autotag(item.title) if @auto_tag
           if new_title == item.title
@@ -1233,6 +1084,11 @@ module Doing
           end
 
           opt[:tags].each do |tag|
+            if tag == 'done' && !item.should_finish?(@config)
+              Doing.logger.debug('Skipped:', "Item in never_finish: #{item.title}")
+              next
+            end
+
             tag = tag.strip
             if opt[:remove] || opt[:rename]
               rename_to = nil
@@ -1240,12 +1096,35 @@ module Doing
                 rename_to = tag
                 tag = opt[:rename]
               end
-
+              old_title = item.title.dup
               item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex])
+              if old_title != item.title
+                if opt[:remove]
+                  removed << tag
+                  added << rename_to if rename_to
+                end
+              end
             else
-              item.title.tag!(tag, value: opt[:date] ? done_date.strftime('%F %R') : nil)
+              old_title = item.title.dup
+              should_date = opt[:date] && item.should_time?(@config)
+              item.title.tag!(tag, value: should_date ? done_date.strftime('%F %R') : nil)
+              added << tag if old_title != item.title
             end
           end
+        end
+
+        if added.empty?
+          logger.debug('No tags added:', %("#{item.title}" in #{item.section}))
+        else
+          did_add = added.map { |t| "@#{t}".cyan }.join(', ')
+          logger.info('Added tags:', %(#{did_add} to "#{item.title}" in #{item.section}))
+        end
+
+        if removed.empty?
+          logger.debug('No tags removed:', %("#{item.title}" in #{item.section}))
+        else
+          did_remove = removed.map { |t| "@#{t}".cyan }.join(', ')
+          logger.info('Removed tags:', %(#{did_remove} from "#{item.title}" in #{item.section}))
         end
 
         if opt[:note]
@@ -1314,49 +1193,6 @@ module Doing
       section_items = @content[section][:items]
       deleted = section_items.delete(item)
       logger.info('Entry deleted:', deleted.title)
-    end
-
-    ##
-    ## @brief      Tag an item from the index
-    ##
-    ## @param      item    (Item) The item to tag
-    ## @param      tags    (string) The tag to apply
-    ## @param      remove  (Boolean) remove tags
-    ## @param      date    (Boolean) Include timestamp?
-    ##
-    def tag_item(item, tags, remove: false, date: false)
-      added = []
-      removed = []
-
-      tags = tags.to_tags if tags.is_a? ::String
-
-      done_date = Time.now
-
-      tags.each do |tag|
-        bool = remove ? :and : :not
-        if item.tags?(tag, bool)
-          item.tag(tag, remove: remove, value: date ? done_date.strftime('%F %R') : nil)
-          remove ? removed.push(tag) : added.push(tag)
-        else
-          logger.debug('Skipped:', %(Item #{remove ? 'not' : 'already' } @#{tag}: "#{title}" in #{item.section}))
-        end
-      end
-
-      if added.empty?
-        logger.debug('No tags added:', %("#{item.title}" in #{item.section}))
-      else
-        did_add = added.map { |t| "@#{tag}".cyan }.join(', ')
-        logger.info('Added tags:', %(#{added} to "#{item.title}" in #{item.section}))
-      end
-
-      if removed.empty?
-        logger.debug('No tags removed:', %("#{item.title}" in #{item.section}))
-      else
-        did_remove = removed.map { |t| "@#{tag}".cyan }.join(', ')
-        logger.info('Removed tags:', %(#{added} from "#{item.title}" in #{item.section}))
-      end
-
-      item
     end
 
     ##
@@ -1430,7 +1266,7 @@ module Doing
     ##
     def stop_start(target_tag, opt = {})
       tag = target_tag.dup
-      opt[:section] ||= @current_section
+      opt[:section] ||= @config['current_section']
       opt[:archive] ||= false
       opt[:back] ||= Time.now
       opt[:new_item] ||= false
@@ -1482,7 +1318,7 @@ module Doing
       if file.nil?
         $stdout.puts output
       else
-        write_to_file(file, output, backup: backup)
+        Util.write_to_file(file, output, backup: backup)
         run_after if @config.key?('run_after')
       end
     end
@@ -1496,28 +1332,6 @@ module Doing
       end
 
       output + @other_content_bottom.join("\n") unless @other_content_bottom.nil?
-    end
-
-    ##
-    ## @brief      Write content to a file
-    ##
-    ## @param      file     (String) The path to the file to (over)write
-    ## @param      content  (String) The content to write to the file
-    ## @param      backup   (Boolean) create a ~ backup
-    ##
-    def write_to_file(file, content, backup: true)
-      file = File.expand_path(file)
-
-      if File.exist?(file) && backup
-        # Create a backup copy for the undo command
-        FileUtils.cp(file, "#{file}~")
-      end
-
-      File.open(file, 'w+') do |f|
-        f.puts content
-      end
-
-      Hooks.trigger :post_write, file
     end
 
     ##
@@ -1666,11 +1480,11 @@ module Doing
     def list_section(opt = {})
       opt[:count] ||= 0
       opt[:age] ||= 'newest'
-      opt[:format] ||= @default_date_format
+      opt[:format] ||= @config.dig('templates', 'default', 'date_format')
       opt[:order] ||= 'desc'
       opt[:tag_order] ||= 'asc'
       opt[:tags_color] ||= false
-      opt[:template] ||= @default_template
+      opt[:template] ||= @config.dig('templates', 'default', 'template')
 
       # opt[:highlight] ||= true
       section = ''
@@ -1760,7 +1574,7 @@ module Doing
     ## @param      section      (String) The source section
     ## @param      options      (Hash) Options
     ##
-    def archive(section = @current_section, options = {})
+    def archive(section = @config['current_section'], options = {})
       count       = options[:keep] || 0
       destination = options[:destination] || 'Archive'
       tags        = options[:tags] || []
@@ -1824,7 +1638,7 @@ module Doing
             end
           end
           moved_items.each do |item|
-            if label && section != @current_section
+            if label && section != @config['current_section']
               item.title =
                 item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
             end
@@ -1837,7 +1651,7 @@ module Doing
           count = items.length if items.length < count
 
           items.map! do |item|
-            if label && section != @current_section
+            if label && section != @config['current_section']
               item.title =
                 item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
             end
@@ -1957,7 +1771,7 @@ module Doing
       opt[:sort_tags] ||= false
 
       cfg = @config['templates']['recent']
-      section ||= @current_section
+      section ||= @config['current_section']
       section = guess_section(section)
 
       list_section({ section: section, wrap_width: cfg['wrap_width'], count: count,

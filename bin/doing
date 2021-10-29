@@ -34,12 +34,6 @@ MissingConfigFile = Class.new(RuntimeError)
 colors = Doing::Color
 wwid = Doing::WWID.new
 
-wwid.user_home = if Dir.respond_to?('home')
-                   Dir.home
-                 else
-                   File.expand_path('~')
-                 end
-
 Doing.logger.log_level = :info
 
 if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DOING_VERBOSE'] || ENV['DOING_PLUGIN_DEBUG']
@@ -55,15 +49,16 @@ if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DO
   end
 end
 
+config = Doing::Configuration
 if ENV['DOING_CONFIG']
   cf = File.expand_path(ENV['DOING_CONFIG'])
   raise MissingConfigFile, "$DOING_CONFIG not found (#{ENV['DOING_CONFIG']})" unless File.exist?(cf)
 
-  wwid.config_file = cf
-  wwid.config = nil
-  wwid.configure({ ignore_local: true })
+  config.config_file = cf
+  wwid.config = config.configure({ ignore_local: true })
 else
-  wwid.configure
+  config.config_file = File.join(Doing::Util.user_home, '.doingrc')
+  wwid.config = config.configure
 end
 
 program_desc 'A CLI for a What Was I Doing system'
@@ -96,7 +91,7 @@ desc 'Verbose output'
 switch %i[verbose debug], default_value: false, negatable: false
 
 desc 'Use a specific configuration file. Deprecated, set $DOING_CONFIG instead.'
-flag [:config_file], default_value: wwid.config_file
+flag [:config_file], default_value: config.config_file
 
 desc 'Specify a different doing_file'
 flag %i[f doing_file]
@@ -138,7 +133,7 @@ command %i[now next] do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      options[:section] = wwid.current_section
+      options[:section] = wwid.config['current_section']
     end
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero?)
@@ -291,7 +286,7 @@ command :meanwhile do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.current_section
+      section = wwid.config['current_section']
     end
     input = ''
 
@@ -566,7 +561,7 @@ command %i[done did] do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.current_section
+      section = wwid.config['current_section']
     end
 
     note = Doing::Note.new
@@ -597,7 +592,13 @@ command %i[done did] do |c|
 
       title, note = wwid.format_input(input)
       new_entry = Doing::Item.new(date, title, section, note)
-      new_entry.tag('done', value: donedate)
+      if new_entry.should_finish?(wwid.config)
+        if new_entry.should_time?(wwid.config)
+          new_entry.tag('done', value: donedate)
+        else
+          new_entry.tag('done')
+        end
+      end
 
       if (is_new)
         wwid.content[section][:items].push(new_entry)
@@ -634,17 +635,33 @@ command %i[done did] do |c|
       title.chomp!
       section = 'Archive' if options[:a]
       new_entry = Doing::Item.new(date, title, section, new_note)
-      new_entry.tag('done', value: donedate)
+      if new_entry.should_finish?(wwid.config)
+        if new_entry.should_time?(wwid.config)
+          new_entry.tag('done', value: donedate)
+        else
+          new_entry.tag('done')
+        end
+      end
       wwid.content[section][:items].push(new_entry)
       wwid.write(wwid.doing_file)
+      Doing.logger.info('Entry Added:', new_entry.title)
     elsif $stdin.stat.size.positive?
       title, note = wwid.format_input($stdin.read)
       note.add(options[:note]) if options[:note]
-      title.tag!('done', value: donedate)
       section = options[:a] ? 'Archive' : section
       new_entry = Doing::Item.new(date, title, section, note)
+
+      if new_entry.should_finish?(wwid.config)
+        if new_entry.should_time?(wwid.config)
+          new_entry.tag('done', value: donedate)
+        else
+          new_entry.tag('done')
+        end
+      end
+
       wwid.content[section][:items].push(new_entry)
       wwid.write(wwid.doing_file)
+      Doing.logger.info('Entry Added:', new_entry.title)
     else
       raise Doing::Errors::EmptyInput, 'You must provide content when creating a new entry'
     end
@@ -677,7 +694,7 @@ command :cancel do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.current_section
+      section = wwid.config['current_section']
     end
 
     if options[:tag].nil?
@@ -1165,7 +1182,7 @@ command :show do |c|
         end
       end
     else
-      section = wwid.current_section
+      section = wwid.config['current_section']
     end
 
     tags.concat(options[:tag].to_tags) if options[:tag]
@@ -1711,7 +1728,7 @@ command :view do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.current_section
+      section = wwid.config['current_section']
     end
 
     view = wwid.get_view(title)
@@ -1752,7 +1769,7 @@ command :view do |c|
       section = if options[:s]
                   section
                 else
-                  view.key?('section') ? view['section'] : wwid.current_section
+                  view.key?('section') ? view['section'] : wwid.config['current_section']
                 end
       order = view.key?('order') ? view['order'].normalize_order : 'asc'
 
@@ -1837,7 +1854,7 @@ end
 
 desc 'Move entries between sections'
 arg_name 'SECTION_NAME'
-default_value wwid.current_section
+default_value wwid.config['current_section']
 command :archive do |c|
   c.desc 'How many items to keep (ignored if archiving by tag or search)'
   c.arg_name 'X'
@@ -1869,7 +1886,7 @@ command :archive do |c|
 
   c.action do |_global_options, options, args|
     if args.empty?
-      section = wwid.current_section
+      section = wwid.config['current_section']
       tags = []
     elsif args[0] =~ /^all/i
       section = 'all'
@@ -1933,7 +1950,7 @@ command :rotate do |c|
 end
 
 desc 'Open the "doing" file in an editor'
-long_desc "`doing open` defaults to using the editor_app setting in #{wwid.config_file} (#{wwid.config.key?('editor_app') ? wwid.config['editor_app'] : 'not set'})"
+long_desc "`doing open` defaults to using the editor_app setting in #{config.config_file} (#{wwid.config.key?('editor_app') ? wwid.config['editor_app'] : 'not set'})"
 command :open do |c|
   if `uname` =~ /Darwin/
     c.desc 'Open with app name'
@@ -2007,8 +2024,8 @@ command :config do |c|
 
   c.action do |_global_options, options, _args|
     if options[:update]
-      wwid.configure({rewrite: true, ignore_local: true})
-      Doing.logger.warn("Config file rewritten: #{wwid.config_file}")
+      config.configure({rewrite: true, ignore_local: true})
+      # Doing.logger.warn("Config file rewritten: #{config.config_file}")
       return
     end
 
@@ -2029,7 +2046,7 @@ command :config do |c|
                        if cfg.is_a?(String)
                          cfg
                        else
-                         YAML.dump(cfg)
+                         YAML.dump(cfg.to_h)
                        end
                      end
       else
@@ -2039,16 +2056,16 @@ command :config do |c|
       return
     end
 
-    if wwid.additional_configs.count.positive?
-      choices = [wwid.config_file]
-      choices.concat(wwid.additional_configs)
+    if config.additional_configs.count.positive?
+      choices = [config.config_file]
+      choices.concat(config.additional_configs)
       res = wwid.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to edit > ')
 
       raise Doing::Errors::UserCancelled, 'Cancelled' unless res
 
-      config_file = res.strip || wwid.config_file
+      config_file = res.strip || config.config_file
     else
-      config_file = wwid.config_file
+      config_file = config.config_file
     end
 
     if `uname` =~ /Darwin/
@@ -2213,15 +2230,15 @@ around do |global, command, options, arguments, code|
 
   wwid.default_option = global[:default]
 
-  if global[:config_file] && global[:config_file] != wwid.config_file
+  if global[:config_file] && global[:config_file] != config.config_file
     Doing.logger.warn(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', colors.flamingo, colors.default, colors.boldred))
     Doing.logger.warn(format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  colors.red, colors.boldwhite, colors.default))
-    wwid.config_file = global[:config_file]
-    wwid.config = nil
-    wwid.configure({ ignore_local: true })
-    # Doing.logger.info("Override config file #{wwid.config_file}")
-  # else
-  #   wwid.configure
+
+    cf = File.expand_path(global[:config_file])
+    raise MissingConfigFile, "Config file not found (#{global[:config_file]})" unless File.exist?(cf)
+
+    config.config_file = cf
+    wwid.config = config.configure({ ignore_local: true })
   end
 
   if global[:doing_file]

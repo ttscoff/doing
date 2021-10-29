@@ -95,3 +95,5 @@ export_templates:
   say:
   trizzer:
 tag_sort: name
+never_time: ['@nevertime']
+never_finish: ['@neverfinish']
