@@ -10,6 +10,8 @@ require 'test_helper'
 class DoingTagTest < Test::Unit::TestCase
   include DoingHelpers
 
+  ENTRY_REGEX = /^\d{4}-\d\d-\d\d \d\d:\d\d \|/.freeze
+
   def setup
     @tmpdirs = []
     @result = ''
@@ -69,7 +71,7 @@ class DoingTagTest < Test::Unit::TestCase
     json = JSON.parse(IO.read(@import_file))
     search_term = 'oracle'
     test_tag = 'testtag'
-    test_tag_2 = 'othertag'
+    test_tag2 = 'othertag'
     rx = /#{search_term}/i
     matches = json.select do |entry|
       entry['project'] =~ rx || (entry.key?('activityTitle') && entry['activityTitle'] =~ rx)
@@ -77,16 +79,20 @@ class DoingTagTest < Test::Unit::TestCase
     target = matches.size
 
     doing('import', '--type', 'timing', @import_file)
+
     # Add a tag to items matching search term
     result = doing('--stdout', 'tag', '--search', search_term, '-c', '0', '--force', test_tag)
-    assert_equal(target, result.scan(/Added tags:/).size, 'The number of affected items should be the same as were in the imported file')
+    assert_equal(target, result.scan(/Added tags:/).size,
+                 'The number of affected items should be the same as were in the imported file')
+
     # Add a second tag to items matching a tag search for previous tag
-    result = doing('--stdout', 'tag', '--tag', test_tag, '-c', '0', '--force', test_tag_2)
-    # FIXME: Why is result only showing two results when the operation appears successful?
-    # assert_equal(target, result.scan(/Added tags:/).size, 'The number of affected items should be the same as the number of search results')
+    doing('--stdout', 'tag', '--tag', test_tag, '-c', '0', '--force', test_tag2)
+    assert_count_entries(target, doing('show', "@#{test_tag2}"), "Should show #{target} tagged matches")
+
     # Remove the first tag from items matching a tag search for the second tag
-    result = doing('--stdout', 'tag', '--tag', test_tag_2, '-r', '-c', '0', '--force', test_tag)
-    assert_equal(target, result.scan(/Removed tags:/).size, 'The number of affected items should be the same as the tag results')
+    result = doing('--stdout', 'tag', '--tag', test_tag2, '-r', '-c', '0', '--force', test_tag)
+    assert_equal(target, result.scan(/Removed tags:/).size,
+                 'The number of affected items should be the same as the tag results')
   end
 
   def test_tag_date
@@ -97,6 +103,10 @@ class DoingTagTest < Test::Unit::TestCase
   end
 
   private
+
+  def assert_count_entries(count, shown, message = 'Should be X entries shown')
+    assert_equal(count, shown.uncolor.strip.scan(ENTRY_REGEX).count, message)
+  end
 
   def mktmpdir
     tmpdir = Dir.mktmpdir
