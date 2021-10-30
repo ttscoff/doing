@@ -178,6 +178,50 @@ command %i[now next] do |c|
   end
 end
 
+desc 'Reset the start time of an entry'
+command :reset do |c|
+  c.desc 'Reset last item in section'
+  c.arg_name 'NAME'
+  c.flag %i[s section], default_value: 'All'
+
+  c.desc 'Resume entry (remove @done)'
+  c.switch %i[r resume]
+
+  c.desc 'Reset last entry matching tag'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Reset last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
+
+  c.action do |_global_options, options, args|
+    if options[:section]
+      options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
+    end
+
+    options[:tag_bool] = options[:bool].normalize_bool
+
+    last_entry = wwid.last_entry(options)
+
+    unless last_entry
+      Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
+      return
+    end
+
+    wwid.reset_item(last_entry, resume: options[:resume])
+
+    # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
+
+    wwid.write(wwid.doing_file)
+  end
+end
+
+
 desc 'Add a note to the last entry'
 long_desc %(
   If -r is provided with no other arguments, the last note is removed.
@@ -1971,7 +2015,7 @@ command :rotate do |c|
 end
 
 desc 'Open the "doing" file in an editor'
-long_desc "`doing open` defaults to using the editor_app setting in #{config.config_file} (#{settings.key?('editor_app') ? settings['editor_app'] : 'not set'})"
+long_desc "`doing open` defaults to using the editor_app setting in #{config.config_file} (#{settings.key?('editor_app') ? settings['editor_app'] : 'not set'})."
 command :open do |c|
   if `uname` =~ /Darwin/
     c.desc 'Open with app name'
@@ -1998,7 +2042,7 @@ command :open do |c|
       elsif options[:editor]
         raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
-        system %($EDITOR "#{File.expand_path(wwid.doing_file)}")
+        system %(#{Doing::Util.default_editor} "#{File.expand_path(wwid.doing_file)}")
       elsif settings.key?('editor_app') && !settings['editor_app'].nil?
         system %(open -a "#{settings['editor_app']}" "#{File.expand_path(wwid.doing_file)}")
       else
@@ -2008,7 +2052,7 @@ command :open do |c|
     else
       raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
-      system %($EDITOR "#{File.expand_path(wwid.doing_file)}")
+      system %(#{Doing::Util.default_editor} "#{File.expand_path(wwid.doing_file)}")
     end
   end
 end

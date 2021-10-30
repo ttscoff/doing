@@ -517,6 +517,15 @@ module Doing
       "#{last_item.title}\n# EDIT BELOW THIS LINE ------------\n#{note}"
     end
 
+    def reset_item(item, resume: false)
+      item.date = Time.now
+      if resume
+        item.tag('done', remove: true)
+      end
+      Doing.logger.info('Reset:', %(Reset #{resume ? 'and resumed ' : ''} "#{item.title}" in #{item.section}))
+      item
+    end
+
     def restart_item(item, opt = {})
       original = item.dup
       if item.should_finish?
@@ -790,6 +799,7 @@ module Doing
                                'move',
                                'edit',
                                'resume/repeat',
+                               'reset',
                                'output formatted'
                              ],
                              prompt: 'What do you want to do with the selected items? > ',
@@ -801,8 +811,10 @@ module Doing
         to_do = choice.strip.split(/\n/)
         to_do.each do |action|
           case action
-          when /(resume)/
+          when /resume/
             opt[:resume] = true
+          when /reset/
+            opt[:reset] = true
           when /(add|remove) tag/
             type = action =~ /^add/ ? 'add' : 'remove'
             raise Errors::InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
@@ -847,13 +859,18 @@ module Doing
         end
       end
 
-      if opt[:resume]
+      if opt[:resume] || opt[:reset]
         if items.count > 1
-          logger.error('Error:', 'resume can only be used on a single entry')
+          logger.error('Error:', 'resume and restart can only be used on a single entry')
         else
-          restart_item(items[0], { editor: opt[:editor] })
+          item = items[0]
+          if opt[:resume] && !opt[:reset]
+            restart_item(item, { editor: opt[:editor] })
+          elsif opt[:reset]
+            update_item(item, reset_item(item, resume: opt[:resume]))
+          end
+          write(@doing_file)
         end
-
         return
       end
 
