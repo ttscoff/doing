@@ -50,7 +50,7 @@ module Doing
 
         title = "#{title} @project(#{i.section})" unless variables[:is_single]
 
-        interval = wwid.get_interval(i, record: false) if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+        interval = wwid.get_interval(i, record: true) if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
         interval ||= false
 
         done = i.title =~ /(?<= |^)@done/ ? 'x' : ' '

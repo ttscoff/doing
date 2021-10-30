@@ -1,7 +1,5 @@
 # <%= @page_title %>
 <% @items.each do |i| %>
-- [<%= i[:done] %>] <%= i[:date] %> <%= i[:title] %> <% if i[:time] && i[:time] != "00:00:00" %>[**<%= i[:time] %>**]<% end %><% if i[:note] %>
-
-    <%= i[:note].map{|n| n.strip }.join("\n    ") %><% end %><% end %>
+- [<%= i[:done] %>] <%= i[:date] %> <%= i[:title] %> <% if i[:time] && i[:time] != "00:00:00" %>[**<%= i[:time] %>**]<% end %><% if i[:note].length.positive? %><%= "\n\n    " + i[:note].map{|n| n.strip }.join("\n    ") %><% end %><% end %>
 
 <%= @totals %>

@@ -282,7 +282,7 @@ module Doing
       end
 
       @content[title.cap_first] = { :original => "#{title}:", :items => [] }
-      logger.info('Added section:', %("#{title.cap_first}"))
+      logger.info('New section:', %("#{title.cap_first}"))
     end
 
     ##
@@ -301,7 +301,7 @@ module Doing
       sections.each do |sect|
         next unless sect =~ /#{re}/i
 
-        logger.debug('Section match:', %(Assuming "#{sect}" from "#{frag}"))
+        logger.debug('Match:', %(Assuming "#{sect}" from "#{frag}"))
         section = sect
         break
       end
@@ -393,7 +393,7 @@ module Doing
       views.each do |v|
         next unless v =~ /#{re}/i
 
-        logger.debug('View match:', %(Assuming "#{v}" from "#{frag}"))
+        logger.debug('Match:', %(Assuming "#{v}" from "#{frag}"))
         view = v
         break
       end
@@ -448,8 +448,8 @@ module Doing
       end
 
       items.push(entry)
-
-      logger.info('Entry added:', %("#{entry.title}" to #{section}))
+      logger.count(:added)
+      logger.debug('Entry added:', %("#{entry.title}" to #{section}))
     end
 
     ##
@@ -471,6 +471,7 @@ module Doing
           duped = no_overlap ? item.overlapping_time?(comp) : item.same_time?(comp)
           break if duped
         end
+        logger.count(:skipped, level: :debug, message: 'overlapping entry') if duped
         logger.log_now(:debug, 'Skipped:', "overlapping entry: #{item.title}") if duped
         duped
       end
@@ -519,7 +520,7 @@ module Doing
       last_item = @content[section][:items].dup.sort_by(&:date).reverse[0]
       raise Errors::NoEntryError, 'No entry found' unless last_item
 
-      logger.log_now(:info, 'Editing note:', last_item.title)
+      logger.log_now(:info, 'Edit note:', last_item.title)
       note = ''
       note = last_item.note.to_s unless last_item.note.nil?
       "#{last_item.title}\n# EDIT BELOW THIS LINE ------------\n#{note}"
@@ -631,7 +632,7 @@ module Doing
     ## - +:age+ (String, 'old' or 'new')
     ##
     def filter_items(items = [], opt: {})
-      if items.empty?
+      if items.nil? || items.empty?
         section = opt[:section] ? guess_section(opt[:section]) : 'All'
 
         if section =~ /^all$/i
@@ -724,16 +725,7 @@ module Doing
     def interactive(opt = {})
       section = opt[:section] ? guess_section(opt[:section]) : 'All'
       opt[:query] = opt[:search] if opt[:search] && !opt[:query]
-
-      if section =~ /^all$/i
-        combined = { :items => [] }
-        @content.each do |_k, v|
-          combined[:items] += v[:items]
-        end
-        items = combined[:items].dup.sort_by { |item| item.date }.reverse
-      else
-        items = @content[section][:items]
-      end
+      items = filter_items([], opt: { section: section, search: opt[:search] }).sort_by { |item| item.date }.reverse
 
       selection = choose_from_items(items, opt, include_section: section =~ /^all$/i)
 
@@ -976,7 +968,7 @@ module Doing
             f.puts output
           end
 
-          logger.info('File written:', file)
+          logger.warn('File written:', file)
         else
           Doing::Pager.page output
         end
@@ -1004,24 +996,10 @@ module Doing
         if item.tags?(tag, bool)
           item.tag(tag, remove: remove, value: date ? done_date.strftime('%F %R') : nil)
           remove ? removed.push(tag) : added.push(tag)
-        else
-          logger.debug('Skipped:', %(Item #{remove ? 'not' : 'already' } @#{tag}: "#{title}" in #{item.section}))
         end
       end
 
-      if added.empty?
-        logger.debug('No tags added:', %("#{item.title}" in #{item.section}))
-      else
-        did_add = added.map { |t| "@#{t}".cyan }.join(', ')
-        logger.info('Added tags:', %(#{did_add} to "#{item.title}" in #{item.section}))
-      end
-
-      if removed.empty?
-        logger.debug('No tags removed:', %("#{item.title}" in #{item.section}))
-      else
-        did_remove = removed.map { |t| "@#{t}".cyan }.join(', ')
-        logger.info('Removed tags:', %(#{did_remove} from "#{item.title}" in #{item.section}))
-      end
+      log_change(tags_added: added, tags_removed: removed, count: 1)
 
       item
     end
@@ -1045,6 +1023,8 @@ module Doing
 
       items = filter_items([], opt: opt)
 
+      logger.info('Skipped:', 'no items matched your search') if items.empty?
+
       items.each do |item|
         added = []
         removed = []
@@ -1052,20 +1032,22 @@ module Doing
         if opt[:autotag]
           new_title = autotag(item.title) if @auto_tag
           if new_title == item.title
-            logger.debug('Autotag:', 'No changes')
+            logger.count(:skipped, level: :debug, message: '%count unchaged %items')
+            # logger.debug('Autotag:', 'No changes')
           else
-            logger.info('Tags updated:', new_title)
+            logger.count(:added_tags)
+            logger.debug('Tags updated:', new_title)
             item.title = new_title
           end
         else
           if opt[:sequential]
             next_entry = next_item(item)
 
-            if next_entry.nil?
-              done_date = Time.now
-            else
-              done_date = next_entry.date - 60
-            end
+            done_date = if next_entry.nil?
+                          Time.now
+                        else
+                          next_entry.date - 60
+                        end
           elsif opt[:took]
             if item.date + opt[:took] > Time.now
               item.date = Time.now - opt[:took]
@@ -1074,18 +1056,20 @@ module Doing
               done_date = item.date + opt[:took]
             end
           elsif opt[:back]
-            if opt[:back].is_a? Integer
-              done_date = item.date + opt[:back]
-            else
-              done_date = item.date + (opt[:back] - item.date)
-            end
+            done_date = if opt[:back].is_a? Integer
+                          item.date + opt[:back]
+                        else
+                          item.date + (opt[:back] - item.date)
+                        end
           else
             done_date = Time.now
           end
 
           opt[:tags].each do |tag|
             if tag == 'done' && !item.should_finish?(@config)
+
               Doing.logger.debug('Skipped:', "Item in never_finish: #{item.title}")
+              logger.count(:skipped, level: :debug)
               next
             end
 
@@ -1113,28 +1097,14 @@ module Doing
           end
         end
 
-        if added.empty?
-          logger.debug('No tags added:', %("#{item.title}" in #{item.section}))
-        else
-          did_add = added.map { |t| "@#{t}".cyan }.join(', ')
-          logger.info('Added tags:', %(#{did_add} to "#{item.title}" in #{item.section}))
-        end
+        log_change(tags_added: added, tags_removed: removed)
 
-        if removed.empty?
-          logger.debug('No tags removed:', %("#{item.title}" in #{item.section}))
-        else
-          did_remove = removed.map { |t| "@#{t}".cyan }.join(', ')
-          logger.info('Removed tags:', %(#{did_remove} from "#{item.title}" in #{item.section}))
-        end
-
-        if opt[:note]
-          item.note.add(opt[:note])
-        end
+        item.note.add(opt[:note]) if opt[:note]
 
         if opt[:archive] && opt[:section] != 'Archive' && (opt[:count]).positive?
           move_item(item, 'Archive', label: true)
-        else
-          logger.warn('Archiving is skipped when operating on all entries') if opt[:archive] && opt[:count].zero?
+        elsif opt[:archive] && opt[:count].zero?
+          logger.warn('Skipped:', 'Archiving is skipped when operating on all entries')
         end
       end
 
@@ -1158,7 +1128,9 @@ module Doing
 
       @content[section][:items].concat([new_item])
 
-      logger.info("Entry #{section == 'Archive' ? 'archived' : 'moved'}:", "#{new_item.title.truncate(60)} from #{from} to #{section}")
+      logger.count(section == 'Archive' ? :archived : :moved)
+      logger.debug("Entry #{section == 'Archive' ? 'archived' : 'moved'}:",
+                  "#{new_item.title.truncate(60)} from #{from} to #{section}")
       new_item
     end
 
@@ -1167,19 +1139,12 @@ module Doing
     ##
     ## @param      item
     ##
-    def next_item(item)
-      combined = { :items => [] }
-      @content.each do |_k, v|
-        combined[:items] += v[:items]
-      end
-      items = combined[:items].dup.sort_by { |item| item.date }.reverse
+    def next_item(item, options = {})
+      items = filter_items([], opt: options)
+
       idx = items.index(item)
 
-      if idx > 0
-        items[idx - 1]
-      else
-        nil
-      end
+      idx.positive? ? items[idx - 1] : nil
     end
 
     ##
@@ -1192,7 +1157,8 @@ module Doing
 
       section_items = @content[section][:items]
       deleted = section_items.delete(item)
-      logger.info('Entry deleted:', deleted.title)
+      logger.count(:deleted)
+      logger.debug('Entry deleted:', deleted.title)
     end
 
     ##
@@ -1205,9 +1171,7 @@ module Doing
       section = old_item.section
 
       section_items = @content[section][:items]
-      s_idx = section_items.index {|item|
-        item.equal?(old_item)
-      }
+      s_idx = section_items.index { |item| item.equal?(old_item) }
 
       unless s_idx
         Doing.logger.error('Fail to update:', 'Could not find item in index')
@@ -1217,7 +1181,8 @@ module Doing
       return if section_items[s_idx].equal?(new_item)
 
       section_items[s_idx] = new_item
-      logger.info('Entry updated:', section_items[s_idx].title.truncate(60))
+      logger.count(:updated)
+      logger.debug('Entry updated:', section_items[s_idx].title.truncate(60))
       new_item
     end
 
@@ -1248,7 +1213,7 @@ module Doing
       else
         item.title = title
         item.note.add(note, replace: true)
-        logger.info('Entry edited:', item.title)
+        logger.info('Edited:', item.title)
 
         write(@doing_file)
       end
@@ -1289,9 +1254,11 @@ module Doing
         if opt[:archive] && opt[:section] != 'Archive'
           item.title = item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{item.section})")
           move_item(item, 'Archive', label: false)
-          logger.info('Completed/archived:', item.title)
+          logger.count(:completed_archived)
+          logger.debug('Completed/archived:', item.title)
         else
-          logger.info('Completed:', item.title)
+          logger.count(:completed)
+          logger.debug('Completed:', item.title)
         end
       end
 
@@ -1487,37 +1454,26 @@ module Doing
       opt[:template] ||= @config.dig('templates', 'default', 'template')
 
       # opt[:highlight] ||= true
-      section = ''
+      title = ''
       is_single = true
       if opt[:section].nil?
-        section = choose_section
-        target_section = @content[section]
+        opt[:section] = choose_section
+        title = opt[:section]
       elsif opt[:section].instance_of?(String)
         if opt[:section] =~ /^all$/i
-          is_single = false
-          combined = { :items => [] }
-          @content.each do |_k, v|
-            combined[:items] += v[:items]
-          end
-          section = if opt[:page_title]
-                      opt[:page_title]
-                    elsif opt[:tag_filter] && opt[:tag_filter]['bool'].normalize_bool != :not
-                      opt[:tag_filter]['tags'].map { |tag| "@#{tag}" }.join(' + ')
-                    else
-                      'doing'
-                    end
-          target_section = combined
+          title = if opt[:page_title]
+                    opt[:page_title]
+                  elsif opt[:tag_filter] && opt[:tag_filter]['bool'].normalize_bool != :not
+                    opt[:tag_filter]['tags'].map { |tag| "@#{tag}" }.join(' + ')
+                  else
+                    'doing'
+                  end
         else
-          section = guess_section(opt[:section])
-          target_section = @content[section]
+          title = guess_section(opt[:section])
         end
       end
 
-      raise Errors::InvalidSection, 'Invalid section object' unless target_section.instance_of? Hash
-
-      items = target_section[:items].sort_by { |item| item.date }
-
-      items = filter_items(items, opt: opt).reverse
+      items = filter_items([], opt: opt).reverse
 
       items.reverse! if opt[:order] =~ /^d/i
 
@@ -1543,8 +1499,7 @@ module Doing
 
       raise Errors::InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
 
-      # exporter = WWIDExport.new(section, items, is_single, opt, self)
-      export_options = { page_title: section, is_single: is_single, options: opt }
+      export_options = { page_title: title, is_single: is_single, options: opt }
 
       Plugins.plugins[:export].each do |_, options|
         next unless opt[:output] =~ /^(#{options[:trigger].normalize_trigger})$/i
@@ -1638,22 +1593,32 @@ module Doing
             end
           end
           moved_items.each do |item|
-            if label && section != @config['current_section']
-              item.title =
-                item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+            if label
+              item.title = if section == @config['current_section']
+                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, '\1')
+                           else
+                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+                           end
+              logger.debug('Moved:', "#{item.title} from #{section} to #{desination}")
             end
           end
 
           @content[section][:items] = items
           @content[destination][:items].concat(moved_items)
-          logger.info('Archived:', "#{moved_items.length} items from #{section} to #{destination}")
+          if moved_items.length.positive?
+            logger.info('Archived:', "#{moved_items.length} items from #{section} to #{destination}")
+          end
         else
           count = items.length if items.length < count
 
           items.map! do |item|
-            if label && section != @config['current_section']
-              item.title =
-                item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+            if label
+              item.title = if section == @config['current_section']
+                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, '\1')
+                           else
+                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+                           end
+              logger.debug('Moved:', "#{item.title} from #{section} to #{destination}")
             end
             item
           end
@@ -1665,12 +1630,14 @@ module Doing
           end
 
           @content[section][:items] = if count.zero?
-                                         []
-                                       else
-                                         items[0..count - 1]
-                                       end
-
-          logger.info('Archived:', "#{items.length - count} items from #{section} to #{destination}")
+                                        []
+                                      else
+                                        items[0..count - 1]
+                                      end
+          logger.count(destination == 'Archive' ? :archived : :moved,
+                       count: items.length - count,
+                       message: "%count %items from #{section} to #{destination}")
+          # logger.info('Archived:', "#{items.length - count} items from #{section} to #{destination}")
         end
       end
     end
@@ -1942,7 +1909,7 @@ EOS
         output + tail
       when :markdown
         pad = sorted_tags_data.map {|k, v| k }.group_by(&:size).max.last[0].length
-        output = <<-EOS
+        output = <<~EOS
   | #{' ' * (pad - 7) }project | time     |
   | #{'-' * (pad - 1)}: | :------- |
         EOS
@@ -2059,6 +2026,27 @@ EOS
 
       logger.log_now(:error, 'Script error:', "Error running #{@config['run_after']}")
       logger.log_now(:error, 'STDERR output:', stderr)
+    end
+
+    def log_change(tags_added: [], tags_removed: [], count: 1)
+      if tags_added.empty? && tags_removed.empty?
+        logger.count(:skipped, level: :debug, message: '%count %items with no change', count: count)
+      else
+
+        if tags_added.empty?
+          logger.count(:skipped, level: :debug, message: 'no tags added to %count %items')
+          # logger.debug('No tags added:', %("#{item.title}" in #{item.section}))
+        else
+          logger.count(:added_tags, tag: tags_added, message: '%tags added to %count %items')
+          # logger.info('Added tags:', %(#{did_add} to "#{item.title}" in #{item.section}))
+        end
+
+        if tags_removed.empty?
+          logger.count(:skipped, level: :debug, message: 'no tags removed from %count %items')
+        else
+          logger.count(:removed_tags, tag: tags_removed, message: '%tags removed from %count %items')
+        end
+      end
     end
   end
 end

@@ -9,12 +9,27 @@ module Doing
 
     attr_reader :messages, :level, :results
 
+    TOPIC_WIDTH = 12
+
     LOG_LEVELS = {
       debug: ::Logger::DEBUG,
       info: ::Logger::INFO,
       warn: ::Logger::WARN,
       error: ::Logger::ERROR
     }.freeze
+
+    COUNT_KEYS = [
+      :added_tags,
+      :removed_tags,
+      :added,
+      :updated,
+      :deleted,
+      :completed,
+      :archived,
+      :moved,
+      :completed_archived,
+      :skipped
+    ].freeze
 
     #
     # @brief      Create a new instance of a log writer
@@ -23,6 +38,8 @@ module Doing
     #
     def initialize(level = :info)
       @messages = []
+      @counters = {}
+      COUNT_KEYS.each { |key| @counters[key] = { tag: [], count: 0 } }
       @results = []
       @logdev = $stderr
       @max_length = `tput cols`.strip.to_i - 5 || 85
@@ -65,6 +82,55 @@ module Doing
       end
       log_now :debug, 'Logging at level:', @level.to_s
       # log_now :debug, 'Doing Version:', Doing::VERSION
+    end
+
+    def format_counter(key, data)
+      case key
+      when :added_tags
+        ['Tagged:', data[:message] || 'added %tags to %count %items']
+      when :removed_tags
+        ['Untagged:', data[:message] || 'removed %tags from %count %items']
+      when :added
+        ['Added:', data[:message] || 'added %count new %items']
+      when :updated
+        ['Updated:', data[:message] || 'updated %count %items']
+      when :deleted
+        ['Deleted:', data[:message] || 'deleted %count %items']
+      when :moved
+        ['Moved:', data[:message] || 'moved %count %items']
+      when :completed
+        ['Completed:', data[:message] || 'completed %count %items']
+      when :archived
+        ['Archived:',  data[:message] || 'archived %count %items']
+      when :completed_archived
+        ['Archived:',  data[:message] || 'completed and archived %count %items']
+      when :skipped
+        ['Skipped:', data[:message] || '%count %items were unchanged']
+      end
+    end
+
+    def total_counters
+      @counters.each do |key, data|
+        next if data[:count].zero?
+
+        count = data[:count]
+        tags = data[:tag] ? data[:tag].uniq.map { |t| "@#{t}".cyan }.join(', ') : 'tags'
+        topic, m = format_counter(key, data)
+        message = m.dup
+        message.sub!(/%count/, count.to_s)
+        message.sub!(/%items/, count == 1 ? 'item' : 'items')
+        message.sub!(/%tags/, tags)
+        write(data[:level], topic, message)
+      end
+    end
+
+    def count(key, level: :info, count: 1, tag: nil, message: nil)
+      raise ArgumentError, 'invalid counter key' unless COUNT_KEYS.include?(key)
+
+      @counters[key][:count] += count
+      @counters[key][:tag].concat(tag).sort.uniq unless tag.nil?
+      @counters[key][:level] ||= level
+      @counters[key][:message] ||= message
     end
 
     #
@@ -153,10 +219,10 @@ module Doing
       message = yield if block_given?
       message = message.to_s.gsub(/\s+/, ' ')
 
-      return "#{topic}" if topic && message.strip.empty?
+      return topic.ljust(TOPIC_WIDTH) if topic && message.strip.empty?
 
       topic = formatted_topic(topic, colon: block_given?)
-      message.truncmiddle!(@max_length - 25)
+      message.truncmiddle!(@max_length - TOPIC_WIDTH - 5)
       out = topic + message
       out.truncate!(@max_length) if @max_length.positive?
       messages << out
@@ -174,7 +240,13 @@ module Doing
     # @return     the formatted topic statement
     #
     def formatted_topic(topic, colon: false)
-      "#{topic}#{colon ? ': ' : ' '}".rjust(20)
+      if colon
+        "#{topic}: ".rjust(TOPIC_WIDTH)
+      elsif topic =~ /:$/
+        "#{topic} ".rjust(TOPIC_WIDTH)
+      else
+        "#{topic} "
+      end
     end
 
     #
@@ -252,6 +324,8 @@ module Doing
     end
 
     def output_results
+      total_counters
+
       results = @results.select { |msg| write_message?(msg[:level]) }.uniq
 
       if @logdev == $stdout

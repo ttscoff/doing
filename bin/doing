@@ -1853,9 +1853,13 @@ command :views do |c|
 end
 
 desc 'Move entries between sections'
-arg_name 'SECTION_NAME'
+long_desc %(Argument can be a section name to move all entries from a section,
+or start with an "@" to move entries matching a tag.
+
+Default with no argument moves items from the "#{wwid.config['current_section']}" section to Archive.)
+arg_name 'SECTION_OR_TAG'
 default_value wwid.config['current_section']
-command :archive do |c|
+command %i[archive move] do |c|
   c.desc 'How many items to keep (ignored if archiving by tag or search)'
   c.arg_name 'X'
   c.flag %i[k keep], must_match: /^\d+$/, type: Integer
