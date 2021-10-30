@@ -286,11 +286,11 @@ module Doing
     def log_now(level, topic, message = nil, &block)
       return false unless write_message?(level)
 
-      # if @logdev == $stdout
-      #   @logdev.puts message(topic, message, &block)
-      # else
-      #   @logdev.puts color_message(level, topic, message, &block)
-      # end
+      if @logdev == $stdout
+        @logdev.puts message(topic, message, &block)
+      else
+        @logdev.puts color_message(level, topic, message, &block)
+      end
     end
 
     def color_message(level, topic, message = nil, &block)
@@ -317,6 +317,8 @@ module Doing
 
       message.sub!(/^(\s*\S.*?): (.*?)$/) do
         m = Regexp.last_match
+        msg = m[2] =~ /(\e\[[\d;]+m)/ ? msg : "#{message_fg}#{m[2]}"
+
         "#{topic_fg}#{m[1]}#{colors.reset}: #{message_fg}#{m[2]}"
       end
 

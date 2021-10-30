@@ -86,6 +86,11 @@ module Doing
     ## @param      backup   (Boolean) create a ~ backup
     ##
     def write_to_file(file, content, backup: true)
+      unless file
+        puts content
+        return
+      end
+
       file = File.expand_path(file)
 
       if File.exist?(file) && backup
@@ -98,6 +103,53 @@ module Doing
       end
 
       Hooks.trigger :post_write, file
+    end
+
+    def safe_load_file(filename)
+      SafeYAML.load_file(filename) || {}
+    end
+
+    def default_editor
+      @default_editor = find_default_editor
+    end
+
+    def editor_with_args
+      args_for_editor(default_editor)
+    end
+
+    def args_for_editor(editor)
+      return editor if editor =~ /-\S/
+
+      args = case editor
+             when /^(subl|code|mate)$/
+               ['-w']
+             when /^(vim|mvim)$/
+               ['-f']
+             else
+               []
+             end
+      "#{editor} #{args.join(' ')}"
+    end
+
+    def find_default_editor
+      if Doing.config.settings['editor']
+        editor = Doing.config.settings['editor']
+        Doing.logger.debug('ENV:', "Using #{editor} from config")
+        return editor if exec_available(editor)
+      end
+
+      return ENV['GIT_EDITOR'] if ENV['GIT_EDITOR']
+
+      return ENV['EDITOR'] if ENV['EDITOR']
+
+      Doing.logger.debug('ENV:', 'No EDITOR environment variable, testing available editors')
+      editors = %w[vim vi code subl mate mvim nano emacs]
+      editors.each do |ed|
+        return ed if exec_available(ed)
+        Doing.logger.debug('ENV:', "#{ed} not available")
+      end
+
+      nil
     end
   end
 end

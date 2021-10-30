@@ -11,13 +11,15 @@ require 'chronic'
 require 'haml'
 require 'json'
 require 'logger'
-require 'doing/configuration'
+require 'safe_yaml/load'
+require 'doing/hash'
 require 'doing/colors'
 require 'doing/string'
 require 'doing/time'
 require 'doing/array'
 require 'doing/symbol'
 require 'doing/util'
+require 'doing/configuration'
 require 'doing/item'
 require 'doing/note'
 require 'doing/wwidfile'
@@ -39,6 +41,14 @@ module Doing
     #
     def logger
       @logger ||= LogAdapter.new((ENV['DOING_LOG_LEVEL'] || :info).to_sym)
+    end
+
+    def config
+      @config ||= Configuration.new
+    end
+
+    def config_with(file, options = {})
+      @config = Configuration.new(file, options: options)
     end
   end
 end

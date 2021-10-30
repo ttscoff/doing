@@ -30,7 +30,7 @@ module Doing
           reset = ''
         end
 
-        if (!item.note.empty?) && wwid.config[:include_notes]
+        if (!item.note.empty?) && wwid.config['include_notes']
           note = item.note.map(&:strip).delete_if(&:empty?)
           note.map! { |line| "#{line.sub(/^\t*/, '')}  " }
 

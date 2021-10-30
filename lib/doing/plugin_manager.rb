@@ -4,16 +4,15 @@ module Doing
   # Plugin handling
   module Plugins
     class << self
-
       def user_home
         @user_home ||= Util.user_home
       end
 
       def plugins
-        @plugins ||=  {
-                        import: {},
-                        export: {}
-                      }
+        @plugins ||= {
+          import: {},
+          export: {}
+        }
       end
 
       ##
@@ -76,7 +75,6 @@ module Doing
         return unless ENV['DOING_PLUGIN_DEBUG']
 
         Doing.logger.debug('Plugin Manager:', "Registered #{type} plugin \"#{title}\"")
-
       end
 
       def validate_plugin(title, type, klass)
@@ -174,7 +172,7 @@ module Doing
         type = valid_type(type)
         templates = []
         plugs = plugins[type].clone
-        plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
+        plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
           options[:templates].each do |t|
             templates << t[:name]
           end
@@ -187,7 +185,7 @@ module Doing
         type = valid_type(type)
         pattern = []
         plugs = plugins[type].clone
-        plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
+        plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
           options[:templates].each do |t|
             pattern << t[:trigger].normalize_trigger
           end
@@ -198,11 +196,9 @@ module Doing
       def template_for_trigger(trigger, type: :export)
         type = valid_type(type)
         plugs = plugins[type].clone
-        plugs.delete_if { |t, o| o[:templates].nil? }.each do |_, options|
+        plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
           options[:templates].each do |t|
-            if trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
-              return options[:class].template(trigger)
-            end
+            return options[:class].template(trigger) if trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
           end
         end
         raise Errors::InvalidArgument, "No template type matched \"#{trigger}\""

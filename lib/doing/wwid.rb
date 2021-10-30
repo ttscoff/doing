@@ -125,7 +125,7 @@ module Doing
     def fork_editor(input = '')
       # raise Errors::NonInteractive, 'Non-interactive terminal' unless $stdout.isatty || ENV['DOING_EDITOR_TEST']
 
-      raise Errors::MissingEditor, 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      raise Errors::MissingEditor, 'No EDITOR variable defined in environment' if Util.default_editor.nil?
 
       tmpfile = Tempfile.new(['doing', '.md'])
 
@@ -134,7 +134,7 @@ module Doing
         f.puts "\n# The first line is the entry title, any lines after that are added as a note"
       end
 
-      pid = Process.fork { system("$EDITOR #{tmpfile.path}") }
+      pid = Process.fork { system("#{Util.editor_with_args} #{tmpfile.path}") }
 
       trap('INT') do
         begin
@@ -507,23 +507,48 @@ module Doing
     def last_note(section = 'All')
       section = guess_section(section)
 
-      if section =~ /^all$/i
-        combined = { :items => [] }
-        @content.each do |_k, v|
-          combined[:items] += v[:items]
-        end
-        section = combined[:items].dup.sort_by { |item| item.date }.reverse[0].section
-      end
+      last_item = last_entry({ section: section })
 
-      raise Errors::InvalidSection, "Section #{section} not found" unless @content.key?(section)
-
-      last_item = @content[section][:items].dup.sort_by(&:date).reverse[0]
       raise Errors::NoEntryError, 'No entry found' unless last_item
 
       logger.log_now(:info, 'Edit note:', last_item.title)
-      note = ''
-      note = last_item.note.to_s unless last_item.note.nil?
+
+      note = last_item.note&.to_s || ''
       "#{last_item.title}\n# EDIT BELOW THIS LINE ------------\n#{note}"
+    end
+
+    def restart_item(item, opt = {})
+      original = item.dup
+      if item.should_finish?
+        if item.should_time?
+          item.title.tag!('done', value: Time.now.strftime('%F %R'))
+        else
+          item.title.tag!('done')
+        end
+      end
+
+      # Remove @done tag
+      title = item.title.sub(/\s*@done(\(.*?\))?/, '').chomp
+      section = opt[:in].nil? ? item.section : guess_section(opt[:in])
+      @auto_tag = false
+
+      note = opt[:note] || Note.new
+
+      if opt[:editor]
+        to_edit = title
+        to_edit += "\n#{note.to_s}" unless note.empty?
+        new_item = fork_editor(to_edit)
+        title, note = format_input(new_item)
+
+        if title.nil? || title.empty?
+          logger.debug('Skipped:', 'No content provided')
+          return
+        end
+      end
+
+      update_item(original, item)
+      add_item(title, section, { note: note, back: opt[:date], timed: true })
+      write(@doing_file)
     end
 
     ##
@@ -543,35 +568,7 @@ module Doing
         return
       end
 
-      if last.should_finish?(@config)
-        if last.should_time?(@config)
-          last.title.tag!('done', value: Time.now.strftime('%F %R'))
-        else
-          last.title.tag!('done')
-        end
-      end
-
-      # Remove @done tag
-      title = last.title.sub(/\s*@done(\(.*?\))?/, '').chomp
-      section = opt[:in].nil? ? last.section : guess_section(opt[:in])
-      @auto_tag = false
-
-      note = opt[:note]
-
-      if opt[:editor]
-        to_edit = title
-        to_edit += "\n#{note.to_s}" unless note.empty?
-        new_item = fork_editor(to_edit)
-        title, note = format_input(new_item)
-
-        if title.nil? || title.empty?
-          logger.debug('Skipped:', 'No content provided')
-          return
-        end
-      end
-
-      add_item(title, section, { note: note, back: opt[:date], timed: true })
-      write(@doing_file)
+      restart_item(last, opt)
     end
 
     ##
@@ -635,18 +632,14 @@ module Doing
       if items.nil? || items.empty?
         section = opt[:section] ? guess_section(opt[:section]) : 'All'
 
-        if section =~ /^all$/i
-          combined = { :items => [] }
-          @content.each do |_k, v|
-            combined[:items] += v[:items]
-          end
-          items = combined[:items].dup
-        else
-          items = @content[section][:items].dup
-        end
+        items = if section =~ /^all$/i
+                  @content.each_with_object([]) { |(_k, v), arr| arr.concat(v[:items].dup) }
+                else
+                  @content[section][:items].dup
+                end
       end
 
-      items.sort_by! { |item| item.date }.reverse
+      items.sort_by! { |item| [item.date, item.title.downcase] }.reverse
       filtered_items = items.select do |item|
         keep = true
         finished = opt[:unfinished] && item.tags?('done', :and)
@@ -674,35 +667,28 @@ module Doing
           keep = false unless in_date_range
         end
 
-        if keep && opt[:only_timed]
-          keep = false unless item.interval
-        end
+        keep = false if keep && opt[:only_timed] && !item.interval
 
         if keep && opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
-          filter_match = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
-          keep = false unless filter_match
+          keep = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
         end
 
         if keep && opt[:before]
           time_string = opt[:before]
           cutoff = chronify(time_string, guess: :begin)
-          if cutoff
-            keep = false if item.date >= cutoff
-          end
+          keep = cutoff && item.date <= cutoff
         end
 
         if keep && opt[:after]
           time_string = opt[:after]
           cutoff = chronify(time_string, guess: :end)
-          if cutoff
-            keep = false if item.date <= cutoff
-          end
+          keep = cutoff && item.date >= cutoff
         end
 
         if keep && opt[:today]
-          keep = false if item.date < Date.today.to_time
+          keep = item.date >= Date.today.to_time && item.date < Date.today.next_day.to_time
         elsif keep && opt[:yesterday]
-          keep = false if item.date <= Date.today.prev_day.to_time || item.date >= Date.today.to_time
+          keep = item.date >= Date.today.prev_day.to_time && item.date < Date.today.to_time
         end
 
         keep
@@ -725,7 +711,7 @@ module Doing
     def interactive(opt = {})
       section = opt[:section] ? guess_section(opt[:section]) : 'All'
       opt[:query] = opt[:search] if opt[:search] && !opt[:query]
-      items = filter_items([], opt: { section: section, search: opt[:search] }).sort_by { |item| item.date }.reverse
+      items = filter_items([], opt: { section: section, search: opt[:search] })
 
       selection = choose_from_items(items, opt, include_section: section =~ /^all$/i)
 
@@ -803,6 +789,7 @@ module Doing
                                'archive',
                                'move',
                                'edit',
+                               'resume/repeat',
                                'output formatted'
                              ],
                              prompt: 'What do you want to do with the selected items? > ',
@@ -814,6 +801,8 @@ module Doing
         to_do = choice.strip.split(/\n/)
         to_do.each do |action|
           case action
+          when /(resume)/
+            opt[:resume] = true
           when /(add|remove) tag/
             type = action =~ /^add/ ? 'add' : 'remove'
             raise Errors::InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
@@ -858,6 +847,16 @@ module Doing
         end
       end
 
+      if opt[:resume]
+        if items.count > 1
+          logger.error('Error:', 'resume can only be used on a single entry')
+        else
+          restart_item(items[0], { editor: opt[:editor] })
+        end
+
+        return
+      end
+
       if opt[:delete]
         res = opt[:force] ? true : yn("Delete #{items.size} items?", default_response: 'y')
         if res
@@ -877,8 +876,8 @@ module Doing
       if opt[:finish] || opt[:cancel]
         tag = 'done'
         items.map! do |item|
-          if item.should_finish?(@config)
-            should_date = !opt[:cancel] && item.should_time?(@config)
+          if item.should_finish?
+            should_date = !opt[:cancel] && item.should_time?
             tag_item(item, tag, date: should_date, remove: opt[:remove])
           end
         end
@@ -1066,7 +1065,7 @@ module Doing
           end
 
           opt[:tags].each do |tag|
-            if tag == 'done' && !item.should_finish?(@config)
+            if tag == 'done' && !item.should_finish?
 
               Doing.logger.debug('Skipped:', "Item in never_finish: #{item.title}")
               logger.count(:skipped, level: :debug)
@@ -1090,7 +1089,7 @@ module Doing
               end
             else
               old_title = item.title.dup
-              should_date = opt[:date] && item.should_time?(@config)
+              should_date = opt[:date] && item.should_time?
               item.title.tag!(tag, value: should_date ? done_date.strftime('%F %R') : nil)
               added << tag if old_title != item.title
             end
@@ -1448,7 +1447,7 @@ module Doing
       opt[:count] ||= 0
       opt[:age] ||= 'newest'
       opt[:format] ||= @config.dig('templates', 'default', 'date_format')
-      opt[:order] ||= 'desc'
+      opt[:order] ||= @config.dig('templates', 'default', 'order') || 'asc'
       opt[:tag_order] ||= 'asc'
       opt[:tags_color] ||= false
       opt[:template] ||= @config.dig('templates', 'default', 'template')
@@ -1599,7 +1598,7 @@ module Doing
                            else
                              item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
                            end
-              logger.debug('Moved:', "#{item.title} from #{section} to #{desination}")
+              logger.debug('Moved:', "#{item.title} from #{section} to #{destination}")
             end
           end
 
@@ -1712,7 +1711,7 @@ module Doing
         after: opt[:after],
         before: opt[:before],
         count: 0,
-        order: 'asc',
+        order: opt[:order],
         output: output,
         section: section,
         sort_tags: opt[:sort_tags],
@@ -1789,12 +1788,14 @@ module Doing
       return unless text
       return text unless @auto_tag
 
+      original = text.dup
+
       current_tags = text.scan(/@\w+/)
       whitelisted = []
       @config['autotag']['whitelist'].each do |tag|
         next if text =~ /@#{tag}\b/i
 
-        text.sub!(/(?<!@)(#{tag.strip})\b/i) do |m|
+        text.sub!(/(?<!@)\b(#{tag.strip})\b/i) do |m|
           m.downcase! if tag =~ /[a-z]/
           whitelisted.push("@#{m}")
           "@#{m}"
@@ -1835,12 +1836,19 @@ module Doing
       end
 
       logger.debug('Autotag:', "Whitelisted tags: #{whitelisted.join(', ')}") unless whitelisted.empty?
-
+      new_tags = whitelisted
       unless tail_tags.empty?
         tags = tail_tags.uniq.map { |t| "@#{t}".cyan }.join(' ')
         logger.debug('Autotag:', "Synonym tags: #{tags}")
         tags_a = tail_tags.map { |t| "@#{t}" }.join(' ')
         text.add_tags!(tags_a)
+        new_tags.concat(tags_a)
+      end
+
+      unless text == original
+        logger.info('Autotag:', "added #{new_tags.join(', ')} to \"#{text}\"")
+      else
+        logger.debug('Autotag:', "no change to \"#{text}\"")
       end
 
       text

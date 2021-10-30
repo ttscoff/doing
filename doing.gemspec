@@ -22,6 +22,7 @@ spec = Gem::Specification.new do |s|
   s.rdoc_options << '--title' << 'doing' << '--main' << 'README.md' << '--markup' << 'markdown'
   s.bindir = 'bin'
   s.executables << 'doing'
+  s.add_runtime_dependency('safe_yaml', '~> 1.0')
   s.add_development_dependency 'rake', '~> 13.0', '>= 13.0.1'
   s.add_development_dependency 'rdoc', '~> 6.3.1'
   s.add_development_dependency 'aruba', '~> 1.0.2'

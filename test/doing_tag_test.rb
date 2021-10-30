@@ -81,8 +81,8 @@ class DoingTagTest < Test::Unit::TestCase
     doing('import', '--type', 'timing', @import_file)
 
     # Add a tag to items matching search term
-    result = doing('--stdout', 'tag', '--search', search_term, '-c', '0', '--force', test_tag)
-    assert_equal(target, result.scan(/Added tags:/).size,
+    result = doing('--stdout', '--debug', 'tag', '--search', search_term, '-c', '0', '--force', test_tag)
+    assert_match(/@#{test_tag} added to #{target} items/, result,
                  'The number of affected items should be the same as were in the imported file')
 
     # Add a second tag to items matching a tag search for previous tag
@@ -90,8 +90,8 @@ class DoingTagTest < Test::Unit::TestCase
     assert_count_entries(target, doing('show', "@#{test_tag2}"), "Should show #{target} tagged matches")
 
     # Remove the first tag from items matching a tag search for the second tag
-    result = doing('--stdout', 'tag', '--tag', test_tag2, '-r', '-c', '0', '--force', test_tag)
-    assert_equal(target, result.scan(/Removed tags:/).size,
+    result = doing('--stdout', '--debug', 'tag', '--tag', test_tag2, '-r', '-c', '0', '--force', test_tag)
+    assert_match(/@#{test_tag} removed from #{target} items/, result,
                  'The number of affected items should be the same as the tag results')
   end
 

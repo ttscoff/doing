@@ -87,25 +87,25 @@ module Doing
       text =~ rx
     end
 
-    def should_finish?(config)
-      should?('never_finish', config)
+    def should_finish?
+      should?('never_finish')
     end
 
-    def should_time?(config)
-      should?('never_time', config)
+    def should_time?
+      should?('never_time')
     end
 
     private
 
-    def should?(key, config)
-
+    def should?(key)
+      config = Doing.config.settings
       return true unless config[key].is_a?(Array)
 
       config[key].each do |tag|
         if tag =~ /^@/
           return false if tags?(tag.sub(/^@/, '').downcase)
-        else
-          return false if section.downcase == tag.downcase
+        elsif section.downcase == tag.downcase
+          return false
         end
       end
 

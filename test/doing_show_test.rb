@@ -40,6 +40,17 @@ class DoingShowTest < Test::Unit::TestCase
     assert_match(/#{subject}\s*$/, result, 'doing show @tag1 results should include test entry')
   end
 
+  def test_date_name_sort
+    doing('now', '--back', '12pm', 'Z this should be last')
+    doing('now', '--back', '12pm', 'AX this should be where?')
+    doing('now', '--back', '12pm', 'B this should be third')
+    doing('now', '--back', '12pm', '2 this should be first')
+    doing('now', '--back', '12pm', 'A this should be second')
+    res = doing('show').split(/\n/)
+    assert_match(/first/, res[0], 'Number should be first')
+    assert_match(/last/, res[-1], 'Z should be last')
+  end
+
   def first_last_times(res)
     entries = res.strip.split(/\n/)
     first = get_start_date(entries.first.strip)

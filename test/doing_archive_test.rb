@@ -70,7 +70,7 @@ class DoingArchiveTest < Test::Unit::TestCase
     entries = doing('show').scan(ENTRY_REGEX).count
     doing('add_section', 'Testing')
     result = doing('--stdout', 'archive', '-t', 'Testing')
-    assert_match(/Archived: #{entries} items from #{@config['current_section']} to Testing/, result, "Should have archived #{entries} items to destination Testing")
+    assert_match(/Moved: #{entries} items from #{@config['current_section']} to Testing/, result, "Should have archived #{entries} items to destination Testing")
   end
 
   def test_rotate

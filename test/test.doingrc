@@ -4,7 +4,7 @@ plugins:
   trizzer:
     trizzle: test value from config
   say:
-    say_voice: Fiona
+    say_voice: Ellen
 default_tags: []
 autotag:
   transform:

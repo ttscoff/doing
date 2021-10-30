@@ -23,7 +23,7 @@ include GLI::App
 include Doing::Errors
 version Doing::VERSION
 hide_commands_without_desc true
-
+autocomplete_commands true
 
 REGEX_BOOL = /^(?:and|all|any|or|not|none)$/i
 REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
@@ -49,19 +49,20 @@ if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DO
   end
 end
 
-config = Doing::Configuration
 if ENV['DOING_CONFIG']
-  cf = File.expand_path(ENV['DOING_CONFIG'])
-  raise MissingConfigFile, "$DOING_CONFIG not found (#{ENV['DOING_CONFIG']})" unless File.exist?(cf)
+  Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
+end
 
-  config.config_file = cf
-  wwid.config = config.configure({ ignore_local: true })
-else
-  config.config_file = File.join(Doing::Util.user_home, '.doingrc')
-  wwid.config = config.configure
+config = Doing.config
+settings = config.settings
+wwid.config = settings
+
+if config.settings.dig('plugins', 'command_path')
+  commands_from File.expand_path(config.settings.dig('plugins', 'command_path'))
 end
 
 program_desc 'A CLI for a What Was I Doing system'
+program_long_desc %(Doing uses a TaskPaper-like formatting to keep a plain text record of what you've been doing, complete with tag-based time tracking. The command line tool allows you to add entries, annotate with tags and notes, and view your entries with myriad options, with a focus on a "natural" language syntax.)
 
 default_command :recent
 # sort_help :manually
@@ -73,7 +74,7 @@ desc 'Send results report to STDOUT instead of STDERR'
 switch [:stdout], default_value: false, negatable: false
 
 desc 'Use a pager when output is longer than screen'
-switch %i[p pager], default_value: wwid.config['paginate']
+switch %i[p pager], default_value: settings['paginate']
 
 desc 'Answer yes/no menus with default option'
 switch [:default], default_value: false
@@ -97,13 +98,24 @@ desc 'Specify a different doing_file'
 flag %i[f doing_file]
 
 desc 'Add an entry'
+long_desc %(Record what you're starting now, or backdate the start time using natural language.
+
+A parenthetical at the end of the entry will be converted to a note.
+
+Run with no argument to create a new entry using #{Doing::Util.default_editor}.)
 arg_name 'ENTRY'
 command %i[now next] do |c|
+  c.example 'doing now', desc: "Open #{Doing::Util.default_editor} to input an entry and optional note."
+  c.example 'doing now working on a new project', desc: 'Add a new entry at the current time'
+  c.example 'doing now debugging @project2', desc: 'Add an entry with a tag'
+  c.example 'doing now adding an entry (with a note)', desc: 'Parenthetical at end is converted to note'
+  c.example 'doing now --back 2pm A thing I started at 2:00 and am still doing...', desc: 'Backdate an entry'
+
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section]
 
-  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.desc 'Backdate start time [4pm|20m|2h|yesterday noon]'
@@ -133,11 +145,11 @@ command %i[now next] do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      options[:section] = wwid.config['current_section']
+      options[:section] = settings['current_section']
     end
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero?)
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input = ''
       input += args.join(' ') unless args.empty?
@@ -180,7 +192,7 @@ command :note do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.desc "Replace/Remove last entry's note (default append)"
@@ -217,7 +229,7 @@ command :note do |c|
     new_note = Doing::Note.new
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero? && !options[:r])
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input = !args.empty? ? args.join(' ') : ''
 
@@ -260,7 +272,7 @@ command :meanwhile do |c|
   c.arg_name 'NAME'
   c.flag %i[s section]
 
-  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.desc 'Archive previous @meanwhile entry'
@@ -286,12 +298,12 @@ command :meanwhile do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = settings['current_section']
     end
     input = ''
 
     if options[:e]
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
@@ -422,6 +434,9 @@ command :select do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Copy selection as a new entry with current time and no @done tag. Only works with single selections. Can be combined with --editor."
+  c.switch %i[again resume]
+
   c.action do |_global_options, options, args|
     raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
@@ -434,7 +449,7 @@ end
 desc 'Add an item to the Later section'
 arg_name 'ENTRY'
 command :later do |c|
-  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
@@ -454,7 +469,7 @@ command :later do |c|
     end
 
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input = args.empty? ? '' : args.join(' ')
       input = wwid.fork_editor(input).strip
@@ -511,7 +526,7 @@ command %i[done did] do |c|
   c.arg_name 'NAME'
   c.flag %i[s section]
 
-  c.desc "Edit entry with #{ENV['EDITOR']} (with no arguments, edits the last entry)"
+  c.desc "Edit entry with #{Doing::Util.default_editor} (with no arguments, edits the last entry)"
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.desc 'Include a note'
@@ -561,14 +576,14 @@ command %i[done did] do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = settings['current_section']
     end
 
     note = Doing::Note.new
     note.add(options[:note]) if options[:note]
 
     if options[:editor]
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
       is_new = false
 
       if args.empty?
@@ -592,8 +607,8 @@ command %i[done did] do |c|
 
       title, note = wwid.format_input(input)
       new_entry = Doing::Item.new(date, title, section, note)
-      if new_entry.should_finish?(wwid.config)
-        if new_entry.should_time?(wwid.config)
+      if new_entry.should_finish?
+        if new_entry.should_time?
           new_entry.tag('done', value: donedate)
         else
           new_entry.tag('done')
@@ -635,8 +650,8 @@ command %i[done did] do |c|
       title.chomp!
       section = 'Archive' if options[:a]
       new_entry = Doing::Item.new(date, title, section, new_note)
-      if new_entry.should_finish?(wwid.config)
-        if new_entry.should_time?(wwid.config)
+      if new_entry.should_finish?
+        if new_entry.should_time?
           new_entry.tag('done', value: donedate)
         else
           new_entry.tag('done')
@@ -651,8 +666,8 @@ command %i[done did] do |c|
       section = options[:a] ? 'Archive' : section
       new_entry = Doing::Item.new(date, title, section, note)
 
-      if new_entry.should_finish?(wwid.config)
-        if new_entry.should_time?(wwid.config)
+      if new_entry.should_finish?
+        if new_entry.should_time?
           new_entry.tag('done', value: donedate)
         else
           new_entry.tag('done')
@@ -694,7 +709,7 @@ command :cancel do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = settings['current_section']
     end
 
     if options[:tag].nil?
@@ -854,7 +869,7 @@ command %i[again resume] do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
-  c.desc "Edit duplicated entry with #{ENV['EDITOR']} before adding"
+  c.desc "Edit duplicated entry with #{Doing::Util.default_editor} before adding"
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.desc 'Note'
@@ -1033,7 +1048,7 @@ command [:mark, :flag] do |c|
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
   c.action do |_global_options, options, _args|
-    mark = wwid.config['marker_tag'] || 'flagged'
+    mark = settings['marker_tag'] || 'flagged'
 
     raise Doing::Errors::InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 
@@ -1139,7 +1154,7 @@ command :show do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] || 'name'
+  default = settings['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)/i, default_value: default
 
@@ -1182,7 +1197,7 @@ command :show do |c|
         end
       end
     else
-      section = wwid.config['current_section']
+      section = settings['current_section']
     end
 
     tags.concat(options[:tag].to_tags) if options[:tag]
@@ -1211,7 +1226,7 @@ command :show do |c|
 
     options[:times] = true if options[:totals]
 
-    tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
+    tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
 
     opt = options.dup
 
@@ -1263,7 +1278,7 @@ command %i[grep search] do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] || 'name'
+  default = settings['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1276,7 +1291,7 @@ command %i[grep search] do |c|
   c.action do |_global_options, options, args|
     raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
+    tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
 
     section = wwid.guess_section(options[:section]) if options[:section]
 
@@ -1307,7 +1322,7 @@ command :recent do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] || 'name'
+  default = settings['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1315,15 +1330,15 @@ command :recent do |c|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
     unless global_options[:version]
-      if wwid.config['templates']['recent'].key?('count')
-        config_count = wwid.config['templates']['recent']['count'].to_i
+      if settings['templates']['recent'].key?('count')
+        config_count = settings['templates']['recent']['count'].to_i
       else
         config_count = 10
       end
       count = args.empty? ? config_count : args[0].to_i
       options[:t] = true if options[:totals]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
-      tags_color = wwid.config.key?('tags_color') ? wwid.config['tags_color'] : nil
+      tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
 
       opts = {
         sort_tags: options[:sort_tags],
@@ -1352,7 +1367,7 @@ command :today do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] || 'name'
+  default = settings['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1378,7 +1393,8 @@ command :today do |c|
       before: options[:before],
       section: options[:section],
       sort_tags: options[:sort_tags],
-      totals: options[:totals]
+      totals: options[:totals],
+      order: settings.dig('templates', 'today', 'order')
     }
     Doing::Pager.page wwid.today(options[:times], options[:output], opt).chomp
   end
@@ -1402,7 +1418,7 @@ command :on do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] || 'name'
+  default = settings['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1457,7 +1473,7 @@ command :since do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] || 'name'
+  default = settings['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1508,7 +1524,7 @@ command :yesterday do |c|
 
   c.desc 'Sort tags by (name|time)'
   default = 'time'
-  default = wwid.config['tag_sort'] || 'name'
+  default = settings['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
@@ -1534,7 +1550,8 @@ command :yesterday do |c|
       before: options[:before],
       sort_tags: options[:sort_tags],
       tag_order: options[:tag_order].normalize_order,
-      totals: options[:totals]
+      totals: options[:totals],
+      order: settings.dig('templates', 'today', 'order')
     }
     Doing::Pager.page wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
   end
@@ -1546,7 +1563,7 @@ command :last do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc "Edit entry with #{ENV['EDITOR']}"
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.desc 'Tag filter, combine multiple tags with a comma.'
@@ -1728,7 +1745,7 @@ command :view do |c|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = wwid.config['current_section']
+      section = settings['current_section']
     end
 
     view = wwid.get_view(title)
@@ -1769,7 +1786,7 @@ command :view do |c|
       section = if options[:s]
                   section
                 else
-                  view.key?('section') ? view['section'] : wwid.config['current_section']
+                  view.key?('section') ? view['section'] : settings['current_section']
                 end
       order = view.key?('order') ? view['order'].normalize_order : 'asc'
 
@@ -1856,9 +1873,9 @@ desc 'Move entries between sections'
 long_desc %(Argument can be a section name to move all entries from a section,
 or start with an "@" to move entries matching a tag.
 
-Default with no argument moves items from the "#{wwid.config['current_section']}" section to Archive.)
+Default with no argument moves items from the "#{settings['current_section']}" section to Archive.)
 arg_name 'SECTION_OR_TAG'
-default_value wwid.config['current_section']
+default_value settings['current_section']
 command %i[archive move] do |c|
   c.desc 'How many items to keep (ignored if archiving by tag or search)'
   c.arg_name 'X'
@@ -1890,7 +1907,7 @@ command %i[archive move] do |c|
 
   c.action do |_global_options, options, args|
     if args.empty?
-      section = wwid.config['current_section']
+      section = settings['current_section']
       tags = []
     elsif args[0] =~ /^all/i
       section = 'all'
@@ -1954,7 +1971,7 @@ command :rotate do |c|
 end
 
 desc 'Open the "doing" file in an editor'
-long_desc "`doing open` defaults to using the editor_app setting in #{config.config_file} (#{wwid.config.key?('editor_app') ? wwid.config['editor_app'] : 'not set'})"
+long_desc "`doing open` defaults to using the editor_app setting in #{config.config_file} (#{settings.key?('editor_app') ? settings['editor_app'] : 'not set'})"
 command :open do |c|
   if `uname` =~ /Darwin/
     c.desc 'Open with app name'
@@ -1965,7 +1982,7 @@ command :open do |c|
     c.arg_name 'BUNDLE_ID'
     c.flag %i[b bundle_id]
   end
-  c.desc "Open with $EDITOR (#{ENV['EDITOR']})"
+  c.desc "Open with $EDITOR (#{Doing::Util.default_editor})"
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
@@ -1979,17 +1996,17 @@ command :open do |c|
       elsif options[:bundle_id]
         system %(open -b "#{options[:b]}" "#{File.expand_path(wwid.doing_file)}")
       elsif options[:editor]
-        raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+        raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
         system %($EDITOR "#{File.expand_path(wwid.doing_file)}")
-      elsif wwid.config.key?('editor_app') && !wwid.config['editor_app'].nil?
-        system %(open -a "#{wwid.config['editor_app']}" "#{File.expand_path(wwid.doing_file)}")
+      elsif settings.key?('editor_app') && !settings['editor_app'].nil?
+        system %(open -a "#{settings['editor_app']}" "#{File.expand_path(wwid.doing_file)}")
       else
         system %(open "#{File.expand_path(wwid.doing_file)}")
       end
 
     else
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if ENV['EDITOR'].nil?
+      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       system %($EDITOR "#{File.expand_path(wwid.doing_file)}")
     end
@@ -2022,7 +2039,7 @@ command :config do |c|
     c.arg_name 'BUNDLE_ID'
     c.flag [:b]
 
-    c.desc "Use the config_editor_app defined in ~/.doingrc (#{wwid.config.key?('config_editor_app') ? wwid.config['config_editor_app'] : 'config_editor_app not set'})"
+    c.desc "Use the config_editor_app defined in ~/.doingrc (#{settings.key?('config_editor_app') ? settings['config_editor_app'] : 'config_editor_app not set'})"
     c.switch [:x]
   end
 
@@ -2034,7 +2051,7 @@ command :config do |c|
     end
 
     if options[:dump]
-      cfg = wwid.config
+      cfg = settings
       unless options[:dump] == '.'
         path = options[:dump].split(/[:.]/)
         cfg = cfg.dig(*path)
@@ -2049,6 +2066,8 @@ command :config do |c|
                      else
                        if cfg.is_a?(String)
                          cfg
+                       elsif !!cfg == cfg
+                         YAML.dump(cfg)
                        else
                          YAML.dump(cfg.to_h)
                        end
@@ -2056,7 +2075,7 @@ command :config do |c|
       else
         Doing.logger.log_now(:error, 'Config:', "Key #{options[:dump]} not found")
       end
-
+      Doing.logger.output_results
       return
     end
 
@@ -2074,7 +2093,17 @@ command :config do |c|
 
     if `uname` =~ /Darwin/
       if options[:x]
-        `open -a "#{wwid.config['config_editor_app']}" "#{config_file}"`
+        if settings.key?('config_editor_app') && !settings['config_editor_app'].nil?
+          editor = settings['config_editor_app']
+
+          if Util.exec_available(editor)
+            system %(#{editor} "#{config_file}")
+          else
+            `open -a "#{settings['config_editor_app']}" "#{config_file}"`
+          end
+        else
+          raise Doing::Errors::InvalidArgument, 'No config_editor_app key found in configuration.'
+        end
       elsif options[:a] || options[:b]
         if options[:a]
           `open -a "#{options[:a]}" "#{config_file}"`
@@ -2082,15 +2111,29 @@ command :config do |c|
           `open -b #{options[:b]} "#{config_file}"`
         end
       else
-        raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if options[:e].nil? && ENV['EDITOR'].nil?
+        if options[:e].nil?
+          if settings.key?('config_editor_app') && !settings['config_editor_app'].nil?
+            if Util.exec_available(editor)
+              system %(#{editor} "#{config_file}")
+            else
+              `open -a "#{settings['config_editor_app']}" "#{config_file}"`
+            end
+            return
+          else
+            editor = Doing::Util.default_editor
+          end
+        else
+          editor = options[:e]
+        end
 
-        editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
+        raise Doing::Errors::MissingEditor, 'No editor defined in config or environment' if editor.nil?
+
         system %(#{editor} "#{config_file}")
       end
     else
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if options[:e].nil? && ENV['EDITOR'].nil?
+      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if options[:e].nil? && Doing::Util.default_editor.nil?
 
-      editor = options[:e].nil? ? ENV['EDITOR'] : options[:e]
+      editor = options[:e].nil? ? Doing::Util.default_editor : options[:e]
       system %(#{editor} "#{config_file}")
     end
   end
@@ -2189,7 +2232,7 @@ command :import do |c|
 end
 
 pre do |global, _command, _options, _args|
-  # global[:pager] ||= wwid.config['paginate']
+  # global[:pager] ||= settings['paginate']
 
   Doing::Pager.paginate = global[:pager]
 
@@ -2225,7 +2268,7 @@ post do |global, _command, _options, _args|
 end
 
 around do |global, command, options, arguments, code|
-  # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{wwid.config['paginate']}, Pager: #{Doing::Pager.paginate}")
+  # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{settings['paginate']}, Pager: #{Doing::Pager.paginate}")
   Doing.logger.adjust_verbosity(global)
 
   if global[:stdout]
@@ -2242,7 +2285,7 @@ around do |global, command, options, arguments, code|
     raise MissingConfigFile, "Config file not found (#{global[:config_file]})" unless File.exist?(cf)
 
     config.config_file = cf
-    wwid.config = config.configure({ ignore_local: true })
+    settings = config.configure({ ignore_local: true })
   end
 
   if global[:doing_file]
@@ -2253,7 +2296,9 @@ around do |global, command, options, arguments, code|
 
   wwid.auto_tag = !global[:noauto]
 
-  wwid.config[:include_notes] = false unless global[:notes]
+  settings[:include_notes] = false unless global[:notes]
+
+  global[:wwid] = wwid
 
   code.call
 end

@@ -234,31 +234,30 @@ module Doing
           title.dedup_tags!
           title.chomp!
 
-          f = "@#{tag}".cyan
           if rename_to
+            f = "@#{tag}".cyan
             t = "@#{rename_to}".cyan
-            # Doing.logger.debug('Renamed tag:', %(#{f} to #{t} in "#{title}"))
+            Doing.logger.debug('Tag:', %(renamed #{f} to #{t} in "#{title}"))
           else
-            # Doing.logger.debug('Removed tag:', %(#{f} from "#{title}"))
+            f = "@#{tag}".cyan
+            Doing.logger.debug('Tag:', %(removed #{f} from "#{title}"))
           end
         else
-          t = "@#{tag}".cyan
-          Doing.logger.debug('Skipped:', "Not tagged #{t}")
+          Doing.logger.debug('Skipped:', "not tagged #{"@#{tag}".cyan}")
         end
+      elsif title =~ /@#{tag}(?=[ (]|$)/
+        Doing.logger.debug('Skipped:', "already tagged #{"@#{tag}".cyan}")
+        return title
       else
-        if title =~ /@#{tag}(?=[ (]|$)/
-          Doing.logger.debug('Skipped:', "Already tagged #{('@' + tag).cyan}")
-          return title
-        else
-          add = tag
-          add += "(#{value})" unless value.nil?
-          title += " @#{add}"
+        add = tag
+        add += "(#{value})" unless value.nil?
+        title += " @#{add}"
 
-          title.dedup_tags!
-          title.chomp!
-          # Doing.logger.debug('Added tag:', %(#{('@' + tag).cyan} to "#{title}"))
-        end
+        title.dedup_tags!
+        title.chomp!
+        # Doing.logger.debug('Added tag:', %(#{('@' + tag).cyan} to "#{title}"))
       end
+
       title
     end
 

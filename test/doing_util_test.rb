@@ -20,13 +20,12 @@ class DoingUtilTest < Test::Unit::TestCase
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
-    @config = YAML.load(IO.read(@config_file))
+    @config = Util.safe_load_file(@config_file)
     import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
     doing('import', '--type', 'timing', import_file)
     @wwid = WWID.new
-    config = Configuration
-    config.config_file = @config_file
-    @wwid.config = config.configure({ ignore_local: true })
+    config = Doing.config_with(@config_file, { ignore_local: true })
+    @wwid.config = config.settings
     @wwid.init_doing_file(@wwid_file)
   end
 
@@ -37,7 +36,7 @@ class DoingUtilTest < Test::Unit::TestCase
   def test_format_time
     item = @wwid.content[@wwid.config['current_section']][:items][0]
     interval = @wwid.get_interval(item, formatted: false, record: false)
-    assert_equal(720, interval, 'Interval should match')
+    assert_equal(360, interval, 'Interval should match')
     minutes = interval / 60 % 60
     res = @wwid.fmt_time(interval)
     assert_equal(minutes, res[2], 'Interval array should match')
