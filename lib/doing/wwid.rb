@@ -1857,8 +1857,8 @@ module Doing
       unless tail_tags.empty?
         tags = tail_tags.uniq.map { |t| "@#{t}".cyan }.join(' ')
         logger.debug('Autotag:', "Synonym tags: #{tags}")
-        tags_a = tail_tags.map { |t| "@#{t}" }.join(' ')
-        text.add_tags!(tags_a)
+        tags_a = tail_tags.map { |t| "@#{t}" }
+        text.add_tags!(tags_a.join(' '))
         new_tags.concat(tags_a)
       end
 

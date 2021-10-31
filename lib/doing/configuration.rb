@@ -19,6 +19,7 @@ module Doing
       'doing_file' => '~/what_was_i_doing.md',
       'current_section' => 'Currently',
       'config_editor_app' => nil,
+      'editor' => ENV['DOING_EDITOR'] || ENV['GIT_EDITOR'] || ENV['EDITOR'],
       'editor_app' => nil,
       'paginate' => false,
       'never_time' => [],
@@ -136,6 +137,7 @@ module Doing
         end
       end
 
+
       config.deep_merge({ 'plugins' => plugin_config })
 
       if !File.exist?(config_file) || opt[:rewrite]
@@ -145,7 +147,7 @@ module Doing
 
       Hooks.trigger :post_config, self
 
-      config.deep_merge(local_config) unless @ignore_local
+      config = local_config.deep_merge(config) unless @ignore_local
 
       Hooks.trigger :post_local_config, self
 

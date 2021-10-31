@@ -19,6 +19,8 @@ module Doing
     ## @param      cli   (String) The name or path of the cli
     ##
     def exec_available(cli)
+      return false if cli.nil?
+
       if File.exist?(File.expand_path(cli))
         File.executable?(File.expand_path(cli))
       else
@@ -132,15 +134,22 @@ module Doing
     end
 
     def find_default_editor
+      if ENV['DOING_EDITOR_TEST']
+        return ENV['EDITOR']
+      end
+
       if Doing.config.settings['editor']
         editor = Doing.config.settings['editor']
         Doing.logger.debug('ENV:', "Using #{editor} from config")
         return editor if exec_available(editor)
       end
 
-      return ENV['GIT_EDITOR'] if ENV['GIT_EDITOR']
+      editor ||= ENV['DOING_EDITOR'] || ENV['GIT_EDITOR'] || ENV['EDITOR']
 
-      return ENV['EDITOR'] if ENV['EDITOR']
+      unless editor.nil?
+        Doing.logger.debug('Found editor in environment variables')
+        return editor if exec_available(editor)
+      end
 
       Doing.logger.debug('ENV:', 'No EDITOR environment variable, testing available editors')
       editors = %w[vim vi code subl mate mvim nano emacs]

@@ -2096,7 +2096,7 @@ command :config do |c|
 
     if options[:dump]
       cfg = settings
-      unless options[:dump] == '.'
+      unless options[:dump] =~ /^[.*]$/
         path = options[:dump].split(/[:.]/)
         cfg = cfg.dig(*path)
       end
@@ -2157,7 +2157,7 @@ command :config do |c|
       else
         if options[:e].nil?
           if settings.key?('config_editor_app') && !settings['config_editor_app'].nil?
-            if Util.exec_available(editor)
+            if Doing::Util.exec_available(editor)
               system %(#{editor} "#{config_file}")
             else
               `open -a "#{settings['config_editor_app']}" "#{config_file}"`
