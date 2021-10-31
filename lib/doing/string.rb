@@ -6,6 +6,10 @@ module Doing
   ##
   class ::String
     include Doing::Color
+    def to_rx(distance)
+      gsub(/(.)/, "\\1.{0,#{distance}}")
+    end
+
     def truthy?
       if self =~ /^(0|f(alse)?|n(o)?)$/i
         false

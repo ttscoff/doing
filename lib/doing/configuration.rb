@@ -96,6 +96,32 @@ module Doing
       @additional_configs ||= find_local_config
     end
 
+    def value_for_key(keypath = '')
+      cfg = @settings
+      last_key = nil
+      unless keypath =~ /^[.*]?$/
+        paths = keypath.split(/[:.]/)
+        while paths.length.positive? && !cfg.nil?
+          path = paths.shift
+          new_cfg = nil
+          cfg.each do |key, val|
+            next unless key =~ /#{path.to_rx(2)}/
+            last_key = key
+            new_cfg = val
+            break
+          end
+          if new_cfg.nil?
+            Doing.logger.error("Key match not found: #{path}")
+            break
+          end
+
+          cfg = new_cfg
+        end
+      end
+
+      cfg
+    end
+
     # Static: Produce a Configuration ready for use in a Site.
     # It takes the input, fills in the defaults where values do not exist.
     #

@@ -179,13 +179,13 @@ command %i[now next] do |c|
 end
 
 desc 'Reset the start time of an entry'
-command :reset do |c|
-  c.desc 'Reset last item in section'
+command %i[reset begin] do |c|
+  c.desc 'Set the start date of an item to now'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
   c.desc 'Resume entry (remove @done)'
-  c.switch %i[r resume]
+  c.switch %i[r resume], default_value: true
 
   c.desc 'Reset last entry matching tag'
   c.arg_name 'TAG'
@@ -199,14 +199,30 @@ command :reset do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
-  c.action do |_global_options, options, args|
+  c.desc 'Select from a menu of matching entries'
+  c.switch %i[i interactive]
+
+  c.action do |global_options, options, args|
     if options[:section]
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
 
     options[:tag_bool] = options[:bool].normalize_bool
 
-    last_entry = wwid.last_entry(options)
+    items = wwid.filter_items([], opt: options)
+
+    if options[:interactive]
+      last_entry = wwid.choose_from_items(items, {
+        menu: true,
+        header: '',
+        prompt: 'Select an entry to start/reset > ',
+        multiple: false,
+        sort: false,
+        show_if_single: true
+      }, include_section: options[:section].nil? )
+    else
+      last_entry = items.last
+    end
 
     unless last_entry
       Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
@@ -254,11 +270,13 @@ command :note do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
+  c.desc 'Select item for new note from a menu of matching entries'
+  c.switch %i[i interactive]
+
   c.action do |_global_options, options, args|
     if options[:section]
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
-
 
     options[:tag_bool] = options[:bool].normalize_bool
 
@@ -400,9 +418,15 @@ command :template do |c|
       return
     end
 
-    raise Doing::Errors::InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" if args.empty?
+    if args.empty?
+      type = wwid.choose_from(Doing::Plugins.plugin_templates, sorted: false, prompt: 'Select template type > ')
+    else
+      type = args[0]
+    end
 
-    $stdout.puts Doing::Plugins.template_for_trigger(args[0])
+    raise Doing::Errors::InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" unless type
+
+    $stdout.puts Doing::Plugins.template_for_trigger(type)
 
     # case args[0]
     # when /html|haml/i
@@ -749,6 +773,9 @@ command :cancel do |c|
   c.desc 'Cancel last entry (or entries) not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
 
+  c.desc 'Select item(s) to cancel from a menu of matching entries'
+  c.switch %i[i interactive]
+
   c.action do |_global_options, options, args|
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
@@ -766,7 +793,12 @@ command :cancel do |c|
 
     raise Doing::Errors::InvalidArgument, 'Invalid argument (specify number of recent items to mark @done)' unless args.empty? || args[0] =~ /\d+/
 
-    count = args[0] ? args[0].to_i : 1
+    if options[:interactive]
+      count = 0
+    else
+      count = args[0] ? args[0].to_i : 1
+    end
+
     opts = {
       archive: options[:a],
       count: count,
@@ -776,8 +808,10 @@ command :cancel do |c|
       tag: tags,
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],
-      unfinished: options[:unfinished]
+      unfinished: options[:unfinished],
+      interactive: options[:interactive]
     }
+
     wwid.tag_last(opts)
   end
 end
@@ -832,6 +866,9 @@ command :finish do |c|
   c.arg_name 'NAME'
   c.flag %i[s section]
 
+  c.desc 'Select item(s) to finish from a menu of matching entries'
+  c.switch %i[i interactive]
+
   c.action do |_global_options, options, args|
     unless options[:auto]
       if options[:took]
@@ -869,7 +906,11 @@ command :finish do |c|
 
     raise Doing::Errors::InvalidArgument, 'Invalid argument (specify number of recent items to mark @done)' unless args.length == 0 || args[0] =~ /\d+/
 
-    count = args[0] ? args[0].to_i : 1
+    if options[:interactive]
+      count = 0
+    else
+      count = args[0] ? args[0].to_i : 1
+    end
 
     opts = {
       archive: options[:archive],
@@ -883,7 +924,8 @@ command :finish do |c|
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],
       unfinished: options[:unfinished],
-      remove: options[:remove]
+      remove: options[:remove],
+      interactive: options[:interactive]
     }
 
     wwid.tag_last(opts)
@@ -920,13 +962,17 @@ command %i[again resume] do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
+  c.desc 'Select item to resume from a menu of matching entries'
+  c.switch %i[i interactive]
+
   c.action do |_global_options, options, _args|
     tags = options[:tag].nil? ? [] : options[:tag].to_tags
     opts = options
     opts[:tag] = tags
     opts[:tag_bool] = options[:bool].normalize_bool
+    opts[:interactive] = options[:interactive]
 
-    wwid.restart_last(opts)
+    wwid.repeat_last(opts)
   end
 end
 
@@ -989,6 +1035,9 @@ command :tag do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
+  c.desc 'Select item(s) to tag from a menu of matching entries'
+  c.switch %i[i interactive]
+
   c.action do |_global_options, options, args|
     raise Doing::Errors::MissingArgument, 'You must specify at least one tag' if args.empty? && !options[:a]
 
@@ -1019,7 +1068,13 @@ command :tag do |c|
       tags.map! { |tag| tag.sub(/^@/, '').strip }
     end
 
-    count = options[:count].to_i
+    if options[:interactive]
+      count = 0
+      options[:force] = true
+    else
+      count = options[:count].to_i
+    end
+
 
     if count.zero? && !options[:force]
       if options[:search]
@@ -1091,6 +1146,9 @@ command [:mark, :flag] do |c|
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
+  c.desc 'Select item(s) to flag from a menu of matching entries'
+  c.switch %i[i interactive]
+
   c.action do |_global_options, options, _args|
     mark = settings['marker_tag'] || 'flagged'
 
@@ -1108,7 +1166,12 @@ command [:mark, :flag] do |c|
       search_tags = options[:tag].to_tags
     end
 
-    count = options[:count].to_i
+    if options[:interactive]
+      count = 0
+      options[:force] = true
+    else
+      count = options[:count].to_i
+    end
 
     if count.zero? && !options[:force]
       if options[:search]
@@ -1208,6 +1271,9 @@ command :show do |c|
 
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
+
+  c.desc 'Select from a menu of matching entries to perform additional operations'
+  c.switch %i[i interactive]
 
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
@@ -1370,6 +1436,9 @@ command :recent do |c|
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
+  c.desc 'Select from a menu of matching entries to perform additional operations'
+  c.switch %i[i interactive]
+
   c.action do |global_options, options, args|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
 
@@ -1379,7 +1448,13 @@ command :recent do |c|
       else
         config_count = 10
       end
-      count = args.empty? ? config_count : args[0].to_i
+
+      if options[:interactive]
+        count = 0
+      else
+        count = args.empty? ? config_count : args[0].to_i
+      end
+
       options[:t] = true if options[:totals]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
       tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
@@ -1388,7 +1463,8 @@ command :recent do |c|
         sort_tags: options[:sort_tags],
         tags_color: tags_color,
         times: options[:t],
-        totals: options[:totals]
+        totals: options[:totals],
+        interactive: options[:interactive]
       }
 
       Doing::Pager::page wwid.recent(count, section.cap_first, opts)
@@ -1775,6 +1851,9 @@ command :view do |c|
   c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
 
+  c.desc 'Select from a menu of matching entries to perform additional operations'
+  c.switch %i[i interactive]
+
   c.action do |_global_options, options, args|
     raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
@@ -1892,6 +1971,7 @@ command :view do |c|
       opts[:totals] = totals
       opts[:page_title] = page_title
       opts[:date_filter] = dates
+      opts[:output] = options[:interactive] ? nil : options[:output]
 
       Doing::Pager.page wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
@@ -2057,15 +2137,27 @@ command :open do |c|
   end
 end
 
-desc 'Edit the configuration file'
+desc 'Edit the configuration file or output a value from it'
+long_desc %(Run without arguments, `doing config` opens your `.doingrc` in an editor.
+If local configurations are found in the path between the current directory
+and `~/.doingrc`, a menu will allow you to select which to open in the editor.
+
+It will use the editor defined in `config_editor_app`, or one specified with `--editor`.
+
+Use `doing config -d` to output the configuration to the terminal, and
+provide a dot-separated key path to get a specific value. Shows the current value
+including keys/overrides set by local configs.)
+arg_name 'KEY_PATH'
 command :config do |c|
+  c.example 'doing config', desc: "Open an active configuration in #{Doing::Util.find_default_editor('config_editor_app')}"
+  c.example 'doing config -d doing_file', desc: 'Output the value of a config key as YAML'
+  c.example 'doing config -d plugins.say.say_voice -o json', desc: 'Output the value of a key path as JSON'
   c.desc 'Editor to use'
   c.arg_name 'EDITOR'
   c.flag %i[e editor], default_value: nil
 
-  c.desc 'Show a config key value. Separate key paths with colons or dots, e.g. "export_templates.html". Use . to output the entire config.'
-  c.arg_name 'KEY'
-  c.flag %i[d dump]
+  c.desc 'Show a config key value based on arguments. Separate key paths with colons or dots, e.g. "export_templates.html". Empty arguments outputs the entire config.'
+  c.switch %i[d dump]
 
   c.desc 'Format for --dump (json|yaml|raw)'
   c.arg_name 'FORMAT'
@@ -2087,7 +2179,7 @@ command :config do |c|
     c.switch [:x]
   end
 
-  c.action do |_global_options, options, _args|
+  c.action do |_global_options, options, args|
     if options[:update]
       config.configure({rewrite: true, ignore_local: true})
       # Doing.logger.warn("Config file rewritten: #{config.config_file}")
@@ -2095,11 +2187,8 @@ command :config do |c|
     end
 
     if options[:dump]
-      cfg = settings
-      unless options[:dump] =~ /^[.*]$/
-        path = options[:dump].split(/[:.]/)
-        cfg = cfg.dig(*path)
-      end
+      keypath = args.join('.')
+      cfg = config.value_for_key(keypath)
 
       if cfg
         $stdout.puts case options[:output]
@@ -2108,16 +2197,11 @@ command :config do |c|
                      when /^r/
                        cfg
                      else
-                       if cfg.is_a?(String)
-                         cfg
-                       elsif !!cfg == cfg
-                         YAML.dump(cfg)
-                       else
-                         YAML.dump(cfg.to_h)
-                       end
+                       # cfg = { last_key => cfg } unless last_key.nil?
+                       YAML.dump(cfg)
                      end
       else
-        Doing.logger.log_now(:error, 'Config:', "Key #{options[:dump]} not found")
+        Doing.logger.log_now(:error, 'Config:', "Key #{keypath} not found")
       end
       Doing.logger.output_results
       return
@@ -2137,16 +2221,15 @@ command :config do |c|
 
     if `uname` =~ /Darwin/
       if options[:x]
-        if settings.key?('config_editor_app') && !settings['config_editor_app'].nil?
-          editor = settings['config_editor_app']
-
-          if Util.exec_available(editor)
+        editor = Doing::Util.find_default_editor('config_editor_app')
+        if editor
+          if Doing::Util.exec_available(editor)
             system %(#{editor} "#{config_file}")
           else
-            `open -a "#{settings['config_editor_app']}" "#{config_file}"`
+            `open -a "#{editor}" "#{config_file}"`
           end
         else
-          raise Doing::Errors::InvalidArgument, 'No config_editor_app key found in configuration.'
+          raise Doing::Errors::InvalidArgument, 'No viable editor found in config or environment.'
         end
       elsif options[:a] || options[:b]
         if options[:a]
@@ -2155,29 +2238,20 @@ command :config do |c|
           `open -b #{options[:b]} "#{config_file}"`
         end
       else
-        if options[:e].nil?
-          if settings.key?('config_editor_app') && !settings['config_editor_app'].nil?
-            if Doing::Util.exec_available(editor)
-              system %(#{editor} "#{config_file}")
-            else
-              `open -a "#{settings['config_editor_app']}" "#{config_file}"`
-            end
-            return
-          else
-            editor = Doing::Util.default_editor
-          end
+        editor = options[:e] || Doing::Util.find_default_editor('config_editor_app')
+
+        raise Doing::Errors::MissingEditor, 'No viable editor defined in config or environment' unless editor
+
+        if Doing::Util.exec_available(editor)
+          system %(#{editor} "#{config_file}")
         else
-          editor = options[:e]
+          `open -a "#{editor}" "#{config_file}"`
         end
-
-        raise Doing::Errors::MissingEditor, 'No editor defined in config or environment' if editor.nil?
-
-        system %(#{editor} "#{config_file}")
       end
     else
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if options[:e].nil? && Doing::Util.default_editor.nil?
+      editor = options[:e] || Doing::Util.default_editor
+      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor)
 
-      editor = options[:e].nil? ? Doing::Util.default_editor : options[:e]
       system %(#{editor} "#{config_file}")
     end
   end

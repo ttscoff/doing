@@ -526,7 +526,7 @@ module Doing
       item
     end
 
-    def restart_item(item, opt = {})
+    def repeat_item(item, opt = {})
       original = item.dup
       if item.should_finish?
         if item.should_time?
@@ -565,7 +565,7 @@ module Doing
     ##
     ## @param      opt   (Hash) Additional Options
     ##
-    def restart_last(opt = {})
+    def repeat_last(opt = {})
       opt[:section] ||= 'all'
       opt[:note] ||= []
       opt[:tag] ||= []
@@ -577,7 +577,7 @@ module Doing
         return
       end
 
-      restart_item(last, opt)
+      repeat_item(last, opt)
     end
 
     ##
@@ -589,11 +589,24 @@ module Doing
       opt[:tag_bool] ||= :and
       opt[:section] ||= @config['current_section']
 
-      all_items = filter_items([], opt: opt)
+      items = filter_items([], opt: opt)
 
-      logger.debug('Filtered:', "Parameters matched #{all_items.count} entries")
+      logger.debug('Filtered:', "Parameters matched #{items.count} entries")
 
-      all_items.max_by { |item| item.date }
+      if opt[:interactive]
+        last_entry = choose_from_items(items, {
+          menu: true,
+          header: '',
+          prompt: 'Select an entry > ',
+          multiple: false,
+          sort: false,
+          show_if_single: true
+        }, include_section: opt[:section] =~ /^all$/i )
+      else
+        last_entry = items.max_by { |item| item.date }
+      end
+
+      last_entry
     end
 
     ##
@@ -602,6 +615,8 @@ module Doing
     ## @return     (String) The selected option
     ##
     def choose_from(options, prompt: 'Make a selection: ', multiple: false, sorted: true, fzf_args: [])
+      return nil unless $stdout.isatty
+
       fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
       # fzf_args << '-1' # User is expecting a menu, and even if only one it seves as confirmation
       fzf_args << %(--prompt "#{prompt}")
@@ -720,6 +735,7 @@ module Doing
     def interactive(opt = {})
       section = opt[:section] ? guess_section(opt[:section]) : 'All'
       opt[:query] = opt[:search] if opt[:search] && !opt[:query]
+      opt[:multiple] = true
       items = filter_items([], opt: { section: section, search: opt[:search] })
 
       selection = choose_from_items(items, opt, include_section: section =~ /^all$/i)
@@ -733,6 +749,13 @@ module Doing
     end
 
     def choose_from_items(items, opt = {}, include_section: false)
+      return nil unless $stdout.isatty
+
+      return nil unless items.count.positive?
+
+      opt[:header] ||= "Arrows: navigate, tab: mark for selection, ctrl-a: select all, enter: commit"
+      opt[:prompt] ||= "Select entries to act on > "
+
       pad = items.length.to_s.length
       options = items.map.with_index do |item, i|
         out = [
@@ -753,18 +776,21 @@ module Doing
       end
 
       fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
+
       fzf_args = [
-        %(--header="Arrows: navigate, tab: mark for selection, ctrl-a: select all, enter: commit"),
-        %(--prompt="Select entries to act on > "),
-        '-1',
-        '-m',
+        %(--header="#{opt[:header]}"),
+        %(--prompt="#{opt[:prompt].sub(/ *$/, ' ')}"),
+        opt[:multiple] ? '--multi' : '--no-multi',
+        '-0',
         '--bind ctrl-a:select-all',
         %(-q "#{opt[:query]}")
       ]
-      if !opt[:menu]
+      fzf_args.push('-1') unless opt[:show_if_single]
+
+      unless opt[:menu]
         raise Errors::InvalidArgument, "Can't skip menu when no query is provided" unless opt[:query]
 
-        fzf_args.concat([%(--filter="#{opt[:query]}"), '--no-sort'])
+        fzf_args.concat([%(--filter="#{opt[:query]}"), opt[:sort] ? '' : '--no-sort'])
       end
 
       res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
@@ -774,11 +800,11 @@ module Doing
         selected.push(items[idx])
       end
 
-      selected
+      opt[:multiple] ? selected : selected[0]
     end
 
     def act_on(items, opt = {})
-      actions = %i[editor delete tag flag finish cancel tag archive output save_to]
+      actions = %i[editor delete tag flag finish cancel archive output save_to]
       has_action = false
       actions.each do |a|
         if opt[a]
@@ -788,20 +814,22 @@ module Doing
       end
 
       unless has_action
-        choice = choose_from([
-                               'add tag',
-                               'remove tag',
-                               'cancel',
-                               'delete',
-                               'finish',
-                               'flag',
-                               'archive',
-                               'move',
-                               'edit',
-                               'resume/repeat',
-                               'reset',
-                               'output formatted'
-                             ],
+        actions = [
+                     'add tag',
+                     'remove tag',
+                     'cancel',
+                     'delete',
+                     'finish',
+                     'flag',
+                     'archive',
+                     'move',
+                     'edit',
+                     'output formatted'
+                   ]
+
+        actions.concat(['resume/repeat', 'begin/reset']) if items.count == 1
+
+        choice = choose_from(actions,
                              prompt: 'What do you want to do with the selected items? > ',
                              multiple: true,
                              sorted: false,
@@ -826,10 +854,14 @@ module Doing
             opt[:tag] = tag.strip.sub(/^@/, '')
             opt[:remove] = true if type == 'remove'
           when /output formatted/
-            output_format = choose_from(available_plugins.sort,
+            output_format = choose_from(Plugins.available_plugins(type: :export).sort,
                                         prompt: 'Which output format? > ',
                                         fzf_args: ['--height=60%', '--tac', '--no-sort'])
             next if tag =~ /^ *$/
+
+            unless output_format
+              raise Errors::UserCancelled, 'Cancelled'
+            end
 
             opt[:output] = output_format.strip
             res = opt[:force] ? false : yn('Save to file?', default_response: 'n')
@@ -865,9 +897,14 @@ module Doing
         else
           item = items[0]
           if opt[:resume] && !opt[:reset]
-            restart_item(item, { editor: opt[:editor] })
+            repeat_item(item, { editor: opt[:editor] })
           elsif opt[:reset]
-            update_item(item, reset_item(item, resume: opt[:resume]))
+            if item.tags?('done', :and) && !opt[:resume]
+              res = opt[:force] ? true : yn('Remove @done tag?', default_response: 'y')
+            else
+              res = opt[:resume]
+            end
+            update_item(item, reset_item(item, resume: res))
           end
           write(@doing_file)
         end
@@ -964,11 +1001,13 @@ module Doing
         @content = { 'Export' => { :original => 'Export:', :items => items } }
         options = { section: 'Export' }
 
+
         if opt[:output] =~ /doing/
           options[:output] = 'template'
           options[:template] = '- %date | %title%note'
         else
           options[:output] = opt[:output]
+          options[:template] = opt[:template] || nil
         end
 
         output = list_section(options)
@@ -1040,6 +1079,19 @@ module Doing
       items = filter_items([], opt: opt)
 
       logger.info('Skipped:', 'no items matched your search') if items.empty?
+
+      if opt[:interactive]
+        items = choose_from_items(items, {
+          menu: true,
+          header: '',
+          prompt: 'Select entries to tag > ',
+          multiple: true,
+          sort: true,
+          show_if_single: true
+        }, include_section: opt[:section] =~ /^all$/i )
+
+        return if items.nil?
+      end
 
       items.each do |item|
         added = []
@@ -1498,6 +1550,7 @@ module Doing
       if opt[:interactive]
         opt[:menu] = !opt[:force]
         opt[:query] = '' # opt[:search]
+        opt[:multiple] = true
         selected = choose_from_items(items, opt, include_section: opt[:section] =~ /^all$/i )
 
         if selected.empty?

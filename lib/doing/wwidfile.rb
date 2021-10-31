@@ -1,35 +1,12 @@
 # frozen_string_literal: true
 
 module Doing
-  class WWIDFile
-    attr_reader :other_content_top, :other_content_bottom, :sections
-    attr_accessor :items
+  class Items < Array
+    def from(path)
+      return [] unless path
+      path = File.expand_path(path)
 
-    def initialize(doing_file)
-      @doing_file = File.expand_path(doing_file)
-
-      @other_content_top = []
-      @other_content_bottom = []
-      @sections = []
-      @items = []
-
-      init_doing_file(doing_file)
-    end
-
-    def init_doing_file(path = nil)
-      input = path
-
-      if input.nil?
-        create(@doing_file) unless File.exist?(@doing_file)
-        input = IO.read(@doing_file)
-        input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
-      elsif File.exist?(File.expand_path(input)) && File.file?(File.expand_path(input)) && File.stat(File.expand_path(input)).size.positive?
-        @doing_file = File.expand_path(input)
-        input = IO.read(File.expand_path(input))
-        input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
-      elsif input.length < 256
-        @doing_file = File.expand_path(input)
-        create(input)
+      if File.exist?(path) && File.file?(path) && File.stat(path).size.positive?
         input = IO.read(File.expand_path(input))
         input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
       end
@@ -65,18 +42,6 @@ module Doing
         end
       end
       Hooks.trigger :post_read, self
-    end
-
-    ##
-    ## @brief      Create a new doing file
-    ##
-    def create(filename = nil)
-      filename = @doing_file if filename.nil?
-      return if File.exist?(filename) && File.stat(filename).size.positive?
-
-      File.open(filename, 'w+') do |f|
-        f.puts "#{@current_section}:"
-      end
     end
 
     def section_titles

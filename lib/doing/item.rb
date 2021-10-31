@@ -53,7 +53,7 @@ module Doing
     end
 
     def tag(tag, value: nil, remove: false, rename_to: nil, regex: false)
-      @title.tag!(tag, value: value, remove: remove, rename_to: rename_to, regex: regex)
+      @title.tag!(tag, value: value, remove: remove, rename_to: rename_to, regex: regex).strip!
     end
 
     def tags?(tags, bool = :and)

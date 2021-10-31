@@ -5,6 +5,7 @@ module Doing
 
     class UserCancelled < ::StandardError
       def initialize(msg='Cancelled')
+        Doing.logger.output_results
         Doing.logger.log_now(:warn, 'Exited:', msg)
         Process.exit 1
       end
@@ -12,6 +13,7 @@ module Doing
 
     class EmptyInput < ::StandardError
       def initialize(msg='No input')
+        Doing.logger.output_results
         Doing.logger.log_now(:warn, 'Exited:', 'Input empty')
         Process.exit 1
       end
