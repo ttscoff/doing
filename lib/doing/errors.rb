@@ -59,7 +59,7 @@ module Doing
       attr_reader :plugin
 
       def initialize(msg = 'Plugin error', type: nil, plugin: nil)
-        @plugin = plugin || 'Uknown Plugin'
+        @plugin = plugin || 'Unknown Plugin'
 
         type ||= 'Unknown'
         @type = case type.to_s

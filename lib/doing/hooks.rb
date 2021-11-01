@@ -9,6 +9,7 @@ module Doing
       post_config: [],
       post_local_config: [],
       post_read: [],
+      pre_write: [],
       post_write: []
     }
 

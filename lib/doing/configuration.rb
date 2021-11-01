@@ -16,11 +16,17 @@ module Doing
         'whitelist' => [],
         'synonyms' => {}
       },
+      'editors' => {
+        'default' => ENV['DOING_EDITOR'] || ENV['GIT_EDITOR'] || ENV['EDITOR'],
+        'doing_file' => nil,
+        'config' => nil
+      },
+      'plugins' => {
+        'plugin_path' => File.join(Util.user_home, '.config', 'doing', 'plugins'),
+        'command_path' => File.join(Util.user_home, '.config', 'doing', 'commands')
+      },
       'doing_file' => '~/what_was_i_doing.md',
       'current_section' => 'Currently',
-      'config_editor_app' => nil,
-      'editor' => ENV['DOING_EDITOR'] || ENV['GIT_EDITOR'] || ENV['EDITOR'],
-      'editor_app' => nil,
       'paginate' => false,
       'never_time' => [],
       'never_finish' => [],
@@ -122,7 +128,6 @@ module Doing
       cfg
     end
 
-    # Static: Produce a Configuration ready for use in a Site.
     # It takes the input, fills in the defaults where values do not exist.
     #
     # user_config - a Hash or Configuration of overrides.
@@ -150,21 +155,22 @@ module Doing
 
       config = read_config.dup
 
-      plugin_config = { 'plugin_path' => nil, 'command_path' => nil }
-      command_path = config.dig('plugins', 'command_path') || File.join(Util.user_home, '.config', 'doing', 'commands')
+      plugin_config = Util.deep_merge_hashes(DEFAULTS['plugins'], config['plugins'] || {})
 
-      plugin_path = config.dig('plugins', 'plugin_path') || File.join(Util.user_home, '.config', 'doing', 'plugins')
-      load_plugins(plugin_path)
+      load_plugins(plugin_config['plugin_path'])
 
       Plugins.plugins.each do |_type, plugins|
         plugins.each do |title, plugin|
-          plugin_config[title] = plugin[:config] if plugin.key?(:config) && !plugin[:config].empty?
-          config['export_templates'][title] ||= nil if plugin.key?(:templates)
+          plugin_config[title] = plugin[:config] if plugin[:config] && !plugin[:config].empty?
+          config['export_templates'][title] ||= nil if plugin[:templates] && !plugin[:templates].empty?
         end
       end
 
+      config = Util.deep_merge_hashes({
+                                        'plugins' => plugin_config
+                                      }, config)
 
-      config.deep_merge({ 'plugins' => plugin_config })
+      config = find_deprecations(config)
 
       if !File.exist?(config_file) || opt[:rewrite]
         Util.write_to_file(config_file, YAML.dump(config), backup: true)
@@ -173,7 +179,8 @@ module Doing
 
       Hooks.trigger :post_config, self
 
-      config = local_config.deep_merge(config) unless @ignore_local
+      # config = local_config.deep_merge(config) unless @ignore_local
+      config = Util.deep_merge_hashes(config, local_config) unless @ignore_local
 
       Hooks.trigger :post_local_config, self
 
@@ -181,6 +188,33 @@ module Doing
     end
 
     private
+
+    def find_deprecations(config)
+      deprecated = false
+      if config.key?('editor')
+        deprecated = true
+        config['editors']['default'] ||= config['editor']
+        config.delete('editor')
+        Doing.logger.debug('Deprecated:', "config key 'editor' is now 'editors->default', please update your config.")
+      end
+
+      if config.key?('config_editor_app') && !config['editors']['config']
+        deprecated = true
+        config['editors']['config'] = config['config_editor_app']
+        config.delete('config_editor_app')
+        Doing.logger.debug('Deprecated:', "config key 'config_editor_app' is now 'editors->config', please update your config.")
+      end
+
+      if config.key?('editor_app') && !config['editors']['doing_file']
+        deprecated = true
+        config['editors']['doing_file'] = config['editor_app']
+        config.delete('editor_app')
+        Doing.logger.debug('Deprecated:', "config key 'editor_app' is now 'editors->doing_file', please update your config.")
+      end
+
+      Doing.logger.warn('Deprecated:', 'outdated keys found, please run `doing config --update`.') if deprecated
+      config
+    end
 
     ##
     ## @brief      Read local configurations
@@ -263,7 +297,11 @@ module Doing
     end
 
     def load_plugins(add_dir = nil)
-      FileUtils.mkdir_p(add_dir) if add_dir
+      begin
+        FileUtils.mkdir_p(add_dir) if add_dir && !File.exist?(add_dir)
+      rescue
+        nil
+      end
 
       Plugins.load_plugins(add_dir)
     end

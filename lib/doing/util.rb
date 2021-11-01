@@ -64,6 +64,15 @@ module Doing
       target
     end
 
+    def duplicable?(obj)
+      case obj
+      when nil, false, true, Symbol, Numeric
+        false
+      else
+        true
+      end
+    end
+
     def mergable?(value)
       value.is_a?(Hash)
     end
@@ -133,28 +142,35 @@ module Doing
       "#{editor} #{args.join(' ')}"
     end
 
-    def find_default_editor(editor_for = 'editor')
+    def find_default_editor(editor_for = 'default')
       if ENV['DOING_EDITOR_TEST']
         return ENV['EDITOR']
       end
 
-      if Doing.config.settings[editor_for]
-        editor = Doing.config.settings[editor_for]
-        Doing.logger.debug('ENV:', "Using #{editor} from config")
+      editor_config = Doing.config.settings['editors']
+
+      if editor_config.is_a?(String)
+        Doing.logger.warn('Deprecated:', "Please update your configuration, 'editors' should be a mapping. Delete the key and run `doing config --update`.")
+        return editor_config
+      end
+
+      if editor_config[editor_for]
+        editor = editor_config[editor_for]
+        Doing.logger.debug('Editor:', "Using #{editor} from config 'editors->#{editor_for}'")
         return editor unless editor.nil? || editor.empty?
       end
 
-      if editor_for != 'editor' && Doing.config.settings['editor']
-        editor = Doing.config.settings['editor']
-        Doing.logger.debug('ENV:', "Using #{editor} from config")
+      if editor_for != 'editor' && editor_config['default']
+        editor = editor_config['default']
+        Doing.logger.debug('Editor:', "Using #{editor} from config: 'editors->default'")
         return editor unless editor.nil? || editor.empty?
       end
 
       editor ||= ENV['DOING_EDITOR'] || ENV['GIT_EDITOR'] || ENV['EDITOR']
 
-      unless editor.nil?
-        Doing.logger.debug('Found editor in environment variables')
-        return editor unless editor.nil? || editor.empty?
+      unless editor.nil? || editor.empty?
+        Doing.logger.debug('Editor:', "Found editor in environment variables: #{editor}")
+        return editor
       end
 
       Doing.logger.debug('ENV:', 'No EDITOR environment variable, testing available editors')

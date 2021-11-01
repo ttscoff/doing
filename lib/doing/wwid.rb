@@ -1348,6 +1348,7 @@ module Doing
     ## @param      file  (String) The filepath to write to
     ##
     def write(file = nil, backup: true)
+      Hooks.trigger :pre_write, self, file
       output = wrapped_content
 
       if file.nil?
@@ -1585,7 +1586,11 @@ module Doing
         add_dir = @config['plugins']['plugin_path']
       else
         add_dir = File.join(@user_home, '.config', 'doing', 'plugins')
-        FileUtils.mkdir_p(add_dir) if add_dir
+        begin
+          FileUtils.mkdir_p(add_dir) if add_dir
+        rescue
+          nil
+        end
       end
 
       Plugins.load_plugins(add_dir)

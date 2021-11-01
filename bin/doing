@@ -2106,8 +2106,6 @@ command :open do |c|
     c.arg_name 'BUNDLE_ID'
     c.flag %i[b bundle_id]
   end
-  c.desc "Open with $EDITOR (#{Doing::Util.default_editor})"
-  c.switch %i[e editor], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
     params = options.dup
@@ -2119,16 +2117,16 @@ command :open do |c|
         system %(open -a "#{options[:a]}" "#{File.expand_path(wwid.doing_file)}")
       elsif options[:bundle_id]
         system %(open -b "#{options[:b]}" "#{File.expand_path(wwid.doing_file)}")
-      elsif options[:editor]
-        raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
-        system %(#{Doing::Util.default_editor} "#{File.expand_path(wwid.doing_file)}")
-      elsif settings.key?('editor_app') && !settings['editor_app'].nil?
-        system %(open -a "#{settings['editor_app']}" "#{File.expand_path(wwid.doing_file)}")
+      elsif Doing::Util.find_default_editor('doing_file')
+        editor = Doing::Util.find_default_editor('doing_file')
+        if Doing::Util.exec_available(editor)
+          system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
+        else
+          system %(open -a "#{editor}" "#{File.expand_path(wwid.doing_file)}")
+        end
       else
         system %(open "#{File.expand_path(wwid.doing_file)}")
       end
-
     else
       raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
@@ -2149,7 +2147,7 @@ provide a dot-separated key path to get a specific value. Shows the current valu
 including keys/overrides set by local configs.)
 arg_name 'KEY_PATH'
 command :config do |c|
-  c.example 'doing config', desc: "Open an active configuration in #{Doing::Util.find_default_editor('config_editor_app')}"
+  c.example 'doing config', desc: "Open an active configuration in #{Doing::Util.find_default_editor('config')}"
   c.example 'doing config -d doing_file', desc: 'Output the value of a config key as YAML'
   c.example 'doing config -d plugins.say.say_voice -o json', desc: 'Output the value of a key path as JSON'
   c.desc 'Editor to use'
@@ -2221,7 +2219,7 @@ command :config do |c|
 
     if `uname` =~ /Darwin/
       if options[:x]
-        editor = Doing::Util.find_default_editor('config_editor_app')
+        editor = Doing::Util.find_default_editor('config')
         if editor
           if Doing::Util.exec_available(editor)
             system %(#{editor} "#{config_file}")
@@ -2238,7 +2236,7 @@ command :config do |c|
           `open -b #{options[:b]} "#{config_file}"`
         end
       else
-        editor = options[:e] || Doing::Util.find_default_editor('config_editor_app')
+        editor = options[:e] || Doing::Util.find_default_editor('config')
 
         raise Doing::Errors::MissingEditor, 'No viable editor defined in config or environment' unless editor
 
