@@ -75,6 +75,7 @@ command :wiki do |c|
       File.open(File.join('doing_wiki', 'index.html'), 'w') do |f|
         f.puts index_out
       end
+      Doing.logger.warn("Wiki written to doing_wiki directory")
     end
   end
 end
