@@ -260,6 +260,7 @@ module Doing
       begin
         user_config = Util.safe_load_file(config_file)
         if user_config.key?('html_template')
+          user_config['export_templates'] ||= {}
           user_config['export_templates'].deep_merge(user_config.delete('html_template'))
         end
 
