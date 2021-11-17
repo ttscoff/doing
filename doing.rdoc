@@ -1,6 +1,8 @@
 == doing - A CLI for a What Was I Doing system
 
-v2.0.0
+Doing uses a TaskPaper-like formatting to keep a plain text record of what you've been doing, complete with tag-based time tracking. The command line tool allows you to add entries, annotate with tags and notes, and view your entries with myriad options, with a focus on a "natural" language syntax.
+
+v2.0.2.pre
 
 === Global Options
 === --config_file arg
@@ -22,6 +24,11 @@ Colored output
 
 
 
+=== --debug
+Verbose output
+
+
+
 === --[no-]default
 Answer yes/no menus with default option
 
@@ -37,6 +44,11 @@ Output notes if included in the template
 
 
 
+=== -p|--[no-]pager
+Use a pager when output is longer than screen
+
+
+
 === -q|--quiet
 Silence info messages
 
@@ -44,11 +56,6 @@ Silence info messages
 
 === --stdout
 Send results report to STDOUT instead of STDERR
-
-
-
-=== --verbose|--debug
-Verbose output
 
 
 
@@ -117,14 +124,22 @@ Repeat last entry matching tags. Combine multiple tags with a comma.
 
 
 ===== -e|--editor
-Edit duplicated entry with /Users/ttscoff/scripts/editor.sh before adding
+Edit duplicated entry with vim before adding
 
 
 
-==== Command: <tt>archive  SECTION_NAME</tt>
+===== -i|--[no-]interactive
+Select item to resume from a menu of matching entries
+
+
+
+==== Command: <tt>archive|move  SECTION_OR_TAG</tt>
 Move entries between sections
 
+Argument can be a section name to move all entries from a section,
+or start with an "@" to move entries matching a tag.
 
+Default with no argument moves items from the "Currently" section to Archive.
 ===== Options
 ===== --before DATE_STRING
 
@@ -208,6 +223,11 @@ Archive entries
 
 
 
+===== -i|--[no-]interactive
+Select item(s) to cancel from a menu of matching entries
+
+
+
 ===== -u|--unfinished
 Cancel last entry (or entries) not already marked @done
 
@@ -221,10 +241,18 @@ Select a section to display from a menu
 List available color variables for configuration templates and views
 
 
-==== Command: <tt>config </tt>
-Edit the configuration file
+==== Command: <tt>config  KEY_PATH</tt>
+Edit the configuration file or output a value from it
 
+Run without arguments, `doing config` opens your `.doingrc` in an editor.
+If local configurations are found in the path between the current directory
+and `~/.doingrc`, a menu will allow you to select which to open in the editor.
 
+It will use the editor defined in `config_editor_app`, or one specified with `--editor`.
+
+Use `doing config -d` to output the configuration to the terminal, and
+provide a dot-separated key path to get a specific value. Shows the current value
+including keys/overrides set by local configs.
 ===== Options
 ===== -a APP_NAME
 
@@ -236,13 +264,6 @@ Application to use
 ===== -b BUNDLE_ID
 
 Application bundle id to use
-
-[Default Value] None
-
-
-===== -d|--dump KEY
-
-Show a config key value. Separate key paths with colons or dots, e.g. "export_templates.html". Use . to output the entire config.
 
 [Default Value] None
 
@@ -262,13 +283,18 @@ Format for --dump (json|yaml|raw)
 [Must Match] (?-mix:^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$)
 
 
+===== -d|--[no-]dump
+Show a config key value based on arguments. Separate key paths with colons or dots, e.g. "export_templates.html". Empty arguments outputs the entire config.
+
+
+
 ===== -u|--update
 Update config file with missing configuration options
 
 
 
 ===== -x
-Use the config_editor_app defined in ~/.doingrc (Sublime Text)
+Use the config_editor_app defined in ~/.doingrc (config_editor_app not set)
 
 
 
@@ -288,6 +314,13 @@ Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm
 ===== -b|--back DATE_STRING
 
 Backdate start date by interval [4pm|20m|2h|yesterday noon]
+
+[Default Value] None
+
+
+===== -n|--note TEXT
+
+Include a note
 
 [Default Value] None
 
@@ -319,12 +352,17 @@ Include date
 
 
 ===== -e|--editor
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with vim (with no arguments, edits the last entry)
 
 
 
 ===== -r|--remove
 Remove @done tag
+
+
+
+===== -u|--unfinished
+Finish last entry not already marked @done
 
 
 
@@ -401,6 +439,16 @@ Include date
 
 
 
+===== -i|--[no-]interactive
+Select item(s) to finish from a menu of matching entries
+
+
+
+===== -r|--remove
+Remove done tag
+
+
+
 ===== -u|--unfinished
 Finish last entry (or entries) not already marked @done
 
@@ -429,7 +477,7 @@ Constrain search to entries older than date
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -592,7 +640,7 @@ Tag filter, combine multiple tags with a comma.
 
 
 ===== -e|--editor
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with vim
 
 
 
@@ -616,7 +664,7 @@ Note
 
 
 ===== -e|--editor
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with vim
 
 
 
@@ -638,6 +686,7 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 How many recent entries to tag (0 for all)
 
 [Default Value] 1
+[Must Match] (?-mix:^\d+$)
 
 
 ===== -s|--section SECTION_NAME
@@ -669,6 +718,11 @@ Include current date/time with tag
 
 ===== --force
 Don't ask permission to flag all entries when count is 0
+
+
+
+===== -i|--[no-]interactive
+Select item(s) to flag from a menu of matching entries
 
 
 
@@ -714,7 +768,7 @@ Archive previous @meanwhile entry
 
 
 ===== -e|--editor
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with vim
 
 
 
@@ -757,7 +811,12 @@ Add/remove note from last entry matching tag
 
 
 ===== -e|--editor
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with vim
+
+
+
+===== -i|--[no-]interactive
+Select item for new note from a menu of matching entries
 
 
 
@@ -769,7 +828,11 @@ Replace/Remove last entry's note (default append)
 ==== Command: <tt>now|next  ENTRY</tt>
 Add an entry
 
+Record what you're starting now, or backdate the start time using natural language.
 
+A parenthetical at the end of the entry will be converted to a note.
+
+Run with no argument to create a new entry using vim.
 ===== Options
 ===== -b|--back DATE_STRING
 
@@ -780,7 +843,7 @@ Backdate start time [4pm|20m|2h|yesterday noon]
 
 ===== -n|--note TEXT
 
-Note
+Include a note
 
 [Default Value] None
 
@@ -793,7 +856,7 @@ Section
 
 
 ===== -e|--editor
-Edit entry with /Users/ttscoff/scripts/editor.sh
+Edit entry with vim
 
 
 
@@ -811,7 +874,7 @@ it will create a range.
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -844,7 +907,7 @@ Show time totals at the end of output
 ==== Command: <tt>open </tt>
 Open the "doing" file in an editor
 
-`doing open` defaults to using the editor_app setting in /Users/ttscoff/.doingrc (Taskpaper)
+`doing open` defaults to using the editor_app setting in /Users/ttscoff/.doingrc (not set).
 ===== Options
 ===== -a|--app APP_NAME
 
@@ -858,11 +921,6 @@ Open with app name
 Open with app bundle id
 
 [Default Value] None
-
-
-===== -e|--editor
-Open with $EDITOR (/Users/ttscoff/scripts/editor.sh)
-
 
 
 ==== Command: <tt>plugins </tt>
@@ -907,6 +965,11 @@ Sort tags by (name|time)
 [Must Match] (?i-mx:^(?:name|time)$)
 
 
+===== -i|--[no-]interactive
+Select from a menu of matching entries to perform additional operations
+
+
+
 ===== -t|--[no-]times
 Show time intervals on @done tasks
 
@@ -914,6 +977,50 @@ Show time intervals on @done tasks
 
 ===== --totals
 Show intervals with totals at the end of output
+
+
+
+==== Command: <tt>reset|begin </tt>
+Reset the start time of an entry
+
+
+===== Options
+===== --bool BOOLEAN
+
+Boolean (AND|OR|NOT) with which to combine multiple tag filters
+
+[Default Value] AND
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+
+
+===== -s|--section NAME
+
+Set the start date of an item to now
+
+[Default Value] All
+
+
+===== --search QUERY
+
+Reset last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("'query")
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Reset last entry matching tag
+
+[Default Value] None
+
+
+===== -i|--[no-]interactive
+Select from a menu of matching entries
+
+
+
+===== -r|--[no-]resume
+Resume entry (remove @done)
 
 
 
@@ -995,7 +1102,7 @@ Move selected items to section
 
 ===== -o|--output FORMAT
 
-Output entries to format (csv|doing|html|markdown|say|taskpaper|template|timeline)
+Output entries to format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1030,6 +1137,11 @@ Tag selected entries
 
 ===== -a|--archive
 Archive selected items
+
+
+
+===== --[no-]again|--[no-]resume
+Copy selection as a new entry with current time and no @done tag. Only works with single selections. Can be combined with --editor.
 
 
 
@@ -1126,7 +1238,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1169,6 +1281,11 @@ Sort tags by (name|time)
 [Must Match] (?i-mx:^(?:name|time))
 
 
+===== -i|--[no-]interactive
+Select from a menu of matching entries to perform additional operations
+
+
+
 ===== --only_timed
 Only show items with recorded time intervals
 
@@ -1192,7 +1309,7 @@ and "2d" would be interpreted as "two days ago."
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1252,6 +1369,7 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 How many recent entries to tag (0 for all)
 
 [Default Value] 1
+[Must Match] (?-mix:^\d+$)
 
 
 ===== --rename ORIG_TAG
@@ -1298,6 +1416,11 @@ Don't ask permission to tag all entries when count is 0
 
 
 
+===== -i|--[no-]interactive
+Select item(s) to tag from a menu of matching entries
+
+
+
 ===== -r|--remove
 Remove given tag(s)
 
@@ -1331,6 +1454,10 @@ List all available templates
 
 
 
+==== Command: <tt>test </tt>
+Test Stuff
+
+This command is coming from /Users/ttscoff/.config/doing/commands/test.rb
 ==== Command: <tt>today </tt>
 List entries from today
 
@@ -1352,7 +1479,7 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1431,7 +1558,7 @@ Count to display
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1478,6 +1605,11 @@ Include colors in output
 
 
 
+===== -i|--[no-]interactive
+Select from a menu of matching entries to perform additional operations
+
+
+
 ===== --only_timed
 Only show items with recorded time intervals (override view settings)
 
@@ -1503,6 +1635,68 @@ List in single column
 
 
 
+==== Command: <tt>wiki </tt>
+Output a tag wiki
+
+
+===== Options
+===== --after DATE_STRING
+
+Include entries newer than date
+
+[Default Value] None
+
+
+===== -b|--bool BOOLEAN
+
+Tag boolean (AND,OR,NOT)
+
+[Default Value] OR
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+
+
+===== --before DATE_STRING
+
+Include entries older than date
+
+[Default Value] None
+
+
+===== -f|--from DATE_OR_RANGE
+
+Date range to include, or a single day to filter date on.
+    Date range argument should be quoted. Date specifications can be natural language.
+    To specify a range, use "to" or "through": `doing show --from "monday to friday"`
+
+[Default Value] None
+
+
+===== -s|--section SECTION_NAME
+
+Section to rotate
+
+[Default Value] All
+
+
+===== --search QUERY
+
+Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("'query")
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Tag filter, combine multiple tags with a comma, use with --bool
+
+[Default Value] None
+
+
+===== --only_timed
+Only show items with recorded time intervals
+
+
+
 ==== Command: <tt>yesterday </tt>
 List entries from yesterday
 
@@ -1524,7 +1718,7 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline)
+Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
