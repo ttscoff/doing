@@ -200,7 +200,7 @@ command %i[reset begin] do |c|
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
   c.desc 'Select from a menu of matching entries'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |global_options, options, args|
     if options[:section]
@@ -271,7 +271,7 @@ command :note do |c|
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
   c.desc 'Select item for new note from a menu of matching entries'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
     if options[:section]
@@ -774,7 +774,7 @@ command :cancel do |c|
   c.switch %i[u unfinished], negatable: false, default_value: false
 
   c.desc 'Select item(s) to cancel from a menu of matching entries'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
     if options[:section]
@@ -867,7 +867,7 @@ command :finish do |c|
   c.flag %i[s section]
 
   c.desc 'Select item(s) to finish from a menu of matching entries'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
     unless options[:auto]
@@ -963,7 +963,7 @@ command %i[again resume] do |c|
   c.flag %i[n note]
 
   c.desc 'Select item to resume from a menu of matching entries'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
     tags = options[:tag].nil? ? [] : options[:tag].to_tags
@@ -1042,7 +1042,7 @@ command :tag do |c|
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
   c.desc 'Select item(s) to tag from a menu of matching entries'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
     raise Doing::Errors::MissingArgument, 'You must specify at least one tag' if args.empty? && !options[:a]
@@ -1170,7 +1170,7 @@ command [:mark, :flag] do |c|
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
 
   c.desc 'Select item(s) to flag from a menu of matching entries'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
     mark = settings['marker_tag'] || 'flagged'
@@ -1302,7 +1302,7 @@ command :show do |c|
   c.switch [:only_timed], default_value: false, negatable: false
 
   c.desc 'Select from a menu of matching entries to perform additional operations'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
@@ -1476,7 +1476,7 @@ command :recent do |c|
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
 
   c.desc 'Select from a menu of matching entries to perform additional operations'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |global_options, options, args|
     section = wwid.guess_section(options[:s]) || options[:s].cap_first
@@ -1923,7 +1923,7 @@ command :view do |c|
   c.switch [:only_timed], default_value: false, negatable: false
 
   c.desc 'Select from a menu of matching entries to perform additional operations'
-  c.switch %i[i interactive]
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
     raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
