@@ -1,0 +1,169 @@
+body {
+  background: #fff;
+  color: #333;
+  font-family: Helvetica,arial,freesans,clean,sans-serif;
+  font-size: 21px;
+  line-height: 1.5;
+  text-align: justify;
+}
+
+@media only screen and (max-width: 900px) {
+  body {
+    font-size: calc(12px + 1vw);
+  }
+
+  .date,
+  .note {
+    font-size: calc(8px + 1vw)!important;
+  }
+}
+
+h1 {
+  margin-bottom: 1em;
+  margin-left: .1em;
+  position: relative;
+  text-align: left;
+}
+
+ul {
+  list-style-position: outside;
+  position: relative;
+  text-align: left;
+  padding-left: 0;
+}
+
+article > ul > li {
+  display: grid;
+  grid-template-columns: 14ch auto;
+  line-height: 1.2;
+  list-style-type: none;
+  padding-left: 10px;
+  position: relative;
+  word-break: break-word;
+  transition: background .2s ease-in-out;
+}
+
+article > ul > li:hover {
+  background: rgba(150,150,150,.05);
+}
+
+.date {
+  color: #7d9ca2;
+  font-size: 17px;
+  padding: 15px 1ch 0 0;
+  text-align: right;
+  white-space: nowrap;
+  transition: color .2s ease-in-out;
+}
+
+.entry {
+  border-left: solid 1px #ccc;
+  line-height: 1.2;
+  padding: 10px 10px 10px 3ch;
+  text-indent: -2ch;
+}
+
+.tag {
+  color: #999;
+  transition: color 1s ease-in;
+}
+
+.note {
+  color: #aaa;
+  display: block;
+  font-size: 17px;
+  line-height: 1.1;
+  padding: 1em 0 0 2ch;
+  position: relative;
+  transition: color .2s ease-in-out;
+}
+
+li:hover .note {
+  color: #777;
+}
+
+li:hover .tag {
+  color: rgb(182, 120, 125);
+}
+
+li:hover .date {
+  color: rgb(100, 169, 165);
+}
+
+.note li {
+    margin-bottom: .5em;
+    list-style: none;
+    position: relative;
+}
+
+.note li:before {
+  color: #ddd;
+  content: '\25BA';
+  font-size: 12px;
+  font-weight: 300;
+  left: -3ch;
+  position: absolute;
+  top: .25em;
+}
+
+.time {
+  background: #f9fced;
+  border-bottom: dashed 1px #ccc;
+  color: #729953;
+  font-size: 15px;
+  margin-right: 4px;
+  padding: 0 5px;
+  position: relative;
+  text-align: right;
+}
+
+table td {
+  border-bottom: solid 1px #ddd;
+  height: 24px;
+}
+
+caption {
+  border-bottom: solid 1px #aaa;
+  margin: 10px 0;
+  text-align: left;
+}
+
+table {
+  margin: 50px 0 0 211px;
+  width: 400px;
+}
+
+th {
+  padding-bottom: 10px;
+}
+
+th, td {
+  padding-right: 20px;
+}
+
+table {
+  margin: 50px 0 2em 16ch;
+  max-width: 400px;
+}
+
+.section {
+  border-left: solid 1px rgb(182, 120, 125);
+  border-radius: 25px;
+  border-right: solid 1px rgb(182, 120, 125);
+  color: rgb(182, 120, 125);
+  font-size: .8em;
+  line-height: 1 !important;
+  padding: 0 4px;
+  transition: background .4s ease-in, color .4s ease-in;
+}
+
+li:hover .section {
+  color: #fff;
+  background: rgb(182, 120, 125);
+}
+
+a:link {
+  background-color: rgba(203, 255, 251, .15);
+  color: #64a9a5;
+  text-decoration: none;
+}

@@ -1,0 +1,27 @@
+!!!
+%html
+%head
+  %meta{"charset" => "utf-8"}/
+  %meta{"content" => "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}/
+  %title what are you doing?
+  %style= @style
+%body
+  %header
+    %h1= @page_title
+    %p
+      %a{ href: 'index.html' }= "[[Home]]"
+  %article
+    %ul
+      - @items.each do |i|
+        %li
+          %span.date= i[:date]
+          %div.entry
+            = i[:title]
+            %span.section= i[:section]
+            - if i[:time] && i[:time] != "00:00:00"
+              %span.time= i[:time]
+            - if i[:note]
+              %ul.note
+                - i[:note].map{|n| n.strip }.each do |li|
+                  %li= li
+    = @totals
