@@ -630,6 +630,24 @@ module Doing
       res
     end
 
+    def all_tags(items, opt: {})
+      all_tags = []
+      items.each { |item| all_tags.concat(item.tags).uniq! }
+      all_tags.sort
+    end
+
+    def tag_groups(items, opt: {})
+      all_items = filter_items(items, opt: opt)
+      tags = all_tags(all_items, opt: {})
+      tag_groups = {}
+      tags.each do |tag|
+        tag_groups[tag] ||= []
+        tag_groups[tag] = filter_items(all_items, opt: { tag: tag, tag_bool: :or })
+      end
+
+      tag_groups
+    end
+
     ##
     ## @brief      Filter items based on search criteria
     ##
@@ -670,6 +688,7 @@ module Doing
         keep = false if finished
 
         if keep && opt[:tag]
+          opt[:tag_bool] ||= :and
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
           keep = false unless tag_match
         end
@@ -1508,8 +1527,7 @@ module Doing
     end
 
     ##
-    ## @brief      Overachieving function for displaying contents of a section.
-    ##             This is a fucking mess. I mean, Jesus Christ.
+    ## @brief      Display contents of a section based on options
     ##
     ## @param      opt   (Hash) Additional Options
     ##
@@ -1546,7 +1564,6 @@ module Doing
 
       items.reverse! if opt[:order] =~ /^d/i
 
-      out = nil
 
       if opt[:interactive]
         opt[:menu] = !opt[:force]
@@ -1563,9 +1580,16 @@ module Doing
         return
       end
 
+
       opt[:output] ||= 'template'
 
       opt[:wrap_width] ||= @config['templates']['default']['wrap_width']
+
+      output(items, title, is_single, opt)
+    end
+
+    def output(items, title, is_single, opt = {})
+      out = nil
 
       raise Errors::InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
 

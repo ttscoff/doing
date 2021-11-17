@@ -56,6 +56,10 @@ module Doing
       @title.tag!(tag, value: value, remove: remove, rename_to: rename_to, regex: regex).strip!
     end
 
+    def tags
+      @title.scan(/(?<= |\A)@([^\s(]+)/).map {|tag| tag[0]}.sort.uniq
+    end
+
     def tags?(tags, bool = :and)
       tags = split_tags(tags)
       bool = bool.normalize_bool
