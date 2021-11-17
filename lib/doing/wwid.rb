@@ -1170,10 +1170,10 @@ module Doing
               old_title = item.title.dup
               item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex])
               if old_title != item.title
-                if opt[:remove]
-                  removed << tag
-                  added << rename_to if rename_to
-                end
+                removed << tag
+                added << rename_to if rename_to
+              else
+                logger.count(:skipped, level: :debug)
               end
             else
               old_title = item.title.dup

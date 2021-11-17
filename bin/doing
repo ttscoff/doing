@@ -992,13 +992,19 @@ long_desc 'Add (or remove) tags from the last entry, or from multiple entries
           Tag name arguments do not need to be prefixed with @.'
 arg_name 'TAG', :multiple
 command :tag do |c|
+  c.example 'doing tag mytag', desc: 'Add @mytag to the last entry created'
+  c.example 'doing tag --remove mytag', desc: 'Remove @mytag from the last entry created'
+  c.example 'doing tag --rename "other*" --count 10 newtag', desc: 'Rename tags beginning with "other" (wildcard) to @newtag on the last 10 entries'
+  c.example 'doing tag --search "developing" coding', desc: 'Add @coding to the last entry containing string "developing" (fuzzy matching)'
+  c.example 'doing tag --interactive --tag project1 coding', desc: 'Create an interactive menu from entries tagged @project1, selection(s) will be tagged with @coding'
+
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'
   c.flag %i[s section], default_value: 'All'
 
   c.desc 'How many recent entries to tag (0 for all)'
   c.arg_name 'COUNT'
-  c.flag %i[c count], default_value: 1
+  c.flag %i[c count], default_value: 1, must_match: /^\d+$/, type: Integer
 
   c.desc 'Replace existing tag with tag argument, wildcards (*,?) allowed, or use with --regex'
   c.arg_name 'ORIG_TAG'
@@ -1111,15 +1117,32 @@ command :tag do |c|
   end
 end
 
+# desc 'Autotag last X entries'
+# arg_name 'COUNT'
+# command :autotag do |c|
+#   c.action do |global_options, options, args|
+#     options = {
+#       autotag: true,
+#       count: args[0].to_i
+#     }
+#     cmd = commands[:tag]
+#     cmd.action.(global_options, options, [])
+#   end
+# end
+
 desc 'Mark last entry as flagged'
 command [:mark, :flag] do |c|
+  c.example 'doing flag', desc: 'Add @flagged to the last entry created'
+  c.example 'doing flag --tag project1 --count 2', desc: 'Add @flagged to the last 2 entries tagged @project1'
+  c.example 'doing flag --interactive --search "/(develop|cod)ing/"', desc: 'Find entries matching regular expression and create a menu allowing multiple selections, selected items will be @flagged'
+
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'
   c.flag %i[s section], default_value: 'All'
 
   c.desc 'How many recent entries to tag (0 for all)'
   c.arg_name 'COUNT'
-  c.flag %i[c count], default_value: 1
+  c.flag %i[c count], default_value: 1, must_match: /^\d+$/, type: Integer
 
   c.desc 'Don\'t ask permission to flag all entries when count is 0'
   c.switch %i[force], negatable: false, default_value: false
@@ -1213,6 +1236,12 @@ long_desc %(
 )
 arg_name '[SECTION|@TAGS]'
 command :show do |c|
+  c.example 'doing show Currently', desc: 'Show entries in the Currently section'
+  c.example 'doing show @project1', desc: 'Show entries tagged @project1'
+  c.example 'doing show Later @doing', desc: 'Show entries from the Later section tagged @doing'
+  c.example 'doing show Ideas --from "mon to fri" --tag doing', desc: 'Show entries tagged @doing from the Ideas section added between monday and friday of the current week.'
+  c.example 'doing show --interactive Later @doing', desc: 'Create a menu from entries from the Later section tagged @doing to perform batch actions'
+
   c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
   c.arg_name 'TAG'
   c.flag [:tag]
@@ -1364,6 +1393,11 @@ EODESC
 
 arg_name 'SEARCH_PATTERN'
 command %i[grep search] do |c|
+  c.example 'doing grep "doing wiki"', desc: 'Find entries containing "doing wiki" using fuzzy matching'
+  c.example 'doing search "\'search command"', desc: 'Find entries containing "search command" using exact matching (search is an alias for grep)'
+  c.example 'doing grep "/do.*?wiki.*?@done/"', desc: 'Find entries matching regular expression'
+  c.example 'doing search --before 12/21 "doing wiki"', desc: 'Find entries containing "doing wiki" with entry dates before 12/21 of the current year'
+
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -1420,6 +1454,11 @@ desc 'List recent entries'
 default_value 10
 arg_name 'COUNT'
 command :recent do |c|
+  c.example 'doing recent', desc: 'Show the 10 most recent entries across all sections'
+  c.example 'doing recent 20', desc: 'Show the 20 most recent entries across all sections'
+  c.example 'doing recent --section Currently 20', desc: 'List the 20 most recent entries from the Currently section'
+  c.example 'doing recent --interactive 20', desc: 'Create a menu from the 20 most recent entries to perform batch actions on'
+
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -1475,6 +1514,11 @@ end
 
 desc 'List entries from today'
 command :today do |c|
+  c.example 'doing today', desc: 'List all entries with start dates between 12am and 11:59PM for the current day'
+  c.example 'doing today --section Later', desc: 'List today\'s entries in the Later section'
+  c.example 'doing today --before 3pm --after 12pm', desc: 'List entries with start dates between 12pm and 3pm today'
+  c.example 'doing today --output json', desc: 'Output entries from today in JSON format'
+
   c.desc 'Specify a section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -1526,6 +1570,10 @@ and "2d" would be interpreted as "two days ago." If you use "to" or "through" be
 it will create a range.)
 arg_name 'DATE_STRING'
 command :on do |c|
+  c.example 'doing on friday', desc: 'List entries between 12am and 11:59PM last Friday'
+  c.example 'doing on 12/21/2020', desc: 'List entries from Dec 21, 2020'
+  c.example 'doing on "3d to 1d"', desc: 'List entries added between 3 days ago and 1 day ago'
+
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -1581,6 +1629,9 @@ long_desc %(Date argument can be natural language and are always interpreted as 
 and "2d" would be interpreted as "two days ago.")
 arg_name 'DATE_STRING'
 command :since do |c|
+  c.example 'doing since 7/30', desc: 'List all entries created since 12am on 7/30 of the current year'
+  c.example 'doing since "monday 3pm" --output json', desc: 'Show entries since 3pm on Monday of the current week, output in JSON format'
+
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -1628,6 +1679,10 @@ end
 
 desc 'List entries from yesterday'
 command :yesterday do |c|
+  c.example 'doing yesterday', desc: 'List all entries from the previous day'
+  c.example 'doing yesterday --after 8am --before 5pm', desc: 'List entries from the previous day between 8am and 5pm'
+  c.example 'doing yesterday --totals', desc: 'List entries from previous day, including tag timers'
+
   c.desc 'Specify a section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -1679,6 +1734,14 @@ end
 
 desc 'Show the last entry, optionally edit'
 command :last do |c|
+  c.example 'doing last', desc: 'Show the most recent entry in all sections'
+  c.example 'doing last -s Later', desc: 'Show the most recent entry in the Later section'
+  c.example 'doing last --tag project1,work --bool AND', desc: 'Show most recent entry tagged @project1 and @work'
+  c.example 'doing last --search "side hustle"', desc: 'Show most recent entry containing "side hustle" (fuzzy matching)'
+  c.example 'doing last --search "\'side hustle"', desc: 'Show most recent entry containing "side hustle" (exact match)'
+  c.example 'doing last --edit', desc: 'Open the most recent entry in an editor for modifications'
+  c.example 'doing last --search "\'side hustle" --edit', desc: 'Open most recent entry containing "side hustle" (exact match) in editor'
+
   c.desc 'Specify a section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -1748,6 +1811,8 @@ end
 desc 'Add a new section to the "doing" file'
 arg_name 'SECTION_NAME'
 command :add_section do |c|
+  c.example 'doing add_section Ideas', desc: 'Add a section called Ideas to the doing file'
+
   c.action do |_global_options, _options, args|
     raise Doing::Errors::InvalidArgument, "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
 
@@ -1783,6 +1848,9 @@ Export plugins are available with the `--output` flag on commands that support i
 Import plugins are available using `doing import --type PLUGIN`.
 )
 command :plugins do |c|
+  c.example 'doing plugins', desc: 'List all plugins'
+  c.example 'doing plugins -t import', desc: 'List all import plugins'
+
   c.desc 'List plugins of type (import, export)'
   c.arg_name 'TYPE'
   c.flag %i[t type], must_match: /^[iea].*$/i, default_value: 'all'
@@ -1799,6 +1867,9 @@ desc 'Display a user-created view'
 long_desc 'Command line options override view configuration'
 arg_name 'VIEW_NAME'
 command :view do |c|
+  c.example 'doing view color', desc: 'Display entries according to config for view "color"'
+  c.example 'doing view color --section Archive --count 10', desc: 'Display view "color", overriding some configured settings'
+
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section]
@@ -2001,6 +2072,11 @@ Default with no argument moves items from the "#{settings['current_section']}" s
 arg_name 'SECTION_OR_TAG'
 default_value settings['current_section']
 command %i[archive move] do |c|
+  c.example 'doing archive Currently', desc: 'Move all entries in the Currently section to Archive section'
+  c.example 'doing archive @done', desc: 'Move all entries tagged @done to Archive'
+  c.example 'doing archive --to Later @project1', desc: 'Move all entries tagged @project1 to Later section'
+  c.example 'doing move Later --tag project1 --to Currently', desc: 'Move entries in Later tagged @project1 to Currently (move is an alias for archive)'
+
   c.desc 'How many items to keep (ignored if archiving by tag or search)'
   c.arg_name 'X'
   c.flag %i[k keep], must_match: /^\d+$/, type: Integer
@@ -2058,6 +2134,10 @@ end
 
 desc 'Move entries to archive file'
 command :rotate do |c|
+  c.example 'doing rotate', desc: 'Move all entries in doing file to a dated secondary file'
+  c.example 'doing rotate --section Archive --keep 10', desc: 'Move entries in the Archive section to a secondary file, keeping the most recent 10 entries'
+  c.example 'doing rotate --tag project1,done --bool AND', desc: 'Move entries tagged @project1 and @done to a secondary file'
+
   c.desc 'How many items to keep in each section (most recent)'
   c.arg_name 'X'
   c.flag %i[k keep], must_match: /^\d+$/, type: Integer
@@ -2150,6 +2230,7 @@ command :config do |c|
   c.example 'doing config', desc: "Open an active configuration in #{Doing::Util.find_default_editor('config')}"
   c.example 'doing config -d doing_file', desc: 'Output the value of a config key as YAML'
   c.example 'doing config -d plugins.say.say_voice -o json', desc: 'Output the value of a key path as JSON'
+
   c.desc 'Editor to use'
   c.arg_name 'EDITOR'
   c.flag %i[e editor], default_value: nil
