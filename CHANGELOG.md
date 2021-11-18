@@ -3,6 +3,7 @@
 #### NEW
 
 - If `doing view` and `doing show` are confused, offer option to run the other command
+- `doing completion` to generate shell completion scripts for zsh, bash, and fish
 
 #### IMPROVED
 
@@ -15,7 +16,8 @@
 
 - Remove `--[no]` from non-negatable options
 - `doing plugins -t export -c` not outputting columns
-
+- View config not respecting tag_order setting
+ 
 ### 2.0.5.pre
 
 #### NEW

@@ -2,7 +2,7 @@
 
 Doing uses a TaskPaper-like formatting to keep a plain text record of what you've been doing, complete with tag-based time tracking. The command line tool allows you to add entries, annotate with tags and notes, and view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.0.5.pre
+v2.0.6.pre
 
 === Global Options
 === --config_file arg
@@ -191,6 +191,66 @@ Label moved items with @from(SECTION_NAME)
 
 
 
+==== Command: <tt>autotag </tt>
+Autotag last entry or filtered entries
+
+
+===== Options
+===== --bool BOOLEAN
+
+Boolean (AND|OR|NOT) with which to combine multiple tag filters
+
+[Default Value] AND
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+
+
+===== -c|--count COUNT
+
+How many recent entries to autotag (0 for all)
+
+[Default Value] 1
+[Must Match] (?-mix:^\d+$)
+
+
+===== -s|--section SECTION_NAME
+
+Section
+
+[Default Value] All
+
+
+===== --search QUERY
+
+Autotag entries matching search filter,
+  surround with slashes for regex (e.g. "/query.*/"),
+  start with single quote for exact match ("'query")
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Autotag the last X entries containing TAG.
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool
+
+[Default Value] None
+
+
+===== --force
+Don't ask permission to autotag all entries when count is 0
+
+
+
+===== -i|--interactive
+Select item(s) to tag from a menu of matching entries
+
+
+
+===== -u|--unfinished
+Autotag last entry (or entries) not marked @done
+
+
+
 ==== Command: <tt>cancel  COUNT</tt>
 End last X entries with no time tracked
 
@@ -241,6 +301,26 @@ Select a section to display from a menu
 List available color variables for configuration templates and views
 
 
+==== Command: <tt>completion </tt>
+Generate shell completion scripts
+
+
+===== Options
+===== -f|--file PATH
+
+File to write output to
+
+[Default Value] stdout
+
+
+===== -t|--type SHELL
+
+Shell to generate for (bash, zsh, fish)
+
+[Default Value] zsh
+[Must Match] (?i-mx:^[bzf](?:[ai]?sh)?$)
+
+
 ==== Command: <tt>config  KEY_PATH</tt>
 Edit the configuration file or output a value from it
 
@@ -283,7 +363,7 @@ Format for --dump (json|yaml|raw)
 [Must Match] (?-mix:^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$)
 
 
-===== -d|--[no-]dump
+===== -d|--dump
 Show a config key value based on arguments. Separate key paths with colons or dots, e.g. "export_templates.html". Empty arguments outputs the entire config.
 
 
@@ -762,7 +842,7 @@ Section
 [Default Value] None
 
 
-===== -a|--[no-]archive
+===== -a|--archive
 Archive previous @meanwhile entry
 
 
@@ -937,10 +1017,10 @@ Import plugins are available using `doing import --type PLUGIN`.
 List plugins of type (import, export)
 
 [Default Value] all
-[Must Match] (?i-mx:^[iea].*$)
+[Must Match] (?i-mx:^(?:[iea].*)$)
 
 
-===== -c|--[no-]column
+===== -c|--column
 List in single column for completion
 
 
@@ -1079,7 +1159,7 @@ List sections
 
 
 ===== Options
-===== -c|--[no-]column
+===== -c|--column
 List in single column
 
 
@@ -1140,7 +1220,7 @@ Archive selected items
 
 
 
-===== --[no-]again|--[no-]resume
+===== --again|--resume
 Copy selection as a new entry with current time and no @done tag. Only works with single selections. Can be combined with --editor.
 
 
@@ -1449,7 +1529,7 @@ List in single column for completion
 
 
 
-===== -l|--[no-]list
+===== -l|--list
 List all available templates
 
 
