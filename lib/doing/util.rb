@@ -148,6 +148,8 @@ module Doing
     end
 
     def find_default_editor(editor_for = 'default')
+      # return nil unless $stdout.isatty || ENV['DOING_EDITOR_TEST']
+
       if ENV['DOING_EDITOR_TEST']
         return ENV['EDITOR']
       end

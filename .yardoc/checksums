@@ -2,7 +2,7 @@ lib/doing/hash.rb 516c5a40b713a52f5d2cb73c20df5e84d57c6d66
 lib/doing/item.rb 69ef4f60e970daafed1c708d28ef15dadd09c2e6
 lib/doing/note.rb 84f53a2980a7b23793056e647bbd55a9f04c8cf1
 lib/doing/time.rb d83c862e7fffd841e12150a3d954b445a6003da9
-lib/doing/util.rb e335778cb14fa5098b0bb6fb7684f0da6cba63b7
+lib/doing/util.rb 4793f8193d7366e5072d03c96843e1b7fb71f90d
 lib/doing/wwid.rb 21029a7ba3c0414968ff0b1779f58559e0e0a96d
 lib/doing/array.rb 695309e5b659d47ab0383fecf1dc77a74c237e10
 lib/doing/hooks.rb 00feacdbf24dc67951c49ca8c1ca9a568441920e
@@ -14,7 +14,7 @@ lib/doing/symbol.rb 1729951e207d6ed30bf17ce719b2230dd495b988
 lib/doing/version.rb 2eed30271513448cebe46be379bca7d28bac86eb
 lib/doing/wwidfile.rb c6b09c62751ae43b3b27aa95cc93601f6e5a49ad
 lib/doing/cli_status.rb 96ebd3cdbeca646dd5c151a56ed07147302ab4d8
-lib/doing/log_adapter.rb eb6323c4b0a9e9ff30412d55ecdc16686a90e1dc
+lib/doing/log_adapter.rb 00a4c9f47e8fb6e22019d39717ed61860b804e6b
 lib/doing/configuration.rb 4e4b101901559ecdedffe376fad21359b1870bb0
 lib/doing/plugin_manager.rb fb926e3998bac0b14dd4548b16ece0d32bbe0b9e
 lib/doing/markdown_document_listener.rb 45485f225068a34951ec818a345f642323e5ba35

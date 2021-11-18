@@ -5,6 +5,13 @@ require 'rdoc'
 require 'rdoc/task'
 require 'rake/testtask'
 require 'open3'
+require 'yard'
+
+YARD::Rake::YardocTask.new do |t|
+ t.files = ['lib/doing/*.rb']
+ t.options = ['--markup-provider=redcarpet', '--markup=markdown', '--no-private']
+ # t.stats_options = ['--list-undoc']
+end
 
 Rake::RDocTask.new do |rd|
   rd.main = 'README.md'
@@ -76,4 +83,4 @@ task :bump, :type do |_, args|
   File.open(version_file, 'w+') { |f| f.puts content }
 end
 
-task default: %i[clobber rdoc package]
+task default: %i[clobber yard package]
