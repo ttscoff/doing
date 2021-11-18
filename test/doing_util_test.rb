@@ -38,7 +38,7 @@ class DoingUtilTest < Test::Unit::TestCase
     interval = @wwid.get_interval(item, formatted: false, record: false)
     assert_equal(360, interval, 'Interval should match')
     minutes = interval / 60 % 60
-    res = @wwid.fmt_time(interval)
+    res = @wwid.format_time(interval)
     assert_equal(minutes, res[2], 'Interval array should match')
   end
 

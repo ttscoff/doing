@@ -255,6 +255,7 @@ module Doing
       else
         add = tag
         add += "(#{value})" unless value.nil?
+        title.chomp!
         title += " @#{add}"
 
         title.dedup_tags!
@@ -262,7 +263,7 @@ module Doing
         # Doing.logger.debug('Added tag:', %(#{('@' + tag).cyan} to "#{title}"))
       end
 
-      title
+      title.gsub(/ +/, ' ')
     end
 
     ##

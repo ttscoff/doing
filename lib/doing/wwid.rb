@@ -1178,6 +1178,7 @@ module Doing
             else
               old_title = item.title.dup
               should_date = opt[:date] && item.should_time?
+              item.title.tag!('done', remove: true) if tag =~ /done/ && !should_date
               item.title.tag!(tag, value: should_date ? done_date.strftime('%F %R') : nil)
               added << tag if old_title != item.title
             end
@@ -1997,7 +1998,7 @@ module Doing
 EOS
         sorted_tags_data.reverse.each do |k, v|
           if v > 0
-            output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{'%02d:%02d:%02d' % fmt_time(v)}</td></tr>\n"
+            output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{'%02d:%02d:%02d' % format_time(v)}</td></tr>\n"
           end
         end
         tail = <<EOS
@@ -2008,7 +2009,7 @@ EOS
         <tfoot>
         <tr>
           <td style="text-align:left;"><strong>Total</strong></td>
-          <td style="text-align:left;">#{'%02d:%02d:%02d' % fmt_time(total)}</td>
+          <td style="text-align:left;">#{'%02d:%02d:%02d' % format_time(total)}</td>
         </tr>
         </tfoot>
         </table>
@@ -2022,7 +2023,7 @@ EOS
         EOS
         sorted_tags_data.reverse.each do |k, v|
           if v > 0
-            output += "| #{' ' * (pad - k.length)}#{k} | #{'%02d:%02d:%02d' % fmt_time(v)} |\n"
+            output += "| #{' ' * (pad - k.length)}#{k} | #{'%02d:%02d:%02d' % format_time(v)} |\n"
           end
         end
         tail = "[Tag Totals]"
@@ -2030,13 +2031,46 @@ EOS
       when :json
         output = []
         sorted_tags_data.reverse.each do |k, v|
-          d, h, m = fmt_time(v)
+          d, h, m = format_time(v)
           output << {
             'tag' => k,
             'seconds' => v,
             'formatted' => format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
           }
         end
+        output
+      when :human
+        output = []
+        sorted_tags_data.reverse.each do |k, v|
+          spacer = ''
+          (max - k.length).times do
+            spacer += ' '
+          end
+          d, h, m = format_time(v, human: true)
+          output.push("┃ #{spacer}#{k}:#{format('%<h> 4dh %<m>02dm', h: h, m: m)} ┃")
+        end
+
+        header = '┏━━ Tag Totals '
+        (max - 2).times { header += '━' }
+        header += '┓'
+        footer = '┗'
+        (max + 12).times { footer += '━' }
+        footer += '┛'
+        divider = '┣'
+        (max + 12).times { divider += '━' }
+        divider += '┫'
+        output = output.empty? ? '' : "\n#{header}\n#{output.join("\n")}"
+        d, h, m = format_time(total, human: true)
+        output += "\n#{divider}"
+        spacer = ''
+        (max - 6).times do
+          spacer += ' '
+        end
+        total = "┃ #{spacer}total: "
+        total += format('%<h> 4dh %<m>02dm', h: h, m: m)
+        total += ' ┃'
+        output += "\n#{total}"
+        output += "\n#{footer}"
         output
       else
         output = []
@@ -2045,12 +2079,12 @@ EOS
           (max - k.length).times do
             spacer += ' '
           end
-          d, h, m = fmt_time(v)
+          d, h, m = format_time(v)
           output.push("#{k}:#{spacer}#{format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)}")
         end
 
         output = output.empty? ? '' : "\n--- Tag Totals ---\n#{output.join("\n")}"
-        d, h, m = fmt_time(total)
+        d, h, m = format_time(total)
         output += "\n\nTotal tracked: #{format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)}\n"
         output
       end
@@ -2076,7 +2110,7 @@ EOS
         record_tag_times(item, seconds) if record
         return seconds.positive? ? seconds : false unless formatted
 
-        return seconds.positive? ? format('%02d:%02d:%02d', *fmt_time(seconds)) : false
+        return seconds.positive? ? format('%02d:%02d:%02d', *format_time(seconds)) : false
       end
 
       false
@@ -2106,7 +2140,7 @@ EOS
     ##
     ## @param      seconds  The seconds
     ##
-    def fmt_time(seconds)
+    def format_time(seconds, human: false)
       return [0, 0, 0] if seconds.nil?
 
       if seconds.class == String && seconds =~ /(\d+):(\d+):(\d+)/
@@ -2117,10 +2151,15 @@ EOS
       end
       minutes = (seconds / 60).to_i
       hours = (minutes / 60).to_i
-      days = (hours / 24).to_i
-      hours = (hours % 24).to_i
-      minutes = (minutes % 60).to_i
-      [days, hours, minutes]
+      if human
+        minutes = (minutes % 60).to_i
+        [0, hours, minutes]
+      else
+        days = (hours / 24).to_i
+        hours = (hours % 24).to_i
+        minutes = (minutes % 60).to_i
+        [days, hours, minutes]
+      end
     end
 
     private

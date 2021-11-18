@@ -31,6 +31,8 @@ module Doing
       'never_time' => [],
       'never_finish' => [],
 
+      'timer_format' => 'text',
+
       'templates' => {
         'default' => {
           'date_format' => '%Y-%m-%d %H:%M',
