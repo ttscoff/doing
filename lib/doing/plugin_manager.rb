@@ -113,7 +113,7 @@ module Doing
       ##
       def list_plugins(options = {})
         separator = options[:column] ? "\n" : "\t"
-        type = options[:type].nil? || options[:type] =~ /all/i ? 'all' : [valid_type(options[:type])]
+        type = options[:type].nil? || options[:type] =~ /all/i ? 'all' : valid_type(options[:type])
 
         case type
         when :import

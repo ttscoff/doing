@@ -2,53 +2,61 @@
 
 module Doing
   module Errors
-
     class UserCancelled < ::StandardError
-      def initialize(msg='Cancelled')
+      def initialize(msg = 'Cancelled', topic = 'Exited:')
         Doing.logger.output_results
-        Doing.logger.log_now(:warn, 'Exited:', msg)
+        Doing.logger.log_now(:warn, topic, msg)
         Process.exit 1
       end
     end
 
     class EmptyInput < ::StandardError
-      def initialize(msg='No input')
+      def initialize(msg = 'No input', topic = 'Exited:')
         Doing.logger.output_results
-        Doing.logger.log_now(:warn, 'Exited:', 'Input empty')
+        Doing.logger.log_now(:warn, topic, msg)
         Process.exit 1
       end
     end
 
     class DoingStandardError < ::StandardError
-      def initialize(msg='')
+      def initialize(msg = '')
         Doing.logger.output_results
 
         super
+      end
+    end
+
+    class WrongCommand < ::StandardError
+      def initialize(msg = 'wrong command', topic = 'Error:')
+        Doing.logger.warn(topic, msg)
+
+        super(msg)
       end
     end
 
     class DoingRuntimeError < ::RuntimeError
-      def initialize(msg='')
+      def initialize(msg = 'Runtime Error', topic: 'Error:')
         Doing.logger.output_results
-
-        super
+        Doing.logger.log_now(:error, topic, msg)
+        Process.exit 1
       end
     end
 
     class NoResults < ::StandardError
-      def initialize(msg='No results')
+      def initialize(msg = 'No results', topic = 'Exited:')
         Doing.logger.output_results
+        Doing.logger.log_now(:warn, topic, msg)
         Process.exit 0
 
       end
     end
 
     class DoingNoTraceError < ::StandardError
-      def initialize(msg = nil, level = nil)
+      def initialize(msg = nil, level = nil, topic = nil)
         level ||= :error
         Doing.logger.output_results
         if msg
-          Doing.logger.log_now(level, msg)
+          Doing.logger.log_now(level, topic, msg)
         end
 
         Process.exit 1
@@ -58,7 +66,7 @@ module Doing
     class PluginException < ::StandardError
       attr_reader :plugin
 
-      def initialize(msg = 'Plugin error', type: nil, plugin: nil)
+      def initialize(msg = 'Plugin error', type = nil, plugin = nil)
         @plugin = plugin || 'Unknown Plugin'
 
         type ||= 'Unknown'
@@ -73,8 +81,7 @@ module Doing
 
         msg = "(#{@type}: #{@plugin}) #{msg}"
 
-        Doing.logger.error('Plugin Error:', msg)
-        Doing.logger.output_results
+        Doing.logger.log_now(:error, 'Plugin:', msg)
         Process.exit 1
       end
     end

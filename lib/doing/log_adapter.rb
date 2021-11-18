@@ -18,17 +18,17 @@ module Doing
       error: ::Logger::ERROR
     }.freeze
 
-    COUNT_KEYS = [
-      :added_tags,
-      :removed_tags,
-      :added,
-      :updated,
-      :deleted,
-      :completed,
-      :archived,
-      :moved,
-      :completed_archived,
-      :skipped
+    COUNT_KEYS = %i[
+      added_tags
+      removed_tags
+      added
+      updated
+      deleted
+      completed
+      archived
+      moved
+      completed_archived
+      skipped
     ].freeze
 
     #
@@ -293,6 +293,22 @@ module Doing
       end
     end
 
+    def output_results
+      total_counters
+
+      results = @results.select { |msg| write_message?(msg[:level]) }.uniq
+
+      if @logdev == $stdout
+        $stdout.print results.map {|res| res[:message].uncolor }.join("\n")
+      else
+        results.each do |msg|
+          @logdev.puts color_message(msg[:level], msg[:message])
+        end
+      end
+    end
+
+    private
+
     def color_message(level, topic, message = nil, &block)
       colors = Doing::Color
       message = message(topic, message, &block)
@@ -323,20 +339,6 @@ module Doing
       end
 
       "#{prefix} #{message.highlight_tags}#{colors.reset}"
-    end
-
-    def output_results
-      total_counters
-
-      results = @results.select { |msg| write_message?(msg[:level]) }.uniq
-
-      if @logdev == $stdout
-        $stdout.print results.map {|res| res[:message].uncolor }.join("\n")
-      else
-        results.each do |msg|
-          @logdev.puts color_message(msg[:level], msg[:message])
-        end
-      end
     end
   end
 end

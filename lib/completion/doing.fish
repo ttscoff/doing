@@ -1,50 +1,50 @@
 function __fish_doing_needs_command
-  # Figure out if the current invocation already has a command.
+	# Figure out if the current invocation already has a command.
 
-  set -l opts h-help config_file= f-doing_file= n-notes v-version stdout d-debug default x-noauto
-  set cmd (commandline -opc)
-  set -e cmd[1]
-  argparse -s $opts -- $cmd 2>/dev/null
-  or return 0
-  # These flags function as commands, effectively.
-  if set -q argv[1]
-    # Also print the command, so this can be used to figure out what it is.
-    echo $argv[1]
-    return 1
-  end
-  return 0
+	set -l opts h-help config_file= f-doing_file= n-notes v-version stdout d-debug default x-noauto
+	set cmd (commandline -opc)
+	set -e cmd[1]
+	argparse -s $opts -- $cmd 2>/dev/null
+	or return 0
+	# These flags function as commands, effectively.
+	if set -q argv[1]
+		# Also print the command, so this can be used to figure out what it is.
+		echo $argv[1]
+		return 1
+	end
+	return 0
 end
 
 function __fish_doing_using_command
-  set -l cmd (__fish_doing_needs_command)
-  test -z "$cmd"
-  and return 1
-  contains -- $cmd $argv
-  and return 0
+	set -l cmd (__fish_doing_needs_command)
+	test -z "$cmd"
+	and return 1
+	contains -- $cmd $argv
+	and return 0
 end
 
 function __fish_doing_complete_sections
-  doing sections -c
+	doing sections -c
 end
 
 function __fish_doing_complete_views
-  doing views -c
+	doing views -c
 end
 
 function __fish_doing_subcommands
-  doing help -c
+	doing help -c
 end
 
 function __fish_doing_export_plugins
-  doing plugins --type export -c
+	doing plugins --type export -c
 end
 
 function __fish_doing_import_plugins
-  doing plugins --type import -c
+	doing plugins --type import -c
 end
 
 function __fish_doing_complete_templates
-  doing template -c
+	doing template -c
 end
 
 complete -c doing -f
@@ -54,7 +54,6 @@ complete -f -c doing -n '__fish_doing_using_command show' -a '(__fish_doing_comp
 complete -f -c doing -n '__fish_doing_using_command view' -a '(__fish_doing_complete_views)'
 complete -f -c doing -n '__fish_doing_using_command template' -a '(__fish_doing_complete_templates)'
 complete -f -c doing -s t -l type -x -n '__fish_doing_using_command import' -a '(__fish_doing_import_plugins)'
-
 
 complete -xc doing -n '__fish_doing_needs_command' -a 'add_section' -d Add\ a\ new\ section\ to\ the\ \"doing\"\ file
 complete -xc doing -n '__fish_doing_needs_command' -a 'again resume' -d Repeat\ last\ entry\ as\ new\ entry
@@ -90,6 +89,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'undo' -d Undo\ the\ last\
 complete -xc doing -n '__fish_doing_needs_command' -a 'view' -d Display\ a\ user-created\ view
 complete -xc doing -n '__fish_doing_needs_command' -a 'views' -d List\ available\ custom\ views
 complete -xc doing -n '__fish_doing_needs_command' -a 'yesterday' -d List\ entries\ from\ yesterday
+complete -xc doing -n '__fish_seen_subcommand_from help; and not __fish_seen_subcommand_from (doing help -c)' -a "(doing help -c)"
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command again resume' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command again resume' -d Edit\ duplicated\ entry\ with\ before\ adding
 complete -c doing -l in  -f -r -n '__fish_doing_using_command again resume' -d Add\ new\ entry\ to\ section

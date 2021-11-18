@@ -209,11 +209,12 @@ module Doing
       title
     end
 
-    def tag!(tag, value: nil, remove: false, rename_to: nil, regex: false)
-      replace tag(tag, value: value, remove: remove, rename_to: rename_to, regex: regex)
+    def tag!(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)
+      replace tag(tag, value: value, remove: remove, rename_to: rename_to, regex: regex, single: single)
     end
 
-    def tag(tag, value: nil, remove: false, rename_to: nil, regex: false)
+    def tag(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)
+      log_level = single ? :info : :debug
       title = dup
       title.chomp!
       tag = tag.sub(/^@?/, '')
@@ -241,10 +242,10 @@ module Doing
           if rename_to
             f = "@#{tag}".cyan
             t = "@#{rename_to}".cyan
-            Doing.logger.debug('Tag:', %(renamed #{f} to #{t} in "#{title}"))
+            Doing.logger.write(log_level, 'Tag:', %(renamed #{f} to #{t} in "#{title}"))
           else
             f = "@#{tag}".cyan
-            Doing.logger.debug('Tag:', %(removed #{f} from "#{title}"))
+            Doing.logger.write(log_level, 'Tag:', %(removed #{f} from "#{title}"))
           end
         else
           Doing.logger.debug('Skipped:', "not tagged #{"@#{tag}".cyan}")
@@ -260,7 +261,7 @@ module Doing
 
         title.dedup_tags!
         title.chomp!
-        # Doing.logger.debug('Added tag:', %(#{('@' + tag).cyan} to "#{title}"))
+        Doing.logger.write(log_level, 'Tag:', %(added #{('@' + tag).cyan} to "#{title}"))
       end
 
       title.gsub(/ +/, ' ')

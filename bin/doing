@@ -57,8 +57,8 @@ config = Doing.config
 settings = config.settings
 wwid.config = settings
 
-if config.settings.dig('plugins', 'command_path')
-  commands_from File.expand_path(config.settings.dig('plugins', 'command_path'))
+if settings.dig('plugins', 'command_path')
+  commands_from File.expand_path(settings.dig('plugins', 'command_path'))
 end
 
 program_desc 'A CLI for a What Was I Doing system'
@@ -137,7 +137,7 @@ command %i[now next] do |c|
     if options[:back]
       date = wwid.chronify(options[:back], guess: :begin)
 
-      raise Doing::Errors::InvalidTimeExpression, 'Unable to parse date string' if date.nil?
+      raise InvalidTimeExpression.new('unable to parse date string', topic: 'Date parser:') if date.nil?
     else
       date = Time.now
     end
@@ -149,13 +149,13 @@ command %i[now next] do |c|
     end
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero?)
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input = ''
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
 
-      raise Doing::Errors::EmptyInput, 'No content' if input.empty?
+      raise EmptyInput, 'No content' if input.empty?
 
       title, note = wwid.format_input(input)
       note.push(options[:n]) if options[:n]
@@ -173,7 +173,7 @@ command %i[now next] do |c|
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
       wwid.write(wwid.doing_file)
     else
-      raise Doing::Errors::EmptyInput, 'You must provide content when creating a new entry'
+      raise EmptyInput, 'You must provide content when creating a new entry'
     end
   end
 end
@@ -291,7 +291,7 @@ command :note do |c|
     new_note = Doing::Note.new
 
     if options[:e] || (args.empty? && $stdin.stat.size.zero? && !options[:r])
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input = !args.empty? ? args.join(' ') : ''
 
@@ -312,7 +312,7 @@ command :note do |c|
     elsif $stdin.stat.size.positive?
       new_note.add($stdin.read)
     else
-      raise Doing::Errors::EmptyInput, 'You must provide content when adding a note' unless options[:remove]
+      raise EmptyInput, 'You must provide content when adding a note' unless options[:remove]
     end
 
     if last_note.equal?(new_note)
@@ -338,7 +338,7 @@ command :meanwhile do |c|
   c.switch %i[e editor], negatable: false, default_value: false
 
   c.desc 'Archive previous @meanwhile entry'
-  c.switch %i[a archive], default_value: false
+  c.switch %i[a archive], negatable: false, default_value: false
 
   c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
   c.arg_name 'DATE_STRING'
@@ -352,7 +352,7 @@ command :meanwhile do |c|
     if options[:back]
       date = wwid.chronify(options[:back], guess: :begin)
 
-      raise Doing::Errors::InvalidTimeExpression, 'Unable to parse date string' if date.nil?
+      raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
     else
       date = Time.now
     end
@@ -365,7 +365,7 @@ command :meanwhile do |c|
     input = ''
 
     if options[:e]
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
@@ -403,7 +403,7 @@ long_desc %(
 arg_name 'TYPE', must_match: Doing::Plugins.template_regex
 command :template do |c|
   c.desc 'List all available templates'
-  c.switch %i[l list]
+  c.switch %i[l list], negatable: false
 
   c.desc 'List in single column for completion'
   c.switch %i[c]
@@ -424,7 +424,7 @@ command :template do |c|
       type = args[0]
     end
 
-    raise Doing::Errors::InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" unless type
+    raise InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" unless type
 
     $stdout.puts Doing::Plugins.template_for_trigger(type)
 
@@ -503,12 +503,12 @@ command :select do |c|
   c.flag %i[o output]
 
   c.desc "Copy selection as a new entry with current time and no @done tag. Only works with single selections. Can be combined with --editor."
-  c.switch %i[again resume]
+  c.switch %i[again resume], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    raise Doing::Errors::InvalidArgument, '--no-menu requires --query' if !options[:menu] && !options[:query]
+    raise InvalidArgument, '--no-menu requires --query' if !options[:menu] && !options[:query]
 
     wwid.interactive(options)
   end
@@ -531,17 +531,17 @@ command :later do |c|
   c.action do |_global_options, options, args|
     if options[:back]
       date = wwid.chronify(options[:back], guess: :begin)
-      raise Doing::Errors::InvalidTimeExpression, 'Unable to parse date string' if date.nil?
+      raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
     else
       date = Time.now
     end
 
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input = args.empty? ? '' : args.join(' ')
       input = wwid.fork_editor(input).strip
-      raise Doing::Errors::EmptyInput, 'No content' unless input && !input.empty?
+      raise EmptyInput, 'No content' unless input && !input.empty?
 
       title, note = wwid.format_input(input)
       note.push(options[:n]) if options[:n]
@@ -558,7 +558,7 @@ command :later do |c|
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
     else
-      raise Doing::Errors::EmptyInput, 'You must provide content when creating a new entry'
+      raise EmptyInput, 'You must provide content when creating a new entry'
     end
   end
 end
@@ -614,19 +614,19 @@ command %i[done did] do |c|
 
     if options[:took]
       took = wwid.chronify_qty(options[:took])
-      raise Doing::Errors::InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
+      raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
     end
 
     if options[:back]
       date = wwid.chronify(options[:back], guess: :begin)
-      raise Doing::Errors::InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
+      raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
     else
       date = options[:took] ? Time.now - took : Time.now
     end
 
     if options[:at]
       finish_date = wwid.chronify(options[:at], guess: :begin)
-      raise Doing::Errors::InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
+      raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
       date = options[:took] ? finish_date - took : finish_date
     elsif options[:took]
@@ -651,7 +651,7 @@ command %i[done did] do |c|
     note.add(options[:note]) if options[:note]
 
     if options[:editor]
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
       is_new = false
 
       if args.empty?
@@ -659,7 +659,7 @@ command %i[done did] do |c|
 
         unless last_entry
           Doing.logger.debug('Skipped:', options[:unfinished] ? 'No unfinished entry' : 'Last entry already @done')
-          raise Doing::Errors::NoResults, 'No results'
+          raise NoResults, 'No results'
         end
 
         old_entry = last_entry.dup
@@ -671,7 +671,7 @@ command %i[done did] do |c|
       end
 
       input = wwid.fork_editor(input).strip
-      raise Doing::Errors::EmptyInput, 'No content' unless input && !input.empty?
+      raise EmptyInput, 'No content' unless input && !input.empty?
 
       title, note = wwid.format_input(input)
       new_entry = Doing::Item.new(date, title, section, note)
@@ -746,7 +746,7 @@ command %i[done did] do |c|
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     else
-      raise Doing::Errors::EmptyInput, 'You must provide content when creating a new entry'
+      raise EmptyInput, 'You must provide content when creating a new entry'
     end
   end
 end
@@ -789,9 +789,9 @@ command :cancel do |c|
       tags = options[:tag].to_tags
     end
 
-    raise Doing::Errors::InvalidArgument, 'Only one argument allowed' if args.length > 1
+    raise InvalidArgument, 'Only one argument allowed' if args.length > 1
 
-    raise Doing::Errors::InvalidArgument, 'Invalid argument (specify number of recent items to mark @done)' unless args.empty? || args[0] =~ /\d+/
+    raise InvalidArgument, 'Invalid argument (specify number of recent items to mark @done)' unless args.empty? || args[0] =~ /\d+/
 
     if options[:interactive]
       count = 0
@@ -873,22 +873,22 @@ command :finish do |c|
     unless options[:auto]
       if options[:took]
         took = wwid.chronify_qty(options[:took])
-        raise Doing::Errors::InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
+        raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
       end
 
-      raise Doing::Errors::InvalidArgument, '--back and --took can not be used together' if options[:back] && options[:took]
+      raise InvalidArgument, '--back and --took can not be used together' if options[:back] && options[:took]
 
-      raise Doing::Errors::InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
+      raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 
       if options[:at]
         finish_date = wwid.chronify(options[:at], guess: :begin)
-        raise Doing::Errors::InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
+        raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
         date = options[:took] ? finish_date - took : finish_date
       elsif options[:back]
         date = wwid.chronify(options[:back])
 
-        raise Doing::Errors::InvalidTimeExpression, 'Unable to parse date string' if date.nil?
+        raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
       elsif options[:took]
         date = wwid.chronify_qty(options[:took])
       else
@@ -902,9 +902,9 @@ command :finish do |c|
       tags = options[:tag].to_tags
     end
 
-    raise Doing::Errors::InvalidArgument, 'Only one argument allowed' if args.length > 1
+    raise InvalidArgument, 'Only one argument allowed' if args.length > 1
 
-    raise Doing::Errors::InvalidArgument, 'Invalid argument (specify number of recent items to mark @done)' unless args.length == 0 || args[0] =~ /\d+/
+    raise InvalidArgument, 'Invalid argument (specify number of recent items to mark @done)' unless args.length == 0 || args[0] =~ /\d+/
 
     if options[:interactive]
       count = 0
@@ -1045,9 +1045,9 @@ command :tag do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
-    raise Doing::Errors::MissingArgument, 'You must specify at least one tag' if args.empty? && !options[:autotag]
+    raise MissingArgument, 'You must specify at least one tag' if args.empty? && !options[:autotag]
 
-    raise Doing::Errors::InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
+    raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 
     section = 'All'
 
@@ -1162,7 +1162,7 @@ command [:mark, :flag] do |c|
   c.action do |_global_options, options, _args|
     mark = settings['marker_tag'] || 'flagged'
 
-    raise Doing::Errors::InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
+    raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 
     section = 'All'
 
@@ -1294,8 +1294,8 @@ command :show do |c|
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
-  c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+  c.action do |global_options, options, args|
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     tag_filter = false
     tags = []
@@ -1310,8 +1310,15 @@ command :show do |c|
       when /^@/
         section = 'All'
       else
-        section = wwid.guess_section(args[0])
-        raise Doing::Errors::InvalidSection, "No such section: #{args[0]}" unless section
+        begin
+          section = wwid.guess_section(args[0])
+        rescue WrongCommand => exception
+          cmd = commands[:view]
+          action = cmd.send(:get_action, nil)
+          return action.call(global_options, options, args)
+        end
+
+        raise InvalidSection, "No such section: #{args[0]}" unless section
 
         args.shift
       end
@@ -1346,7 +1353,7 @@ command :show do |c|
         start = wwid.chronify(date_string, guess: :begin)
         finish = false
       end
-      raise Doing::Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
+      raise InvalidTimeExpression, 'Unrecognized date string' unless start
       dates = [start, finish]
     end
 
@@ -1420,7 +1427,7 @@ command %i[grep search] do |c|
   c.switch %i[i interactive], default_value: false, negatable: false
 
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
 
@@ -1535,7 +1542,7 @@ command :today do |c|
   c.flag [:after]
 
   c.action do |_global_options, options, _args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -1582,9 +1589,9 @@ command :on do |c|
   c.flag %i[o output]
 
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    raise Doing::Errors::MissingArgument, 'Missing date argument' if args.empty?
+    raise MissingArgument, 'Missing date argument' if args.empty?
 
     date_string = args.join(' ')
 
@@ -1597,7 +1604,7 @@ command :on do |c|
       finish = false
     end
 
-    raise Doing::Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
+    raise InvalidTimeExpression, 'Unrecognized date string' unless start
 
     message = "Date interpreted as #{start}"
     message += " to #{finish}" if finish
@@ -1640,9 +1647,9 @@ command :since do |c|
   c.flag %i[o output]
 
   c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    raise Doing::Errors::MissingArgument, 'Missing date argument' if args.empty?
+    raise MissingArgument, 'Missing date argument' if args.empty?
 
     date_string = args.join(' ')
 
@@ -1652,7 +1659,7 @@ command :since do |c|
     start = wwid.chronify(date_string, guess: :begin)
     finish = Time.now
 
-    raise Doing::Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
+    raise InvalidTimeExpression, 'Unrecognized date string' unless start
 
     Doing.logger.debug("Date interpreted as #{start} through the current time")
 
@@ -1703,7 +1710,7 @@ command :yesterday do |c|
   c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
 
   c.action do |_global_options, options, _args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
@@ -1749,7 +1756,7 @@ command :last do |c|
   c.flag [:search]
 
   c.action do |global_options, options, _args|
-    raise Doing::Errors::InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
+    raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
 
     if options[:tag].nil?
       tags = []
@@ -1778,7 +1785,7 @@ end
 desc 'List sections'
 command :sections do |c|
   c.desc 'List in single column'
-  c.switch %i[c column], default_value: false
+  c.switch %i[c column], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
     joiner = options[:c] ? "\n" : "\t"
@@ -1801,7 +1808,7 @@ command :add_section do |c|
   c.example 'doing add_section Ideas', desc: 'Add a section called Ideas to the doing file'
 
   c.action do |_global_options, _options, args|
-    raise Doing::Errors::InvalidArgument, "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
+    raise InvalidArgument, "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
 
     wwid.add_section(args.join(' ').cap_first)
     wwid.write(wwid.doing_file)
@@ -1840,10 +1847,10 @@ command :plugins do |c|
 
   c.desc 'List plugins of type (import, export)'
   c.arg_name 'TYPE'
-  c.flag %i[t type], must_match: /^[iea].*$/i, default_value: 'all'
+  c.flag %i[t type], must_match: /^(?:[iea].*)$/i, default_value: 'all'
 
   c.desc 'List in single column for completion'
-  c.switch %i[c column], default_value: false
+  c.switch %i[c column], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
     Doing::Plugins.list_plugins(options)
@@ -1896,7 +1903,7 @@ command :view do |c|
 
   c.desc 'Tag sort direction (asc|desc)'
   c.arg_name 'DIRECTION'
-  c.flag [:tag_order], must_match: REGEX_SORT_ORDER
+  c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
 
   c.desc 'View entries older than date'
   c.arg_name 'DATE_STRING'
@@ -1912,15 +1919,22 @@ command :view do |c|
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
 
-  c.action do |_global_options, options, args|
-    raise InvalidExportType, "Invalid export type: #{options[:output]}" if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+  c.action do |global_options, options, args|
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    raise Doing::Errors::InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
+    raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
 
     title = if args.empty?
               wwid.choose_view
             else
-              wwid.guess_view(args[0])
+              begin
+                wwid.guess_view(args[0])
+              rescue WrongCommand => exception
+                cmd = commands[:show]
+                options[:sort] = 'asc'
+                action = cmd.send(:get_action, nil)
+                return action.call(global_options, options, args)
+              end
             end
 
     if options[:section]
@@ -2010,7 +2024,7 @@ command :view do |c|
           start = wwid.chronify(date_string, guess: :begin)
           finish = false
         end
-        raise Doing::Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
+        raise InvalidTimeExpression, 'Unrecognized date string' unless start
         dates = [start, finish]
       end
 
@@ -2035,7 +2049,7 @@ command :view do |c|
     elsif title.instance_of?(FalseClass)
       exit_now! 'Cancelled'
     else
-      raise Doing::Errors::InvalidView, "View #{title} not found in config"
+      raise InvalidView, "View #{title} not found in config"
     end
   end
 end
@@ -2106,7 +2120,7 @@ command %i[archive move] do |c|
       tags = args.length > 1 ? args[1..].map { |t| t.sub(/^@/, '').strip } : []
     end
 
-    raise Doing::Errors::InvalidArgument, '--keep and --count can not be used together' if options[:keep] && options[:count]
+    raise InvalidArgument, '--keep and --count can not be used together' if options[:keep] && options[:count]
 
     tags.concat(options[:tag].to_tags) if options[:tag]
 
@@ -2195,7 +2209,7 @@ command :open do |c|
         system %(open "#{File.expand_path(wwid.doing_file)}")
       end
     else
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       system %(#{Doing::Util.default_editor} "#{File.expand_path(wwid.doing_file)}")
     end
@@ -2223,7 +2237,7 @@ command :config do |c|
   c.flag %i[e editor], default_value: nil
 
   c.desc 'Show a config key value based on arguments. Separate key paths with colons or dots, e.g. "export_templates.html". Empty arguments outputs the entire config.'
-  c.switch %i[d dump]
+  c.switch %i[d dump], negatable: false
 
   c.desc 'Format for --dump (json|yaml|raw)'
   c.arg_name 'FORMAT'
@@ -2248,7 +2262,6 @@ command :config do |c|
   c.action do |_global_options, options, args|
     if options[:update]
       config.configure({rewrite: true, ignore_local: true})
-      # Doing.logger.warn("Config file rewritten: #{config.config_file}")
       return
     end
 
@@ -2263,7 +2276,6 @@ command :config do |c|
                      when /^r/
                        cfg
                      else
-                       # cfg = { last_key => cfg } unless last_key.nil?
                        YAML.dump(cfg)
                      end
       else
@@ -2278,7 +2290,7 @@ command :config do |c|
       choices.concat(config.additional_configs)
       res = wwid.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to edit > ')
 
-      raise Doing::Errors::UserCancelled, 'Cancelled' unless res
+      raise UserCancelled, 'Cancelled' unless res
 
       config_file = res.strip || config.config_file
     else
@@ -2295,7 +2307,7 @@ command :config do |c|
             `open -a "#{editor}" "#{config_file}"`
           end
         else
-          raise Doing::Errors::InvalidArgument, 'No viable editor found in config or environment.'
+          raise InvalidArgument, 'No viable editor found in config or environment.'
         end
       elsif options[:a] || options[:b]
         if options[:a]
@@ -2306,7 +2318,7 @@ command :config do |c|
       else
         editor = options[:e] || Doing::Util.find_default_editor('config')
 
-        raise Doing::Errors::MissingEditor, 'No viable editor defined in config or environment' unless editor
+        raise MissingEditor, 'No viable editor defined in config or environment' unless editor
 
         if Doing::Util.exec_available(editor)
           system %(#{editor} "#{config_file}")
@@ -2316,7 +2328,7 @@ command :config do |c|
       end
     else
       editor = options[:e] || Doing::Util.default_editor
-      raise Doing::Errors::MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor)
+      raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor)
 
       system %(#{editor} "#{config_file}")
     end
@@ -2400,7 +2412,7 @@ command :import do |c|
         start = wwid.chronify(date_string, guess: :begin)
         finish = false
       end
-      raise Doing::Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
+      raise InvalidTimeExpression, 'Unrecognized date string' unless start
       dates = [start, finish]
     end
 
@@ -2410,7 +2422,7 @@ command :import do |c|
       wwid.import(args, options)
       wwid.write(wwid.doing_file)
     else
-      raise Doing::Errors::InvalidPluginType, "Invalid import type: #{options[:type]}"
+      raise InvalidPluginType, "Invalid import type: #{options[:type]}"
     end
   end
 end

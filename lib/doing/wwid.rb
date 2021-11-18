@@ -123,9 +123,9 @@ module Doing
     ## @param      input  (String) Text input for editor
     ##
     def fork_editor(input = '')
-      # raise Errors::NonInteractive, 'Non-interactive terminal' unless $stdout.isatty || ENV['DOING_EDITOR_TEST']
+      # raise NonInteractive, 'Non-interactive terminal' unless $stdout.isatty || ENV['DOING_EDITOR_TEST']
 
-      raise Errors::MissingEditor, 'No EDITOR variable defined in environment' if Util.default_editor.nil?
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Util.default_editor.nil?
 
       tmpfile = Tempfile.new(['doing', '.md'])
 
@@ -173,11 +173,11 @@ module Doing
     ## @return     (Array) [(String)title, (Note)note]
     ##
     def format_input(input)
-      raise Errors::EmptyInput, 'No content in entry' if input.nil? || input.strip.empty?
+      raise EmptyInput, 'No content in entry' if input.nil? || input.strip.empty?
 
       input_lines = input.split(/[\n\r]+/).delete_if(&:ignore?)
       title = input_lines[0]&.strip
-      raise Errors::EmptyInput, 'No content in first line' if title.nil? || title.strip.empty?
+      raise EmptyInput, 'No content in first line' if title.nil? || title.strip.empty?
 
       note = Note.new
       note.add(input_lines[1..-1]) if input_lines.length > 1
@@ -209,7 +209,7 @@ module Doing
     ##
     def chronify(input, future: false, guess: :begin)
       now = Time.now
-      raise Errors::InvalidTimeExpression, "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
+      raise InvalidTimeExpression, "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
 
       secs_ago = if input.match(/^(\d+)$/)
                    # plain number, assume minutes
@@ -277,8 +277,7 @@ module Doing
     ##
     def add_section(title)
       if @content.key?(title.cap_first)
-        logger.debug('Skipped': 'Section already exists')
-        return
+        raise InvalidSection, %(section "#{title.cap_first}" already exists)
       end
 
       @content[title.cap_first] = { :original => "#{title}:", :items => [] }
@@ -311,11 +310,13 @@ module Doing
       unless section || guessed
         alt = guess_view(frag, guessed: true, suggest: true)
         if alt
-          meant_view = yn("Did you mean `doing view #{alt}`?", default_response: 'n')
-          raise Errors::InvalidSection, "Run again with `doing view #{alt}`" if meant_view
+          meant_view = yn("#{Color.boldwhite}Did you mean `#{Color.yellow}doing view #{alt}#{Color.boldwhite}`?", default_response: 'n')
+
+          raise WrongCommand.new("run again with #{"doing view #{alt}".boldwhite}", topic: 'Try again:') if meant_view
+
         end
 
-        res = yn("Section #{frag} not found, create it", default_response: 'n')
+        res = yn("#{Color.boldwhite}Section #{frag.yellow}#{Color.boldwhite} not found, create it", default_response: 'n')
 
         if res
           add_section(frag.cap_first)
@@ -323,7 +324,7 @@ module Doing
           return frag.cap_first
         end
 
-        raise Errors::InvalidSection, "Unknown section: #{frag}"
+        raise InvalidSection.new("unknown section #{frag.yellow}", topic: 'Missing:')
       end
       section ? section.cap_first : guessed
     end
@@ -398,11 +399,12 @@ module Doing
         break
       end
       unless view || guessed
-        guess = guess_section(frag, guessed: true, suggest: true)
-        exit_now! "Did you mean `doing show #{guess}`?" if guess
+        alt = guess_section(frag, guessed: true, suggest: true)
+        meant_view = yn("Did you mean `doing show #{alt}`?", default_response: 'n')
 
-        raise Errors::InvalidView, "Unknown view: #{frag}"
+        raise WrongCommand.new("run again with #{"doing show #{alt}".yellow}", topic: 'Try again:') if meant_view
 
+        raise InvalidView.new(%(unkown view #{alt.yellow}), topic: 'Missing:')
       end
       view
     end
@@ -448,8 +450,8 @@ module Doing
       end
 
       items.push(entry)
-      logger.count(:added)
-      logger.debug('Entry added:', %("#{entry.title}" to #{section}))
+      # logger.count(:added, level: :debug)
+      logger.info('New entry:', %(added "#{entry.title}" to #{section}))
     end
 
     ##
@@ -471,8 +473,8 @@ module Doing
           duped = no_overlap ? item.overlapping_time?(comp) : item.same_time?(comp)
           break if duped
         end
-        logger.count(:skipped, level: :debug, message: 'overlapping entry') if duped
-        logger.log_now(:debug, 'Skipped:', "overlapping entry: #{item.title}") if duped
+        logger.count(:skipped, level: :debug, message: 'overlapping %item') if duped
+        # logger.log_now(:debug, 'Skipped:', "overlapping entry: #{item.title}") if duped
         duped
       end
     end
@@ -509,7 +511,7 @@ module Doing
 
       last_item = last_entry({ section: section })
 
-      raise Errors::NoEntryError, 'No entry found' unless last_item
+      raise NoEntryError, 'No entry found' unless last_item
 
       logger.log_now(:info, 'Edit note:', last_item.title)
 
@@ -522,7 +524,7 @@ module Doing
       if resume
         item.tag('done', remove: true)
       end
-      Doing.logger.info('Reset:', %(Reset #{resume ? 'and resumed ' : ''} "#{item.title}" in #{item.section}))
+      logger.info('Reset:', %(Reset #{resume ? 'and resumed ' : ''} "#{item.title}" in #{item.section}))
       item
     end
 
@@ -550,7 +552,7 @@ module Doing
         title, note = format_input(new_item)
 
         if title.nil? || title.empty?
-          logger.debug('Skipped:', 'No content provided')
+          logger.warn('Skipped:', 'No content provided')
           return
         end
       end
@@ -573,7 +575,7 @@ module Doing
 
       last = last_entry(opt)
       if last.nil?
-        logger.debug('Skipped:', 'No previous entry found')
+        logger.warn('Skipped:', 'No previous entry found')
         return
       end
 
@@ -759,10 +761,7 @@ module Doing
 
       selection = choose_from_items(items, opt, include_section: section =~ /^all$/i)
 
-      if selection.empty?
-        logger.debug('Skipped:', 'No selection')
-        return
-      end
+      raise NoResults, 'no items selected' if selection.empty?
 
       act_on(selection, opt)
     end
@@ -807,7 +806,7 @@ module Doing
       fzf_args.push('-1') unless opt[:show_if_single]
 
       unless opt[:menu]
-        raise Errors::InvalidArgument, "Can't skip menu when no query is provided" unless opt[:query]
+        raise InvalidArgument, "Can't skip menu when no query is provided" unless opt[:query] && !opt[:query].empty?
 
         fzf_args.concat([%(--filter="#{opt[:query]}"), opt[:sort] ? '' : '--no-sort'])
       end
@@ -823,8 +822,10 @@ module Doing
     end
 
     def act_on(items, opt = {})
-      actions = %i[editor delete tag flag finish cancel archive output save_to]
+      actions = %i[editor delete tag flag finish cancel archive output save_to again resume]
       has_action = false
+      single = items.count == 1
+
       actions.each do |a|
         if opt[a]
           has_action = true
@@ -864,7 +865,7 @@ module Doing
             opt[:reset] = true
           when /(add|remove) tag/
             type = action =~ /^add/ ? 'add' : 'remove'
-            raise Errors::InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
+            raise InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
 
             print "#{Color.yellow}Tag to #{type}: #{Color.reset}"
             tag = $stdin.gets
@@ -879,7 +880,7 @@ module Doing
             next if tag =~ /^ *$/
 
             unless output_format
-              raise Errors::UserCancelled, 'Cancelled'
+              raise UserCancelled, 'Cancelled'
             end
 
             opt[:output] = output_format.strip
@@ -912,7 +913,7 @@ module Doing
 
       if opt[:resume] || opt[:reset]
         if items.count > 1
-          logger.error('Error:', 'resume and restart can only be used on a single entry')
+          raise InvalidArgument, 'resume and restart can only be used on a single entry'
         else
           item = items[0]
           if opt[:resume] && !opt[:reset]
@@ -942,7 +943,7 @@ module Doing
       if opt[:flag]
         tag = @config['marker_tag'] || 'flagged'
         items.map! do |item|
-          tag_item(item, tag, date: false, remove: opt[:remove])
+          tag_item(item, tag, date: false, remove: opt[:remove], single: single)
         end
       end
 
@@ -951,7 +952,7 @@ module Doing
         items.map! do |item|
           if item.should_finish?
             should_date = !opt[:cancel] && item.should_time?
-            tag_item(item, tag, date: should_date, remove: opt[:remove])
+            tag_item(item, tag, date: should_date, remove: opt[:remove], single: single)
           end
         end
       end
@@ -959,7 +960,7 @@ module Doing
       if opt[:tag]
         tag = opt[:tag]
         items.map! do |item|
-          tag_item(item, tag, date: false, remove: opt[:remove])
+          tag_item(item, tag, date: false, remove: opt[:remove], single: single)
         end
       end
 
@@ -1057,7 +1058,7 @@ module Doing
     ## @param      remove  (Boolean) remove tags
     ## @param      date    (Boolean) Include timestamp?
     ##
-    def tag_item(item, tags, remove: false, date: false)
+    def tag_item(item, tags, remove: false, date: false, single: false)
       added = []
       removed = []
 
@@ -1073,7 +1074,7 @@ module Doing
         end
       end
 
-      log_change(tags_added: added, tags_removed: removed, count: 1)
+      log_change(tags_added: added, tags_removed: removed, count: 1, item: item, single: single)
 
       item
     end
@@ -1097,20 +1098,21 @@ module Doing
 
       items = filter_items([], opt: opt)
 
-      logger.info('Skipped:', 'no items matched your search') if items.empty?
-
       if opt[:interactive]
         items = choose_from_items(items, {
-          menu: true,
-          header: '',
-          prompt: 'Select entries to tag > ',
-          multiple: true,
-          sort: true,
-          show_if_single: true
-        }, include_section: opt[:section] =~ /^all$/i )
+                                    menu: true,
+                                    header: '',
+                                    prompt: 'Select entries to tag > ',
+                                    multiple: true,
+                                    sort: true,
+                                    show_if_single: true
+                                  }, include_section: opt[:section] =~ /^all$/i)
 
-        return if items.nil?
+        raise NoResults, 'no items selected' if items.empty?
+
       end
+
+      raise NoResults, 'no items matched your search' if items.empty?
 
       items.each do |item|
         added = []
@@ -1123,7 +1125,7 @@ module Doing
             # logger.debug('Autotag:', 'No changes')
           else
             logger.count(:added_tags)
-            logger.debug('Tags updated:', new_title)
+            logger.write(items.count == 1 ? :info : :debug, 'Tagged:', new_title)
             item.title = new_title
           end
         else
@@ -1185,7 +1187,7 @@ module Doing
           end
         end
 
-        log_change(tags_added: added, tags_removed: removed)
+        log_change(tags_added: added, tags_removed: removed, item: item, single: items.count == 1)
 
         item.note.add(opt[:note]) if opt[:note]
 
@@ -1217,7 +1219,7 @@ module Doing
       @content[section][:items].concat([new_item])
 
       logger.count(section == 'Archive' ? :archived : :moved)
-      logger.debug("Entry #{section == 'Archive' ? 'archived' : 'moved'}:",
+      logger.debug("#{section == 'Archive' ? 'Archived' : 'Moved'}:",
                   "#{new_item.title.truncate(60)} from #{from} to #{section}")
       new_item
     end
@@ -1246,7 +1248,7 @@ module Doing
       section_items = @content[section][:items]
       deleted = section_items.delete(item)
       logger.count(:deleted)
-      logger.debug('Entry deleted:', deleted.title)
+      logger.info('Entry deleted:', deleted.title)
     end
 
     ##
@@ -1261,16 +1263,13 @@ module Doing
       section_items = @content[section][:items]
       s_idx = section_items.index { |item| item.equal?(old_item) }
 
-      unless s_idx
-        Doing.logger.error('Fail to update:', 'Could not find item in index')
-        raise Errors::ItemNotFound, 'Unable to find item in index, did it mutate?'
-      end
+      raise ItemNotFound, 'Unable to find item in index, did it mutate?' unless s_idx
 
       return if section_items[s_idx].equal?(new_item)
 
       section_items[s_idx] = new_item
       logger.count(:updated)
-      logger.debug('Entry updated:', section_items[s_idx].title.truncate(60))
+      logger.info('Entry updated:', section_items[s_idx].title.truncate(60))
       new_item
     end
 
@@ -1343,10 +1342,10 @@ module Doing
           item.title = item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{item.section})")
           move_item(item, 'Archive', label: false)
           logger.count(:completed_archived)
-          logger.debug('Completed/archived:', item.title)
+          logger.info('Completed/archived:', item.title)
         else
           logger.count(:completed)
-          logger.debug('Completed:', item.title)
+          logger.info('Completed:', item.title)
         end
       end
 
@@ -1478,10 +1477,10 @@ module Doing
       if File.exist?(file)
         init_doing_file(file)
         @content.deep_merge(new_content)
-        logger.warn('File update:', "Added entries to existing file: #{file}")
+        logger.warn('File update:', "added entries to existing file: #{file}")
       else
         @content = new_content
-        logger.warn('File update:', "Created new file: #{file}")
+        logger.warn('File update:', "created new file: #{file}")
       end
 
       write(file, backup: false)
@@ -1572,10 +1571,7 @@ module Doing
         opt[:multiple] = true
         selected = choose_from_items(items, opt, include_section: opt[:section] =~ /^all$/i )
 
-        if selected.empty?
-          logger.debug('Skipped:', 'No selection')
-          return
-        end
+        raise NoResults, 'no items selected' if selected.empty?
 
         act_on(selected, opt)
         return
@@ -1592,7 +1588,7 @@ module Doing
     def output(items, title, is_single, opt = {})
       out = nil
 
-      raise Errors::InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
+      raise InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
 
       export_options = { page_title: title, is_single: is_single, options: opt }
 
@@ -1646,7 +1642,7 @@ module Doing
         do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label], before: options[:before] })
         write(doing_file)
       else
-        raise Errors::InvalidArgument, 'Either source or destination does not exist'
+        raise InvalidArgument, 'Either source or destination does not exist'
       end
     end
 
@@ -1705,7 +1701,12 @@ module Doing
           @content[section][:items] = items
           @content[destination][:items].concat(moved_items)
           if moved_items.length.positive?
-            logger.info('Archived:', "#{moved_items.length} items from #{section} to #{destination}")
+            logger.count(destination == 'Archive' ? :archived : :moved,
+                         level: :info,
+                         count: moved_items.length,
+                         message: "%count %items from #{section} to #{destination}")
+          else
+            logger.info('Skipped:', 'No items were moved')
           end
         else
           count = items.length if items.length < count
@@ -1733,10 +1734,11 @@ module Doing
                                       else
                                         items[0..count - 1]
                                       end
+
           logger.count(destination == 'Archive' ? :archived : :moved,
+                       level: :info,
                        count: items.length - count,
                        message: "%count %items from #{section} to #{destination}")
-          # logger.info('Archived:', "#{items.length - count} items from #{section} to #{destination}")
         end
       end
     end
@@ -1935,11 +1937,11 @@ module Doing
         end
       end
 
-      logger.debug('Autotag:', "Whitelisted tags: #{whitelisted.join(', ')}") unless whitelisted.empty?
+      logger.debug('Autotag:', "whitelisted tags: #{whitelisted.join(', ')}") unless whitelisted.empty?
       new_tags = whitelisted
       unless tail_tags.empty?
         tags = tail_tags.uniq.map { |t| "@#{t}".cyan }.join(' ')
-        logger.debug('Autotag:', "Synonym tags: #{tags}")
+        logger.debug('Autotag:', "synonym tags: #{tags}")
         tags_a = tail_tags.map { |t| "@#{t}" }
         text.add_tags!(tags_a.join(' '))
         new_tags.concat(tags_a)
@@ -1948,7 +1950,7 @@ module Doing
       unless text == original
         logger.info('Autotag:', "added #{new_tags.join(', ')} to \"#{text}\"")
       else
-        logger.debug('Autotag:', "no change to \"#{text}\"")
+        logger.debug('Skipped:', "no change to \"#{text}\"")
       end
 
       text
@@ -2174,23 +2176,28 @@ EOS
       logger.log_now(:error, 'STDERR output:', stderr)
     end
 
-    def log_change(tags_added: [], tags_removed: [], count: 1)
+    def log_change(tags_added: [], tags_removed: [], count: 1, item: nil, single: false)
       if tags_added.empty? && tags_removed.empty?
         logger.count(:skipped, level: :debug, message: '%count %items with no change', count: count)
       else
-
         if tags_added.empty?
           logger.count(:skipped, level: :debug, message: 'no tags added to %count %items')
-          # logger.debug('No tags added:', %("#{item.title}" in #{item.section}))
         else
-          logger.count(:added_tags, tag: tags_added, message: '%tags added to %count %items')
-          # logger.info('Added tags:', %(#{did_add} to "#{item.title}" in #{item.section}))
+          if single && item
+            logger.info('Tagged:', %(added #{tags_added.count == 1 ? 'tag' : 'tags'} #{tags_added.map {|t| "@#{t}"}.join(', ')} to #{item.title}))
+          else
+            logger.count(:added_tags, level: :info, tag: tags_added, message: '%tags added to %count %items')
+          end
         end
 
         if tags_removed.empty?
           logger.count(:skipped, level: :debug, message: 'no tags removed from %count %items')
         else
-          logger.count(:removed_tags, tag: tags_removed, message: '%tags removed from %count %items')
+          if single && item
+            logger.info('Untagged:', %(removed #{tags_removed.count == 1 ? 'tag' : 'tags'} #{tags_added.map {|t| "@#{t}"}.join(', ')} from #{item.title}))
+          else
+            logger.count(:removed_tags, level: :info, tag: tags_removed, message: '%tags removed from %count %items')
+          end
         end
       end
     end
