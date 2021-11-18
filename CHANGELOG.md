@@ -1,22 +1,14 @@
-### 2.0.8.pre
+### 2.0.9.pre
 
 #### NEW
 
-- Add `--exact` flag to all commands with `--search` flag to force exact matching without requiring single quote prefix
-- Add `--not` flag to all commands with filters (--tag, --search, --before, etc.) to negate the filter and return entries NOT matched
-
-### 2.0.7.pre
-
-#### FIXED
-
-- Zsh completion not outputting results
-
-### 2.0.6.pre
-
-#### NEW
-
+- Add 'timer_format' config with 'human' option for tag totals
 - If `doing view` and `doing show` are confused, offer option to run the other command
 - `doing completion` to generate shell completion scripts for zsh, bash, and fish
+- --search and --not for cancel command
+- --case flag for commands with --search. Can be (c)ase-sensitive, (i)nsensitive, or (s)mart (default smart, case insensitive unless search string contains uppercase letters)
+- Add `--exact` flag to all commands with `--search` flag to force exact matching without requiring single quote prefix
+- Add `--not` flag to all commands with filters (--tag, --search, --before, etc.) to negate the filter and return entries NOT matched
 
 #### IMPROVED
 
@@ -27,16 +19,11 @@
 
 #### FIXED
 
+- Zsh completion not outputting results
 - Remove `--[no]` from non-negatable options
 - `doing plugins -t export -c` not outputting columns
 - View config not respecting tag_order setting
  
-### 2.0.5.pre
-
-#### NEW
-
-- Add 'timer_format' config with 'human' option for tag totals
-
 ### 2.0.3.pre
 
 #### NEW
