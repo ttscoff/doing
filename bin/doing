@@ -204,6 +204,10 @@ command %i[reset begin] do |c|
   c.desc 'Reset items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
@@ -216,7 +220,9 @@ command %i[reset begin] do |c|
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
 
-    options[:tag_bool] = options[:bool].normalize_bool
+    options[:bool] = options[:bool].normalize_bool
+
+    options[:case] = options[:case].normalize_case
 
     if options[:search]
       search = options[:search]
@@ -288,6 +294,10 @@ command :note do |c|
   c.desc 'Add note to item that *doesn\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
@@ -300,7 +310,9 @@ command :note do |c|
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
 
-    options[:tag_bool] = options[:bool].normalize_bool
+    options[:bool] = options[:bool].normalize_bool
+
+    options[:case] = options[:case].normalize_case
 
     if options[:search]
       search = options[:search]
@@ -508,6 +520,10 @@ command :select do |c|
   c.desc 'Select items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.'
   c.switch %i[menu], negatable: true, default_value: true
 
@@ -544,6 +560,8 @@ command :select do |c|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     raise InvalidArgument, '--no-menu requires --query' if !options[:menu] && !options[:query]
+
+    options[:case] = options[:case].normalize_case
 
     wwid.interactive(options)
   end
@@ -821,6 +839,10 @@ command :cancel do |c|
   c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Cancel last entry (or entries) not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
 
@@ -859,6 +881,7 @@ command :cancel do |c|
 
     opts = {
       search: search,
+      case: options[:case].normalize_case,
       not: options[:not],
       archive: options[:a],
       count: count,
@@ -909,6 +932,10 @@ command :finish do |c|
 
   c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
+
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
@@ -991,6 +1018,7 @@ command :finish do |c|
       count: count,
       date: options[:date],
       search: search,
+      case: options[:case].normalize_case,
       not: options[:not],
       section: options[:section],
       sequential: options[:auto],
@@ -1031,6 +1059,10 @@ command %i[again resume] do |c|
   c.desc 'Resume items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Boolean used to combine multiple tags'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
@@ -1047,6 +1079,8 @@ command %i[again resume] do |c|
 
   c.action do |_global_options, options, _args|
     tags = options[:tag].nil? ? [] : options[:tag].to_tags
+
+    options[:case] = options[:case].normalize_case
 
     if options[:search]
       search = options[:search]
@@ -1131,6 +1165,10 @@ command :tag do |c|
   c.desc 'Tag items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
@@ -1174,6 +1212,8 @@ command :tag do |c|
     else
       count = options[:count].to_i
     end
+
+    options[:case] = options[:case].normalize_case
 
     if options[:search]
       search = options[:search]
@@ -1257,6 +1297,10 @@ command [:mark, :flag] do |c|
   c.desc 'Flag items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
@@ -1287,6 +1331,8 @@ command [:mark, :flag] do |c|
     else
       count = options[:count].to_i
     end
+
+    options[:case] = options[:case].normalize_case
 
     if options[:search]
       search = options[:search]
@@ -1373,6 +1419,10 @@ command :show do |c|
 
   c.desc 'Show items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
+
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
@@ -1478,6 +1528,8 @@ command :show do |c|
 
     tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
 
+    options[:case] = options[:case].normalize_case
+
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
@@ -1549,11 +1601,12 @@ command %i[grep search] do |c|
   c.desc 'Force exact string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive matching'
-  c.switch %i[case]
-
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
+
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
   c.desc 'Display an interactive menu of results to perform further operations'
   c.switch %i[i interactive], default_value: false, negatable: false
@@ -1564,6 +1617,9 @@ command %i[grep search] do |c|
     tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
 
     section = wwid.guess_section(options[:section]) if options[:section]
+
+    options[:case] = options[:case].normalize_case
+
     search = args.join(' ')
     search.sub!(/^'?/, "'") if options[:exact]
 
@@ -1894,6 +1950,10 @@ command :last do |c|
   c.desc 'Show items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.action do |global_options, options, _args|
     raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
 
@@ -1912,6 +1972,8 @@ command :last do |c|
 
     end
 
+    options[:case] = options[:case].normalize_case
+
     search = nil
 
     if options[:search]
@@ -1920,10 +1982,10 @@ command :last do |c|
     end
 
     if options[:editor]
-      wwid.edit_last(section: options[:s], options: { search: search, tag: tags, tag_bool: options[:bool], not: options[:not] })
+      wwid.edit_last(section: options[:s], options: { search: search, case: options[:case], tag: tags, tag_bool: options[:bool], not: options[:not] })
     else
       Doing::Pager::page wwid.last(times: true, section: options[:s],
-                     options: { search: search, negate: options[:not], tag: tags, tag_bool: options[:bool] }).strip
+                     options: { search: search, case: options[:case], negate: options[:not], tag: tags, tag_bool: options[:bool] }).strip
     end
   end
 end
@@ -2087,6 +2149,10 @@ command :view do |c|
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Sort tags by (name|time)'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i
@@ -2218,6 +2284,8 @@ command :view do |c|
         dates = [start, finish]
       end
 
+      options[:case] = options[:case].normalize_case
+
       search = nil
 
       if options[:search]
@@ -2225,7 +2293,7 @@ command :view do |c|
         search.sub!(/^'?/, "'") if options[:exact]
       end
 
-      opts = options
+      opts = options.dup
       opts[:search] = search
       opts[:output] = output_format
       opts[:count] = count
@@ -2305,6 +2373,10 @@ command %i[archive move] do |c|
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Archive entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
   c.arg_name 'DATE_STRING'
@@ -2330,12 +2402,14 @@ command %i[archive move] do |c|
 
     search = nil
 
+    options[:case] = options[:case].normalize_case
+
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
     end
 
-    opts = options
+    opts = options.dup
     opts[:search] = search
     opts[:bool] = options[:bool].normalize_bool
     opts[:destination] = options[:to]
@@ -2377,6 +2451,10 @@ command :rotate do |c|
   c.desc 'Rotate items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Rotate entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
   c.arg_name 'DATE_STRING'
@@ -2388,6 +2466,8 @@ command :rotate do |c|
     end
 
     options[:bool] = options[:bool].normalize_bool
+
+    options[:case] = options[:case].normalize_case
 
     search = nil
 
@@ -2591,6 +2671,10 @@ command :import do |c|
   c.desc 'Import items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+
   c.desc 'Only import items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
@@ -2647,6 +2731,8 @@ command :import do |c|
       raise InvalidTimeExpression, 'Unrecognized date string' unless start
       dates = [start, finish]
     end
+
+    options[:case] = options[:case].normalize_case
 
     if options[:type] =~ Doing::Plugins.plugin_regex(type: :import)
       options[:no_overlap] = !options[:overlap]

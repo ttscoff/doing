@@ -75,7 +75,7 @@ module Doing
       negate ? !matches : matches
     end
 
-    def search(search, negate: false)
+    def search(search, negate: false, case_type: :smart)
       text = @title + @note.to_s
       pattern = case search.strip
                 when %r{^/.*?/$}
@@ -84,7 +84,12 @@ module Doing
                   case_sensitive = true
                   search.sub(/^'(.*?)'?$/, '\1')
                 else
-                  case_sensitive = true if search =~ /[A-Z]/
+                  if case_type == :smart
+                    case_sensitive = true if search =~ /[A-Z]/
+                  else
+                    case_sensitive = case_type == :sensitive
+                  end
+
                   search.split('').join('.{0,3}')
                 end
       rx = Regexp.new(pattern, !case_sensitive)

@@ -700,11 +700,16 @@ module Doing
         end
 
         if keep && opt[:search]
-          search_match = opt[:search].nil? || opt[:search].empty? ? true : item.search(opt[:search])
+          opt[:case] = opt[:case].normalize_case unless opt[:case].is_a?(Symbol)
+          search_match = if opt[:search].nil? || opt[:search].empty?
+                           true
+                         else
+                           item.search(opt[:search], case_type: opt[:case])
+                         end
+
           keep = false unless search_match
           keep = opt[:not] ? !keep : keep
         end
-
 
         if keep && opt[:date_filter]&.length == 2
           start_date = opt[:date_filter][0]
@@ -773,14 +778,13 @@ module Doing
       if opt[:search]
         search = opt[:search]
         search.sub!(/^'?/, "'") if opt[:exact]
-        search.downcase! if opt[:case] == false
         opt[:search] = search
       end
 
       opt[:query] = opt[:search] if opt[:search] && !opt[:query]
       opt[:query] = "!#{opt[:query]}" if opt[:not]
       opt[:multiple] = true
-      items = filter_items([], opt: { section: section, search: opt[:search] })
+      items = filter_items([], opt: { section: section, search: opt[:search], case: opt[:case] })
 
       selection = choose_from_items(items, opt, include_section: section =~ /^all$/i)
 
@@ -1897,6 +1901,7 @@ module Doing
       end
 
       opts[:search] = options[:search] if options[:search]
+      opts[:case] = options[:case]
       opts[:not] = options[:negate]
       list_section(opts)
     end

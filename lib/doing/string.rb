@@ -165,6 +165,28 @@ module Doing
     end
 
     ##
+    ## @brief      Convert a case sensitivity string to a symbol
+    ##
+    ## @return     Symbol :smart, :sensitive, :insensitive
+    ##
+    def normalize_case!
+      replace normalize_case
+    end
+
+    def normalize_case(default = :smart)
+      case self
+      when /^c/i
+        :sensitive
+      when /^i/i
+        :insensitive
+      when /^s/i
+        :smart
+      else
+        default.is_a?(Symbol) ? default : default.normalize_case
+      end
+    end
+
+    ##
     ## @brief      Convert a boolean string to a symbol
     ##
     ## @return     Symbol :and, :or, or :not
