@@ -1,8 +1,11 @@
 == doing - A CLI for a What Was I Doing system
 
-Doing uses a TaskPaper-like formatting to keep a plain text record of what you've been doing, complete with tag-based time tracking. The command line tool allows you to add entries, annotate with tags and notes, and view your entries with myriad options, with a focus on a "natural" language syntax.
+Doing uses a TaskPaper-like formatting to keep a plain text
+record of what you've been doing, complete with tag-based time tracking. The
+command line tool allows you to add entries, annotate with tags and notes, and
+view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.0.8.pre
+v2.0.9.pre
 
 === Global Options
 === --config_file arg
@@ -87,6 +90,14 @@ Boolean used to combine multiple tags
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== --in SECTION_NAME
 
 Add new entry to section (default: same section as repeated entry)
@@ -165,6 +176,14 @@ Tag boolean (AND|OR|NOT)
 
 [Default Value] AND
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
 
 
 ===== -k|--keep X
@@ -284,9 +303,24 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== -s|--section NAME
 
 Section
+
+[Default Value] None
+
+
+===== --search QUERY
+
+Cancel the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("'query")
 
 [Default Value] None
 
@@ -308,8 +342,18 @@ Select item(s) to cancel from a menu of matching entries
 
 
 
+===== --not
+Finish items that *don't* match search/tag filters
+
+
+
 ===== -u|--unfinished
 Cancel last entry (or entries) not already marked @done
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -493,6 +537,14 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== -s|--section NAME
 
 Section
@@ -585,6 +637,14 @@ Constrain search to entries older than date
 [Default Value] None
 
 
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== -o|--output FORMAT
 
 Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
@@ -605,11 +665,6 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time)$)
-
-
-===== --[no-]case
-Force case sensitive matching
-
 
 
 ===== -i|--interactive
@@ -669,6 +724,14 @@ Import entries newer than date
 Import entries older than date
 
 [Default Value] None
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
 
 
 ===== -f|--from DATE_OR_RANGE
@@ -753,6 +816,14 @@ Tag boolean
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== -s|--section NAME
 
 Specify a section
@@ -832,6 +903,14 @@ How many recent entries to tag (0 for all)
 
 [Default Value] 1
 [Must Match] (?-mix:^\d+$)
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
 
 
 ===== -s|--section SECTION_NAME
@@ -942,6 +1021,14 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 [Default Value] AND
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
 
 
 ===== -s|--section NAME
@@ -1158,6 +1245,14 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== -s|--section NAME
 
 Limit search to section
@@ -1220,6 +1315,14 @@ Tag boolean (AND|OR|NOT)
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
 
 
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== -k|--keep X
 
 How many items to keep in each section (most recent)
@@ -1278,6 +1381,14 @@ Multiple selections are allowed, hit tab to add the highlighted entry to the
 selection, and use ctrl-a to select all visible items. Return processes the
 selected entries.
 ===== Options
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== -m|--move SECTION
 
 Move selected items to section
@@ -1420,6 +1531,14 @@ View entries older than date
 Max count to show
 
 [Default Value] 0
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
 
 
 ===== -f|--from DATE_OR_RANGE
@@ -1577,6 +1696,14 @@ How many recent entries to tag (0 for all)
 [Must Match] (?-mix:^\d+$)
 
 
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== --rename ORIG_TAG
 
 Replace existing tag with tag argument, wildcards (*,?) allowed, or use with --regex
@@ -1655,9 +1782,7 @@ Force exact search string matching (case sensitive)
 Output HTML, CSS, and Markdown (ERB) templates for customization
 
 Templates are printed to STDOUT for piping to a file.
-  Save them and use them in the configuration file under html_template.
-
-  Example `doing template haml > ~/styles/my_doing.haml`
+  Save them and use them in the configuration file under export_templates.
 ===== Options
 ===== -c
 List in single column for completion
@@ -1769,6 +1894,14 @@ Count to display
 
 [Default Value] None
 [Must Match] (?-mix:^\d+$)
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
 
 
 ===== -o|--output FORMAT
