@@ -180,6 +180,27 @@ class DoingShowTest < Test::Unit::TestCase
     assert_match(/#{subject}\s*$/, result, 'doing show results should include entry without @tag2')
   end
 
+  def test_show_search
+    subject = '1 Test entry unique string'
+    doing('now', subject)
+    subject2 = '2 Test entry Barley hooP'
+    doing('now', subject2)
+    subject3 = '3 Test entry barley hoop'
+    doing('now', subject3)
+
+    result = doing('show', '--search', 'barley hoop')
+    assert_count_entries(2, result, 'Search should be case insensitive and match 2 entries')
+
+    result = doing('show', '--search', 'Barley hooP')
+    assert_count_entries(1, result, 'Search should be case sensitive (smart case) and match 1 entry')
+
+    result = doing('show', '--search', 'barley hoop', '--case', 'c')
+    assert_count_entries(1, result, 'Search should be case sensitive and match 1 entry')
+
+    result = doing('show', '--search', 'barley', '--not')
+    assert_count_entries(1, result, 'Search should ignore 2 entries')
+  end
+
   private
 
   def assert_matches(matches, shown)
