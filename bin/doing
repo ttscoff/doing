@@ -1045,7 +1045,7 @@ command :tag do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
-    raise Doing::Errors::MissingArgument, 'You must specify at least one tag' if args.empty? && !options[:a]
+    raise Doing::Errors::MissingArgument, 'You must specify at least one tag' if args.empty? && !options[:autotag]
 
     raise Doing::Errors::InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 
@@ -1116,19 +1116,6 @@ command :tag do |c|
     wwid.tag_last(options)
   end
 end
-
-# desc 'Autotag last X entries'
-# arg_name 'COUNT'
-# command :autotag do |c|
-#   c.action do |global_options, options, args|
-#     options = {
-#       autotag: true,
-#       count: args[0].to_i
-#     }
-#     cmd = commands[:tag]
-#     cmd.action.(global_options, options, [])
-#   end
-# end
 
 desc 'Mark last entry as flagged'
 command [:mark, :flag] do |c|
@@ -2448,14 +2435,13 @@ pre do |global, _command, _options, _args|
 end
 
 on_error do |exception|
-  # if exception.kind_of?(SystemExit)
-  #   false
-  # else
-  #   p exception.inspect
-  #   Doing.logger.output_results
-  #   true
-  # end
-  false
+  if exception.kind_of?(SystemExit)
+    false
+  else
+    # Doing.logger.error('Fatal:', exception)
+    Doing.logger.output_results
+    true
+  end
 end
 
 post do |global, _command, _options, _args|
