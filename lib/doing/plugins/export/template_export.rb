@@ -94,7 +94,7 @@ module Doing
         end
 
         if note.empty?
-          output.gsub!(/%([io]d|(\^.)?(([ _t]|[^a-z0-9])?\d+)?(.[ _t]?)?)?note/, '')
+          output.gsub!(/%(chomp|[io]d|(\^.)?(([ _t]|[^a-z0-9])?\d+)?(.[ _t]?)?)?note/, '')
         else
           output.sub!(/%note/, "\n#{note.map { |l| "\t#{l.strip}  " }.join("\n")}")
           output.sub!(/%idnote/, "\n#{note.map { |l| "\t\t#{l.strip}  " }.join("\n")}")
@@ -111,11 +111,9 @@ module Doing
             prefix = m['prefix'] || ''
             "\n#{note.map { |l| "#{mark}#{indent}#{prefix}#{l.strip}  " }.join("\n")}"
           end
-          output.sub!(/%chompnote/) do |_m|
-            chomp_note = note.map do |l|
-              l.gsub(/\n+/, ' ').gsub(/(^\s*|\s*$)/, '').gsub(/\s+/, ' ')
-            end
-            chomp_note.join(' ')
+
+          output.sub!(/%chompnote/) do
+            note.map { |l| l.gsub(/\n+/, ' ').gsub(/(^\s*|\s*$)/, '').gsub(/\s+/, ' ') }.join(' ')
           end
         end
 
