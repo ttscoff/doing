@@ -1,3 +1,9 @@
+### 2.0.5.pre
+
+#### NEW
+
+- Add 'timer_format' config with 'human' option for tag totals
+
 ### 2.0.3.pre
 
 #### NEW
