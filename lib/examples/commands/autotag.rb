@@ -1,5 +1,11 @@
+# frozen_string_literal: true
+
+# Example command that calls an existing command (tag) with
+# preset options
 desc 'Autotag last entry or filtered entries'
 command :autotag do |c|
+  # Preserve some switches and flags. Values will be passed
+  # to tag command.
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'
   c.flag %i[s section], default_value: 'All'
@@ -19,7 +25,9 @@ command :autotag do |c|
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Autotag entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.desc 'Autotag entries matching search filter,
+  surround with slashes for regex (e.g. "/query.*/"),
+  start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
 
@@ -30,12 +38,20 @@ command :autotag do |c|
   c.desc 'Select item(s) to tag from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
-  c.action do |global, options, args|
-    options[:rename] = nil
+  c.action do |global, options, _args|
+    # Force some switches and flags. We're using the tag
+    # command with settings that would invoke autotagging.
+
+    # Force enable autotag
     options[:a] = true
     options[:autotag] = true
+
+    # No need for date values
     options[:d] = false
     options[:date] = false
+
+    # Don't remove any tags
+    options[:rename] = nil
     options[:regex] = false
     options[:r] = false
     options[:remove] = false
