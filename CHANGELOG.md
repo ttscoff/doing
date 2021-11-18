@@ -1,3 +1,9 @@
+### 2.0.7.pre
+
+#### FIXED
+
+- Zsh completion not outputting results
+
 ### 2.0.6.pre
 
 #### NEW
