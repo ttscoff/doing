@@ -270,6 +270,11 @@ long_desc %(
 )
 arg_name 'NOTE_TEXT'
 command :note do |c|
+  c.example 'doing note', desc: 'Open the last entry in $EDITOR to append a note'
+  c.example 'doing note "Just a quick annotation"', desc: 'Add a quick note to the last entry'
+  c.example 'doing note --tag done "Keeping it real or something"', desc: 'Add a note to the last item tagged @done'
+  c.example 'doing note --search "late night" -e', desc: 'Open $EDITOR to add a note to the last item containing "late night" (fuzzy matched)'
+
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -371,6 +376,11 @@ end
 desc 'Finish any running @meanwhile tasks and optionally create a new one'
 arg_name 'ENTRY'
 command :meanwhile do |c|
+  c.example 'doing meanwhile "Long task that will have others after it before it\'s done"', desc: 'Add a new long-running entry, completing any current @meanwhile entry'
+  c.example 'doing meanwhile', desc: 'Finish any open @meanwhile entry'
+  c.example 'doing meanwhile --archive', desc: 'Finish any open @meanwhile entry and archive it'
+  c.example 'doing meanwhile --back 2h "Something I\'ve been working on for a while', desc: 'Add a @meanwhile entry with a start date 2 hours ago'
+
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section]
@@ -437,12 +447,12 @@ end
 desc 'Output HTML, CSS, and Markdown (ERB) templates for customization'
 long_desc %(
   Templates are printed to STDOUT for piping to a file.
-  Save them and use them in the configuration file under html_template.
-
-  Example `doing template haml > ~/styles/my_doing.haml`
+  Save them and use them in the configuration file under export_templates.
 )
 arg_name 'TYPE', must_match: Doing::Plugins.template_regex
 command :template do |c|
+  c.example 'doing template haml > ~/styles/my_doing.haml', desc: 'Output the haml template and save it to a file'
+
   c.desc 'List all available templates'
   c.switch %i[l list], negatable: false
 
@@ -622,6 +632,11 @@ end
 desc 'Add a completed item with @done(date). No argument finishes last entry.'
 arg_name 'ENTRY'
 command %i[done did] do |c|
+  c.example 'doing done', desc: 'Tag the last entry @done'
+  c.example 'doing done I already finished this', desc: 'Add a new entry and immediately mark it @done'
+  c.example 'doing done --back 30m This took me half an hour', desc: 'Add an entry with a start date 30 minutes ago and a @done date of right now'
+  c.example 'doing done --at 3pm --took 1h Started and finished this afternoon', desc: 'Add an entry with a @done date of 3pm and a start date of 2pm (3pm - 1h)'
+
   c.desc 'Remove @done tag'
   c.switch %i[r remove], negatable: false, default_value: false
 
@@ -903,6 +918,10 @@ desc 'Mark last X entries as @done'
 long_desc 'Marks the last X entries with a @done tag and current date. Does not alter already completed entries.'
 arg_name 'COUNT'
 command :finish do |c|
+  c.example 'doing finish', desc: 'Mark the last entry @done'
+  c.example 'doing finish --auto --section Later 10', desc: 'Add @done to any unfinished entries in the last 10 in Later, setting the finish time based on the start time of the task after it'
+  c.example 'doing finish --search "a specific entry" --at "yesterday 3pm"', desc: 'Search for an entry containing string and set its @done time to yesterday at 3pm'
+
   c.desc 'Include date'
   c.switch [:date], negatable: true, default_value: true
 
