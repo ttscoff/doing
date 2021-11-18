@@ -55,7 +55,7 @@ class DoingArchiveTest < Test::Unit::TestCase
     assert_match(/Archived: 2 items/, result, 'Should have archived 2 items')
 
     result = doing('--stdout', 'archive', '--search', '/cont.*?ion/')
-    assert_match(/Archived: 1 items/, result, 'Regex search should have matched 1 items')
+    assert_match(/Archived: 1 item/, result, 'Regex search should have matched 1 items')
 
     assert_count_entries(entries - 3, doing('show'), "Current section should have 3 fewer items items")
     assert_count_entries(3, doing('show', 'archive'), 'Archive should have 3 items')

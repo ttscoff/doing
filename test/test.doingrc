@@ -1,6 +1,7 @@
 ---
 plugins:
   plugin_path: test/plugins
+  command_path: "/Users/ttscoff/.config/doing/commands"
   trizzer:
     trizzle: test value from config
   say:
@@ -19,16 +20,17 @@ autotag:
     - guntzel
 doing_file: "~/what_was_i_doing.md"
 current_section: Lately
-editor_app:
 templates:
   default:
     date_format: "%Y-%m-%d %H:%M"
     template: "%date | %title%note"
     wrap_width: 0
+    order: asc
   today:
     date_format: "%Y-%m-%d %H:%M"
     template: "%date | %title %interval%note"
     wrap_width: 0
+    order: asc
   last:
     date_format: "%-I:%M%P on %a"
     template: "%title (at %date)%odnote"
@@ -37,6 +39,8 @@ templates:
     date_format: "%_I:%M%P"
     template: "%shortdate: %title (%section)"
     wrap_width: 88
+    count: 10
+    order: asc
 views:
   test:
     template: "%date | DOING TEST: %title%note"
@@ -77,8 +81,6 @@ views:
     order: asc
 marker_tag: flagged
 marker_color: red
-:include_notes: true
-config_editor_app:
 export_templates:
   css:
   haml:
@@ -94,6 +96,16 @@ export_templates:
   doing:
   say:
   trizzer:
+  wiki:
 tag_sort: name
-never_time: ['@nevertime']
-never_finish: ['@neverfinish']
+never_time:
+- "@nevertime"
+never_finish:
+- "@neverfinish"
+timer_format: text
+include_notes: true
+editors:
+  default: vim
+  doing_file:
+  config:
+paginate: false

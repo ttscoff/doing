@@ -1692,7 +1692,6 @@ command :yesterday do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = 'time'
   default = settings['tag_sort'] || 'name'
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
@@ -1941,7 +1940,7 @@ command :view do |c|
 
   c.desc 'Tag sort direction (asc|desc)'
   c.arg_name 'DIRECTION'
-  c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
+  c.flag [:tag_order], must_match: REGEX_SORT_ORDER
 
   c.desc 'View entries older than date'
   c.arg_name 'DATE_STRING'
@@ -2085,7 +2084,7 @@ command :view do |c|
 
       Doing::Pager.page wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
-      exit_now! 'Cancelled'
+      raise UserCancelled, 'Cancelled' unless res
     else
       raise InvalidView, "View #{title} not found in config"
     end

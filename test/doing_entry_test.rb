@@ -76,7 +76,7 @@ class DoingEntryTest < Test::Unit::TestCase
     result = doing('--stdout', 'later', subject)
     assert_matches([
       [/New section: "Later"/, 'should have added Later section'],
-      [/Added: added 1 new item/, 'should have added entry to Later section']
+      [/New entry: added "#{subject}" to Later/, 'should have added entry to Later section']
     ], result)
     assert_count_entries(1, doing('show', 'later'), 'There should be one later entry')
   end
@@ -113,7 +113,7 @@ class DoingEntryTest < Test::Unit::TestCase
     result = doing('--stdout', 'archive', '--search', '/consuming.*?bagels/')
 
     assert_match(/New section: "Archive"/, result, 'Archive section should have been added')
-    assert_match(/Archived: 1 items from #{@config['current_section']} to Archive/, result, '1 item should have been archived')
+    assert_match(/Archived: 1 item from #{@config['current_section']} to Archive/, result, '1 item should have been archived')
     assert_match(/consuming @bagels/i, doing('show', 'Archive'), 'Archive section should contain test entry')
 
     result = doing('--stdout', 'archive', '--search', 'eating')
