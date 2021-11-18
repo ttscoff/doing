@@ -1,3 +1,21 @@
+### 2.0.6.pre
+
+#### NEW
+
+- If `doing view` and `doing show` are confused, offer option to run the other command
+
+#### IMPROVED
+
+- More command line feedback
+- Error formatting and output
+- Add subcommand completion for `doing help` in fish shell
+- Logging and error handling
+
+#### FIXED
+
+- Remove `--[no]` from non-negatable options
+- `doing plugins -t export -c` not outputting columns
+
 ### 2.0.5.pre
 
 #### NEW

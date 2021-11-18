@@ -88,6 +88,16 @@ class DoingOutputTest < Test::Unit::TestCase
     assert_match(/^#{@config['current_section']}$/, result, "#{@config['current_section']} should be the only section shown")
   end
 
+  def test_plugins_command
+    result = doing('plugins')
+    assert_match(/Import plugins:/, result, 'Output should contain import plugins')
+    assert_match(/Export plugins:/, result, 'Output should contain export plugins')
+    result = doing('plugins', '--type=export')
+    assert_match(/\w+\t\w+\t\w+/, result, 'Output should contain tab-separated list')
+    result = doing('plugins', '--type=export', '--column')
+    assert_match(/\w+\n\w+\n\w+/, result, 'Output should contain newline-separated list')
+  end
+
   def test_recent_command
     # 1:42pm: Did a thing @done(2021-07-05 13:42)
     doing('now', 'Test new entry @tag1')
