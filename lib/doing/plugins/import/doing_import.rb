@@ -40,13 +40,13 @@ module Doing
 
       new_items = read_doing_file(path)
 
-      if options[:date_filter]
-        new_items = wwid.filter_items(new_items, opt: { count: 0, date_filter: options[:date_filter] })
-      end
+      total = new_items.count
 
-      if options[:before] || options[:after]
-        new_items = wwid.filter_items(new_items, opt: { count: 0, before: options[:before], after: options[:after] })
-      end
+      options[:count] = 0
+      new_items = wwid.filter_items(new_items, opt: options)
+
+      skipped = total - new_items.count
+      Doing.logger.debug('Skipped:' , %(#{skipped} items that didn't match filter criteria)) if skipped.positive?
 
       imported = []
 

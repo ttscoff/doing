@@ -64,9 +64,15 @@ module Doing
         new_items.push(new_entry)
       end
       total = new_items.count
+
+      new_items = wwid.filter_items(new_items, opt: options)
+      filtered = total - new_items.count
+      Doing.logger.debug('Skipped:' , %(#{filtered} items that didn't match filter criteria)) if filtered.positive?
+
       new_items = wwid.dedup(new_items, options[:no_overlap])
-      dups = total - new_items.count
+      dups = filtered - new_items.count
       Doing.logger.info(%(Skipped #{dups} items with overlapping times)) if dups.positive?
+
       wwid.content[section][:items].concat(new_items)
       Doing.logger.info(%(Imported #{new_items.count} items to #{section}))
     end

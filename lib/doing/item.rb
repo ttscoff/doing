@@ -60,21 +60,22 @@ module Doing
       @title.scan(/(?<= |\A)@([^\s(]+)/).map {|tag| tag[0]}.sort.uniq
     end
 
-    def tags?(tags, bool = :and)
+    def tags?(tags, bool = :and, negate: false)
       tags = split_tags(tags)
       bool = bool.normalize_bool
 
-      case bool
-      when :and
-        all_tags?(tags)
-      when :not
-        no_tags?(tags)
-      else
-        any_tags?(tags)
-      end
+      matches = case bool
+                when :and
+                  all_tags?(tags)
+                when :not
+                  no_tags?(tags)
+                else
+                  any_tags?(tags)
+                end
+      negate ? !matches : matches
     end
 
-    def search(search)
+    def search(search, negate: false)
       text = @title + @note.to_s
       pattern = case search.strip
                 when %r{^/.*?/$}
@@ -88,7 +89,7 @@ module Doing
                 end
       rx = Regexp.new(pattern, !case_sensitive)
 
-      text =~ rx
+      negate ? text !~ rx : text =~ rx
     end
 
     def should_finish?

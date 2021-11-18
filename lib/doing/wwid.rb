@@ -686,19 +686,25 @@ module Doing
       items.sort_by! { |item| [item.date, item.title.downcase] }.reverse
       filtered_items = items.select do |item|
         keep = true
-        finished = opt[:unfinished] && item.tags?('done', :and)
-        keep = false if finished
+        if opt[:unfinished]
+          finished = item.tags?('done', :and)
+          finished = opt[:not] ? !finished : finished
+          keep = false if finished
+        end
 
         if keep && opt[:tag]
           opt[:tag_bool] ||= :and
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
           keep = false unless tag_match
+          keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:search]
           search_match = opt[:search].nil? || opt[:search].empty? ? true : item.search(opt[:search])
           keep = false unless search_match
+          keep = opt[:not] ? !keep : keep
         end
+
 
         if keep && opt[:date_filter]&.length == 2
           start_date = opt[:date_filter][0]
@@ -710,30 +716,36 @@ module Doing
                             item.date.strftime('%F') == start_date.strftime('%F')
                           end
           keep = false unless in_date_range
+          keep = opt[:not] ? !keep : keep
         end
 
         keep = false if keep && opt[:only_timed] && !item.interval
 
         if keep && opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
           keep = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
+          keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:before]
           time_string = opt[:before]
           cutoff = chronify(time_string, guess: :begin)
           keep = cutoff && item.date <= cutoff
+          keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:after]
           time_string = opt[:after]
           cutoff = chronify(time_string, guess: :end)
           keep = cutoff && item.date >= cutoff
+          keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:today]
           keep = item.date >= Date.today.to_time && item.date < Date.today.next_day.to_time
+          keep = opt[:not] ? !keep : keep
         elsif keep && opt[:yesterday]
           keep = item.date >= Date.today.prev_day.to_time && item.date < Date.today.to_time
+          keep = opt[:not] ? !keep : keep
         end
 
         keep
@@ -755,7 +767,18 @@ module Doing
     ##
     def interactive(opt = {})
       section = opt[:section] ? guess_section(opt[:section]) : 'All'
+
+      search = nil
+
+      if opt[:search]
+        search = opt[:search]
+        search.sub!(/^'?/, "'") if opt[:exact]
+        search.downcase! if opt[:case] == false
+        opt[:search] = search
+      end
+
       opt[:query] = opt[:search] if opt[:search] && !opt[:query]
+      opt[:query] = "!#{opt[:query]}" if opt[:not]
       opt[:multiple] = true
       items = filter_items([], opt: { section: section, search: opt[:search] })
 
@@ -1564,7 +1587,6 @@ module Doing
 
       items.reverse! if opt[:order] =~ /^d/i
 
-
       if opt[:interactive]
         opt[:menu] = !opt[:force]
         opt[:query] = '' # opt[:search]
@@ -1875,7 +1897,7 @@ module Doing
       end
 
       opts[:search] = options[:search] if options[:search]
-
+      opts[:not] = options[:negate]
       list_section(opts)
     end
 
