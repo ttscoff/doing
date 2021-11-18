@@ -62,7 +62,10 @@ if settings.dig('plugins', 'command_path')
 end
 
 program_desc 'A CLI for a What Was I Doing system'
-program_long_desc %(Doing uses a TaskPaper-like formatting to keep a plain text record of what you've been doing, complete with tag-based time tracking. The command line tool allows you to add entries, annotate with tags and notes, and view your entries with myriad options, with a focus on a "natural" language syntax.)
+program_long_desc %(Doing uses a TaskPaper-like formatting to keep a plain text
+record of what you've been doing, complete with tag-based time tracking. The
+command line tool allows you to add entries, annotate with tags and notes, and
+view your entries with myriad options, with a focus on a "natural" language syntax.)
 
 default_command :recent
 # sort_help :manually
@@ -549,6 +552,9 @@ end
 desc 'Add an item to the Later section'
 arg_name 'ENTRY'
 command :later do |c|
+  c.example 'doing later "Something I\'ll think about tomorrow"', desc: 'Add an entry to the Later section'
+  c.example 'doing later -e', desc: 'Open $EDITOR to create an entry and optional note'
+
   c.desc "Edit entry with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
@@ -787,6 +793,9 @@ desc 'End last X entries with no time tracked'
 long_desc 'Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doing finish --no-date`.'
 arg_name 'COUNT'
 command :cancel do |c|
+  c.example 'doing cancel', desc: 'Cancel the last entry'
+  c.example 'doing cancel --tag project1 -u 5', desc: 'Cancel the last 5 unfinished entries containing @project1'
+
   c.desc 'Archive entries'
   c.switch %i[a archive], negatable: false, default_value: false
 
@@ -801,6 +810,16 @@ command :cancel do |c|
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
+
+  c.desc 'Cancel the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  c.desc 'Force exact search string matching (case sensitive)'
+  c.switch %i[x exact], default_value: false, negatable: false
+
+  c.desc 'Finish items that *don\'t* match search/tag filters'
+  c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Cancel last entry (or entries) not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
@@ -831,7 +850,16 @@ command :cancel do |c|
       count = args[0] ? args[0].to_i : 1
     end
 
+    search = nil
+
+    if options[:search]
+      search = options[:search]
+      search.sub!(/^'?/, "'") if options[:exact]
+    end
+
     opts = {
+      search: search,
+      not: options[:not],
       archive: options[:a],
       count: count,
       date: false,

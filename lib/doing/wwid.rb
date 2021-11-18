@@ -957,7 +957,7 @@ module Doing
       if opt[:delete]
         res = opt[:force] ? true : yn("Delete #{items.size} items?", default_response: 'y')
         if res
-          items.each { |item| delete_item(item) }
+          items.each { |item| delete_item(item, single: items.count == 1) }
           write(@doing_file)
         end
         return
@@ -1015,7 +1015,7 @@ module Doing
           title = input_lines[0]&.strip
 
           if title.nil? || title =~ /^#{divider.strip}$/ || title.strip.empty?
-            delete_item(items[i])
+            delete_item(items[i], single: new_items.count == 1)
           else
             note = input_lines.length > 1 ? input_lines[1..-1] : []
 
@@ -1265,13 +1265,13 @@ module Doing
     ##
     ## @param      item  The item
     ##
-    def delete_item(item)
+    def delete_item(item, single: false)
       section = item.section
 
       section_items = @content[section][:items]
       deleted = section_items.delete(item)
       logger.count(:deleted)
-      logger.info('Entry deleted:', deleted.title)
+      logger.info('Entry deleted:', deleted.title) if single
     end
 
     ##

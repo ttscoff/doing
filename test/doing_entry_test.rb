@@ -87,6 +87,17 @@ class DoingEntryTest < Test::Unit::TestCase
     assert_match(/@done$/, doing('show'), 'should have @done tag with no timestamp')
   end
 
+  def test_cancel_search
+    unique = 'unique string'
+    doing('now', '1 Test entry @tag1')
+    doing('now', "3 Test entry #{unique}")
+    doing('now', '2 Test entry @tag2')
+    res = doing('--stdout', 'cancel', '--tag', 'tag1')
+    assert_match(/added tag @done to 1 Test/, res, 'should have cancelled tagged entry')
+    res = doing('--stdout', 'cancel', '--search', unique)
+    assert_match(/added tag @done to 3 Test/, res, 'should have @done tag with no timestamp')
+  end
+
   def test_cancel_multiple_args
     doing('now', 'Test entry')
     assert_raises(RuntimeError, 'Multiple arguments should cause error') { doing('cancel', '1', 'arg2') }
