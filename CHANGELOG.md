@@ -1,3 +1,10 @@
+### 2.0.8.pre
+
+#### NEW
+
+- Add `--exact` flag to all commands with `--search` flag to force exact matching without requiring single quote prefix
+- Add `--not` flag to all commands with filters (--tag, --search, --before, etc.) to negate the filter and return entries NOT matched
+
 ### 2.0.7.pre
 
 #### FIXED

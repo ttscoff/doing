@@ -2,7 +2,7 @@
 
 Doing uses a TaskPaper-like formatting to keep a plain text record of what you've been doing, complete with tag-based time tracking. The command line tool allows you to add entries, annotate with tags and notes, and view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.0.7.pre
+v2.0.8.pre
 
 === Global Options
 === --config_file arg
@@ -133,6 +133,16 @@ Select item to resume from a menu of matching entries
 
 
 
+===== --not
+Resume items that *don't* match search/tag filters
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
+
+
+
 ==== Command: <tt>archive|move  SECTION_OR_TAG</tt>
 Move entries between sections
 
@@ -188,6 +198,16 @@ Tag filter, combine multiple tags with a comma. Added for compatibility with oth
 
 ===== --[no-]label
 Label moved items with @from(SECTION_NAME)
+
+
+
+===== --not
+Show items that *don't* match search string
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -524,6 +544,11 @@ Select item(s) to finish from a menu of matching entries
 
 
 
+===== --not
+Finish items that *don't* match search/tag filters
+
+
+
 ===== -r|--remove
 Remove done tag
 
@@ -531,6 +556,11 @@ Remove done tag
 
 ===== -u|--unfinished
 Finish last entry (or entries) not already marked @done
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -577,8 +607,18 @@ Sort tags by (name|time)
 [Must Match] (?i-mx:^(?:name|time)$)
 
 
+===== --[no-]case
+Force case sensitive matching
+
+
+
 ===== -i|--interactive
 Display an interactive menu of results to perform further operations
+
+
+
+===== --not
+Show items that *don't* match search string
 
 
 
@@ -594,6 +634,11 @@ Show time intervals on @done tasks
 
 ===== --totals
 Show intervals with totals at the end of output
+
+
+
+===== -x|--exact
+Force exact string matching (case sensitive)
 
 
 
@@ -675,6 +720,11 @@ Autotag entries
 
 
 
+===== --not
+Import items that *don't* match search/tag/date filters
+
+
+
 ===== --only_timed
 Only import items with recorded time intervals
 
@@ -682,6 +732,11 @@ Only import items with recorded time intervals
 
 ===== --[no-]overlap
 Allow entries that overlap existing times
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -721,6 +776,16 @@ Tag filter, combine multiple tags with a comma.
 
 ===== -e|--editor
 Edit entry with vim
+
+
+
+===== --not
+Show items that *don't* match search string or tag filter
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -806,6 +871,11 @@ Select item(s) to flag from a menu of matching entries
 
 
 
+===== --not
+Flag items that *don't* match search/tag/date filters
+
+
+
 ===== -r|--remove
 Remove flag
 
@@ -813,6 +883,11 @@ Remove flag
 
 ===== -u|--unfinished
 Flag last entry (or entries) not marked @done
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -900,8 +975,18 @@ Select item for new note from a menu of matching entries
 
 
 
+===== --not
+Add note to item that *doesn't* match search/tag filters
+
+
+
 ===== -r|--remove
 Replace/Remove last entry's note (default append)
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -1075,7 +1160,7 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 ===== -s|--section NAME
 
-Set the start date of an item to now
+Limit search to section
 
 [Default Value] All
 
@@ -1099,8 +1184,18 @@ Select from a menu of matching entries
 
 
 
+===== --not
+Reset items that *don't* match search/tag filters
+
+
+
 ===== -r|--[no-]resume
 Resume entry (remove @done)
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -1152,6 +1247,16 @@ Search filter
 Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
 
 [Default Value] None
+
+
+===== --not
+Rotate items that *don't* match search string or tag filter
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
+
 
 
 ==== Command: <tt>sections </tt>
@@ -1260,8 +1365,18 @@ Use --no-menu to skip the interactive menu. Use with --query to filter items and
 
 
 
+===== --not
+Select items that *don't* match search/tag filters
+
+
+
 ===== -r|--remove
 Reverse -c, -f, --flag, and -t (remove instead of adding)
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -1366,6 +1481,11 @@ Select from a menu of matching entries to perform additional operations
 
 
 
+===== --not
+Show items that *don't* match search/tag/date filters
+
+
+
 ===== --only_timed
 Only show items with recorded time intervals
 
@@ -1378,6 +1498,11 @@ Show time intervals on @done tasks
 
 ===== --totals
 Show intervals with totals at the end of output
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -1501,6 +1626,11 @@ Select item(s) to tag from a menu of matching entries
 
 
 
+===== --not
+Tag items that *don't* match search/tag filters
+
+
+
 ===== -r|--remove
 Remove given tag(s)
 
@@ -1513,6 +1643,11 @@ Interpret tag string as regular expression (with --remove)
 
 ===== -u|--unfinished
 Tag last entry (or entries) not marked @done
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -1690,6 +1825,11 @@ Select from a menu of matching entries to perform additional operations
 
 
 
+===== --not
+Show items that *don't* match search string
+
+
+
 ===== --only_timed
 Only show items with recorded time intervals (override view settings)
 
@@ -1702,6 +1842,11 @@ Show time intervals on @done tasks
 
 ===== --totals
 Show intervals with totals at the end of output
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
