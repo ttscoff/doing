@@ -167,37 +167,7 @@
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-55
-56
-57
-58
-59
-60
-61
-62
-63</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/errors.rb', line 55</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_level'>level</span> <span class='op'>||=</span> <span class='symbol'>:error</span>
-  <span class='const'><span class='object_link'><a href="../../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_output_results'>output_results</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_msg'>msg</span>
-    <span class='const'><span class='object_link'><a href="../../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
-  <span class='const'>Process</span><span class='period'>.</span><span class='id identifier rubyid_exit'>exit</span> <span class='int'>1</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
   
 </div>
@@ -206,7 +176,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:17:50 2021 by
+  Generated on Thu Nov 18 16:39:12 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

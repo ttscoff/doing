@@ -9,7 +9,7 @@ require 'yard'
 
 YARD::Rake::YardocTask.new do |t|
  t.files = ['lib/doing/*.rb']
- t.options = ['--markup-provider=redcarpet', '--markup=markdown', '--no-private']
+ t.options = ['--markup-provider=redcarpet', '--markup=markdown', '--no-private', '-p', 'yard_templates']
  # t.stats_options = ['--list-undoc']
 end
 

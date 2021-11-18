@@ -256,25 +256,7 @@
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-11
-12
-13</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/hash.rb', line 11</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_deep_freeze'>deep_freeze</span>
-  <span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='op'>|</span> <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="" title="Hash (class)">Hash</a></span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_deep_freeze'>deep_freeze</span> <span class='op'>:</span> <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -286,25 +268,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-15
-16
-17</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/hash.rb', line 15</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_deep_freeze!'>deep_freeze!</span>
-  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_deep_freeze'>deep_freeze</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -328,25 +292,7 @@
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-22
-23
-24</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/hash.rb', line 22</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_stringify_keys'>stringify_keys</span>
-  <span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='lparen'>(</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_hsh'>hsh</span><span class='op'>|</span> <span class='id identifier rubyid_hsh'>hsh</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="" title="Hash (class)">Hash</a></span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_stringify_keys'>stringify_keys</span> <span class='op'>:</span> <span class='id identifier rubyid_v'>v</span> <span class='rbrace'>}</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -368,25 +314,7 @@
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-27
-28
-29</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/hash.rb', line 27</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_symbolize_keys'>symbolize_keys</span>
-  <span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='lparen'>(</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_hsh'>hsh</span><span class='op'>|</span> <span class='id identifier rubyid_hsh'>hsh</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="" title="Hash (class)">Hash</a></span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_symbolize_keys'>symbolize_keys</span> <span class='op'>:</span> <span class='id identifier rubyid_v'>v</span> <span class='rbrace'>}</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -394,7 +322,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:17:50 2021 by
+  Generated on Thu Nov 18 16:39:11 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

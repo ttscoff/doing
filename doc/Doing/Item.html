@@ -603,31 +603,7 @@ the item belongs</p>
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-21
-22
-23
-24
-25
-26</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 21</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_date'>date</span><span class='comma'>,</span> <span class='id identifier rubyid_title'>title</span><span class='comma'>,</span> <span class='id identifier rubyid_section'>section</span><span class='comma'>,</span> <span class='id identifier rubyid_note'>note</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='ivar'>@date</span> <span class='op'>=</span> <span class='id identifier rubyid_date'>date</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_date'>date</span> <span class='op'>:</span> <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_date'>date</span><span class='rparen'>)</span>
-  <span class='ivar'>@title</span> <span class='op'>=</span> <span class='id identifier rubyid_title'>title</span>
-  <span class='ivar'>@section</span> <span class='op'>=</span> <span class='id identifier rubyid_section'>section</span>
-  <span class='ivar'>@note</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Note.html" title="Doing::Note (class)">Note</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Note.html#initialize-instance_method" title="Doing::Note#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_note'>note</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
   
 </div>
@@ -656,25 +632,7 @@ the item belongs</p>
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-8
-9
-10</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 8</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_date'>date</span>
-  <span class='ivar'>@date</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       
@@ -698,25 +656,7 @@ the item belongs</p>
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-8
-9
-10</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 8</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_note'>note</span>
-  <span class='ivar'>@note</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       
@@ -740,25 +680,7 @@ the item belongs</p>
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-8
-9
-10</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 8</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_section'>section</span>
-  <span class='ivar'>@section</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       
@@ -782,25 +704,7 @@ the item belongs</p>
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-8
-9
-10</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 8</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_title'>title</span>
-  <span class='ivar'>@title</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -846,25 +750,7 @@ the item belongs</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-47
-48
-49</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 47</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_end_date'>end_date</span>
-  <span class='ivar'>@end_date</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@title</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)</span><span class='regexp_end'>/</span></span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -922,37 +808,7 @@ the item belongs</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-58
-59
-60
-61
-62
-63
-64
-65
-66</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 58</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='ivar'>@title</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='op'>!=</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
-
-  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='ivar'>@date</span> <span class='op'>!=</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_date'>date</span>
-
-  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='ivar'>@note</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_note'>note</span><span class='rparen'>)</span>
-
-  <span class='kw'>true</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -992,25 +848,7 @@ the value of its @done tag (if present)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-38
-39
-40</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 38</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_interval'>interval</span>
-  <span class='ivar'>@interval</span> <span class='op'>||=</span> <span class='id identifier rubyid_calc_interval'>calc_interval</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1069,41 +907,7 @@ value overlaps with another item&#39;s</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 87</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_overlapping_time?'>overlapping_time?</span><span class='lparen'>(</span><span class='id identifier rubyid_item_b'>item_b</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_same_time?'>same_time?</span><span class='lparen'>(</span><span class='id identifier rubyid_item_b'>item_b</span><span class='rparen'>)</span>
-
-  <span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>=</span> <span class='id identifier rubyid_date'>date</span>
-  <span class='id identifier rubyid_interval'>interval</span> <span class='op'>=</span> <span class='id identifier rubyid_interval'>interval</span>
-  <span class='id identifier rubyid_end_a'>end_a</span> <span class='op'>=</span> <span class='id identifier rubyid_interval'>interval</span> <span class='op'>?</span> <span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>+</span> <span class='id identifier rubyid_interval'>interval</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>:</span> <span class='id identifier rubyid_start_a'>start_a</span>
-  <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>=</span> <span class='id identifier rubyid_item_b'>item_b</span><span class='period'>.</span><span class='id identifier rubyid_date'>date</span>
-  <span class='id identifier rubyid_interval'>interval</span> <span class='op'>=</span> <span class='id identifier rubyid_item_b'>item_b</span><span class='period'>.</span><span class='id identifier rubyid_interval'>interval</span>
-  <span class='id identifier rubyid_end_b'>end_b</span> <span class='op'>=</span> <span class='id identifier rubyid_interval'>interval</span> <span class='op'>?</span> <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>+</span> <span class='id identifier rubyid_interval'>interval</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>:</span> <span class='id identifier rubyid_start_b'>start_b</span>
-  <span class='lparen'>(</span><span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_end_b'>end_b</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid_end_a'>end_a</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_a'>end_a</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_end_b'>end_b</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_a'>end_a</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_end_b'>end_b</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1161,25 +965,7 @@ value overlaps with another item&#39;s</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-75
-76
-77</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 75</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_same_time?'>same_time?</span><span class='lparen'>(</span><span class='id identifier rubyid_item_b'>item_b</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_date'>date</span> <span class='op'>==</span> <span class='id identifier rubyid_item_b'>item_b</span><span class='period'>.</span><span class='id identifier rubyid_date'>date</span> <span class='op'>?</span> <span class='id identifier rubyid_interval'>interval</span> <span class='op'>==</span> <span class='id identifier rubyid_item_b'>item_b</span><span class='period'>.</span><span class='id identifier rubyid_interval'>interval</span> <span class='op'>:</span> <span class='kw'>false</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1273,61 +1059,7 @@ type (:sensitive,
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-156
-157
-158
-159
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 156</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='id identifier rubyid_search'>search</span><span class='comma'>,</span> <span class='label'>negate:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>case_type:</span> <span class='symbol'>:smart</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='ivar'>@title</span> <span class='op'>+</span> <span class='ivar'>@note</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='id identifier rubyid_pattern'>pattern</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
-            <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^/.*?/$</span><span class='regexp_end'>}</span></span>
-              <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>/(.*?)/</span><span class='regexp_end'>}</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-            <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^&#39;</span><span class='regexp_end'>/</span></span>
-              <span class='id identifier rubyid_case_sensitive'>case_sensitive</span> <span class='op'>=</span> <span class='kw'>true</span>
-              <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^&#39;(.*?)&#39;?$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-            <span class='kw'>else</span>
-              <span class='kw'>if</span> <span class='id identifier rubyid_case_type'>case_type</span> <span class='op'>==</span> <span class='symbol'>:smart</span>
-                <span class='id identifier rubyid_case_sensitive'>case_sensitive</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_search'>search</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[A-Z]</span><span class='regexp_end'>/</span></span>
-              <span class='kw'>else</span>
-                <span class='id identifier rubyid_case_sensitive'>case_sensitive</span> <span class='op'>=</span> <span class='id identifier rubyid_case_type'>case_type</span> <span class='op'>==</span> <span class='symbol'>:sensitive</span>
-              <span class='kw'>end</span>
-
-              <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.{0,3}</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-            <span class='kw'>end</span>
-  <span class='id identifier rubyid_rx'>rx</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='op'>!</span><span class='id identifier rubyid_case_sensitive'>case_sensitive</span><span class='rparen'>)</span>
-
-  <span class='id identifier rubyid_negate'>negate</span> <span class='op'>?</span> <span class='id identifier rubyid_text'>text</span> <span class='op'>!~</span> <span class='id identifier rubyid_rx'>rx</span> <span class='op'>:</span> <span class='id identifier rubyid_text'>text</span> <span class='op'>=~</span> <span class='id identifier rubyid_rx'>rx</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1361,25 +1093,7 @@ type (:sensitive,
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-178
-179
-180</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 178</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_should_finish?'>should_finish?</span>
-  <span class='id identifier rubyid_should?'>should?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>never_finish</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1413,25 +1127,7 @@ type (:sensitive,
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-182
-183
-184</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 182</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_should_time?'>should_time?</span>
-  <span class='id identifier rubyid_should?'>should?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>never_time</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1540,25 +1236,7 @@ type (:sensitive,
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-108
-109
-110</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 108</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_tag'>tag</span><span class='lparen'>(</span><span class='id identifier rubyid_tag'>tag</span><span class='comma'>,</span> <span class='label'>value:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>remove:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>rename_to:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>regex:</span> <span class='kw'>false</span><span class='rparen'>)</span>
-  <span class='ivar'>@title</span><span class='period'>.</span><span class='id identifier rubyid_tag!'>tag!</span><span class='lparen'>(</span><span class='id identifier rubyid_tag'>tag</span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='label'>remove:</span> <span class='id identifier rubyid_remove'>remove</span><span class='comma'>,</span> <span class='label'>rename_to:</span> <span class='id identifier rubyid_rename_to'>rename_to</span><span class='comma'>,</span> <span class='label'>regex:</span> <span class='id identifier rubyid_regex'>regex</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_strip!'>strip!</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1597,25 +1275,7 @@ type (:sensitive,
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-117
-118
-119</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 117</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_tags'>tags</span>
-  <span class='ivar'>@title</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(?&lt;= |\A)@([^\s(]+)</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_tag'>tag</span><span class='op'>|</span> <span class='id identifier rubyid_tag'>tag</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1707,47 +1367,7 @@ type (:sensitive,
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-130
-131
-132
-133
-134
-135
-136
-137
-138
-139
-140
-141
-142
-143</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/item.rb', line 130</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_tags?'>tags?</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='comma'>,</span> <span class='id identifier rubyid_bool'>bool</span> <span class='op'>=</span> <span class='symbol'>:and</span><span class='comma'>,</span> <span class='label'>negate:</span> <span class='kw'>false</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_tags'>tags</span> <span class='op'>=</span> <span class='id identifier rubyid_split_tags'>split_tags</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_bool'>bool</span> <span class='op'>=</span> <span class='id identifier rubyid_bool'>bool</span><span class='period'>.</span><span class='id identifier rubyid_normalize_bool'>normalize_bool</span>
-
-  <span class='id identifier rubyid_matches'>matches</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_bool'>bool</span>
-            <span class='kw'>when</span> <span class='symbol'>:and</span>
-              <span class='id identifier rubyid_all_tags?'>all_tags?</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='rparen'>)</span>
-            <span class='kw'>when</span> <span class='symbol'>:not</span>
-              <span class='id identifier rubyid_no_tags?'>no_tags?</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='rparen'>)</span>
-            <span class='kw'>else</span>
-              <span class='id identifier rubyid_any_tags?'>any_tags?</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='rparen'>)</span>
-            <span class='kw'>end</span>
-  <span class='id identifier rubyid_negate'>negate</span> <span class='op'>?</span> <span class='op'>!</span><span class='id identifier rubyid_matches'>matches</span> <span class='op'>:</span> <span class='id identifier rubyid_matches'>matches</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -1755,7 +1375,7 @@ type (:sensitive,
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:17:50 2021 by
+  Generated on Thu Nov 18 16:39:11 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

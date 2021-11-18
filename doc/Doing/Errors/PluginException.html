@@ -200,55 +200,7 @@
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/errors.rb', line 69</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Plugin error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_plugin'>plugin</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='ivar'>@plugin</span> <span class='op'>=</span> <span class='id identifier rubyid_plugin'>plugin</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Unknown Plugin</span><span class='tstring_end'>&#39;</span></span>
-
-  <span class='id identifier rubyid_type'>type</span> <span class='op'>||=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Unknown</span><span class='tstring_end'>&#39;</span></span>
-  <span class='ivar'>@type</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-          <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^i</span><span class='regexp_end'>/</span></span>
-            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Import plugin</span><span class='tstring_end'>&#39;</span></span>
-          <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^e</span><span class='regexp_end'>/</span></span>
-            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Export plugin</span><span class='tstring_end'>&#39;</span></span>
-          <span class='kw'>else</span>
-            <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-          <span class='kw'>end</span>
-
-  <span class='id identifier rubyid_msg'>msg</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(</span><span class='embexpr_beg'>#{</span><span class='ivar'>@type</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='ivar'>@plugin</span><span class='embexpr_end'>}</span><span class='tstring_content'>) </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_msg'>msg</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-
-  <span class='const'><span class='object_link'><a href="../../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='symbol'>:error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Plugin:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
-  <span class='const'>Process</span><span class='period'>.</span><span class='id identifier rubyid_exit'>exit</span> <span class='int'>1</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
   
 </div>
@@ -277,25 +229,7 @@
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-67
-68
-69</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/errors.rb', line 67</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_plugin'>plugin</span>
-  <span class='ivar'>@plugin</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -304,7 +238,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:17:50 2021 by
+  Generated on Thu Nov 18 16:39:12 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

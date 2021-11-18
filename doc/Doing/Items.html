@@ -281,37 +281,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-56
-57
-58
-59
-60
-61
-62
-63
-64</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/wwidfile.rb', line 56</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_add_section'>add_section</span><span class='lparen'>(</span><span class='id identifier rubyid_title'>title</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_section_titles'>section_titles</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_cap_first'>cap_first</span><span class='rparen'>)</span>
-    <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Skipped</span><span class='label_end'>&#39;:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Section already exists</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-    <span class='kw'>return</span>
-  <span class='kw'>end</span>
-
-  <span class='ivar'>@sections</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span> <span class='label'>original:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>title:</span> <span class='id identifier rubyid_title'>title</span> <span class='rbrace'>}</span>
-  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Added section:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_cap_first'>cap_first</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -323,101 +293,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/wwidfile.rb', line 5</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_from'>from</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_path'>path</span>
-  <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
-
-  <span class='kw'>if</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_file?'>file?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_stat'>stat</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span>
-    <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='const'>IO</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='rparen'>)</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_force_encoding'>force_encoding</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>utf-8</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span> <span class='symbol'>:force_encoding</span>
-  <span class='kw'>end</span>
-
-  <span class='id identifier rubyid_section'>section</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Uncategorized</span><span class='tstring_end'>&#39;</span></span>
-  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[\n\r]</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='int'>0</span>
-
-  <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span>
-    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*$</span><span class='regexp_end'>/</span></span>
-
-    <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^(\S[\S ]+):\s*(@\S+\s*)*$</span><span class='regexp_end'>/</span></span>
-      <span class='id identifier rubyid_section'>section</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span>
-      <span class='ivar'>@sections</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span> <span class='label'>original:</span> <span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='label'>title:</span> <span class='id identifier rubyid_section'>section</span> <span class='rbrace'>}</span>
-      <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='int'>0</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_line'>line</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)</span><span class='regexp_end'>/</span></span>
-      <span class='id identifier rubyid_date'>date</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
-      <span class='id identifier rubyid_title'>title</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
-      <span class='id identifier rubyid_item'>item</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Item.html" title="Doing::Item (class)">Item</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Item.html#initialize-instance_method" title="Doing::Item#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_date'>date</span><span class='comma'>,</span> <span class='id identifier rubyid_title'>title</span><span class='comma'>,</span> <span class='id identifier rubyid_section'>section</span><span class='rparen'>)</span>
-      <span class='ivar'>@items</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_item'>item</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_current'>current</span> <span class='op'>+=</span> <span class='int'>1</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_zero?'>zero?</span>
-      <span class='comment'># if content[section][:items].length - 1 == current
-</span>      <span class='ivar'>@other_content_top</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_line'>line</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\S</span><span class='regexp_end'>/</span></span>
-      <span class='ivar'>@other_content_bottom</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
-    <span class='kw'>else</span>
-      <span class='id identifier rubyid_prev_item'>prev_item</span> <span class='op'>=</span> <span class='ivar'>@items</span><span class='lbracket'>[</span><span class='id identifier rubyid_current'>current</span> <span class='op'>-</span> <span class='int'>1</span><span class='rbracket'>]</span>
-      <span class='id identifier rubyid_prev_item'>prev_item</span><span class='period'>.</span><span class='id identifier rubyid_note'>note</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Note.html" title="Doing::Note (class)">Note</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Note.html#initialize-instance_method" title="Doing::Note#initialize (method)">new</a></span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_prev_item'>prev_item</span><span class='period'>.</span><span class='id identifier rubyid_note'>note</span>
-
-      <span class='id identifier rubyid_prev_item'>prev_item</span><span class='period'>.</span><span class='id identifier rubyid_note'>note</span><span class='period'>.</span><span class='id identifier rubyid_add'>add</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
-      <span class='comment'># end
-</span>    <span class='kw'>end</span>
-  <span class='kw'>end</span>
-  <span class='const'><span class='object_link'><a href="Hooks.html" title="Doing::Hooks (module)">Hooks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_trigger'><span class='object_link'><a href="Hooks.html#trigger-class_method" title="Doing::Hooks.trigger (method)">trigger</a></span></span> <span class='symbol'>:post_read</span><span class='comma'>,</span> <span class='kw'>self</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -475,93 +351,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/wwidfile.rb', line 72</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_guess_section'>guess_section</span><span class='lparen'>(</span><span class='id identifier rubyid_frag'>frag</span><span class='comma'>,</span> <span class='label'>guessed:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>suggest:</span> <span class='kw'>false</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>All</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_frag'>frag</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^all$</span><span class='regexp_end'>/i</span></span>
-  <span class='id identifier rubyid_frag'>frag</span> <span class='op'>||=</span> <span class='id identifier rubyid_wwid'>wwid</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>current_section</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
-
-  <span class='ivar'>@sections</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_sect'>sect</span><span class='op'>|</span> <span class='kw'>return</span> <span class='id identifier rubyid_sect'>sect</span><span class='lbracket'>[</span><span class='symbol'>:title</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_cap_first'>cap_first</span> <span class='kw'>if</span> <span class='id identifier rubyid_frag'>frag</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='op'>==</span> <span class='id identifier rubyid_sect'>sect</span><span class='lbracket'>[</span><span class='symbol'>:title</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='rbrace'>}</span>
-
-  <span class='id identifier rubyid_section'>section</span> <span class='op'>=</span> <span class='kw'>false</span>
-  <span class='id identifier rubyid_re'>re</span> <span class='op'>=</span> <span class='id identifier rubyid_frag'>frag</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.*?</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_sections'>sections</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_sect'>sect</span><span class='op'>|</span>
-    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_sect'>sect</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_re'>re</span><span class='embexpr_end'>}</span><span class='regexp_end'>/i</span></span>
-
-    <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Section match:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>Assuming &quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_sect'>sect</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot; from &quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_frag'>frag</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_section'>section</span> <span class='op'>=</span> <span class='id identifier rubyid_sect'>sect</span>
-    <span class='kw'>break</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>return</span> <span class='id identifier rubyid_section'>section</span> <span class='kw'>if</span> <span class='id identifier rubyid_suggest'>suggest</span>
-
-  <span class='kw'>unless</span> <span class='id identifier rubyid_section'>section</span> <span class='op'>||</span> <span class='id identifier rubyid_guessed'>guessed</span>
-    <span class='id identifier rubyid_alt'>alt</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="WWID.html" title="Doing::WWID (class)">WWID</a></span></span><span class='period'>.</span><span class='id identifier rubyid_guess_view'><span class='object_link'><a href="WWID.html#guess_view-instance_method" title="Doing::WWID#guess_view (method)">guess_view</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_frag'>frag</span><span class='comma'>,</span> <span class='label'>guessed:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>suggest:</span> <span class='kw'>true</span><span class='rparen'>)</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_alt'>alt</span>
-      <span class='id identifier rubyid_meant_view'>meant_view</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="WWID.html" title="Doing::WWID (class)">WWID</a></span></span><span class='period'>.</span><span class='id identifier rubyid_yn'><span class='object_link'><a href="WWID.html#yn-instance_method" title="Doing::WWID#yn (method)">yn</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Did you mean `doing view </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_alt'>alt</span><span class='embexpr_end'>}</span><span class='tstring_content'>`?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>default_response:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>n</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="Errors.html" title="Doing::Errors (module)">Errors</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Errors.html#InvalidSection-constant" title="Doing::Errors::InvalidSection (constant)">InvalidSection</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Run again with `doing view </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_alt'>alt</span><span class='embexpr_end'>}</span><span class='tstring_content'>`</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_meant_view'>meant_view</span>
-    <span class='kw'>end</span>
-
-    <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="WWID.html" title="Doing::WWID (class)">WWID</a></span></span><span class='period'>.</span><span class='id identifier rubyid_yn'><span class='object_link'><a href="WWID.html#yn-instance_method" title="Doing::WWID#yn (method)">yn</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Section </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_frag'>frag</span><span class='embexpr_end'>}</span><span class='tstring_content'> not found, create it</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>default_response:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>n</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-
-    <span class='kw'>if</span> <span class='id identifier rubyid_res'>res</span>
-      <span class='id identifier rubyid_add_section'>add_section</span><span class='lparen'>(</span><span class='id identifier rubyid_frag'>frag</span><span class='period'>.</span><span class='id identifier rubyid_cap_first'>cap_first</span><span class='rparen'>)</span>
-      <span class='const'><span class='object_link'><a href="WWID.html" title="Doing::WWID (class)">WWID</a></span></span><span class='period'>.</span><span class='id identifier rubyid_write'><span class='object_link'><a href="WWID.html#write-instance_method" title="Doing::WWID#write (method)">write</a></span></span><span class='lparen'>(</span><span class='ivar'>@doing_file</span><span class='rparen'>)</span>
-      <span class='kw'>return</span> <span class='id identifier rubyid_frag'>frag</span><span class='period'>.</span><span class='id identifier rubyid_cap_first'>cap_first</span>
-    <span class='kw'>end</span>
-
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="Errors.html" title="Doing::Errors (module)">Errors</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Errors.html#InvalidSection-constant" title="Doing::Errors::InvalidSection (constant)">InvalidSection</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown section: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_frag'>frag</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_section'>section</span> <span class='op'>?</span> <span class='id identifier rubyid_section'>section</span><span class='period'>.</span><span class='id identifier rubyid_cap_first'>cap_first</span> <span class='op'>:</span> <span class='id identifier rubyid_guessed'>guessed</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -573,31 +363,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-110
-111
-112
-113
-114
-115</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/wwidfile.rb', line 110</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_section_items'>section_items</span><span class='lparen'>(</span><span class='id identifier rubyid_section'>section</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_section'>section</span> <span class='op'>=</span> <span class='id identifier rubyid_guess_section'>guess_section</span><span class='lparen'>(</span><span class='id identifier rubyid_section'>section</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='ivar'>@items</span> <span class='kw'>if</span> <span class='id identifier rubyid_section'>section</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>all</span><span class='regexp_end'>/i</span></span>
-
-  <span class='ivar'>@items</span><span class='period'>.</span><span class='id identifier rubyid_filter'>filter</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span> <span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_section'>section</span> <span class='op'>==</span> <span class='id identifier rubyid_section'>section</span> <span class='rbrace'>}</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -609,25 +375,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-47
-48
-49</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/wwidfile.rb', line 47</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_section_titles'>section_titles</span>
-  <span class='ivar'>@sections</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:title</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
   </div>
@@ -635,7 +383,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:17:50 2021 by
+  Generated on Thu Nov 18 16:39:12 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

@@ -656,37 +656,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-39
-40
-41
-42
-43
-44
-45
-46
-47</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 39</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='symbol'>:info</span><span class='rparen'>)</span>
-  <span class='ivar'>@messages</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='ivar'>@counters</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
-  <span class='const'><span class='object_link'><a href="#COUNT_KEYS-constant" title="Doing::LogAdapter::COUNT_KEYS (constant)">COUNT_KEYS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='op'>|</span> <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>tag:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>count:</span> <span class='int'>0</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
-  <span class='ivar'>@results</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='ivar'>@logdev</span> <span class='op'>=</span> <span class='gvar'>$stderr</span>
-  <span class='ivar'>@max_length</span> <span class='op'>=</span> <span class='backtick'>`</span><span class='tstring_content'>tput cols</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>-</span> <span class='int'>5</span> <span class='op'>||</span> <span class='int'>85</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
   
 </div>
@@ -715,25 +685,7 @@
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-10
-11
-12</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 10</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_level'>level</span>
-  <span class='ivar'>@level</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       
@@ -776,25 +728,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-8
-9
-10</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 8</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_logdev='>logdev=</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='ivar'>@logdev</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       
@@ -837,25 +771,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-8
-9
-10</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 8</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_max_length='>max_length=</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='ivar'>@max_length</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       
@@ -879,25 +795,7 @@
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-10
-11
-12</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 10</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_messages'>messages</span>
-  <span class='ivar'>@messages</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       
@@ -921,25 +819,7 @@
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-10
-11
-12</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 10</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_results'>results</span>
-  <span class='ivar'>@results</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -1025,27 +905,7 @@ omitted)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-158
-159
-160
-161</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 158</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_abort_with'>abort_with</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_error'>error</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_abort'>abort</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1057,37 +917,7 @@ omitted)</p>
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-73
-74
-75
-76
-77
-78
-79
-80
-81</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 73</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_adjust_verbosity'>adjust_verbosity</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:quiet</span><span class='rbracket'>]</span>
-    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='symbol'>:error</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:verbose</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:debug</span><span class='rbracket'>]</span>
-    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='symbol'>:debug</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_log_now'>log_now</span> <span class='symbol'>:debug</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Logging at level:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='ivar'>@level</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='comment'># log_now :debug, &#39;Doing Version:&#39;, Doing::VERSION
-</span><span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -1121,35 +951,7 @@ omitted)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-83
-84
-85
-86
-87
-88
-89
-90</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 83</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>level:</span> <span class='symbol'>:info</span><span class='comma'>,</span> <span class='label'>count:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>tag:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>invalid counter key</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="#COUNT_KEYS-constant" title="Doing::LogAdapter::COUNT_KEYS (constant)">COUNT_KEYS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
-
-  <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:count</span><span class='rbracket'>]</span> <span class='op'>+=</span> <span class='id identifier rubyid_count'>count</span>
-  <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tag</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_tag'>tag</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span> <span class='kw'>unless</span> <span class='id identifier rubyid_tag'>tag</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
-  <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='id identifier rubyid_level'>level</span>
-  <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='id identifier rubyid_message'>message</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1224,25 +1026,7 @@ omitted)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-100
-101
-102</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 100</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='symbol'>:debug</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1319,25 +1103,7 @@ omitted)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-142
-143
-144</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 142</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_error'>error</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='symbol'>:error</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1414,37 +1180,7 @@ omitted)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-173
-174
-175
-176
-177
-178
-179
-180
-181</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 173</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_formatted_topic'>formatted_topic</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='label'>colon:</span> <span class='kw'>false</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_colon'>colon</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_topic'>topic</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#TOPIC_WIDTH-constant" title="Doing::LogAdapter::TOPIC_WIDTH (constant)">TOPIC_WIDTH</a></span></span><span class='rparen'>)</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_topic'>topic</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>:$</span><span class='regexp_end'>/</span></span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_topic'>topic</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#TOPIC_WIDTH-constant" title="Doing::LogAdapter::TOPIC_WIDTH (constant)">TOPIC_WIDTH</a></span></span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_topic'>topic</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1521,25 +1257,7 @@ omitted)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-114
-115
-116</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 114</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_info'>info</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='symbol'>:info</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1599,51 +1317,7 @@ omitted)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 56</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_log_level='>log_level=</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>info</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-
-  <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_level'>level</span>
-          <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[e0]</span><span class='regexp_end'>/i</span></span>
-            <span class='symbol'>:error</span>
-          <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[w1]</span><span class='regexp_end'>/i</span></span>
-            <span class='symbol'>:warn</span>
-          <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[d3]</span><span class='regexp_end'>/i</span></span>
-            <span class='symbol'>:debug</span>
-          <span class='kw'>else</span>
-            <span class='symbol'>:info</span>
-          <span class='kw'>end</span>
-
-  <span class='ivar'>@level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1731,37 +1405,7 @@ omitted)</p>
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-212
-213
-214
-215
-216
-217
-218
-219
-220</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 212</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_write_message?'>write_message?</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
-
-  <span class='kw'>if</span> <span class='ivar'>@logdev</span> <span class='op'>==</span> <span class='gvar'>$stdout</span>
-    <span class='ivar'>@logdev</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_message'>message</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='ivar'>@logdev</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_color_message'>color_message</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1800,45 +1444,7 @@ omitted)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237
-238
-239</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 227</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_output_results'>output_results</span>
-  <span class='id identifier rubyid_total_counters'>total_counters</span>
-
-  <span class='id identifier rubyid_results'>results</span> <span class='op'>=</span> <span class='ivar'>@results</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_msg'>msg</span><span class='op'>|</span> <span class='id identifier rubyid_write_message?'>write_message?</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
-
-  <span class='kw'>if</span> <span class='ivar'>@logdev</span> <span class='op'>==</span> <span class='gvar'>$stdout</span>
-    <span class='gvar'>$stdout</span><span class='period'>.</span><span class='id identifier rubyid_print'>print</span> <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_res'>res</span><span class='op'>|</span> <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_uncolor'>uncolor</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_msg'>msg</span><span class='op'>|</span>
-      <span class='ivar'>@logdev</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_color_message'>color_message</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-    <span class='kw'>end</span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -1915,25 +1521,7 @@ omitted)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-128
-129
-130</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 128</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='symbol'>:warn</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -2044,27 +1632,7 @@ message (optional)</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-199
-200
-201
-202</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/log_adapter.rb', line 199</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_level_of_message'>level_of_message</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='ivar'>@results</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span> <span class='label'>level:</span> <span class='id identifier rubyid_level_of_message'>level_of_message</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-  <span class='kw'>true</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -2072,7 +1640,7 @@ message (optional)</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:17:50 2021 by
+  Generated on Thu Nov 18 16:39:12 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

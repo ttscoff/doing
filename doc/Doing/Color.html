@@ -359,25 +359,7 @@ uncoloring strings.</p>
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-130
-131
-132</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 130</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_attributes'>attributes</span>
-  <span class='const'><span class='object_link'><a href="#ATTRIBUTE_NAMES-constant" title="Doing::Color::ATTRIBUTE_NAMES (constant)">ATTRIBUTE_NAMES</a></span></span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -401,25 +383,7 @@ this for example:
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-84
-85
-86</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 84</span>
-
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_coloring='>coloring=</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
-  <span class='ivar'>@coloring</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -455,25 +419,7 @@ is switched on, false otherwise.</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-77
-78
-79</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 77</span>
-
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_coloring?'>coloring?</span>
-  <span class='ivar'>@coloring</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -519,31 +465,7 @@ attribute instead.</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-69
-70
-71
-72
-73
-74</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 69</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_support?'>support?</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='rparen'>)</span>
-  <span class='kw'>case</span> <span class='id identifier rubyid_feature'>feature</span>
-  <span class='kw'>when</span> <span class='symbol'>:clear</span>
-    <span class='op'>!</span><span class='const'><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></span><span class='period'>.</span><span class='id identifier rubyid_instance_methods'>instance_methods</span><span class='lparen'>(</span><span class='kw'>false</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_sym</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='symbol'>:clear</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -566,41 +488,7 @@ ANSI-sequences are stripped from the string.</p>
 <div class="tags">
   
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 115</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_uncolor'>uncolor</span><span class='lparen'>(</span><span class='id identifier rubyid_string'>string</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='comment'># :yields:
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
-    <span class='kw'>yield</span><span class='period'>.</span><span class='id identifier rubyid_to_str'>to_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#COLORED_REGEXP-constant" title="Doing::Color::COLORED_REGEXP (constant)">COLORED_REGEXP</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_string'>string</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:to_str</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_string'>string</span><span class='period'>.</span><span class='id identifier rubyid_to_str'>to_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#COLORED_REGEXP-constant" title="Doing::Color::COLORED_REGEXP (constant)">COLORED_REGEXP</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:to_str</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_to_str'>to_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#COLORED_REGEXP-constant" title="Doing::Color::COLORED_REGEXP (constant)">COLORED_REGEXP</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -608,7 +496,7 @@ ANSI-sequences are stripped from the string.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:17:50 2021 by
+  Generated on Thu Nov 18 16:39:11 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>
