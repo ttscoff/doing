@@ -2075,7 +2075,7 @@ EOS
           (max - k.length).times do
             spacer += ' '
           end
-          d, h, m = format_time(v, human: true)
+          _d, h, m = format_time(v, human: true)
           output.push("┃ #{spacer}#{k}:#{format('%<h> 4dh %<m>02dm', h: h, m: m)} ┃")
         end
 
