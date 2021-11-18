@@ -28,7 +28,7 @@ class ZshCompletions
   attr_accessor :commands, :global_options
 
   def generate_helpers
-    <<~EOFUNCTIONS
+    out=<<~EOFUNCTIONS
       compdef _doing doing
 
       function _doing() {
@@ -57,6 +57,8 @@ class ZshCompletions
       }
 
     EOFUNCTIONS
+    status('Complete', reset: false)
+    out
   end
 
   def get_help_sections(command = '')
@@ -161,7 +163,6 @@ class ZshCompletions
 
   def generate_completions
     generate_helpers
-    status('Complete', reset: false)
   end
 end
 
