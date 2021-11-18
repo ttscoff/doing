@@ -82,7 +82,7 @@ class BashCompletions
         fi
       }
     EOFUNC
-
+    clear
     out.join("\n")
   end
 
@@ -151,7 +151,7 @@ class BashCompletions
 
 
   def get_help_sections(command = '')
-    res = `bundle exec bin/doing help #{command}`.strip
+    res = `doing help #{command}`.strip
     scanned = res.scan(/(?m-i)^([A-Z ]+)\n([\s\S]*?)(?=\n+[A-Z]+|\Z)/)
     sections = {}
     scanned.each do |sect|
@@ -203,6 +203,7 @@ class BashCompletions
     out = []
     out << main_function
     out << 'complete -F _doing doing'
+    status('Complete', reset: false)
     out.join("\n")
   end
 end

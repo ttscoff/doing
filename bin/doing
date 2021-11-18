@@ -1857,6 +1857,44 @@ command :plugins do |c|
   end
 end
 
+desc 'Generate shell completion scripts'
+command :completion do |c|
+  c.example 'doing completion', desc: 'Output zsh (default) to STDOUT'
+  c.example 'doing completion --type zsh --file ~/.zsh-completions/_doing.zsh', desc: 'Output zsh completions to file'
+  c.example 'doing completion --type fish --file ~/.config/fish/completions/doing.fish', desc: 'Output fish completions to file'
+  c.example 'doing completion --type bash --file ~/.bash_it/completion/enabled/doing.bash', desc: 'Output bash completions to file'
+
+  c.desc 'Shell to generate for (bash, zsh, fish)'
+  c.arg_name 'SHELL'
+  c.flag %i[t type], must_match: /^[bzf](?:[ai]?sh)?$/i, default_value: 'zsh'
+
+  c.desc 'File to write output to'
+  c.arg_name 'PATH'
+  c.flag %i[f file], default_value: 'stdout'
+
+  c.action do |_global_options, options, _args|
+    script_dir = File.join(File.dirname(__FILE__), '..', 'scripts')
+
+    case options[:type]
+    when /^b/
+      result = `ruby #{File.join(script_dir, 'generate_bash_completions.rb')}`
+    when /^z/
+      result = `ruby #{File.join(script_dir, 'generate_zsh_completions.rb')}`
+    when /^f/
+      result = `ruby #{File.join(script_dir, 'generate_fish_completions.rb')}`
+    end
+
+    if options[:file] =~ /^stdout$/i
+      $stdout.puts result
+    else
+      File.open(File.expand_path(options[:file]), 'w') do |f|
+        f.puts result
+      end
+      Doing.logger.warn('File written:', "#{options[:type]} completions written to #{options[:file]}")
+    end
+  end
+end
+
 desc 'Display a user-created view'
 long_desc 'Command line options override view configuration'
 arg_name 'VIEW_NAME'

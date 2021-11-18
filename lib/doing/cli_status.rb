@@ -18,6 +18,10 @@ module Status
     $stderr.print format("#{esc['kill']}#{esc['boldyellow']}> #{esc['whiteboard']}%s#{esc['default']}%s", msg, reset ? "\r" : "\n")
   end
 
+  def clear
+    $stderr.print format("\r#{esc['kill']}")
+  end
+
   def esc
     e = {}
     e['kill'] = "\033[2K"

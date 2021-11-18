@@ -22,44 +22,45 @@ class ::String
   end
 end
 
-class FishCompletions
+class ZshCompletions
   include Status
 
   attr_accessor :commands, :global_options
 
   def generate_helpers
     <<~EOFUNCTIONS
-    #compdef doing
+      compdef _doing doing
 
-    local ret=1 state
+      function _doing() {
+          local line state
 
-    _arguments \\
-      ':subcommand:->subcommand' \\
-      '*::options:->options' && ret=0
+          function _commands {
+              local -a commands
 
-    case $state in
-        subcommand)
-            local -a subcommands
-            subcommands=(
-                #{generate_subcommand_completions.join("\n            ")}
-            )
-            _describe -t subcommands 'doing subcommand' subcommands && ret=0
-        ;;
-        options)
-            case $words[1] in
-                #{generate_subcommand_option_completions(indent: '            ').join("\n            ")}
-            esac
+              commands=(
+                        #{generate_subcommand_completions.join("\n                  ")}
+              )
+              _describe 'command' commands
+          }
 
-            _arguments $args && ret=0
-        ;;
-    esac
+          _arguments -C \
+                  "1: :_commands" \
+                  "*::arg:->args"
 
-    return ret
+
+
+          case $line[1] in
+              #{generate_subcommand_option_completions(indent: '            ').join("\n            ")}
+          esac
+
+          _arguments -s $args
+      }
+
     EOFUNCTIONS
   end
 
   def get_help_sections(command = '')
-    res = `bundle exec bin/doing help #{command}`.strip
+    res = `doing help #{command}`.strip
     scanned = res.scan(/(?m-i)^([A-Z ]+)\n([\s\S]*?)(?=\n+[A-Z]+|\Z)/)
     sections = {}
     scanned.each do |sect|
@@ -73,6 +74,7 @@ class FishCompletions
   def parse_option(option)
     res = option.match(/(?:-(?<short>\w), )?(?:--(?:\[no-\])?(?<long>[\w_]+)(?:=(?<arg>\w+))?)\s+- (?<desc>.*?)$/)
     return nil unless res
+
     {
       short: res['short'],
       long: res['long'],
@@ -108,17 +110,16 @@ class FishCompletions
       processing = cmd[:commands]
       progress('Processing subcommands', i, @commands.count, processing)
       cmd[:commands].each do |c|
-        out << "'#{c}:#{cmd[:description].gsub(/'/,'\\\'')}'"
+        out << "'#{c}:#{cmd[:description].gsub(/'/, '\\\'')}'"
       end
     end
-
+    clear
     out
   end
 
   def generate_subcommand_option_completions(indent: '        ')
 
     out = []
-    need_export = []
     # processing = []
 
     @commands.each_with_index do |cmd, i|
@@ -133,16 +134,18 @@ class FishCompletions
         parse_options(data[:command_options]).each do |option|
           next if option.nil?
 
-          arg = option[:arg] ? '-r' : ''
-          short = option[:short] ? "-s #{option[:short]}" : ''
-          long = option[:long] ? "-l #{option[:long]}" : ''
-          arg = option[:arg] ? "=" : ''
-          option_arr << %({-#{option[:short]},--#{option[:long]}#{arg}}"[#{option[:description].gsub(/'/,'\\\'')}]")
+          arg = option[:arg] ? '=' : ''
+
+          option_arr << if option[:short]
+                          %({-#{option[:short]},--#{option[:long]}#{arg}}"[#{option[:description].gsub(/'/, '\\\'')}]")
+                        else
+                          %("(--#{option[:long]}#{arg})--#{option[:long]}#{arg}}[#{option[:description].gsub(/'/, '\\\'')}]")
+                        end
         end
       end
 
       cmd[:commands].each do |c|
-        out << "#{c}) \n#{indent+'    '}args=( #{option_arr.join(' ')} )\n#{indent};;"
+        out << "#{c}) \n#{indent}    args=( #{option_arr.join(' ')} )\n#{indent};;"
       end
     end
 
@@ -158,7 +161,8 @@ class FishCompletions
 
   def generate_completions
     generate_helpers
+    status('Complete', reset: false)
   end
 end
 
-puts FishCompletions.new.generate_completions
+puts ZshCompletions.new.generate_completions

@@ -91,7 +91,7 @@ class FishCompletions
   end
 
   def get_help_sections(command = '')
-    res = `bundle exec bin/doing help #{command}`.strip
+    res = `doing help #{command}`.strip
     scanned = res.scan(/(?m-i)^([A-Z ]+)\n([\s\S]*?)(?=\n+[A-Z]+|\Z)/)
     sections = {}
     scanned.each do |sect|
@@ -180,6 +180,7 @@ class FishCompletions
       out << "complete -f -c doing -s o -l output -x -n '__fish_doing_using_command #{need_export.join(' ')}' -a '(__fish_doing_export_plugins)'"
     end
 
+    clear
     out.join("\n")
   end
 
@@ -195,6 +196,7 @@ class FishCompletions
     out << generate_helpers
     out << generate_subcommand_completions
     out << generate_subcommand_option_completions
+    status('Complete', reset: false)
     out.join("\n")
   end
 end
