@@ -310,7 +310,7 @@ command :note do |c|
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
 
-    options[:bool] = options[:bool].normalize_bool
+    options[:tag_bool] = options[:bool].normalize_bool
 
     options[:case] = options[:case].normalize_case
 
