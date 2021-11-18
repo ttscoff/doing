@@ -36,7 +36,7 @@ class DoingImportTest < Test::Unit::TestCase
     result = doing('--stdout', '--debug', 'import', '--type', 'timing', @timing_import_file)
     assert_match(/Imported: #{target} items/, result, "Should have imported #{target} entries")
     result = doing('--stdout', '--debug', 'import', '--type', 'timing', @timing_import_file)
-    assert_match(/Skipped: #{target} items/, result, "Should have skipped #{target} duplicate entries")
+    assert_match(/Skipped: #{target} overlapping items/, result, "Should have skipped #{target} duplicate entries")
   end
 
   def test_timing_import_no_arg
@@ -66,7 +66,7 @@ class DoingImportTest < Test::Unit::TestCase
     target = json.count
     doing('done', '--back', '2021-07-22 11:20', '--took', '30m', 'Testing overlapping entry')
     result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--no-overlap', @timing_import_file)
-    assert_match(/Skipped: 1 items/, result, "Should have skipped #{target} duplicate entries")
+    assert_match(/Skipped: 1 overlapping item/, result, "Should have skipped #{target} duplicate entries")
     assert_match(/Imported: #{target - 1} items/, result, "Should have imported #{target - 1} entries")
   end
 

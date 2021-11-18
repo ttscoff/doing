@@ -473,7 +473,7 @@ module Doing
           duped = no_overlap ? item.overlapping_time?(comp) : item.same_time?(comp)
           break if duped
         end
-        logger.count(:skipped, level: :debug, message: 'overlapping %item') if duped
+        logger.count(:skipped, level: :debug, message: '%count overlapping %items') if duped
         # logger.log_now(:debug, 'Skipped:', "overlapping entry: #{item.title}") if duped
         duped
       end

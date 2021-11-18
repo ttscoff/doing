@@ -198,9 +198,6 @@ command %i[reset begin] do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Reset items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
@@ -221,7 +218,6 @@ command %i[reset begin] do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
       options[:search] = search
     end
 
@@ -286,9 +282,6 @@ command :note do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Add note to item that *doesn\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
@@ -309,7 +302,6 @@ command :note do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
       options[:search] = search
     end
 
@@ -509,9 +501,6 @@ command :select do |c|
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
-
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
 
   c.desc 'Select items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
@@ -890,9 +879,6 @@ command :finish do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
@@ -969,7 +955,6 @@ command :finish do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
     end
 
     opts = {
@@ -1015,9 +1000,6 @@ command %i[again resume] do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Resume items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
@@ -1041,7 +1023,6 @@ command %i[again resume] do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
       options[:search] = search
     end
 
@@ -1119,9 +1100,6 @@ command :tag do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Tag items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
@@ -1172,7 +1150,6 @@ command :tag do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
       options[:search] = search
     end
 
@@ -1249,9 +1226,6 @@ command [:mark, :flag] do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Flag items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
@@ -1289,7 +1263,6 @@ command [:mark, :flag] do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
       options[:search] = search
     end
 
@@ -1369,9 +1342,6 @@ command :show do |c|
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
-
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
 
   c.desc 'Show items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
@@ -1483,7 +1453,6 @@ command :show do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
       options[:search] = search
     end
 
@@ -1569,7 +1538,6 @@ command %i[grep search] do |c|
     section = wwid.guess_section(options[:section]) if options[:section]
     search = args.join(' ')
     search.sub!(/^'?/, "'") if options[:exact]
-    search.downcase! if options[:case] == false
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -1895,9 +1863,6 @@ command :last do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Show items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
@@ -1924,7 +1889,6 @@ command :last do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
     end
 
     if options[:editor]
@@ -2092,9 +2056,6 @@ command :view do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
@@ -2234,7 +2195,6 @@ command :view do |c|
       if options[:search]
         search = options[:search]
         search.sub!(/^'?/, "'") if options[:exact]
-        search.downcase! if options[:case] == false
       end
 
       opts = options
@@ -2314,9 +2274,6 @@ command %i[archive move] do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
@@ -2348,7 +2305,6 @@ command %i[archive move] do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
     end
 
     opts = options
@@ -2390,9 +2346,6 @@ command :rotate do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
-
   c.desc 'Rotate items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
@@ -2413,7 +2366,6 @@ command :rotate do |c|
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
-      search.downcase! if options[:case] == false
       options[:search] = search
     end
 
@@ -2607,9 +2559,6 @@ command :import do |c|
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
-
-  c.desc 'Force case sensitive search string matching'
-  c.switch %i[case]
 
   c.desc 'Import items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false

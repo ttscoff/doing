@@ -27,7 +27,7 @@ module Doing
     end
 
     class WrongCommand < ::StandardError
-      def initialize(msg = 'wrong command', topic = 'Error:')
+      def initialize(msg = 'wrong command', topic: 'Error:')
         Doing.logger.warn(topic, msg)
 
         super(msg)
