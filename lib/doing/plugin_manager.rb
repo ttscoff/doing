@@ -107,7 +107,7 @@ module Doing
       end
 
       ##
-      ## @brief      List available plugins to stdout
+      ## List available plugins to stdout
       ##
       ## @param      options  { type, separator }
       ##
@@ -129,11 +129,11 @@ module Doing
       end
 
       ##
-      ## @brief      Return array of available plugin names
+      ## Return array of available plugin names
       ##
       ## @param      type  Plugin type (:import, :export)
       ##
-      ## @returns    [Array<String>] plugin names
+      ## @return     [Array<String>] plugin names
       ##
       def available_plugins(type: :export)
         type = valid_type(type)
@@ -141,7 +141,7 @@ module Doing
       end
 
       ##
-      ## @brief      Return string version of plugin names
+      ## Return string version of plugin names
       ##
       ## @param      type       Plugin type (:import, :export)
       ## @param      separator  The separator to join names with
@@ -154,7 +154,7 @@ module Doing
       end
 
       ##
-      ## @brief      Return a regular expression of all
+      ## Return a regular expression of all
       ##             plugin triggers for type
       ##
       ## @param      type  The type :import or :export

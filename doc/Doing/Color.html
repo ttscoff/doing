@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Doing::Color
+  
+    &mdash; Documentation by YARD 0.9.26
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "Doing::Color";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (C)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span>
+     &raquo; 
+    <span class="title">Color</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Doing::Color
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  <dl>
+      <dt>Extended by:</dt>
+      <dd><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span></dd>
+  </dl>
+  
+  
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span>, <span class='object_link'><a href="../String.html" title="String (class)">String</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/doing/colors.rb</dd>
+  </dl>
+  
+</div>
+
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="ATTRIBUTES-constant" class="">ATTRIBUTES =
+          <div class="docstring">
+  <div class="discussion">
+    <p>:stopdoc:</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbracket'>[</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:clear</span>              <span class='comma'>,</span>   <span class='int'>0</span> <span class='rbracket'>]</span><span class='comma'>,</span>     <span class='comment'># String#clear is already used to empty string in Ruby 1.9
+</span>  <span class='lbracket'>[</span> <span class='symbol'>:reset</span>              <span class='comma'>,</span>   <span class='int'>0</span> <span class='rbracket'>]</span><span class='comma'>,</span>     <span class='comment'># synonym for :clear
+</span>  <span class='lbracket'>[</span> <span class='symbol'>:bold</span>               <span class='comma'>,</span>   <span class='int'>1</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:dark</span>               <span class='comma'>,</span>   <span class='int'>2</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:italic</span>             <span class='comma'>,</span>   <span class='int'>3</span> <span class='rbracket'>]</span><span class='comma'>,</span>     <span class='comment'># not widely implemented
+</span>  <span class='lbracket'>[</span> <span class='symbol'>:underline</span>          <span class='comma'>,</span>   <span class='int'>4</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:underscore</span>         <span class='comma'>,</span>   <span class='int'>4</span> <span class='rbracket'>]</span><span class='comma'>,</span>     <span class='comment'># synonym for :underline
+</span>  <span class='lbracket'>[</span> <span class='symbol'>:blink</span>              <span class='comma'>,</span>   <span class='int'>5</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:rapid_blink</span>        <span class='comma'>,</span>   <span class='int'>6</span> <span class='rbracket'>]</span><span class='comma'>,</span>     <span class='comment'># not widely implemented
+</span>  <span class='lbracket'>[</span> <span class='symbol'>:negative</span>           <span class='comma'>,</span>   <span class='int'>7</span> <span class='rbracket'>]</span><span class='comma'>,</span>     <span class='comment'># no reverse because of String#reverse
+</span>  <span class='lbracket'>[</span> <span class='symbol'>:concealed</span>          <span class='comma'>,</span>   <span class='int'>8</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:strikethrough</span>      <span class='comma'>,</span>   <span class='int'>9</span> <span class='rbracket'>]</span><span class='comma'>,</span>     <span class='comment'># not widely implemented
+</span>  <span class='lbracket'>[</span> <span class='symbol'>:black</span>              <span class='comma'>,</span>  <span class='int'>30</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:red</span>                <span class='comma'>,</span>  <span class='int'>31</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:green</span>              <span class='comma'>,</span>  <span class='int'>32</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:yellow</span>             <span class='comma'>,</span>  <span class='int'>33</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:blue</span>               <span class='comma'>,</span>  <span class='int'>34</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:magenta</span>            <span class='comma'>,</span>  <span class='int'>35</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:cyan</span>               <span class='comma'>,</span>  <span class='int'>36</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:white</span>              <span class='comma'>,</span>  <span class='int'>37</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:bgblack</span>            <span class='comma'>,</span>  <span class='int'>40</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:bgred</span>              <span class='comma'>,</span>  <span class='int'>41</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:bggreen</span>            <span class='comma'>,</span>  <span class='int'>42</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:bgyellow</span>           <span class='comma'>,</span>  <span class='int'>43</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:bgblue</span>             <span class='comma'>,</span>  <span class='int'>44</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:bgmagenta</span>          <span class='comma'>,</span>  <span class='int'>45</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:bgcyan</span>             <span class='comma'>,</span>  <span class='int'>46</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:bgwhite</span>            <span class='comma'>,</span>  <span class='int'>47</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldblack</span>          <span class='comma'>,</span>  <span class='int'>90</span> <span class='rbracket'>]</span><span class='comma'>,</span>    <span class='comment'># High intensity, aixterm (works in OS X)
+</span>  <span class='lbracket'>[</span> <span class='symbol'>:boldred</span>            <span class='comma'>,</span>  <span class='int'>91</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldgreen</span>          <span class='comma'>,</span>  <span class='int'>92</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldyellow</span>         <span class='comma'>,</span>  <span class='int'>93</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldblue</span>           <span class='comma'>,</span>  <span class='int'>94</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldmagenta</span>        <span class='comma'>,</span>  <span class='int'>95</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldcyan</span>           <span class='comma'>,</span>  <span class='int'>96</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldwhite</span>          <span class='comma'>,</span>  <span class='int'>97</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldbgblack</span>        <span class='comma'>,</span> <span class='int'>100</span> <span class='rbracket'>]</span><span class='comma'>,</span>    <span class='comment'># High intensity background, aixterm (works in OS X)
+</span>  <span class='lbracket'>[</span> <span class='symbol'>:boldbgred</span>          <span class='comma'>,</span> <span class='int'>101</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldbggreen</span>        <span class='comma'>,</span> <span class='int'>102</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldbgyellow</span>       <span class='comma'>,</span> <span class='int'>103</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldbgblue</span>         <span class='comma'>,</span> <span class='int'>104</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldbgmagenta</span>      <span class='comma'>,</span> <span class='int'>105</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldbgcyan</span>         <span class='comma'>,</span> <span class='int'>106</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:boldbgwhite</span>        <span class='comma'>,</span> <span class='int'>107</span> <span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:softpurple</span>    <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0;35;40</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:hotpants</span>      <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>7;34;40</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:knightrider</span>   <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>7;30;40</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:flamingo</span>      <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>7;31;47</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:yeller</span>        <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1;37;43</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:whiteboard</span>    <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1;30;47</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='lbracket'>[</span> <span class='symbol'>:default</span>         <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0;39</span><span class='tstring_end'>&#39;</span></span> <span class='rbracket'>]</span>
+<span class='rbracket'>]</span></pre></dd>
+      
+        <dt id="ATTRIBUTE_NAMES-constant" class="">ATTRIBUTE_NAMES =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'><span class='object_link'><a href="#ATTRIBUTES-constant" title="Doing::Color::ATTRIBUTES (constant)">ATTRIBUTES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_transpose'>transpose</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span></pre></dd>
+      
+        <dt id="COLORED_REGEXP-constant" class="">COLORED_REGEXP =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Regular expression that is used to scan for ANSI-sequences while
+uncoloring strings.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\e\[(?:(?:[349]|10)[0-7]|[0-9])?m</span><span class='regexp_end'>/</span></span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#attributes-class_method" title="attributes (class method)">.<strong>attributes</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns an array of all Doing::Color attributes as symbols.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#coloring=-class_method" title="coloring= (class method)">.<strong>coloring=</strong>(val)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Turns the coloring on or off globally, so you can easily do this for example:  Doing::Color::coloring = STDOUT.isatty.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#coloring%3F-class_method" title="coloring? (class method)">.<strong>coloring?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns true, if the coloring function of this module is switched on, false otherwise.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#support%3F-instance_method" title="#support? (instance method)">#<strong>support?</strong>(feature)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns true if Doing::Color supports the +feature+.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#uncolor-instance_method" title="#uncolor (instance method)">#<strong>uncolor</strong>(string = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns an uncolored version of the string, that is all ANSI-sequences are stripped from the string.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="attributes-class_method">
+  
+    .<strong>attributes</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns an array of all Doing::Color attributes as symbols.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+130
+131
+132</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 130</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attributes'>attributes</span>
+  <span class='const'><span class='object_link'><a href="#ATTRIBUTE_NAMES-constant" title="Doing::Color::ATTRIBUTE_NAMES (constant)">ATTRIBUTE_NAMES</a></span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="coloring=-class_method">
+  
+    .<strong>coloring=</strong>(val)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Turns the coloring on or off globally, so you can easily do
+this for example:
+ Doing::Color::coloring = STDOUT.isatty</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+84
+85
+86</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 84</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_coloring='>coloring=</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
+  <span class='ivar'>@coloring</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="coloring?-class_method">
+  
+    .<strong>coloring?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns true, if the coloring function of this module
+is switched on, false otherwise.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+77
+78
+79</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 77</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_coloring?'>coloring?</span>
+  <span class='ivar'>@coloring</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="support?-instance_method">
+  
+    #<strong>support?</strong>(feature)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns true if Doing::Color supports the +feature+.</p>
+
+<p>The feature :clear, that is mixing the clear color attribute into String,
+is only supported on ruby implementations, that do <em>not</em> already
+implement the String#clear method. It&#39;s better to use the reset color
+attribute instead.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+69
+70
+71
+72
+73
+74</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 69</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_support?'>support?</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_feature'>feature</span>
+  <span class='kw'>when</span> <span class='symbol'>:clear</span>
+    <span class='op'>!</span><span class='const'><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></span><span class='period'>.</span><span class='id identifier rubyid_instance_methods'>instance_methods</span><span class='lparen'>(</span><span class='kw'>false</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_sym</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='symbol'>:clear</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="uncolor-instance_method">
+  
+    #<strong>uncolor</strong>(string = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns an uncolored version of the string, that is all
+ANSI-sequences are stripped from the string.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 115</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_uncolor'>uncolor</span><span class='lparen'>(</span><span class='id identifier rubyid_string'>string</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='comment'># :yields:
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='kw'>yield</span><span class='period'>.</span><span class='id identifier rubyid_to_str'>to_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#COLORED_REGEXP-constant" title="Doing::Color::COLORED_REGEXP (constant)">COLORED_REGEXP</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_string'>string</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:to_str</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_string'>string</span><span class='period'>.</span><span class='id identifier rubyid_to_str'>to_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#COLORED_REGEXP-constant" title="Doing::Color::COLORED_REGEXP (constant)">COLORED_REGEXP</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:to_str</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_to_str'>to_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#COLORED_REGEXP-constant" title="Doing::Color::COLORED_REGEXP (constant)">COLORED_REGEXP</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Nov 18 15:33:54 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-3.0.1).
+</div>
+
+    </div>
+  </body>
+</html>

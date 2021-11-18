@@ -26,7 +26,7 @@
 
 module Doing
   ##
-  ## @brief      Plugin class
+  ## Plugin class
   ##
   class SayExport
     include Doing::Util
@@ -65,7 +65,7 @@ module Doing
     ##
     ##      wwid.config['plugins'][PLUGIN_NAME][KEY]
     ##
-    ## @brief      Method to return plugin settings (required)
+    ## Method to return plugin settings (required)
     ##
     ## @return     Hash of settings for this plugin
     ##
@@ -87,7 +87,7 @@ module Doing
     ## included in settings. The method should return a
     ## string (not output it to the STDOUT).
     ##
-    ## @brief      Method to return template (optional)
+    ## Method to return template (optional)
     ##
     ## @param      trigger  The trigger passed to the
     ##                      template function. When this
@@ -96,7 +96,7 @@ module Doing
     ##                      used to determine which one is
     ##                      output.
     ##
-    ## @return     (String) template contents
+    ## @return     [String] template contents
     ##
     def self.template(trigger)
       return unless trigger =~ /^say(it)?$/
@@ -105,7 +105,7 @@ module Doing
 
 
     ##
-    ## @brief      Render data received from an output
+    ## Render data received from an output
     ##             command
     ##
     ## @param      wwid       The wwid object with config
@@ -117,7 +117,7 @@ module Doing
     ##                        flags passed to command
     ##                        (variables[:options])
     ##
-    ## @return     (String) Rendered output
+    ## @return     [String] Rendered output
     ##
     def self.render(wwid, items, variables: {})
       return if items.nil? || items.empty?

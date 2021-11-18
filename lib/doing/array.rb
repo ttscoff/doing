@@ -2,7 +2,7 @@
 
 module Doing
   ##
-  ## @brief      Array helpers
+  ## Array helpers
   ##
   class ::Array end
 end

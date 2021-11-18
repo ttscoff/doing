@@ -2,7 +2,7 @@
 
 module Doing
   ##
-  ## @brief      This class describes an item note.
+  ## This class describes an item note.
   ##
   class Note < Array
     def initialize(note = [])

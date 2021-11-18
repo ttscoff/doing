@@ -8,7 +8,7 @@ require 'json'
 
 module Doing
   ##
-  ## @brief      Plugin for importing from Calendar.app on macOS
+  ## Plugin for importing from Calendar.app on macOS
   ##
   class CalendarImport
     include Doing::Util

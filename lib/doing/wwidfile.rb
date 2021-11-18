@@ -49,9 +49,9 @@ module Doing
     end
 
     ##
-    ## @brief      Adds a section.
+    ## Adds a section.
     ##
-    ## @param      title  (String) The new section title
+    ## @param      title  [String] The new section title
     ##
     def add_section(title)
       if section_titles.include?(title.cap_first)
@@ -64,10 +64,10 @@ module Doing
     end
 
     ##
-    ## @brief      Attempt to match a string with an existing section
+    ## Attempt to match a string with an existing section
     ##
-    ## @param      frag     (String) The user-provided string
-    ## @param      guessed  (Boolean) already guessed and failed
+    ## @param      frag     [String] The user-provided string
+    ## @param      guessed  [Boolean] already guessed and failed
     ##
     def guess_section(frag, guessed: false, suggest: false)
       return 'All' if frag =~ /^all$/i

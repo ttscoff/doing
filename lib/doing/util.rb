@@ -14,9 +14,9 @@ module Doing
     end
 
     ##
-    ## @brief      Test if command line tool is available
+    ## Test if command line tool is available
     ##
-    ## @param      cli   (String) The name or path of the cli
+    ## @param      cli   [String] The name or path of the cli
     ##
     def exec_available(cli)
       return false if cli.nil?
@@ -40,9 +40,14 @@ module Doing
       end
     end
 
-    # Non-destructive version of deep_merge_hashes! See that method.
+    # Non-destructive version of deep_merge_hashes! See that
+    # method.
     #
-    # Returns the merged hashes.
+    # @return     the merged hashes.
+    #
+    # @param      [Hash] master_hash  The master hash
+    # @param      [Hash] other_hash   The other hash
+    #
     def deep_merge_hashes(master_hash, other_hash)
       deep_merge_hashes!(master_hash.dup, other_hash)
     end
@@ -90,11 +95,11 @@ module Doing
     end
 
     ##
-    ## @brief      Write content to a file
+    ## Write content to a file
     ##
-    ## @param      file     (String) The path to the file to (over)write
-    ## @param      content  (String) The content to write to the file
-    ## @param      backup   (Boolean) create a ~ backup
+    ## @param      file     [String] The path to the file to (over)write
+    ## @param      content  [String] The content to write to the file
+    ## @param      backup   [Boolean] create a ~ backup
     ##
     def write_to_file(file, content, backup: true)
       unless file
@@ -156,20 +161,20 @@ module Doing
 
       if editor_config[editor_for]
         editor = editor_config[editor_for]
-        Doing.logger.debug('Editor:', "Using #{editor} from config 'editors->#{editor_for}'")
+        # Doing.logger.debug('Editor:', "Using #{editor} from config 'editors->#{editor_for}'")
         return editor unless editor.nil? || editor.empty?
       end
 
       if editor_for != 'editor' && editor_config['default']
         editor = editor_config['default']
-        Doing.logger.debug('Editor:', "Using #{editor} from config: 'editors->default'")
+        # Doing.logger.debug('Editor:', "Using #{editor} from config: 'editors->default'")
         return editor unless editor.nil? || editor.empty?
       end
 
       editor ||= ENV['DOING_EDITOR'] || ENV['GIT_EDITOR'] || ENV['EDITOR']
 
       unless editor.nil? || editor.empty?
-        Doing.logger.debug('Editor:', "Found editor in environment variables: #{editor}")
+        # Doing.logger.debug('Editor:', "Found editor in environment variables: #{editor}")
         return editor
       end
 

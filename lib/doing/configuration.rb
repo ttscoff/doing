@@ -2,7 +2,7 @@
 
 module Doing
   ##
-  ## @brief      Configuration object
+  ## Configuration object
   ##
   class Configuration
     attr_reader :settings
@@ -148,9 +148,9 @@ module Doing
     end
 
     ##
-    ## @brief      Read user configuration and merge with defaults
+    ## Read user configuration and merge with defaults
     ##
-    ## @param      opt   (Hash) Additional Options
+    ## @param      opt   [Hash] Additional Options
     ##
     def configure(opt = {})
       @ignore_local = opt[:ignore_local] if opt[:ignore_local]
@@ -219,7 +219,7 @@ module Doing
     end
 
     ##
-    ## @brief      Read local configurations
+    ## Read local configurations
     ##
     ## @return     Hash of config options
     ##
@@ -251,7 +251,7 @@ module Doing
     end
 
     ##
-    ## @brief      Reads a configuration.
+    ## Reads a configuration.
     ##
     def read_config
       unless File.exist?(config_file)
@@ -279,9 +279,9 @@ module Doing
     end
 
     ##
-    ## @brief      Finds a project-specific configuration file
+    ## Finds a project-specific configuration file
     ##
-    ## @return     (String) A file path
+    ## @return     [String] A file path
     ##
     def find_local_config
       dir = Dir.pwd

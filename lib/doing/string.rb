@@ -2,14 +2,28 @@
 
 module Doing
   ##
-  ## @brief      String helpers
+  ## String helpers
   ##
   class ::String
     include Doing::Color
+
+    ##
+    ## Convert string to fuzzy regex
+    ##
+    ## @param      distance  [Integer] Allowed distance
+    ##                       between characters
+    ##
+    ## @return     [String] Regex pattern
+    ##
     def to_rx(distance)
       gsub(/(.)/, "\\1.{0,#{distance}}")
     end
 
+    ##
+    ## Test string for truthiness (0, "f", "false", "n", "no" all return false, case insensitive, otherwise true)
+    ##
+    ## @return     [Boolean] String is truthy
+    ##
     def truthy?
       if self =~ /^(0|f(alse)?|n(o)?)$/i
         false
@@ -18,10 +32,18 @@ module Doing
       end
     end
 
+    ## @param (see #highlight_tags)
     def highlight_tags!(color = 'yellow')
       replace highlight_tags(color)
     end
 
+    ##
+    ## Colorize @tags with ANSI escapes
+    ##
+    ## @param      color  [String] color (see #Color)
+    ##
+    ## @return     [String] string with @tags highlighted
+    ##
     def highlight_tags(color = 'yellow')
       escapes = scan(/(\e\[[\d;]+m)[^\e]+@/)
       tag_color = Doing::Color.send(color)
@@ -34,7 +56,7 @@ module Doing
     end
 
     ##
-    ## @brief      Test if line should be ignored
+    ## Test if line should be ignored
     ##
     ## @return     [Boolean] line is empty or comment
     ##
@@ -44,7 +66,7 @@ module Doing
     end
 
     ##
-    ## @brief      Truncate to nearest word
+    ## Truncate to nearest word
     ##
     ## @param      len   The length
     ##
@@ -68,7 +90,7 @@ module Doing
     end
 
     ##
-    ## @brief      Truncate string in the middle
+    ## Truncate string in the middle
     ##
     ## @param      len       The length
     ## @param      ellipsis  The ellipsis
@@ -87,7 +109,7 @@ module Doing
     end
 
     ##
-    ## @brief      Remove color escape codes
+    ## Remove color escape codes
     ##
     ## @return     clean string
     ##
@@ -100,7 +122,7 @@ module Doing
     end
 
     ##
-    ## @brief      Wrap string at word breaks, respecting tags
+    ## Wrap string at word breaks, respecting tags
     ##
     ## @param      len     [Integer] The length
     ## @param      offset  [Integer] (Optional) The width to pad each subsequent line
@@ -134,7 +156,7 @@ module Doing
     end
 
     ##
-    ## @brief      Capitalize on the first character on string
+    ## Capitalize on the first character on string
     ##
     ## @return     Capitalized string
     ##
@@ -145,12 +167,12 @@ module Doing
     end
 
     ##
-    ## @brief      Convert a sort order string to a qualified type
+    ## Convert a sort order string to a qualified type
     ##
-    ## @return     (String) 'asc' or 'desc'
+    ## @return     [String] 'asc' or 'desc'
     ##
-    def normalize_order!
-      replace normalize_order
+    def normalize_order!(default = 'asc')
+      replace normalize_order(default)
     end
 
     def normalize_order(default = 'asc')
@@ -165,7 +187,7 @@ module Doing
     end
 
     ##
-    ## @brief      Convert a case sensitivity string to a symbol
+    ## Convert a case sensitivity string to a symbol
     ##
     ## @return     Symbol :smart, :sensitive, :insensitive
     ##
@@ -187,12 +209,12 @@ module Doing
     end
 
     ##
-    ## @brief      Convert a boolean string to a symbol
+    ## Convert a boolean string to a symbol
     ##
     ## @return     Symbol :and, :or, or :not
     ##
-    def normalize_bool!
-      replace normalize_bool
+    def normalize_bool!(default = :and)
+      replace normalize_bool(default)
     end
 
     def normalize_bool(default = :and)
@@ -290,7 +312,7 @@ module Doing
     end
 
     ##
-    ## @brief      Remove duplicate tags, leaving only first occurrence
+    ## Remove duplicate tags, leaving only first occurrence
     ##
     ## @return     Deduplicated string
     ##
@@ -316,9 +338,9 @@ module Doing
     end
 
     ##
-    ## @brief      Turn raw urls into HTML links
+    ## Turn raw urls into HTML links
     ##
-    ## @param      opt   (Hash) Additional Options
+    ## @param      opt   [Hash] Additional Options
     ##
     def link_urls!(opt = {})
       replace link_urls(opt)

@@ -15,10 +15,12 @@ module Doing
     end
 
     ##
-    ## @brief      Imports a Timing report
+    ## Imports a Timing report
     ##
-    ## @param      path     (String) Path to JSON report file
-    ## @param      options      (Hash) Additional Options
+    ## @param      wwid     [WWID] The wwid object
+    ## @param      path     [String] Path to JSON report
+    ##                      file
+    ## @param      options  [Hash] Additional Options
     ##
     def self.import(wwid, path, options: {})
       exit_now! 'Path to JSON report required' if path.nil?

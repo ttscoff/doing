@@ -64,7 +64,7 @@ class DoingTagTest < Test::Unit::TestCase
   end
 
   ##
-  ## @brief      Test tagging via text and tag search
+  ## Test tagging via text and tag search
   ##             results. Imports a Timing.app report.
   ##
   def test_tag_search_results

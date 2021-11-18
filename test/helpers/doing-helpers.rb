@@ -41,7 +41,7 @@ module DoingHelpers
   end
 
   ##
-  ## @brief      Time helpers
+  ## Time helpers
   ##
   class ::Time
     def round_time(min = 1)

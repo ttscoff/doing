@@ -6,7 +6,7 @@
 # url: https://brettterpstra.com
 module Doing
   ##
-  ## @brief      CSV Export
+  ## CSV Export
   ##
   class CSVExport
     include Doing::Util

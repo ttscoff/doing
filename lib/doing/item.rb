@@ -2,11 +2,22 @@
 
 module Doing
   ##
-  ## @brief      This class describes a single WWID item
+  ## This class describes a single WWID item
   ##
   class Item
     attr_accessor :date, :title, :section, :note
 
+    ##
+    ## Initialize an item with date, title, section, and
+    ## optional note
+    ##
+    ## @param      date     [Time] The item's start date
+    ## @param      title    [String] The title
+    ## @param      section  [String] The section to which
+    ##                      the item belongs
+    ## @param      note     [Array or String] The note
+    ##                      (optional)
+    ##
     def initialize(date, title, section, note = nil)
       @date = date.is_a?(Time) ? date : Time.parse(date)
       @title = title
@@ -18,14 +29,32 @@ module Doing
     #   @date = new_date.is_a?(Time) ? new_date : Time.parse(new_date)
     # end
 
+    ##
+    ## Get the difference between the item's start date and
+    ## the value of its @done tag (if present)
+    ##
+    ## @return     Interval in seconds
+    ##
     def interval
       @interval ||= calc_interval
     end
 
+    ##
+    ## Get the value of the item's @done tag
+    ##
+    ## @return     [Time] @done value
+    ##
     def end_date
       @end_date ||= Time.parse(Regexp.last_match(1)) if @title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
     end
 
+    ##
+    ## Test for equality between items
+    ##
+    ## @param      other [Item] The other item
+    ##
+    ## @return     [Boolean] is equal?
+    ##
     def equal?(other)
       return false if @title.strip != other.title.strip
 
@@ -36,10 +65,25 @@ module Doing
       true
     end
 
+    ##
+    ## Test if two items occur at the same time (same start date and equal duration)
+    ##
+    ## @param      item_b  [Item] The item to compare
+    ##
+    ## @return     [Boolean] is equal?
+    ##
     def same_time?(item_b)
       date == item_b.date ? interval == item_b.interval : false
     end
 
+    ##
+    ## Test if the interval between start date and @done
+    ## value overlaps with another item's
+    ##
+    ## @param      item_b  [Item] The item to compare
+    ##
+    ## @return     [Boolean] overlaps?
+    ##
     def overlapping_time?(item_b)
       return true if same_time?(item_b)
 
@@ -52,14 +96,37 @@ module Doing
       (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
     end
 
+    ##
+    ## Add (or remove) tags from the title of the item
+    ##
+    ## @param      tag        [String] The tag to add
+    ## @param      value      [String] A value to include as @tag(value)
+    ## @param      remove     [Boolean] if true remove instead of adding
+    ## @param      rename_to  [String] if not nil, rename target tag to this tag name
+    ## @param      regex      [Boolean] treat target tag string as regex pattern
+    ##
     def tag(tag, value: nil, remove: false, rename_to: nil, regex: false)
       @title.tag!(tag, value: value, remove: remove, rename_to: rename_to, regex: regex).strip!
     end
 
+    ##
+    ## Get a list of tags on the item
+    ##
+    ## @return     [Array] array of tags (no values)
+    ##
     def tags
       @title.scan(/(?<= |\A)@([^\s(]+)/).map {|tag| tag[0]}.sort.uniq
     end
 
+    ##
+    ## Test if item contains tag(s)
+    ##
+    ## @param      tags    (Array or String) The tags to test. Can be an array or a comma-separated string.
+    ## @param      bool    (Symbol) The boolean to use for multiple tags (:and, :or, :not)
+    ## @param      negate  [Boolean] negate the result?
+    ##
+    ## @return     [Boolean] true if tag/bool combination passes
+    ##
     def tags?(tags, bool = :and, negate: false)
       tags = split_tags(tags)
       bool = bool.normalize_bool
@@ -75,6 +142,17 @@ module Doing
       negate ? !matches : matches
     end
 
+    ##
+    ## Test if item matches search string
+    ##
+    ## @param      search     [String] The search string
+    ## @param      negate     [Boolean] negate results
+    ## @param      case_type  (Symbol) The case-sensitivity
+    ##                        type (:sensitive,
+    ##                        :insensitive, :smart)
+    ##
+    ## @return     [Boolean] matches search criteria
+    ##
     def search(search, negate: false, case_type: :smart)
       text = @title + @note.to_s
       pattern = case search.strip

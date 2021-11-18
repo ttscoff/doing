@@ -15,11 +15,11 @@ module Doing
     end
 
     ##
-    ## @brief      Imports a Doing file
+    ## Imports a Doing file
     ##
-    ## @param      wwid     WWID object
-    ## @param      path     (String) Path to Doing file
-    ## @param      options  (Hash) Additional Options
+    ## @param      wwid     [WWID] WWID object
+    ## @param      path     [String] Path to Doing file
+    ## @param      options  [Hash] Additional Options
     ##
     ## @return     Nothing
     ##

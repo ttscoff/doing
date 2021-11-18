@@ -35,7 +35,7 @@ require 'doing/pager'
 module Doing
   class << self
     #
-    # @brief      Fetch the logger
+    # Fetch the logger
     #
     # @return     the LogAdapter instance.
     #

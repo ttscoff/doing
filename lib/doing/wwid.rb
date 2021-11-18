@@ -9,7 +9,7 @@ require 'erb'
 
 module Doing
   ##
-  ## @brief      Main "What Was I Doing" methods
+  ## Main "What Was I Doing" methods
   ##
   class WWID
     attr_reader   :additional_configs, :current_section, :doing_file, :content
@@ -19,7 +19,7 @@ module Doing
     # include Util
 
     ##
-    ## @brief      Initializes the object.
+    ## Initializes the object.
     ##
     def initialize
       @timers = {}
@@ -32,7 +32,7 @@ module Doing
     end
 
     ##
-    ## @brief      Logger
+    ## Logger
     ##
     ## Responds to :debug, :info, :warn, and :error
     ##
@@ -45,9 +45,9 @@ module Doing
     end
 
     ##
-    ## @brief      Initializes the doing file.
+    ## Initializes the doing file.
     ##
-    ## @param      path  (String) Override path to a doing file, optional
+    ## @param      path  [String] Override path to a doing file, optional
     ##
     def init_doing_file(path = nil)
       @doing_file =  File.expand_path(@config['doing_file'])
@@ -106,7 +106,7 @@ module Doing
     end
 
     ##
-    ## @brief      Create a new doing file
+    ## Create a new doing file
     ##
     def create(filename = nil)
       filename = @doing_file if filename.nil?
@@ -118,9 +118,9 @@ module Doing
     end
 
     ##
-    ## @brief      Create a process for an editor and wait for the file handle to return
+    ## Create a process for an editor and wait for the file handle to return
     ##
-    ## @param      input  (String) Text input for editor
+    ## @param      input  [String] Text input for editor
     ##
     def fork_editor(input = '')
       # raise NonInteractive, 'Non-interactive terminal' unless $stdout.isatty || ENV['DOING_EDITOR_TEST']
@@ -164,13 +164,11 @@ module Doing
     end
 
     ##
-    ## @brief      Takes a multi-line string and formats it as an entry
+    ## Takes a multi-line string and formats it as an entry
     ##
-    ## @return     (Array) [(String)title, (Array)note]
+    ## @param      input  [String] The string to parse
     ##
-    ## @param      input  (String) The string to parse
-    ##
-    ## @return     (Array) [(String)title, (Note)note]
+    ## @return     [Array] [[String]title, [Note]note]
     ##
     def format_input(input)
       raise EmptyInput, 'No content in entry' if input.nil? || input.strip.empty?
@@ -197,15 +195,15 @@ module Doing
     end
 
     ##
-    ## @brief      Converts input string into a Time object when input takes on the
+    ## Converts input string into a Time object when input takes on the
     ##             following formats:
     ##             - interval format e.g. '1d2h30m', '45m' etc.
     ##             - a semantic phrase e.g. 'yesterday 5:30pm'
     ##             - a strftime e.g. '2016-03-15 15:32:04 PDT'
     ##
-    ## @param      input  (String) String to chronify
+    ## @param      input  [String] String to chronify
     ##
-    ## @return     (DateTime) result
+    ## @return     [DateTime] result
     ##
     def chronify(input, future: false, guess: :begin)
       now = Time.now
@@ -229,13 +227,13 @@ module Doing
     end
 
     ##
-    ## @brief      Converts simple strings into seconds that can be added to a Time
+    ## Converts simple strings into seconds that can be added to a Time
     ##             object
     ##
-    ## @param      qty   (String) HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m,
+    ## @param      qty   [String] HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m,
     ##                   1.5d, 1h20m, etc.)
     ##
-    ## @return     (Integer) seconds
+    ## @return     [Integer] seconds
     ##
     def chronify_qty(qty)
       minutes = 0
@@ -262,18 +260,18 @@ module Doing
     end
 
     ##
-    ## @brief      List sections
+    ## List sections
     ##
-    ## @return     (Array) section titles
+    ## @return     [Array] section titles
     ##
     def sections
       @content.keys
     end
 
     ##
-    ## @brief      Adds a section.
+    ## Adds a section.
     ##
-    ## @param      title  (String) The new section title
+    ## @param      title  [String] The new section title
     ##
     def add_section(title)
       if @content.key?(title.cap_first)
@@ -285,10 +283,10 @@ module Doing
     end
 
     ##
-    ## @brief      Attempt to match a string with an existing section
+    ## Attempt to match a string with an existing section
     ##
-    ## @param      frag     (String) The user-provided string
-    ## @param      guessed  (Boolean) already guessed and failed
+    ## @param      frag     [String] The user-provided string
+    ## @param      guessed  [Boolean] already guessed and failed
     ##
     def guess_section(frag, guessed: false, suggest: false)
       return 'All' if frag =~ /^all$/i
@@ -330,10 +328,12 @@ module Doing
     end
 
     ##
-    ## @brief      Ask a yes or no question in the terminal
+    ## Ask a yes or no question in the terminal
     ##
-    ## @param      question     (String) The question to ask
-    ## @param      default      (Bool)   default response if no input
+    ## @param      question          [String] The question
+    ##                               to ask
+    ## @param      default_response  (Bool)   default
+    ##                               response if no input
     ##
     ## @return     (Bool) yes or no
     ##
@@ -382,10 +382,10 @@ module Doing
     end
 
     ##
-    ## @brief      Attempt to match a string with an existing view
+    ## Attempt to match a string with an existing view
     ##
-    ## @param      frag     (String) The user-provided string
-    ## @param      guessed  (Boolean) already guessed
+    ## @param      frag     [String] The user-provided string
+    ## @param      guessed  [Boolean] already guessed
     ##
     def guess_view(frag, guessed: false, suggest: false)
       views.each { |view| return view if frag.downcase == view.downcase }
@@ -410,11 +410,11 @@ module Doing
     end
 
     ##
-    ## @brief      Adds an entry
+    ## Adds an entry
     ##
-    ## @param      title    (String) The entry title
-    ## @param      section  (String) The section to add to
-    ## @param      opt      (Hash) Additional Options {:date, :note, :back, :timed}
+    ## @param      title    [String] The entry title
+    ## @param      section  [String] The section to add to
+    ## @param      opt      [Hash] Additional Options: :date, :note, :back, :timed
     ##
     def add_item(title, section = nil, opt = {})
       section ||= @config['current_section']
@@ -455,10 +455,10 @@ module Doing
     end
 
     ##
-    ## @brief      Remove items from a list that already exist in @content
+    ## Remove items from a list that already exist in @content
     ##
-    ## @param      items       (Array) The items to deduplicate
-    ## @param      no_overlap  (Boolean) Remove items with overlapping time spans
+    ## @param      items       [Array] The items to deduplicate
+    ## @param      no_overlap  [Boolean] Remove items with overlapping time spans
     ##
     def dedup(items, no_overlap = false)
 
@@ -480,10 +480,10 @@ module Doing
     end
 
     ##
-    ## @brief      Imports external entries
+    ## Imports external entries
     ##
-    ## @param      path     (String) Path to JSON report file
-    ## @param      opt      (Hash) Additional Options
+    ## @param      paths  [String] Path to JSON report file
+    ## @param      opt    [Hash] Additional Options
     ##
     def import(paths, opt = {})
       Plugins.plugins[:import].each do |_, options|
@@ -501,9 +501,9 @@ module Doing
     end
 
     ##
-    ## @brief      Return the content of the last note for a given section
+    ## Return the content of the last note for a given section
     ##
-    ## @param      section  (String) The section to retrieve from, default
+    ## @param      section  [String] The section to retrieve from, default
     ##                      All
     ##
     def last_note(section = 'All')
@@ -563,9 +563,9 @@ module Doing
     end
 
     ##
-    ## @brief      Restart the last entry
+    ## Restart the last entry
     ##
-    ## @param      opt   (Hash) Additional Options
+    ## @param      opt   [Hash] Additional Options
     ##
     def repeat_last(opt = {})
       opt[:section] ||= 'all'
@@ -583,9 +583,9 @@ module Doing
     end
 
     ##
-    ## @brief      Get the last entry
+    ## Get the last entry
     ##
-    ## @param      opt   (Hash) Additional Options
+    ## @param      opt   [Hash] Additional Options
     ##
     def last_entry(opt = {})
       opt[:tag_bool] ||= :and
@@ -612,9 +612,9 @@ module Doing
     end
 
     ##
-    ## @brief      Generate a menu of options and allow user selection
+    ## Generate a menu of options and allow user selection
     ##
-    ## @return     (String) The selected option
+    ## @return     [String] The selected option
     ##
     def choose_from(options, prompt: 'Make a selection: ', multiple: false, sorted: true, fzf_args: [])
       return nil unless $stdout.isatty
@@ -651,26 +651,24 @@ module Doing
     end
 
     ##
-    ## @brief      Filter items based on search criteria
+    ## Filter items based on search criteria
     ##
-    ## @param      items  (Array) The items to filter (if empty, filters all items)
-    ## @param      opt    (Hash) The filter parameters
+    ## @param      items  [Array] The items to filter (if empty, filters all items)
+    ## @param      opt    [Hash] The filter parameters
     ##
-    ## Available filter options in opt object
-    ##
-    ## - +:section+ (String)
-    ## - +:unfinished+ (Boolean)
-    ## - +:tag+ (Array or comma-separated string)
-    ## - +:tag_bool+ (:and, :or, :not)
-    ## - +:search+ (string, optional regex with //)
-    ## - +:date_filter+ (Array[(Time)start, (Time)end])
-    ## - +:only_timed+ (Boolean)
-    ## - +:before+ (Date/Time string, unparsed)
-    ## - +:after+ (Date/Time string, unparsed)
-    ## - +:today+ (Boolean)
-    ## - +:yesterday+ (Boolean)
-    ## - +:count+ (Number to return)
-    ## - +:age+ (String, 'old' or 'new')
+    ## @option opt [String] :section
+    ## @option opt [Boolean] :unfinished
+    ## @option opt [Array or String] :tag  (Array or comma-separated string)
+    ## @option opt [Symbol] :tag_bool  (:and, :or, :not)
+    ## @option opt [String] :search  (string, optional regex with //)
+    ## @option opt [Array] :date_filter  [[Time]start, [Time]end]
+    ## @option opt [Boolean] :only_timed
+    ## @option opt [String] :before  (Date/Time string, unparsed)
+    ## @option opt [String] :after  (Date/Time string, unparsed)
+    ## @option opt [Boolean] :today
+    ## @option opt [Boolean] :yesterday
+    ## @option opt [Number] :count  (Number to return)
+    ## @option opt [String] :age  ('old' or 'new')
     ##
     def filter_items(items = [], opt: {})
       if items.nil? || items.empty?
@@ -766,9 +764,9 @@ module Doing
     end
 
     ##
-    ## @brief      Display an interactive menu of entries
+    ## Display an interactive menu of entries
     ##
-    ## @param      opt   (Hash) Additional options
+    ## @param      opt   [Hash] Additional options
     ##
     def interactive(opt = {})
       section = opt[:section] ? guess_section(opt[:section]) : 'All'
@@ -828,7 +826,8 @@ module Doing
         opt[:multiple] ? '--multi' : '--no-multi',
         '-0',
         '--bind ctrl-a:select-all',
-        %(-q "#{opt[:query]}")
+        %(-q "#{opt[:query]}"),
+        '--info=inline'
       ]
       fzf_args.push('-1') unless opt[:show_if_single]
 
@@ -848,6 +847,19 @@ module Doing
       opt[:multiple] ? selected : selected[0]
     end
 
+    ##
+    ## Perform actions on a set of entries. If
+    ##             no valid action is included in the opt
+    ##             hash and the terminal is a TTY, a menu
+    ##             will be presented
+    ##
+    ## @param      items  The items to affect
+    ## @param      opt    The actions and options. Can
+    ##                    include :editor, :delete, :tag,
+    ##                    :flag, :finish, :cancel, :archive,
+    ##                    :output, :save_to, :again, and
+    ##                    :resume
+    ##
     def act_on(items, opt = {})
       actions = %i[editor delete tag flag finish cancel archive output save_to again resume]
       has_action = false
@@ -862,17 +874,17 @@ module Doing
 
       unless has_action
         actions = [
-                     'add tag',
-                     'remove tag',
-                     'cancel',
-                     'delete',
-                     'finish',
-                     'flag',
-                     'archive',
-                     'move',
-                     'edit',
-                     'output formatted'
-                   ]
+          'add tag',
+          'remove tag',
+          'cancel',
+          'delete',
+          'finish',
+          'flag',
+          'archive',
+          'move',
+          'edit',
+          'output formatted'
+        ]
 
         actions.concat(['resume/repeat', 'begin/reset']) if items.count == 1
 
@@ -880,7 +892,7 @@ module Doing
                              prompt: 'What do you want to do with the selected items? > ',
                              multiple: true,
                              sorted: false,
-                             fzf_args: ['--height=60%', '--tac', '--no-sort'])
+                             fzf_args: ["--height=#{actions.count + 3}", '--tac', '--no-sort', '--info=hidden'])
         return unless choice
 
         to_do = choice.strip.split(/\n/)
@@ -901,14 +913,13 @@ module Doing
             opt[:tag] = tag.strip.sub(/^@/, '')
             opt[:remove] = true if type == 'remove'
           when /output formatted/
-            output_format = choose_from(Plugins.available_plugins(type: :export).sort,
+            plugins = Plugins.available_plugins(type: :export).sort
+            output_format = choose_from(plugins,
                                         prompt: 'Which output format? > ',
-                                        fzf_args: ['--height=60%', '--tac', '--no-sort'])
+                                        fzf_args: ["--height=#{plugins.count + 3}", '--tac', '--no-sort', '--info=hidden'])
             next if tag =~ /^ *$/
 
-            unless output_format
-              raise UserCancelled, 'Cancelled'
-            end
+            raise UserCancelled unless output_format
 
             opt[:output] = output_format.strip
             res = opt[:force] ? false : yn('Save to file?', default_response: 'n')
@@ -1078,12 +1089,15 @@ module Doing
     end
 
     ##
-    ## @brief      Tag an item from the index
+    ## Tag an item from the index
     ##
-    ## @param      item    (Item) The item to tag
-    ## @param      tags    (string) The tag to apply
-    ## @param      remove  (Boolean) remove tags
-    ## @param      date    (Boolean) Include timestamp?
+    ## @param      item    [Item] The item to tag
+    ## @param      tags    [String] The tag to apply
+    ## @param      remove  [Boolean] remove tags?
+    ## @param      date    [Boolean] Include timestamp?
+    ## @param      single  [Boolean] Log as a single change?
+    ##
+    ## @return     [Item] updated item
     ##
     def tag_item(item, tags, remove: false, date: false, single: false)
       added = []
@@ -1107,9 +1121,13 @@ module Doing
     end
 
     ##
-    ## @brief      Tag the last entry or X entries
+    ## Tag the last entry or X entries
     ##
-    ## @param      opt   (Hash) Additional Options
+    ## @param      opt   [Hash] Additional Options (see
+    ##                   #filter_items for filtering
+    ##                   options)
+    ##
+    ## @see        #filter_items
     ##
     def tag_last(opt = {})
       opt[:count] ||= 1
@@ -1229,13 +1247,13 @@ module Doing
     end
 
     ##
-    ## @brief      Move item from current section to
+    ## Move item from current section to
     ##             destination section
     ##
-    ## @param      item     The item
-    ## @param      section  The destination section
+    ## @param      item     [Item] The item to move
+    ## @param      section  [String] The destination section
     ##
-    ## @return     Updated item
+    ## @return     [Item] Updated item
     ##
     def move_item(item, section, label: true)
       from = item.section
@@ -1252,9 +1270,13 @@ module Doing
     end
 
     ##
-    ## @brief      Get next item in the index
+    ## Get next item in the index
     ##
-    ## @param      item
+    ## @param      item     [Item] target item
+    ## @param      options  [Hash] additional options
+    ## @see #filter_items
+    ##
+    ## @return     [Item] the next chronological item in the index
     ##
     def next_item(item, options = {})
       items = filter_items([], opt: options)
@@ -1265,7 +1287,7 @@ module Doing
     end
 
     ##
-    ## @brief      Delete an item from the index
+    ## Delete an item from the index
     ##
     ## @param      item  The item
     ##
@@ -1279,7 +1301,7 @@ module Doing
     end
 
     ##
-    ## @brief      Update an item in the index with a modified item
+    ## Update an item in the index with a modified item
     ##
     ## @param      old_item  The old item
     ## @param      new_item  The new item
@@ -1301,9 +1323,9 @@ module Doing
     end
 
     ##
-    ## @brief      Edit the last entry
+    ## Edit the last entry
     ##
-    ## @param      section  (String) The section, default "All"
+    ## @param      section  [String] The section, default "All"
     ##
     def edit_last(section: 'All', options: {})
       options[:section] = guess_section(section)
@@ -1334,14 +1356,14 @@ module Doing
     end
 
     ##
-    ## @brief      Accepts one tag and the raw text of a new item if the passed tag
-    ##             is on any item, it's replaced with @done. if new_item is not
-    ##             nil, it's tagged with the passed tag and inserted. This is for
-    ##             use where only one instance of a given tag should exist
-    ##             (@meanwhile)
+    ## Accepts one tag and the raw text of a new item if the
+    ## passed tag is on any item, it's replaced with @done.
+    ## if new_item is not nil, it's tagged with the passed
+    ## tag and inserted. This is for use where only one
+    ## instance of a given tag should exist (@meanwhile)
     ##
-    ## @param      tag   (String) Tag to replace
-    ## @param      opt   (Hash) Additional Options
+    ## @param      target_tag  [String] Tag to replace
+    ## @param      opt         [Hash] Additional Options
     ##
     def stop_start(target_tag, opt = {})
       tag = target_tag.dup
@@ -1389,13 +1411,13 @@ module Doing
     end
 
     ##
-    ## @brief      Write content to file or STDOUT
+    ## Write content to file or STDOUT
     ##
-    ## @param      file  (String) The filepath to write to
+    ## @param      file  [String] The filepath to write to
     ##
     def write(file = nil, backup: true)
       Hooks.trigger :pre_write, self, file
-      output = wrapped_content
+      output = combined_content
 
       if file.nil?
         $stdout.puts output
@@ -1405,21 +1427,10 @@ module Doing
       end
     end
 
-    def wrapped_content
-      output = @other_content_top ? "#{@other_content_top.join("\n")}\n" : ''
-
-      @content.each do |title, section|
-        output += "#{section[:original]}\n"
-        output += list_section({ section: title, template: "\t- %date | %title%t2note", highlight: false, wrap_width: 0 })
-      end
-
-      output + @other_content_bottom.join("\n") unless @other_content_bottom.nil?
-    end
-
     ##
-    ## @brief      Restore a backed up version of a file
+    ## Restore a backed up version of a file
     ##
-    ## @param      file  (String) The filepath to restore
+    ## @param      file  [String] The filepath to restore
     ##
     def restore_backup(file)
       if File.exist?("#{file}~")
@@ -1431,7 +1442,7 @@ module Doing
     end
 
     ##
-    ## @brief      Rename doing file with date and start fresh one
+    ## Rename doing file with date and start fresh one
     ##
     def rotate(opt = {})
       keep = opt[:keep] || 0
@@ -1514,9 +1525,9 @@ module Doing
     end
 
     ##
-    ## @brief      Generate a menu of sections and allow user selection
+    ## Generate a menu of sections and allow user selection
     ##
-    ## @return     (String) The selected section name
+    ## @return     [String] The selected section name
     ##
     def choose_section
       choice = choose_from(sections.sort, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
@@ -1524,18 +1535,18 @@ module Doing
     end
 
     ##
-    ## @brief      List available views
+    ## List available views
     ##
-    ## @return     (Array) View names
+    ## @return     [Array] View names
     ##
     def views
       @config.has_key?('views') ? @config['views'].keys : []
     end
 
     ##
-    ## @brief      Generate a menu of views and allow user selection
+    ## Generate a menu of views and allow user selection
     ##
-    ## @return     (String) The selected view name
+    ## @return     [String] The selected view name
     ##
     def choose_view
       choice = choose_from(views.sort, prompt: 'Choose a view > ', fzf_args: ['--height=60%'])
@@ -1543,9 +1554,9 @@ module Doing
     end
 
     ##
-    ## @brief      Gets a view from configuration
+    ## Gets a view from configuration
     ##
-    ## @param      title  (String) The title of the view to retrieve
+    ## @param      title  [String] The title of the view to retrieve
     ##
     def get_view(title)
       return @config['views'][title] if @config['views'].has_key?(title)
@@ -1554,9 +1565,9 @@ module Doing
     end
 
     ##
-    ## @brief      Display contents of a section based on options
+    ## Display contents of a section based on options
     ##
-    ## @param      opt   (Hash) Additional Options
+    ## @param      opt   [Hash] Additional Options
     ##
     def list_section(opt = {})
       opt[:count] ||= 0
@@ -1611,44 +1622,12 @@ module Doing
       output(items, title, is_single, opt)
     end
 
-    def output(items, title, is_single, opt = {})
-      out = nil
-
-      raise InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
-
-      export_options = { page_title: title, is_single: is_single, options: opt }
-
-      Plugins.plugins[:export].each do |_, options|
-        next unless opt[:output] =~ /^(#{options[:trigger].normalize_trigger})$/i
-
-        out = options[:class].render(self, items, variables: export_options)
-        break
-      end
-
-      out
-    end
-
-    def load_plugins
-      if @config.key?('plugins') && @config['plugins']['plugin_path']
-        add_dir = @config['plugins']['plugin_path']
-      else
-        add_dir = File.join(@user_home, '.config', 'doing', 'plugins')
-        begin
-          FileUtils.mkdir_p(add_dir) if add_dir
-        rescue
-          nil
-        end
-      end
-
-      Plugins.load_plugins(add_dir)
-    end
-
     ##
-    ## @brief      Move entries from a section to Archive or other specified
+    ## Move entries from a section to Archive or other specified
     ##             section
     ##
-    ## @param      section      (String) The source section
-    ## @param      options      (Hash) Options
+    ## @param      section      [String] The source section
+    ## @param      options      [Hash] Options
     ##
     def archive(section = @config['current_section'], options = {})
       count       = options[:keep] || 0
@@ -1673,108 +1652,11 @@ module Doing
     end
 
     ##
-    ## @brief      Helper function, performs the actual archiving
+    ## Show all entries from the current day
     ##
-    ## @param      section      (String) The source section
-    ## @param      destination  (String) The destination section
-    ## @param      opt          (Hash) Additional Options
-    ##
-    def do_archive(sect, destination, opt = {})
-      count = opt[:count] || 0
-      tags  = opt[:tags] || []
-      bool  = opt[:bool] || :and
-      label = opt[:label] || true
-
-      if sect =~ /^all$/i
-        all_sections = sections.dup
-        all_sections.delete(destination)
-      else
-        all_sections = [sect]
-      end
-
-      counter = 0
-
-      all_sections.each do |section|
-        items = @content[section][:items].dup
-
-        moved_items = []
-        if !tags.empty? || opt[:search] || opt[:before]
-          if opt[:before]
-            time_string = opt[:before]
-            cutoff = chronify(time_string, guess: :begin)
-          end
-
-          items.delete_if do |item|
-            if ((!tags.empty? && item.tags?(tags, bool)) || (opt[:search] && item.search(opt[:search].to_s)) || (opt[:before] && item.date < cutoff))
-              moved_items.push(item)
-              counter += 1
-              true
-            else
-              false
-            end
-          end
-          moved_items.each do |item|
-            if label
-              item.title = if section == @config['current_section']
-                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, '\1')
-                           else
-                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
-                           end
-              logger.debug('Moved:', "#{item.title} from #{section} to #{destination}")
-            end
-          end
-
-          @content[section][:items] = items
-          @content[destination][:items].concat(moved_items)
-          if moved_items.length.positive?
-            logger.count(destination == 'Archive' ? :archived : :moved,
-                         level: :info,
-                         count: moved_items.length,
-                         message: "%count %items from #{section} to #{destination}")
-          else
-            logger.info('Skipped:', 'No items were moved')
-          end
-        else
-          count = items.length if items.length < count
-
-          items.map! do |item|
-            if label
-              item.title = if section == @config['current_section']
-                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, '\1')
-                           else
-                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
-                           end
-              logger.debug('Moved:', "#{item.title} from #{section} to #{destination}")
-            end
-            item
-          end
-
-          if items.count > count
-            @content[destination][:items].concat(items[count..-1])
-          else
-            @content[destination][:items].concat(items)
-          end
-
-          @content[section][:items] = if count.zero?
-                                        []
-                                      else
-                                        items[0..count - 1]
-                                      end
-
-          logger.count(destination == 'Archive' ? :archived : :moved,
-                       level: :info,
-                       count: items.length - count,
-                       message: "%count %items from #{section} to #{destination}")
-        end
-      end
-    end
-
-    ##
-    ## @brief      Show all entries from the current day
-    ##
-    ## @param      times   (Boolean) show times
-    ## @param      output  (String) output format
-    ## @param      opt     (Hash) Options
+    ## @param      times   [Boolean] show times
+    ## @param      output  [String] output format
+    ## @param      opt     [Hash] Options
     ##
     def today(times = true, output = nil, opt = {})
       opt[:totals] ||= false
@@ -1800,13 +1682,13 @@ module Doing
     end
 
     ##
-    ## @brief      Display entries within a date range
+    ## Display entries within a date range
     ##
-    ## @param      dates    (Array) [start, end]
-    ## @param      section  (String) The section
+    ## @param      dates    [Array] [start, end]
+    ## @param      section  [String] The section
     ## @param      times    (Bool) Show times
-    ## @param      output   (String) Output format
-    ## @param      opt      (Hash) Additional Options
+    ## @param      output   [String] Output format
+    ## @param      opt      [Hash] Additional Options
     ##
     def list_date(dates, section, times = nil, output = nil, opt = {})
       opt[:totals] ||= false
@@ -1820,12 +1702,12 @@ module Doing
     end
 
     ##
-    ## @brief      Show entries from the previous day
+    ## Show entries from the previous day
     ##
-    ## @param      section  (String) The section
+    ## @param      section  [String] The section
     ## @param      times    (Bool) Show times
-    ## @param      output   (String) Output format
-    ## @param      opt      (Hash) Additional Options
+    ## @param      output   [String] Output format
+    ## @param      opt      [Hash] Additional Options
     ##
     def yesterday(section, times = nil, output = nil, opt = {})
       opt[:totals] ||= false
@@ -1853,11 +1735,11 @@ module Doing
     end
 
     ##
-    ## @brief      Show recent entries
+    ## Show recent entries
     ##
-    ## @param      count    (Integer) The number to show
-    ## @param      section  (String) The section to show from, default Currently
-    ## @param      opt      (Hash) Additional Options
+    ## @param      count    [Integer] The number to show
+    ## @param      section  [String] The section to show from, default Currently
+    ## @param      opt      [Hash] Additional Options
     ##
     def recent(count = 10, section = nil, opt = {})
       times = opt[:t] || true
@@ -1875,10 +1757,10 @@ module Doing
     end
 
     ##
-    ## @brief      Show the last entry
+    ## Show the last entry
     ##
     ## @param      times    (Bool) Show times
-    ## @param      section  (String) Section to pull from, default Currently
+    ## @param      section  [String] Section to pull from, default Currently
     ##
     def last(times: true, section: nil, options: {})
       section = section.nil? || section =~ /all/i ? 'All' : guess_section(section)
@@ -1907,11 +1789,11 @@ module Doing
     end
 
     ##
-    ## @brief Uses 'autotag' configuration to turn keywords into tags for time tracking.
+    ## Uses 'autotag' configuration to turn keywords into tags for time tracking.
     ## Does not repeat tags in a title, and only converts the first instance of an
     ## untagged keyword
     ##
-    ## @param      text  (String) The text to tag
+    ## @param      text  [String] The text to tag
     ##
     def autotag(text)
       return unless text
@@ -1984,13 +1866,13 @@ module Doing
     end
 
     ##
-    ## @brief      Get total elapsed time for all tags in
+    ## Get total elapsed time for all tags in
     ##             selection
     ##
-    ## @param      format        (String) return format (html,
+    ## @param      format        [String] return format (html,
     ##                           json, or text)
-    ## @param      sort_by_name  (Boolean) Sort by name if true, otherwise by time
-    ## @param      sort_order    (String) The sort order (asc or desc)
+    ## @param      sort_by_name  [Boolean] Sort by name if true, otherwise by time
+    ## @param      sort_order    [String] The sort order (asc or desc)
     ##
     def tag_times(format: :text, sort_by_name: false, sort_order: 'asc')
       return '' if @timers.empty?
@@ -2120,13 +2002,13 @@ EOS
     end
 
     ##
-    ## @brief      Gets the interval between entry's start
+    ## Gets the interval between entry's start
     ##             date and @done date
     ##
-    ## @param      item       (Hash) The entry
-    ## @param      formatted  (Bool) Return human readable
+    ## @param      item       [Item] The entry
+    ## @param      formatted  [Boolean] Return human readable
     ##                        time (default seconds)
-    ## @param      record     (Bool) Add the interval to the
+    ## @param      record     [Boolean] Add the interval to the
     ##                        total for each tag
     ##
     ## @return     Interval in seconds, or [d, h, m] array if
@@ -2146,28 +2028,9 @@ EOS
     end
 
     ##
-    ## @brief      Record times for item tags
+    ## Format human readable time from seconds
     ##
-    ## @param      item  The item
-    ##
-    def record_tag_times(item, seconds)
-      item_hash = "#{item.date.strftime('%s')}#{item.title}#{item.section}"
-      return if @recorded_items.include?(item_hash)
-      item.title.scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
-        k = m[0] == 'done' ? 'All' : m[0].downcase
-        if @timers.key?(k)
-          @timers[k] += seconds
-        else
-          @timers[k] = seconds
-        end
-        @recorded_items.push(item_hash)
-      end
-    end
-
-    ##
-    ## @brief      Format human readable time from seconds
-    ##
-    ## @param      seconds  The seconds
+    ## @param      seconds  [Integer] Seconds
     ##
     def format_time(seconds, human: false)
       return [0, 0, 0] if seconds.nil?
@@ -2192,6 +2055,169 @@ EOS
     end
 
     private
+
+    ##
+    ## Wraps doing file content with additional
+    ##             header/footer content
+    ##
+    ## @return     [String] concatenated content
+    ##
+    def combined_content
+      output = @other_content_top ? "#{@other_content_top.join("\n")}\n" : ''
+
+      @content.each do |title, section|
+        output += "#{section[:original]}\n"
+        output += list_section({ section: title, template: "\t- %date | %title%t2note", highlight: false, wrap_width: 0 })
+      end
+
+      output + @other_content_bottom.join("\n") unless @other_content_bottom.nil?
+    end
+
+    ##
+    ## Generate output using available export plugins
+    ##
+    ## @param      items      [Array] The items
+    ## @param      title      [String] Page title
+    ## @param      is_single  [Boolean] Indicates if single
+    ##                        section
+    ## @param      opt        [Hash] Additional options
+    ##
+    ## @return     [String] formatted output based on opt[:output]
+    ##             template trigger
+    ##
+    def output(items, title, is_single, opt = {})
+      out = nil
+
+      raise InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
+
+      export_options = { page_title: title, is_single: is_single, options: opt }
+
+      Plugins.plugins[:export].each do |_, options|
+        next unless opt[:output] =~ /^(#{options[:trigger].normalize_trigger})$/i
+
+        out = options[:class].render(self, items, variables: export_options)
+        break
+      end
+
+      out
+    end
+
+    ##
+    ## Record times for item tags
+    ##
+    ## @param      item  [Item] The item to record
+    ##
+    def record_tag_times(item, seconds)
+      item_hash = "#{item.date.strftime('%s')}#{item.title}#{item.section}"
+      return if @recorded_items.include?(item_hash)
+      item.title.scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
+        k = m[0] == 'done' ? 'All' : m[0].downcase
+        if @timers.key?(k)
+          @timers[k] += seconds
+        else
+          @timers[k] = seconds
+        end
+        @recorded_items.push(item_hash)
+      end
+    end
+
+    ##
+    ## Helper function, performs the actual archiving
+    ##
+    ## @param      sect         [String] The source section
+    ## @param      destination  [String] The destination
+    ##                          section
+    ## @param      opt          [Hash] Additional Options
+    ##
+    def do_archive(sect, destination, opt = {})
+      count = opt[:count] || 0
+      tags  = opt[:tags] || []
+      bool  = opt[:bool] || :and
+      label = opt[:label] || true
+
+      if sect =~ /^all$/i
+        all_sections = sections.dup
+        all_sections.delete(destination)
+      else
+        all_sections = [sect]
+      end
+
+      counter = 0
+
+      all_sections.each do |section|
+        items = @content[section][:items].dup
+
+        moved_items = []
+        if !tags.empty? || opt[:search] || opt[:before]
+          if opt[:before]
+            time_string = opt[:before]
+            cutoff = chronify(time_string, guess: :begin)
+          end
+
+          items.delete_if do |item|
+            if ((!tags.empty? && item.tags?(tags, bool)) || (opt[:search] && item.search(opt[:search].to_s)) || (opt[:before] && item.date < cutoff))
+              moved_items.push(item)
+              counter += 1
+              true
+            else
+              false
+            end
+          end
+          moved_items.each do |item|
+            if label
+              item.title = if section == @config['current_section']
+                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, '\1')
+                           else
+                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+                           end
+              logger.debug('Moved:', "#{item.title} from #{section} to #{destination}")
+            end
+          end
+
+          @content[section][:items] = items
+          @content[destination][:items].concat(moved_items)
+          if moved_items.length.positive?
+            logger.count(destination == 'Archive' ? :archived : :moved,
+                         level: :info,
+                         count: moved_items.length,
+                         message: "%count %items from #{section} to #{destination}")
+          else
+            logger.info('Skipped:', 'No items were moved')
+          end
+        else
+          count = items.length if items.length < count
+
+          items.map! do |item|
+            if label
+              item.title = if section == @config['current_section']
+                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, '\1')
+                           else
+                             item.title.sub(/(?: ?@from\(.*?\))?(.*)$/, "\\1 @from(#{section})")
+                           end
+              logger.debug('Moved:', "#{item.title} from #{section} to #{destination}")
+            end
+            item
+          end
+
+          if items.count > count
+            @content[destination][:items].concat(items[count..-1])
+          else
+            @content[destination][:items].concat(items)
+          end
+
+          @content[section][:items] = if count.zero?
+                                        []
+                                      else
+                                        items[0..count - 1]
+                                      end
+
+          logger.count(destination == 'Archive' ? :archived : :moved,
+                       level: :info,
+                       count: items.length - count,
+                       message: "%count %items from #{section} to #{destination}")
+        end
+      end
+    end
 
     def run_after
       return unless @config.key?('run_after')

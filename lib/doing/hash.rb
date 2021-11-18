@@ -4,7 +4,7 @@ module Doing
   # Hash helpers
   class ::Hash
     ##
-    ## @brief      Freeze all values in a hash
+    ## Freeze all values in a hash
     ##
     ## @return     { description_of_the_return_value }
     ##

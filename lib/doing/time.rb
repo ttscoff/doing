@@ -1,6 +1,6 @@
 module Doing
   ##
-  ## @brief      Date helpers
+  ## Date helpers
   ##
   class ::Time
     def relative_date

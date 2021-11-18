@@ -1,0 +1,2620 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: String
+  
+    &mdash; Documentation by YARD 0.9.26
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "String";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (S)</a> &raquo;
+    
+    
+    <span class="title">String</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: String
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">String</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="Doing/Color.html" title="Doing::Color (module)">Doing::Color</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/doing/string.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>String helpers</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+  <h2>Constant Summary</h2>
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="Doing/Color.html" title="Doing::Color (module)">Doing::Color</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Doing/Color.html#ATTRIBUTES-constant" title="Doing::Color::ATTRIBUTES (constant)">Doing::Color::ATTRIBUTES</a></span>, <span class='object_link'><a href="Doing/Color.html#ATTRIBUTE_NAMES-constant" title="Doing::Color::ATTRIBUTE_NAMES (constant)">Doing::Color::ATTRIBUTE_NAMES</a></span>, <span class='object_link'><a href="Doing/Color.html#COLORED_REGEXP-constant" title="Doing::Color::COLORED_REGEXP (constant)">Doing::Color::COLORED_REGEXP</a></span></p>
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_tags-instance_method" title="#add_tags (instance method)">#<strong>add_tags</strong>(tags, remove: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_tags!-instance_method" title="#add_tags! (instance method)">#<strong>add_tags!</strong>(tags, remove: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#cap_first-instance_method" title="#cap_first (instance method)">#<strong>cap_first</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Capitalize on the first character on string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#dedup_tags-instance_method" title="#dedup_tags (instance method)">#<strong>dedup_tags</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#dedup_tags!-instance_method" title="#dedup_tags! (instance method)">#<strong>dedup_tags!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Remove duplicate tags, leaving only first occurrence.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#highlight_tags-instance_method" title="#highlight_tags (instance method)">#<strong>highlight_tags</strong>(color = &#39;yellow&#39;)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Colorize @tags with ANSI escapes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#highlight_tags!-instance_method" title="#highlight_tags! (instance method)">#<strong>highlight_tags!</strong>(color = &#39;yellow&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ignore%3F-instance_method" title="#ignore? (instance method)">#<strong>ignore?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Test if line should be ignored.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#link_urls-instance_method" title="#link_urls (instance method)">#<strong>link_urls</strong>(opt = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#link_urls!-instance_method" title="#link_urls! (instance method)">#<strong>link_urls!</strong>(opt = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Turn raw urls into HTML links.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_bool-instance_method" title="#normalize_bool (instance method)">#<strong>normalize_bool</strong>(default = :and)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_bool!-instance_method" title="#normalize_bool! (instance method)">#<strong>normalize_bool!</strong>(default = :and)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert a boolean string to a symbol.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_case-instance_method" title="#normalize_case (instance method)">#<strong>normalize_case</strong>(default = :smart)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_case!-instance_method" title="#normalize_case! (instance method)">#<strong>normalize_case!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert a case sensitivity string to a symbol.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_order-instance_method" title="#normalize_order (instance method)">#<strong>normalize_order</strong>(default = &#39;asc&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_order!-instance_method" title="#normalize_order! (instance method)">#<strong>normalize_order!</strong>(default = &#39;asc&#39;)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert a sort order string to a qualified type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_trigger-instance_method" title="#normalize_trigger (instance method)">#<strong>normalize_trigger</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_trigger!-instance_method" title="#normalize_trigger! (instance method)">#<strong>normalize_trigger!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#tag-instance_method" title="#tag (instance method)">#<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#tag!-instance_method" title="#tag! (instance method)">#<strong>tag!</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_rx-instance_method" title="#to_rx (instance method)">#<strong>to_rx</strong>(distance)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert string to fuzzy regex.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_tags-instance_method" title="#to_tags (instance method)">#<strong>to_tags</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#truncate-instance_method" title="#truncate (instance method)">#<strong>truncate</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Truncate to nearest word.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#truncate!-instance_method" title="#truncate! (instance method)">#<strong>truncate!</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#truncmiddle-instance_method" title="#truncmiddle (instance method)">#<strong>truncmiddle</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Truncate string in the middle.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#truncmiddle!-instance_method" title="#truncmiddle! (instance method)">#<strong>truncmiddle!</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#truthy%3F-instance_method" title="#truthy? (instance method)">#<strong>truthy?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Test string for truthiness (0, &quot;f&quot;, &quot;false&quot;, &quot;n&quot;, &quot;no&quot; all return false, case insensitive, otherwise true).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#uncolor-instance_method" title="#uncolor (instance method)">#<strong>uncolor</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Remove color escape codes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#uncolor!-instance_method" title="#uncolor! (instance method)">#<strong>uncolor!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#wrap-instance_method" title="#wrap (instance method)">#<strong>wrap</strong>(len, pad: 0, indent: &#39;  &#39;, offset: 0, prefix: &#39;&#39;, after: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Wrap string at word breaks, respecting tags.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Doing/Color.html" title="Doing::Color (module)">Doing::Color</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Doing/Color.html#attributes-class_method" title="Doing::Color.attributes (method)">attributes</a></span>, <span class='object_link'><a href="Doing/Color.html#coloring=-class_method" title="Doing::Color.coloring= (method)">coloring=</a></span>, <span class='object_link'><a href="Doing/Color.html#coloring%3F-class_method" title="Doing::Color.coloring? (method)">coloring?</a></span>, <span class='object_link'><a href="Doing/Color.html#support%3F-instance_method" title="Doing::Color#support? (method)">#support?</a></span></p>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="add_tags-instance_method">
+  
+    #<strong>add_tags</strong>(tags, remove: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+249
+250
+251
+252
+253
+254</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 249</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_tags'>add_tags</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='comma'>,</span> <span class='label'>remove:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_title'>title</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
+  <span class='id identifier rubyid_tags'>tags</span> <span class='op'>=</span> <span class='id identifier rubyid_tags'>tags</span><span class='period'>.</span><span class='id identifier rubyid_to_tags'>to_tags</span> <span class='kw'>if</span> <span class='id identifier rubyid_tags'>tags</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="" title="String (class)">String</a></span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_tags'>tags</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_tag'>tag</span><span class='op'>|</span> <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_tag!'>tag!</span><span class='lparen'>(</span><span class='id identifier rubyid_tag'>tag</span><span class='comma'>,</span> <span class='label'>remove:</span> <span class='id identifier rubyid_remove'>remove</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_title'>title</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="add_tags!-instance_method">
+  
+    #<strong>add_tags!</strong>(tags, remove: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+245
+246
+247</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 245</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_tags!'>add_tags!</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='comma'>,</span> <span class='label'>remove:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_add_tags'>add_tags</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='comma'>,</span> <span class='label'>remove:</span> <span class='id identifier rubyid_remove'>remove</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="cap_first-instance_method">
+  
+    #<strong>cap_first</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Capitalize on the first character on string</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>Capitalized string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+163
+164
+165
+166
+167</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 163</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_cap_first'>cap_first</span>
+  <span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\w</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+    <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="dedup_tags-instance_method">
+  
+    #<strong>dedup_tags</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 323</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_dedup_tags'>dedup_tags</span>
+  <span class='id identifier rubyid_title'>title</span> <span class='op'>=</span> <span class='id identifier rubyid_dup'>dup</span>
+  <span class='id identifier rubyid_tags'>tags</span> <span class='op'>=</span> <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(?&lt;=^| )(@(\S+?)(\([^)]+\))?)(?= |$)</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
+  <span class='id identifier rubyid_tags'>tags</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tag'>tag</span><span class='op'>|</span>
+    <span class='id identifier rubyid_found'>found</span> <span class='op'>=</span> <span class='kw'>false</span>
+    <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_gsub!'>gsub!</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>( |^)</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>(\([^)]+\))?(?= |$)</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_found'>found</span>
+        <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_found'>found</span> <span class='op'>=</span> <span class='kw'>true</span>
+        <span class='id identifier rubyid_m'>m</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_title'>title</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="dedup_tags!-instance_method">
+  
+    #<strong>dedup_tags!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Remove duplicate tags, leaving only first occurrence</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>Deduplicated string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+319
+320
+321</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 319</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_dedup_tags!'>dedup_tags!</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_dedup_tags'>dedup_tags</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="highlight_tags-instance_method">
+  
+    #<strong>highlight_tags</strong>(color = &#39;yellow&#39;)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Colorize @tags with ANSI escapes</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>color</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;yellow&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>color (see #Color)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>string with @tags highlighted</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_highlight_tags'>highlight_tags</span><span class='lparen'>(</span><span class='id identifier rubyid_color'>color</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yellow</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_escapes'>escapes</span> <span class='op'>=</span> <span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(\e\[[\d;]+m)[^\e]+@</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_tag_color'>tag_color</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Doing/Color.html" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_color'>color</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_last_color'>last_color</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_escapes'>escapes</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+                 <span class='id identifier rubyid_escapes'>escapes</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+               <span class='kw'>else</span>
+                 <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Doing/Color.html" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_default'>default</span>
+               <span class='kw'>end</span>
+  <span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(\s|m)(@[^ (&quot;&#39;]+)</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\\1</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag_color'>tag_color</span><span class='embexpr_end'>}</span><span class='tstring_content'>\\2</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_color'>last_color</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="highlight_tags!-instance_method">
+  
+    #<strong>highlight_tags!</strong>(color = &#39;yellow&#39;)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>color</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;yellow&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>color (see #Color)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+36
+37
+38</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 36</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_highlight_tags!'>highlight_tags!</span><span class='lparen'>(</span><span class='id identifier rubyid_color'>color</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yellow</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_highlight_tags'>highlight_tags</span><span class='lparen'>(</span><span class='id identifier rubyid_color'>color</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ignore?-instance_method">
+  
+    #<strong>ignore?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Test if line should be ignored</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>line is empty or comment</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63
+64
+65
+66</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ignore?'>ignore?</span>
+  <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='kw'>self</span>
+  <span class='id identifier rubyid_line'>line</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^#</span><span class='regexp_end'>/</span></span> <span class='op'>||</span> <span class='id identifier rubyid_line'>line</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*$</span><span class='regexp_end'>/</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="link_urls-instance_method">
+  
+    #<strong>link_urls</strong>(opt = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 349</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_link_urls'>link_urls</span><span class='lparen'>(</span><span class='id identifier rubyid_opt'>opt</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:format</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='symbol'>:html</span>
+  <span class='id identifier rubyid_str'>str</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
+
+  <span class='kw'>if</span> <span class='symbol'>:format</span> <span class='op'>==</span> <span class='symbol'>:markdown</span>
+    <span class='comment'># Remove &lt;self-linked&gt; formatting
+</span>    <span class='id identifier rubyid_str'>str</span><span class='period'>.</span><span class='id identifier rubyid_gsub!'>gsub!</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>&lt;(.*?)&gt;</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_match'>match</span><span class='op'>|</span>
+      <span class='id identifier rubyid_m'>m</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^https?:</span><span class='regexp_end'>/</span></span>
+        <span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_match'>match</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Replace qualified urls
+</span>  <span class='id identifier rubyid_str'>str</span><span class='period'>.</span><span class='id identifier rubyid_gsub!'>gsub!</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>(?mi)(?&lt;![&quot;&#39;\[(\\])((http|https)://)([\w\-_]+(\.[\w\-_]+)+)([\w\-.,@?^=%&amp;amp;:/~+#]*[\w\-@^=%&amp;amp;/~+#])?</span><span class='regexp_end'>}</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid__match'>_match</span><span class='op'>|</span>
+    <span class='id identifier rubyid_m'>m</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span>
+    <span class='id identifier rubyid_proto'>proto</span> <span class='op'>=</span> <span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>http://</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>case</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:format</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='symbol'>:html</span>
+      <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>&lt;a href=&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_proto'>proto</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot; title=&quot;Link to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^https?:\/\/</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;&gt;[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>3</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>]&lt;/a&gt;</span><span class='tstring_end'>)</span></span>
+    <span class='kw'>when</span> <span class='symbol'>:markdown</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>](</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_proto'>proto</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Clean up unlinked &lt;urls&gt;
+</span>  <span class='id identifier rubyid_str'>str</span><span class='period'>.</span><span class='id identifier rubyid_gsub!'>gsub!</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>&lt;(\w+:.*?)&gt;</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_match'>match</span><span class='op'>|</span>
+    <span class='id identifier rubyid_m'>m</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>&lt;a href</span><span class='regexp_end'>/</span></span>
+      <span class='id identifier rubyid_match'>match</span>
+    <span class='kw'>else</span>
+      <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>&lt;a href=&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot; title=&quot;Link to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;&gt;[link]&lt;/a&gt;</span><span class='tstring_end'>)</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_str'>str</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="link_urls!-instance_method">
+  
+    #<strong>link_urls!</strong>(opt = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Turn raw urls into HTML links</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>opt</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional Options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+345
+346
+347</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 345</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_link_urls!'>link_urls!</span><span class='lparen'>(</span><span class='id identifier rubyid_opt'>opt</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_link_urls'>link_urls</span><span class='lparen'>(</span><span class='id identifier rubyid_opt'>opt</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_bool-instance_method">
+  
+    #<strong>normalize_bool</strong>(default = :and)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 220</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_bool'>normalize_bool</span><span class='lparen'>(</span><span class='id identifier rubyid_default'>default</span> <span class='op'>=</span> <span class='symbol'>:and</span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='kw'>self</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(and|all)</span><span class='regexp_end'>/i</span></span>
+    <span class='symbol'>:and</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(any|or)</span><span class='regexp_end'>/i</span></span>
+    <span class='symbol'>:or</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(not|none)</span><span class='regexp_end'>/i</span></span>
+    <span class='symbol'>:not</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_default'>default</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_default'>default</span> <span class='op'>:</span> <span class='id identifier rubyid_default'>default</span><span class='period'>.</span><span class='id identifier rubyid_normalize_bool'>normalize_bool</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_bool!-instance_method">
+  
+    #<strong>normalize_bool!</strong>(default = :and)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert a boolean string to a symbol</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>Symbol :and, :or, or :not</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+216
+217
+218</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 216</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_bool!'>normalize_bool!</span><span class='lparen'>(</span><span class='id identifier rubyid_default'>default</span> <span class='op'>=</span> <span class='symbol'>:and</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_normalize_bool'>normalize_bool</span><span class='lparen'>(</span><span class='id identifier rubyid_default'>default</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_case-instance_method">
+  
+    #<strong>normalize_case</strong>(default = :smart)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 198</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_case'>normalize_case</span><span class='lparen'>(</span><span class='id identifier rubyid_default'>default</span> <span class='op'>=</span> <span class='symbol'>:smart</span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='kw'>self</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^c</span><span class='regexp_end'>/i</span></span>
+    <span class='symbol'>:sensitive</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^i</span><span class='regexp_end'>/i</span></span>
+    <span class='symbol'>:insensitive</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^s</span><span class='regexp_end'>/i</span></span>
+    <span class='symbol'>:smart</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_default'>default</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_default'>default</span> <span class='op'>:</span> <span class='id identifier rubyid_default'>default</span><span class='period'>.</span><span class='id identifier rubyid_normalize_case'>normalize_case</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_case!-instance_method">
+  
+    #<strong>normalize_case!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert a case sensitivity string to a symbol</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>Symbol :smart, :sensitive, :insensitive</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+194
+195
+196</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 194</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_case!'>normalize_case!</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_normalize_case'>normalize_case</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_order-instance_method">
+  
+    #<strong>normalize_order</strong>(default = &#39;asc&#39;)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 178</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_order'>normalize_order</span><span class='lparen'>(</span><span class='id identifier rubyid_default'>default</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>asc</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='kw'>self</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^a</span><span class='regexp_end'>/i</span></span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>asc</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^d</span><span class='regexp_end'>/i</span></span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>desc</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_default'>default</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_order!-instance_method">
+  
+    #<strong>normalize_order!</strong>(default = &#39;asc&#39;)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert a sort order string to a qualified type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>&#39;asc&#39; or &#39;desc&#39;</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+174
+175
+176</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 174</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_order!'>normalize_order!</span><span class='lparen'>(</span><span class='id identifier rubyid_default'>default</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>asc</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_normalize_order'>normalize_order</span><span class='lparen'>(</span><span class='id identifier rubyid_default'>default</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_trigger-instance_method">
+  
+    #<strong>normalize_trigger</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+237
+238
+239</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 237</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_trigger'>normalize_trigger</span>
+  <span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\((?!\?:)</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(?:</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_trigger!-instance_method">
+  
+    #<strong>normalize_trigger!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+233
+234
+235</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 233</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_trigger!'>normalize_trigger!</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_normalize_trigger'>normalize_trigger</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="tag-instance_method">
+  
+    #<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 260</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_tag'>tag</span><span class='lparen'>(</span><span class='id identifier rubyid_tag'>tag</span><span class='comma'>,</span> <span class='label'>value:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>remove:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>rename_to:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>regex:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>single:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='id identifier rubyid_single'>single</span> <span class='op'>?</span> <span class='symbol'>:info</span> <span class='op'>:</span> <span class='symbol'>:debug</span>
+  <span class='id identifier rubyid_title'>title</span> <span class='op'>=</span> <span class='id identifier rubyid_dup'>dup</span>
+  <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_chomp!'>chomp!</span>
+  <span class='id identifier rubyid_tag'>tag</span> <span class='op'>=</span> <span class='id identifier rubyid_tag'>tag</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^@?</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_case_sensitive'>case_sensitive</span> <span class='op'>=</span> <span class='id identifier rubyid_tag'>tag</span> <span class='op'>!~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[A-Z]</span><span class='regexp_end'>/</span></span>
+
+  <span class='id identifier rubyid_rx_tag'>rx_tag</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_regex'>regex</span>
+             <span class='id identifier rubyid_tag'>tag</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\.</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\S</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+           <span class='kw'>else</span>
+             <span class='id identifier rubyid_tag'>tag</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\?</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\*</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\S*?</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+           <span class='kw'>end</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_remove'>remove</span> <span class='op'>||</span> <span class='id identifier rubyid_rename_to'>rename_to</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_title'>title</span> <span class='kw'>unless</span> <span class='id identifier rubyid_title'>title</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rx_tag'>rx_tag</span><span class='embexpr_end'>}</span><span class='tstring_content'>(?=[ (]|$)</span><span class='regexp_end'>/</span></span>
+
+    <span class='id identifier rubyid_rx'>rx</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(^| )@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rx_tag'>rx_tag</span><span class='embexpr_end'>}</span><span class='tstring_content'>(\\([^)]*\\))?(?= |$)</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_case_sensitive'>case_sensitive</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_title'>title</span> <span class='op'>=~</span> <span class='id identifier rubyid_rx'>rx</span>
+      <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_gsub!'>gsub!</span><span class='lparen'>(</span><span class='id identifier rubyid_rx'>rx</span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_m'>m</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span>
+        <span class='id identifier rubyid_rename_to'>rename_to</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rename_to'>rename_to</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+      <span class='kw'>end</span>
+
+      <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_dedup_tags!'>dedup_tags!</span>
+      <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_chomp!'>chomp!</span>
+
+      <span class='kw'>if</span> <span class='id identifier rubyid_rename_to'>rename_to</span>
+        <span class='id identifier rubyid_f'>f</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_cyan'>cyan</span>
+        <span class='id identifier rubyid_t'>t</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rename_to'>rename_to</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_cyan'>cyan</span>
+        <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_log_level'>log_level</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Tag:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>renamed </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_f'>f</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_t'>t</span><span class='embexpr_end'>}</span><span class='tstring_content'> in &quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_f'>f</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_cyan'>cyan</span>
+        <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_log_level'>log_level</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Tag:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>removed </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_f'>f</span><span class='embexpr_end'>}</span><span class='tstring_content'> from &quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>else</span>
+      <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Skipped:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>not tagged </span><span class='embexpr_beg'>#{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_cyan'>cyan</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_title'>title</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='embexpr_end'>}</span><span class='tstring_content'>(?=[ (]|$)</span><span class='regexp_end'>/</span></span>
+    <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Skipped:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>already tagged </span><span class='embexpr_beg'>#{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_cyan'>cyan</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_title'>title</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_add'>add</span> <span class='op'>=</span> <span class='id identifier rubyid_tag'>tag</span>
+    <span class='id identifier rubyid_add'>add</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_chomp!'>chomp!</span>
+    <span class='id identifier rubyid_title'>title</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> @</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_add'>add</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_dedup_tags!'>dedup_tags!</span>
+    <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_chomp!'>chomp!</span>
+    <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_log_level'>log_level</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Tag:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>added </span><span class='embexpr_beg'>#{</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>@</span><span class='tstring_end'>&#39;</span></span> <span class='op'>+</span> <span class='id identifier rubyid_tag'>tag</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_cyan'>cyan</span><span class='embexpr_end'>}</span><span class='tstring_content'> to &quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot;</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> +</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="tag!-instance_method">
+  
+    #<strong>tag!</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+256
+257
+258</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 256</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_tag!'>tag!</span><span class='lparen'>(</span><span class='id identifier rubyid_tag'>tag</span><span class='comma'>,</span> <span class='label'>value:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>remove:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>rename_to:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>regex:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>single:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_tag'>tag</span><span class='lparen'>(</span><span class='id identifier rubyid_tag'>tag</span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='label'>remove:</span> <span class='id identifier rubyid_remove'>remove</span><span class='comma'>,</span> <span class='label'>rename_to:</span> <span class='id identifier rubyid_rename_to'>rename_to</span><span class='comma'>,</span> <span class='label'>regex:</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='label'>single:</span> <span class='id identifier rubyid_single'>single</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_rx-instance_method">
+  
+    #<strong>to_rx</strong>(distance)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert string to fuzzy regex</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>distance</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Allowed distance
+between characters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Regex pattern</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+18
+19
+20</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 18</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_rx'>to_rx</span><span class='lparen'>(</span><span class='id identifier rubyid_distance'>distance</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(.)</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\\1.{0,</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_distance'>distance</span><span class='embexpr_end'>}</span><span class='tstring_content'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_tags-instance_method">
+  
+    #<strong>to_tags</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+241
+242
+243</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 241</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_tags'>to_tags</span>
+  <span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> *, *</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> +</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> </span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^@</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="truncate-instance_method">
+  
+    #<strong>truncate</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Truncate to nearest word</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>len</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The length</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 73</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_truncate'>truncate</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_len'>len</span>
+
+  <span class='id identifier rubyid_total'>total</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> </span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_word'>word</span><span class='op'>|</span>
+    <span class='kw'>break</span> <span class='kw'>if</span> <span class='id identifier rubyid_total'>total</span> <span class='op'>+</span> <span class='int'>1</span> <span class='op'>+</span> <span class='id identifier rubyid_word'>word</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_len'>len</span>
+
+    <span class='id identifier rubyid_total'>total</span> <span class='op'>+=</span> <span class='int'>1</span> <span class='op'>+</span> <span class='id identifier rubyid_word'>word</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+    <span class='id identifier rubyid_res'>res</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_word'>word</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_res'>res</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_ellipsis'>ellipsis</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="truncate!-instance_method">
+  
+    #<strong>truncate!</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 88</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_truncate!'>truncate!</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_truncate'>truncate</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='id identifier rubyid_ellipsis'>ellipsis</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="truncmiddle-instance_method">
+  
+    #<strong>truncmiddle</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Truncate string in the middle</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>len</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The length</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ellipsis</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;...&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The ellipsis</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+98
+99
+100
+101
+102
+103
+104
+105</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 98</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_truncmiddle'>truncmiddle</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_len'>len</span>
+  <span class='id identifier rubyid_len'>len</span> <span class='op'>-=</span> <span class='lparen'>(</span><span class='id identifier rubyid_ellipsis'>ellipsis</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>/</span> <span class='int'>2</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+  <span class='id identifier rubyid_total'>total</span> <span class='op'>=</span> <span class='id identifier rubyid_length'>length</span>
+  <span class='id identifier rubyid_half'>half</span> <span class='op'>=</span> <span class='id identifier rubyid_total'>total</span> <span class='op'>/</span> <span class='int'>2</span>
+  <span class='id identifier rubyid_cut'>cut</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_total'>total</span> <span class='op'>-</span> <span class='id identifier rubyid_len'>len</span><span class='rparen'>)</span> <span class='op'>/</span> <span class='int'>2</span>
+  <span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(.{</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_half'>half</span> <span class='op'>-</span> <span class='id identifier rubyid_cut'>cut</span><span class='embexpr_end'>}</span><span class='tstring_content'>}).*?(.{</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_half'>half</span> <span class='op'>-</span> <span class='id identifier rubyid_cut'>cut</span><span class='embexpr_end'>}</span><span class='tstring_content'>})$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\\1</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ellipsis'>ellipsis</span><span class='embexpr_end'>}</span><span class='tstring_content'>\\2</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="truncmiddle!-instance_method">
+  
+    #<strong>truncmiddle!</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+107
+108
+109</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 107</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_truncmiddle!'>truncmiddle!</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_truncmiddle'>truncmiddle</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='id identifier rubyid_ellipsis'>ellipsis</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="truthy?-instance_method">
+  
+    #<strong>truthy?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Test string for truthiness (0, &quot;f&quot;, &quot;false&quot;, &quot;n&quot;, &quot;no&quot; all return false, case insensitive, otherwise true)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>String is truthy</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+27
+28
+29
+30
+31
+32
+33</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 27</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_truthy?'>truthy?</span>
+  <span class='kw'>if</span> <span class='kw'>self</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^(0|f(alse)?|n(o)?)$</span><span class='regexp_end'>/i</span></span>
+    <span class='kw'>false</span>
+  <span class='kw'>else</span>
+    <span class='kw'>true</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="uncolor-instance_method">
+  
+    #<strong>uncolor</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Remove color escape codes</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>clean string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+116
+117
+118</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 116</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_uncolor'>uncolor</span>
+  <span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\e\[[\d;]+m</span><span class='regexp_end'>/</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="uncolor!-instance_method">
+  
+    #<strong>uncolor!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+120
+121
+122</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 120</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_uncolor!'>uncolor!</span>
+  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_uncolor'>uncolor</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="wrap-instance_method">
+  
+    #<strong>wrap</strong>(len, pad: 0, indent: &#39;  &#39;, offset: 0, prefix: &#39;&#39;, after: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Wrap string at word breaks, respecting tags</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>len</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The length</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>offset</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>0</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>(Optional) The width to pad each subsequent line</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>prefix</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>(Optional) A prefix to add to each line</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string.rb', line 131</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_wrap'>wrap</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>pad:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>indent:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>  </span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>offset:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>prefix:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>after:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>reset:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_note_rx'>note_rx</span> <span class='op'>=</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(?i-m)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)</span><span class='regexp_end'>/</span></span>
+  <span class='id identifier rubyid_str'>str</span> <span class='op'>=</span> <span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>@\w+\(.*?\)</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_tag'>tag</span><span class='op'>|</span> <span class='id identifier rubyid_tag'>tag</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%%%%</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_words'>words</span> <span class='op'>=</span> <span class='id identifier rubyid_str'>str</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> </span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_word'>word</span><span class='op'>|</span> <span class='id identifier rubyid_word'>word</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>%%%%</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_out'>out</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_words'>words</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_word'>word</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>+</span> <span class='id identifier rubyid_word'>word</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>+</span> <span class='int'>1</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_len'>len</span>
+      <span class='id identifier rubyid_out'>out</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_line'>line</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_word'>word</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_out'>out</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_note'>note</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_after'>after</span><span class='period'>.</span><span class='id identifier rubyid_sub!'>sub!</span><span class='lparen'>(</span><span class='id identifier rubyid_note_rx'>note_rx</span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_note'>note</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_out'>out</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>%-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pad'>pad</span><span class='embexpr_end'>}</span><span class='tstring_content'>s%s</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_out'>out</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_after'>after</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_left_pad'>left_pad</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_left_pad'>left_pad</span> <span class='op'>+=</span> <span class='id identifier rubyid_indent'>indent</span>
+  <span class='id identifier rubyid_out'>out</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_l'>l</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_left_pad'>left_pad</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_prefix'>prefix</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_l'>l</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_note'>note</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_chomp'>chomp</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Nov 18 15:33:55 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-3.0.1).
+</div>
+
+    </div>
+  </body>
+</html>
