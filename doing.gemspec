@@ -33,7 +33,6 @@ spec = Gem::Specification.new do |s|
   s.add_runtime_dependency('gli', '~> 2.19', '>= 2.19.2')
   s.add_runtime_dependency('haml','~>5.0.0', '>= 5.0.0')
   s.add_runtime_dependency('chronic','~> 0.10', '>= 0.10.2')
-  s.add_runtime_dependency 'deep_merge', '~> 1.2', '>= 1.2.1'
-
-
+  s.add_runtime_dependency('deep_merge', '~> 1.2', '>= 1.2.1')
+  s.add_runtime_dependency('amatch', '~> 0.4', '>= 0.4.0')
 end

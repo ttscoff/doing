@@ -106,14 +106,15 @@ module Doing
 
     def value_for_key(keypath = '')
       cfg = @settings
+      real_path = []
       unless keypath =~ /^[.*]?$/
         paths = keypath.split(/[:.]/)
         while paths.length.positive? && !cfg.nil?
           path = paths.shift
           new_cfg = nil
           cfg.each do |key, val|
-            next unless key =~ /#{path.to_rx(2)}/
-
+            next unless key =~ path.to_rx(distance: 2)
+            real_path << key
             new_cfg = val
             break
           end
@@ -122,12 +123,13 @@ module Doing
             Doing.logger.error("Key match not found: #{path}")
             break
           end
-
           cfg = new_cfg
         end
       end
-
-      cfg
+      Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}")
+      result = {}
+      result[real_path[-1]] = cfg
+      result
     end
 
     # It takes the input, fills in the defaults where values do not exist.

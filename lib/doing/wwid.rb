@@ -650,6 +650,37 @@ module Doing
       tag_groups
     end
 
+    def fuzzy_filter_items(items, opt: {})
+      scannable = items.map.with_index { |item, idx| "#{item.title} #{item.note.join(' ')}".gsub(/[|*?!]/, '') + "|#{idx}"  }.join("\n")
+
+      fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
+
+      fzf_args = [
+        '--multi',
+        %(--filter="#{opt[:search].sub(/^'?/, "'")}"),
+        '--no-sort',
+        '-d "\|"',
+        '--nth=1'
+      ]
+      if opt[:case]
+        fzf_args << case opt[:case].normalize_case
+                    when :sensitive
+                      '+i'
+                    when :ignore
+                      '-i'
+                    end
+      end
+      # fzf_args << '-e' if opt[:exact]
+      # puts fzf_args.join(' ')
+      res = `echo #{Shellwords.escape(scannable)}|#{fzf} #{fzf_args.join(' ')}`
+      selected = []
+      res.split(/\n/).each do |item|
+        idx = item.match(/\|(\d+)$/)[1].to_i
+        selected.push(items[idx])
+      end
+      selected
+    end
+
     ##
     ## Filter items based on search criteria
     ##
@@ -682,6 +713,7 @@ module Doing
       end
 
       items.sort_by! { |item| [item.date, item.title.downcase] }.reverse
+
       filtered_items = items.select do |item|
         keep = true
         if opt[:unfinished]
@@ -698,11 +730,10 @@ module Doing
         end
 
         if keep && opt[:search]
-          opt[:case] = opt[:case].normalize_case unless opt[:case].is_a?(Symbol)
           search_match = if opt[:search].nil? || opt[:search].empty?
                            true
                          else
-                           item.search(opt[:search], case_type: opt[:case])
+                           item.search(opt[:search], case_type: opt[:case].normalize_case, fuzzy: opt[:fuzzy])
                          end
 
           keep = false unless search_match
@@ -768,6 +799,8 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional options
     ##
+    ## Options hash is shared with #filter_items and #act_on
+    ##
     def interactive(opt = {})
       section = opt[:section] ? guess_section(opt[:section]) : 'All'
 
@@ -782,20 +815,38 @@ module Doing
       opt[:query] = opt[:search] if opt[:search] && !opt[:query]
       opt[:query] = "!#{opt[:query]}" if opt[:not]
       opt[:multiple] = true
-      items = filter_items([], opt: { section: section, search: opt[:search], case: opt[:case] })
+      opt[:show_if_single] = true
+      items = filter_items([], opt: { section: section, search: opt[:search], fuzzy: opt[:fuzzy], case: opt[:case], not: opt[:not] })
 
       selection = choose_from_items(items, opt, include_section: section =~ /^all$/i)
 
-      raise NoResults, 'no items selected' if selection.empty?
+      raise NoResults, 'no items selected' if selection.nil? || selection.empty?
 
       act_on(selection, opt)
     end
 
+    ##
+    ## Create an interactive menu to select from a set of Items
+    ##
+    ## @param      items            [Array] list of items
+    ## @param      opt              [Hash] options
+    ## @param      include_section  [Boolean] include section
+    ##
+    ## @option opt [String] :header
+    ## @option opt [String] :prompt
+    ## @option opt [String] :query
+    ## @option opt [Boolean] :show_if_single
+    ## @option opt [Boolean] :menu
+    ## @option opt [Boolean] :sort
+    ## @option opt [Boolean] :multiple
+    ## @option opt [Symbol] :case (:sensitive, :ignore, :smart)
+    ##
     def choose_from_items(items, opt = {}, include_section: false)
-      return nil unless $stdout.isatty
+      return items unless $stdout.isatty
 
       return nil unless items.count.positive?
 
+      opt[:case] ||= :smart
       opt[:header] ||= "Arrows: navigate, tab: mark for selection, ctrl-a: select all, enter: commit"
       opt[:prompt] ||= "Select entries to act on > "
 
@@ -830,6 +881,14 @@ module Doing
         '--info=inline'
       ]
       fzf_args.push('-1') unless opt[:show_if_single]
+      fzf_args << case opt[:case].normalize_case
+                  when :sensitive
+                    '+i'
+                  when :ignore
+                    '-i'
+                  end
+      fzf_args << '-e' if opt[:exact]
+
 
       unless opt[:menu]
         raise InvalidArgument, "Can't skip menu when no query is provided" unless opt[:query] && !opt[:query].empty?
@@ -853,12 +912,20 @@ module Doing
     ##             hash and the terminal is a TTY, a menu
     ##             will be presented
     ##
-    ## @param      items  The items to affect
-    ## @param      opt    The actions and options. Can
-    ##                    include :editor, :delete, :tag,
-    ##                    :flag, :finish, :cancel, :archive,
-    ##                    :output, :save_to, :again, and
-    ##                    :resume
+    ## @param      items  [Array] Array of Items to affect
+    ## @param      opt    [Hash] Options and actions to perform
+    ##
+    ## @option opt [Boolean] :editor
+    ## @option opt [Boolean] :delete
+    ## @option opt [String] :tag
+    ## @option opt [Boolean] :flag
+    ## @option opt [Boolean] :finish
+    ## @option opt [Boolean] :cancel
+    ## @option opt [Boolean] :archive
+    ## @option opt [String] :output
+    ## @option opt [String] :save_to
+    ## @option opt [Boolean] :again
+    ## @option opt [Boolean] :resume
     ##
     def act_on(items, opt = {})
       actions = %i[editor delete tag flag finish cancel archive output save_to again resume]

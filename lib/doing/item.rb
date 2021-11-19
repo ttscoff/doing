@@ -5,6 +5,8 @@ module Doing
   ## This class describes a single WWID item
   ##
   class Item
+    include Amatch
+
     attr_accessor :date, :title, :section, :note
 
     ##
@@ -46,6 +48,10 @@ module Doing
     ##
     def end_date
       @end_date ||= Time.parse(Regexp.last_match(1)) if @title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
+    end
+
+    def hash_id
+      (@date.to_s + @title + @section + @note.join(' ')).hash
     end
 
     ##
@@ -149,30 +155,30 @@ module Doing
     ## @param      negate     [Boolean] negate results
     ## @param      case_type  (Symbol) The case-sensitivity
     ##                        type (:sensitive,
-    ##                        :insensitive, :smart)
+    ##                        :ignore, :smart)
     ##
     ## @return     [Boolean] matches search criteria
     ##
-    def search(search, negate: false, case_type: :smart)
+    def search(search, distance: 3, negate: false, case_type: :smart, fuzzy: false)
       text = @title + @note.to_s
-      pattern = case search.strip
-                when %r{^/.*?/$}
-                  search.sub(%r{/(.*?)/}, '\1')
-                when /^'/
-                  case_sensitive = true
-                  search.sub(/^'(.*?)'?$/, '\1')
+
+      if search.is_rx? || !fuzzy
+        matches = text =~ search.to_rx(distance: distance, case_type: case_type)
+      else
+        distance = 0.25 if distance > 1
+        score = if (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
+                  text.downcase.pair_distance_similar(search.downcase)
                 else
-                  if case_type == :smart
-                    case_sensitive = true if search =~ /[A-Z]/
-                  else
-                    case_sensitive = case_type == :sensitive
-                  end
-
-                  search.split('').join('.{0,3}')
+                  score = text.pair_distance_similar(search)
                 end
-      rx = Regexp.new(pattern, !case_sensitive)
 
-      negate ? text !~ rx : text =~ rx
+        if score >= distance
+          matches = true
+          Doing.logger.debug('Fuzzy Match:', %(#{@title}, "#{search}" #{score}))
+        end
+      end
+
+      negate ? !matches : matches
     end
 
     def should_finish?

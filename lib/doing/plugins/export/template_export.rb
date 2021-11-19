@@ -117,7 +117,7 @@ module Doing
           end
         end
 
-        output.gsub!(/%hr(_under)?/) do |_m|
+        output.gsub!(/%hr(_under)?/) do
           o = ''
           `tput cols`.to_i.times do
             o += Regexp.last_match(1).nil? ? '-' : '_'

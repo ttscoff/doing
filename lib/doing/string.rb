@@ -6,17 +6,48 @@ module Doing
   ##
   class ::String
     include Doing::Color
+    ##
+    ## Determines if receiver is surrounded by slashes or starts with single quote
+    ##
+    ## @return     True if regex, False otherwise.
+    ##
+    def is_rx?
+      self =~ %r{(^/.*?/$|^')}
+    end
 
     ##
-    ## Convert string to fuzzy regex
+    ## Convert string to fuzzy regex. Characters in words
+    ## can be separated by up to *distance* characters in
+    ## haystack, spaces indicate unlimited distance.
     ##
-    ## @param      distance  [Integer] Allowed distance
-    ##                       between characters
+    ## @example    "this word".to_rx(2) =>
+    ## /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/
     ##
-    ## @return     [String] Regex pattern
+    ## @param      distance   [Integer] Allowed distance
+    ##                        between characters
+    ## @param      case_type  The case type
     ##
-    def to_rx(distance)
-      gsub(/(.)/, "\\1.{0,#{distance}}")
+    ## @return     [Regexp] Regex pattern
+    ##
+    def to_rx(distance: 3, case_type: :smart)
+      case_sensitive = case case_type
+                       when :smart
+                         self =~ /[A-Z]/ ? true : false
+                       when :sensitive
+                         true
+                       else
+                         false
+                       end
+
+      pattern = case dup.strip
+                when %r{^/.*?/$}
+                  sub(%r{/(.*?)/}, '\1')
+                when /^'/
+                  sub(/^'(.*?)'?$/, '\1')
+                else
+                  split(/ +/).map { |w| w.split('').join(".{0,#{distance}}") }.join('.*?')
+                end
+      Regexp.new(pattern, !case_sensitive)
     end
 
     ##
@@ -189,7 +220,7 @@ module Doing
     ##
     ## Convert a case sensitivity string to a symbol
     ##
-    ## @return     Symbol :smart, :sensitive, :insensitive
+    ## @return     Symbol :smart, :sensitive, :ignore
     ##
     def normalize_case!
       replace normalize_case
@@ -200,7 +231,7 @@ module Doing
       when /^c/i
         :sensitive
       when /^i/i
-        :insensitive
+        :ignore
       when /^s/i
         :smart
       else

@@ -198,13 +198,16 @@ command %i[reset begin] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Reset items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -293,13 +296,16 @@ command :note do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Add note to item that *doesn\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -530,7 +536,7 @@ command :select do |c|
   c.desc 'Select items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -848,13 +854,16 @@ command :cancel do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -895,19 +904,20 @@ command :cancel do |c|
     end
 
     opts = {
-      search: search,
-      case: options[:case].normalize_case,
-      not: options[:not],
       archive: options[:a],
+      case: options[:case].normalize_case,
       count: count,
       date: false,
+      fuzzy: options[:fuzzy],
+      interactive: options[:interactive],
+      not: options[:not],
+      search: search,
       section: section,
       sequential: false,
       tag: tags,
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],
-      unfinished: options[:unfinished],
-      interactive: options[:interactive]
+      unfinished: options[:unfinished]
     }
 
     wwid.tag_last(opts)
@@ -946,13 +956,16 @@ command :finish do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -1034,19 +1047,20 @@ command :finish do |c|
     opts = {
       archive: options[:archive],
       back: date,
+      case: options[:case].normalize_case,
       count: count,
       date: options[:date],
-      search: search,
-      case: options[:case].normalize_case,
+      fuzzy: options[:fuzzy],
+      interactive: options[:interactive],
       not: options[:not],
+      remove: options[:remove],
+      search: search,
       section: options[:section],
       sequential: options[:auto],
       tag: tags,
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],
-      unfinished: options[:unfinished],
-      remove: options[:remove],
-      interactive: options[:interactive]
+      unfinished: options[:unfinished]
     }
 
     wwid.tag_last(opts)
@@ -1072,13 +1086,16 @@ command %i[again resume] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Resume items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -1107,7 +1124,7 @@ command %i[again resume] do |c|
       options[:search] = search
     end
 
-    opts = options
+    opts = options.dup
 
     opts[:tag] = tags
     opts[:tag_bool] = options[:bool].normalize_bool
@@ -1178,13 +1195,16 @@ command :tag do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Tag items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -1310,13 +1330,16 @@ command [:mark, :flag] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Flag items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -1402,7 +1425,9 @@ command :show do |c|
   c.example 'doing show Currently', desc: 'Show entries in the Currently section'
   c.example 'doing show @project1', desc: 'Show entries tagged @project1'
   c.example 'doing show Later @doing', desc: 'Show entries from the Later section tagged @doing'
-  c.example 'doing show Ideas --from "mon to fri" --tag doing', desc: 'Show entries tagged @doing from the Ideas section added between monday and friday of the current week.'
+  c.example 'doing show @oracle @writing --bool and', desc: 'Show entries tagged both @oracle and @writing'
+  c.example 'doing show Currently @devo --bool not', desc: 'Show entries in Currently NOT tagged @devo'
+  c.example 'doing show Ideas @doing --from "mon to fri"', desc: 'Show entries tagged @doing from the Ideas section added between monday and friday of the current week.'
   c.example 'doing show --interactive Later @doing', desc: 'Create a menu from entries from the Later section tagged @doing to perform batch actions'
 
   c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
@@ -1433,13 +1458,16 @@ command :show do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Show items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -1617,13 +1645,16 @@ command %i[grep search] do |c|
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -1963,13 +1994,16 @@ command :last do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Show items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -2001,10 +2035,10 @@ command :last do |c|
     end
 
     if options[:editor]
-      wwid.edit_last(section: options[:s], options: { search: search, case: options[:case], tag: tags, tag_bool: options[:bool], not: options[:not] })
+      wwid.edit_last(section: options[:s], options: { search: search, fuzzy: options[:fuzzy], case: options[:case], tag: tags, tag_bool: options[:bool], not: options[:not] })
     else
       Doing::Pager::page wwid.last(times: true, section: options[:s],
-                     options: { search: search, case: options[:case], negate: options[:not], tag: tags, tag_bool: options[:bool] }).strip
+                     options: { search: search, fuzzy: options[:fuzzy], case: options[:case], negate: options[:not], tag: tags, tag_bool: options[:bool] }).strip
     end
   end
 end
@@ -2162,13 +2196,16 @@ command :view do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -2386,13 +2423,16 @@ command %i[archive move] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -2464,13 +2504,16 @@ command :rotate do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Rotate items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
@@ -2599,7 +2642,7 @@ command :config do |c|
                      when /^j/
                        JSON.pretty_generate(cfg)
                      when /^r/
-                       cfg
+                       cfg.map {|k, v| v.to_s }
                      else
                        YAML.dump(cfg)
                      end
@@ -2684,13 +2727,16 @@ command :import do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Use alternative fuzzy matching for search string'
+  c.switch [:fuzzy], default_value: false, negatable: false
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
   c.desc 'Import items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]'
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 

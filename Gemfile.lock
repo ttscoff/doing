@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     doing (2.0.9.pre)
+      amatch (~> 0.4, >= 0.4.0)
       chronic (~> 0.10, >= 0.10.2)
       deep_merge (~> 1.2, >= 1.2.1)
       gli (~> 2.19, >= 2.19.2)
@@ -17,6 +18,9 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
+    amatch (0.4.0)
+      mize
+      tins (~> 1.0)
     aruba (1.0.4)
       childprocess (>= 2.0, < 5.0)
       contracts (~> 0.16.0)
@@ -71,6 +75,8 @@ GEM
       concurrent-ruby (~> 1.0)
     middleware (0.1.0)
     minitest (5.14.4)
+    mize (0.4.0)
+      protocol (~> 2.0)
     multi_test (0.1.2)
     power_assert (2.0.1)
     protobuf-cucumber (3.10.8)
@@ -78,6 +84,8 @@ GEM
       middleware
       thor
       thread_safe
+    protocol (2.0.0)
+      ruby_parser (~> 3.0)
     rake (13.0.6)
     rdoc (6.3.3)
     redcarpet (3.5.1)
@@ -85,7 +93,11 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.3)
+    ruby_parser (3.18.1)
+      sexp_processor (~> 4.16)
     safe_yaml (1.0.5)
+    sexp_processor (4.16.0)
+    sync (0.5.0)
     sys-uname (1.2.2)
       ffi (~> 1.1)
     temple (0.8.2)
@@ -94,6 +106,8 @@ GEM
     thor (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
+    tins (1.29.1)
+      sync
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     yard (0.9.26)
