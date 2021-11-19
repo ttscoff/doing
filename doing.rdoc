@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.0.9.pre
+v2.0.10
 
 === Global Options
 === --config_file arg
@@ -92,7 +92,7 @@ Boolean used to combine multiple tags
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -139,6 +139,11 @@ Edit duplicated entry with vim before adding
 
 
 
+===== --fuzzy
+Use alternative fuzzy matching for search string
+
+
+
 ===== -i|--interactive
 Select item to resume from a menu of matching entries
 
@@ -180,7 +185,7 @@ Tag boolean (AND|OR|NOT)
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -213,6 +218,11 @@ Move entries to
 Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
 
 [Default Value] None
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
+
 
 
 ===== --[no-]label
@@ -305,7 +315,7 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -334,6 +344,11 @@ Cancel the last X entries containing TAG. Separate multiple tags with comma (--t
 
 ===== -a|--archive
 Archive entries
+
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
 
 
 
@@ -539,7 +554,7 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -591,6 +606,11 @@ Include date
 
 
 
+===== --fuzzy
+Use alternative fuzzy matching for search string
+
+
+
 ===== -i|--interactive
 Select item(s) to finish from a menu of matching entries
 
@@ -639,7 +659,7 @@ Constrain search to entries older than date
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -665,6 +685,11 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
+
 
 
 ===== -i|--interactive
@@ -728,7 +753,7 @@ Import entries older than date
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -783,6 +808,11 @@ Autotag entries
 
 
 
+===== --fuzzy
+Use alternative fuzzy matching for search string
+
+
+
 ===== --not
 Import items that *don't* match search/tag/date filters
 
@@ -818,7 +848,7 @@ Tag boolean
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -847,6 +877,11 @@ Tag filter, combine multiple tags with a comma.
 
 ===== -e|--editor
 Edit entry with vim
+
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
 
 
 
@@ -907,7 +942,7 @@ How many recent entries to tag (0 for all)
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -942,6 +977,11 @@ Include current date/time with tag
 
 ===== --force
 Don't ask permission to flag all entries when count is 0
+
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
 
 
 
@@ -1025,7 +1065,7 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -1054,6 +1094,11 @@ Add/remove note from last entry matching tag
 
 ===== -e|--editor
 Edit entry with vim
+
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
 
 
 
@@ -1247,7 +1292,7 @@ Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -1272,6 +1317,11 @@ Reset last entry matching search filter, surround with slashes for regex (e.g. "
 Reset last entry matching tag
 
 [Default Value] None
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
+
 
 
 ===== -i|--interactive
@@ -1317,7 +1367,7 @@ Tag boolean (AND|OR|NOT)
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -1352,6 +1402,11 @@ Tag filter, combine multiple tags with a comma. Added for compatibility with oth
 [Default Value] None
 
 
+===== --fuzzy
+Use alternative fuzzy matching for search string
+
+
+
 ===== --not
 Rotate items that *don't* match search string or tag filter
 
@@ -1383,7 +1438,7 @@ selected entries.
 ===== Options
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -1535,7 +1590,7 @@ Max count to show
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -1593,6 +1648,11 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time))
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
+
 
 
 ===== -i|--interactive
@@ -1698,7 +1758,7 @@ How many recent entries to tag (0 for all)
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -1745,6 +1805,11 @@ Include current date/time with tag
 
 ===== --force
 Don't ask permission to tag all entries when count is 0
+
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
 
 
 
@@ -1898,7 +1963,7 @@ Count to display
 
 ===== --case TYPE
 
-Case sensitivity for search string matching [(c)ase-sensitive, (i)nsensitive, (s)mart]
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
@@ -1950,6 +2015,11 @@ Sort tags by (name|time)
 
 ===== --[no-]color
 Include colors in output
+
+
+
+===== --fuzzy
+Use alternative fuzzy matching for search string
 
 
 
