@@ -1909,17 +1909,18 @@ module Doing
           end
           r.gsub!(/\$/, '\\')
           rx.sub!(/^@?/, '@')
-          regex = Regexp.new("(?<= |\A)#{rx}(?= |\Z)")
+          regex = Regexp.new("(?<= |\\A)#{rx}(?= |\\Z)")
+
           text.sub!(regex) do
             m = Regexp.last_match
             new_tag = r
-            if m.is_a?(Array)
-              m.each_with_index do |v, idx|
-                new_tag.gsub!("\\#{idx + 1}", v)
-              end
+
+            m.to_a.slice(1, m.length - 1).each_with_index do |v, idx|
+              p [idx, v]
+              new_tag.gsub!("\\#{idx + 1}", v)
             end
             # Replace original tag if /r
-            if flags.include?('r')
+            if flags&.include?('r')
               tagged[:replaced].concat(new_tag.split(/ /).map { |t| t.sub(/^@/, '') })
               new_tag.split(/ /).map { |t| t.sub(/^@?/, '@') }.join(' ')
             else
