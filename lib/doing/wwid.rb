@@ -1916,7 +1916,6 @@ module Doing
             new_tag = r
 
             m.to_a.slice(1, m.length - 1).each_with_index do |v, idx|
-              p [idx, v]
               new_tag.gsub!("\\#{idx + 1}", v)
             end
             # Replace original tag if /r

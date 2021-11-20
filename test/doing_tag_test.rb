@@ -50,10 +50,12 @@ class DoingTagTest < Test::Unit::TestCase
   end
 
   def test_tag_transform
-    doing('now', 'testing @deploy @test-4')
+    doing('now', 'testing @flubber @deploy @test-4')
     result = doing('show', '-c 1').strip
     assert_match(/@deploy-test\b/, result, 'should have added @deploy-test')
     assert_match(/@dev-test\b/, result, 'should have added @dev-test')
+    assert_no_match(/@flubber/, result, '@flubber should have been replaced')
+    assert_match(/@fraggle @rock\b/, result, '@fraggle @rock should have been added')
   end
 
   def test_tag_autotag

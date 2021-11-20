@@ -9,6 +9,7 @@ default_tags: [defaulttag]
 autotag:
   transform:
   - (deploy|merge)\s+@(\w+)-\d+:$1-$2 @dev @dev-$2
+  - "flubber:fraggle rock/r"
   whitelist:
   - autotag
   - overtired
