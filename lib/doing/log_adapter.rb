@@ -19,16 +19,17 @@ module Doing
     }.freeze
 
     COUNT_KEYS = %i[
-      added_tags
-      removed_tags
       added
-      updated
-      deleted
-      completed
+      added_tags
       archived
-      moved
+      autotag
+      completed
       completed_archived
+      deleted
+      moved
+      removed_tags
       skipped
+      updated
     ].freeze
 
     #
@@ -242,6 +243,8 @@ module Doing
 
     def format_counter(key, data)
       case key
+      when :autotag
+        ['Autotag:', data[:message] || 'autotagged %count %items']
       when :added_tags
         ['Tagged:', data[:message] || 'added %tags to %count %items']
       when :removed_tags

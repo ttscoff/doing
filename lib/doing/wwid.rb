@@ -1868,68 +1868,90 @@ module Doing
 
       original = text.dup
 
-      current_tags = text.scan(/@\w+/)
-      whitelisted = []
+      current_tags = text.scan(/@\w+/).map { |t| t.sub(/^@/, '') }
+      tagged = {
+        whitelisted: [],
+        synonyms: [],
+        transformed: [],
+        replaced: []
+      }
+
       @config['autotag']['whitelist'].each do |tag|
         next if text =~ /@#{tag}\b/i
 
-        text.sub!(/(?<!@)\b(#{tag.strip})\b/i) do |m|
-          m.downcase! if tag =~ /[a-z]/
-          whitelisted.push("@#{m}")
+        text.sub!(/(?<= |\A)(#{tag.strip})(?= |\Z)/i) do |m|
+          m.downcase! unless tag =~ /[A-Z]/
+          tagged[:whitelisted].push(m)
           "@#{m}"
         end
       end
-      tail_tags = []
+
       @config['autotag']['synonyms'].each do |tag, v|
         v.each do |word|
           next unless text =~ /\b#{word}\b/i
 
-          tail_tags.push(tag) unless current_tags.include?("@#{tag}") || whitelisted.include?("@#{tag}")
+          unless current_tags.include?(tag) || tagged[:whitelisted].include?(tag)
+            tagged[:synonyms].push(tag)
+            tagged[:synonyms] = tagged[:synonyms].uniq
+          end
         end
       end
+
       if @config['autotag'].key? 'transform'
         @config['autotag']['transform'].each do |tag|
           next unless tag =~ /\S+:\S+/
 
           rx, r = tag.split(/:/)
+          flag_rx = %r{/([r]+)$}
+          if r =~ flag_rx
+            flags = r.match(flag_rx)[1].split(//)
+            r.sub!(flag_rx, '')
+          end
           r.gsub!(/\$/, '\\')
-          rx.sub!(/^@/, '')
-          regex = Regexp.new('@' + rx + '\b')
-
-          matches = text.scan(regex)
-          next unless matches
-
-          matches.each do |m|
+          rx.sub!(/^@?/, '@')
+          regex = Regexp.new("(?<= |\A)#{rx}(?= |\Z)")
+          text.sub!(regex) do
+            m = Regexp.last_match
             new_tag = r
             if m.is_a?(Array)
-              index = 1
-              m.each do |v|
-                new_tag.gsub!('\\' + index.to_s, v)
-                index += 1
+              m.each_with_index do |v, idx|
+                new_tag.gsub!("\\#{idx + 1}", v)
               end
             end
-            tail_tags.push(new_tag)
+            # Replace original tag if /r
+            if flags.include?('r')
+              tagged[:replaced].concat(new_tag.split(/ /).map { |t| t.sub(/^@/, '') })
+              new_tag.split(/ /).map { |t| t.sub(/^@?/, '@') }.join(' ')
+            else
+              tagged[:transformed].concat(new_tag.split(/ /).map { |t| t.sub(/^@/, '') })
+              tagged[:transformed] = tagged[:transformed].uniq
+              m[0]
+            end
           end
         end
       end
 
-      logger.debug('Autotag:', "whitelisted tags: #{whitelisted.join(', ')}") unless whitelisted.empty?
-      new_tags = whitelisted
-      unless tail_tags.empty?
-        tags = tail_tags.uniq.map { |t| "@#{t}".cyan }.join(' ')
-        logger.debug('Autotag:', "synonym tags: #{tags}")
-        tags_a = tail_tags.map { |t| "@#{t}" }
-        text.add_tags!(tags_a.join(' '))
-        new_tags.concat(tags_a)
-      end
 
-      unless text == original
-        logger.info('Autotag:', "added #{new_tags.join(', ')} to \"#{text}\"")
+      logger.debug('Autotag:', "whitelisted tags: #{tagged[:whitelisted].log_tags}") unless tagged[:whitelisted].empty?
+      logger.debug('Autotag:', "synonyms: #{tagged[:synonyms].log_tags}") unless tagged[:synonyms].empty?
+      logger.debug('Autotag:', "transforms: #{tagged[:transformed].log_tags}") unless tagged[:transformed].empty?
+      logger.debug('Autotag:', "transform replaced: #{tagged[:replaced].log_tags}") unless tagged[:replaced].empty?
+
+      tail_tags = tagged[:synonyms].concat(tagged[:transformed])
+      tail_tags.sort!
+      tail_tags.uniq!
+
+      text.add_tags!(tail_tags) unless tail_tags.empty?
+
+      if text == original
+        logger.debug('Autotag:', "no change to \"#{text}\"")
       else
-        logger.debug('Skipped:', "no change to \"#{text}\"")
+        new_tags = tagged[:whitelisted].concat(tail_tags).concat(tagged[:replaced])
+        logger.debug('Autotag:', "added #{new_tags.log_tags} to \"#{text}\"")
+        logger.count(:autotag, level: :info, count: 1, message: 'autotag updated %count %items')
       end
 
-      text
+      text.dedup_tags
     end
 
     ##

@@ -1252,6 +1252,7 @@ command :tag do |c|
       count = options[:count].to_i
     end
 
+    options[:case] ||= :smart
     options[:case] = options[:case].normalize_case
 
     if options[:search]

@@ -279,7 +279,7 @@ module Doing
 
     def add_tags(tags, remove: false)
       title = self.dup
-      tags = tags.to_tags if tags.is_a?(String)
+      tags = tags.to_tags
       tags.each { |tag| title.tag!(tag, remove: remove) }
       title
     end
@@ -353,7 +353,7 @@ module Doing
 
     def dedup_tags
       title = dup
-      tags = title.scan(/(?<=^| )(@(\S+?)(\([^)]+\))?)(?= |$)/).uniq
+      tags = title.scan(/(?<=\A| )(@(\S+?)(\([^)]+\))?)(?= |\Z)/).uniq
       tags.each do |tag|
         found = false
         title.gsub!(/( |^)#{tag[1]}(\([^)]+\))?(?= |$)/) do |m|
