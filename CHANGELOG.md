@@ -1,3 +1,13 @@
+### 2.0.11
+
+#### NEW
+
+- Append `/r` to tag transforms to replace original tag
+
+#### FIXED
+
+- Autotag tag transform fixes
+
 ### 2.0.10
 
 #### NEW
