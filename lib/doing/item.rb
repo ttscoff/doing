@@ -5,7 +5,7 @@ module Doing
   ## This class describes a single WWID item
   ##
   class Item
-    include Amatch
+    # include Amatch
 
     attr_accessor :date, :title, :section, :note
 
@@ -161,22 +161,23 @@ module Doing
     ##
     def search(search, distance: 3, negate: false, case_type: :smart, fuzzy: false)
       text = @title + @note.to_s
+      matches = text =~ search.to_rx(distance: distance, case_type: case_type)
 
-      if search.is_rx? || !fuzzy
-        matches = text =~ search.to_rx(distance: distance, case_type: case_type)
-      else
-        distance = 0.25 if distance > 1
-        score = if (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
-                  text.downcase.pair_distance_similar(search.downcase)
-                else
-                  score = text.pair_distance_similar(search)
-                end
+      # if search.is_rx? || !fuzzy
+      #   matches = text =~ search.to_rx(distance: distance, case_type: case_type)
+      # else
+      #   distance = 0.25 if distance > 1
+      #   score = if (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
+      #             text.downcase.pair_distance_similar(search.downcase)
+      #           else
+      #             score = text.pair_distance_similar(search)
+      #           end
 
-        if score >= distance
-          matches = true
-          Doing.logger.debug('Fuzzy Match:', %(#{@title}, "#{search}" #{score}))
-        end
-      end
+      #   if score >= distance
+      #     matches = true
+      #     Doing.logger.debug('Fuzzy Match:', %(#{@title}, "#{search}" #{score}))
+      #   end
+      # end
 
       negate ? !matches : matches
     end

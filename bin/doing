@@ -198,8 +198,8 @@ command %i[reset begin] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -219,6 +219,7 @@ command %i[reset begin] do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |global_options, options, args|
+    options[:fuzzy] = false
     if options[:section]
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
@@ -296,8 +297,8 @@ command :note do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -317,6 +318,7 @@ command :note do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
+    options[:fuzzy] = false
     if options[:section]
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
@@ -854,8 +856,8 @@ command :cancel do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -874,6 +876,7 @@ command :cancel do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
+    options[:fuzzy] = false
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
     else
@@ -956,8 +959,8 @@ command :finish do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -995,6 +998,7 @@ command :finish do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
+    options[:fuzzy] = false
     unless options[:auto]
       if options[:took]
         took = wwid.chronify_qty(options[:took])
@@ -1086,8 +1090,8 @@ command %i[again resume] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -1114,6 +1118,7 @@ command %i[again resume] do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
+    options[:fuzzy] = false
     tags = options[:tag].nil? ? [] : options[:tag].to_tags
 
     options[:case] = options[:case].normalize_case
@@ -1195,8 +1200,8 @@ command :tag do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -1216,6 +1221,7 @@ command :tag do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
+    options[:fuzzy] = false
     raise MissingArgument, 'You must specify at least one tag' if args.empty? && !options[:autotag]
 
     raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
@@ -1331,8 +1337,8 @@ command [:mark, :flag] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -1352,6 +1358,7 @@ command [:mark, :flag] do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
+    options[:fuzzy] = false
     mark = settings['marker_tag'] || 'flagged'
 
     raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
@@ -1459,8 +1466,8 @@ command :show do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -1510,6 +1517,7 @@ command :show do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
   c.action do |global_options, options, args|
+    options[:fuzzy] = false
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     tag_filter = false
@@ -1646,8 +1654,8 @@ command %i[grep search] do |c|
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -1663,6 +1671,7 @@ command %i[grep search] do |c|
   c.switch %i[i interactive], default_value: false, negatable: false
 
   c.action do |_global_options, options, args|
+    options[:fuzzy] = false
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
@@ -1995,8 +2004,8 @@ command :last do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -2009,6 +2018,7 @@ command :last do |c|
   c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
 
   c.action do |global_options, options, _args|
+    options[:fuzzy] = false
     raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
 
     if options[:tag].nil?
@@ -2197,8 +2207,8 @@ command :view do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -2233,6 +2243,7 @@ command :view do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |global_options, options, args|
+    options[:fuzzy] = false
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
@@ -2424,8 +2435,8 @@ command %i[archive move] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -2443,6 +2454,7 @@ command %i[archive move] do |c|
   c.flag [:before]
 
   c.action do |_global_options, options, args|
+    options[:fuzzy] = false
     if args.empty?
       section = settings['current_section']
       tags = []
@@ -2505,8 +2517,8 @@ command :rotate do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -2524,6 +2536,7 @@ command :rotate do |c|
   c.flag [:before]
 
   c.action do |_global_options, options, args|
+    options[:fuzzy] = false
     if options[:section] && options[:section] !~ /^all$/i
       options[:section] = wwid.guess_section(options[:section])
     end
@@ -2728,8 +2741,8 @@ command :import do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Use alternative fuzzy matching for search string'
-  c.switch [:fuzzy], default_value: false, negatable: false
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
@@ -2779,7 +2792,7 @@ command :import do |c|
   c.switch [:overlap], negatable: true
 
   c.action do |_global_options, options, args|
-
+    options[:fuzzy] = false
     if options[:section]
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end

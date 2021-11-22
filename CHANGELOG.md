@@ -1,3 +1,9 @@
+### 2.0.12
+
+#### FIXED
+
+- Remove amatch gem dependency due to compatibility issues with Windows systems (also removes `--fuzzy` option from all search commands)
+
 ### 2.0.11
 
 #### NEW
