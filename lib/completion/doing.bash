@@ -1,9 +1,9 @@
 _doing_again() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--bool --editor --interactive --in --note --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '--bool --case --editor --interactive --in --note --not --section --search --tag --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-e -i -n -s --bool --editor --interactive --in --note --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '-e -i -n -s -x --bool --case --editor --interactive --in --note --not --section --search --tag --exact' -- $token ) )
   
   fi
 }
@@ -16,9 +16,9 @@ local words=$(doing sections)
 IFS="$OLD_IFS"
 
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--before --bool --keep --label --search --to --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '--before --bool --case --keep --label --not --search --to --tag --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-k -t --before --bool --keep --label --search --to --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '-k -t -x --before --bool --case --keep --label --not --search --to --tag --exact' -- $token ) )
   else
   local nocasematchWasOff=0
   shopt nocasematch >/dev/null || nocasematchWasOff=1
@@ -51,9 +51,19 @@ _doing_autotag() {
 _doing_cancel() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--archive --bool --interactive --section --tag --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '--archive --bool --case --interactive --not --section --search --tag --unfinished --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -i -s -u --archive --bool --interactive --section --tag --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -i -s -u -x --archive --bool --case --interactive --not --section --search --tag --unfinished --exact' -- $token ) )
+  
+  fi
+}
+
+_doing_completion() {
+  
+  if [[ "$token" == --* ]]; then
+    COMPREPLY=( $( compgen -W '--file --type' -- $token ) )
+  elif [[ "$token" == -* ]]; then
+    COMPREPLY=( $( compgen -W '-f -t --file --type' -- $token ) )
   
   fi
 }
@@ -81,9 +91,9 @@ _doing_done() {
 _doing_finish() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--archive --at --auto --back --bool --date --interactive --remove --section --search --took --tag --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '--archive --at --auto --back --bool --case --date --interactive --not --remove --section --search --took --tag --unfinished --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -b -i -r -s -t -u --archive --at --auto --back --bool --date --interactive --remove --section --search --took --tag --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -b -i -r -s -t -u -x --archive --at --auto --back --bool --case --date --interactive --not --remove --section --search --took --tag --unfinished --exact' -- $token ) )
   
   fi
 }
@@ -91,9 +101,9 @@ _doing_finish() {
 _doing_grep() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--after --before --interactive --output --only_timed --section --times --tag_sort --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --before --case --interactive --not --output --only_timed --section --times --tag_sort --totals --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-i -o -s -t --after --before --interactive --output --only_timed --section --times --tag_sort --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '-i -o -s -t -x --after --before --case --interactive --not --output --only_timed --section --times --tag_sort --totals --exact' -- $token ) )
   
   fi
 }
@@ -111,9 +121,9 @@ _doing_help() {
 _doing_import() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--after --autotag --before --from --only_timed --overlap --prefix --section --search --tag --type' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --autotag --before --case --from --not --only_timed --overlap --prefix --section --search --tag --type --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-f -s --after --autotag --before --from --only_timed --overlap --prefix --section --search --tag --type' -- $token ) )
+    COMPREPLY=( $( compgen -W '-f -s -x --after --autotag --before --case --from --not --only_timed --overlap --prefix --section --search --tag --type --exact' -- $token ) )
   
   fi
 }
@@ -121,9 +131,9 @@ _doing_import() {
 _doing_last() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--bool --editor --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '--bool --case --editor --not --section --search --tag --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-e -s --bool --editor --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '-e -s -x --bool --case --editor --not --section --search --tag --exact' -- $token ) )
   
   fi
 }
@@ -141,9 +151,9 @@ _doing_later() {
 _doing_mark() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--bool --count --date --force --interactive --remove --section --search --tag --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '--bool --count --case --date --force --interactive --not --remove --section --search --tag --unfinished --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-c -d -i -r -s -u --bool --count --date --force --interactive --remove --section --search --tag --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '-c -d -i -r -s -u -x --bool --count --case --date --force --interactive --not --remove --section --search --tag --unfinished --exact' -- $token ) )
   
   fi
 }
@@ -161,9 +171,9 @@ _doing_meanwhile() {
 _doing_note() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--bool --editor --interactive --remove --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '--bool --case --editor --interactive --not --remove --section --search --tag --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-e -i -r -s --bool --editor --interactive --remove --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '-e -i -r -s -x --bool --case --editor --interactive --not --remove --section --search --tag --exact' -- $token ) )
   
   fi
 }
@@ -221,9 +231,9 @@ _doing_recent() {
 _doing_reset() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--bool --interactive --resume --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '--bool --case --interactive --not --resume --section --search --tag --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-i -r -s --bool --interactive --resume --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '-i -r -s -x --bool --case --interactive --not --resume --section --search --tag --exact' -- $token ) )
   
   fi
 }
@@ -231,9 +241,9 @@ _doing_reset() {
 _doing_rotate() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--before --bool --keep --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '--before --bool --case --keep --not --section --search --tag --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-k -s --before --bool --keep --section --search --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '-k -s -x --before --bool --case --keep --not --section --search --tag --exact' -- $token ) )
   
   fi
 }
@@ -251,9 +261,9 @@ _doing_sections() {
 _doing_select() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--archive --resume --cancel --delete --editor --finish --flag --force --move --menu --output --search --remove --section --save_to --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '--archive --resume --cancel --case --delete --editor --finish --flag --force --move --menu --not --output --search --remove --section --save_to --tag --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -c -d -e -f -m -o -r -s -t --archive --resume --cancel --delete --editor --finish --flag --force --move --menu --output --search --remove --section --save_to --tag' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -c -d -e -f -m -o -r -s -t -x --archive --resume --cancel --case --delete --editor --finish --flag --force --move --menu --not --output --search --remove --section --save_to --tag --exact' -- $token ) )
   
   fi
 }
@@ -266,9 +276,9 @@ local words=$(doing sections)
 IFS="$OLD_IFS"
 
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--age --after --bool --before --count --from --interactive --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '--age --after --bool --before --count --case --from --interactive --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -b -c -f -i -o -s -t --age --after --bool --before --count --from --interactive --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -b -c -f -i -o -s -t -x --age --after --bool --before --count --case --from --interactive --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
   else
   local nocasematchWasOff=0
   shopt nocasematch >/dev/null || nocasematchWasOff=1
@@ -301,9 +311,9 @@ _doing_since() {
 _doing_tag() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--autotag --bool --count --date --force --interactive --remove --regex --rename --section --search --tag --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '--autotag --bool --count --case --date --force --interactive --not --remove --regex --rename --section --search --tag --unfinished --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -c -d -i -r -s -u --autotag --bool --count --date --force --interactive --remove --regex --rename --section --search --tag --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -c -d -i -r -s -u -x --autotag --bool --count --case --date --force --interactive --not --remove --regex --rename --section --search --tag --unfinished --exact' -- $token ) )
   
   fi
 }
@@ -346,9 +356,9 @@ local words=$(doing views)
 IFS="$OLD_IFS"
 
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--after --bool --before --count --color --interactive --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --bool --before --count --case --color --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-b -c -i -o -s -t --after --bool --before --count --color --interactive --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '-b -c -i -o -s -t -x --after --bool --before --count --case --color --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
   else
   local nocasematchWasOff=0
   shopt nocasematch >/dev/null || nocasematchWasOff=1
@@ -407,6 +417,7 @@ _doing()
     elif [[ $last =~ (archive|move) ]]; then _doing_archive
     elif [[ $last =~ (autotag) ]]; then _doing_autotag
     elif [[ $last =~ (cancel) ]]; then _doing_cancel
+    elif [[ $last =~ (completion) ]]; then _doing_completion
     elif [[ $last =~ (config) ]]; then _doing_config
     elif [[ $last =~ (done|did) ]]; then _doing_done
     elif [[ $last =~ (finish) ]]; then _doing_finish

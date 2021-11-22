@@ -6,7 +6,7 @@ _If you're one of the rare people like me who find this useful, feel free to [bu
 
 <!--README-->
 
-The current version of `doing` is <!--VER-->2.0.10<!--END VER-->.
+The current version of `doing` is <!--VER-->2.0.11<!--END VER-->.
 
 Find all of the documentation in the [doing wiki](https://github.com/ttscoff/doing/wiki).
 
