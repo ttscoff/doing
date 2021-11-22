@@ -1574,7 +1574,12 @@ command :show do |c|
 
     options[:times] = true if options[:totals]
 
-    tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
+    template = settings['templates']['default'].deep_merge({
+        'wrap_width' => settings['wrap_width'] || 0,
+        'date_format' => settings['default_date_format'],
+        'order' => settings['order'] || 'asc',
+        'tags_color' => settings['tags_color']
+      })
 
     options[:case] = options[:case].normalize_case
 
@@ -1595,7 +1600,7 @@ command :show do |c|
     opt[:tag] = nil
     opt[:tag_filter] = tag_filter
     opt[:tag_order] = options[:tag_order].normalize_order
-    opt[:tags_color] = tags_color
+    opt[:tags_color] = template['tags_color']
 
     Doing::Pager.page wwid.list_section(opt)
   end
@@ -1665,7 +1670,8 @@ command %i[grep search] do |c|
   c.action do |_global_options, options, args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
+    template = settings['templates']['default'].deep_merge(settings)
+    tags_color = template.key?('tags_color') ? template['tags_color'] : nil
 
     section = wwid.guess_section(options[:section]) if options[:section]
 
@@ -1731,7 +1737,9 @@ command :recent do |c|
 
       options[:t] = true if options[:totals]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
-      tags_color = settings.key?('tags_color') ? settings['tags_color'] : nil
+
+      template = settings['templates']['recent'].deep_merge(settings['templates']['default'])
+      tags_color = template.key?('tags_color') ? template['tags_color'] : nil
 
       opts = {
         sort_tags: options[:sort_tags],
@@ -1792,8 +1800,7 @@ command :today do |c|
       before: options[:before],
       section: options[:section],
       sort_tags: options[:sort_tags],
-      totals: options[:totals],
-      order: settings.dig('templates', 'today', 'order')
+      totals: options[:totals]
     }
     Doing::Pager.page wwid.today(options[:times], options[:output], opt).chomp
   end
@@ -2267,6 +2274,7 @@ command :view do |c|
 
       template = view.key?('template') ? view['template'] : nil
       date_format = view.key?('date_format') ? view['date_format'] : nil
+
       tags_color = view.key?('tags_color') ? view['tags_color'] : nil
       tag_filter = false
       if options[:tag]

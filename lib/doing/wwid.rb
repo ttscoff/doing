@@ -1637,13 +1637,20 @@ module Doing
     ## @param      opt   [Hash] Additional Options
     ##
     def list_section(opt = {})
+      opt[:config_template] ||= 'default'
+      cfg = @config.dig('templates', opt[:config_template]).deep_merge({
+        'wrap_width' => @config['wrap_width'] || 0,
+        'date_format' => @config['default_date_format'],
+        'order' => @config['order'] || 'asc',
+        'tags_color' => @config['tags_color']
+      })
       opt[:count] ||= 0
       opt[:age] ||= 'newest'
-      opt[:format] ||= @config.dig('templates', 'default', 'date_format')
-      opt[:order] ||= @config.dig('templates', 'default', 'order') || 'asc'
+      opt[:format] ||= cfg['date_format']
+      opt[:order] ||= cfg['order'] || 'asc'
       opt[:tag_order] ||= 'asc'
-      opt[:tags_color] ||= false
-      opt[:template] ||= @config.dig('templates', 'default', 'template')
+      opt[:tags_color] ||= cfg['tags_color'] || false
+      opt[:template] ||= cfg['template']
 
       # opt[:highlight] ||= true
       title = ''
@@ -1684,7 +1691,7 @@ module Doing
 
       opt[:output] ||= 'template'
 
-      opt[:wrap_width] ||= @config['templates']['default']['wrap_width']
+      opt[:wrap_width] ||= @config['templates']['default']['wrap_width'] || 0
 
       output(items, title, is_single, opt)
     end
@@ -1729,13 +1736,18 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates']['today']
+      cfg = @config['templates']['today'].deep_merge(@config['templates']['default']).deep_merge({
+        'wrap_width' => @config['wrap_width'] || 0,
+        'date_format' => @config['default_date_format'],
+        'order' => @config['order'] || 'asc',
+        'tags_color' => @config['tags_color']
+      })
       options = {
         after: opt[:after],
         before: opt[:before],
         count: 0,
         format: cfg['date_format'],
-        order: 'asc',
+        order: cfg['order'] || 'asc',
         output: output,
         section: opt[:section],
         sort_tags: opt[:sort_tags],
@@ -1743,7 +1755,9 @@ module Doing
         times: times,
         today: true,
         totals: opt[:totals],
-        wrap_width: cfg['wrap_width']
+        wrap_width: cfg['wrap_width'],
+        tags_color: cfg['tags_color'],
+        config_template: 'today'
       }
       list_section(options)
     end
@@ -1765,7 +1779,7 @@ module Doing
       dates = [dates, dates] if dates.instance_of?(String)
 
       list_section({ section: section, count: 0, order: 'asc', date_filter: dates, times: times,
-                     output: output, totals: opt[:totals], sort_tags: opt[:sort_tags] })
+                     output: output, totals: opt[:totals], sort_tags: opt[:sort_tags], config_template: 'default' })
     end
 
     ##
@@ -1795,7 +1809,8 @@ module Doing
         tag_order: opt[:tag_order],
         times: times,
         totals: opt[:totals],
-        yesterday: true
+        yesterday: true,
+        config_template: 'today'
       }
 
       list_section(options)
@@ -1813,14 +1828,19 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates']['recent']
+      cfg = @config['templates']['recent'].deep_merge(@config['templates']['default']).deep_merge({
+        'wrap_width' => @config['wrap_width'] || 0,
+        'date_format' => @config['default_date_format'],
+        'order' => @config['order'] || 'asc',
+        'tags_color' => @config['tags_color']
+      })
       section ||= @config['current_section']
       section = guess_section(section)
 
       list_section({ section: section, wrap_width: cfg['wrap_width'], count: count,
                      format: cfg['date_format'], template: cfg['template'],
                      order: 'asc', times: times, totals: opt[:totals],
-                     sort_tags: opt[:sort_tags], tags_color: opt[:tags_color] })
+                     sort_tags: opt[:sort_tags], tags_color: opt[:tags_color], config_template: 'recent' })
     end
 
     ##
@@ -1831,7 +1851,12 @@ module Doing
     ##
     def last(times: true, section: nil, options: {})
       section = section.nil? || section =~ /all/i ? 'All' : guess_section(section)
-      cfg = @config['templates']['last']
+      cfg = @config['templates']['last'].deep_merge(@config['templates']['default']).deep_merge({
+        'wrap_width' => @config['wrap_width'] || 0,
+        'date_format' => @config['default_date_format'],
+        'order' => @config['order'] || 'asc',
+        'tags_color' => @config['tags_color']
+      })
 
       opts = {
         section: section,
@@ -1852,6 +1877,7 @@ module Doing
       opts[:search] = options[:search] if options[:search]
       opts[:case] = options[:case]
       opts[:not] = options[:negate]
+      opts[:config_template] = 'last'
       list_section(opts)
     end
 
