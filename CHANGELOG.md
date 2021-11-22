@@ -1,3 +1,7 @@
+### 2.0.15
+
+- Test release to validate git flow automation
+
 ### 2.0.13
 
 #### FIXED
