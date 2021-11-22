@@ -69,22 +69,28 @@ module Doing
 
         output.sub!(/%section/, item.section) if item.section
 
-        title_offset = Doing::Color.uncolor(output).match(/%(-?\d+)?([ _t]\d+)?title/).begin(0)
-        output.sub!(/%(-?\d+)?(([ _t])(\d+))?title(.*?)$/) do
+        title_rx = /(?mi)%(?<width>-?\d+)?(?:(?<ichar>[ _t])(?<icount>\d+))?(?<prefix>.[ _t]?)?title(?<after>.*?)$/
+        title_color = Doing::Color.reset + output.match(/(?mi)^(.*?)(%.*?title)/)[1].last_color
+
+        title_offset = Doing::Color.uncolor(output).match(title_rx).begin(0)
+
+        output.sub!(title_rx) do
           m = Regexp.last_match
-          pad = m[1].to_i
+
+          after = m['after']
+          pad = m['width'].to_i
           indent = ''
-          if m[2]
-            char = m[3] =~ /t/ ? "\t" : " "
-            indent = char * m[4].to_i
+          if m['ichar']
+            char = m['ichar'] =~ /t/ ? "\t" : ' '
+            indent = char * m['icount'].to_i
           end
-          after = m[5]
+          prefix = m['prefix']
           if opt[:wrap_width]&.positive? || pad.positive?
             width = pad.positive? ? pad : opt[:wrap_width]
-            item.title.wrap(width, pad: pad, indent: indent, offset: title_offset, prefix: flag, after: after, reset: reset)
+            item.title.wrap(width, pad: pad, indent: indent, offset: title_offset, prefix: prefix, color: title_color, after: after, reset: reset)
             # flag + item.title.gsub(/(.{#{opt[:wrap_width]}})(?=\s+|\Z)/, "\\1\n ").sub(/\s*$/, '') + reset
           else
-            format("%s%#{pad}s%s%s", flag, item.title.sub(/\s*$/, ''), reset, after)
+            format("%s%s%#{pad}s%s%s", title_color, prefix, item.title.sub(/\s*$/, ''), reset, after)
           end
         end
 

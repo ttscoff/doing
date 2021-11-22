@@ -77,13 +77,15 @@ module Doing
     ##
     def highlight_tags(color = 'yellow')
       escapes = scan(/(\e\[[\d;]+m)[^\e]+@/)
-      tag_color = Doing::Color.send(color)
+      color = color.split(' ') unless color.is_a?(Array)
+      tag_color = ''
+      color.each { |c| tag_color += Doing::Color.send(c) }
       last_color = if !escapes.empty?
                      escapes[-1][0]
                    else
                      Doing::Color.default
                    end
-      gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{last_color}")
+      gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{Doing::Color.reset}#{last_color}")
     end
 
     ##
@@ -159,19 +161,21 @@ module Doing
     ## @param      offset  [Integer] (Optional) The width to pad each subsequent line
     ## @param      prefix  [String] (Optional) A prefix to add to each line
     ##
-    def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', after: '', reset: '')
+    def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', color: '', after: '', reset: '')
+      last_color = after.last_color
       note_rx = /(?i-m)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)/
-      str = gsub(/@\w+\(.*?\)/) { |tag| tag.gsub(/\s/, '%%%%') }
+      # Don't break inside of tag values
+      str = gsub(/@\S+\(.*?\)/) { |tag| tag.gsub(/\s/, '%%%%') }
       words = str.split(/ /).map { |word| word.gsub(/%%%%/, ' ') }
       out = []
       line = []
       words.each do |word|
-        if line.join(' ').length + word.length + 1 > len
+        if line.join(' ').uncolor.length + word.uncolor.length + 1 > len
           out.push(line.join(' '))
           line.clear
         end
 
-        line << word
+        line << word.uncolor
       end
       out.push(line.join(' '))
       note = ''
@@ -180,10 +184,11 @@ module Doing
         ''
       end
 
-      out[0] = format("%-#{pad}s%s", out[0], after)
-      left_pad = ' ' * (offset)
+      out[0] = format("%-#{pad}s%s%s", out[0], last_color, after)
+
+      left_pad = ' ' * offset
       left_pad += indent
-      out.map { |l| "#{left_pad}#{prefix}#{l}" }.join("\n").strip + " #{note}".chomp
+      out.map { |l| "#{left_pad}#{color}#{l}#{last_color}" }.join("\n").strip + last_color + " #{note}".chomp
     end
 
     ##
@@ -366,6 +371,14 @@ module Doing
         end
       end
       title
+    end
+
+    # Returns the last escape sequence from a string
+    #
+    # @param      string  The string to examine
+    #
+    def last_color
+      scan(/\e\[[\d;]+m/).join('')
     end
 
     ##

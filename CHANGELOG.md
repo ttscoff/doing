@@ -1,3 +1,7 @@
+### 2.0.17
+
+- Improvements to %title formatting and wrapping
+
 ### 2.0.16
 
 - Test release to validate git flow automation
