@@ -99,6 +99,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'yesterday' -d List\ entri
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command again resume' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l case  -f -r -n '__fish_doing_using_command again resume' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command again resume' -d Edit\ duplicated\ entry\ with\ vim\ before\ adding
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command again resume' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command again resume' -d Select\ item\ to\ resume\ from\ a\ menu\ of\ matching\ entries
 complete -c doing -l in  -f -r -n '__fish_doing_using_command again resume' -d Add\ new\ entry\ to\ section
 complete -c doing -l note -s n -f -r -n '__fish_doing_using_command again resume' -d Note
@@ -110,6 +111,7 @@ complete -c doing -l exact -s x -f  -n '__fish_doing_using_command again resume'
 complete -c doing -l before  -f -r -n '__fish_doing_using_command archive move' -d Archive\ entries\ older\ than\ date
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command archive move' -d Tag\ boolean
 complete -c doing -l case  -f -r -n '__fish_doing_using_command archive move' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command archive move' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l keep -s k -f -r -n '__fish_doing_using_command archive move' -d How\ many\ items\ to\ keep
 complete -c doing -l label  -f  -n '__fish_doing_using_command archive move' -d Label\ moved\ items\ with\ @from\(SECTION_NAME\)
 complete -c doing -l not  -f  -n '__fish_doing_using_command archive move' -d Show\ items\ that\ \*don\'t\*\ match\ search\ string
@@ -128,6 +130,7 @@ complete -c doing -l unfinished -s u -f  -n '__fish_doing_using_command autotag'
 complete -c doing -l archive -s a -f  -n '__fish_doing_using_command cancel' -d Archive\ entries
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command cancel' -d Boolean
 complete -c doing -l case  -f -r -n '__fish_doing_using_command cancel' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command cancel' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command cancel' -d Select\ item\(s\)\ to\ cancel\ from\ a\ menu\ of\ matching\ entries
 complete -c doing -l not  -f  -n '__fish_doing_using_command cancel' -d Finish\ items\ that\ \*don\'t\*\ match\ search/tag\ filters
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command cancel' -d Section
@@ -159,6 +162,7 @@ complete -c doing -l back -s b -f -r -n '__fish_doing_using_command finish' -d B
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command finish' -d Boolean
 complete -c doing -l case  -f -r -n '__fish_doing_using_command finish' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l date  -f  -n '__fish_doing_using_command finish' -d Include\ date
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command finish' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command finish' -d Select\ item\(s\)\ to\ finish\ from\ a\ menu\ of\ matching\ entries
 complete -c doing -l not  -f  -n '__fish_doing_using_command finish' -d Finish\ items\ that\ \*don\'t\*\ match\ search/tag\ filters
 complete -c doing -l remove -s r -f  -n '__fish_doing_using_command finish' -d Remove\ done\ tag
@@ -171,6 +175,7 @@ complete -c doing -l exact -s x -f  -n '__fish_doing_using_command finish' -d Fo
 complete -c doing -l after  -f -r -n '__fish_doing_using_command grep search' -d Constrain\ search\ to\ entries\ newer\ than\ date
 complete -c doing -l before  -f -r -n '__fish_doing_using_command grep search' -d Constrain\ search\ to\ entries\ older\ than\ date
 complete -c doing -l case  -f -r -n '__fish_doing_using_command grep search' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command grep search' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command grep search' -d Display\ an\ interactive\ menu\ of\ results\ to\ perform\ further\ operations
 complete -c doing -l not  -f  -n '__fish_doing_using_command grep search' -d Show\ items\ that\ \*don\'t\*\ match\ search\ string
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command grep search' -d Output\ to\ export\ format
@@ -186,6 +191,7 @@ complete -c doing -l autotag  -f  -n '__fish_doing_using_command import' -d Auto
 complete -c doing -l before  -f -r -n '__fish_doing_using_command import' -d Import\ entries\ older\ than\ date
 complete -c doing -l case  -f -r -n '__fish_doing_using_command import' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l from -s f -f -r -n '__fish_doing_using_command import' -d Date\ range\ to\ import
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command import' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l not  -f  -n '__fish_doing_using_command import' -d Import\ items\ that\ \*don\'t\*\ match\ search/tag/date\ filters
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command import' -d Only\ import\ items\ with\ recorded\ time\ intervals
 complete -c doing -l overlap  -f  -n '__fish_doing_using_command import' -d Allow\ entries\ that\ overlap\ existing\ times
@@ -198,6 +204,7 @@ complete -c doing -l exact -s x -f  -n '__fish_doing_using_command import' -d Fo
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command last' -d Tag\ boolean
 complete -c doing -l case  -f -r -n '__fish_doing_using_command last' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command last' -d Edit\ entry\ with\ vim
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command last' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l not  -f  -n '__fish_doing_using_command last' -d Show\ items\ that\ \*don\'t\*\ match\ search\ string\ or\ tag\ filter
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command last' -d Specify\ a\ section
 complete -c doing -l search  -f -r -n '__fish_doing_using_command last' -d Search\ filter
@@ -211,6 +218,7 @@ complete -c doing -l count -s c -f -r -n '__fish_doing_using_command mark flag' 
 complete -c doing -l case  -f -r -n '__fish_doing_using_command mark flag' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l date -s d -f  -n '__fish_doing_using_command mark flag' -d Include\ current\ date/time\ with\ tag
 complete -c doing -l force  -f  -n '__fish_doing_using_command mark flag' -d Don\'t\ ask\ permission\ to\ flag\ all\ entries\ when\ count\ is\ 0
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command mark flag' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command mark flag' -d Select\ item\(s\)\ to\ flag\ from\ a\ menu\ of\ matching\ entries
 complete -c doing -l not  -f  -n '__fish_doing_using_command mark flag' -d Flag\ items\ that\ \*don\'t\*\ match\ search/tag/date\ filters
 complete -c doing -l remove -s r -f  -n '__fish_doing_using_command mark flag' -d Remove\ flag
@@ -227,6 +235,7 @@ complete -c doing -l section -s s -f -r -n '__fish_doing_using_command meanwhile
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command note' -d Boolean
 complete -c doing -l case  -f -r -n '__fish_doing_using_command note' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command note' -d Edit\ entry\ with\ vim
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command note' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command note' -d Select\ item\ for\ new\ note\ from\ a\ menu\ of\ matching\ entries
 complete -c doing -l not  -f  -n '__fish_doing_using_command note' -d Add\ note\ to\ item\ that\ \*doesn\'t\*\ match\ search/tag\ filters
 complete -c doing -l remove -s r -f  -n '__fish_doing_using_command note' -d Replace/Remove\ last\ entry\'s\ note
@@ -255,6 +264,7 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command recent' -d S
 complete -c doing -l totals  -f  -n '__fish_doing_using_command recent' -d Show\ intervals\ with\ totals\ at\ the\ end\ of\ output
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command reset begin' -d Boolean
 complete -c doing -l case  -f -r -n '__fish_doing_using_command reset begin' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command reset begin' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command reset begin' -d Select\ from\ a\ menu\ of\ matching\ entries
 complete -c doing -l not  -f  -n '__fish_doing_using_command reset begin' -d Reset\ items\ that\ \*don\'t\*\ match\ search/tag\ filters
 complete -c doing -l resume -s r -f  -n '__fish_doing_using_command reset begin' -d Resume\ entry
@@ -265,6 +275,7 @@ complete -c doing -l exact -s x -f  -n '__fish_doing_using_command reset begin' 
 complete -c doing -l before  -f -r -n '__fish_doing_using_command rotate' -d Rotate\ entries\ older\ than\ date
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command rotate' -d Tag\ boolean
 complete -c doing -l case  -f -r -n '__fish_doing_using_command rotate' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command rotate' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l keep -s k -f -r -n '__fish_doing_using_command rotate' -d How\ many\ items\ to\ keep\ in\ each\ section
 complete -c doing -l not  -f  -n '__fish_doing_using_command rotate' -d Rotate\ items\ that\ \*don\'t\*\ match\ search\ string\ or\ tag\ filter
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command rotate' -d Section\ to\ rotate
@@ -298,6 +309,7 @@ complete -c doing -l before  -f -r -n '__fish_doing_using_command show' -d View\
 complete -c doing -l count -s c -f -r -n '__fish_doing_using_command show' -d Max\ count\ to\ show
 complete -c doing -l case  -f -r -n '__fish_doing_using_command show' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l from -s f -f -r -n '__fish_doing_using_command show' -d Date\ range\ to\ show
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command show' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command show' -d Select\ from\ a\ menu\ of\ matching\ entries\ to\ perform\ additional\ operations
 complete -c doing -l not  -f  -n '__fish_doing_using_command show' -d Show\ items\ that\ \*don\'t\*\ match\ search/tag/date\ filters
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command show' -d Output\ to\ export\ format
@@ -321,6 +333,7 @@ complete -c doing -l count -s c -f -r -n '__fish_doing_using_command tag' -d How
 complete -c doing -l case  -f -r -n '__fish_doing_using_command tag' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l date -s d -f  -n '__fish_doing_using_command tag' -d Include\ current\ date/time\ with\ tag
 complete -c doing -l force  -f  -n '__fish_doing_using_command tag' -d Don\'t\ ask\ permission\ to\ tag\ all\ entries\ when\ count\ is\ 0
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command tag' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command tag' -d Select\ item\(s\)\ to\ tag\ from\ a\ menu\ of\ matching\ entries
 complete -c doing -l not  -f  -n '__fish_doing_using_command tag' -d Tag\ items\ that\ \*don\'t\*\ match\ search/tag\ filters
 complete -c doing -l remove -s r -f  -n '__fish_doing_using_command tag' -d Remove\ given\ tag\(s\)
@@ -346,6 +359,7 @@ complete -c doing -l before  -f -r -n '__fish_doing_using_command view' -d View\
 complete -c doing -l count -s c -f -r -n '__fish_doing_using_command view' -d Count\ to\ display
 complete -c doing -l case  -f -r -n '__fish_doing_using_command view' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l color  -f  -n '__fish_doing_using_command view' -d Include\ colors\ in\ output
+complete -c doing -l fuzzy  -f  -n '__fish_doing_using_command view' -d Use\ alternative\ fuzzy\ matching\ for\ search\ string
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command view' -d Select\ from\ a\ menu\ of\ matching\ entries\ to\ perform\ additional\ operations
 complete -c doing -l not  -f  -n '__fish_doing_using_command view' -d Show\ items\ that\ \*don\'t\*\ match\ search\ string
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command view' -d Output\ to\ export\ format
