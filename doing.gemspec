@@ -30,6 +30,7 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency 'yard'
   s.add_development_dependency 'redcarpet'
   s.add_development_dependency 'github-markup'
+  s.add_development_dependency 'parallel_tests'
   s.add_runtime_dependency('gli', '~> 2.19', '>= 2.19.2')
   s.add_runtime_dependency('haml','~>5.0.0', '>= 5.0.0')
   s.add_runtime_dependency('chronic','~> 0.10', '>= 0.10.2')

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    doing (2.0.11)
+    doing (2.0.12)
       amatch (~> 0.4, >= 0.4.0)
       chronic (~> 0.10, >= 0.10.2)
       deep_merge (~> 1.2, >= 1.2.1)
@@ -78,6 +78,9 @@ GEM
     mize (0.4.0)
       protocol (~> 2.0)
     multi_test (0.1.2)
+    parallel (1.21.0)
+    parallel_tests (3.7.3)
+      parallel
     power_assert (2.0.1)
     protobuf-cucumber (3.10.8)
       activesupport (>= 3.2)
@@ -120,6 +123,7 @@ DEPENDENCIES
   aruba (~> 1.0.2)
   doing!
   github-markup
+  parallel_tests
   rake (~> 13.0, >= 13.0.1)
   rdoc (~> 6.3.1)
   redcarpet

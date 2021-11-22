@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'tempfile'
 
-require 'doing-helpers'
+require 'helpers/doing-helpers'
 require 'test_helper'
 
 # Tests for archive commands

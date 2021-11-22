@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'tempfile'
 require 'yaml'
-require 'doing-helpers'
+require 'helpers/doing-helpers'
 require 'test_helper'
 
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')

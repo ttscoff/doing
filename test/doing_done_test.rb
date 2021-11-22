@@ -2,7 +2,7 @@ require 'fileutils'
 require 'tempfile'
 require 'time'
 
-require 'doing-helpers'
+require 'helpers/doing-helpers'
 require 'test_helper'
 
 # Tests for done commands

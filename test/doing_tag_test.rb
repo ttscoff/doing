@@ -3,7 +3,7 @@ require 'tempfile'
 require 'time'
 require 'json'
 
-require 'doing-helpers'
+require 'helpers/doing-helpers'
 require 'test_helper'
 
 # Tests for tagging commands

@@ -4,7 +4,7 @@ require 'time'
 require 'yaml'
 require 'json'
 
-require 'doing-helpers'
+require 'helpers/doing-helpers'
 require 'test_helper'
 
 # Tests for entry modifying commands

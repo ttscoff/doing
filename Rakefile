@@ -6,6 +6,8 @@ require 'rdoc/task'
 require 'rake/testtask'
 require 'open3'
 require 'yard'
+require 'parallel_tests'
+require 'parallel_tests/tasks'
 
 YARD::Rake::YardocTask.new do |t|
  t.files = ['lib/doing/*.rb']

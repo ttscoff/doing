@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'tempfile'
 require 'test_helper'
-require 'doing-helpers'
+require 'helpers/doing-helpers'
 
 class NoteEditorTest < Test::Unit::TestCase
   include DoingHelpers

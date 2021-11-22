@@ -4,7 +4,7 @@ require 'time'
 require 'json'
 require 'yaml'
 
-require 'doing-helpers'
+require 'helpers/doing-helpers'
 require 'test_helper'
 
 # Tests for archive commands
