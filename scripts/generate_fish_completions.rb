@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
-$LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
-require 'doing/cli_status'
-
+require 'tty-progressbar'
 require 'shellwords'
 
 class ::String
@@ -23,7 +21,6 @@ class ::String
 end
 
 class FishCompletions
-  include Status
 
   attr_accessor :commands, :global_options
 
@@ -134,11 +131,7 @@ class FishCompletions
 
   def generate_subcommand_completions
     out = []
-    # processing = []
     @commands.each_with_index do |cmd, i|
-      # processing << cmd[:commands].first
-      processing = cmd[:commands]
-      progress('Processing subcommands', i, @commands.count, processing)
       out << "complete -xc doing -n '__fish_doing_needs_command' -a '#{cmd[:commands].join(' ')}' -d #{Shellwords.escape(cmd[:description])}"
     end
 
@@ -149,13 +142,9 @@ class FishCompletions
 
     out = []
     need_export = []
-    # processing = []
 
     @commands.each_with_index do |cmd, i|
-      # processing << cmd[:commands].first
-      processing = cmd[:commands]
-      progress('Processing subcommand options', i, @commands.count, processing)
-
+      @bar.advance
       data = get_help_sections(cmd[:commands].first)
 
       if data[:synopsis].join(' ').strip.split(/ /).last =~ /(path|file)/i
@@ -180,23 +169,25 @@ class FishCompletions
       out << "complete -f -c doing -s o -l output -x -n '__fish_doing_using_command #{need_export.join(' ')}' -a '(__fish_doing_export_plugins)'"
     end
 
-    clear
+    # clear
     out.join("\n")
   end
 
   def initialize
-    status('Generating Fish completions', reset: false)
     data = get_help_sections
     @global_options = parse_options(data[:global_options])
     @commands = parse_commands(data[:commands])
+    @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Fish completions: \033[0;35;40m[:bar]\033[0m", total: @commands.count, bar_format: :blade)
+    @bar.resize(25)
   end
 
   def generate_completions
+    @bar.start
     out = []
     out << generate_helpers
     out << generate_subcommand_completions
     out << generate_subcommand_option_completions
-    status('Complete', reset: false)
+    @bar.finish
     out.join("\n")
   end
 end

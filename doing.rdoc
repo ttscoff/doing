@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.0.19
+v2.0.20
 
 === Global Options
 === --config_file arg
@@ -374,7 +374,7 @@ Generate shell completion scripts
 
 File to write output to
 
-[Default Value] stdout
+[Default Value] STDOUT
 
 
 ===== -t|--type SHELL

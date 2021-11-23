@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
-$LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
-require 'doing/cli_status'
-
+require 'tty-progressbar'
 require 'shellwords'
 
 class ::String
@@ -23,7 +21,6 @@ class ::String
 end
 
 class ZshCompletions
-  include Status
 
   attr_accessor :commands, :global_options
 
@@ -57,7 +54,7 @@ class ZshCompletions
       }
 
     EOFUNCTIONS
-    status('Complete', reset: false)
+    @bar.finish
     out
   end
 
@@ -106,28 +103,20 @@ class ZshCompletions
 
   def generate_subcommand_completions
     out = []
-    # processing = []
     @commands.each_with_index do |cmd, i|
-      # processing << cmd[:commands].first
-      processing = cmd[:commands]
-      progress('Processing subcommands', i, @commands.count, processing)
       cmd[:commands].each do |c|
         out << "'#{c}:#{cmd[:description].gsub(/'/, '\\\'')}'"
       end
     end
-    clear
     out
   end
 
   def generate_subcommand_option_completions(indent: '        ')
 
     out = []
-    # processing = []
 
     @commands.each_with_index do |cmd, i|
-      # processing << cmd[:commands].first
-      processing = cmd[:commands]
-      progress('Processing subcommand options', i, @commands.count, processing)
+      @bar.advance
 
       data = get_help_sections(cmd[:commands].first)
       option_arr = []
@@ -155,13 +144,15 @@ class ZshCompletions
   end
 
   def initialize
-    status('Generating Zsh completions', reset: false)
     data = get_help_sections
     @global_options = parse_options(data[:global_options])
     @commands = parse_commands(data[:commands])
+    @bar = TTY::ProgressBar.new(" \033[0;0;33mGenerating Zsh completions: \033[0;35;40m[:bar]\033[0m", total: @commands.count, bar_format: :blade)
+    @bar.resize(25)
   end
 
   def generate_completions
+    @bar.start
     generate_helpers
   end
 end

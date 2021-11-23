@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
-$LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
-require 'doing/cli_status'
-
+require 'tty-progressbar'
 require 'shellwords'
 
 class ::String
@@ -23,8 +21,6 @@ class ::String
 end
 
 class BashCompletions
-  include Status
-
   attr_accessor :commands, :global_options
 
   def main_function
@@ -32,12 +28,9 @@ class BashCompletions
     out = []
     logic = []
     need_export = []
-    # processing = []
 
     @commands.each_with_index do |cmd, i|
-      # processing << cmd[:commands].first
-      processing = cmd[:commands]
-      progress('Processing subcommand options', i, @commands.count, processing)
+      @bar.advance
 
       data = get_help_sections(cmd[:commands].first)
 
@@ -82,7 +75,6 @@ class BashCompletions
         fi
       }
     EOFUNC
-    clear
     out.join("\n")
   end
 
@@ -193,17 +185,19 @@ class BashCompletions
   end
 
   def initialize
-    status('Generating Bash completions', reset: false)
     data = get_help_sections
     @global_options = parse_options(data[:global_options])
     @commands = parse_commands(data[:commands])
+    @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Bash completions: \033[0;35;40m[:bar]\033[0m", total: @commands.count, bar_format: :blade)
+    @bar.resize(25)
   end
 
   def generate_completions
+    @bar.start
     out = []
     out << main_function
     out << 'complete -F _doing doing'
-    status('Complete', reset: false)
+    @bar.finish
     out.join("\n")
   end
 end

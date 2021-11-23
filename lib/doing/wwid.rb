@@ -611,6 +611,22 @@ module Doing
       last_entry
     end
 
+    def fzf
+      fzf_dir = File.join(File.dirname(__FILE__), '../helpers/fzf')
+      FileUtils.mkdir_p(fzf_dir) unless File.directory?(fzf_dir)
+      fzf = File.join(fzf_dir, 'bin/fzf')
+      return fzf if File.exist?(fzf)
+
+      Doing.logger.log_now(:warn, 'Downloading and installing FZF. This will only happen once')
+      Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi <https://github.com/junegunn/fzf/blob/master/LICENSE>')
+      res = `git clone --depth 1 https://github.com/junegunn/fzf.git #{fzf_dir}`
+      res = `#{fzf_dir}/install --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish`
+
+      raise DoingRuntimeError unless File.exist?(fzf)
+
+      fzf
+    end
+
     ##
     ## Generate a menu of options and allow user selection
     ##
@@ -619,7 +635,6 @@ module Doing
     def choose_from(options, prompt: 'Make a selection: ', multiple: false, sorted: true, fzf_args: [])
       return nil unless $stdout.isatty
 
-      fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
       # fzf_args << '-1' # User is expecting a menu, and even if only one it seves as confirmation
       fzf_args << %(--prompt "#{prompt}")
       fzf_args << '--multi' if multiple
@@ -652,8 +667,6 @@ module Doing
 
     def fuzzy_filter_items(items, opt: {})
       scannable = items.map.with_index { |item, idx| "#{item.title} #{item.note.join(' ')}".gsub(/[|*?!]/, '') + "|#{idx}"  }.join("\n")
-
-      fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
 
       fzf_args = [
         '--multi',
@@ -868,8 +881,6 @@ module Doing
         end
         out.join('')
       end
-
-      fzf = File.join(File.dirname(__FILE__), '../helpers/fuzzyfilefinder')
 
       fzf_args = [
         %(--header="#{opt[:header]}"),

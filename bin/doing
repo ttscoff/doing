@@ -2149,28 +2149,12 @@ command :completion do |c|
 
   c.desc 'File to write output to'
   c.arg_name 'PATH'
-  c.flag %i[f file], default_value: 'stdout'
+  c.flag %i[f file], default_value: 'STDOUT'
 
   c.action do |_global_options, options, _args|
     script_dir = File.join(File.dirname(__FILE__), '..', 'scripts')
 
-    case options[:type]
-    when /^b/
-      result = `ruby #{File.join(script_dir, 'generate_bash_completions.rb')}`
-    when /^z/
-      result = `ruby #{File.join(script_dir, 'generate_zsh_completions.rb')}`
-    when /^f/
-      result = `ruby #{File.join(script_dir, 'generate_fish_completions.rb')}`
-    end
-
-    if options[:file] =~ /^stdout$/i
-      $stdout.puts result
-    else
-      File.open(File.expand_path(options[:file]), 'w') do |f|
-        f.puts result
-      end
-      Doing.logger.warn('File written:', "#{options[:type]} completions written to #{options[:file]}")
-    end
+    Doing::Completion.generate_completion(type: options[:type], file: options[:file])
   end
 end
 
