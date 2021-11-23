@@ -72,7 +72,9 @@ module Doing
     end
 
     def adjust_verbosity(options = {})
-      if options[:quiet]
+      if options[:log_level]
+        self.log_level = options[:log_level].to_sym
+      elsif options[:quiet]
         self.log_level = :error
       elsif options[:verbose] || options[:debug]
         self.log_level = :debug
