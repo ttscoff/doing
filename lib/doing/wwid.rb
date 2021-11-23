@@ -614,17 +614,20 @@ module Doing
     def fzf
       fzf_dir = File.join(File.dirname(__FILE__), '../helpers/fzf')
       FileUtils.mkdir_p(fzf_dir) unless File.directory?(fzf_dir)
-      fzf = File.join(fzf_dir, 'bin/fzf')
-      return fzf if File.exist?(fzf)
+      fzf_bin = File.join(fzf_dir, 'bin/fzf')
+      return fzf_bin if File.exist?(fzf_bin)
 
-      Doing.logger.log_now(:warn, 'Compiling and installing FZF. This will only happen once')
+      Doing.logger.log_now(:warn, 'Compiling and installing FZF -- this will only happen once')
       Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi <https://github.com/junegunn/fzf/blob/master/LICENSE>')
 
-      res = `#{fzf_dir}/install --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish`
+      res = system("#{fzf_dir}/install --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish")
+      unless res
+        Doing.logger.log_now(:warn, 'Error installing, trying again as root')
+        system("sudo #{fzf_dir}/install --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish")
+      end
+      raise RuntimeError.new('Error installing fzf, please report at https://github.com/ttscoff/doing/issues') unless File.exist?(fzf_bin)
 
-      raise DoingRuntimeError unless File.exist?(fzf)
-
-      fzf
+      fzf_bin
     end
 
     ##
