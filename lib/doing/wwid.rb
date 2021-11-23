@@ -618,6 +618,7 @@ module Doing
       return fzf if File.exist?(fzf)
 
       Doing.logger.log_now(:warn, 'Downloading and installing FZF. This will only happen once')
+      Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi <https://github.com/junegunn/fzf/blob/master/LICENSE>')
       res = `git clone --depth 1 https://github.com/junegunn/fzf.git #{fzf_dir}`
       res = `#{fzf_dir}/install --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish`
 

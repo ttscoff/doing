@@ -4,6 +4,10 @@
 
 - completion script generator refactor and progress bars
 
+#### FIXED
+
+- compile fzf for current operating system
+
 ### 2.0.19
 
 #### FIXED
