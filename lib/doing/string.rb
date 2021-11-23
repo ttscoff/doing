@@ -162,7 +162,7 @@ module Doing
     ## @param      prefix  [String] (Optional) A prefix to add to each line
     ##
     def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', color: '', after: '', reset: '')
-      last_color = after.last_color
+      last_color = color.empty? ? '' : after.last_color
       note_rx = /(?i-m)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)/
       # Don't break inside of tag values
       str = gsub(/@\S+\(.*?\)/) { |tag| tag.gsub(/\s/, '%%%%') }

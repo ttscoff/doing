@@ -42,6 +42,7 @@ module Doing
         else
           note = []
         end
+
         output = opt[:template].dup
 
         output.gsub!(/%[a-z]+/) do |m|
@@ -90,7 +91,7 @@ module Doing
             item.title.wrap(width, pad: pad, indent: indent, offset: title_offset, prefix: prefix, color: title_color, after: after, reset: reset)
             # flag + item.title.gsub(/(.{#{opt[:wrap_width]}})(?=\s+|\Z)/, "\\1\n ").sub(/\s*$/, '') + reset
           else
-            format("%s%s%#{pad}s%s%s", title_color, prefix, item.title.sub(/\s*$/, ''), reset, after)
+            format("%s%#{pad}s%s", prefix, item.title.sub(/\s*$/, ''), after)
           end
         end
 
@@ -135,6 +136,7 @@ module Doing
 
         out += "#{output}\n"
       end
+
       # Doing.logger.debug('Template Export:', "#{items.count} items output to template #{opt[:template]}")
       out += wwid.tag_times(format: wwid.config['timer_format'].to_sym, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) if opt[:totals]
       out

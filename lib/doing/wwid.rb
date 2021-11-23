@@ -1649,7 +1649,9 @@ module Doing
       opt[:format] ||= cfg['date_format']
       opt[:order] ||= cfg['order'] || 'asc'
       opt[:tag_order] ||= 'asc'
-      opt[:tags_color] ||= cfg['tags_color'] || false
+      if opt[:tags_color].nil?
+        opt[:tags_color] = cfg['tags_color'] || false
+      end
       opt[:template] ||= cfg['template']
 
       # opt[:highlight] ||= true
@@ -2182,7 +2184,7 @@ EOS
 
       @content.each do |title, section|
         output += "#{section[:original]}\n"
-        output += list_section({ section: title, template: "\t- %date | %title%t2note", highlight: false, wrap_width: 0 })
+        output += list_section({ section: title, template: "\t- %date | %title%t2note", highlight: false, wrap_width: 0, tags_color: false })
       end
 
       output + @other_content_bottom.join("\n") unless @other_content_bottom.nil?

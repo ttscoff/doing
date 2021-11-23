@@ -1,4 +1,12 @@
+### 2.0.18
+
+#### FIXED
+
+- Escape codes being included in doing file
+
 ### 2.0.17
+
+#### IMPROVED
 
 - Improvements to %title formatting and wrapping
 
