@@ -1,3 +1,9 @@
+### 2.0.20
+
+#### IMPROVED
+
+- completion script generator refactor and progress bars
+
 ### 2.0.19
 
 #### FIXED
