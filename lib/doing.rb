@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 require 'doing/version'
 require 'time'
 require 'date'
@@ -30,6 +29,7 @@ require 'doing/errors'
 require 'doing/hooks'
 require 'doing/plugin_manager'
 require 'doing/pager'
+require 'doing/completion'
 # require 'doing/markdown_document_listener'
 
 # Main doing module
