@@ -27,10 +27,11 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency 'rdoc', '~> 6.3.1'
   s.add_development_dependency 'aruba', '~> 1.0.2'
   s.add_development_dependency 'test-unit', '~> 3.4.4'
-  s.add_development_dependency 'yard'
-  s.add_development_dependency 'redcarpet'
-  s.add_development_dependency 'github-markup'
-  s.add_development_dependency 'parallel_tests'
+  s.add_development_dependency 'yard', '~> 0.9', '>= 0.9.26'
+  s.add_development_dependency 'redcarpet', '~> 3.5', '>= 3.5.1'
+  s.add_development_dependency 'github-markup', '~> 4.0', '>= 4.0.0'
+  s.add_development_dependency 'parallel_tests', '~> 3.7', '>= 3.7.3'
+  s.add_runtime_dependency('tty-progressbar', '~> 0.18', '>= 0.18.2')
   s.add_runtime_dependency('gli', '~> 2.19', '>= 2.19.2')
   s.add_runtime_dependency('haml','~>5.0.0', '>= 5.0.0')
   s.add_runtime_dependency('chronic','~> 0.10', '>= 0.10.2')
