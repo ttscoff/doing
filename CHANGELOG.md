@@ -1,3 +1,9 @@
+### 2.0.21
+
+#### IMPROVED
+
+- include fzf source directly, in case git isn't installed
+
 ### 2.0.20
 
 #### IMPROVED

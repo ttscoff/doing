@@ -14,4 +14,4 @@ wwid.md
 COMMANDS.bak
 .gitsecret/keys/random_seed
 !*.secret
-lib/helpers/fzf
+lib/helpers/fzf/bin/fzf
