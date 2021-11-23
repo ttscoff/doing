@@ -2187,7 +2187,8 @@ EOS
         output += list_section({ section: title, template: "\t- %date | %title%t2note", highlight: false, wrap_width: 0, tags_color: false })
       end
 
-      output + @other_content_bottom.join("\n") unless @other_content_bottom.nil?
+      output += @other_content_bottom.join("\n") unless @other_content_bottom.nil?
+      output.uncolor
     end
 
     ##
