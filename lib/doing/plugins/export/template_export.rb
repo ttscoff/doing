@@ -90,7 +90,7 @@ module Doing
             item.title.wrap(width, pad: pad, indent: indent, offset: title_offset, prefix: prefix, color: title_color, after: after, reset: reset)
             # flag + item.title.gsub(/(.{#{opt[:wrap_width]}})(?=\s+|\Z)/, "\\1\n ").sub(/\s*$/, '') + reset
           else
-            format("%s%s%#{pad}s%s%s", title_color, prefix, item.title.sub(/\s*$/, ''), reset, after)
+            format("%s%#{pad}s%s", prefix, item.title.sub(/\s*$/, ''), after)
           end
         end
 
