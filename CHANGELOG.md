@@ -1,3 +1,9 @@
+### 2.0.19
+
+#### FIXED
+
+- Remove any coloring before writing to doing file
+
 ### 2.0.18
 
 #### FIXED
