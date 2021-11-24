@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'yaml'
@@ -16,9 +18,7 @@ class DoingUtilTest < Test::Unit::TestCase
 
   def setup
     @tmpdirs = []
-    @result = ''
-    @basedir = mktmpdir
-    @wwid_file = File.join(@basedir, 'wwid.md')
+    @wwid_file = File.join(mktmpdir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @config = Util.safe_load_file(@config_file)
     import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
@@ -44,7 +44,8 @@ class DoingUtilTest < Test::Unit::TestCase
 
   def test_link_urls
     res = 'Raw https://brettterpstra.com url'.link_urls
-    assert_match(%r{<a href="https://brettterpstra.com" title="Link to brettterpstra.com">\[brettterpstra.com\]</a>}, res, 'Raw URL should be linked matching syntax')
+    assert_match(%r{<a href="https://brettterpstra.com" title="Link to brettterpstra.com">\[brettterpstra.com\]</a>},
+                 res, 'Raw URL should be linked matching syntax')
     res = 'Quoted "https://brettterpstra.com" url'.link_urls
     assert_no_match(/<a href/, res, 'Quoted URL should not be linked')
     res = 'Markdown [test](https://brettterpstra.com) url'.link_urls
@@ -61,7 +62,7 @@ class DoingUtilTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file }, '--doing_file', @wwid_file, *args)
   end
 end
 

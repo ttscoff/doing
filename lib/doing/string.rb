@@ -392,36 +392,50 @@ module Doing
 
     def link_urls(opt = {})
       opt[:format] ||= :html
-      str = self.dup
+      str = dup
 
-      if :format == :markdown
-        # Remove <self-linked> formatting
-        str.gsub!(/<(.*?)>/) do |match|
-          m = Regexp.last_match
-          if m[1] =~ /^https?:/
-            m[1]
-          else
-            match
-          end
+      str = str.remove_self_links if opt[:format] == :markdown
+
+      str.replace_qualified_urls(format: opt[:format]).clean_unlinked_urls
+    end
+
+    # Remove <self-linked> formatting
+    def remove_self_links
+      gsub(/<(.*?)>/) do |match|
+        m = Regexp.last_match
+        if m[1] =~ /^https?:/
+          m[1]
+        else
+          match
         end
       end
+    end
 
-      # Replace qualified urls
-      str.gsub!(%r{(?mi)(?<!["'\[(\\])((http|https)://)([\w\-]+(\.[\w\-]+)+)([\w\-.,@?^=%&;:/~+#]*[\w\-@^=%&;/~+#])?}) do |_match|
+    # Replace qualified urls
+    def replace_qualified_urls(opt = {})
+      opt[:format] ||= :html
+      gsub(%r{(?mi)(?x:
+      (?<!["'\[(\\])
+      ((http|https)://)
+      ([\w\-]+(\.[\w\-]+)+)
+      ([\w\-.,@?^=%&;:/~+#]*[\w\-@^=%&;/~+#])?
+      )}) do |_match|
         m = Regexp.last_match
         proto = m[1].nil? ? 'http://' : ''
         case opt[:format]
         when :html
-          %(<a href="#{proto}#{m[0]}" title="Link to #{m[0].sub(/^https?:\/\//, '')}">[#{m[3]}]</a>)
+          %(<a href="#{proto}#{m[0]}" title="Link to #{m[0].sub(%r{^https?://}, '')}">[#{m[3]}]</a>)
         when :markdown
           "[#{m[0]}](#{proto}#{m[0]})"
         else
           m[0]
         end
       end
+    end
 
-      # Clean up unlinked <urls>
-      str.gsub!(/<(\w+:.*?)>/) do |match|
+    # Clean up unlinked <urls>
+    def clean_unlinked_urls
+      gsub(/<(\w+:.*?)>/) do |match|
         m = Regexp.last_match
         if m[1] =~ /<a href/
           match
@@ -429,8 +443,6 @@ module Doing
           %(<a href="#{m[1]}" title="Link to #{m[1]}">[link]</a>)
         end
       end
-
-      str
     end
   end
 end

@@ -1,3 +1,11 @@
+### 2.0.25
+
+#### NEW
+
+- `doing config set` to set single config values from command line
+- BREAKING CHANGE: Moves ~/.doingrc to ~/.config/doing/config.yml
+- BREAKING CHANGE: convert config flags to subcommands, e.g. `doing config --udpate` => `doing config update`, and `doing config --dump` => `doing config dump`
+
 ### 2.0.24
 
 - include fzf source directly, in case git isn't installed

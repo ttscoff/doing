@@ -171,6 +171,8 @@ module Doing
       real_path = ['config']
       unless keypath =~ /^[.*]?$/
         real_path = resolve_key_path(keypath)
+        return nil unless real_path && real_path.count.positive?
+
         cfg = cfg.dig(*real_path)
       end
 
