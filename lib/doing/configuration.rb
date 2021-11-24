@@ -125,6 +125,11 @@ module Doing
       @additional_configs ||= find_local_config
     end
 
+    ##
+    ## Present a menu if there are multiple configs found
+    ##
+    ## @return     [String] file path
+    ##
     def choose_config
       if @additional_configs.count.positive?
         choices = [@config_file]
@@ -139,6 +144,16 @@ module Doing
       end
     end
 
+    ##
+    ## Resolve a fuzzy-matched key path
+    ##
+    ## @param      keypath  [String] A dot-separated key
+    ##                      path, e.g.
+    ##                      "plugins.plugin_path". Will also
+    ##                      work with "plug.path" (fuzzy
+    ##                      matched, first match wins)
+    ## @return     [Array] ordered array of resolved keys
+    ##
     def resolve_key_path(keypath)
       cfg = @settings
       real_path = []
@@ -166,6 +181,16 @@ module Doing
       real_path
     end
 
+    ##
+    ## Get the value for a fuzzy-matched key path
+    ##
+    ## @param      keypath  [String] A dot-separated key
+    ##                      path, e.g.
+    ##                      "plugins.plugin_path". Will also
+    ##                      work with "plug.path" (fuzzy
+    ##                      matched, first match wins)
+    ## @return     [Hash] Config value
+    ##
     def value_for_key(keypath = '')
       cfg = @settings
       real_path = ['config']
@@ -188,6 +213,9 @@ module Doing
       Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
     end
 
+    ##
+    ## Method for transitioning from ~/.doingrc to ~/.config/doing/config.yml
+    ##
     def update_deprecated_config
       # return # Until further notice
       return if File.exist?(default_config_file)
@@ -263,6 +291,11 @@ module Doing
 
     private
 
+    ##
+    ## Test for deprecated config keys
+    ##
+    ## @param      config  The configuration
+    ##
     def find_deprecations(config)
       deprecated = false
       if config.key?('editor')

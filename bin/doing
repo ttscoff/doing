@@ -423,7 +423,7 @@ command :meanwhile do |c|
     end
     input = ''
 
-    if options[:e]
+    if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input += args.join(' ') unless args.empty?
@@ -441,13 +441,13 @@ command :meanwhile do |c|
       note = []
     end
 
-    if options[:n]
-      note.push(options[:n])
+    if options[:note]
+      note.push(options[:note])
     elsif note.empty?
       note = nil
     end
 
-    wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:a], note: note })
+    wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:archive], note: note })
     wwid.write(wwid.doing_file)
   end
 end

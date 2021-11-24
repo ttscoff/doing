@@ -5,8 +5,6 @@ module Doing
   ## This class describes a single WWID item
   ##
   class Item
-    # include Amatch
-
     attr_accessor :date, :title, :section, :note
 
     ##

@@ -205,6 +205,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#clean_unlinked_urls-instance_method" title="#clean_unlinked_urls (instance method)">#<strong>clean_unlinked_urls</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Clean up unlinked <urls>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#dedup_tags-instance_method" title="#dedup_tags (instance method)">#<strong>dedup_tags</strong>  &#x21d2; Object </a>
     
 
@@ -310,6 +333,52 @@
 
   
     <span class="summary_desc"><div class='inline'><p>Test if line should be ignored.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#is_rx%3F-instance_method" title="#is_rx? (instance method)">#<strong>is_rx?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Determines if receiver is surrounded by slashes or starts with single quote.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#last_color-instance_method" title="#last_color (instance method)">#<strong>last_color</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the last escape sequence from a string.</p>
 </div></span>
   
 </li>
@@ -542,6 +611,52 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#remove_self_links-instance_method" title="#remove_self_links (instance method)">#<strong>remove_self_links</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Remove <self-linked> formatting.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#replace_qualified_urls-instance_method" title="#replace_qualified_urls (instance method)">#<strong>replace_qualified_urls</strong>(opt = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Replace qualified urls.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#tag-instance_method" title="#tag (instance method)">#<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; Object </a>
     
 
@@ -586,7 +701,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#to_rx-instance_method" title="#to_rx (instance method)">#<strong>to_rx</strong>(distance)  &#x21d2; String </a>
+      <a href="#to_rx-instance_method" title="#to_rx (instance method)">#<strong>to_rx</strong>(distance: 3, case_type: :smart)  &#x21d2; Regexp </a>
     
 
     
@@ -789,7 +904,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#wrap-instance_method" title="#wrap (instance method)">#<strong>wrap</strong>(len, pad: 0, indent: &#39;  &#39;, offset: 0, prefix: &#39;&#39;, after: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; Object </a>
+      <a href="#wrap-instance_method" title="#wrap (instance method)">#<strong>wrap</strong>(len, pad: 0, indent: &#39;  &#39;, offset: 0, prefix: &#39;&#39;, color: &#39;&#39;, after: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; Object </a>
     
 
     
@@ -888,6 +1003,28 @@
     </li>
   
 </ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="clean_unlinked_urls-instance_method">
+  
+    #<strong>clean_unlinked_urls</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Clean up unlinked <urls></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
 
 </div>
 </div>
@@ -1085,6 +1222,86 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="is_rx?-instance_method">
+  
+    #<strong>is_rx?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Determines if receiver is surrounded by slashes or starts with single quote</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>True if regex, False otherwise.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="last_color-instance_method">
+  
+    #<strong>last_color</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the last escape sequence from a string</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>string</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The string to examine</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="link_urls-instance_method">
   
     #<strong>link_urls</strong>(opt = {})  &#x21d2; <tt>Object</tt> 
@@ -1231,7 +1448,7 @@
       
       
         
-        <div class='inline'><p>Symbol :smart, :sensitive, :insensitive</p>
+        <div class='inline'><p>Symbol :smart, :sensitive, :ignore</p>
 </div>
       
     </li>
@@ -1317,6 +1534,50 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="remove_self_links-instance_method">
+  
+    #<strong>remove_self_links</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Remove <self-linked> formatting</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="replace_qualified_urls-instance_method">
+  
+    #<strong>replace_qualified_urls</strong>(opt = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Replace qualified urls</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="tag-instance_method">
   
     #<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; <tt>Object</tt> 
@@ -1343,7 +1604,7 @@
       <div class="method_details ">
   <h3 class="signature " id="to_rx-instance_method">
   
-    #<strong>to_rx</strong>(distance)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
+    #<strong>to_rx</strong>(distance: 3, case_type: :smart)  &#x21d2; <tt>Regexp</tt> 
   
 
   
@@ -1351,13 +1612,28 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Convert string to fuzzy regex</p>
+    <p>Convert string to fuzzy regex. Characters in words
+can be separated by up to <em>distance</em> characters in
+haystack, spaces indicate unlimited distance.</p>
+
+<p>/t.0,3h.0,3i.0,3s.0,3.*?w.0,3o.0,3r.0,3d/</p>
 
 
   </div>
 </div>
 <div class="tags">
-  <p class="tag_title">Parameters:</p>
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+        <p class="example_title"><div class='inline'><p>&quot;this word&quot;.to_rx(2) =&gt;</p>
+</div></p>
+      
+      <pre class="example code"><code></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
 <ul class="param">
   
     <li>
@@ -1368,10 +1644,29 @@
         <span class='type'>(<tt>Integer</tt>)</span>
       
       
+        <em class="default">(defaults to: <tt>3</tt>)</em>
+      
       
         &mdash;
         <div class='inline'><p>Allowed distance
 between characters</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>case_type</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>:smart</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The case type</p>
 </div>
       
     </li>
@@ -1384,7 +1679,7 @@ between characters</p>
     <li>
       
       
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+        <span class='type'>(<tt>Regexp</tt>)</span>
       
       
       
@@ -1627,7 +1922,7 @@ between characters</p>
       <div class="method_details ">
   <h3 class="signature " id="wrap-instance_method">
   
-    #<strong>wrap</strong>(len, pad: 0, indent: &#39;  &#39;, offset: 0, prefix: &#39;&#39;, after: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; <tt>Object</tt> 
+    #<strong>wrap</strong>(len, pad: 0, indent: &#39;  &#39;, offset: 0, prefix: &#39;&#39;, color: &#39;&#39;, after: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1704,7 +1999,7 @@ between characters</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:39:12 2021 by
+  Generated on Wed Nov 24 12:34:40 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

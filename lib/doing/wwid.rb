@@ -411,9 +411,13 @@ module Doing
     ##
     ## @param      title    [String] The entry title
     ## @param      section  [String] The section to add to
-    ## @param      opt      [Hash] Additional Options: :date, :note, :back, :timed
+    ## @param      opt      [Hash] Additional Options
     ##
-    def add_item(title, section = nil, opt = {})
+    ## @option opt :date [Date] item start date
+    ## @option opt :note [Array] item note (will be converted if value is String)
+    ## @option opt :back [Date] backdate
+    ## @option opt :timed [Boolean] new item is timed entry, marks previous entry as @done
+    ##
       section ||= @config['current_section']
       add_section(section) unless @content.key?(section)
       opt[:date] ||= Time.now
@@ -1451,6 +1455,11 @@ module Doing
     ## @param      target_tag  [String] Tag to replace
     ## @param      opt         [Hash] Additional Options
     ##
+    ## @option opt :section [String] target section
+    ## @option opt :archive [Boolean] archive old item
+    ## @option opt :back [Date] backdate new item
+    ## @option opt :new_item [String] content to use for new item
+    ## @option opt :note [Array] note content for new item
     def stop_start(target_tag, opt = {})
       tag = target_tag.dup
       opt[:section] ||= @config['current_section']

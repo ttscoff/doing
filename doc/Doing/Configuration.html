@@ -307,6 +307,51 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#choose_config-instance_method" title="#choose_config (instance method)">#<strong>choose_config</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Present a menu if there are multiple configs found.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#config_dir-instance_method" title="#config_dir (instance method)">#<strong>config_dir</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#config_file-instance_method" title="#config_file (instance method)">#<strong>config_file</strong>  &#x21d2; Object </a>
     
 
@@ -374,6 +419,28 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#default_config_file-instance_method" title="#default_config_file (instance method)">#<strong>default_config_file</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#from-instance_method" title="#from (instance method)">#<strong>from</strong>(user_config)  &#x21d2; Object </a>
     
 
@@ -422,7 +489,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#value_for_key-instance_method" title="#value_for_key (instance method)">#<strong>value_for_key</strong>(keypath = &#39;&#39;)  &#x21d2; Object </a>
+      <a href="#resolve_key_path-instance_method" title="#resolve_key_path (instance method)">#<strong>resolve_key_path</strong>(keypath)  &#x21d2; Array </a>
     
 
     
@@ -436,7 +503,54 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Resolve a fuzzy-matched key path.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update_deprecated_config-instance_method" title="#update_deprecated_config (instance method)">#<strong>update_deprecated_config</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Method for transitioning from ~/.doingrc to ~/.config/doing/config.yml.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#value_for_key-instance_method" title="#value_for_key (instance method)">#<strong>value_for_key</strong>(keypath = &#39;&#39;)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get the value for a fuzzy-matched key path.</p>
+</div></span>
   
 </li>
 
@@ -561,6 +675,57 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="choose_config-instance_method">
+  
+    #<strong>choose_config</strong>  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Present a menu if there are multiple configs found</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>file path</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="config_dir-instance_method">
+  
+    #<strong>config_dir</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="config_file-instance_method">
   
     #<strong>config_file</strong>  &#x21d2; <tt>Object</tt> 
@@ -628,6 +793,40 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="default_config_file-instance_method">
+  
+    #<strong>default_config_file</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>DoingRuntimeError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="from-instance_method">
   
     #<strong>from</strong>(user_config)  &#x21d2; <tt>Object</tt> 
@@ -654,15 +853,151 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="resolve_key_path-instance_method">
+  
+    #<strong>resolve_key_path</strong>(keypath)  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Resolve a fuzzy-matched key path</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>keypath</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>A dot-separated key
+path, e.g.
+&quot;plugins.plugin_path&quot;. Will also
+work with &quot;plug.path&quot; (fuzzy
+matched, first match wins)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>ordered array of resolved keys</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="update_deprecated_config-instance_method">
+  
+    #<strong>update_deprecated_config</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Method for transitioning from ~/.doingrc to ~/.config/doing/config.yml</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="value_for_key-instance_method">
   
-    #<strong>value_for_key</strong>(keypath = &#39;&#39;)  &#x21d2; <tt>Object</tt> 
+    #<strong>value_for_key</strong>(keypath = &#39;&#39;)  &#x21d2; <tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get the value for a fuzzy-matched key path</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>keypath</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>A dot-separated key
+path, e.g.
+&quot;plugins.plugin_path&quot;. Will also
+work with &quot;plug.path&quot; (fuzzy
+matched, first match wins)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Config value</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
   </div>
@@ -670,7 +1005,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:39:12 2021 by
+  Generated on Wed Nov 24 12:34:40 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>
