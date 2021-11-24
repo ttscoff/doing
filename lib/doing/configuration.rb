@@ -100,7 +100,8 @@ module Doing
     end
 
     def config_dir
-      @config_dir ||= File.join(Util.user_home, '.config', 'doing')
+      # @config_dir ||= File.join(Util.user_home, '.config', 'doing')
+      @config_dir ||= Util.user_home
     end
 
     def default_config_file
@@ -108,7 +109,8 @@ module Doing
 
       FileUtils.mkdir_p(config_dir) unless File.exist?(config_dir)
 
-      File.join(config_dir, 'config.yml')
+      # File.join(config_dir, 'config.yml')
+      File.join(config_dir, '.doingrc')
     end
 
     def config_file=(file)
@@ -182,6 +184,8 @@ module Doing
     end
 
     def update_deprecated_config
+      return # Until further notice
+
       old_file = File.join(Util.user_home, '.doingrc')
       return unless File.exist?(old_file)
 
