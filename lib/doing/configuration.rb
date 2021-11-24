@@ -90,21 +90,56 @@ module Doing
     }
 
     def initialize(file = nil, options: {})
-      if file
-        cf = File.expand_path(file)
-        # raise MissingConfigFile, "Config not found (#{cf})" unless File.exist?(cf)
-
-        @config_file = cf
-      end
+      @config_file = file.nil? ? default_config_file : File.expand_path(file)
 
       @settings = configure(options)
     end
+
+    def config_file
+      @config_file ||= default_config_file
+    end
+
+    def config_dir
+      @config_dir ||= File.join(Util.user_home, '.config', 'doing')
+      # @config_dir ||= Util.user_home
+    end
+
+    def default_config_file
+      raise DoingRuntimeError, "#{config_dir} exists but is not a directory" if File.exist?(config_dir) && !File.directory?(config_dir)
+
+      unless File.exist?(config_dir)
+        FileUtils.mkdir_p(config_dir)
+        Doing.logger.log_now(:warn, "Config directory created at #{config_dir}")
+      end
+
+      # File.join(config_dir, 'config.yml')
+      File.join(config_dir, 'config.yml')
+    end
+
+    def config_file=(file)
+      @config_file = file
+    end
+
 
     def additional_configs
       @additional_configs ||= find_local_config
     end
 
-    def value_for_key(keypath = '')
+    def choose_config
+      if @additional_configs.count.positive?
+        choices = [@config_file]
+        choices.concat(@additional_configs)
+        res = Doing::WWID.new.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to update > ')
+
+        raise UserCancelled, 'Cancelled' unless res
+
+        res.strip || @config_file
+      else
+        @config_file
+      end
+    end
+
+    def resolve_key_path(keypath)
       cfg = @settings
       real_path = []
       unless keypath =~ /^[.*]?$/
@@ -113,7 +148,8 @@ module Doing
           path = paths.shift
           new_cfg = nil
           cfg.each do |key, val|
-            next unless key =~ path.to_rx(distance: 2)
+            next unless key =~ path.to_rx(distance: 4)
+
             real_path << key
             new_cfg = val
             break
@@ -127,9 +163,20 @@ module Doing
         end
       end
       Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}")
-      result = {}
-      result[real_path[-1]] = cfg
-      result
+      real_path
+    end
+
+    def value_for_key(keypath = '')
+      cfg = @settings
+      real_path = ['config']
+      unless keypath =~ /^[.*]?$/
+        real_path = resolve_key_path(keypath)
+        return nil unless real_path && real_path.count.positive?
+
+        cfg = cfg.dig(*real_path)
+      end
+
+      cfg.nil? ? nil : { real_path[-1] => cfg }
     end
 
     # It takes the input, fills in the defaults where values do not exist.
@@ -141,12 +188,33 @@ module Doing
       Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
     end
 
-    def config_file
-      @config_file ||= File.join(Util.user_home, '.doingrc')
-    end
+    def update_deprecated_config
+      # return # Until further notice
+      return if File.exist?(default_config_file)
 
-    def config_file=(file)
-      @config_file = file
+      old_file = File.join(Util.user_home, '.doingrc')
+      return unless File.exist?(old_file)
+
+      wwid = Doing::WWID.new
+      Doing.logger.log_now(:warn, 'Deprecated:', "main config file location has changed to #{config_file}")
+      res = wwid.yn("Move #{old_file} to new location, preserving settings?", default_response: true)
+
+      if res
+        if File.exist?(default_config_file)
+          res = wwid.yn("#{default_config_file} already exists, overwrite it?", default_response: false)
+
+          unless res
+            @config_file = old_file
+            return
+          end
+        end
+
+        FileUtils.mv old_file, default_config_file, force: true
+        Doing.logger.log_now(:warn, 'Config:', "Config file moved to #{default_config_file}")
+        Doing.logger.log_now(:warn, 'Config:', %(If ~/.config/doing/config.yml exists in the future, it will be considered a local
+                             config and its values will override the default configuration.))
+        Process.exit 0
+      end
     end
 
     ##
@@ -155,6 +223,8 @@ module Doing
     ## @param      opt   [Hash] Additional Options
     ##
     def configure(opt = {})
+      update_deprecated_config if config_file == default_config_file
+
       @ignore_local = opt[:ignore_local] if opt[:ignore_local]
 
       config = read_config.dup

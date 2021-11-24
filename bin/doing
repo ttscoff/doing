@@ -1188,7 +1188,7 @@ command :tag do |c|
   c.desc 'Tag last entry (or entries) not marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
 
-  c.desc 'Autotag entries based on autotag configuration in ~/.doingrc'
+  c.desc 'Autotag entries based on autotag configuration in ~/.config/doing/config.yml'
   c.switch %i[a autotag], negatable: false, default_value: false
 
   c.desc 'Tag the last X entries containing TAG.
@@ -2591,55 +2591,138 @@ command :open do |c|
 end
 
 desc 'Edit the configuration file or output a value from it'
-long_desc %(Run without arguments, `doing config` opens your `.doingrc` in an editor.
+long_desc %(Run without arguments, `doing config` opens your `config.yml` in an editor.
 If local configurations are found in the path between the current directory
-and `~/.doingrc`, a menu will allow you to select which to open in the editor.
+and the root (/), a menu will allow you to select which to open in the editor.
 
 It will use the editor defined in `config_editor_app`, or one specified with `--editor`.
 
-Use `doing config -d` to output the configuration to the terminal, and
+Use `doing config get` to output the configuration to the terminal, and
 provide a dot-separated key path to get a specific value. Shows the current value
 including keys/overrides set by local configs.)
-arg_name 'KEY_PATH'
 command :config do |c|
   c.example 'doing config', desc: "Open an active configuration in #{Doing::Util.find_default_editor('config')}"
-  c.example 'doing config -d doing_file', desc: 'Output the value of a config key as YAML'
-  c.example 'doing config -d plugins.say.say_voice -o json', desc: 'Output the value of a key path as JSON'
+  c.example 'doing config get doing_file', desc: 'Output the value of a config key as YAML'
+  c.example 'doing config get plugins.plugin_path -o json', desc: 'Output the value of a key path as JSON'
+  c.example 'doing config set plugins.say.say_voice Alex', desc: 'Set the value of a key path and update config file'
+  c.example 'doing config set plug.say.voice Zarvox', desc: 'Key paths for get and set are fuzzy matched'
 
-  c.desc 'Editor to use'
-  c.arg_name 'EDITOR'
-  c.flag %i[e editor], default_value: nil
+  c.default_command :edit
 
-  c.desc 'Show a config key value based on arguments. Separate key paths with colons or dots, e.g. "export_templates.html". Empty arguments outputs the entire config.'
-  c.switch %i[d dump], negatable: false
+  c.desc 'DEPRECATED'
+  c.switch %i[d dump]
 
-  c.desc 'Format for --dump (json|yaml|raw)'
-  c.arg_name 'FORMAT'
-  c.flag %i[o output], default_value: 'yaml', must_match: /^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$/
+  c.desc 'DEPRECATED'
+  c.switch %i[u update]
 
-  c.desc 'Update config file with missing configuration options'
-  c.switch %i[u update], default_value: false, negatable: false
+  c.desc 'Open config file in editor'
+  c.command :edit do |edit|
+    edit.example 'doing config edit', desc: 'Open a config file in the default editor'
+    edit.example 'doing config edit --editor vim', desc: 'Open config in specific editor'
 
-  if `uname` =~ /Darwin/
-    c.desc 'Application to use'
-    c.arg_name 'APP_NAME'
-    c.flag [:a]
+    edit.desc 'Editor to use'
+    edit.arg_name 'EDITOR'
+    edit.flag %i[e editor], default_value: nil
 
-    c.desc 'Application bundle id to use'
-    c.arg_name 'BUNDLE_ID'
-    c.flag [:b]
+    if `uname` =~ /Darwin/
+      edit.desc 'Application to use'
+      edit.arg_name 'APP_NAME'
+      edit.flag [:a]
 
-    c.desc "Use the config_editor_app defined in ~/.doingrc (#{settings.key?('config_editor_app') ? settings['config_editor_app'] : 'config_editor_app not set'})"
-    c.switch [:x]
-  end
+      edit.desc 'Application bundle id to use'
+      edit.arg_name 'BUNDLE_ID'
+      edit.flag [:b]
 
-  c.action do |_global_options, options, args|
-    if options[:update]
-      config.configure({rewrite: true, ignore_local: true})
-      return
+      edit.desc "Use the config_editor_app defined in ~/.config/doing/config.yml (#{settings.key?('config_editor_app') ? settings['config_editor_app'] : 'config_editor_app not set'})"
+      edit.switch [:x]
     end
 
-    if options[:dump]
+    edit.action do |global, options, args|
+      if options[:update] || options[:dump]
+        cmd = commands[:config]
+        if options[:update]
+          cmd = cmd.commands[:update]
+        elsif options[:dump]
+          cmd = cmd.commands[:get]
+        end
+        action = cmd.send(:get_action, nil)
+        action.call(global, options, args)
+        Doing.logger.warn('Deprecated:', '--dump and --update are deprecated,
+                             use `doing config get` and `doing config update`')
+        Doing.logger.output_results
+        return
+      end
+
+      config_file = config.choose_config
+
+      if `uname` =~ /Darwin/
+        if options[:x]
+          editor = Doing::Util.find_default_editor('config')
+          if editor
+            if Doing::Util.exec_available(editor)
+              system %(#{editor} "#{config_file}")
+            else
+              `open -a "#{editor}" "#{config_file}"`
+            end
+          else
+            raise InvalidArgument, 'No viable editor found in config or environment.'
+          end
+        elsif options[:a] || options[:b]
+          if options[:a]
+            `open -a "#{options[:a]}" "#{config_file}"`
+          elsif options[:b]
+            `open -b #{options[:b]} "#{config_file}"`
+          end
+        else
+          editor = options[:e] || Doing::Util.find_default_editor('config')
+
+          raise MissingEditor, 'No viable editor defined in config or environment' unless editor
+
+          if Doing::Util.exec_available(editor)
+            system %(#{editor} "#{config_file}")
+          else
+            `open -a "#{editor}" "#{config_file}"`
+          end
+        end
+      else
+        editor = options[:e] || Doing::Util.default_editor
+        raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor)
+
+        system %(#{editor} "#{config_file}")
+      end
+    end
+  end
+
+  c.desc 'Update default config file, adding any missing keys'
+  c.command %i[update refresh] do |update|
+    update.action do |_global, options, args|
+      config.configure({rewrite: true, ignore_local: true})
+      Doing.logger.warn('Config:', 'config refreshed')
+    end
+  end
+
+  c.desc 'Undo the last change to a config file'
+  c.command :undo do |undo|
+    undo.action do |_global, options, args|
+      config_file = config.choose_config
+      wwid.restore_backup(config_file)
+    end
+  end
+
+  c.desc 'Output a key\'s value'
+  c.arg 'KEY_PATH'
+  c.command %i[get dump] do |dump|
+    dump.example 'doing config get', desc: 'Output the entire configuration'
+    dump.example 'doing config get timer_format --output raw', desc: 'Output the value of timer_format as a plain string'
+    dump.example 'doing config get doing_file', desc: 'Output the value of the doing_file setting, respecting local configurations'
+    dump.example 'doing config get -o json plug.plugpath', desc: 'Key path is fuzzy matched: output the value of plugins->plugin_path as JSON'
+
+    dump.desc 'Format for output (json|yaml|raw)'
+    dump.arg_name 'FORMAT'
+    dump.flag %i[o output], default_value: 'yaml', must_match: /^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$/
+
+    dump.action do |_global, options, args|
+
       keypath = args.join('.')
       cfg = config.value_for_key(keypath)
 
@@ -2658,53 +2741,42 @@ command :config do |c|
       Doing.logger.output_results
       return
     end
+  end
 
-    if config.additional_configs.count.positive?
-      choices = [config.config_file]
-      choices.concat(config.additional_configs)
-      res = wwid.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to edit > ')
+  c.desc 'Set a key\'s value in the config file'
+  c.arg 'KEY VALUE'
+  c.command :set do |set|
+    set.example 'doing config set timer_format human', desc: 'Set the value of timer_format to "human"'
+    set.example 'doing config set plug.plugpath ~/my_plugins', desc: 'Key path is fuzzy matched: set the value of plugins->plugin_path'
+
+    set.action do |_global, options, args|
+      if args.count < 2
+        raise InvalidArgument, 'config set requires at least two arguments, key path and value'
+
+      end
+
+      value = args.pop
+      keypath = args.join('.')
+      old_value = config.value_for_key(keypath).map { |k, v| v.to_s }
+      real_path = config.resolve_key_path(keypath)
+      raise InvalidArgument, 'Invalid key path' if real_path.empty?
+
+      key = real_path.last
+      real_path[0...-1].inject(config.settings, :fetch)[key] = value
+
+      config_file = config.choose_config
+
+      prev_level = Doing.logger.level
+      Doing.logger.adjust_verbosity({ level: :info })
+      Doing.logger.log_now(:info, 'Config:', "Updating #{config_file}")
+      Doing.logger.log_now(:info, 'Config:', "#{real_path.join('->')} => #{value}")
+      res = wwid.yn('Update selected config', default_response: true)
 
       raise UserCancelled, 'Cancelled' unless res
 
-      config_file = res.strip || config.config_file
-    else
-      config_file = config.config_file
-    end
-
-    if `uname` =~ /Darwin/
-      if options[:x]
-        editor = Doing::Util.find_default_editor('config')
-        if editor
-          if Doing::Util.exec_available(editor)
-            system %(#{editor} "#{config_file}")
-          else
-            `open -a "#{editor}" "#{config_file}"`
-          end
-        else
-          raise InvalidArgument, 'No viable editor found in config or environment.'
-        end
-      elsif options[:a] || options[:b]
-        if options[:a]
-          `open -a "#{options[:a]}" "#{config_file}"`
-        elsif options[:b]
-          `open -b #{options[:b]} "#{config_file}"`
-        end
-      else
-        editor = options[:e] || Doing::Util.find_default_editor('config')
-
-        raise MissingEditor, 'No viable editor defined in config or environment' unless editor
-
-        if Doing::Util.exec_available(editor)
-          system %(#{editor} "#{config_file}")
-        else
-          `open -a "#{editor}" "#{config_file}"`
-        end
-      end
-    else
-      editor = options[:e] || Doing::Util.default_editor
-      raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor)
-
-      system %(#{editor} "#{config_file}")
+      Doing.logger.adjust_verbosity({ level: prev_level })
+      Doing::Util.write_to_file(config_file, YAML.dump(config.settings), backup: true)
+      Doing.logger.warn('Config:', "#{config_file} updated")
     end
   end
 end

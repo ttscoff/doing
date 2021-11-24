@@ -14,13 +14,13 @@
 # Change what the plugin says by generating a template with
 # `doing template --type say`, saving it to a file, and
 # putting the path to that file in `export_templates->say` in
-# .doingrc.
+# config.yml.
 #
 # export_templates:
 #   say: /path/to/template.txt
 #
 # Use a different voice by adding a `say_voice` key to your
-# .doingrc. Use `say -v ?` to see available voices.
+# config.yml. Use `say -v ?` to see available voices.
 #
 # say_voice: Zarvox
 

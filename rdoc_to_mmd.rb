@@ -3,18 +3,24 @@
 
 input = IO.read('doing.rdoc')
 
+input.gsub!(/^======= Options/, "###### Options\n\n")
 input.gsub!(/^===== Options/, "##### Options\n\n")
+input.gsub!(/^===== Commands/, "### Commands\n")
 input.gsub!(/^=== Commands/, "## Commands\n")
-input.gsub!(/(?<=\n)===== (.*?)\n+((.|\n)+?)(?=\n=|$)/s) do
+
+input.gsub!(/^(?<pre>={4,6}) Command: <tt>(?<cmd>.*?) (?<arg> .*?)?<\/tt>\n(?<after>.*?)$/) do
+  m = Regexp.last_match
+  level = m['pre'].length == 6 ? '####' : '###'
+  r = "#{level} #{m['cmd'].sub(/\|(.*?)$/, ' (*or* \1)')}"
+  r += " #{m['arg']}" if m['arg']
+  r += " {##{m['cmd'].gsub(/\|.*?$/, '')}}" if m['pre'].length == 4
+  r += "\n\n"
+  "#{r}**#{m['after']}**{:.description}\n"
+end
+
+input.gsub!(/(?<=\n)={5,7} (.*?)\n+((.|\n)+?)(?=\n=|$)/s) do
   m = Regexp.last_match
   "`#{m[1]}`\n: #{m[2].gsub(/\|/, '\\|')}"
-end
-input.gsub!(/^==== Command: <tt>(.*?) ( .*?)?<\/tt>\n(.*?)$/) do
-  m = Regexp.last_match
-  r = "### #{m[1].sub(/\|(.*?)$/, ' (*or* \1)')}"
-  r += " #{m[2]}" if m[2]
-  r += " {##{m[1].gsub(/\|.*?$/, '')}}\n\n"
-  "#{r}**#{m[3]}**{:.description}\n"
 end
 
 input.gsub!(/^=== Global Options/, "## Global Options\n")
@@ -28,7 +34,7 @@ input.gsub!(/\n  (?=\S)/, ' ')
 input.gsub!(/^([^:`\n#*](.*?))$/, "\\1\n")
 input.gsub!(/\n{3,}/, "\n\n")
 input.gsub!(/^(: .*?)\n\n(:.*?)$/, "\\1\n\\2")
-input.gsub!(/^\[Default Command\] (.*?)$/, '## Default Command: [`\1`](#\1)')
+input.gsub!(/^\[Default Command\] (.*?)$/, '> **Default Command:** [`\1`](#\1)')
 input.gsub!(/\/Users\/ttscoff\/scripts\/editor.sh/, '$EDITOR')
 input.gsub!(/\/Users\/ttscoff/, '~')
 puts %(---

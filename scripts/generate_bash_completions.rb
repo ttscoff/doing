@@ -155,7 +155,7 @@ class BashCompletions
   end
 
   def parse_option(option)
-    res = option.match(/(?:-(?<short>\w), )?(?:--(?:\[no-\])?(?<long>[\w_]+)(?:=(?<arg>\w+))?)\s+- (?<desc>.*?)$/)
+    res = option.match(/(?:-(?<short>\w), )?(?:--(?:\[no-\])?(?<long>w+)(?:=(?<arg>\w+))?)\s+- (?<desc>.*?)$/)
     return nil unless res
     {
       short: res['short'],

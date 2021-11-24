@@ -25,10 +25,7 @@ module Doing
       @timers = {}
       @recorded_items = []
       @content = {}
-      @doingrc_needs_update = false
-      @default_config_file = '.doingrc'
       @auto_tag = true
-      @user_home = Util.user_home
     end
 
     ##
@@ -626,7 +623,7 @@ module Doing
       Doing.logger.log_now(:warn, 'Compiling and installing fzf -- this will only happen once')
       Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi, MIT License <https://github.com/junegunn/fzf/blob/master/LICENSE>')
 
-      res = system("'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
+      system("'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
       unless File.exist?(fzf_bin)
         Doing.logger.log_now(:warn, 'Error installing, trying again as root')
         system("sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
@@ -1524,7 +1521,7 @@ module Doing
     def restore_backup(file)
       if File.exist?("#{file}~")
         FileUtils.cp("#{file}~", file)
-        logger.warn('File update:', "Restored #{file.sub(/^#{@user_home}/, '~')}")
+        logger.warn('File update:', "Restored #{file.sub(/^#{Util.user_home}/, '~')}")
       else
         logger.error('Restore error:', 'No backup file found')
       end
