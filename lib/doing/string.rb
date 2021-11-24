@@ -6,6 +6,14 @@ module Doing
   ##
   class ::String
     include Doing::Color
+
+    def markdown(width: nil)
+      if width
+        TTY::Markdown.parse(strip, width: width).strip
+      else
+        TTY::Markdown.parse(strip).strip
+      end
+    end
     ##
     ## Determines if receiver is surrounded by slashes or starts with single quote
     ##

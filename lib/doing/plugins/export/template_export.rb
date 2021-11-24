@@ -103,9 +103,9 @@ module Doing
         if note.empty?
           output.gsub!(/%(chomp|[io]d|(\^.)?(([ _t]|[^a-z0-9])?\d+)?(.[ _t]?)?)?note/, '')
         else
-          output.sub!(/%note/, "\n#{note.map { |l| "\t#{l.strip}  " }.join("\n")}")
-          output.sub!(/%idnote/, "\n#{note.map { |l| "\t\t#{l.strip}  " }.join("\n")}")
-          output.sub!(/%odnote/, "\n#{note.map { |l| "#{l.strip}  " }.join("\n")}")
+          output.sub!(/%note/, "\n#{note.map { |l| "\t#{l.markdown}  " }.join("\n")}")
+          output.sub!(/%idnote/, "\n#{note.map { |l| "\t\t#{l.markdown}  " }.join("\n")}")
+          output.sub!(/%odnote/, "\n#{note.map { |l| "#{l.markdown}  " }.join("\n")}")
           output.sub!(/(?mi)%(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])?(?<icount>\d+))?(?<prefix>.[ _t]?)?note/) do
             m = Regexp.last_match
             mark = m['mchar'] || ''
@@ -116,11 +116,11 @@ module Doing
                        ''
                      end
             prefix = m['prefix'] || ''
-            "\n#{note.map { |l| "#{mark}#{indent}#{prefix}#{l.strip}  " }.join("\n")}"
+            "\n#{note.map { |l| "#{mark}#{indent}#{prefix}#{l.markdown(width: 80)}  " }.join("\n")}"
           end
 
           output.sub!(/%chompnote/) do
-            note.map { |l| l.gsub(/\n+/, ' ').gsub(/(^\s*|\s*$)/, '').gsub(/\s+/, ' ') }.join(' ')
+            note.map { |l| l.gsub(/\n+/, ' ').gsub(/(^\s*|\s*$)/, '').gsub(/\s+/, ' ') }.join(' ').markdown
           end
         end
 
