@@ -407,7 +407,7 @@ module Doing
       end
 
       # Replace qualified urls
-      str.gsub!(%r{(?mi)(?<!["'\[(\\])((http|https)://)([\w\-_]+(\.[\w\-_]+)+)([\w\-.,@?^=%&amp;:/~+#]*[\w\-@^=%&amp;/~+#])?}) do |_match|
+      str.gsub!(%r{(?mi)(?<!["'\[(\\])((http|https)://)([\w\-]+(\.[\w\-]+)+)([\w\-.,@?^=%&;:/~+#]*[\w\-@^=%&;/~+#])?}) do |_match|
         m = Regexp.last_match
         proto = m[1].nil? ? 'http://' : ''
         case opt[:format]

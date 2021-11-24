@@ -41,6 +41,12 @@ See the [doing project on BrettTerpstra.com](https://brettterpstra.com/projects/
 
 Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
 
+## Contributing
+
+If you [create a plugin](https://github.com/ttscoff/doing/wiki/Creating-Plugins), custom command, or hook you can share, please [let me know](https://brettterpstra.com/contact/). If I get a few plugin contributions, I'll set up a second repository for them.
+
+Feel free to fork [the repository](https://github.com/ttscoff/doing/) on GitHub and make pull requests with changes. Please target the `develop` branch with pull requests.
+
 <!--END README-->
 
 ---

@@ -623,7 +623,7 @@ module Doing
       Doing.logger.log_now(:warn, 'Compiling and installing fzf -- this will only happen once')
       Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi, MIT License <https://github.com/junegunn/fzf/blob/master/LICENSE>')
 
-      res = system("'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
+      system("'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
       unless File.exist?(fzf_bin)
         Doing.logger.log_now(:warn, 'Error installing, trying again as root')
         system("sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")

@@ -7,7 +7,6 @@ module Doing
         first = true
         out = []
         logic = []
-        need_export = []
 
         @commands.each_with_index do |cmd, i|
           @bar.advance
@@ -135,7 +134,7 @@ module Doing
       end
 
       def parse_option(option)
-        res = option.match(/(?:-(?<short>\w), )?(?:--(?:\[no-\])?(?<long>[\w_]+)(?:=(?<arg>\w+))?)\s+- (?<desc>.*?)$/)
+        res = option.match(/(?:-(?<short>\w), )?(?:--(?:\[no-\])?(?<long>\w+)(?:=(?<arg>\w+))?)\s+- (?<desc>.*?)$/)
         return nil unless res
         {
           short: res['short'],
