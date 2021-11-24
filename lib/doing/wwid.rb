@@ -612,21 +612,29 @@ module Doing
     end
 
     def fzf
+      @fzf ||= install_fzf
+    end
+
+    def install_fzf
       fzf_dir = File.join(File.dirname(__FILE__), '../helpers/fzf')
       FileUtils.mkdir_p(fzf_dir) unless File.directory?(fzf_dir)
       fzf_bin = File.join(fzf_dir, 'bin/fzf')
       return fzf_bin if File.exist?(fzf_bin)
 
-      Doing.logger.log_now(:warn, 'Compiling and installing FZF -- this will only happen once')
-      Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi <https://github.com/junegunn/fzf/blob/master/LICENSE>')
+      prev_level = Doing.logger.level
+      Doing.logger.adjust_verbosity({ log_level: :info })
+      Doing.logger.log_now(:warn, 'Compiling and installing fzf -- this will only happen once')
+      Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi, MIT License <https://github.com/junegunn/fzf/blob/master/LICENSE>')
 
-      res = system("#{fzf_dir}/install --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish")
-      unless res
+      res = system("'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
+      unless File.exist?(fzf_bin)
         Doing.logger.log_now(:warn, 'Error installing, trying again as root')
-        system("sudo #{fzf_dir}/install --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish")
+        system("sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
       end
       raise RuntimeError.new('Error installing fzf, please report at https://github.com/ttscoff/doing/issues') unless File.exist?(fzf_bin)
 
+      Doing.logger.info("fzf installed to #{fzf}")
+      Doing.logger.adjust_verbosity({ log_level: prev_level })
       fzf_bin
     end
 
