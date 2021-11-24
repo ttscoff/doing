@@ -125,7 +125,7 @@ module Doing
       note = Note.new
       lines.each_with_index do |l, i|
         if l =~ /^-{4,}/
-          note.add(lines[i..-1])
+          note.add(lines.slice(i + 1, lines.count - i))
           break
         else
           title += l
