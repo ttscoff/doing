@@ -26,7 +26,7 @@ module Doing
       @recorded_items = []
       @content = {}
       @doingrc_needs_update = false
-      @default_config_file = '.doingrc'
+      @default_config_file = 'config.yml'
       @auto_tag = true
       @user_home = Util.user_home
     end
