@@ -82,6 +82,12 @@ switch %i[p pager], default_value: settings['paginate']
 desc 'Answer yes/no menus with default option'
 switch [:default], default_value: false
 
+desc 'Answer all yes/no menus with yes'
+switch [:yes], negatable: false
+
+desc 'Answer all yes/no menus with no'
+switch [:no], negatable: false
+
 desc 'Exclude auto tags and default tags'
 switch %i[x noauto], default_value: false, negatable: false
 
@@ -238,14 +244,13 @@ command %i[reset begin] do |c|
     items = wwid.filter_items([], opt: options)
 
     if options[:interactive]
-      last_entry = wwid.choose_from_items(items, {
+      last_entry = Doing::Prompt.choose_from_items(items, include_section: options[:section].nil?,
         menu: true,
         header: '',
         prompt: 'Select an entry to start/reset > ',
         multiple: false,
         sort: false,
-        show_if_single: true
-      }, include_section: options[:section].nil? )
+        show_if_single: true)
     else
       last_entry = items.last
     end
@@ -1287,7 +1292,7 @@ command :tag do |c|
                    "Are you sure you want to add #{tags.join(' and ')} to all records#{section_q}"
                  end
 
-      res = wwid.yn(question, default_response: false)
+      res = Doing::Prompt.yn(question, default_response: false)
 
       raise UserCancelled unless res
     end
@@ -1408,7 +1413,7 @@ command [:mark, :flag] do |c|
                    "Are you sure you want to flag all records#{section_q}"
                  end
 
-      res = wwid.yn(question, default_response: false)
+      res = Doing::Prompt.yn(question, default_response: false)
 
       exit_now! 'Cancelled' unless res
     end
@@ -2247,6 +2252,7 @@ command :view do |c|
               rescue WrongCommand => exception
                 cmd = commands[:show]
                 options[:sort] = 'asc'
+                options[:tag_order] = 'asc'
                 action = cmd.send(:get_action, nil)
                 return action.call(global_options, options, args)
               end
@@ -2780,7 +2786,7 @@ command :config do |c|
       Doing.logger.adjust_verbosity({ level: :info })
       Doing.logger.log_now(:info, 'Config:', "Updating #{config_file}")
       Doing.logger.log_now(:info, 'Config:', "#{real_path.join('->')} => #{value}")
-      res = wwid.yn('Update selected config', default_response: true)
+      res = Doing::Prompt.yn('Update selected config', default_response: true)
 
       raise UserCancelled, 'Cancelled' unless res
 
@@ -2905,9 +2911,9 @@ pre do |global, _command, _options, _args|
 
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
   unless STDOUT.isatty
-    Doing::Color::coloring = global[:pager] ? global[:color] : false
+    Doing::Color.coloring = global[:pager] ? global[:color] : false
   else
-    Doing::Color::coloring = global[:color]
+    Doing::Color.coloring = global[:color]
   end
 
   # Return true to proceed; false to abort and not call the
@@ -2941,7 +2947,13 @@ around do |global, command, options, arguments, code|
     Doing.logger.logdev = $stdout
   end
 
-  wwid.default_option = global[:default]
+  if global[:yes]
+    Doing::Prompt.force_answer = true
+  elsif global[:no]
+    Doing::Prompt.force_answer = false
+  else
+    Doing::Prompt.default_answer = global[:default]
+  end
 
   if global[:config_file] && global[:config_file] != config.config_file
     Doing.logger.warn(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', colors.flamingo, colors.default, colors.boldred))

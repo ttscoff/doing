@@ -1,64 +1,65 @@
+# frozen_string_literal: true
+
 # Cribbed from <https://github.com/flori/term-ansicolor>
 module Doing
+  # Terminal color functions
   module Color
-
     # :stopdoc:
     ATTRIBUTES = [
-      [ :clear              ,   0 ],     # String#clear is already used to empty string in Ruby 1.9
-      [ :reset              ,   0 ],     # synonym for :clear
-      [ :bold               ,   1 ],
-      [ :dark               ,   2 ],
-      [ :italic             ,   3 ],     # not widely implemented
-      [ :underline          ,   4 ],
-      [ :underscore         ,   4 ],     # synonym for :underline
-      [ :blink              ,   5 ],
-      [ :rapid_blink        ,   6 ],     # not widely implemented
-      [ :negative           ,   7 ],     # no reverse because of String#reverse
-      [ :concealed          ,   8 ],
-      [ :strikethrough      ,   9 ],     # not widely implemented
-      [ :black              ,  30 ],
-      [ :red                ,  31 ],
-      [ :green              ,  32 ],
-      [ :yellow             ,  33 ],
-      [ :blue               ,  34 ],
-      [ :magenta            ,  35 ],
-      [ :cyan               ,  36 ],
-      [ :white              ,  37 ],
-      [ :bgblack            ,  40 ],
-      [ :bgred              ,  41 ],
-      [ :bggreen            ,  42 ],
-      [ :bgyellow           ,  43 ],
-      [ :bgblue             ,  44 ],
-      [ :bgmagenta          ,  45 ],
-      [ :bgcyan             ,  46 ],
-      [ :bgwhite            ,  47 ],
-      [ :boldblack          ,  90 ],    # High intensity, aixterm (works in OS X)
-      [ :boldred            ,  91 ],
-      [ :boldgreen          ,  92 ],
-      [ :boldyellow         ,  93 ],
-      [ :boldblue           ,  94 ],
-      [ :boldmagenta        ,  95 ],
-      [ :boldcyan           ,  96 ],
-      [ :boldwhite          ,  97 ],
-      [ :boldbgblack        , 100 ],    # High intensity background, aixterm (works in OS X)
-      [ :boldbgred          , 101 ],
-      [ :boldbggreen        , 102 ],
-      [ :boldbgyellow       , 103 ],
-      [ :boldbgblue         , 104 ],
-      [ :boldbgmagenta      , 105 ],
-      [ :boldbgcyan         , 106 ],
-      [ :boldbgwhite        , 107 ],
-      [ :softpurple    , '0;35;40'],
-      [ :hotpants      , '7;34;40'],
-      [ :knightrider   , '7;30;40'],
-      [ :flamingo      , '7;31;47'],
-      [ :yeller        , '1;37;43'],
-      [ :whiteboard    , '1;30;47'],
-      [ :default         , '0;39' ]
-    ]
+      [:clear,   0],     # String#clear is already used to empty string in Ruby 1.9
+      [:reset,   0],     # synonym for :clear
+      [:bold,   1],
+      [:dark,   2],
+      [:italic, 3], # not widely implemented
+      [:underline, 4],
+      [:underscore, 4], # synonym for :underline
+      [:blink, 5],
+      [:rapid_blink, 6], # not widely implemented
+      [:negative, 7], # no reverse because of String#reverse
+      [:concealed, 8],
+      [:strikethrough, 9], # not widely implemented
+      [:black, 30],
+      [:red, 31],
+      [:green, 32],
+      [:yellow, 33],
+      [:blue, 34],
+      [:magenta, 35],
+      [:cyan, 36],
+      [:white, 37],
+      [:bgblack, 40],
+      [:bgred, 41],
+      [:bggreen, 42],
+      [:bgyellow, 43],
+      [:bgblue, 44],
+      [:bgmagenta, 45],
+      [:bgcyan, 46],
+      [:bgwhite, 47],
+      [:boldblack, 90], # High intensity, aixterm (works in OS X)
+      [:boldred, 91],
+      [:boldgreen, 92],
+      [:boldyellow, 93],
+      [:boldblue, 94],
+      [:boldmagenta, 95],
+      [:boldcyan, 96],
+      [:boldwhite, 97],
+      [:boldbgblack, 100], # High intensity background, aixterm (works in OS X)
+      [:boldbgred, 101],
+      [:boldbggreen, 102],
+      [:boldbgyellow, 103],
+      [:boldbgblue, 104],
+      [:boldbgmagenta, 105],
+      [:boldbgcyan, 106],
+      [:boldbgwhite, 107],
+      [:softpurple, '0;35;40'],
+      [:hotpants, '7;34;40'],
+      [:knightrider, '7;30;40'],
+      [:flamingo, '7;31;47'],
+      [:yeller, '1;37;43'],
+      [:whiteboard, '1;30;47'],
+      [:default, '0;39']
+    ].map(&:freeze).freeze
 
     ATTRIBUTE_NAMES = ATTRIBUTES.transpose.first
-    # :startdoc:
 
     # Returns true if Doing::Color supports the +feature+.
     #
@@ -72,19 +73,23 @@ module Doing
         !String.instance_methods(false).map(&:to_sym).include?(:clear)
       end
     end
-    # Returns true, if the coloring function of this module
-    # is switched on, false otherwise.
-    def self.coloring?
-      @coloring
-    end
 
-    # Turns the coloring on or off globally, so you can easily do
-    # this for example:
-    #  Doing::Color::coloring = STDOUT.isatty
-    def self.coloring=(val)
-      @coloring = val
+    class << self
+      # Returns true, if the coloring function of this module
+      # is switched on, false otherwise.
+      def coloring?
+        @coloring
+      end
+
+      # Turns the coloring on or off globally, so you can easily do
+      # this for example:
+      #  Doing::Color::coloring = STDOUT.isatty
+      attr_writer :coloring
+
+      def coloring
+        @coloring ||= true
+      end
     end
-    self.coloring = true
 
     ATTRIBUTES.each do |c, v|
       eval <<-EOT
@@ -133,4 +138,3 @@ module Doing
     extend self
   end
 end
-

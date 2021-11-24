@@ -16,6 +16,7 @@ module Doing
 
     attr_accessor :config, :config_file, :auto_tag, :default_option
 
+    include Color
     # include Util
 
     ##
@@ -305,13 +306,13 @@ module Doing
       unless section || guessed
         alt = guess_view(frag, guessed: true, suggest: true)
         if alt
-          meant_view = yn("#{Color.boldwhite}Did you mean `#{Color.yellow}doing view #{alt}#{Color.boldwhite}`?", default_response: 'n')
+          meant_view = Prompt.yn("#{boldwhite("Did you mean")} `#{yellow("doing view #{alt}")}#{boldwhite}`?", default_response: 'n')
 
           raise WrongCommand.new("run again with #{"doing view #{alt}".boldwhite}", topic: 'Try again:') if meant_view
 
         end
 
-        res = yn("#{Color.boldwhite}Section #{frag.yellow}#{Color.boldwhite} not found, create it", default_response: 'n')
+        res = Prompt.yn("#{boldwhite}Section #{frag.yellow}#{boldwhite} not found, create it", default_response: 'n')
 
         if res
           add_section(frag.cap_first)
@@ -319,63 +320,9 @@ module Doing
           return frag.cap_first
         end
 
-        raise InvalidSection.new("unknown section #{frag.yellow}", topic: 'Missing:')
+        raise InvalidSection.new("unknown section #{frag.bold.white}", topic: 'Missing:')
       end
       section ? section.cap_first : guessed
-    end
-
-    ##
-    ## Ask a yes or no question in the terminal
-    ##
-    ## @param      question          [String] The question
-    ##                               to ask
-    ## @param      default_response  (Bool)   default
-    ##                               response if no input
-    ##
-    ## @return     (Bool) yes or no
-    ##
-    def yn(question, default_response: false)
-      if default_response.is_a?(String)
-        default = default_response =~ /y/i ? true : false
-      else
-        default = default_response
-      end
-
-      # if global --default is set, answer default
-      return default if @default_option
-
-      # if this isn't an interactive shell, answer default
-      return default unless $stdout.isatty
-
-      # clear the buffer
-      if ARGV&.length
-        ARGV.length.times do
-          ARGV.shift
-        end
-      end
-      system 'stty cbreak'
-
-      cw = Color.white
-      cbw = Color.boldwhite
-      cbg = Color.boldgreen
-      cd = Color.default
-
-      options = unless default.nil?
-                  "#{cw}[#{default ? "#{cbg}Y#{cw}/#{cbw}n" : "#{cbw}y#{cw}/#{cbg}N"}#{cw}]#{cd}"
-                else
-                  "#{cw}[#{cbw}y#{cw}/#{cbw}n#{cw}]#{cd}"
-                end
-      $stdout.syswrite "#{cbw}#{question.sub(/\?$/, '')} #{options}#{cbw}?#{cd} "
-      res = $stdin.sysread 1
-      puts
-      system 'stty cooked'
-
-      res.chomp!
-      res.downcase!
-
-      return default if res.empty?
-
-      res =~ /y/i ? true : false
     end
 
     ##
@@ -397,11 +344,14 @@ module Doing
       end
       unless view || guessed
         alt = guess_section(frag, guessed: true, suggest: true)
-        meant_view = yn("Did you mean `doing show #{alt}`?", default_response: 'n')
+
+        raise InvalidView.new(%(unknown view #{frag.bold.white}), topic: 'Missing:') unless alt
+
+        meant_view = Prompt.yn("Did you mean `doing show #{alt}`?", default_response: 'n')
 
         raise WrongCommand.new("run again with #{"doing show #{alt}".yellow}", topic: 'Try again:') if meant_view
 
-        raise InvalidView.new(%(unkown view #{alt.yellow}), topic: 'Missing:')
+        raise InvalidView.new(%(unknown view #{alt.bold.white}), topic: 'Missing:')
       end
       view
     end
@@ -418,6 +368,7 @@ module Doing
     ## @option opt :back [Date] backdate
     ## @option opt :timed [Boolean] new item is timed entry, marks previous entry as @done
     ##
+    def add_item(title, section = nil, opt = {})
       section ||= @config['current_section']
       add_section(section) unless @content.key?(section)
       opt[:date] ||= Time.now
@@ -597,66 +548,19 @@ module Doing
       logger.debug('Filtered:', "Parameters matched #{items.count} entries")
 
       if opt[:interactive]
-        last_entry = choose_from_items(items, {
+        last_entry = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i,
           menu: true,
           header: '',
           prompt: 'Select an entry > ',
           multiple: false,
           sort: false,
           show_if_single: true
-        }, include_section: opt[:section] =~ /^all$/i )
+         )
       else
         last_entry = items.max_by { |item| item.date }
       end
 
       last_entry
-    end
-
-    def fzf
-      @fzf ||= install_fzf
-    end
-
-    def install_fzf
-      fzf_dir = File.join(File.dirname(__FILE__), '../helpers/fzf')
-      FileUtils.mkdir_p(fzf_dir) unless File.directory?(fzf_dir)
-      fzf_bin = File.join(fzf_dir, 'bin/fzf')
-      return fzf_bin if File.exist?(fzf_bin)
-
-      prev_level = Doing.logger.level
-      Doing.logger.adjust_verbosity({ log_level: :info })
-      Doing.logger.log_now(:warn, 'Compiling and installing fzf -- this will only happen once')
-      Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi, MIT License <https://github.com/junegunn/fzf/blob/master/LICENSE>')
-
-      system("'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
-      unless File.exist?(fzf_bin)
-        Doing.logger.log_now(:warn, 'Error installing, trying again as root')
-        system("sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
-      end
-      raise RuntimeError.new('Error installing fzf, please report at https://github.com/ttscoff/doing/issues') unless File.exist?(fzf_bin)
-
-      Doing.logger.info("fzf installed to #{fzf}")
-      Doing.logger.adjust_verbosity({ log_level: prev_level })
-      fzf_bin
-    end
-
-    ##
-    ## Generate a menu of options and allow user selection
-    ##
-    ## @return     [String] The selected option
-    ##
-    def choose_from(options, prompt: 'Make a selection: ', multiple: false, sorted: true, fzf_args: [])
-      return nil unless $stdout.isatty
-
-      # fzf_args << '-1' # User is expecting a menu, and even if only one it seves as confirmation
-      fzf_args << %(--prompt "#{prompt}")
-      fzf_args << '--multi' if multiple
-      header = "esc: cancel,#{multiple ? ' tab: multi-select, ctrl-a: select all,' : ''} return: confirm"
-      fzf_args << %(--header "#{header}")
-      options.sort! if sorted
-      res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
-      return false if res.strip.size.zero?
-
-      res
     end
 
     def all_tags(items, opt: {})
@@ -697,7 +601,7 @@ module Doing
       end
       # fzf_args << '-e' if opt[:exact]
       # puts fzf_args.join(' ')
-      res = `echo #{Shellwords.escape(scannable)}|#{fzf} #{fzf_args.join(' ')}`
+      res = `echo #{Shellwords.escape(scannable)}|#{Prompt.fzf} #{fzf_args.join(' ')}`
       selected = []
       res.split(/\n/).each do |item|
         idx = item.match(/\|(\d+)$/)[1].to_i
@@ -843,90 +747,11 @@ module Doing
       opt[:show_if_single] = true
       items = filter_items([], opt: { section: section, search: opt[:search], fuzzy: opt[:fuzzy], case: opt[:case], not: opt[:not] })
 
-      selection = choose_from_items(items, opt, include_section: section =~ /^all$/i)
+      selection = Prompt.choose_from_items(items, include_section: section =~ /^all$/i, **opt)
 
       raise NoResults, 'no items selected' if selection.nil? || selection.empty?
 
       act_on(selection, opt)
-    end
-
-    ##
-    ## Create an interactive menu to select from a set of Items
-    ##
-    ## @param      items            [Array] list of items
-    ## @param      opt              [Hash] options
-    ## @param      include_section  [Boolean] include section
-    ##
-    ## @option opt [String] :header
-    ## @option opt [String] :prompt
-    ## @option opt [String] :query
-    ## @option opt [Boolean] :show_if_single
-    ## @option opt [Boolean] :menu
-    ## @option opt [Boolean] :sort
-    ## @option opt [Boolean] :multiple
-    ## @option opt [Symbol] :case (:sensitive, :ignore, :smart)
-    ##
-    def choose_from_items(items, opt = {}, include_section: false)
-      return items unless $stdout.isatty
-
-      return nil unless items.count.positive?
-
-      opt[:case] ||= :smart
-      opt[:header] ||= "Arrows: navigate, tab: mark for selection, ctrl-a: select all, enter: commit"
-      opt[:prompt] ||= "Select entries to act on > "
-
-      pad = items.length.to_s.length
-      options = items.map.with_index do |item, i|
-        out = [
-          format("%#{pad}d", i),
-          ') ',
-          format('%13s', item.date.relative_date),
-          ' | ',
-          item.title
-        ]
-        if include_section
-          out.concat([
-            ' (',
-            item.section,
-            ') '
-          ])
-        end
-        out.join('')
-      end
-
-      fzf_args = [
-        %(--header="#{opt[:header]}"),
-        %(--prompt="#{opt[:prompt].sub(/ *$/, ' ')}"),
-        opt[:multiple] ? '--multi' : '--no-multi',
-        '-0',
-        '--bind ctrl-a:select-all',
-        %(-q "#{opt[:query]}"),
-        '--info=inline'
-      ]
-      fzf_args.push('-1') unless opt[:show_if_single]
-      fzf_args << case opt[:case].normalize_case
-                  when :sensitive
-                    '+i'
-                  when :ignore
-                    '-i'
-                  end
-      fzf_args << '-e' if opt[:exact]
-
-
-      unless opt[:menu]
-        raise InvalidArgument, "Can't skip menu when no query is provided" unless opt[:query] && !opt[:query].empty?
-
-        fzf_args.concat([%(--filter="#{opt[:query]}"), opt[:sort] ? '' : '--no-sort'])
-      end
-
-      res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
-      selected = []
-      res.split(/\n/).each do |item|
-        idx = item.match(/^ *(\d+)\)/)[1].to_i
-        selected.push(items[idx])
-      end
-
-      opt[:multiple] ? selected : selected[0]
     end
 
     ##
@@ -978,7 +803,7 @@ module Doing
 
         actions.concat(['resume/repeat', 'begin/reset']) if items.count == 1
 
-        choice = choose_from(actions,
+        choice = Prompt.choose_from(actions,
                              prompt: 'What do you want to do with the selected items? > ',
                              multiple: true,
                              sorted: false,
@@ -996,7 +821,7 @@ module Doing
             type = action =~ /^add/ ? 'add' : 'remove'
             raise InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
 
-            print "#{Color.yellow}Tag to #{type}: #{Color.reset}"
+            print "#{yellow("Tag to #{type}: ")}#{reset}"
             tag = $stdin.gets
             next if tag =~ /^ *$/
 
@@ -1004,7 +829,7 @@ module Doing
             opt[:remove] = true if type == 'remove'
           when /output formatted/
             plugins = Plugins.available_plugins(type: :export).sort
-            output_format = choose_from(plugins,
+            output_format = Prompt.choose_from(plugins,
                                         prompt: 'Which output format? > ',
                                         fzf_args: ["--height=#{plugins.count + 3}", '--tac', '--no-sort', '--info=hidden'])
             next if tag =~ /^ *$/
@@ -1012,9 +837,9 @@ module Doing
             raise UserCancelled unless output_format
 
             opt[:output] = output_format.strip
-            res = opt[:force] ? false : yn('Save to file?', default_response: 'n')
+            res = opt[:force] ? false : Prompt.yn('Save to file?', default_response: 'n')
             if res
-              print "#{Color.yellow}File path/name: #{Color.reset}"
+              print "#{yellow('File path/name: ')}#{reset}"
               filename = $stdin.gets.strip
               next if filename.empty?
 
@@ -1048,7 +873,7 @@ module Doing
             repeat_item(item, { editor: opt[:editor] })
           elsif opt[:reset]
             if item.tags?('done', :and) && !opt[:resume]
-              res = opt[:force] ? true : yn('Remove @done tag?', default_response: 'y')
+              res = opt[:force] ? true : Prompt.yn('Remove @done tag?', default_response: 'y')
             else
               res = opt[:resume]
             end
@@ -1060,7 +885,7 @@ module Doing
       end
 
       if opt[:delete]
-        res = opt[:force] ? true : yn("Delete #{items.size} items?", default_response: 'y')
+        res = opt[:force] ? true : Prompt.yn("Delete #{items.size} items?", default_response: 'y')
         if res
           items.each { |item| delete_item(item, single: items.count == 1) }
           write(@doing_file)
@@ -1234,14 +1059,12 @@ module Doing
       items = filter_items([], opt: opt)
 
       if opt[:interactive]
-        items = choose_from_items(items, {
-                                    menu: true,
+        items = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, menu: true,
                                     header: '',
                                     prompt: 'Select entries to tag > ',
                                     multiple: true,
                                     sort: true,
-                                    show_if_single: true
-                                  }, include_section: opt[:section] =~ /^all$/i)
+                                    show_if_single: true)
 
         raise NoResults, 'no items selected' if items.empty?
 
@@ -1625,7 +1448,7 @@ module Doing
     ## @return     [String] The selected section name
     ##
     def choose_section
-      choice = choose_from(sections.sort, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
+      choice = Prompt.choose_from(sections.sort, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
       choice ? choice.strip : choice
     end
 
@@ -1644,7 +1467,7 @@ module Doing
     ## @return     [String] The selected view name
     ##
     def choose_view
-      choice = choose_from(views.sort, prompt: 'Choose a view > ', fzf_args: ['--height=60%'])
+      choice = Prompt.choose_from(views.sort, prompt: 'Choose a view > ', fzf_args: ['--height=60%'])
       choice ? choice.strip : choice
     end
 
@@ -1710,7 +1533,7 @@ module Doing
         opt[:menu] = !opt[:force]
         opt[:query] = '' # opt[:search]
         opt[:multiple] = true
-        selected = choose_from_items(items, opt, include_section: opt[:section] =~ /^all$/i )
+        selected = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **opt )
 
         raise NoResults, 'no items selected' if selected.empty?
 
@@ -1722,7 +1545,6 @@ module Doing
       opt[:output] ||= 'template'
 
       opt[:wrap_width] ||= @config['templates']['default']['wrap_width'] || 0
-
       output(items, title, is_single, opt)
     end
 
@@ -2180,7 +2002,7 @@ EOS
     def format_time(seconds, human: false)
       return [0, 0, 0] if seconds.nil?
 
-      if seconds.class == String && seconds =~ /(\d+):(\d+):(\d+)/
+      if seconds.instance_of?(String) && seconds =~ /(\d+):(\d+):(\d+)/
         h = Regexp.last_match(1)
         m = Regexp.last_match(2)
         s = Regexp.last_match(3)
@@ -2209,13 +2031,22 @@ EOS
     ##
     def combined_content
       output = @other_content_top ? "#{@other_content_top.join("\n")}\n" : ''
-
+      was_color = Color.coloring?
+      Color.coloring = false
       @content.each do |title, section|
         output += "#{section[:original]}\n"
-        output += list_section({ section: title, template: "\t- %date | %title%t2note", highlight: false, wrap_width: 0, tags_color: false })
+        output += list_section({
+                                 section: title,
+                                 template: "\t- %date | %title%t2note",
+                                 highlight: false,
+                                 wrap_width: 0,
+                                 tags_color: false
+                               })
       end
 
       output += @other_content_bottom.join("\n") unless @other_content_bottom.nil?
+      # Just strip all ANSI colors from the content before writing to doing file
+      Color.coloring = was_color
       output.uncolor
     end
 
