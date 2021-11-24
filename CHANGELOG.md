@@ -1,3 +1,11 @@
+### 2.0.26
+
+#### IMPROVED
+
+- Config -o raw outputs value as YAML if result is a Hash/mapping, unquoted string if a single value, comma-separated list if it's an Array.
+- Config -o json no longer includes key, only value.
+- Config get output revisions
+
 ### 2.0.25
 
 #### NEW
