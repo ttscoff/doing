@@ -1,4 +1,4 @@
-### 2.0.23
+### 2.0.24
 
 - include fzf source directly, in case git isn't installed
 - fall back to installing fzf with sudo on error
