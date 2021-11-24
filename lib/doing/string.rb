@@ -9,9 +9,9 @@ module Doing
 
     def markdown(width: nil)
       if width
-        TTY::Markdown.parse(strip, width: width).strip
+        TTY::Markdown.parse(strip, width: width, color: :always, symbols: :ascii).strip
       else
-        TTY::Markdown.parse(strip).strip
+        TTY::Markdown.parse(strip, color: :always, symbols: :ascii).strip
       end
     end
     ##
