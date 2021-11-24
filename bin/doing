@@ -2727,14 +2727,24 @@ command :config do |c|
       cfg = config.value_for_key(keypath)
 
       if cfg
-        $stdout.puts case options[:output]
-                     when /^j/
-                       JSON.pretty_generate(cfg)
-                     when /^r/
-                       cfg.map {|k, v| v.to_s }
-                     else
-                       YAML.dump(cfg)
-                     end
+
+        val = cfg.map {|k, v| v }[0]
+        if options[:output] =~ /^r/
+          if val.is_a?(Hash)
+            $stdout.puts YAML.dump(val)
+          elsif val.is_a?(Array)
+            $stdout.puts val.join(', ')
+          else
+            $stdout.puts val.to_s
+          end
+        else
+          $stdout.puts case options[:output]
+                       when /^j/
+                         JSON.pretty_generate(val)
+                       else
+                         YAML.dump(cfg)
+                       end
+        end
       else
         Doing.logger.log_now(:error, 'Config:', "Key #{keypath} not found")
       end
@@ -2781,7 +2791,7 @@ command :config do |c|
   end
 end
 
-desc 'Undo the last change to the doing_file'
+desc 'Undo the last change to the Doing file'
 command :undo do |c|
   c.desc 'Specify alternate doing file'
   c.arg_name 'PATH'
