@@ -25,10 +25,7 @@ module Doing
       @timers = {}
       @recorded_items = []
       @content = {}
-      @doingrc_needs_update = false
-      @default_config_file = '.doingrc'
       @auto_tag = true
-      @user_home = Util.user_home
     end
 
     ##
@@ -1524,7 +1521,7 @@ module Doing
     def restore_backup(file)
       if File.exist?("#{file}~")
         FileUtils.cp("#{file}~", file)
-        logger.warn('File update:', "Restored #{file.sub(/^#{@user_home}/, '~')}")
+        logger.warn('File update:', "Restored #{file.sub(/^#{Util.user_home}/, '~')}")
       else
         logger.error('Restore error:', 'No backup file found')
       end

@@ -100,17 +100,20 @@ module Doing
     end
 
     def config_dir
-      # @config_dir ||= File.join(Util.user_home, '.config', 'doing')
-      @config_dir ||= Util.user_home
+      @config_dir ||= File.join(Util.user_home, '.config', 'doing')
+      # @config_dir ||= Util.user_home
     end
 
     def default_config_file
       raise DoingRuntimeError, "#{config_dir} exists but is not a directory" if File.exist?(config_dir) && !File.directory?(config_dir)
 
-      FileUtils.mkdir_p(config_dir) unless File.exist?(config_dir)
+      unless File.exist?(config_dir)
+        FileUtils.mkdir_p(config_dir)
+        Doing.logger.log_now(:warn, "Config directory created at #{config_dir}")
+      end
 
       # File.join(config_dir, 'config.yml')
-      File.join(config_dir, '.doingrc')
+      File.join(config_dir, 'config.yml')
     end
 
     def config_file=(file)
@@ -184,14 +187,15 @@ module Doing
     end
 
     def update_deprecated_config
-      return # Until further notice
+      # return # Until further notice
+      return if File.exist?(default_config_file)
 
       old_file = File.join(Util.user_home, '.doingrc')
       return unless File.exist?(old_file)
 
       wwid = Doing::WWID.new
       Doing.logger.log_now(:warn, 'Deprecated:', "main config file location has changed to #{config_file}")
-      res = wwid.yn('Move ~/.doingrc to new location, preserving settings?', default_response: true)
+      res = wwid.yn("Move #{old_file} to new location, preserving settings?", default_response: true)
 
       if res
         if File.exist?(default_config_file)
@@ -204,6 +208,10 @@ module Doing
         end
 
         FileUtils.mv old_file, default_config_file, force: true
+        Doing.logger.log_now(:warn, 'Config:', "Config file moved to #{default_config_file}")
+        Doing.logger.log_now(:warn, 'Config:', %(If ~/.config/doing/config.yml exists in the future, it will be considered a local
+                             config and its values will override the default configuration.))
+        Process.exit 0
       end
     end
 

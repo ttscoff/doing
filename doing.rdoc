@@ -12,7 +12,7 @@ v2.0.24
 
 Use a specific configuration file. Deprecated, set $DOING_CONFIG instead.
 
-[Default Value] /Users/ttscoff/.doingrc
+[Default Value] /Users/ttscoff/.config/doing/config.yml
 
 
 === -f|--doing_file arg
@@ -385,63 +385,82 @@ Shell to generate for (bash, zsh, fish)
 [Must Match] (?i-mx:^[bzf](?:[ai]?sh)?$)
 
 
-==== Command: <tt>config  KEY_PATH</tt>
+==== Command: <tt>config </tt>
 Edit the configuration file or output a value from it
 
-Run without arguments, `doing config` opens your `.doingrc` in an editor.
+Run without arguments, `doing config` opens your `config.yml` in an editor.
 If local configurations are found in the path between the current directory
-and `~/.doingrc`, a menu will allow you to select which to open in the editor.
+and the root (/), a menu will allow you to select which to open in the editor.
 
 It will use the editor defined in `config_editor_app`, or one specified with `--editor`.
 
-Use `doing config -d` to output the configuration to the terminal, and
+Use `doing config get` to output the configuration to the terminal, and
 provide a dot-separated key path to get a specific value. Shows the current value
 including keys/overrides set by local configs.
 ===== Options
-===== -a APP_NAME
+===== -d|--[no-]dump|-u|--[no-]update
+DEPRECATED
+
+
+
+===== Commands
+====== Command: <tt>edit </tt>
+Open config file in editor
+
+
+======= Options
+======= -a APP_NAME
 
 Application to use
 
 [Default Value] None
 
 
-===== -b BUNDLE_ID
+======= -b BUNDLE_ID
 
 Application bundle id to use
 
 [Default Value] None
 
 
-===== -e|--editor EDITOR
+======= -e|--editor EDITOR
 
 Editor to use
 
 [Default Value] None
 
 
-===== -o|--output FORMAT
+======= -x
+Use the config_editor_app defined in ~/.config/doing/config.yml (config_editor_app not set)
 
-Format for --dump (json|yaml|raw)
+
+
+====== Command: <tt>get|dump </tt>
+Output a key's value
+
+
+======= Options
+======= -o|--output FORMAT
+
+Format for output (json|yaml|raw)
 
 [Default Value] yaml
 [Must Match] (?-mix:^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$)
 
 
-===== -d|--dump
-Show a config key value based on arguments. Separate key paths with colons or dots, e.g. "export_templates.html". Empty arguments outputs the entire config.
+====== Command: <tt>set </tt>
+Set a key's value in the config file
 
 
-
-===== -u|--update
-Update config file with missing configuration options
-
+====== Command: <tt>undo </tt>
+Undo the last change to a config file
 
 
-===== -x
-Use the config_editor_app defined in ~/.doingrc (config_editor_app not set)
+====== Command: <tt>update|refresh </tt>
+Update default config file, adding any missing keys
 
 
-
+[Default Command] edit
 ==== Command: <tt>done|did  ENTRY</tt>
 Add a completed item with @done(date). No argument finishes last entry.
 
@@ -1159,7 +1178,7 @@ Show time totals at the end of output
 ==== Command: <tt>open </tt>
 Open the "doing" file in an editor
 
-`doing open` defaults to using the editor_app setting in /Users/ttscoff/.doingrc (not set).
+`doing open` defaults to using the editor_app setting in /Users/ttscoff/.config/doing/config.yml (not set).
 ===== Options
 ===== -a|--app APP_NAME
 
@@ -1734,7 +1753,7 @@ Tag the last X entries containing TAG.
 
 
 ===== -a|--autotag
-Autotag entries based on autotag configuration in ~/.doingrc
+Autotag entries based on autotag configuration in ~/.config/doing/config.yml
 
 
 
