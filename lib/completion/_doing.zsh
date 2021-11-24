@@ -66,22 +66,22 @@ function _doing() {
                 args=(  )
             ;;
             again) 
-                args=( "(--bool=)--bool=}[Boolean used to combine multiple tags]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-e,--editor}"[Edit duplicated entry with vim before adding]" {-i,--interactive}"[Select item to resume from a menu of matching entries]" "(--in=)--in=}[Add new entry to section]" {-n,--note=}"[Note]" "(--not)--not}[Resume items that *dont* match search/tag filterst* match search/tag filters]" {-s,--section=}"[Get last entry from a specific section]" "(--search=)--search=}[Repeat last entry matching search]" "(--tag=)--tag=}[Repeat last entry matching tags]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             resume) 
-                args=( "(--bool=)--bool=}[Boolean used to combine multiple tags]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-e,--editor}"[Edit duplicated entry with vim before adding]" {-i,--interactive}"[Select item to resume from a menu of matching entries]" "(--in=)--in=}[Add new entry to section]" {-n,--note=}"[Note]" "(--not)--not}[Resume items that *dont* match search/tag filterst* match search/tag filters]" {-s,--section=}"[Get last entry from a specific section]" "(--search=)--search=}[Repeat last entry matching search]" "(--tag=)--tag=}[Repeat last entry matching tags]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             archive) 
-                args=( "(--before=)--before=}[Archive entries older than date]" "(--bool=)--bool=}[Tag boolean]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-k,--keep=}"[How many items to keep]" "(--label)--label}[Label moved items with @from(SECTION_NAME)]" "(--not)--not}[Show items that *dont* match search stringt* match search string]" "(--search=)--search=}[Search filter]" {-t,--to=}"[Move entries to]" "(--tag=)--tag=}[Tag filter]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             move) 
-                args=( "(--before=)--before=}[Archive entries older than date]" "(--bool=)--bool=}[Tag boolean]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-k,--keep=}"[How many items to keep]" "(--label)--label}[Label moved items with @from(SECTION_NAME)]" "(--not)--not}[Show items that *dont* match search stringt* match search string]" "(--search=)--search=}[Search filter]" {-t,--to=}"[Move entries to]" "(--tag=)--tag=}[Tag filter]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             autotag) 
-                args=( "(--bool=)--bool=}[Boolean]" {-c,--count=}"[How many recent entries to autotag]" "(--force)--force}[Dont ask permission to autotag all entries when count is 0t ask permission to autotag all entries when count is 0]" {-i,--interactive}"[Select item(s) to tag from a menu of matching entries]" {-s,--section=}"[Section]" "(--search=)--search=}[Autotag entries matching search filter]" "(--tag=)--tag=}[Autotag the last X entries containing TAG]" {-u,--unfinished}"[Autotag last entry]" )
+                args=(  )
             ;;
             cancel) 
-                args=( {-a,--archive}"[Archive entries]" "(--bool=)--bool=}[Boolean]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-i,--interactive}"[Select item(s) to cancel from a menu of matching entries]" "(--not)--not}[Finish items that *dont* match search/tag filterst* match search/tag filters]" {-s,--section=}"[Section]" "(--search=)--search=}[Cancel the last X entries matching search filter]" "(--tag=)--tag=}[Cancel the last X entries containing TAG]" {-u,--unfinished}"[Cancel last entry]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             choose) 
                 args=(  )
@@ -90,115 +90,115 @@ function _doing() {
                 args=(  )
             ;;
             completion) 
-                args=( {-f,--file=}"[File to write output to]" {-t,--type=}"[Shell to generate for]" )
+                args=(  )
             ;;
             config) 
-                args=( {-d,--dump}"[Show a config key value based on arguments]" {-e,--editor=}"[Editor to use]" {-o,--output=}"[Format for --dump]" {-u,--update}"[Update config file with missing configuration options]" )
+                args=(  )
             ;;
             done) 
-                args=( {-a,--archive}"[Immediately archive the entry]" "(--at=)--at=}[Set finish date to specific date/time]" {-b,--back=}"[Backdate start date by interval [4pm|20m|2h|yesterday noon]]" "(--date)--date}[Include date]" {-e,--editor}"[Edit entry with vim]" {-n,--note=}"[Include a note]" {-r,--remove}"[Remove @done tag]" {-s,--section=}"[Section]" {-t,--took=}"[Set completion date to start date plus interval]" {-u,--unfinished}"[Finish last entry not already marked @done]" )
+                args=(  )
             ;;
             did) 
-                args=( {-a,--archive}"[Immediately archive the entry]" "(--at=)--at=}[Set finish date to specific date/time]" {-b,--back=}"[Backdate start date by interval [4pm|20m|2h|yesterday noon]]" "(--date)--date}[Include date]" {-e,--editor}"[Edit entry with vim]" {-n,--note=}"[Include a note]" {-r,--remove}"[Remove @done tag]" {-s,--section=}"[Section]" {-t,--took=}"[Set completion date to start date plus interval]" {-u,--unfinished}"[Finish last entry not already marked @done]" )
+                args=(  )
             ;;
             finish) 
-                args=( {-a,--archive}"[Archive entries]" "(--at=)--at=}[Set finish date to specific date/time]" "(--auto)--auto}[Auto-generate finish dates from next entrys start times start time]" {-b,--back=}"[Backdate completed date to date string [4pm|20m|2h|yesterday noon]]" "(--bool=)--bool=}[Boolean]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" "(--date)--date}[Include date]" {-i,--interactive}"[Select item(s) to finish from a menu of matching entries]" "(--not)--not}[Finish items that *dont* match search/tag filterst* match search/tag filters]" {-r,--remove}"[Remove done tag]" {-s,--section=}"[Section]" "(--search=)--search=}[Finish the last X entries matching search filter]" {-t,--took=}"[Set the completed date to the start date plus XX[hmd]]" "(--tag=)--tag=}[Finish the last X entries containing TAG]" {-u,--unfinished}"[Finish last entry]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             grep) 
-                args=( "(--after=)--after=}[Constrain search to entries newer than date]" "(--before=)--before=}[Constrain search to entries older than date]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-i,--interactive}"[Display an interactive menu of results to perform further operations]" "(--not)--not}[Show items that *dont* match search stringt* match search string]" {-o,--output=}"[Output to export format]" "(--only_timed)--only_timed}[Only show items with recorded time intervals]" {-s,--section=}"[Section]" {-t,--times}"[Show time intervals on @done tasks]" "(--tag_sort=)--tag_sort=}[Sort tags by]" "(--totals)--totals}[Show intervals with totals at the end of output]" {-x,--exact}"[Force exact string matching]" )
+                args=(  )
             ;;
             search) 
-                args=( "(--after=)--after=}[Constrain search to entries newer than date]" "(--before=)--before=}[Constrain search to entries older than date]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-i,--interactive}"[Display an interactive menu of results to perform further operations]" "(--not)--not}[Show items that *dont* match search stringt* match search string]" {-o,--output=}"[Output to export format]" "(--only_timed)--only_timed}[Only show items with recorded time intervals]" {-s,--section=}"[Section]" {-t,--times}"[Show time intervals on @done tasks]" "(--tag_sort=)--tag_sort=}[Sort tags by]" "(--totals)--totals}[Show intervals with totals at the end of output]" {-x,--exact}"[Force exact string matching]" )
+                args=(  )
             ;;
             help) 
                 args=(  )
             ;;
             import) 
-                args=( "(--after=)--after=}[Import entries newer than date]" "(--autotag)--autotag}[Autotag entries]" "(--before=)--before=}[Import entries older than date]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-f,--from=}"[Date range to import]" "(--not)--not}[Import items that *dont* match search/tag/date filterst* match search/tag/date filters]" "(--only_timed)--only_timed}[Only import items with recorded time intervals]" "(--overlap)--overlap}[Allow entries that overlap existing times]" "(--prefix=)--prefix=}[Prefix entries with]" {-s,--section=}"[Target section]" "(--search=)--search=}[Only import items matching search]" "(--tag=)--tag=}[Tag all imported entries]" "(--type=)--type=}[Import type]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             last) 
-                args=( "(--bool=)--bool=}[Tag boolean]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-e,--editor}"[Edit entry with vim]" "(--not)--not}[Show items that *dont* match search string or tag filtert* match search string or tag filter]" {-s,--section=}"[Specify a section]" "(--search=)--search=}[Search filter]" "(--tag=)--tag=}[Tag filter]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             later) 
-                args=( {-b,--back=}"[Backdate start time to date string [4pm|20m|2h|yesterday noon]]" {-e,--editor}"[Edit entry with vim]" {-n,--note=}"[Note]" )
+                args=(  )
             ;;
             mark) 
-                args=( "(--bool=)--bool=}[Boolean]" {-c,--count=}"[How many recent entries to tag]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-d,--date}"[Include current date/time with tag]" "(--force)--force}[Dont ask permission to flag all entries when count is 0t ask permission to flag all entries when count is 0]" {-i,--interactive}"[Select item(s) to flag from a menu of matching entries]" "(--not)--not}[Flag items that *dont* match search/tag/date filterst* match search/tag/date filters]" {-r,--remove}"[Remove flag]" {-s,--section=}"[Section]" "(--search=)--search=}[Flag the last entry matching search filter]" "(--tag=)--tag=}[Flag the last entry containing TAG]" {-u,--unfinished}"[Flag last entry]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             flag) 
-                args=( "(--bool=)--bool=}[Boolean]" {-c,--count=}"[How many recent entries to tag]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-d,--date}"[Include current date/time with tag]" "(--force)--force}[Dont ask permission to flag all entries when count is 0t ask permission to flag all entries when count is 0]" {-i,--interactive}"[Select item(s) to flag from a menu of matching entries]" "(--not)--not}[Flag items that *dont* match search/tag/date filterst* match search/tag/date filters]" {-r,--remove}"[Remove flag]" {-s,--section=}"[Section]" "(--search=)--search=}[Flag the last entry matching search filter]" "(--tag=)--tag=}[Flag the last entry containing TAG]" {-u,--unfinished}"[Flag last entry]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             meanwhile) 
-                args=( {-a,--archive}"[Archive previous @meanwhile entry]" {-b,--back=}"[Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]]" {-e,--editor}"[Edit entry with vim]" {-n,--note=}"[Note]" {-s,--section=}"[Section]" )
+                args=(  )
             ;;
             note) 
-                args=( "(--bool=)--bool=}[Boolean]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-e,--editor}"[Edit entry with vim]" {-i,--interactive}"[Select item for new note from a menu of matching entries]" "(--not)--not}[Add note to item that *doesnt* match search/tag filterst* match search/tag filters]" {-r,--remove}"[Replace/Remove last entrys notes note]" {-s,--section=}"[Section]" "(--search=)--search=}[Add/remove note from last entry matching search filter]" "(--tag=)--tag=}[Add/remove note from last entry matching tag]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             now) 
-                args=( {-b,--back=}"[Backdate start time [4pm|20m|2h|yesterday noon]]" {-e,--editor}"[Edit entry with vim]" {-f,--finish_last}"[Timed entry]" {-n,--note=}"[Include a note]" {-s,--section=}"[Section]" )
+                args=(  )
             ;;
             next) 
-                args=( {-b,--back=}"[Backdate start time [4pm|20m|2h|yesterday noon]]" {-e,--editor}"[Edit entry with vim]" {-f,--finish_last}"[Timed entry]" {-n,--note=}"[Include a note]" {-s,--section=}"[Section]" )
+                args=(  )
             ;;
             on) 
-                args=( {-o,--output=}"[Output to export format]" {-s,--section=}"[Section]" {-t,--times}"[Show time intervals on @done tasks]" "(--tag_sort=)--tag_sort=}[Sort tags by]" "(--totals)--totals}[Show time totals at the end of output]" )
+                args=(  )
             ;;
             open) 
-                args=( {-a,--app=}"[Open with app name]" {-b,--bundle_id=}"[Open with app bundle id]" )
+                args=(  )
             ;;
             plugins) 
-                args=( {-c,--column}"[List in single column for completion]" {-t,--type=}"[List plugins of type]" )
+                args=(  )
             ;;
             recent) 
-                args=( {-i,--interactive}"[Select from a menu of matching entries to perform additional operations]" {-s,--section=}"[Section]" {-t,--times}"[Show time intervals on @done tasks]" "(--tag_sort=)--tag_sort=}[Sort tags by]" "(--totals)--totals}[Show intervals with totals at the end of output]" )
+                args=(  )
             ;;
             reset) 
-                args=( "(--bool=)--bool=}[Boolean]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-i,--interactive}"[Select from a menu of matching entries]" "(--not)--not}[Reset items that *dont* match search/tag filterst* match search/tag filters]" {-r,--resume}"[Resume entry]" {-s,--section=}"[Limit search to section]" "(--search=)--search=}[Reset last entry matching search filter]" "(--tag=)--tag=}[Reset last entry matching tag]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             begin) 
-                args=( "(--bool=)--bool=}[Boolean]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-i,--interactive}"[Select from a menu of matching entries]" "(--not)--not}[Reset items that *dont* match search/tag filterst* match search/tag filters]" {-r,--resume}"[Resume entry]" {-s,--section=}"[Limit search to section]" "(--search=)--search=}[Reset last entry matching search filter]" "(--tag=)--tag=}[Reset last entry matching tag]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             rotate) 
-                args=( "(--before=)--before=}[Rotate entries older than date]" "(--bool=)--bool=}[Tag boolean]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-k,--keep=}"[How many items to keep in each section]" "(--not)--not}[Rotate items that *dont* match search string or tag filtert* match search string or tag filter]" {-s,--section=}"[Section to rotate]" "(--search=)--search=}[Search filter]" "(--tag=)--tag=}[Tag filter]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             sections) 
-                args=( {-c,--column}"[List in single column]" )
+                args=(  )
             ;;
             select) 
-                args=( {-a,--archive}"[Archive selected items]" "(--resume)--resume}[Copy selection as a new entry with current time and no @done tag]" {-c,--cancel}"[Cancel selected items]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-d,--delete}"[Delete selected items]" {-e,--editor}"[Edit selected item(s)]" {-f,--finish}"[Add @done with current time to selected item(s)]" "(--flag)--flag}[Add flag to selected item(s)]" "(--force)--force}[Perform action without confirmation]" {-m,--move=}"[Move selected items to section]" "(--menu)--menu}[Use --no-menu to skip the interactive menu]" "(--not)--not}[Select items that *dont* match search/tag filterst* match search/tag filters]" {-o,--output=}"[Output entries to format]" "(--search=)--search=}[Initial search query for filtering]" {-r,--remove}"[Reverse -c]" {-s,--section=}"[Select from a specific section]" "(--save_to=)--save_to=}[Save selected entries to file using --output format]" {-t,--tag=}"[Tag selected entries]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             show) 
-                args=( {-a,--age=}"[Age]" "(--after=)--after=}[View entries newer than date]" {-b,--bool=}"[Tag boolean]" "(--before=)--before=}[View entries older than date]" {-c,--count=}"[Max count to show]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-f,--from=}"[Date range to show]" {-i,--interactive}"[Select from a menu of matching entries to perform additional operations]" "(--not)--not}[Show items that *dont* match search/tag/date filterst* match search/tag/date filters]" {-o,--output=}"[Output to export format]" "(--only_timed)--only_timed}[Only show items with recorded time intervals]" {-s,--sort=}"[Sort order]" "(--search=)--search=}[Search filter]" {-t,--times}"[Show time intervals on @done tasks]" "(--tag=)--tag=}[Tag filter]" "(--tag_order=)--tag_order=}[Tag sort direction]" "(--tag_sort=)--tag_sort=}[Sort tags by]" "(--totals)--totals}[Show intervals with totals at the end of output]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             since) 
-                args=( {-o,--output=}"[Output to export format]" {-s,--section=}"[Section]" {-t,--times}"[Show time intervals on @done tasks]" "(--tag_sort=)--tag_sort=}[Sort tags by]" "(--totals)--totals}[Show time totals at the end of output]" )
+                args=(  )
             ;;
             tag) 
-                args=( {-a,--autotag}"[Autotag entries based on autotag configuration in ~/]" "(--bool=)--bool=}[Boolean]" {-c,--count=}"[How many recent entries to tag]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-d,--date}"[Include current date/time with tag]" "(--force)--force}[Dont ask permission to tag all entries when count is 0t ask permission to tag all entries when count is 0]" {-i,--interactive}"[Select item(s) to tag from a menu of matching entries]" "(--not)--not}[Tag items that *dont* match search/tag filterst* match search/tag filters]" {-r,--remove}"[Remove given tag(s)]" "(--regex)--regex}[Interpret tag string as regular expression]" "(--rename=)--rename=}[Replace existing tag with tag argument]" {-s,--section=}"[Section]" "(--search=)--search=}[Tag entries matching search filter]" "(--tag=)--tag=}[Tag the last X entries containing TAG]" {-u,--unfinished}"[Tag last entry]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             template) 
-                args=( {-l,--list}"[List all available templates]" )
+                args=(  )
             ;;
             test) 
                 args=(  )
             ;;
             today) 
-                args=( "(--after=)--after=}[View entries after specified time]" "(--before=)--before=}[View entries before specified time]" {-o,--output=}"[Output to export format]" {-s,--section=}"[Specify a section]" {-t,--times}"[Show time intervals on @done tasks]" "(--tag_sort=)--tag_sort=}[Sort tags by]" "(--totals)--totals}[Show time totals at the end of output]" )
+                args=(  )
             ;;
             undo) 
-                args=( {-f,--file=}"[Specify alternate doing file]" )
+                args=(  )
             ;;
             view) 
-                args=( "(--after=)--after=}[View entries newer than date]" {-b,--bool=}"[Tag boolean]" "(--before=)--before=}[View entries older than date]" {-c,--count=}"[Count to display]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" "(--color)--color}[Include colors in output]" {-i,--interactive}"[Select from a menu of matching entries to perform additional operations]" "(--not)--not}[Show items that *dont* match search stringt* match search string]" {-o,--output=}"[Output to export format]" "(--only_timed)--only_timed}[Only show items with recorded time intervals]" {-s,--section=}"[Section]" "(--search=)--search=}[Search filter]" {-t,--times}"[Show time intervals on @done tasks]" "(--tag=)--tag=}[Tag filter]" "(--tag_order=)--tag_order=}[Tag sort direction]" "(--tag_sort=)--tag_sort=}[Sort tags by]" "(--totals)--totals}[Show intervals with totals at the end of output]" {-x,--exact}"[Force exact search string matching]" )
+                args=(  )
             ;;
             views) 
-                args=( {-c,--column}"[List in single column]" )
+                args=(  )
             ;;
             wiki) 
-                args=( "(--after=)--after=}[Include entries newer than date]" {-b,--bool=}"[Tag boolean]" "(--before=)--before=}[Include entries older than date]" {-f,--from=}"[Date range to include]" "(--only_timed)--only_timed}[Only show items with recorded time intervals]" {-s,--section=}"[Section to rotate]" "(--search=)--search=}[Search filter]" "(--tag=)--tag=}[Tag filter]" )
+                args=(  )
             ;;
             yesterday) 
-                args=( "(--after=)--after=}[View entries after specified time]" "(--before=)--before=}[View entries before specified time]" {-o,--output=}"[Output to export format]" {-s,--section=}"[Specify a section]" {-t,--times}"[Show time intervals on @done tasks]" "(--tag_order=)--tag_order=}[Tag sort direction]" "(--tag_sort=)--tag_sort=}[Sort tags by]" "(--totals)--totals}[Show time totals at the end of output]" )
+                args=(  )
             ;;
     esac
 

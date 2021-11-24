@@ -71,9 +71,9 @@ _doing_completion() {
 _doing_config() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--dump --editor --output --update' -- $token ) )
+    COMPREPLY=( $( compgen -W '--dump --update' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-d -e -o -u --dump --editor --output --update' -- $token ) )
+    COMPREPLY=( $( compgen -W '-d -u --dump --update' -- $token ) )
   
   fi
 }

@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.0.24
+v2.0.25
 
 === Global Options
 === --config_file arg
@@ -398,7 +398,12 @@ Use `doing config get` to output the configuration to the terminal, and
 provide a dot-separated key path to get a specific value. Shows the current value
 including keys/overrides set by local configs.
 ===== Options
-===== -d|--[no-]dump|-u|--[no-]update
+===== -d|--[no-]dump
+DEPRECATED
+
+
+
+===== -u|--[no-]update
 DEPRECATED
 
 
