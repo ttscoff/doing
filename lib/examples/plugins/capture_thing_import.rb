@@ -41,7 +41,7 @@ module Doing
 
       @old_items = []
 
-      wwid.content.each { |_, v| @old_items.concat(v[:items]) }
+      wwid.content.each { |_, v| @old_items.concat(v.items) }
 
       new_items = read_capture_folder(path)
 
@@ -88,7 +88,7 @@ module Doing
 
       imported.each do |item|
         wwid.add_section(item.section) unless wwid.content.key?(item.section)
-        wwid.content[item.section][:items].push(item)
+        wwid.content[item.section].items.push(item)
       end
 
       Doing.logger.info('Imported:', "#{imported.count} items")

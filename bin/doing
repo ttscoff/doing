@@ -768,7 +768,7 @@ command %i[done did] do |c|
       end
 
       if (is_new)
-        wwid.content[section][:items].push(new_entry)
+        wwid.content[section].items.push(new_entry)
       else
         wwid.update_item(old_entry, new_entry)
       end
@@ -809,7 +809,7 @@ command %i[done did] do |c|
           new_entry.tag('done')
         end
       end
-      wwid.content[section][:items].push(new_entry)
+      wwid.content[section].items.push(new_entry)
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     elsif $stdin.stat.size.positive?
@@ -826,7 +826,7 @@ command %i[done did] do |c|
         end
       end
 
-      wwid.content[section][:items].push(new_entry)
+      wwid.content[section].items.push(new_entry)
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     else

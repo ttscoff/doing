@@ -34,7 +34,7 @@ class DoingUtilTest < Test::Unit::TestCase
   end
 
   def test_format_time
-    item = @wwid.content[@wwid.config['current_section']][:items][0]
+    item = @wwid.content[@wwid.config['current_section']].items[0]
     interval = @wwid.get_interval(item, formatted: false, record: false)
     assert_equal(360, interval, 'Interval should match')
     minutes = interval / 60 % 60

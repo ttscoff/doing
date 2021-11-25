@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  class Items < Array
+  class WWIDFile < Array
     def from(path)
       return [] unless path
       path = File.expand_path(path)
@@ -29,7 +29,7 @@ module Doing
           @items.push(item)
           current += 1
         elsif current.zero?
-          # if content[section][:items].length - 1 == current
+          # if content[section].items.length - 1 == current
           @other_content_top.push(line)
         elsif line =~ /^\S/
           @other_content_bottom.push(line)

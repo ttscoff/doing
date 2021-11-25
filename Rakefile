@@ -27,11 +27,30 @@ spec = eval(File.read('doing.gemspec'))
 Gem::PackageTask.new(spec) do |pkg|
 end
 
-Rake::TestTask.new do |t|
-  t.libs << ['test', 'test/helpers']
-  t.test_files = FileList['test/*_test.rb']
-  t.verbose = ENV['VERBOSE'] =~ /(true|1)/i ? true : false
+# Rake::TestTask.new do |t|
+#   t.libs << ['test', 'test/helpers']
+#   t.test_files = FileList['test/*_test.rb']
+#   t.verbose = ENV['VERBOSE'] =~ /(true|1)/i ? true : false
+# end
+
+namespace :test do
+
+  FileList['test/*_test.rb'].each do |rakefile|
+    test_name = File.basename(rakefile, '.rb').sub(%r{^.*?_(.*?)_.*?$}, '\1')
+
+    Rake::TestTask.new(:"#{test_name}") do |t|
+      t.libs << ['test', 'test/helpers']
+      t.pattern = rakefile
+      t.verbose = ENV['VERBOSE'] =~ /(true|1)/i ? true : false
+    end
+    #Define default task for :test
+    task :default => test_name
+  end
+
 end
+
+desc "Run all tests"
+task :test => 'test:default'
 
 desc 'Run one test verbosely'
 task :test_one, :test do |_, args|

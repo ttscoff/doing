@@ -188,6 +188,15 @@ module Doing
       should?('never_time')
     end
 
+    def to_s
+      "#{@date.strftime('%Y-%m-%d %H:%M')} | #{@title} [#{@section}]\n#{@note.map { |l| "\t#{l.strip}  " }.join("\n")}"
+    end
+
+    def inspect
+      # %(<Doing::Item @date=#{@date} @title="#{@title}" @section:"#{@section}" @note:#{@note.to_s}>)
+      %(<Doing::Item @date=#{@date}>)
+    end
+
     private
 
     def should?(key)

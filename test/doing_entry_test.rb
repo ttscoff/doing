@@ -31,6 +31,7 @@ class DoingEntryTest < Test::Unit::TestCase
     subject = 'Test new entry @tag1'
     doing('now', subject)
     assert_match(/#{subject}\s*$/, doing('show', '-c 1'), 'should have added entry')
+    assert_valid_file(@wwid_file)
   end
 
   def test_new_entry_finishing_last
@@ -42,6 +43,7 @@ class DoingEntryTest < Test::Unit::TestCase
       [/#{subject} @done/, 'First entry should be @done'],
       [/#{subject2}\s*$/, 'Second entry should be added']
     ], doing('show'))
+    assert_valid_file(@wwid_file)
   end
 
   def test_section_rejects_empty_args
@@ -52,6 +54,7 @@ class DoingEntryTest < Test::Unit::TestCase
     doing('add_section', 'Test Section')
     res = doing('--stdout', '--debug', 'show', 'Test').strip
     assert_match(/Assuming "Test Section"/, res, 'Should have guessed Test Section')
+    assert_valid_file(@wwid_file)
   end
 
   def test_invalid_section
@@ -61,6 +64,7 @@ class DoingEntryTest < Test::Unit::TestCase
   def test_add_section
     doing('add_section', 'Test Section')
     assert_match(/^Test Section$/, doing('sections', '-c'), 'should have added section')
+    assert_valid_file(@wwid_file)
   end
 
   def test_add_to_section
@@ -69,6 +73,7 @@ class DoingEntryTest < Test::Unit::TestCase
     doing('add_section', section)
     doing('now', '--section', section, subject)
     assert_match(/#{subject}/, doing('show', section), 'Entry should exist in new section')
+    assert_valid_file(@wwid_file)
   end
 
   def test_later_entry

@@ -25,7 +25,7 @@ module Doing
     def initialize
       @timers = {}
       @recorded_items = []
-      @content = {}
+      @content = Content.new
       @auto_tag = true
     end
 
@@ -68,7 +68,7 @@ module Doing
       @other_content_top = []
       @other_content_bottom = []
 
-      section = 'Uncategorized'
+      section = nil
       lines = input.split(/[\n\r]/)
       current = 0
 
@@ -77,29 +77,33 @@ module Doing
 
         if line =~ /^(\S[\S ]+):\s*(@\S+\s*)*$/
           section = Regexp.last_match(1)
-          @content[section] = {}
-          @content[section][:original] = line
-          @content[section][:items] = []
+          @content[section] = Section.new(line)
           current = 0
         elsif line =~ /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/
+          if section.nil?
+            section = 'Uncategorized'
+            @content[section] = Section.new('Uncategorized:')
+          end
+
           date = Regexp.last_match(1).strip
           title = Regexp.last_match(2).strip
           item = Item.new(date, title, section)
-          @content[section][:items].push(item)
+          @content[section].items.push(item)
           current += 1
         elsif current.zero?
-          # if content[section][:items].length - 1 == current
+          # if content[section].items.length - 1 == current
           @other_content_top.push(line)
         elsif line =~ /^\S/
           @other_content_bottom.push(line)
         else
-          prev_item = @content[section][:items][current - 1]
+          prev_item = @content[section].items[current - 1]
           prev_item.note = Note.new unless prev_item.note
 
           prev_item.note.add(line)
           # end
         end
       end
+
       Hooks.trigger :post_read, self
     end
 
@@ -276,7 +280,7 @@ module Doing
         raise InvalidSection, %(section "#{title.cap_first}" already exists)
       end
 
-      @content[title.cap_first] = { :original => "#{title}:", :items => [] }
+      @content[title.cap_first] = Section.new(title) # { :original => "#{title}:", :items => Items.new }
       logger.info('New section:', %("#{title.cap_first}"))
     end
 
@@ -389,7 +393,7 @@ module Doing
       title.gsub!(/ +/, ' ')
       entry = Item.new(opt[:back], title.strip, section)
       entry.note = opt[:note].map(&:chomp) unless opt[:note].join('').strip == ''
-      items = @content[section][:items]
+      items = @content[section].items
       if opt[:timed]
         items.reverse!
         items.each_with_index do |i, x|
@@ -414,9 +418,9 @@ module Doing
     ##
     def dedup(items, no_overlap = false)
 
-      combined = []
+      combined = Items.new
       @content.each do |_k, v|
-        combined += v[:items]
+        combined += v.items
       end
 
       items.delete_if do |item|
@@ -543,7 +547,7 @@ module Doing
       opt[:tag_bool] ||= :and
       opt[:section] ||= @config['current_section']
 
-      items = filter_items([], opt: opt)
+      items = filter_items(Items.new, opt: opt)
 
       logger.debug('Filtered:', "Parameters matched #{items.count} entries")
 
@@ -602,7 +606,7 @@ module Doing
       # fzf_args << '-e' if opt[:exact]
       # puts fzf_args.join(' ')
       res = `echo #{Shellwords.escape(scannable)}|#{Prompt.fzf} #{fzf_args.join(' ')}`
-      selected = []
+      selected = Items.new
       res.split(/\n/).each do |item|
         idx = item.match(/\|(\d+)$/)[1].to_i
         selected.push(items[idx])
@@ -630,14 +634,14 @@ module Doing
     ## @option opt [Number] :count  (Number to return)
     ## @option opt [String] :age  ('old' or 'new')
     ##
-    def filter_items(items = [], opt: {})
+    def filter_items(items = Items.new, opt: {})
       if items.nil? || items.empty?
         section = opt[:section] ? guess_section(opt[:section]) : 'All'
 
         items = if section =~ /^all$/i
-                  @content.each_with_object([]) { |(_k, v), arr| arr.concat(v[:items].dup) }
+                  @content.each_with_object(Items.new) { |(_k, v), arr| arr.concat(v.items.dup) }
                 else
-                  @content[section][:items].dup
+                  @content[section].items.dup
                 end
       end
 
@@ -715,12 +719,15 @@ module Doing
       end
       count = opt[:count] && opt[:count].positive? ? opt[:count] : filtered_items.length
 
+      output = Items.new
+
       if opt[:age] =~ /^o/i
-        filtered_items.slice(0, count).reverse
+        output.concat(filtered_items.slice(0, count).reverse)
       else
-        filtered_items.reverse.slice(0, count)
+        output.concat(filtered_items.reverse.slice(0, count))
       end
 
+      output
     end
 
     ##
@@ -745,7 +752,7 @@ module Doing
       opt[:query] = "!#{opt[:query]}" if opt[:not]
       opt[:multiple] = true
       opt[:show_if_single] = true
-      items = filter_items([], opt: { section: section, search: opt[:search], fuzzy: opt[:fuzzy], case: opt[:case], not: opt[:not] })
+      items = filter_items(Items.new, opt: { section: section, search: opt[:search], fuzzy: opt[:fuzzy], case: opt[:case], not: opt[:not] })
 
       selection = Prompt.choose_from_items(items, include_section: section =~ /^all$/i, **opt)
 
@@ -970,8 +977,8 @@ module Doing
           item.title = "#{item.title} @project(#{item.section})"
           item
         end
-
-        @content = { 'Export' => { :original => 'Export:', :items => items } }
+        sect = Section.new('Export:', items)
+        @content = { 'Export' => sect }
         options = { section: 'Export' }
 
 
@@ -1056,7 +1063,7 @@ module Doing
       opt[:unfinished] ||= false
       opt[:section] = opt[:section] ? guess_section(opt[:section]) : 'All'
 
-      items = filter_items([], opt: opt)
+      items = filter_items(Items.new, opt: opt)
 
       if opt[:interactive]
         items = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, menu: true,
@@ -1170,11 +1177,11 @@ module Doing
     ##
     def move_item(item, section, label: true)
       from = item.section
-      new_item = @content[item.section][:items].delete(item)
+      new_item = @content[item.section].items.delete(item)
       new_item.title.sub!(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{from})") if label
       new_item.section = section
 
-      @content[section][:items].concat([new_item])
+      @content[section].items.concat([new_item])
 
       logger.count(section == 'Archive' ? :archived : :moved)
       logger.debug("#{section == 'Archive' ? 'Archived' : 'Moved'}:",
@@ -1192,7 +1199,7 @@ module Doing
     ## @return     [Item] the next chronological item in the index
     ##
     def next_item(item, options = {})
-      items = filter_items([], opt: options)
+      items = filter_items(Items.new, opt: options)
 
       idx = items.index(item)
 
@@ -1207,7 +1214,7 @@ module Doing
     def delete_item(item, single: false)
       section = item.section
 
-      section_items = @content[section][:items]
+      section_items = @content[section].items
       deleted = section_items.delete(item)
       logger.count(:deleted)
       logger.info('Entry deleted:', deleted.title) if single
@@ -1222,7 +1229,7 @@ module Doing
     def update_item(old_item, new_item)
       section = old_item.section
 
-      section_items = @content[section][:items]
+      section_items = @content[section].items
       s_idx = section_items.index { |item| item.equal?(old_item) }
 
       raise ItemNotFound, 'Unable to find item in index, did it mutate?' unless s_idx
@@ -1297,7 +1304,7 @@ module Doing
 
       found_items = 0
 
-      @content[opt[:section]][:items].each_with_index do |item, i|
+      @content[opt[:section]].items.each_with_index do |item, i|
         next unless item.title =~ /@#{tag}/
 
         item.title.add_tags!([tag, 'done'], remove: true)
@@ -1380,12 +1387,11 @@ module Doing
 
 
       all_sections.each do |section|
-        items = @content[section][:items].dup
-        new_content[section] = {}
-        new_content[section][:original] = @content[section][:original]
-        new_content[section][:items] = []
+        items = @content[section].items.dup
+        new_content[section] = Section.new(@content[section].original)
+        new_content[section].items = Items.new
 
-        moved_items = []
+        moved_items = Items.new
         if !tags.empty? || opt[:search] || opt[:before]
           if opt[:before]
             time_string = opt[:before]
@@ -1401,12 +1407,12 @@ module Doing
               false
             end
           end
-          @content[section][:items] = items
-          new_content[section][:items] = moved_items
+          @content[section].items = items
+          new_content[section].items = moved_items
           logger.warn('Rotated:', "#{moved_items.length} items from #{section}")
         else
-          new_content[section][:items] = []
-          moved_items = []
+          new_content[section].items = Items.new
+          moved_items = Items.new
 
           count = items.length < keep ? items.length : keep
 
@@ -1416,12 +1422,12 @@ module Doing
             moved_items.concat(items)
           end
 
-          @content[section][:items] = if count.zero?
-                                         []
+          @content[section].items = if count.zero?
+                                         Items.new
                                        else
                                          items[0..count - 1]
                                        end
-          new_content[section][:items] = moved_items
+          new_content[section].items = moved_items
 
           logger.warn('Rotated:', "#{items.length - count} items from #{section}")
         end
@@ -1525,7 +1531,7 @@ module Doing
         end
       end
 
-      items = filter_items([], opt: opt).reverse
+      items = filter_items(Items.new, opt: opt).reverse
 
       items.reverse! if opt[:order] =~ /^d/i
 
@@ -2034,7 +2040,7 @@ EOS
       was_color = Color.coloring?
       Color.coloring = false
       @content.each do |title, section|
-        output += "#{section[:original]}\n"
+        output += "#{section.original}\n"
         output += list_section({
                                  section: title,
                                  template: "\t- %date | %title%t2note",
@@ -2122,9 +2128,9 @@ EOS
       counter = 0
 
       all_sections.each do |section|
-        items = @content[section][:items].dup
+        items = @content[section].items.dup
 
-        moved_items = []
+        moved_items = Items.new
         if !tags.empty? || opt[:search] || opt[:before]
           if opt[:before]
             time_string = opt[:before]
@@ -2151,8 +2157,8 @@ EOS
             end
           end
 
-          @content[section][:items] = items
-          @content[destination][:items].concat(moved_items)
+          @content[section].items = items
+          @content[destination].items.concat(moved_items)
           if moved_items.length.positive?
             logger.count(destination == 'Archive' ? :archived : :moved,
                          level: :info,
@@ -2177,13 +2183,13 @@ EOS
           end
 
           if items.count > count
-            @content[destination][:items].concat(items[count..-1])
+            @content[destination].items.concat(items[count..-1])
           else
-            @content[destination][:items].concat(items)
+            @content[destination].items.concat(items)
           end
 
-          @content[section][:items] = if count.zero?
-                                        []
+          @content[section].items = if count.zero?
+                                        Items.new
                                       else
                                         items[0..count - 1]
                                       end

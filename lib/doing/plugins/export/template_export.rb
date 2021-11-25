@@ -23,10 +23,10 @@ module Doing
       out = ''
       items.each do |item|
         if opt[:highlight] && item.title =~ /@#{wwid.config['marker_tag']}\b/i
-          flag = Doing::Color.send(wwid.config['marker_color'])
+          # flag = Doing::Color.send(wwid.config['marker_color'])
           reset = Doing::Color.default
         else
-          flag = ''
+          # flag = ''
           reset = ''
         end
 
