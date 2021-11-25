@@ -7,7 +7,7 @@ module Doing
       "#<Doing::Items - #{count} items>"
     end
 
-    def items_for_section(section)
+    def in_section(section)
       select { |item| item.section == section }
     end
   end
