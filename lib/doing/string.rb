@@ -20,8 +20,7 @@ module Doing
     ## can be separated by up to *distance* characters in
     ## haystack, spaces indicate unlimited distance.
     ##
-    ## @example    "this word".to_rx(2) =>
-    ## /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/
+    ## @example    `"this word".to_rx(2) => /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/`
     ##
     ## @param      distance   [Integer] Allowed distance
     ##                        between characters
@@ -373,9 +372,16 @@ module Doing
       title
     end
 
-    # Returns the last escape sequence from a string
+    # Returns the last escape sequence from a string.
     #
-    # @param      string  The string to examine
+    # Actually returns all escape codes, with the assumption
+    # that the result of inserting them will generate the
+    # same color as was set at the end of the string.
+    # Because you can send modifiers like dark and bold
+    # separate from color codes, only using the last code
+    # may not render the same style.
+    #
+    # @return     [String]  All escape codes in string
     #
     def last_color
       scan(/\e\[[\d;]+m/).join('')
@@ -386,17 +392,20 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def link_urls!(opt = {})
-      replace link_urls(opt)
+    def link_urls!(**opt)
+      fmt = opt.fetch(:format, :html)
+      replace link_urls(format: fmt)
     end
 
-    def link_urls(opt = {})
-      opt[:format] ||= :html
+    def link_urls(**opt)
+      fmt = opt.fetch(:format, :html)
+      return self unless fmt
+
       str = dup
 
-      str = str.remove_self_links if opt[:format] == :markdown
+      str = str.remove_self_links if fmt == :markdown
 
-      str.replace_qualified_urls(format: opt[:format]).clean_unlinked_urls
+      str.replace_qualified_urls(format: fmt).clean_unlinked_urls
     end
 
     # Remove <self-linked> formatting
@@ -412,21 +421,24 @@ module Doing
     end
 
     # Replace qualified urls
-    def replace_qualified_urls(opt = {})
-      opt[:format] ||= :html
+    def replace_qualified_urls(**options)
+      fmt = options.fetch(:format, :html)
       gsub(%r{(?mi)(?x:
       (?<!["'\[(\\])
-      ((http|https)://)
-      ([\w\-]+(\.[\w\-]+)+)
-      ([\w\-.,@?^=%&;:/~+#]*[\w\-@^=%&;/~+#])?
+      (?<protocol>(?:http|https)://)
+      (?<domain>[\w\-]+(?:\.[\w\-]+)+)
+      (?<path>[\w\-.,@?^=%&;:/~+#]*[\w\-@^=%&;/~+#])?
       )}) do |_match|
         m = Regexp.last_match
-        proto = m[1].nil? ? 'http://' : ''
-        case opt[:format]
+        url = "#{m['domain']}#{m['path']}"
+        proto = m['protocol'].nil? ? 'http://' : m['protocol']
+        case fmt
+        when :terminal
+          TTY::Link.link_to("#{proto}#{url}", "#{proto}#{url}")
         when :html
-          %(<a href="#{proto}#{m[0]}" title="Link to #{m[0].sub(%r{^https?://}, '')}">[#{m[3]}]</a>)
+          %(<a href="#{proto}#{url}" title="Link to #{m['domain']}">[#{url}]</a>)
         when :markdown
-          "[#{m[0]}](#{proto}#{m[0]})"
+          "[#{url}](#{proto}#{url})"
         else
           m[0]
         end

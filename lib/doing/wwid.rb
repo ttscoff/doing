@@ -1539,7 +1539,7 @@ module Doing
         opt[:menu] = !opt[:force]
         opt[:query] = '' # opt[:search]
         opt[:multiple] = true
-        selected = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **opt )
+        selected = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **opt)
 
         raise NoResults, 'no items selected' if selected.empty?
 
@@ -1547,9 +1547,7 @@ module Doing
         return
       end
 
-
       opt[:output] ||= 'template'
-
       opt[:wrap_width] ||= @config['templates']['default']['wrap_width'] || 0
       output(items, title, is_single, opt)
     end

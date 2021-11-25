@@ -7,6 +7,7 @@ PATH
       gli (~> 2.19, >= 2.19.2)
       haml (~> 5.0.0, >= 5.0.0)
       safe_yaml (~> 1.0)
+      tty-link (~> 0.1, >= 0.1.1)
       tty-progressbar (~> 0.18, >= 0.18.2)
 
 GEM
@@ -100,6 +101,7 @@ GEM
     thread_safe (0.3.6)
     tilt (2.0.10)
     tty-cursor (0.7.1)
+    tty-link (0.1.1)
     tty-progressbar (0.18.2)
       strings-ansi (~> 0.2)
       tty-cursor (~> 0.7)

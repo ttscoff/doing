@@ -134,7 +134,7 @@ module Doing
       if @additional_configs.count.positive?
         choices = [@config_file]
         choices.concat(@additional_configs)
-        res = Doing::WWID.new.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to update > ')
+        res = Doing::Prompt.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to update > ')
 
         raise UserCancelled, 'Cancelled' unless res
 
