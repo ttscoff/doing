@@ -48,7 +48,7 @@ function _doing() {
                   'template:Output HTML'
                   'test:Test Stuff'
                   'today:List entries from today'
-                  'undo:Undo the last change to the doing_file'
+                  'undo:Undo the last change to the Doing file'
                   'view:Display a user-created view'
                   'views:List available custom views'
                   'wiki:Output a tag wiki'

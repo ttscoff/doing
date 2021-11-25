@@ -91,7 +91,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'tag' -d Add\ tag\(s\)\ to
 complete -xc doing -n '__fish_doing_needs_command' -a 'template' -d Output\ HTML
 complete -xc doing -n '__fish_doing_needs_command' -a 'test' -d Test\ Stuff
 complete -xc doing -n '__fish_doing_needs_command' -a 'today' -d List\ entries\ from\ today
-complete -xc doing -n '__fish_doing_needs_command' -a 'undo' -d Undo\ the\ last\ change\ to\ the\ doing_file
+complete -xc doing -n '__fish_doing_needs_command' -a 'undo' -d Undo\ the\ last\ change\ to\ the\ Doing\ file
 complete -xc doing -n '__fish_doing_needs_command' -a 'view' -d Display\ a\ user-created\ view
 complete -xc doing -n '__fish_doing_needs_command' -a 'views' -d List\ available\ custom\ views
 complete -xc doing -n '__fish_doing_needs_command' -a 'wiki' -d Output\ a\ tag\ wiki
