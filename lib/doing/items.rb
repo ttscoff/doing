@@ -30,7 +30,7 @@ module Doing
       has_section
     end
 
-    def add_section(section, log: true)
+    def add_section(section, log: false)
       section = section.is_a?(Section) ? section : Section.new(section.cap_first)
 
       return if section?(section)
@@ -44,7 +44,7 @@ module Doing
         dup
       else
         items = Items.new.concat(select { |item| item.section == section })
-        items.add_section(section)
+        items.add_section(section, log: false)
         items
       end
     end

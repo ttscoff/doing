@@ -362,7 +362,7 @@ module Doing
     ##
     def add_item(title, section = nil, opt = {})
       section ||= @config['current_section']
-      @content.add_section(section, log: true)
+      @content.add_section(section, log: false)
       opt[:date] ||= Time.now
       note = Note.new
       opt[:back] ||= Time.now
@@ -485,7 +485,7 @@ module Doing
 
       if opt[:editor]
         to_edit = title
-        to_edit += "\n#{note.to_s}" unless note.empty?
+        to_edit += "\n#{note.strip_lines.join("\n")}" unless note.empty?
         new_item = fork_editor(to_edit)
         title, note = format_input(new_item)
 
@@ -915,7 +915,7 @@ module Doing
 
         items.each do |item|
           editable = "#{item.date} | #{item.title}"
-          old_note = item.note ? item.note.to_s : nil
+          old_note = item.note ? item.note.strip_lines.join("\n") : nil
           editable += "\n#{old_note}" unless old_note.nil?
           editable_items << editable
         end
@@ -1233,7 +1233,7 @@ module Doing
       end
 
       content = [item.title.dup]
-      content << item.note.to_s unless item.note.empty?
+      content << item.note.strip_lines.join("\n") unless item.note.empty?
       new_item = fork_editor(content.join("\n"))
       title, note = format_input(new_item)
 
