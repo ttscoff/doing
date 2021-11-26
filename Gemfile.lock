@@ -9,6 +9,7 @@ PATH
       safe_yaml (~> 1.0)
       tty-link (~> 0.1, >= 0.1.1)
       tty-progressbar (~> 0.18, >= 0.18.2)
+      tty-which (~> 0.5, >= 0.5.0)
 
 GEM
   remote: http://rubygems.org/
@@ -110,6 +111,7 @@ GEM
     tty-screen (0.8.1)
     tty-spinner (0.9.3)
       tty-cursor (~> 0.7)
+    tty-which (0.5.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)

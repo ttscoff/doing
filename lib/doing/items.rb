@@ -7,21 +7,22 @@ module Doing
 
     def initialize
       super
-      @sections = Array.new
+      @sections = []
     end
 
     def inspect
-      "#<Doing::Items - #{@sections.map { |s| "<Section:#{s.title} #{in_section(s.title).count} items>" }.join(', ')}>"
+      "#<Doing::Items #{count} items, #{@sections.count} sections: #{@sections.map { |s| "<Section:#{s.title} #{in_section(s.title).count} items>" }.join(', ')}>"
     end
 
     def section_titles
-      @sections.map { |s| s.title }
+      @sections.map(&:title)
     end
 
     def section?(section)
       has_section = false
+      section = section.is_a?(Section) ? section.title.downcase : section.downcase
       @sections.each do |s|
-        if s.title.downcase == section.downcase
+        if s.title.downcase == section
           has_section = true
           break
         end
@@ -30,24 +31,21 @@ module Doing
     end
 
     def add_section(section, log: true)
-      if section.is_a?(Section)
-        unless section?(section.title)
-          @sections.push(section)
-          Doing.logger.info('New section:', %("#{section}" added)) if log
-        end
-      else
-        unless section?(section)
-          @sections.push(Section.new(section.cap_first))
-          Doing.logger.info('New section:', %("#{section}" added)) if log
-        end
-      end
+      section = section.is_a?(Section) ? section : Section.new(section.cap_first)
+
+      return if section?(section)
+
+      @sections.push(section)
+      Doing.logger.info('New section:', %("#{section}" added)) if log
     end
 
     def in_section(section)
       if section =~ /^all$/i
         dup
       else
-        select { |item| item.section == section }
+        items = Items.new.concat(select { |item| item.section == section })
+        items.add_section(section)
+        items
       end
     end
 

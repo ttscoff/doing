@@ -183,12 +183,13 @@ module Doing
       note.add(input_lines[1..-1]) if input_lines.length > 1
       # If title line ends in a parenthetical, use that as the note
       if note.empty? && title =~ /\s+\(.*?\)$/
-        title.sub!(/\s+\((.*?)\)$/) do
+        title.sub!(/\s+\((?<note>.*?)\)$/) do
           m = Regexp.last_match
-          note.add(m[1])
+          note.add(m['note'])
           ''
         end
       end
+
 
       note.strip_lines!
       note.compress
@@ -363,11 +364,11 @@ module Doing
       section ||= @config['current_section']
       @content.add_section(section, log: true)
       opt[:date] ||= Time.now
-      opt[:note] ||= []
+      note = Note.new
       opt[:back] ||= Time.now
       opt[:timed] ||= false
 
-      opt[:note] = opt[:note].lines if opt[:note].is_a?(String)
+      note.add(opt[:note]) if opt[:note]
 
       title = [title.strip.cap_first]
       title = title.join(' ')
@@ -379,7 +380,7 @@ module Doing
 
       title.gsub!(/ +/, ' ')
       entry = Item.new(opt[:back], title.strip, section)
-      entry.note = opt[:note].map(&:chomp) unless opt[:note].join('').strip == ''
+      entry.note = note
 
       items = @content.dup
       if opt[:timed]
@@ -1993,6 +1994,7 @@ EOS
       output += @other_content_bottom.join("\n") unless @other_content_bottom.nil?
       # Just strip all ANSI colors from the content before writing to doing file
       Color.coloring = was_color
+
       output.uncolor
     end
 
