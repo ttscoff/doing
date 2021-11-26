@@ -108,9 +108,10 @@ module Doing
     ## @param      remove     [Boolean] if true remove instead of adding
     ## @param      rename_to  [String] if not nil, rename target tag to this tag name
     ## @param      regex      [Boolean] treat target tag string as regex pattern
+    ## @param      force      [Boolean] with rename_to, add tag if it doesn't exist
     ##
-    def tag(tag, value: nil, remove: false, rename_to: nil, regex: false)
-      @title.tag!(tag, value: value, remove: remove, rename_to: rename_to, regex: regex).strip!
+    def tag(tag, **options)
+      @title.tag!(tag, **options).strip!
     end
 
     ##
@@ -188,8 +189,20 @@ module Doing
       should?('never_time')
     end
 
+    def move_to(section, label: true)
+      from = @section.title
+
+      @title.sub!(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{from})") if label
+      @section = section
+
+      Doing.logger.count(section == 'Archive' ? :archived : :moved)
+      Doing.logger.debug("#{section == 'Archive' ? 'Archived' : 'Moved'}:",
+                  "#{item.title.truncate(60)} from #{from} to #{section}")
+    end
+
+
     def to_s
-      "#{@date.strftime('%Y-%m-%d %H:%M')} | #{@title} [#{@section}]\n#{@note.map { |l| "\t#{l.strip}  " }.join("\n")}"
+      "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.empty? ? '' : "\n#{@note.map { |l| "\t\t#{l.strip}  " }.join("\n")}"}"
     end
 
     def inspect

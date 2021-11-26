@@ -35,8 +35,10 @@ colors = Doing::Color
 wwid = Doing::WWID.new
 
 Doing.logger.log_level = :info
+env_log_level = nil
 
 if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DOING_VERBOSE'] || ENV['DOING_PLUGIN_DEBUG']
+  env_log_level = true
   # Quiet always wins
   if ENV['DOING_QUIET'] && ENV['DOING_QUIET'].truthy?
     Doing.logger.log_level = :error
@@ -768,7 +770,7 @@ command %i[done did] do |c|
       end
 
       if (is_new)
-        wwid.content[section].items.push(new_entry)
+        wwid.content.push(new_entry)
       else
         wwid.update_item(old_entry, new_entry)
       end
@@ -809,7 +811,7 @@ command %i[done did] do |c|
           new_entry.tag('done')
         end
       end
-      wwid.content[section].items.push(new_entry)
+      wwid.content.push(new_entry)
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     elsif $stdin.stat.size.positive?
@@ -826,7 +828,7 @@ command %i[done did] do |c|
         end
       end
 
-      wwid.content[section].items.push(new_entry)
+      wwid.content.push(new_entry)
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     else
@@ -1867,9 +1869,9 @@ command :on do |c|
 
     raise InvalidTimeExpression, 'Unrecognized date string' unless start
 
-    message = "Date interpreted as #{start}"
+    message = "date interpreted as #{start}"
     message += " to #{finish}" if finish
-    Doing.logger.debug(message)
+    Doing.logger.debug('Interpreter:', message)
 
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -1922,7 +1924,7 @@ command :since do |c|
 
     raise InvalidTimeExpression, 'Unrecognized date string' unless start
 
-    Doing.logger.debug("Date interpreted as #{start} through the current time")
+    Doing.logger.debug('Interpreter:', "date interpreted as #{start} through the current time")
 
     options[:t] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
@@ -2072,7 +2074,7 @@ command :sections do |c|
 
   c.action do |_global_options, options, _args|
     joiner = options[:c] ? "\n" : "\t"
-    print wwid.sections.join(joiner)
+    print wwid.content.section_titles.join(joiner)
   end
 end
 
@@ -2093,7 +2095,7 @@ command :add_section do |c|
   c.action do |_global_options, _options, args|
     raise InvalidArgument, "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
 
-    wwid.add_section(args.join(' ').cap_first)
+    wwid.content.add_section(args.join(' ').cap_first, log: true)
     wwid.write(wwid.doing_file)
   end
 end
@@ -2940,7 +2942,9 @@ end
 
 around do |global, command, options, arguments, code|
   # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{settings['paginate']}, Pager: #{Doing::Pager.paginate}")
-  Doing.logger.adjust_verbosity(global)
+  if env_log_level.nil?
+    Doing.logger.adjust_verbosity(global)
+  end
 
   if global[:stdout]
     Doing.logger.logdev = $stdout

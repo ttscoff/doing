@@ -1,5 +1,9 @@
 ### 2.0.26
 
+#### NEW
+
+- BREAKING CHANGE: custom classes for Section (hash) and Items (Array). @content is still a regular Hash. Sections have methods :original and :items. This will affect plugins as wwid.content[section][:items] is now wwid[section].items (same for :original)
+
 #### IMPROVED
 
 - Config -o raw outputs value as YAML if result is a Hash/mapping, unquoted string if a single value, comma-separated list if it's an Array.

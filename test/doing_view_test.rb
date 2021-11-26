@@ -45,6 +45,8 @@ class DoingViewTest < Test::Unit::TestCase
   def test_view_from_config
     doing('import', '--type', 'timing', @import_file)
     doing('done', '--no-date', 'Adding untimed entry')
+
+    # view from config
     result = doing('--stdout', 'view', 'test2')
     assert_count_entries(6, result, '6 entries should be shown')
     assert_matches([
@@ -60,11 +62,8 @@ class DoingViewTest < Test::Unit::TestCase
                    [/untimed entry/, 'Should show untimed entry', false],
                    [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
                    ], result)
-  end
 
-  def test_view_flag_override
-    doing('import', '--type', 'timing', @import_file)
-    doing('done', '--no-date', 'Adding untimed entry')
+    # flag override
     result = doing('--stdout', 'view', '-c', '4', '--totals', '--only_timed', 'test3')
     assert_count_entries(4, result, '4 entries should be shown')
     assert_matches([
@@ -77,10 +76,8 @@ class DoingViewTest < Test::Unit::TestCase
     assert_matches([
                    [/\d\d:\d\d:\d\d/, 'Entries should not contain intervals', true]
                    ], result)
-  end
 
-  def test_view_tag_sort
-    doing('import', '--type', 'timing', @import_file)
+    # tag sort
     result = doing('--stdout', 'view', 'test2')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/development/, first_tag[1], 'First tag should be development')
@@ -88,10 +85,8 @@ class DoingViewTest < Test::Unit::TestCase
     result = doing('--stdout', 'view', '--tag_sort=name', '--tag_order=asc', 'test2')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/bunch/, first_tag[1], 'First tag should be bunch')
-  end
 
-  def test_view_date_limit
-    doing('import', '--type', 'timing', @import_file)
+    # date limit
     result = doing('view', '--before', '9/14/2021', '--after', '9/12/2021', 'test2')
     assert_count_entries(5, result, 'There should be 5 entries between specified dates')
   end

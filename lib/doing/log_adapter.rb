@@ -28,6 +28,7 @@ module Doing
       deleted
       moved
       removed_tags
+      rotated
       skipped
       updated
     ].freeze
@@ -229,7 +230,6 @@ module Doing
     ##
     def output_results
       total_counters
-
       results = @results.select { |msg| write_message?(msg[:level]) }.uniq
 
       if @logdev == $stdout
@@ -245,6 +245,8 @@ module Doing
 
     def format_counter(key, data)
       case key
+      when :rotated
+        ['Rotated:', data[:message] || 'rotated %count %items']
       when :autotag
         ['Autotag:', data[:message] || 'autotagged %count %items']
       when :added_tags
