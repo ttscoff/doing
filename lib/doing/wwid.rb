@@ -54,15 +54,18 @@ module Doing
         create(@doing_file) unless File.exist?(@doing_file)
         input = IO.read(@doing_file)
         input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
+        logger.debug('Read:', "read file #{@doing_file}")
       elsif File.exist?(File.expand_path(path)) && File.file?(File.expand_path(path)) && File.stat(File.expand_path(path)).size.positive?
         @doing_file = File.expand_path(path)
         input = IO.read(File.expand_path(path))
         input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
+        logger.debug('Read:', "read file #{File.expand_path(path)}")
       elsif path.length < 256
         @doing_file = File.expand_path(path)
         create(path)
         input = IO.read(File.expand_path(path))
         input = input.force_encoding('utf-8') if input.respond_to? :force_encoding
+        logger.debug('Read:', "read file #{File.expand_path(path)}")
       end
 
       @other_content_top = []

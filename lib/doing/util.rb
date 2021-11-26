@@ -116,6 +116,7 @@ module Doing
 
       File.open(file, 'w+') do |f|
         f.puts content
+        Doing.logger.debug('Write:', "File written: #{file}")
       end
 
       Hooks.trigger :post_write, file

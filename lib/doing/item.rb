@@ -202,7 +202,7 @@ module Doing
 
 
     def to_s
-      "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.empty? ? '' : "\n#{@note.map { |l| "\t\t#{l.strip}  " }.join("\n")}"}"
+      "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.empty? ? '' : "\n#{@note.to_s}"}"
     end
 
     def inspect
