@@ -190,7 +190,7 @@ module Doing
         m = Regexp.last_match
         t = m['tag']
         d = m['date']
-        parsed_date = d =~ date_rx ? Time.parse(d) : chronify(d, guess: :begin)
+        parsed_date = d =~ date_rx ? Time.parse(d) : d.chronify(guess: :begin)
         parsed_date.nil? ? m[0] : "@#{t}(#{parsed_date.strftime('%F %R')})"
       end
 
@@ -200,7 +200,7 @@ module Doing
         date = if d =~ iso_rx
                  Time.parse(d)
                else
-                 chronify(d, guess: :begin)
+                 d.chronify(guess: :begin)
                end
         title.sub!(date_rx, '').strip!
       end
@@ -220,71 +220,6 @@ module Doing
       note.compress
 
       [date, title, note]
-    end
-
-    ##
-    ## Converts input string into a Time object when input takes on the
-    ##             following formats:
-    ##             - interval format e.g. '1d2h30m', '45m' etc.
-    ##             - a semantic phrase e.g. 'yesterday 5:30pm'
-    ##             - a strftime e.g. '2016-03-15 15:32:04 PDT'
-    ##
-    ## @param      input  [String] String to chronify
-    ##
-    ## @return     [DateTime] result
-    ##
-    def chronify(input, future: false, guess: :begin)
-      now = Time.now
-      raise InvalidTimeExpression, "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
-
-      secs_ago = if input.match(/^(\d+)$/)
-                   # plain number, assume minutes
-                   Regexp.last_match(1).to_i * 60
-                 elsif (m = input.match(/^(?:(?<day>\d+)d)?(?:(?<hour>\d+)h)?(?:(?<min>\d+)m)?$/i))
-                   # day/hour/minute format e.g. 1d2h30m
-                   [[m['day'], 24 * 3600],
-                    [m['hour'], 3600],
-                    [m['min'], 60]].map { |qty, secs| qty ? (qty.to_i * secs) : 0 }.reduce(0, :+)
-                 end
-
-      if secs_ago
-        now - secs_ago
-      else
-        Chronic.parse(input, { guess: guess, context: future ? :future : :past, ambiguous_time_range: 8 })
-      end
-    end
-
-    ##
-    ## Converts simple strings into seconds that can be added to a Time
-    ##             object
-    ##
-    ## @param      qty   [String] HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m,
-    ##                   1.5d, 1h20m, etc.)
-    ##
-    ## @return     [Integer] seconds
-    ##
-    def chronify_qty(qty)
-      minutes = 0
-      case qty.strip
-      when /^(\d+):(\d\d)$/
-        minutes += Regexp.last_match(1).to_i * 60
-        minutes += Regexp.last_match(2).to_i
-      when /^(\d+(?:\.\d+)?)([hmd])?$/
-        amt = Regexp.last_match(1)
-        type = Regexp.last_match(2).nil? ? 'm' : Regexp.last_match(2)
-
-        minutes = case type.downcase
-                  when 'm'
-                    amt.to_i
-                  when 'h'
-                    (amt.to_f * 60).round
-                  when 'd'
-                    (amt.to_f * 60 * 24).round
-                  else
-                    minutes
-                  end
-      end
-      minutes * 60
     end
 
     ##
@@ -661,10 +596,53 @@ module Doing
     ## @option opt [String] :age  ('old' or 'new')
     ##
     def filter_items(items = Items.new, opt: {})
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+
       if items.nil? || items.empty?
         section = opt[:section] ? guess_section(opt[:section]) : 'All'
-
         items = section =~ /^all$/i ? @content.dup : @content.in_section(section)
+      end
+
+      opt[:time_filter] = [nil, nil]
+      if opt[:from] && !opt[:date_filter]
+        date_string = opt[:from]
+        case date_string
+        when / (to|through|thru|(un)?til|-+) /
+          dates = date_string.split(/ (?:to|through|thru|(?:un)?til|-+) /)
+          if dates[0].strip =~ time_rx && dates[-1].strip =~ time_rx
+            time_start = dates[0].strip
+            time_end = dates[-1].strip
+          else
+            start = dates[0].chronify(guess: :begin)
+            finish = dates[-1].chronify(guess: :end)
+          end
+        when time_rx
+          time_start = date_string
+          time_end = nil
+        else
+          start = date_string.chronify(guess: :begin)
+          finish = false
+        end
+
+        if time_start
+          opt[:time_filter] = [time_start, time_end]
+          Doing.logger.debug('Parser:', "--from string interpreted as time span, from #{time_start ? time_start : '12am'} to #{time_end ? time_end : '11:59pm'}")
+        else
+          raise InvalidTimeExpression, 'Unrecognized date string' unless start
+
+          opt[:date_filter] = [start, finish]
+          Doing.logger.debug('Parser:', "--from string interpreted as #{start.strftime('%F %R')} -- #{finish ? finish.strftime('%F %R') : 'now'}")
+        end
+      end
+
+      if opt[:before] =~ time_rx
+        opt[:time_filter][1] = opt[:before]
+        opt[:before] = nil
+      end
+
+      if opt[:after] =~ time_rx
+        opt[:time_filter][0] = opt[:after]
+        opt[:after] = nil
       end
 
       items.sort_by! { |item| [item.date, item.title.downcase] }.reverse
@@ -708,6 +686,26 @@ module Doing
           keep = opt[:not] ? !keep : keep
         end
 
+        if keep && opt[:time_filter][0] || opt[:time_filter][1]
+          start_string = if opt[:time_filter][0].nil?
+                           "#{item.date.strftime('%Y-%m-%d')} 12am"
+                         else
+                           "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][0]}"
+                         end
+          start_time = start_string.chronify(guess: :begin)
+
+          end_string = if opt[:time_filter][1].nil?
+                         "#{item.date.next_day.strftime('%Y-%m-%d')} 12am"
+                       else
+                         "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][1]}"
+                       end
+          end_time = end_string.chronify(guess: :end)
+
+          in_time_range = item.date >= start_time && item.date <= end_time
+          keep = false unless in_time_range
+          keep = opt[:not] ? !keep : keep
+        end
+
         keep = false if keep && opt[:only_timed] && !item.interval
 
         if keep && opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
@@ -717,14 +715,22 @@ module Doing
 
         if keep && opt[:before]
           time_string = opt[:before]
-          cutoff = chronify(time_string, guess: :begin)
+          if time_string =~ time_rx
+            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{time_string}".chronify(guess: :begin)
+          else
+            cutoff = time_string.chronify(guess: :begin)
+          end
           keep = cutoff && item.date <= cutoff
           keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:after]
           time_string = opt[:after]
-          cutoff = chronify(time_string, guess: :end)
+          if time_string =~ time_rx
+            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{time_string}".chronify(guess: :end)
+          else
+            cutoff = time_string.chronify(guess: :end)
+          end
           keep = cutoff && item.date >= cutoff
           keep = opt[:not] ? !keep : keep
         end
@@ -760,7 +766,7 @@ module Doing
     ## Options hash is shared with #filter_items and #act_on
     ##
     def interactive(opt = {})
-      section = opt[:section] ? guess_section(opt[:section]) : 'All'
+      opt[:section] = opt[:section] ? guess_section(opt[:section]) : 'All'
 
       search = nil
 
@@ -774,9 +780,12 @@ module Doing
       opt[:query] = "!#{opt[:query]}" if opt[:not]
       opt[:multiple] = true
       opt[:show_if_single] = true
-      items = filter_items(Items.new, opt: { section: section, search: opt[:search], fuzzy: opt[:fuzzy], case: opt[:case], not: opt[:not] })
+      filter_options = %i[after before case date_filter from fuzzy not search section].each_with_object({}) {
+        |k, hsh| hsh[k] = opt[k]
+      }
+      items = filter_items(Items.new, opt: filter_options)
 
-      selection = Prompt.choose_from_items(items, include_section: section =~ /^all$/i, **opt)
+      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **opt)
 
       raise NoResults, 'no items selected' if selection.nil? || selection.empty?
 
@@ -1336,7 +1345,7 @@ module Doing
         break if counter >= max
         if opt[:before]
           time_string = opt[:before]
-          cutoff = chronify(time_string, guess: :begin)
+          cutoff = time_string.chronify(guess: :begin)
         end
 
         unless ((!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s)) || (opt[:before] && item.date >= cutoff))
@@ -1524,10 +1533,12 @@ module Doing
         'order' => @config['order'] || 'asc',
         'tags_color' => @config['tags_color']
       })
+
       options = {
         after: opt[:after],
         before: opt[:before],
         count: 0,
+        from: opt[:from],
         format: cfg['date_format'],
         order: cfg['order'] || 'asc',
         output: output,
@@ -1584,6 +1595,7 @@ module Doing
         after: opt[:after],
         before: opt[:before],
         count: 0,
+        from: opt[:from],
         order: opt[:order],
         output: output,
         section: section,
@@ -2044,7 +2056,7 @@ EOS
         break if counter >= max
         if opt[:before]
           time_string = opt[:before]
-          cutoff = chronify(time_string, guess: :begin)
+          cutoff = time_string.chronify(guess: :begin)
         end
 
         if (item.section.downcase != section.downcase && section != /^all$/i) || item.section.downcase == destination.downcase

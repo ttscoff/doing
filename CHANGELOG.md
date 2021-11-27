@@ -1,3 +1,17 @@
+### 2.1.1pre
+
+#### NEW
+
+- --before, --after, and --from date filters for select command
+- --from flag for `doing today` and `doing yesterday`, filter by time range
+- --from flag for `doing search`, filter by date/time range
+- Commands that accept --before, --after, and --from can now filter on time ranges. If the date string given contains only a time (no day or date), it will be interpreted as a time range, meaning the date isn't filtered, but only entries within the time range are shown/processed
+
+#### FIXED
+
+- `finish --took 60m` is supposed to backdate the start date if needed to finish at the current time and maintain an elapsed time
+- If an editor was specified for config (or default as fallback) with command line options (e.g. `emacs -nw`), Doing would fail to recognize that the executable was available.
+
 ### 2.1.0pre
 
 #### NEW

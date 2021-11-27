@@ -146,9 +146,9 @@ command %i[now next] do |c|
 
   c.action do |_global_options, options, args|
     if options[:back]
-      date = wwid.chronify(options[:back], guess: :begin)
+      date = options[:back].chronify(guess: :begin)
 
-      raise InvalidTimeExpression.new('unable to parse date string', topic: 'Date parser:') if date.nil?
+      raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if date.nil?
     else
       date = Time.now
     end
@@ -421,7 +421,7 @@ command :meanwhile do |c|
 
   c.action do |_global_options, options, args|
     if options[:back]
-      date = wwid.chronify(options[:back], guess: :begin)
+      date = options[:back].chronify(guess: :begin)
 
       raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
     else
@@ -548,6 +548,25 @@ command :select do |c|
   c.arg_name 'QUERY'
   c.flag %i[q query search]
 
+  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
+
+  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.arg_name 'DATE_STRING'
+  c.flag [:after]
+
+  c.desc %(
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing select --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 
@@ -620,7 +639,7 @@ command :later do |c|
 
   c.action do |_global_options, options, args|
     if options[:back]
-      date = wwid.chronify(options[:back], guess: :begin)
+      date = options[:back].chronify(guess: :begin)
       raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
     else
       date = Time.now
@@ -715,19 +734,19 @@ command %i[done did] do |c|
     donedate = nil
 
     if options[:took]
-      took = wwid.chronify_qty(options[:took])
+      took = options[:took].chronify_qty
       raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
     end
 
     if options[:back]
-      date = wwid.chronify(options[:back], guess: :begin)
+      date = options[:back].chronify(guess: :begin)
       raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
     else
       date = options[:took] ? Time.now - took : Time.now
     end
 
     if options[:at]
-      finish_date = wwid.chronify(options[:at], guess: :begin)
+      finish_date = options[:at].chronify(guess: :begin)
       raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
       date = options[:took] ? finish_date - took : finish_date
@@ -1028,7 +1047,7 @@ command :finish do |c|
     options[:fuzzy] = false
     unless options[:auto]
       if options[:took]
-        took = wwid.chronify_qty(options[:took])
+        took = options[:took].chronify_qty
         raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
       end
 
@@ -1037,20 +1056,20 @@ command :finish do |c|
       raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 
       if options[:at]
-        finish_date = wwid.chronify(options[:at], guess: :begin)
+        finish_date = options[:at].chronify(guess: :begin)
         raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
         date = options[:took] ? finish_date - took : finish_date
       elsif options[:back]
-        date = wwid.chronify(options[:back])
+        date = options[:back].chronify()
 
         raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
-      elsif options[:took]
-        date = wwid.chronify_qty(options[:took])
       else
         date = Time.now
       end
     end
+
+    options[:took] = options[:took].chronify_qty if options[:took]
 
     if options[:tag].nil?
       tags = []
@@ -1091,6 +1110,7 @@ command :finish do |c|
       tag: tags,
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],
+      took: options[:took],
       unfinished: options[:unfinished]
     }
 
@@ -1481,13 +1501,25 @@ command :show do |c|
   c.arg_name 'AGE'
   c.flag %i[a age], default_value: 'newest'
 
-  c.desc 'View entries older than date'
+  c.desc 'Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'View entries newer than date'
+  c.desc 'Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
+
+  c.desc %(
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing show --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
+
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
 
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -1509,14 +1541,6 @@ command :show do |c|
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
   c.flag %i[s sort], must_match: REGEX_SORT_ORDER, default_value: 'asc'
-
-  c.desc %(
-    Date range to show, or a single day to filter date on.
-    Date range argument should be quoted. Date specifications can be natural language.
-    To specify a range, use "to" or "through": `doing show --from "monday to friday"`
-  )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag %i[f from]
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1592,21 +1616,6 @@ command :show do |c|
       }
     end
 
-    if options[:from]
-
-      date_string = options[:from]
-      if date_string =~ / (to|through|thru|(un)?til|-+) /
-        dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-        start = wwid.chronify(dates[0], guess: :begin)
-        finish = wwid.chronify(dates[2], guess: :end)
-      else
-        start = wwid.chronify(date_string, guess: :begin)
-        finish = false
-      end
-      raise InvalidTimeExpression, 'Unrecognized date string' unless start
-      dates = [start, finish]
-    end
-
     options[:times] = true if options[:totals]
 
     template = settings['templates']['default'].deep_merge({
@@ -1627,7 +1636,6 @@ command :show do |c|
     opt = options.dup
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
-    opt[:date_filter] = dates
     opt[:highlight] = true
     opt[:order] = options[:sort].normalize_order
     opt[:section] = section
@@ -1658,13 +1666,24 @@ command %i[grep search] do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Constrain search to entries older than date'
+  c.desc 'Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'Constrain search to entries newer than date'
+  c.desc 'Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
+
+  c.desc %(
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing search --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
 
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
@@ -1825,19 +1844,20 @@ command :today do |c|
   c.arg_name 'TIME_STRING'
   c.flag [:after]
 
+  c.desc %(
+    Time range to show `doing today --from "12pm to 4pm"`
+  )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
+
   c.action do |_global_options, options, _args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-    opt = {
-      after: options[:after],
-      before: options[:before],
-      section: options[:section],
-      sort_tags: options[:sort_tags],
-      totals: options[:totals]
-    }
-    Doing::Pager.page wwid.today(options[:times], options[:output], opt).chomp
+    filter_options = %i[after before from section sort_tags totals].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
+
+    Doing::Pager.page wwid.today(options[:times], options[:output], filter_options).chomp
   end
 end
 
@@ -1880,10 +1900,10 @@ command :on do |c|
 
     if date_string =~ / (to|through|thru) /
       dates = date_string.split(/ (to|through|thru) /)
-      start = wwid.chronify(dates[0], guess: :begin)
-      finish = wwid.chronify(dates[2], guess: :end)
+      start = dates[0].chronify(guess: :begin)
+      finish = dates[2].chronify(guess: :end)
     else
-      start = wwid.chronify(date_string, guess: :begin)
+      start = date_string.chronify(guess: :begin)
       finish = false
     end
 
@@ -1939,7 +1959,7 @@ command :since do |c|
     date_string.sub!(/(day) (\d)/, '\1 at \2')
     date_string.sub!(/(\d+)d( ago)?/, '\1 days ago')
 
-    start = wwid.chronify(date_string, guess: :begin)
+    start = date_string.chronify(guess: :begin)
     finish = Time.now
 
     raise InvalidTimeExpression, 'Unrecognized date string' unless start
@@ -1987,6 +2007,12 @@ command :yesterday do |c|
   c.arg_name 'TIME_STRING'
   c.flag [:after]
 
+  c.desc %(
+      Time range to show, e.g. `doing yesterday --from "1am to 8am"`
+    )
+  c.arg_name 'TIME_RANGE'
+  c.flag [:from]
+
   c.desc 'Tag sort direction (asc|desc)'
   c.arg_name 'DIRECTION'
   c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
@@ -1996,9 +2022,16 @@ command :yesterday do |c|
 
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
+    if options[:from]
+      options[:from] = options[:from].split(/ (?:to|through|thru|(?:un)?til|-+) /).map do |time|
+        "yesterday #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}"
+      end.join(' to ')
+    end
+
     opt = {
       after: options[:after],
       before: options[:before],
+      from: options[:from],
       sort_tags: options[:sort_tags],
       tag_order: options[:tag_order].normalize_order,
       totals: options[:totals],
@@ -2245,13 +2278,24 @@ command :view do |c|
   c.arg_name 'DIRECTION'
   c.flag [:tag_order], must_match: REGEX_SORT_ORDER
 
-  c.desc 'View entries older than date'
+  c.desc 'View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'View entries newer than date'
+  c.desc 'View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
+
+  c.desc %(
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing view --from "monday 8am to friday 5pm" view_name`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
 
   c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -2346,27 +2390,8 @@ command :view do |c|
                             else
                               false
                             end
-      if view.key?('after') && !options[:after]
-        options[:after] = view['after']
-      end
 
-      if view.key?('before') && !options[:before]
-        options[:before] = view['before']
-      end
-
-      if view.key?('from')
-        date_string = view['from']
-        if date_string =~ / (to|through|thru|(un)?til|-+) /
-          dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-          start = wwid.chronify(dates[0], guess: :begin)
-          finish = wwid.chronify(dates[2], guess: :end)
-        else
-          start = wwid.chronify(date_string, guess: :begin)
-          finish = false
-        end
-        raise InvalidTimeExpression, 'Unrecognized date string' unless start
-        dates = [start, finish]
-      end
+      %w[before after from].each { |k| options[k.to_sym] = view[k] if view.key?(k) && !options[k.to_sym] }
 
       options[:case] = options[:case].normalize_case
 
@@ -2378,22 +2403,21 @@ command :view do |c|
       end
 
       opts = options.dup
-      opts[:search] = search
-      opts[:output] = output_format
       opts[:count] = count
       opts[:format] = date_format
       opts[:highlight] = options[:color]
       opts[:only_timed] = only_timed
       opts[:order] = order
+      opts[:output] = options[:interactive] ? nil : options[:output]
+      opts[:output] = output_format
+      opts[:page_title] = page_title
+      opts[:search] = search
       opts[:section] = section
       opts[:tag_filter] = tag_filter
       opts[:tag_order] = tag_order
       opts[:tags_color] = tags_color
       opts[:template] = template
       opts[:totals] = totals
-      opts[:page_title] = page_title
-      opts[:date_filter] = dates
-      opts[:output] = options[:interactive] ? nil : options[:output]
 
       Doing::Pager.page wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
@@ -2597,7 +2621,7 @@ command :open do |c|
     end
 
     if options[:editor]
-      raise MissingEditor, "Editor #{options[:editor]} not found" unless Doing::Util.exec_available(options[:editor])
+      raise MissingEditor, "Editor #{options[:editor]} not found" unless Doing::Util.exec_available(options[:editor].split(/ /).first)
 
       editor = TTY::Which.which(options[:editor])
       system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
@@ -2608,7 +2632,7 @@ command :open do |c|
         system %(open -b "#{options[:bundle_id]}" "#{File.expand_path(wwid.doing_file)}")
       elsif Doing::Util.find_default_editor('doing_file')
         editor = Doing::Util.find_default_editor('doing_file')
-        if Doing::Util.exec_available(editor)
+        if Doing::Util.exec_available(editor.split(/ /).first)
           system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
         else
           system %(open -a "#{editor}" "#{File.expand_path(wwid.doing_file)}")
@@ -2703,7 +2727,7 @@ command :config do |c|
         if options[:default]
           editor = Doing::Util.find_default_editor('config')
           if editor
-            if Doing::Util.exec_available(editor)
+            if Doing::Util.exec_available(editor.split(/ /).first)
               system %(#{editor} "#{config_file}")
             else
               `open -a "#{editor}" "#{config_file}"`
@@ -2722,7 +2746,7 @@ command :config do |c|
 
           raise MissingEditor, 'No viable editor defined in config or environment' unless editor
 
-          if Doing::Util.exec_available(editor)
+          if Doing::Util.exec_available(editor.split(/ /).first)
             system %(#{editor} "#{config_file}")
           else
             `open -a "#{editor}" "#{config_file}"`
@@ -2730,7 +2754,7 @@ command :config do |c|
         end
       else
         editor = options[:editor] || Doing::Util.default_editor
-        raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor)
+        raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor.split(/ /).first)
 
         system %(#{editor} "#{config_file}")
       end
@@ -2906,6 +2930,7 @@ command :import do |c|
   c.arg_name 'PREFIX'
   c.flag :prefix
 
+  # TODO: Allow time range filtering
   c.desc 'Import entries older than date'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
@@ -2935,10 +2960,10 @@ command :import do |c|
       date_string = options[:from]
       if date_string =~ / (to|through|thru|(un)?til|-+) /
         dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-        start = wwid.chronify(dates[0], guess: :begin)
-        finish = wwid.chronify(dates[2], guess: :end)
+        start = dates[0].chronify(guess: :begin)
+        finish = dates[2].chronify(guess: :end)
       else
-        start = wwid.chronify(date_string, guess: :begin)
+        start = date_string.chronify(guess: :begin)
         finish = false
       end
       raise InvalidTimeExpression, 'Unrecognized date string' unless start

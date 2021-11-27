@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.0pre
+v2.1.1pre
 
 === Global Options
 === --config_file arg
@@ -145,7 +145,7 @@ Repeat last entry matching tags. Combine multiple tags with a comma.
 
 
 ===== -e|--editor
-Edit duplicated entry with vim before adding
+Edit duplicated entry with emacs -nw before adding
 
 
 
@@ -541,7 +541,7 @@ Include date
 
 
 ===== -e|--editor
-Edit entry with vim (with no arguments, edits the last entry)
+Edit entry with emacs -nw (with no arguments, edits the last entry)
 
 
 
@@ -670,14 +670,14 @@ To search with regular expressions, single quote the string and surround with sl
 ===== Options
 ===== --after DATE_STRING
 
-Constrain search to entries newer than date
+Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
 
 [Default Value] None
 
 
 ===== --before DATE_STRING
 
-Constrain search to entries older than date
+Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
 
 [Default Value] None
 
@@ -688,6 +688,18 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
+
+
+===== --from DATE_OR_RANGE
+
+Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing search --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+
+[Default Value] None
 
 
 ===== -o|--output FORMAT
@@ -891,7 +903,7 @@ Tag filter, combine multiple tags with a comma.
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with emacs -nw
 
 
 
@@ -925,7 +937,7 @@ Note
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with emacs -nw
 
 
 
@@ -1047,7 +1059,7 @@ Archive previous @meanwhile entry
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with emacs -nw
 
 
 
@@ -1098,7 +1110,7 @@ Add/remove note from last entry matching tag
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with emacs -nw
 
 
 
@@ -1129,7 +1141,7 @@ Record what you're starting now, or backdate the start time using natural langua
 
 A parenthetical at the end of the entry will be converted to a note.
 
-Run with no argument to create a new entry using vim.
+Run with no argument to create a new entry using emacs -nw.
 ===== Options
 ===== -b|--back|--started DATE_STRING
 
@@ -1153,7 +1165,7 @@ Section
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with emacs -nw
 
 
 
@@ -1433,12 +1445,38 @@ Multiple selections are allowed, hit tab to add the highlighted entry to the
 selection, and use ctrl-a to select all visible items. Return processes the
 selected entries.
 ===== Options
+===== --after DATE_STRING
+
+Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+
+[Default Value] None
+
+
+===== --before DATE_STRING
+
+Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+
+[Default Value] None
+
+
 ===== --case TYPE
 
 Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
+
+
+===== --from DATE_OR_RANGE
+
+Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing select --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+
+[Default Value] None
 
 
 ===== -m|--move SECTION
@@ -1558,7 +1596,7 @@ Age (oldest|newest)
 
 ===== --after DATE_STRING
 
-View entries newer than date
+Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
 
 [Default Value] None
 
@@ -1573,7 +1611,7 @@ Tag boolean (AND,OR,NOT)
 
 ===== --before DATE_STRING
 
-View entries older than date
+Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
 
 [Default Value] None
 
@@ -1593,11 +1631,14 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 [Must Match] (?-mix:^[csi])
 
 
-===== -f|--from DATE_OR_RANGE
+===== --from DATE_OR_RANGE
 
 Date range to show, or a single day to filter date on.
-    Date range argument should be quoted. Date specifications can be natural language.
-    To specify a range, use "to" or "through": `doing show --from "monday to friday"`
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing show --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
 
 [Default Value] None
 
@@ -1869,6 +1910,13 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 [Default Value] None
 
 
+===== --from DATE_OR_RANGE
+
+Time range to show `doing today --from "12pm to 4pm"`
+
+[Default Value] None
+
+
 ===== -o|--output FORMAT
 
 Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
@@ -1920,7 +1968,7 @@ Command line options override view configuration
 ===== Options
 ===== --after DATE_STRING
 
-View entries newer than date
+View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
 
 [Default Value] None
 
@@ -1935,7 +1983,7 @@ Tag boolean (AND,OR,NOT)
 
 ===== --before DATE_STRING
 
-View entries older than date
+View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
 
 [Default Value] None
 
@@ -1954,6 +2002,18 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 
 [Default Value] smart
 [Must Match] (?-mix:^[csi])
+
+
+===== --from DATE_OR_RANGE
+
+Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing view --from "monday 8am to friday 5pm" view_name`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+
+[Default Value] None
 
 
 ===== -o|--output FORMAT
@@ -2122,6 +2182,13 @@ View entries after specified time (e.g. 8am, 12:30pm, 15:00)
 ===== --before TIME_STRING
 
 View entries before specified time (e.g. 8am, 12:30pm, 15:00)
+
+[Default Value] None
+
+
+===== --from TIME_RANGE
+
+Time range to show, e.g. `doing yesterday --from "1am to 8am"`
 
 [Default Value] None
 

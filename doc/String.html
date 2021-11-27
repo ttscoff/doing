@@ -99,14 +99,16 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/doing/string.rb</dd>
+    <dd>lib/doing/string.rb<span class="defines">,<br />
+  lib/doing/string_chronify.rb</span>
+</dd>
   </dl>
   
 </div>
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>String helpers</p>
+    <p>Chronify methods for strings</p>
 
 
   </div>
@@ -197,6 +199,52 @@
 
   
     <span class="summary_desc"><div class='inline'><p>Capitalize on the first character on string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#chronify-instance_method" title="#chronify (instance method)">#<strong>chronify</strong>(**options)  &#x21d2; DateTime </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Converts input string into a Time object when input takes on the following formats:             - interval format e.g.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#chronify_qty-instance_method" title="#chronify_qty (instance method)">#<strong>chronify_qty</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Converts simple strings into seconds that can be added to a Time object.</p>
 </div></span>
   
 </li>
@@ -1067,6 +1115,162 @@
       
         
         <div class='inline'><p>Capitalized string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="chronify-instance_method">
+  
+    #<strong>chronify</strong>(**options)  &#x21d2; <tt>DateTime</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Converts input string into a Time object when input
+takes on the following formats:
+            - interval format e.g. &#39;1d2h30m&#39;, &#39;45m&#39;
+              etc.
+            - a semantic phrase e.g. &#39;yesterday
+              5:30pm&#39;
+            - a strftime e.g. &#39;2016-03-15 15:32:04
+              PDT&#39;</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <p class="tag_title">Options Hash (<tt>**options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:future</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'><p>assume future date
+(default: false)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:guess</span>
+          <span class="type">(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'><p>:begin or :end to
+assume beginning or end of
+arbitrary time range</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>DateTime</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>result</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>InvalidTimeExpression</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="chronify_qty-instance_method">
+  
+    #<strong>chronify_qty</strong>  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Converts simple strings into seconds that can be
+added to a Time object</p>
+
+<p>Input string can be HH:MM or XX[dhm]<a href="1d2h30m,%2045m,%201.5d,%201h20m,%20etc.">[XXhm][XXm]</a></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>seconds</p>
 </div>
       
     </li>
@@ -2280,7 +2484,7 @@ between characters</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Nov 27 10:06:03 2021 by
+  Generated on Sat Nov 27 13:57:12 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>
