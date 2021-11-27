@@ -62,6 +62,15 @@ module Doing
       end
     end
 
+    # Compress multiple spaces to single space
+    def compress
+      gsub(/ +/, ' ').strip
+    end
+
+    def compress!
+      replace compress
+    end
+
     ## @param (see #highlight_tags)
     def highlight_tags!(color = 'yellow')
       replace highlight_tags(color)

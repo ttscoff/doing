@@ -162,24 +162,29 @@ command %i[now next] do |c|
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
-      input = ''
+      input += date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
 
       raise EmptyInput, 'No content' if input.empty?
 
-      title, note = wwid.format_input(input)
+      date, title, note = wwid.format_input(input)
       note.add(options[:note]) if options[:note]
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     elsif args.length.positive?
-      title, note = wwid.format_input(args.join(' '))
+      d, title, note = wwid.format_input(args.join(' '))
+      date = d.nil? ? date : d
       note.add(options[:note]) if options[:note]
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     elsif $stdin.stat.size.positive?
-      input = $stdin.read
-      title, note = wwid.format_input(input)
+      input = $stdin.read.strip
+      d, title, note = wwid.format_input(input)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
       note.add(options[:note]) if options[:note]
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
@@ -364,14 +369,14 @@ command :note do |c|
 
       input = prev_input.add(input)
 
-      input = wwid.fork_editor([last_entry.title, '### Edit below this line', input.to_s].join("\n")).strip
-      _title, note = wwid.format_input(input)
+      input = wwid.fork_editor(prev_input.strip_lines.join("\n"), message: nil).strip
+      note = input
       options[:remove] = true
       new_note.add(note)
     elsif !args.empty?
       new_note.add(args.join(' '))
     elsif $stdin.stat.size.positive?
-      new_note.add($stdin.read)
+      new_note.add($stdin.read.strip)
     else
       raise EmptyInput, 'You must provide content when adding a note' unless options[:remove]
     end
@@ -432,17 +437,21 @@ command :meanwhile do |c|
 
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
+      input += date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
     elsif !args.empty?
       input = args.join(' ')
     elsif $stdin.stat.size.positive?
-      input = $stdin.read
+      input = $stdin.read.strip
     end
 
     if input && !input.empty?
-      input, note = wwid.format_input(input)
+      d, input, note = wwid.format_input(input)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
     else
       input = nil
       note = []
@@ -620,21 +629,28 @@ command :later do |c|
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
-      input = args.empty? ? '' : args.join(' ')
+      input += date.strftime('%F %R | ')
+      input += args.empty? ? '' : args.join(' ')
       input = wwid.fork_editor(input).strip
       raise EmptyInput, 'No content' unless input && !input.empty?
 
-      title, note = wwid.format_input(input)
+      d, title, note = wwid.format_input(input)
+      date = d.nil? ? date : d
       note.add(options[:note]) if options[:note]
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
     elsif !args.empty?
-      title, note = wwid.format_input(args.join(' '))
+      d, title, note = wwid.format_input(args.join(' '))
+      date = d.nil? ? date : d
       note.add(options[:note]) if options[:note]
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
     elsif $stdin.stat.size.positive?
-      title, note = wwid.format_input($stdin.read)
+      d, title, note = wwid.format_input($stdin.read)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
       note.add(options[:note]) if options[:note]
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
@@ -748,16 +764,17 @@ command %i[done did] do |c|
 
         old_entry = last_entry.dup
         last_entry.note.add(note)
-        input = [last_entry.title, last_entry.note.strip_lines.join("\n")].join("\n")
+        input = ["#{last_entry.date.strftime('%F %R | ')}#{last_entry.title}", last_entry.note.strip_lines.join("\n")].join("\n")
       else
         is_new = true
-        input = [args.join(' '), note.strip_lines.join("\n")].join("\n")
+        input = ["#{date.strftime('%F %R | ')}#{args.join(' ')}", note.strip_lines.join("\n")].join("\n")
       end
 
       input = wwid.fork_editor(input).strip
       raise EmptyInput, 'No content' unless input && !input.empty?
 
-      title, note = wwid.format_input(input)
+      d, title, note = wwid.format_input(input)
+      date = d.nil? ? date : d
       new_entry = Doing::Item.new(date, title, section, note)
       if new_entry.should_finish?
         if new_entry.should_time?
@@ -770,7 +787,7 @@ command %i[done did] do |c|
       if (is_new)
         wwid.content.push(new_entry)
       else
-        wwid.update_item(old_entry, new_entry)
+        wwid.content.update_item(old_entry, new_entry)
       end
 
       if options[:archive]
@@ -798,7 +815,8 @@ command %i[done did] do |c|
       end
     elsif !args.empty?
       note = Doing::Note.new(options[:note])
-      title, new_note = wwid.format_input([args.join(' '), note.strip_lines.join("\n")].join("\n"))
+      d, title, new_note = wwid.format_input([args.join(' '), note.strip_lines.join("\n")].join("\n"))
+      date = d.nil? ? date : d
       title.chomp!
       section = 'Archive' if options[:archive]
       new_entry = Doing::Item.new(date, title, section, new_note)
@@ -813,7 +831,11 @@ command %i[done did] do |c|
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     elsif $stdin.stat.size.positive?
-      title, note = wwid.format_input($stdin.read)
+      d, title, note = wwid.format_input($stdin.read.strip)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
       note.add(options[:note]) if options[:note]
       section = options[:archive] ? 'Archive' : section
       new_entry = Doing::Item.new(date, title, section, note)

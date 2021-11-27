@@ -124,7 +124,7 @@ module Doing
     ##
     ## @param      input  [String] Text input for editor
     ##
-    def fork_editor(input = '')
+    def fork_editor(input = '', message: :default)
       # raise NonInteractive, 'Non-interactive terminal' unless $stdout.isatty || ENV['DOING_EDITOR_TEST']
 
       raise MissingEditor, 'No EDITOR variable defined in environment' if Util.default_editor.nil?
@@ -133,7 +133,9 @@ module Doing
 
       File.open(tmpfile.path, 'w+') do |f|
         f.puts input
-        f.puts "\n# The first line is the entry title, any lines after that are added as a note"
+        unless message.nil?
+          f.puts message == :default ? "# The first line is the entry title, any lines after that are added as a note" : message
+        end
       end
 
       pid = Process.fork { system("#{Util.editor_with_args} #{tmpfile.path}") }
@@ -179,6 +181,30 @@ module Doing
       title = input_lines[0]&.strip
       raise EmptyInput, 'No content in first line' if title.nil? || title.strip.empty?
 
+      date = nil
+      iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
+      done_rx = /(?<=^| )@(?<tag>done|finished|completed?)\((?<date>.*?)\)/i
+      date_rx = /^(?:\s*- )?(?<date>.*?) \| (?=\S)/
+
+      title.gsub!(done_rx) do
+        m = Regexp.last_match
+        t = m['tag']
+        d = m['date']
+        parsed_date = d =~ date_rx ? Time.parse(d) : chronify(d, guess: :begin)
+        parsed_date.nil? ? m[0] : "@#{t}(#{parsed_date.strftime('%F %R')})"
+      end
+
+      if title =~ date_rx
+        m = title.match(date_rx)
+        d = m['date']
+        date = if d =~ iso_rx
+                 Time.parse(d)
+               else
+                 chronify(d, guess: :begin)
+               end
+        title.sub!(date_rx, '').strip!
+      end
+
       note = Note.new
       note.add(input_lines[1..-1]) if input_lines.length > 1
       # If title line ends in a parenthetical, use that as the note
@@ -190,11 +216,10 @@ module Doing
         end
       end
 
-
       note.strip_lines!
       note.compress
 
-      [title, note]
+      [date, title, note]
     end
 
     ##
@@ -363,9 +388,9 @@ module Doing
     def add_item(title, section = nil, opt = {})
       section ||= @config['current_section']
       @content.add_section(section, log: false)
+      opt[:back] ||= opt[:date] ? opt[:date] : Time.now
       opt[:date] ||= Time.now
       note = Note.new
-      opt[:back] ||= Time.now
       opt[:timed] ||= false
 
       note.add(opt[:note]) if opt[:note]
@@ -378,7 +403,7 @@ module Doing
         title.add_tags!(@config['default_tags']) unless @config['default_tags'].empty?
       end
 
-      title.gsub!(/ +/, ' ')
+      title.compress!
       entry = Item.new(opt[:back], title.strip, section)
       entry.note = note
 
@@ -499,10 +524,13 @@ module Doing
       note = opt[:note] || Note.new
 
       if opt[:editor]
-        to_edit = title
+        start = opt[:date] ? opt[:date] : Time.now
+        to_edit = "#{start.strftime('%F %R')} | #{title}"
         to_edit += "\n#{note.strip_lines.join("\n")}" unless note.empty?
         new_item = fork_editor(to_edit)
-        title, note = format_input(new_item)
+        date, title, note = format_input(new_item)
+
+        opt[:date] = date unless date.nil?
 
         if title.nil? || title.empty?
           logger.warn('Skipped:', 'No content provided')
@@ -934,36 +962,44 @@ module Doing
         editable_items = []
 
         items.each do |i|
-          editable = "#{i.date} | #{i.title}"
+          editable = "#{i.date.strftime('%F %R')} | #{i.title}"
           old_note = i.note ? i.note.strip_lines.join("\n") : nil
           editable += "\n#{old_note}" unless old_note.nil?
           editable_items << editable
         end
         divider = "\n-----------\n"
-        notice = '# You may delete entries, but leave all divider lines in place'
+        notice =<<~EONOTICE
+        # - You may delete entries, but leave all divider lines (---) in place.
+        # - Start and @done dates replaced with a time string (yesterday 3pm) will
+        #   be parsed automatically. Do not delete the pipe (|) between start date
+        #   and entry title.
+        EONOTICE
         input =  "#{editable_items.map(&:strip).join(divider)}\n\n#{notice}"
 
         new_items = fork_editor(input).split(/#{divider}/)
 
         new_items.each_with_index do |new_item, i|
           input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
-          title = input_lines[0]&.strip
+          first_line = input_lines[0]&.strip
 
-          if title.nil? || title =~ /^#{divider.strip}$/ || title.strip.empty?
+          if first_line.nil? || first_line =~ /^#{divider.strip}$/ || first_line.strip.empty?
             @content.delete_item(items[i], single: new_items.count == 1)
+            Doing.logger.count(:deleted)
           else
-            note = input_lines.length > 1 ? input_lines[1..-1] : []
+            date, title, note = format_input(new_item)
 
             note.map!(&:strip)
             note.delete_if(&:ignore?)
-
-            date = title.match(/^([\d\-: ]+) \| /)[1]
-            title.sub!(/^([\d\-: ]+) \| /, '')
-
             item = items[i]
+            old_item = item.dup
+            item.date = date || items[i].date
             item.title = title
             item.note = note
-            item.date = Time.parse(date) || items[i].date
+            if (item.equal?(old_item))
+              Doing.logger.count(:skipped, level: :debug)
+            else
+              Doing.logger.count(:updated)
+            end
           end
         end
 
@@ -1165,16 +1201,18 @@ module Doing
         return
       end
 
-      content = [item.title.dup]
+      content = ["#{item.date.strftime('%F %R')} | #{item.title.dup}"]
       content << item.note.strip_lines.join("\n") unless item.note.empty?
       new_item = fork_editor(content.join("\n"))
-      title, note = format_input(new_item)
+      date, title, note = format_input(new_item)
+      date ||= item.date
 
       if title.nil? || title.empty?
         logger.debug('Skipped:', 'No content provided')
-      elsif title == item.title && note.equal?(item.note)
+      elsif title == item.title && note.equal?(item.note) && date.equal?(item.date)
         logger.debug('Skipped:', 'No change in content')
       else
+        item.date = date unless date.nil?
         item.title = title
         item.note.add(note, replace: true)
         logger.info('Edited:', item.title)
@@ -1236,7 +1274,8 @@ module Doing
       logger.debug('Skipped:', "No active @#{tag} tasks found.") if found_items.zero?
 
       if opt[:new_item]
-        title, note = format_input(opt[:new_item])
+        date, title, note = format_input(opt[:new_item])
+        opt[:back] = date unless date.nil?
         note.add(opt[:note]) if opt[:note]
         title.tag!(tag)
         add_item(title.cap_first, opt[:section], { note: note, back: opt[:back] })
