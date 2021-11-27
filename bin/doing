@@ -2621,7 +2621,7 @@ command :open do |c|
     end
 
     if options[:editor]
-      raise MissingEditor, "Editor #{options[:editor]} not found" unless Doing::Util.exec_available(options[:editor])
+      raise MissingEditor, "Editor #{options[:editor]} not found" unless Doing::Util.exec_available(options[:editor].split(/ /).first)
 
       editor = TTY::Which.which(options[:editor])
       system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
@@ -2632,7 +2632,7 @@ command :open do |c|
         system %(open -b "#{options[:bundle_id]}" "#{File.expand_path(wwid.doing_file)}")
       elsif Doing::Util.find_default_editor('doing_file')
         editor = Doing::Util.find_default_editor('doing_file')
-        if Doing::Util.exec_available(editor)
+        if Doing::Util.exec_available(editor.split(/ /).first)
           system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
         else
           system %(open -a "#{editor}" "#{File.expand_path(wwid.doing_file)}")
@@ -2727,7 +2727,7 @@ command :config do |c|
         if options[:default]
           editor = Doing::Util.find_default_editor('config')
           if editor
-            if Doing::Util.exec_available(editor)
+            if Doing::Util.exec_available(editor.split(/ /).first)
               system %(#{editor} "#{config_file}")
             else
               `open -a "#{editor}" "#{config_file}"`
@@ -2746,7 +2746,7 @@ command :config do |c|
 
           raise MissingEditor, 'No viable editor defined in config or environment' unless editor
 
-          if Doing::Util.exec_available(editor)
+          if Doing::Util.exec_available(editor.split(/ /).first)
             system %(#{editor} "#{config_file}")
           else
             `open -a "#{editor}" "#{config_file}"`
@@ -2754,7 +2754,7 @@ command :config do |c|
         end
       else
         editor = options[:editor] || Doing::Util.default_editor
-        raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor)
+        raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor.split(/ /).first)
 
         system %(#{editor} "#{config_file}")
       end
