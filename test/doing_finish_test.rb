@@ -61,8 +61,12 @@ class DoingDoneTest < Test::Unit::TestCase
     d = r.match(ENTRY_DONE_REGEX)
     assert(d, "#{r} should have @done timestamp")
     start = Time.parse(t['ts'])
+
     assert_within_tolerance((start + (60 * 60)), Time.parse(d['ts']),
                             message: 'Finished time should be 60 minutes after start')
+
+    assert_within_tolerance(start, Time.now - (60 * 60),
+                            message: 'Start time should be backdated 60 minutes')
   end
 
   def test_finish_at
