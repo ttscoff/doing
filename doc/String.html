@@ -364,7 +364,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#last_color-instance_method" title="#last_color (instance method)">#<strong>last_color</strong>  &#x21d2; Object </a>
+      <a href="#last_color-instance_method" title="#last_color (instance method)">#<strong>last_color</strong>  &#x21d2; String </a>
     
 
     
@@ -387,7 +387,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#link_urls-instance_method" title="#link_urls (instance method)">#<strong>link_urls</strong>(opt = {})  &#x21d2; Object </a>
+      <a href="#link_urls-instance_method" title="#link_urls (instance method)">#<strong>link_urls</strong>(**opt)  &#x21d2; Object </a>
     
 
     
@@ -409,7 +409,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#link_urls!-instance_method" title="#link_urls! (instance method)">#<strong>link_urls!</strong>(opt = {})  &#x21d2; Object </a>
+      <a href="#link_urls!-instance_method" title="#link_urls! (instance method)">#<strong>link_urls!</strong>(**opt)  &#x21d2; Object </a>
     
 
     
@@ -634,7 +634,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#replace_qualified_urls-instance_method" title="#replace_qualified_urls (instance method)">#<strong>replace_qualified_urls</strong>(opt = {})  &#x21d2; Object </a>
+      <a href="#replace_qualified_urls-instance_method" title="#replace_qualified_urls (instance method)">#<strong>replace_qualified_urls</strong>(**options)  &#x21d2; Object </a>
     
 
     
@@ -657,7 +657,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#tag-instance_method" title="#tag (instance method)">#<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; Object </a>
+      <a href="#set_type-instance_method" title="#set_type (instance method)">#<strong>set_type</strong>(kind = nil)  &#x21d2; Object </a>
     
 
     
@@ -679,7 +679,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#tag!-instance_method" title="#tag! (instance method)">#<strong>tag!</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; Object </a>
+      <a href="#tag-instance_method" title="#tag (instance method)">#<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false, force: false)  &#x21d2; String </a>
     
 
     
@@ -693,7 +693,31 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Add, rename, or remove a tag.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#tag!-instance_method" title="#tag! (instance method)">#<strong>tag!</strong>(tag, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Add, rename, or remove a tag in place.</p>
+</div></span>
   
 </li>
 
@@ -1263,7 +1287,7 @@
       <div class="method_details ">
   <h3 class="signature " id="last_color-instance_method">
   
-    #<strong>last_color</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>last_color</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
   
 
   
@@ -1271,32 +1295,37 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns the last escape sequence from a string</p>
+    <p>Returns the last escape sequence from a string.</p>
+
+<p>Actually returns all escape codes, with the assumption
+that the result of inserting them will generate the
+same color as was set at the end of the string.
+Because you can send modifiers like dark and bold
+separate from color codes, only using the last code
+may not render the same style.</p>
 
 
   </div>
 </div>
 <div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
   
     <li>
       
-        <span class='name'>string</span>
       
-      
-        <span class='type'></span>
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>The string to examine</p>
+        <div class='inline'><p>All escape codes in string</p>
 </div>
       
     </li>
   
 </ul>
-
 
 </div>
 </div>
@@ -1304,7 +1333,7 @@
       <div class="method_details ">
   <h3 class="signature " id="link_urls-instance_method">
   
-    #<strong>link_urls</strong>(opt = {})  &#x21d2; <tt>Object</tt> 
+    #<strong>link_urls</strong>(**opt)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1316,7 +1345,7 @@
       <div class="method_details ">
   <h3 class="signature " id="link_urls!-instance_method">
   
-    #<strong>link_urls!</strong>(opt = {})  &#x21d2; <tt>Object</tt> 
+    #<strong>link_urls!</strong>(**opt)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1340,8 +1369,6 @@
       
         <span class='type'>(<tt><span class='object_link'><a href="Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
       
-      
-        <em class="default">(defaults to: <tt>{}</tt>)</em>
       
       
         &mdash;
@@ -1558,7 +1585,7 @@
       <div class="method_details ">
   <h3 class="signature " id="replace_qualified_urls-instance_method">
   
-    #<strong>replace_qualified_urls</strong>(opt = {})  &#x21d2; <tt>Object</tt> 
+    #<strong>replace_qualified_urls</strong>(**options)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1578,9 +1605,9 @@
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="tag-instance_method">
+  <h3 class="signature " id="set_type-instance_method">
   
-    #<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; <tt>Object</tt> 
+    #<strong>set_type</strong>(kind = nil)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1590,15 +1617,192 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="tag-instance_method">
+  
+    #<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false, force: false)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Add, rename, or remove a tag</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>tag</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The tag</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>value</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Value for tag (@tag(value))</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remove</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Remove the tag instead of adding</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>rename_to</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Replace tag with this tag</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>regex</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Tag is regular expression</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>single</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Operating on a single item (for logging)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>force</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>With rename_to, add tag if it doesn&#39;t exist</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The string with modified tags</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="tag!-instance_method">
   
-    #<strong>tag!</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)  &#x21d2; <tt>Object</tt> 
+    #<strong>tag!</strong>(tag, **options)  &#x21d2; <tt>Object</tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Add, rename, or remove a tag in place</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#tag-instance_method" title="String#tag (method)">#tag</a></span></li>
+    
+  </ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -1997,7 +2201,7 @@ between characters</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 25 08:42:27 2021 by
+  Generated on Sat Nov 27 05:33:25 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

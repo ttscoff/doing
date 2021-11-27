@@ -109,11 +109,7 @@
 <div class="tags">
   
 
-</div><div id="subclasses">
-  <h2>Direct Known Subclasses</h2>
-  <p class="children"><span class='object_link'><a href="Doing/Content.html" title="Doing::Content (class)">Doing::Content</a></span>, <span class='object_link'><a href="Doing/Section.html" title="Doing::Section (class)">Doing::Section</a></span></p>
 </div>
-
 
 
 
@@ -169,6 +165,29 @@
 
   
     <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#deep_set-instance_method" title="#deep_set (instance method)">#<strong>deep_set</strong>(path, value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Set a nested hash value using an array.</p>
+</div></span>
   
 </li>
 
@@ -276,6 +295,79 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="deep_set-instance_method">
+  
+    #<strong>deep_set</strong>(path, value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Set a nested hash value using an array</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+        <p class="example_title"><div class='inline'><p><code>{}.deep_set([&#39;one&#39;, &#39;two&#39;], &#39;value&#39;)</code></p>
+</div></p>
+      
+      <pre class="example code"><code></code></pre>
+    
+      
+        <p class="example_title"><div class='inline'><p>`=&gt; { &#39;one&#39; =&gt; { &#39;two&#39; =&gt; &#39;value&#39; } }</p>
+</div></p>
+      
+      <pre class="example code"><code></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>path</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>key path</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>value</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The value</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="stringify_keys-instance_method">
   
     #<strong>stringify_keys</strong>  &#x21d2; <tt>Object</tt> 
@@ -326,7 +418,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 25 08:42:27 2021 by
+  Generated on Sat Nov 27 05:33:25 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

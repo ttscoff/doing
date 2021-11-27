@@ -374,6 +374,28 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#move_to-instance_method" title="#move_to (instance method)">#<strong>move_to</strong>(section, label: true)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#overlapping_time%3F-instance_method" title="#overlapping_time? (instance method)">#<strong>overlapping_time?</strong>(item_b)  &#x21d2; Boolean </a>
     
 
@@ -487,7 +509,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#tag-instance_method" title="#tag (instance method)">#<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false)  &#x21d2; Object </a>
+      <a href="#tag-instance_method" title="#tag (instance method)">#<strong>tag</strong>(tag, **options)  &#x21d2; Object </a>
     
 
     
@@ -942,6 +964,18 @@ the value of its @done tag (if present)</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="move_to-instance_method">
+  
+    #<strong>move_to</strong>(section, label: true)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="overlapping_time?-instance_method">
   
     #<strong>overlapping_time?</strong>(item_b)  &#x21d2; <tt>Boolean</tt> 
@@ -1223,7 +1257,7 @@ type (:sensitive,
       <div class="method_details ">
   <h3 class="signature " id="tag-instance_method">
   
-    #<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false)  &#x21d2; <tt>Object</tt> 
+    #<strong>tag</strong>(tag, **options)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1263,8 +1297,6 @@ type (:sensitive,
         <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
       
         &mdash;
         <div class='inline'><p>A value to include as @tag(value)</p>
@@ -1279,8 +1311,6 @@ type (:sensitive,
       
         <span class='type'>(<tt>Boolean</tt>)</span>
       
-      
-        <em class="default">(defaults to: <tt>false</tt>)</em>
       
       
         &mdash;
@@ -1297,8 +1327,6 @@ type (:sensitive,
         <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
       
         &mdash;
         <div class='inline'><p>if not nil, rename target tag to this tag name</p>
@@ -1314,11 +1342,24 @@ type (:sensitive,
         <span class='type'>(<tt>Boolean</tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>false</tt>)</em>
-      
       
         &mdash;
         <div class='inline'><p>treat target tag string as regex pattern</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>force</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>with rename_to, add tag if it doesn&#39;t exist</p>
 </div>
       
     </li>
@@ -1477,7 +1518,7 @@ type (:sensitive,
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 25 08:42:27 2021 by
+  Generated on Sat Nov 27 05:33:25 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>
