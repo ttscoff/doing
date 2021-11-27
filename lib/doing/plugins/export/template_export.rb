@@ -58,10 +58,34 @@ module Doing
           format("%#{pad}s", item.date.strftime(opt[:format]))
         end
 
-        interval = wwid.get_interval(item, record: true) if opt[:times]
+        interval = wwid.get_interval(item, record: true, formatted: false) if opt[:times]
+        if interval
+          case opt[:interval_format].to_sym
+          when :human
+            _d, h, m = wwid.format_time(interval, human: true)
+            interval = format('%<h> 4dh %<m>02dm', h: h, m: m)
+          else
+            d, h, m = wwid.format_time(interval)
+            interval = format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
+          end
+        end
 
         interval ||= ''
         output.sub!(/%interval/, interval)
+
+        duration = item.duration if opt[:duration]
+        if duration
+          case opt[:interval_format].to_sym
+          when :human
+            _d, h, m = wwid.format_time(duration, human: true)
+            duration = format('%<h> 4dh %<m>02dm', h: h, m: m)
+          else
+            d, h, m = wwid.format_time(duration)
+            duration = format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
+          end
+        end
+        duration ||= ''
+        output.sub!(/%duration/, duration)
 
         output.sub!(/%(\d+)?shortdate/) do
           pad = Regexp.last_match(1) || 13

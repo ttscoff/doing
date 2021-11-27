@@ -31,6 +31,13 @@ module Doing
     #   @date = new_date.is_a?(Time) ? new_date : Time.parse(new_date)
     # end
 
+    ## If the entry doesn't have a @done date, return the elapsed time
+    def duration
+      return nil if @title =~ /(?<=^| )@done\b/
+
+      return Time.now - @date
+    end
+
     ##
     ## Get the difference between the item's start date and
     ## the value of its @done tag (if present)

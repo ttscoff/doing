@@ -1429,20 +1429,23 @@ module Doing
     ##
     def list_section(opt = {})
       opt[:config_template] ||= 'default'
-      cfg = @config.dig('templates', opt[:config_template]).deep_merge({
-        'wrap_width' => @config['wrap_width'] || 0,
-        'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || 'asc',
-        'tags_color' => @config['tags_color']
-      })
+      cfg = @config.dig('templates',
+                        opt[:config_template]).deep_merge({
+                                                            'wrap_width' => @config['wrap_width'] || 0,
+                                                            'date_format' => @config['default_date_format'],
+                                                            'order' => @config['order'] || 'asc',
+                                                            'tags_color' => @config['tags_color'],
+                                                            'duration' => @config['duration'],
+                                                            'interval_format' => @config['interval_format']
+                                                          })
+      opt[:duration] ||= cfg['duration'] || false
+      opt[:interval_format] ||= cfg['interval_format'] || 'text'
       opt[:count] ||= 0
       opt[:age] ||= 'newest'
       opt[:format] ||= cfg['date_format']
       opt[:order] ||= cfg['order'] || 'asc'
       opt[:tag_order] ||= 'asc'
-      if opt[:tags_color].nil?
-        opt[:tags_color] = cfg['tags_color'] || false
-      end
+      opt[:tags_color] = cfg['tags_color'] || false if opt[:tags_color].nil?
       opt[:template] ||= cfg['template']
 
       # opt[:highlight] ||= true
@@ -1452,17 +1455,17 @@ module Doing
         opt[:section] = choose_section
         title = opt[:section]
       elsif opt[:section].instance_of?(String)
-        if opt[:section] =~ /^all$/i
-          title = if opt[:page_title]
+        title = if opt[:section] =~ /^all$/i
+                  if opt[:page_title]
                     opt[:page_title]
                   elsif opt[:tag_filter] && opt[:tag_filter]['bool'].normalize_bool != :not
                     opt[:tag_filter]['tags'].map { |tag| "@#{tag}" }.join(' + ')
                   else
                     'doing'
                   end
-        else
-          title = guess_section(opt[:section])
-        end
+                else
+                  guess_section(opt[:section])
+                end
       end
 
       items = filter_items(Items.new, opt: opt).reverse
@@ -1531,15 +1534,22 @@ module Doing
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
-        'tags_color' => @config['tags_color']
+        'tags_color' => @config['tags_color'],
+        'duration' => @config['duration'],
+        'interval_format' => @config['interval_format']
       })
+
+      opt[:duration] ||= cfg['duration'] || false
+      opt[:interval_format] ||= cfg['interval_format'] || 'text'
 
       options = {
         after: opt[:after],
         before: opt[:before],
         count: 0,
+        duration: opt[:duration],
         from: opt[:from],
         format: cfg['date_format'],
+        interval_format: opt[:interval_format],
         order: cfg['order'] || 'asc',
         output: output,
         section: opt[:section],
@@ -1571,8 +1581,18 @@ module Doing
       # :date_filter expects an array with start and end date
       dates = [dates, dates] if dates.instance_of?(String)
 
-      list_section({ section: section, count: 0, order: 'asc', date_filter: dates, times: times,
-                     output: output, totals: opt[:totals], sort_tags: opt[:sort_tags], config_template: 'default' })
+      list_section({
+                     section: section,
+                     count: 0,
+                     order: 'asc',
+                     date_filter: dates,
+                     times: times,
+                     output: output,
+                     totals: opt[:totals],
+                     duration: opt[:duration],
+                     sort_tags: opt[:sort_tags],
+                     config_template: 'default'
+                   })
     end
 
     ##
@@ -1595,6 +1615,7 @@ module Doing
         after: opt[:after],
         before: opt[:before],
         count: 0,
+        duration: opt[:duration],
         from: opt[:from],
         order: opt[:order],
         output: output,
@@ -1626,8 +1647,13 @@ module Doing
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
-        'tags_color' => @config['tags_color']
+        'tags_color' => @config['tags_color'],
+        'duration' => @config['duration'],
+        'interval_format' => @config['interval_format']
       })
+      opt[:duration] ||= cfg['duration'] || false
+      opt[:interval_format] ||= cfg['interval_format'] || 'text'
+
       section ||= @config['current_section']
       section = guess_section(section)
 
@@ -1649,8 +1675,12 @@ module Doing
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
-        'tags_color' => @config['tags_color']
+        'tags_color' => @config['tags_color'],
+        'duration' => @config['duration'],
+        'interval_format' => @config['interval_format']
       })
+      options[:duration] ||= cfg['duration'] || false
+      options[:interval_format] ||= cfg['interval_format'] || 'text'
 
       opts = {
         section: section,
@@ -1658,7 +1688,12 @@ module Doing
         count: 1,
         format: cfg['date_format'],
         template: cfg['template'],
-        times: times
+        times: times,
+        duration: options[:duration],
+        interval_format: options[:interval_format],
+        case: options[:case],
+        not: options[:negate],
+        config_template: 'last'
       }
 
       if options[:tag]
@@ -1669,9 +1704,7 @@ module Doing
       end
 
       opts[:search] = options[:search] if options[:search]
-      opts[:case] = options[:case]
-      opts[:not] = options[:negate]
-      opts[:config_template] = 'last'
+
       list_section(opts)
     end
 

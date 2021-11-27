@@ -32,6 +32,7 @@ module Doing
       'never_finish' => [],
 
       'timer_format' => 'text',
+      'interval_format' => 'text',
 
       'templates' => {
         'default' => {
