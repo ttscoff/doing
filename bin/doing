@@ -548,6 +548,22 @@ command :select do |c|
   c.arg_name 'QUERY'
   c.flag %i[q query search]
 
+  c.desc 'Select from entries older than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
+
+  c.desc 'Select from entries newer than date'
+  c.arg_name 'DATE_STRING'
+  c.flag [:after]
+
+  c.desc %(
+    Date range to show, or a single day to filter date on.
+    Date range argument should be quoted. Date specifications can be natural language.
+    To specify a range, use "to" or "through": `doing show --from "monday to friday"`
+  )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
+
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: false, negatable: false
 

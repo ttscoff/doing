@@ -770,11 +770,35 @@ module Doing
         opt[:search] = search
       end
 
+      if opt[:from]
+        date_string = opt[:from]
+        if date_string =~ / (to|through|thru|(un)?til|-+) /
+          dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
+          start = chronify(dates[0], guess: :begin)
+          finish = chronify(dates[2], guess: :end)
+        else
+          start = chronify(date_string, guess: :begin)
+          finish = false
+        end
+        raise InvalidTimeExpression, 'Unrecognized date string' unless start
+
+        opt[:date_filter] = [start, finish]
+      end
+
       opt[:query] = opt[:search] if opt[:search] && !opt[:query]
       opt[:query] = "!#{opt[:query]}" if opt[:not]
       opt[:multiple] = true
       opt[:show_if_single] = true
-      items = filter_items(Items.new, opt: { section: section, search: opt[:search], fuzzy: opt[:fuzzy], case: opt[:case], not: opt[:not] })
+      items = filter_items(Items.new, opt: {
+                             after: opt[:after],
+                             before: opt[:before],
+                             case: opt[:case],
+                             date_filter: opt[:date_filter],
+                             fuzzy: opt[:fuzzy],
+                             not: opt[:not],
+                             search: opt[:search],
+                             section: section
+                           })
 
       selection = Prompt.choose_from_items(items, include_section: section =~ /^all$/i, **opt)
 
