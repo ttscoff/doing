@@ -190,7 +190,7 @@ module Doing
         m = Regexp.last_match
         t = m['tag']
         d = m['date']
-        parsed_date = d =~ date_rx ? Time.parse(d) : chronify(d, guess: :begin)
+        parsed_date = d =~ date_rx ? Time.parse(d) : d.chronify(guess: :begin)
         parsed_date.nil? ? m[0] : "@#{t}(#{parsed_date.strftime('%F %R')})"
       end
 
@@ -200,7 +200,7 @@ module Doing
         date = if d =~ iso_rx
                  Time.parse(d)
                else
-                 chronify(d, guess: :begin)
+                 d.chronify(guess: :begin)
                end
         title.sub!(date_rx, '').strip!
       end
@@ -220,71 +220,6 @@ module Doing
       note.compress
 
       [date, title, note]
-    end
-
-    ##
-    ## Converts input string into a Time object when input takes on the
-    ##             following formats:
-    ##             - interval format e.g. '1d2h30m', '45m' etc.
-    ##             - a semantic phrase e.g. 'yesterday 5:30pm'
-    ##             - a strftime e.g. '2016-03-15 15:32:04 PDT'
-    ##
-    ## @param      input  [String] String to chronify
-    ##
-    ## @return     [DateTime] result
-    ##
-    def chronify(input, future: false, guess: :begin)
-      now = Time.now
-      raise InvalidTimeExpression, "Invalid time expression #{input.inspect}" if input.to_s.strip == ''
-
-      secs_ago = if input.match(/^(\d+)$/)
-                   # plain number, assume minutes
-                   Regexp.last_match(1).to_i * 60
-                 elsif (m = input.match(/^(?:(?<day>\d+)d)?(?:(?<hour>\d+)h)?(?:(?<min>\d+)m)?$/i))
-                   # day/hour/minute format e.g. 1d2h30m
-                   [[m['day'], 24 * 3600],
-                    [m['hour'], 3600],
-                    [m['min'], 60]].map { |qty, secs| qty ? (qty.to_i * secs) : 0 }.reduce(0, :+)
-                 end
-
-      if secs_ago
-        now - secs_ago
-      else
-        Chronic.parse(input, { guess: guess, context: future ? :future : :past, ambiguous_time_range: 8 })
-      end
-    end
-
-    ##
-    ## Converts simple strings into seconds that can be added to a Time
-    ##             object
-    ##
-    ## @param      qty   [String] HH:MM or XX[dhm][[XXhm][XXm]] (1d2h30m, 45m,
-    ##                   1.5d, 1h20m, etc.)
-    ##
-    ## @return     [Integer] seconds
-    ##
-    def chronify_qty(qty)
-      minutes = 0
-      case qty.strip
-      when /^(\d+):(\d\d)$/
-        minutes += Regexp.last_match(1).to_i * 60
-        minutes += Regexp.last_match(2).to_i
-      when /^(\d+(?:\.\d+)?)([hmd])?$/
-        amt = Regexp.last_match(1)
-        type = Regexp.last_match(2).nil? ? 'm' : Regexp.last_match(2)
-
-        minutes = case type.downcase
-                  when 'm'
-                    amt.to_i
-                  when 'h'
-                    (amt.to_f * 60).round
-                  when 'd'
-                    (amt.to_f * 60 * 24).round
-                  else
-                    minutes
-                  end
-      end
-      minutes * 60
     end
 
     ##
@@ -717,14 +652,14 @@ module Doing
 
         if keep && opt[:before]
           time_string = opt[:before]
-          cutoff = chronify(time_string, guess: :begin)
+          cutoff = time_string.chronify(guess: :begin)
           keep = cutoff && item.date <= cutoff
           keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:after]
           time_string = opt[:after]
-          cutoff = chronify(time_string, guess: :end)
+          cutoff = time_string.chronify(guess: :end)
           keep = cutoff && item.date >= cutoff
           keep = opt[:not] ? !keep : keep
         end
@@ -774,10 +709,10 @@ module Doing
         date_string = opt[:from]
         if date_string =~ / (to|through|thru|(un)?til|-+) /
           dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-          start = chronify(dates[0], guess: :begin)
-          finish = chronify(dates[2], guess: :end)
+          start = dates[0].chronify(guess: :begin)
+          finish = dates[2].chronify(guess: :end)
         else
-          start = chronify(date_string, guess: :begin)
+          start = date_string.chronify(guess: :begin)
           finish = false
         end
         raise InvalidTimeExpression, 'Unrecognized date string' unless start
@@ -1360,7 +1295,7 @@ module Doing
         break if counter >= max
         if opt[:before]
           time_string = opt[:before]
-          cutoff = chronify(time_string, guess: :begin)
+          cutoff = time_string.chronify(guess: :begin)
         end
 
         unless ((!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s)) || (opt[:before] && item.date >= cutoff))
@@ -2068,7 +2003,7 @@ EOS
         break if counter >= max
         if opt[:before]
           time_string = opt[:before]
-          cutoff = chronify(time_string, guess: :begin)
+          cutoff = time_string.chronify(guess: :begin)
         end
 
         if (item.section.downcase != section.downcase && section != /^all$/i) || item.section.downcase == destination.downcase

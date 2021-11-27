@@ -146,7 +146,7 @@ command %i[now next] do |c|
 
   c.action do |_global_options, options, args|
     if options[:back]
-      date = wwid.chronify(options[:back], guess: :begin)
+      date = options[:back].chronify(guess: :begin)
 
       raise InvalidTimeExpression.new('unable to parse date string', topic: 'Date parser:') if date.nil?
     else
@@ -421,7 +421,7 @@ command :meanwhile do |c|
 
   c.action do |_global_options, options, args|
     if options[:back]
-      date = wwid.chronify(options[:back], guess: :begin)
+      date = options[:back].chronify(guess: :begin)
 
       raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
     else
@@ -636,7 +636,7 @@ command :later do |c|
 
   c.action do |_global_options, options, args|
     if options[:back]
-      date = wwid.chronify(options[:back], guess: :begin)
+      date = options[:back].chronify(guess: :begin)
       raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
     else
       date = Time.now
@@ -731,19 +731,19 @@ command %i[done did] do |c|
     donedate = nil
 
     if options[:took]
-      took = wwid.chronify_qty(options[:took])
+      took = options[:took].chronify_qty
       raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
     end
 
     if options[:back]
-      date = wwid.chronify(options[:back], guess: :begin)
+      date = options[:back].chronify(guess: :begin)
       raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
     else
       date = options[:took] ? Time.now - took : Time.now
     end
 
     if options[:at]
-      finish_date = wwid.chronify(options[:at], guess: :begin)
+      finish_date = options[:at].chronify(guess: :begin)
       raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
       date = options[:took] ? finish_date - took : finish_date
@@ -1044,7 +1044,7 @@ command :finish do |c|
     options[:fuzzy] = false
     unless options[:auto]
       if options[:took]
-        took = wwid.chronify_qty(options[:took])
+        took = options[:took].chronify_qty
         raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
       end
 
@@ -1053,20 +1053,20 @@ command :finish do |c|
       raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 
       if options[:at]
-        finish_date = wwid.chronify(options[:at], guess: :begin)
+        finish_date = options[:at].chronify(guess: :begin)
         raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
         date = options[:took] ? finish_date - took : finish_date
       elsif options[:back]
-        date = wwid.chronify(options[:back])
+        date = options[:back].chronify()
 
         raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
-      elsif options[:took]
-        date = wwid.chronify_qty(options[:took])
       else
         date = Time.now
       end
     end
+
+    options[:took] = options[:took].chronify_qty if options[:took]
 
     if options[:tag].nil?
       tags = []
@@ -1107,6 +1107,7 @@ command :finish do |c|
       tag: tags,
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],
+      took: options[:took],
       unfinished: options[:unfinished]
     }
 
@@ -1613,10 +1614,10 @@ command :show do |c|
       date_string = options[:from]
       if date_string =~ / (to|through|thru|(un)?til|-+) /
         dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-        start = wwid.chronify(dates[0], guess: :begin)
-        finish = wwid.chronify(dates[2], guess: :end)
+        start = dates[0].chronify(guess: :begin)
+        finish = dates[2].chronify(guess: :end)
       else
-        start = wwid.chronify(date_string, guess: :begin)
+        start = date_string.chronify(guess: :begin)
         finish = false
       end
       raise InvalidTimeExpression, 'Unrecognized date string' unless start
@@ -1896,10 +1897,10 @@ command :on do |c|
 
     if date_string =~ / (to|through|thru) /
       dates = date_string.split(/ (to|through|thru) /)
-      start = wwid.chronify(dates[0], guess: :begin)
-      finish = wwid.chronify(dates[2], guess: :end)
+      start = dates[0].chronify(guess: :begin)
+      finish = dates[2].chronify(guess: :end)
     else
-      start = wwid.chronify(date_string, guess: :begin)
+      start = date_string.chronify(guess: :begin)
       finish = false
     end
 
@@ -1955,7 +1956,7 @@ command :since do |c|
     date_string.sub!(/(day) (\d)/, '\1 at \2')
     date_string.sub!(/(\d+)d( ago)?/, '\1 days ago')
 
-    start = wwid.chronify(date_string, guess: :begin)
+    start = date_string.chronify(guess: :begin)
     finish = Time.now
 
     raise InvalidTimeExpression, 'Unrecognized date string' unless start
@@ -2374,10 +2375,10 @@ command :view do |c|
         date_string = view['from']
         if date_string =~ / (to|through|thru|(un)?til|-+) /
           dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-          start = wwid.chronify(dates[0], guess: :begin)
-          finish = wwid.chronify(dates[2], guess: :end)
+          start = dates[0].chronify(guess: :begin)
+          finish = dates[2].chronify(guess: :end)
         else
-          start = wwid.chronify(date_string, guess: :begin)
+          start = date_string.chronify(guess: :begin)
           finish = false
         end
         raise InvalidTimeExpression, 'Unrecognized date string' unless start
@@ -2951,10 +2952,10 @@ command :import do |c|
       date_string = options[:from]
       if date_string =~ / (to|through|thru|(un)?til|-+) /
         dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-        start = wwid.chronify(dates[0], guess: :begin)
-        finish = wwid.chronify(dates[2], guess: :end)
+        start = dates[0].chronify(guess: :begin)
+        finish = dates[2].chronify(guess: :end)
       else
-        start = wwid.chronify(date_string, guess: :begin)
+        start = date_string.chronify(guess: :begin)
         finish = false
       end
       raise InvalidTimeExpression, 'Unrecognized date string' unless start
