@@ -21,11 +21,17 @@ module Doing
     def exec_available(cli)
       return false if cli.nil?
 
-      if File.exist?(File.expand_path(cli))
-        File.executable?(File.expand_path(cli))
-      else
-        system "which #{cli}", out: File::NULL, err: File::NULL
-      end
+      !TTY::Which.which(cli).nil?
+    end
+
+    ##
+    ## Return the first valid executable from a list of commands
+    ##
+    ## @example `Doing::Util.first_available_exec('bat', 'less -Xr', 'more -r', 'cat')`
+    ##
+    def first_available_exec(*commands)
+      commands.compact.map(&:strip).reject(&:empty?).uniq
+      .find { |cmd| exec_available(cmd.split.first) }
     end
 
     def merge_default_proc(target, overwrite)
@@ -116,6 +122,7 @@ module Doing
 
       File.open(file, 'w+') do |f|
         f.puts content
+        Doing.logger.debug('Write:', "File written: #{file}")
       end
 
       Hooks.trigger :post_write, file
@@ -183,7 +190,8 @@ module Doing
       Doing.logger.debug('ENV:', 'No EDITOR environment variable, testing available editors')
       editors = %w[vim vi code subl mate mvim nano emacs]
       editors.each do |ed|
-        return ed if exec_available(ed)
+        return TTY::Which.which(ed) if TTY::Which.which(ed)
+
         Doing.logger.debug('ENV:', "#{ed} not available")
       end
 

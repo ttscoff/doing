@@ -31,11 +31,13 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency 'redcarpet', '~> 3.5', '>= 3.5.1'
   s.add_development_dependency 'github-markup', '~> 4.0', '>= 4.0.0'
   s.add_development_dependency 'parallel_tests', '~> 3.7', '>= 3.7.3'
+  s.add_development_dependency 'tty-spinner', '~> 0.9', '>= 0.9.3'
   s.add_runtime_dependency('tty-progressbar', '~> 0.18', '>= 0.18.2')
   s.add_runtime_dependency('gli', '~> 2.19', '>= 2.19.2')
   s.add_runtime_dependency('haml','~>5.0.0', '>= 5.0.0')
   s.add_runtime_dependency('chronic','~> 0.10', '>= 0.10.2')
   s.add_runtime_dependency('deep_merge', '~> 1.2', '>= 1.2.1')
   s.add_runtime_dependency('tty-link', '~> 0.1', '>= 0.1.1')
+  s.add_runtime_dependency('tty-which', '~> 0.5', '>= 0.5.0')
   # s.add_runtime_dependency('amatch', '~> 0.4', '>= 0.4.0')
 end

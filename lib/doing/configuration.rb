@@ -289,6 +289,14 @@ module Doing
       config
     end
 
+    def inspect
+      %(<Doing::Configuration #{@settings.hash}>)
+    end
+
+    def to_s
+      YAML.dump(@settings)
+    end
+
     private
 
     ##
@@ -309,14 +317,16 @@ module Doing
         deprecated = true
         config['editors']['config'] = config['config_editor_app']
         config.delete('config_editor_app')
-        Doing.logger.debug('Deprecated:', "config key 'config_editor_app' is now 'editors->config', please update your config.")
+        Doing.logger.debug('Deprecated:',
+                           "config key 'config_editor_app' is now 'editors->config', please update your config.")
       end
 
       if config.key?('editor_app') && !config['editors']['doing_file']
         deprecated = true
         config['editors']['doing_file'] = config['editor_app']
         config.delete('editor_app')
-        Doing.logger.debug('Deprecated:', "config key 'editor_app' is now 'editors->doing_file', please update your config.")
+        Doing.logger.debug('Deprecated:',
+                           "config key 'editor_app' is now 'editors->doing_file', please update your config.")
       end
 
       Doing.logger.warn('Deprecated:', 'outdated keys found, please run `doing config --update`.') if deprecated

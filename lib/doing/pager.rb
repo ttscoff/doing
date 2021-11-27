@@ -1,9 +1,28 @@
 # frozen_string_literal: true
+require 'pathname'
 
 module Doing
   # Pagination
   module Pager
     class << self
+      def command_exist?(command)
+        exts = ENV.fetch("PATHEXT", "").split(::File::PATH_SEPARATOR)
+        if Pathname.new(command).absolute?
+          ::File.exist?(command) ||
+            exts.any? { |ext| ::File.exist?("#{command}#{ext}")}
+        else
+          ENV.fetch("PATH", "").split(::File::PATH_SEPARATOR).any? do |dir|
+            file = ::File.join(dir, command)
+            ::File.exist?(file) ||
+              exts.any? { |ext| ::File.exist?("#{file}#{ext}") }
+          end
+        end
+      end
+
+      def git_pager
+        command_exist?("git") ? `git config --get-all core.pager` : nil
+      end
+
       def paginate
         @paginate ||= false
       end
@@ -18,6 +37,9 @@ module Doing
           return
         end
 
+        pager = which_pager
+        Doing.logger.debug('Pager:', "Using #{pager}")
+
         read_io, write_io = IO.pipe
 
         input = $stdin
@@ -30,10 +52,8 @@ module Doing
           # Wait until we have input before we start the pager
           IO.select [input]
 
-          pager = which_pager
-          Doing.logger.debug('Pager:', "Using #{pager}")
           begin
-            exec(pager.join(' '))
+            exec(pager)
           rescue SystemCallError => e
             raise Errors::DoingStandardError, "Pager error, #{e}"
           end
@@ -51,44 +71,24 @@ module Doing
         status.success?
       end
 
+      def pagers
+        [ENV['GIT_PAGER'], ENV['PAGER'], git_pager,
+         'bat -p --pager="less -Xr"', 'less -Xr', 'more -r'].compact
+      end
+
+      def find_executable(*commands)
+        execs = commands.empty? ? pagers : commands
+        execs
+          .compact.map(&:strip).reject(&:empty?).uniq
+          .find { |cmd| command_exist?(cmd.split.first) }
+      end
+
+      def exec_available?(*commands)
+        !find_executable(*commands).nil?
+      end
+
       def which_pager
-        pagers = [ENV['GIT_PAGER'], ENV['PAGER']]
-
-        if Util.exec_available('git')
-          git_pager = `git config --get-all core.pager || true`.split.first
-          git_pager && pagers.push(git_pager)
-        end
-
-        pagers.concat(%w[bat less more pager])
-
-        pagers.select! do |f|
-          if f
-            if f.strip =~ /[ |]/
-              f
-            elsif f == 'most'
-              Doing.logger.warn('most not allowed as pager')
-              false
-            else
-              system "which #{f}", out: File::NULL, err: File::NULL
-            end
-          else
-            false
-          end
-        end
-
-        pg = pagers.first
-        args = case pg
-               when /^more$/
-                 ' -r'
-               when /^less$/
-                 ' -Xr'
-               when /^bat$/
-                 ' -p --pager="less -Xr"'
-               else
-                 ''
-               end
-
-        [pg, args]
+        @which_pager ||= find_executable(*pagers)
       end
     end
   end

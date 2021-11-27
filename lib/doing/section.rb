@@ -1,23 +1,28 @@
 # frozen_string_literal: true
 
 module Doing
-  # Section Hash
-  class Section < Hash
-    attr_reader :items
-    attr_accessor :original
+  # Section Object
+  class Section
+    attr_accessor :original, :title
 
-    def initialize(original, items = Items.new)
+    def initialize(title, original: nil)
       super()
-      @original = original =~ /:(\s+@\S+(\(.*?\))?)*$/ ? original : "#{original}:"
-      @items = items
+
+      @title = title
+
+      @original = if original.nil?
+                    "#{title}:"
+                  else
+                    original =~ /:(\s+@\S+(\(.*?\))?)*$/ ? original : "#{original}:"
+                  end
     end
 
-    def items=(new_items)
-      @items = Items.new.concat(new_items)
+    def to_s
+      @title
     end
 
     def inspect
-      %(#<Doing::Section @original="#{@original}" @items=#{@items.inspect}>)
+      %(#<Doing::Section @title="#{@title}" @original="#{@original}">)
     end
   end
 end

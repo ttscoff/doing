@@ -39,9 +39,7 @@ module Doing
       options[:tag] = nil
       prefix = options[:prefix] || ''
 
-      @old_items = []
-
-      wwid.content.each { |_, v| @old_items.concat(v.items) }
+      @old_items = wwid.content.dup
 
       new_items = read_capture_folder(path)
 
@@ -82,13 +80,13 @@ module Doing
       dups = new_items.count - imported.count
       Doing.logger.info('Skipped:', %(#{dups} duplicate items)) if dups.positive?
 
-      imported = wwid.dedup(imported, !options[:overlap])
+      imported = wwid.dedup(imported, no_overlap: !options[:overlap])
       overlaps = new_items.count - imported.count - dups
       Doing.logger.debug('Skipped:', "#{overlaps} items with overlapping times") if overlaps.positive?
 
       imported.each do |item|
-        wwid.add_section(item.section) unless wwid.content.key?(item.section)
-        wwid.content[item.section].items.push(item)
+        wwid.content.add_section(item.section) unless wwid.content.section?(item.section)
+        wwid.content.push(item)
       end
 
       Doing.logger.info('Imported:', "#{imported.count} items")

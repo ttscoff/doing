@@ -90,7 +90,7 @@ module Doing
     ##             Note
     ##
     def to_s
-      compress.strip_lines.join("\n")
+      compress.strip_lines.map { |l| "\t\t#{l}" }.join("\n")
     end
 
     ##

@@ -288,11 +288,29 @@ module Doing
       title
     end
 
-    def tag!(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)
-      replace tag(tag, value: value, remove: remove, rename_to: rename_to, regex: regex, single: single)
+    ##
+    ## Add, rename, or remove a tag in place
+    ##
+    ## @see #tag
+    ##
+    def tag!(tag, **options)
+      replace tag(tag, **options)
     end
 
-    def tag(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)
+    ##
+    ## Add, rename, or remove a tag
+    ##
+    ## @param      tag        The tag
+    ## @param      value      [String] Value for tag (@tag(value))
+    ## @param      remove     [Boolean] Remove the tag instead of adding
+    ## @param      rename_to  [String] Replace tag with this tag
+    ## @param      regex      [Boolean] Tag is regular expression
+    ## @param      single     [Boolean] Operating on a single item (for logging)
+    ## @param      force      [Boolean] With rename_to, add tag if it doesn't exist
+    ##
+    ## @return     [String] The string with modified tags
+    ##
+    def tag(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false, force: false)
       log_level = single ? :info : :debug
       title = dup
       title.chomp!
@@ -306,13 +324,14 @@ module Doing
                end
 
       if remove || rename_to
-        return title unless title =~ /#{rx_tag}(?=[ (]|$)/
+        rx = Regexp.new("(?<=^| )@#{rx_tag}(?<parens>\\((?<value>[^)]*)\\))?(?= |$)", case_sensitive)
+        m = title.match(rx)
 
-        rx = Regexp.new("(^| )@#{rx_tag}(\\([^)]*\\))?(?= |$)", case_sensitive)
-        if title =~ rx
+        if m.nil? && rename_to && force
+          title.tag!(rename_to, value: value, single: single)
+        elsif m
           title.gsub!(rx) do
-            m = Regexp.last_match
-            rename_to ? "#{m[1]}@#{rename_to}#{m[2]}" : m[1]
+            rename_to ? "@#{rename_to}#{value.nil? ? m['parens'] : "(#{value})"}" : ''
           end
 
           title.dedup_tags!
@@ -453,6 +472,42 @@ module Doing
           match
         else
           %(<a href="#{m[1]}" title="Link to #{m[1]}">[link]</a>)
+        end
+      end
+    end
+
+    def set_type(kind = nil)
+      if kind
+        case kind.to_s
+        when /^a/i
+          gsub(/^\[ *| *\]$/, '').split(/ *, */)
+        when /^i/i
+          to_i
+        when /^f/i
+          to_f
+        when /^sy/i
+          sub(/^:/, '').to_sym
+        when /^b/i
+          self =~ /^(true|yes)$/ ? true : false
+        else
+          to_s
+        end
+      else
+        case self
+        when / *, */
+          gsub(/^\[ *| *\]$/, '').split(/ *, */)
+        when /^[0-9]+$/
+          to_i
+        when /^[0-9]+\.[0-9]+$/
+          to_f
+        when /^:\w+/
+          sub(/^:/, '').to_sym
+        when /^(true|yes)$/i
+          true
+        when /^(false|no)$/i
+          false
+        else
+          to_s
         end
       end
     end
