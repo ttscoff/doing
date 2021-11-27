@@ -2294,7 +2294,7 @@ command :view do |c|
       # If the -o/--output flag was specified, override any default in the view template
       options[:output] ||= view.key?('output_format') ? view['output_format'] : 'template'
 
-      count = options[:count] || view.key?('count') ? view['count'] : 10
+      count = options[:count] ? options[:count] : view.key?('count') ? view['count'] : 10
 
       section = if options[:section]
                   section
@@ -2741,7 +2741,12 @@ command :config do |c|
 
       if cfg
         val = cfg.map {|k, v| v }[0]
-        nested_cfg = real_path.empty? ? cfg : {}.deep_set(real_path, val)
+        if real_path.count.positive?
+          nested_cfg = {}
+          nested_cfg.deep_set(real_path, val)
+        else
+          nested_cfg = val
+        end
 
         if options[:output] =~ /^r/
           if val.is_a?(Hash)
