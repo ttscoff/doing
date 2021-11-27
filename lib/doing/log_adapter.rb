@@ -46,6 +46,7 @@ module Doing
       @logdev = $stderr
       @max_length = `tput cols`.strip.to_i - 5 || 85
       self.log_level = level
+      @prev_level = level
     end
 
     #
@@ -70,6 +71,22 @@ module Doing
               end
 
       @level = level
+    end
+
+    # Set log level temporarily
+    def temp_level(level)
+      return if level.nil? || level.to_sym == @log_level
+
+      @prev_level = log_level.dup
+      @log_level = level.to_sym
+    end
+
+    # Restore temporary level
+    def restore_level
+      return if @prev_level.nil? || @prev_level == @log_level
+
+      self.log_level = @prev_level
+      @prev_level = nil
     end
 
     def adjust_verbosity(options = {})

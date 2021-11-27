@@ -2737,10 +2737,12 @@ command :config do |c|
 
       keypath = args.join('.')
       cfg = config.value_for_key(keypath)
+      real_path = config.resolve_key_path(keypath)
 
       if cfg
-
         val = cfg.map {|k, v| v }[0]
+        nested_cfg = real_path.empty? ? cfg : {}.deep_set(real_path, val)
+
         if options[:output] =~ /^r/
           if val.is_a?(Hash)
             $stdout.puts YAML.dump(val)
@@ -2754,7 +2756,7 @@ command :config do |c|
                        when /^j/
                          JSON.pretty_generate(val)
                        else
-                         YAML.dump(cfg)
+                         YAML.dump(nested_cfg)
                        end
         end
       else
@@ -2771,45 +2773,42 @@ command :config do |c|
     set.example 'doing config set timer_format human', desc: 'Set the value of timer_format to "human"'
     set.example 'doing config set plug.plugpath ~/my_plugins', desc: 'Key path is fuzzy matched: set the value of plugins->plugin_path'
 
+    set.desc 'Delete specified key'
+    set.switch %i[r remove], default_value: false, negatable: false
+
     set.action do |_global, options, args|
-      if args.count < 2
+      if args.count < 2 && !options[:remove]
         raise InvalidArgument, 'config set requires at least two arguments, key path and value'
 
       end
 
-      value = args.pop
+      value = options[:remove] ? nil : args.pop
       keypath = args.join('.')
       old_value = config.value_for_key(keypath).map { |k, v| v.to_s }
       real_path = config.resolve_key_path(keypath)
       raise InvalidArgument, 'Invalid key path' if real_path.empty?
 
-      if value =~ /(true|yes)/i
-        value = true
-      elsif value =~ /(false|no)/i
-        value = false
+      config_file = config.choose_config
+      cfg = YAML.safe_load_file(config_file) || {}
+
+      $stderr.puts "Updating #{config_file}".yellow
+
+      if options[:remove]
+        cfg.deep_set(real_path, nil)
+        $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('->').boldwhite}"
+      else
+        old_value = cfg.dig(*real_path) || 'empty'
+        cfg.deep_set(real_path, value.set_type)
+        $stderr.puts "#{'Key path:'.yellow} #{real_path.join('->').boldwhite}"
+        $stderr.puts "#{'Previous:'.yellow} #{old_value.to_s.boldwhite}"
+        $stderr.puts "#{'     New:'.yellow} #{value.set_type.to_s.boldwhite}"
       end
 
-      # key = real_path.last
-      # real_path[0...-1].inject(settings, :fetch)[key] = value
-
-      new_settings = {}
-      new_settings.deep_set(real_path, value)
-
-      config_file = config.choose_config
-      old_config = YAML.safe_load_file(config_file)
-      old_config.deep_merge(new_settings)
-
-      prev_level = Doing.logger.level
-      Doing.logger.adjust_verbosity({ level: :info })
-      Doing.logger.log_now(:info, 'Config:', "updating #{config_file}")
-      Doing.logger.log_now(:info, 'Config:', "#{real_path.join('->')}, #{old_config.dig(*real_path)} => #{value}")
       res = Doing::Prompt.yn('Update selected config', default_response: true)
 
       raise UserCancelled, 'Cancelled' unless res
 
-      Doing.logger.adjust_verbosity({ level: prev_level })
-
-      Doing::Util.write_to_file(config_file, YAML.dump(old_config), backup: true)
+      Doing::Util.write_to_file(config_file, YAML.dump(cfg), backup: true)
       Doing.logger.warn('Config:', "#{config_file} updated")
     end
   end

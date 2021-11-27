@@ -37,15 +37,32 @@ module Doing
     # @param      value  The value
     #
     def deep_set(path, value)
-      obj = self
-      path[0...-1].each do |k|
-        unless obj.key?(k)
-          obj[k] = {}
+      if path.count == 1
+        if value
+          self[path[0]] = value
+        else
+          delete(path[0])
         end
-        obj = obj[k]
+      else
+        if value
+          self.default_proc = ->(h, k) { h[k] = Hash.new(&h.default_proc) }
+          dig(*path[0..-2])[path.fetch(-1)] = value
+        else
+          return self unless dig(*path)
+
+          dig(*path[0..-2]).delete(path.fetch(-1))
+          path.pop
+          cleaned = self
+          path.each do |key|
+            if cleaned[key].empty?
+              cleaned.delete(key)
+              break
+            end
+            cleaned = cleaned[key]
+          end
+          empty? ? nil : self
+        end
       end
-      obj[path.last] = value
-      self
     end
   end
 end

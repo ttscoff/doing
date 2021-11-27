@@ -475,5 +475,41 @@ module Doing
         end
       end
     end
+
+    def set_type(kind = nil)
+      if kind
+        case kind.to_s
+        when /^a/i
+          gsub(/^\[ *| *\]$/, '').split(/ *, */)
+        when /^i/i
+          to_i
+        when /^f/i
+          to_f
+        when /^sy/i
+          sub(/^:/, '').to_sym
+        when /^b/i
+          self =~ /^(true|yes)$/ ? true : false
+        else
+          to_s
+        end
+      else
+        case self
+        when / *, */
+          gsub(/^\[ *| *\]$/, '').split(/ *, */)
+        when /^[0-9]+$/
+          to_i
+        when /^[0-9]+\.[0-9]+$/
+          to_f
+        when /^:\w+/
+          sub(/^:/, '').to_sym
+        when /^(true|yes)$/i
+          true
+        when /^(false|no)$/i
+          false
+        else
+          to_s
+        end
+      end
+    end
   end
 end
