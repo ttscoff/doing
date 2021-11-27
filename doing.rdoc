@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.0.26
+v2.1.0pre
 
 === Global Options
 === --config_file arg
@@ -424,14 +424,14 @@ Open config file in editor
 
 
 ======= Options
-======= -a APP_NAME
+======= -a|--app APP_NAME
 
 Application to use
 
 [Default Value] None
 
 
-======= -b BUNDLE_ID
+======= -b|--bundle_id BUNDLE_ID
 
 Application bundle id to use
 
@@ -445,7 +445,7 @@ Editor to use
 [Default Value] None
 
 
-======= -x
+======= -x|--[no-]default
 Use the config_editor_app defined in ~/.config/doing/config.yml (config_editor_app not set)
 
 
@@ -463,8 +463,19 @@ Format for output (json|yaml|raw)
 [Must Match] (?-mix:^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$)
 
 
+====== Command: <tt>list </tt>
+List configuration paths, including .doingrc files in the current and parent directories
+
+Config files are listed in order of precedence (if there are multiple configs detected).
+  Values defined in the top item in the list will override values in configutations below it.
 ====== Command: <tt>set </tt>
 Set a key's value in the config file
+
+
+======= Options
+======= -r|--remove
+Delete specified key
+
 
 
 ====== Command: <tt>undo </tt>
@@ -489,9 +500,9 @@ Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm
 [Default Value] None
 
 
-===== -b|--back DATE_STRING
+===== -b|--back|--started DATE_STRING
 
-Backdate start date by interval [4pm|20m|2h|yesterday noon]
+Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]
 
 [Default Value] None
 
@@ -1120,9 +1131,9 @@ A parenthetical at the end of the entry will be converted to a note.
 
 Run with no argument to create a new entry using vim.
 ===== Options
-===== -b|--back DATE_STRING
+===== -b|--back|--started DATE_STRING
 
-Backdate start time [4pm|20m|2h|yesterday noon]
+Backdate start time [4pm|20m|2h|"yesterday noon"]
 
 [Default Value] None
 
@@ -1205,6 +1216,13 @@ Open with app name
 ===== -b|--bundle_id BUNDLE_ID
 
 Open with app bundle id
+
+[Default Value] None
+
+
+===== -e|--editor COMMAND
+
+Open with editor command (e.g. vim, mate)
 
 [Default Value] None
 
@@ -1818,7 +1836,7 @@ Output HTML, CSS, and Markdown (ERB) templates for customization
 Templates are printed to STDOUT for piping to a file.
   Save them and use them in the configuration file under export_templates.
 ===== Options
-===== -c
+===== -c|--[no-]column
 List in single column for completion
 
 

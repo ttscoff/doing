@@ -162,7 +162,7 @@ command %i[now next] do |c|
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
-      input += date.strftime('%F %R | ')
+      input = date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
 
