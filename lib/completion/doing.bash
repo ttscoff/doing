@@ -81,9 +81,9 @@ _doing_config() {
 _doing_done() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--archive --at --back --date --editor --note --remove --section --took --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '--archive --at --started --date --editor --note --remove --section --took --unfinished' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -b -e -n -r -s -t -u --archive --at --back --date --editor --note --remove --section --took --unfinished' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -e -n -r -s -t -u --archive --at --started --date --editor --note --remove --section --took --unfinished' -- $token ) )
   
   fi
 }
@@ -181,9 +181,9 @@ _doing_note() {
 _doing_now() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--back --editor --finish_last --note --section' -- $token ) )
+    COMPREPLY=( $( compgen -W '--started --editor --finish_last --note --section' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-b -e -f -n -s --back --editor --finish_last --note --section' -- $token ) )
+    COMPREPLY=( $( compgen -W '-e -f -n -s --started --editor --finish_last --note --section' -- $token ) )
   
   fi
 }
@@ -201,9 +201,9 @@ _doing_on() {
 _doing_open() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--app --bundle_id' -- $token ) )
+    COMPREPLY=( $( compgen -W '--app --bundle_id --editor' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -b --app --bundle_id' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -b -e --app --bundle_id --editor' -- $token ) )
   
   fi
 }
@@ -321,9 +321,9 @@ _doing_tag() {
 _doing_template() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--list' -- $token ) )
+    COMPREPLY=( $( compgen -W '--column --list' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-l --list' -- $token ) )
+    COMPREPLY=( $( compgen -W '-c -l --column --list' -- $token ) )
   
   fi
 }

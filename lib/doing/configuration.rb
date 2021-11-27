@@ -99,6 +99,10 @@ module Doing
       @config_file ||= default_config_file
     end
 
+    def config_file=(file)
+      @config_file = file
+    end
+
     def config_dir
       @config_dir ||= File.join(Util.user_home, '.config', 'doing')
       # @config_dir ||= Util.user_home
@@ -116,20 +120,20 @@ module Doing
       File.join(config_dir, 'config.yml')
     end
 
-    def config_file=(file)
-      @config_file = file
-    end
-
-
     def additional_configs
       @additional_configs ||= find_local_config
     end
 
+    ##
+    ## Present a menu if there are multiple configs found
+    ##
+    ## @return     [String] file path
+    ##
     def choose_config
       if @additional_configs.count.positive?
         choices = [@config_file]
         choices.concat(@additional_configs)
-        res = Doing::WWID.new.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to update > ')
+        res = Doing::Prompt.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to update > ')
 
         raise UserCancelled, 'Cancelled' unless res
 
@@ -139,6 +143,16 @@ module Doing
       end
     end
 
+    ##
+    ## Resolve a fuzzy-matched key path
+    ##
+    ## @param      keypath  [String] A dot-separated key
+    ##                      path, e.g.
+    ##                      "plugins.plugin_path". Will also
+    ##                      work with "plug.path" (fuzzy
+    ##                      matched, first match wins)
+    ## @return     [Array] ordered array of resolved keys
+    ##
     def resolve_key_path(keypath)
       cfg = @settings
       real_path = []
@@ -166,12 +180,22 @@ module Doing
       real_path
     end
 
+    ##
+    ## Get the value for a fuzzy-matched key path
+    ##
+    ## @param      keypath  [String] A dot-separated key
+    ##                      path, e.g.
+    ##                      "plugins.plugin_path". Will also
+    ##                      work with "plug.path" (fuzzy
+    ##                      matched, first match wins)
+    ## @return     [Hash] Config value
+    ##
     def value_for_key(keypath = '')
       cfg = @settings
       real_path = ['config']
       unless keypath =~ /^[.*]?$/
         real_path = resolve_key_path(keypath)
-        return nil unless real_path && real_path.count.positive?
+        return nil unless real_path&.count&.positive?
 
         cfg = cfg.dig(*real_path)
       end
@@ -188,6 +212,9 @@ module Doing
       Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
     end
 
+    ##
+    ## Method for transitioning from ~/.doingrc to ~/.config/doing/config.yml
+    ##
     def update_deprecated_config
       # return # Until further notice
       return if File.exist?(default_config_file)
@@ -199,22 +226,23 @@ module Doing
       Doing.logger.log_now(:warn, 'Deprecated:', "main config file location has changed to #{config_file}")
       res = wwid.yn("Move #{old_file} to new location, preserving settings?", default_response: true)
 
-      if res
-        if File.exist?(default_config_file)
-          res = wwid.yn("#{default_config_file} already exists, overwrite it?", default_response: false)
+      return unless res
 
-          unless res
-            @config_file = old_file
-            return
-          end
+      if File.exist?(default_config_file)
+        res = wwid.yn("#{default_config_file} already exists, overwrite it?", default_response: false)
+
+        unless res
+          @config_file = old_file
+          return
         end
-
-        FileUtils.mv old_file, default_config_file, force: true
-        Doing.logger.log_now(:warn, 'Config:', "Config file moved to #{default_config_file}")
-        Doing.logger.log_now(:warn, 'Config:', %(If ~/.config/doing/config.yml exists in the future, it will be considered a local
-                             config and its values will override the default configuration.))
-        Process.exit 0
       end
+
+      FileUtils.mv old_file, default_config_file, force: true
+      Doing.logger.log_now(:warn, 'Config:', "Config file moved to #{default_config_file}")
+      Doing.logger.log_now(:warn, 'Config:', %(If ~/.doingrc exists in the future,
+                           it will be considered a local config and its values will override the
+                           default configuration.))
+      Process.exit 0
     end
 
     ##
@@ -261,8 +289,23 @@ module Doing
       config
     end
 
+    # @private
+    def inspect
+      %(<Doing::Configuration #{@settings.hash}>)
+    end
+
+    # @private
+    def to_s
+      YAML.dump(@settings)
+    end
+
     private
 
+    ##
+    ## Test for deprecated config keys
+    ##
+    ## @param      config  The configuration
+    ##
     def find_deprecations(config)
       deprecated = false
       if config.key?('editor')
@@ -276,14 +319,16 @@ module Doing
         deprecated = true
         config['editors']['config'] = config['config_editor_app']
         config.delete('config_editor_app')
-        Doing.logger.debug('Deprecated:', "config key 'config_editor_app' is now 'editors->config', please update your config.")
+        Doing.logger.debug('Deprecated:',
+                           "config key 'config_editor_app' is now 'editors->config', please update your config.")
       end
 
       if config.key?('editor_app') && !config['editors']['doing_file']
         deprecated = true
         config['editors']['doing_file'] = config['editor_app']
         config.delete('editor_app')
-        Doing.logger.debug('Deprecated:', "config key 'editor_app' is now 'editors->doing_file', please update your config.")
+        Doing.logger.debug('Deprecated:',
+                           "config key 'editor_app' is now 'editors->doing_file', please update your config.")
       end
 
       Doing.logger.warn('Deprecated:', 'outdated keys found, please run `doing config --update`.') if deprecated
@@ -327,7 +372,7 @@ module Doing
     ##
     def read_config
       unless File.exist?(config_file)
-        Doing.logger.info('Config:', 'Config file doesn\'t exist, using default configuration' )
+        Doing.logger.info('Config:', 'Config file doesn\'t exist, using default configuration')
         return {}.deep_merge(DEFAULTS)
       end
 
@@ -372,11 +417,7 @@ module Doing
     end
 
     def load_plugins(add_dir = nil)
-      begin
-        FileUtils.mkdir_p(add_dir) if add_dir && !File.exist?(add_dir)
-      rescue
-        nil
-      end
+      FileUtils.mkdir_p(add_dir) if add_dir && !File.exist?(add_dir)
 
       Plugins.load_plugins(add_dir)
     end

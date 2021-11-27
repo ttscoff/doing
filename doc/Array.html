@@ -120,12 +120,365 @@
 
 
 
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
 
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#highlight_tags-instance_method" title="#highlight_tags (instance method)">#<strong>highlight_tags</strong>(color = &#39;cyan&#39;)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Hightlight @tags in string for console output.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#log_tags-instance_method" title="#log_tags (instance method)">#<strong>log_tags</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Tag array for logging.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#nested_hash-instance_method" title="#nested_hash (instance method)">#<strong>nested_hash</strong>(value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert array to nested hash, setting last key to value.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_tags-instance_method" title="#to_tags (instance method)">#<strong>to_tags</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert strings to @tags.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_tags!-instance_method" title="#to_tags! (instance method)">#<strong>to_tags!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="highlight_tags-instance_method">
+  
+    #<strong>highlight_tags</strong>(color = &#39;cyan&#39;)  &#x21d2; <tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Hightlight @tags in string for console output</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>color</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;cyan&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>the color to highlight
+with</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>string with @tags highlighted</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="log_tags-instance_method">
+  
+    #<strong>log_tags</strong>  &#x21d2; <tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Tag array for logging</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Highlighted tag array joined with comma</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="nested_hash-instance_method">
+  
+    #<strong>nested_hash</strong>(value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert array to nested hash, setting last key to value</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>value</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The value to set</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>StandardError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_tags-instance_method">
+  
+    #<strong>to_tags</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="Array (class)">Array</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert strings to @tags</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+        <p class="example_title"><div class='inline'><p><code>[&#39;one&#39;, &#39;@two&#39;, &#39;three&#39;].to_tags</code></p>
+</div></p>
+      
+      <pre class="example code"><code></code></pre>
+    
+      
+        <p class="example_title"><div class='inline'><p><code>=&gt; [&#39;@one&#39;, &#39;@two&#39;, &#39;@three&#39;]</code></p>
+</div></p>
+      
+      <pre class="example code"><code></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Array of @tags</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_tags!-instance_method">
+  
+    #<strong>to_tags!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+  </div>
 
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:39:12 2021 by
+  Generated on Sat Nov 27 10:06:03 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

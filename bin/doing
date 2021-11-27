@@ -35,8 +35,10 @@ colors = Doing::Color
 wwid = Doing::WWID.new
 
 Doing.logger.log_level = :info
+env_log_level = nil
 
 if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DOING_VERBOSE'] || ENV['DOING_PLUGIN_DEBUG']
+  env_log_level = true
   # Quiet always wins
   if ENV['DOING_QUIET'] && ENV['DOING_QUIET'].truthy?
     Doing.logger.log_level = :error
@@ -82,6 +84,12 @@ switch %i[p pager], default_value: settings['paginate']
 desc 'Answer yes/no menus with default option'
 switch [:default], default_value: false
 
+desc 'Answer all yes/no menus with yes'
+switch [:yes], negatable: false
+
+desc 'Answer all yes/no menus with no'
+switch [:no], negatable: false
+
 desc 'Exclude auto tags and default tags'
 switch %i[x noauto], default_value: false, negatable: false
 
@@ -121,9 +129,9 @@ command %i[now next] do |c|
   c.desc "Edit entry with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
-  c.desc 'Backdate start time [4pm|20m|2h|yesterday noon]'
+  c.desc 'Backdate start time [4pm|20m|2h|"yesterday noon"]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back]
+  c.flag %i[b back started]
 
   c.desc 'Timed entry, marks last entry in section as @done'
   c.switch %i[f finish_last], negatable: false, default_value: false
@@ -151,29 +159,34 @@ command %i[now next] do |c|
       options[:section] = settings['current_section']
     end
 
-    if options[:e] || (args.empty? && $stdin.stat.size.zero?)
+    if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
-      input = ''
+      input = date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
 
       raise EmptyInput, 'No content' if input.empty?
 
-      title, note = wwid.format_input(input)
-      note.push(options[:n]) if options[:n]
-      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
+      date, title, note = wwid.format_input(input)
+      note.add(options[:note]) if options[:note]
+      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     elsif args.length.positive?
-      title, note = wwid.format_input(args.join(' '))
-      note.push(options[:n]) if options[:n]
-      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
+      d, title, note = wwid.format_input(args.join(' '))
+      date = d.nil? ? date : d
+      note.add(options[:note]) if options[:note]
+      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     elsif $stdin.stat.size.positive?
-      input = $stdin.read
-      title, note = wwid.format_input(input)
-      note.push(options[:n]) if options[:n]
-      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:f] })
+      input = $stdin.read.strip
+      d, title, note = wwid.format_input(input)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
+      note.add(options[:note]) if options[:note]
+      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     else
       raise EmptyInput, 'You must provide content when creating a new entry'
@@ -238,14 +251,13 @@ command %i[reset begin] do |c|
     items = wwid.filter_items([], opt: options)
 
     if options[:interactive]
-      last_entry = wwid.choose_from_items(items, {
+      last_entry = Doing::Prompt.choose_from_items(items, include_section: options[:section].nil?,
         menu: true,
         header: '',
         prompt: 'Select an entry to start/reset > ',
         multiple: false,
         sort: false,
-        show_if_single: true
-      }, include_section: options[:section].nil? )
+        show_if_single: true)
     else
       last_entry = items.last
     end
@@ -344,7 +356,7 @@ command :note do |c|
     last_note = last_entry.note || Doing::Note.new
     new_note = Doing::Note.new
 
-    if options[:e] || (args.empty? && $stdin.stat.size.zero? && !options[:r])
+    if options[:editor] || (args.empty? && $stdin.stat.size.zero? && !options[:remove])
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input = !args.empty? ? args.join(' ') : ''
@@ -357,14 +369,14 @@ command :note do |c|
 
       input = prev_input.add(input)
 
-      input = wwid.fork_editor([last_entry.title, '### Edit below this line', input.to_s].join("\n")).strip
-      _title, note = wwid.format_input(input)
+      input = wwid.fork_editor(prev_input.strip_lines.join("\n"), message: nil).strip
+      note = input
       options[:remove] = true
       new_note.add(note)
     elsif !args.empty?
       new_note.add(args.join(' '))
     elsif $stdin.stat.size.positive?
-      new_note.add($stdin.read)
+      new_note.add($stdin.read.strip)
     else
       raise EmptyInput, 'You must provide content when adding a note' unless options[:remove]
     end
@@ -423,31 +435,35 @@ command :meanwhile do |c|
     end
     input = ''
 
-    if options[:e]
+    if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
+      input += date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
       input = wwid.fork_editor(input).strip
     elsif !args.empty?
       input = args.join(' ')
     elsif $stdin.stat.size.positive?
-      input = $stdin.read
+      input = $stdin.read.strip
     end
 
     if input && !input.empty?
-      input, note = wwid.format_input(input)
+      d, input, note = wwid.format_input(input)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
     else
       input = nil
       note = []
     end
 
-    if options[:n]
-      note.push(options[:n])
+    if options[:note]
+      note.push(options[:note])
     elsif note.empty?
       note = nil
     end
 
-    wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:a], note: note })
+    wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:archive], note: note })
     wwid.write(wwid.doing_file)
   end
 end
@@ -465,11 +481,11 @@ command :template do |c|
   c.switch %i[l list], negatable: false
 
   c.desc 'List in single column for completion'
-  c.switch %i[c]
+  c.switch %i[c column]
 
   c.action do |_global_options, options, args|
-    if options[:list] || options[:c]
-      if options[:c]
+    if options[:list] || options[:column]
+      if options[:column]
         $stdout.print Doing::Plugins.plugin_templates.join("\n")
       else
         $stdout.puts "Available templates: #{Doing::Plugins.plugin_templates.join(', ')}"
@@ -478,7 +494,7 @@ command :template do |c|
     end
 
     if args.empty?
-      type = wwid.choose_from(Doing::Plugins.plugin_templates, sorted: false, prompt: 'Select template type > ')
+      type = Doing::Prompt.choose_from(Doing::Plugins.plugin_templates, sorted: false, prompt: 'Select template type > ')
     else
       type = args[0]
     end
@@ -613,22 +629,29 @@ command :later do |c|
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
-      input = args.empty? ? '' : args.join(' ')
+      input += date.strftime('%F %R | ')
+      input += args.empty? ? '' : args.join(' ')
       input = wwid.fork_editor(input).strip
       raise EmptyInput, 'No content' unless input && !input.empty?
 
-      title, note = wwid.format_input(input)
-      note.push(options[:n]) if options[:n]
+      d, title, note = wwid.format_input(input)
+      date = d.nil? ? date : d
+      note.add(options[:note]) if options[:note]
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
     elsif !args.empty?
-      title, note = wwid.format_input(args.join(' '))
-      note.push(options[:n]) if options[:n]
+      d, title, note = wwid.format_input(args.join(' '))
+      date = d.nil? ? date : d
+      note.add(options[:note]) if options[:note]
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
     elsif $stdin.stat.size.positive?
-      title, note = wwid.format_input($stdin.read)
-      note.push(options[:n]) if options[:n]
+      d, title, note = wwid.format_input($stdin.read)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
+      note.add(options[:note]) if options[:note]
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
     else
@@ -659,9 +682,9 @@ command %i[done did] do |c|
   c.arg_name 'DATE_STRING'
   c.flag [:at]
 
-  c.desc 'Backdate start date by interval [4pm|20m|2h|yesterday noon]'
+  c.desc 'Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back]
+  c.flag %i[b back started]
 
   c.desc %(Set completion date to start date plus interval (XX[mhd] or HH:MM).
   If used without the --back option, the start date will be moved back to allow
@@ -710,8 +733,6 @@ command %i[done did] do |c|
       date = options[:took] ? finish_date - took : finish_date
     elsif options[:took]
       finish_date = date + took
-    elsif options[:back]
-      finish_date = date
     else
       finish_date = Time.now
     end
@@ -743,16 +764,17 @@ command %i[done did] do |c|
 
         old_entry = last_entry.dup
         last_entry.note.add(note)
-        input = [last_entry.title, last_entry.note.to_s].join("\n")
+        input = ["#{last_entry.date.strftime('%F %R | ')}#{last_entry.title}", last_entry.note.strip_lines.join("\n")].join("\n")
       else
         is_new = true
-        input = [args.join(' '), note.to_s].join("\n")
+        input = ["#{date.strftime('%F %R | ')}#{args.join(' ')}", note.strip_lines.join("\n")].join("\n")
       end
 
       input = wwid.fork_editor(input).strip
       raise EmptyInput, 'No content' unless input && !input.empty?
 
-      title, note = wwid.format_input(input)
+      d, title, note = wwid.format_input(input)
+      date = d.nil? ? date : d
       new_entry = Doing::Item.new(date, title, section, note)
       if new_entry.should_finish?
         if new_entry.should_time?
@@ -763,23 +785,23 @@ command %i[done did] do |c|
       end
 
       if (is_new)
-        wwid.content[section][:items].push(new_entry)
+        wwid.content.push(new_entry)
       else
-        wwid.update_item(old_entry, new_entry)
+        wwid.content.update_item(old_entry, new_entry)
       end
 
-      if options[:a]
+      if options[:archive]
         wwid.move_item(new_entry, 'Archive', label: true)
       end
 
       wwid.write(wwid.doing_file)
     elsif args.empty? && $stdin.stat.size.zero?
-      if options[:r]
+      if options[:remove]
         wwid.tag_last({ tags: ['done'], count: 1, section: section, remove: true })
       else
         note = options[:note] ? Doing::Note.new(options[:note]) : nil
         opt = {
-          archive: options[:a],
+          archive: options[:archive],
           back: finish_date,
           count: 1,
           date: options[:date],
@@ -793,9 +815,10 @@ command %i[done did] do |c|
       end
     elsif !args.empty?
       note = Doing::Note.new(options[:note])
-      title, new_note = wwid.format_input([args.join(' '), note.to_s].join("\n"))
+      d, title, new_note = wwid.format_input([args.join(' '), note.strip_lines.join("\n")].join("\n"))
+      date = d.nil? ? date : d
       title.chomp!
-      section = 'Archive' if options[:a]
+      section = 'Archive' if options[:archive]
       new_entry = Doing::Item.new(date, title, section, new_note)
       if new_entry.should_finish?
         if new_entry.should_time?
@@ -804,13 +827,17 @@ command %i[done did] do |c|
           new_entry.tag('done')
         end
       end
-      wwid.content[section][:items].push(new_entry)
+      wwid.content.push(new_entry)
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     elsif $stdin.stat.size.positive?
-      title, note = wwid.format_input($stdin.read)
+      d, title, note = wwid.format_input($stdin.read.strip)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
       note.add(options[:note]) if options[:note]
-      section = options[:a] ? 'Archive' : section
+      section = options[:archive] ? 'Archive' : section
       new_entry = Doing::Item.new(date, title, section, note)
 
       if new_entry.should_finish?
@@ -821,7 +848,7 @@ command %i[done did] do |c|
         end
       end
 
-      wwid.content[section][:items].push(new_entry)
+      wwid.content.push(new_entry)
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     else
@@ -907,7 +934,7 @@ command :cancel do |c|
     end
 
     opts = {
-      archive: options[:a],
+      archive: options[:archive],
       case: options[:case].normalize_case,
       count: count,
       date: false,
@@ -1279,15 +1306,15 @@ command :tag do |c|
       end
 
 
-      question = if options[:a]
+      question = if options[:aarchive]
                    "Are you sure you want to autotag all records#{section_q}"
-                 elsif options[:r]
+                 elsif options[:remove]
                    "Are you sure you want to remove #{tags.join(' and ')} from all records#{section_q}"
                  else
                    "Are you sure you want to add #{tags.join(' and ')} to all records#{section_q}"
                  end
 
-      res = wwid.yn(question, default_response: false)
+      res = Doing::Prompt.yn(question, default_response: false)
 
       raise UserCancelled unless res
     end
@@ -1408,7 +1435,7 @@ command [:mark, :flag] do |c|
                    "Are you sure you want to flag all records#{section_q}"
                  end
 
-      res = wwid.yn(question, default_response: false)
+      res = Doing::Prompt.yn(question, default_response: false)
 
       exit_now! 'Cancelled' unless res
     end
@@ -1598,7 +1625,6 @@ command :show do |c|
     end
 
     opt = options.dup
-
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
     opt[:date_filter] = dates
@@ -1729,7 +1755,7 @@ command :recent do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |global_options, options, args|
-    section = wwid.guess_section(options[:s]) || options[:s].cap_first
+    section = wwid.guess_section(options[:section]) || options[:section].cap_first
 
     unless global_options[:version]
       if settings['templates']['recent'].key?('count')
@@ -1744,7 +1770,7 @@ command :recent do |c|
         count = args.empty? ? config_count : args[0].to_i
       end
 
-      options[:t] = true if options[:totals]
+      options[:times] = true if options[:totals]
       options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
       template = settings['templates']['recent'].deep_merge(settings['templates']['default'])
@@ -1753,7 +1779,7 @@ command :recent do |c|
       opts = {
         sort_tags: options[:sort_tags],
         tags_color: tags_color,
-        times: options[:t],
+        times: options[:times],
         totals: options[:totals],
         interactive: options[:interactive]
       }
@@ -1802,7 +1828,7 @@ command :today do |c|
   c.action do |_global_options, options, _args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    options[:t] = true if options[:totals]
+    options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt = {
       after: options[:after],
@@ -1863,14 +1889,14 @@ command :on do |c|
 
     raise InvalidTimeExpression, 'Unrecognized date string' unless start
 
-    message = "Date interpreted as #{start}"
+    message = "date interpreted as #{start}"
     message += " to #{finish}" if finish
-    Doing.logger.debug(message)
+    Doing.logger.debug('Interpreter:', message)
 
-    options[:t] = true if options[:totals]
+    options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    Doing::Pager.page wwid.list_date([start, finish], options[:s], options[:t], options[:output],
+    Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
                         { totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
@@ -1918,12 +1944,12 @@ command :since do |c|
 
     raise InvalidTimeExpression, 'Unrecognized date string' unless start
 
-    Doing.logger.debug("Date interpreted as #{start} through the current time")
+    Doing.logger.debug('Interpreter:', "date interpreted as #{start} through the current time")
 
-    options[:t] = true if options[:totals]
+    options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
-    Doing::Pager.page wwid.list_date([start, finish], options[:s], options[:t], options[:output],
+    Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
                         { totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
@@ -2053,9 +2079,9 @@ command :last do |c|
     end
 
     if options[:editor]
-      wwid.edit_last(section: options[:s], options: { search: search, fuzzy: options[:fuzzy], case: options[:case], tag: tags, tag_bool: options[:bool], not: options[:not] })
+      wwid.edit_last(section: options[:section], options: { search: search, fuzzy: options[:fuzzy], case: options[:case], tag: tags, tag_bool: options[:bool], not: options[:not] })
     else
-      Doing::Pager::page wwid.last(times: true, section: options[:s],
+      Doing::Pager::page wwid.last(times: true, section: options[:section],
                      options: { search: search, fuzzy: options[:fuzzy], case: options[:case], negate: options[:not], tag: tags, tag_bool: options[:bool] }).strip
     end
   end
@@ -2067,8 +2093,8 @@ command :sections do |c|
   c.switch %i[c column], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
-    joiner = options[:c] ? "\n" : "\t"
-    print wwid.sections.join(joiner)
+    joiner = options[:column] ? "\n" : "\t"
+    print wwid.content.section_titles.join(joiner)
   end
 end
 
@@ -2089,7 +2115,7 @@ command :add_section do |c|
   c.action do |_global_options, _options, args|
     raise InvalidArgument, "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
 
-    wwid.add_section(args.join(' ').cap_first)
+    wwid.content.add_section(args.join(' ').cap_first, log: true)
     wwid.write(wwid.doing_file)
   end
 end
@@ -2247,6 +2273,7 @@ command :view do |c|
               rescue WrongCommand => exception
                 cmd = commands[:show]
                 options[:sort] = 'asc'
+                options[:tag_order] = 'asc'
                 action = cmd.send(:get_action, nil)
                 return action.call(global_options, options, args)
               end
@@ -2289,12 +2316,9 @@ command :view do |c|
       # If the -o/--output flag was specified, override any default in the view template
       options[:output] ||= view.key?('output_format') ? view['output_format'] : 'template'
 
-      count = if options[:c]
-                options[:c]
-              else
-                view.key?('count') ? view['count'] : 10
-              end
-      section = if options[:s]
+      count = options[:count] ? options[:count] : view.key?('count') ? view['count'] : 10
+
+      section = if options[:section]
                   section
                 else
                   view.key?('section') ? view['section'] : settings['current_section']
@@ -2312,7 +2336,7 @@ command :view do |c|
                     view.key?('tag_order') ? view['tag_order'].normalize_order : 'asc'
                   end
 
-      options[:t] = true if totals
+      options[:times] = true if totals
       output_format = options[:output]&.downcase || 'template'
 
       options[:sort_tags] = if options[:tag_sort]
@@ -2386,7 +2410,7 @@ command :views do |c|
   c.switch %i[c column], default_value: false
 
   c.action do |_global_options, options, _args|
-    joiner = options[:c] ? "\n" : "\t"
+    joiner = options[:column] ? "\n" : "\t"
     print wwid.views.join(joiner)
   end
 end
@@ -2552,6 +2576,10 @@ end
 desc 'Open the "doing" file in an editor'
 long_desc "`doing open` defaults to using the editor_app setting in #{config.config_file} (#{settings.key?('editor_app') ? settings['editor_app'] : 'not set'})."
 command :open do |c|
+  c.desc 'Open with editor command (e.g. vim, mate)'
+  c.arg_name 'COMMAND'
+  c.flag %i[e editor]
+
   if `uname` =~ /Darwin/
     c.desc 'Open with app name'
     c.arg_name 'APP_NAME'
@@ -2567,11 +2595,17 @@ command :open do |c|
     params.delete_if do |k, v|
       k.instance_of?(String) || v.nil? || v == false
     end
-    if `uname` =~ /Darwin/
+
+    if options[:editor]
+      raise MissingEditor, "Editor #{options[:editor]} not found" unless Doing::Util.exec_available(options[:editor])
+
+      editor = TTY::Which.which(options[:editor])
+      system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
+    elsif `uname` =~ /Darwin/
       if options[:app]
-        system %(open -a "#{options[:a]}" "#{File.expand_path(wwid.doing_file)}")
+        system %(open -a "#{options[:app]}" "#{File.expand_path(wwid.doing_file)}")
       elsif options[:bundle_id]
-        system %(open -b "#{options[:b]}" "#{File.expand_path(wwid.doing_file)}")
+        system %(open -b "#{options[:bundle_id]}" "#{File.expand_path(wwid.doing_file)}")
       elsif Doing::Util.find_default_editor('doing_file')
         editor = Doing::Util.find_default_editor('doing_file')
         if Doing::Util.exec_available(editor)
@@ -2615,6 +2649,16 @@ command :config do |c|
   c.desc 'DEPRECATED'
   c.switch %i[u update]
 
+  c.desc 'List configuration paths, including .doingrc files in the current and parent directories'
+  c.long_desc 'Config files are listed in order of precedence (if there are multiple configs detected).
+  Values defined in the top item in the list will override values in configutations below it.'
+  c.command :list do |list|
+    list.action do |global, options, args|
+      puts config.additional_configs.join("\n")
+      puts config.config_file
+    end
+  end
+
   c.desc 'Open config file in editor'
   c.command :edit do |edit|
     edit.example 'doing config edit', desc: 'Open a config file in the default editor'
@@ -2627,14 +2671,14 @@ command :config do |c|
     if `uname` =~ /Darwin/
       edit.desc 'Application to use'
       edit.arg_name 'APP_NAME'
-      edit.flag [:a]
+      edit.flag %i[a app]
 
       edit.desc 'Application bundle id to use'
       edit.arg_name 'BUNDLE_ID'
-      edit.flag [:b]
+      edit.flag %i[b bundle_id]
 
       edit.desc "Use the config_editor_app defined in ~/.config/doing/config.yml (#{settings.key?('config_editor_app') ? settings['config_editor_app'] : 'config_editor_app not set'})"
-      edit.switch [:x]
+      edit.switch %i[x default]
     end
 
     edit.action do |global, options, args|
@@ -2656,7 +2700,7 @@ command :config do |c|
       config_file = config.choose_config
 
       if `uname` =~ /Darwin/
-        if options[:x]
+        if options[:default]
           editor = Doing::Util.find_default_editor('config')
           if editor
             if Doing::Util.exec_available(editor)
@@ -2667,14 +2711,14 @@ command :config do |c|
           else
             raise InvalidArgument, 'No viable editor found in config or environment.'
           end
-        elsif options[:a] || options[:b]
-          if options[:a]
-            `open -a "#{options[:a]}" "#{config_file}"`
-          elsif options[:b]
-            `open -b #{options[:b]} "#{config_file}"`
+        elsif options[:app] || options[:bundle_id]
+          if options[:app]
+            `open -a "#{options[:app]}" "#{config_file}"`
+          elsif options[:bundle_id]
+            `open -b #{options[:bundle_id]} "#{config_file}"`
           end
         else
-          editor = options[:e] || Doing::Util.find_default_editor('config')
+          editor = options[:editor] || Doing::Util.find_default_editor('config')
 
           raise MissingEditor, 'No viable editor defined in config or environment' unless editor
 
@@ -2685,7 +2729,7 @@ command :config do |c|
           end
         end
       else
-        editor = options[:e] || Doing::Util.default_editor
+        editor = options[:editor] || Doing::Util.default_editor
         raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor)
 
         system %(#{editor} "#{config_file}")
@@ -2725,16 +2769,33 @@ command :config do |c|
 
       keypath = args.join('.')
       cfg = config.value_for_key(keypath)
+      real_path = config.resolve_key_path(keypath)
 
       if cfg
-        $stdout.puts case options[:output]
-                     when /^j/
-                       JSON.pretty_generate(cfg)
-                     when /^r/
-                       cfg.map {|k, v| v.to_s }
-                     else
-                       YAML.dump(cfg)
-                     end
+        val = cfg.map {|k, v| v }[0]
+        if real_path.count.positive?
+          nested_cfg = {}
+          nested_cfg.deep_set(real_path, val)
+        else
+          nested_cfg = val
+        end
+
+        if options[:output] =~ /^r/
+          if val.is_a?(Hash)
+            $stdout.puts YAML.dump(val)
+          elsif val.is_a?(Array)
+            $stdout.puts val.join(', ')
+          else
+            $stdout.puts val.to_s
+          end
+        else
+          $stdout.puts case options[:output]
+                       when /^j/
+                         JSON.pretty_generate(val)
+                       else
+                         YAML.dump(nested_cfg)
+                       end
+        end
       else
         Doing.logger.log_now(:error, 'Config:', "Key #{keypath} not found")
       end
@@ -2749,46 +2810,55 @@ command :config do |c|
     set.example 'doing config set timer_format human', desc: 'Set the value of timer_format to "human"'
     set.example 'doing config set plug.plugpath ~/my_plugins', desc: 'Key path is fuzzy matched: set the value of plugins->plugin_path'
 
+    set.desc 'Delete specified key'
+    set.switch %i[r remove], default_value: false, negatable: false
+
     set.action do |_global, options, args|
-      if args.count < 2
+      if args.count < 2 && !options[:remove]
         raise InvalidArgument, 'config set requires at least two arguments, key path and value'
 
       end
 
-      value = args.pop
+      value = options[:remove] ? nil : args.pop
       keypath = args.join('.')
       old_value = config.value_for_key(keypath).map { |k, v| v.to_s }
       real_path = config.resolve_key_path(keypath)
       raise InvalidArgument, 'Invalid key path' if real_path.empty?
 
-      key = real_path.last
-      real_path[0...-1].inject(config.settings, :fetch)[key] = value
-
       config_file = config.choose_config
+      cfg = YAML.safe_load_file(config_file) || {}
 
-      prev_level = Doing.logger.level
-      Doing.logger.adjust_verbosity({ level: :info })
-      Doing.logger.log_now(:info, 'Config:', "Updating #{config_file}")
-      Doing.logger.log_now(:info, 'Config:', "#{real_path.join('->')} => #{value}")
-      res = wwid.yn('Update selected config', default_response: true)
+      $stderr.puts "Updating #{config_file}".yellow
+
+      if options[:remove]
+        cfg.deep_set(real_path, nil)
+        $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('->').boldwhite}"
+      else
+        old_value = cfg.dig(*real_path) || 'empty'
+        cfg.deep_set(real_path, value.set_type)
+        $stderr.puts "#{'Key path:'.yellow} #{real_path.join('->').boldwhite}"
+        $stderr.puts "#{'Previous:'.yellow} #{old_value.to_s.boldwhite}"
+        $stderr.puts "#{'     New:'.yellow} #{value.set_type.to_s.boldwhite}"
+      end
+
+      res = Doing::Prompt.yn('Update selected config', default_response: true)
 
       raise UserCancelled, 'Cancelled' unless res
 
-      Doing.logger.adjust_verbosity({ level: prev_level })
-      Doing::Util.write_to_file(config_file, YAML.dump(config.settings), backup: true)
+      Doing::Util.write_to_file(config_file, YAML.dump(cfg), backup: true)
       Doing.logger.warn('Config:', "#{config_file} updated")
     end
   end
 end
 
-desc 'Undo the last change to the doing_file'
+desc 'Undo the last change to the Doing file'
 command :undo do |c|
   c.desc 'Specify alternate doing file'
   c.arg_name 'PATH'
   c.flag %i[f file], default_value: wwid.doing_file
 
   c.action do |_global_options, options, _args|
-    file = options[:f] || wwid.doing_file
+    file = options[:file] || wwid.doing_file
     wwid.restore_backup(file)
   end
 end
@@ -2895,9 +2965,9 @@ pre do |global, _command, _options, _args|
 
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
   unless STDOUT.isatty
-    Doing::Color::coloring = global[:pager] ? global[:color] : false
+    Doing::Color.coloring = global[:pager] ? global[:color] : false
   else
-    Doing::Color::coloring = global[:color]
+    Doing::Color.coloring = global[:color]
   end
 
   # Return true to proceed; false to abort and not call the
@@ -2925,13 +2995,21 @@ end
 
 around do |global, command, options, arguments, code|
   # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{settings['paginate']}, Pager: #{Doing::Pager.paginate}")
-  Doing.logger.adjust_verbosity(global)
+  if env_log_level.nil?
+    Doing.logger.adjust_verbosity(global)
+  end
 
   if global[:stdout]
     Doing.logger.logdev = $stdout
   end
 
-  wwid.default_option = global[:default]
+  if global[:yes]
+    Doing::Prompt.force_answer = true
+  elsif global[:no]
+    Doing::Prompt.force_answer = false
+  else
+    Doing::Prompt.default_answer = global[:default]
+  end
 
   if global[:config_file] && global[:config_file] != config.config_file
     Doing.logger.warn(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', colors.flamingo, colors.default, colors.boldred))

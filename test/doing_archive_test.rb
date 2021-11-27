@@ -33,6 +33,7 @@ class DoingArchiveTest < Test::Unit::TestCase
     entries = doing('show').scan(ENTRY_REGEX).count
     result = doing('--stdout', 'archive')
     assert_match(/Archived: #{entries} items from #{@config['current_section']} to Archive/, result, "Should have archived #{entries} items")
+    assert_valid_file(@wwid_file)
   end
 
   def test_archive_tag
@@ -43,12 +44,14 @@ class DoingArchiveTest < Test::Unit::TestCase
     assert_match(/Archived: 3 items/, result, "Should have archived 3 items")
     assert_count_entries(5, doing('show', 'archive'), 'Archive should contain 5 items')
     assert_count_entries(entries - 5, doing('show'), "Currently shoud contain #{entries - 5} items")
+    assert_valid_file(@wwid_file)
   end
 
   def test_archive_search
     entries = doing('show').scan(ENTRY_REGEX).count
 
     result = doing('--stdout', 'archive', '--search', 'Overtired 446')
+    assert_match(/New section: "Archive"/, result, 'Archive section should have been added')
     assert_no_match(/Archived: 2 items/, result, 'Case sensitive search should have been triggered and failed')
 
     result = doing('--stdout', 'archive', '--search', 'overtired 446')
@@ -58,7 +61,9 @@ class DoingArchiveTest < Test::Unit::TestCase
     assert_match(/Archived: 1 item/, result, 'Regex search should have matched 1 items')
 
     assert_count_entries(entries - 3, doing('show'), "Current section should have 3 fewer items items")
+
     assert_count_entries(3, doing('show', 'archive'), 'Archive should have 3 items')
+    assert_valid_file(@wwid_file)
   end
 
   def test_archive_keep
@@ -80,6 +85,8 @@ class DoingArchiveTest < Test::Unit::TestCase
     assert_count_entries(5, doing('show'), 'Should have 5 entries remaining')
     res = doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', rotate_file, 'show')
     assert_count_entries(3, res, 'Rotate file should have 3 entries')
+    assert_valid_file(@wwid_file)
+    assert_valid_file(rotate_file)
   end
 
   private

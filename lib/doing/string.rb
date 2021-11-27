@@ -20,8 +20,7 @@ module Doing
     ## can be separated by up to *distance* characters in
     ## haystack, spaces indicate unlimited distance.
     ##
-    ## @example    "this word".to_rx(2) =>
-    ## /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/
+    ## @example    `"this word".to_rx(2) => /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/`
     ##
     ## @param      distance   [Integer] Allowed distance
     ##                        between characters
@@ -61,6 +60,15 @@ module Doing
       else
         true
       end
+    end
+
+    # Compress multiple spaces to single space
+    def compress
+      gsub(/ +/, ' ').strip
+    end
+
+    def compress!
+      replace compress
     end
 
     ## @param (see #highlight_tags)
@@ -289,11 +297,29 @@ module Doing
       title
     end
 
-    def tag!(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)
-      replace tag(tag, value: value, remove: remove, rename_to: rename_to, regex: regex, single: single)
+    ##
+    ## Add, rename, or remove a tag in place
+    ##
+    ## @see #tag
+    ##
+    def tag!(tag, **options)
+      replace tag(tag, **options)
     end
 
-    def tag(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false)
+    ##
+    ## Add, rename, or remove a tag
+    ##
+    ## @param      tag        The tag
+    ## @param      value      [String] Value for tag (@tag(value))
+    ## @param      remove     [Boolean] Remove the tag instead of adding
+    ## @param      rename_to  [String] Replace tag with this tag
+    ## @param      regex      [Boolean] Tag is regular expression
+    ## @param      single     [Boolean] Operating on a single item (for logging)
+    ## @param      force      [Boolean] With rename_to, add tag if it doesn't exist
+    ##
+    ## @return     [String] The string with modified tags
+    ##
+    def tag(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false, force: false)
       log_level = single ? :info : :debug
       title = dup
       title.chomp!
@@ -307,13 +333,14 @@ module Doing
                end
 
       if remove || rename_to
-        return title unless title =~ /#{rx_tag}(?=[ (]|$)/
+        rx = Regexp.new("(?<=^| )@#{rx_tag}(?<parens>\\((?<value>[^)]*)\\))?(?= |$)", case_sensitive)
+        m = title.match(rx)
 
-        rx = Regexp.new("(^| )@#{rx_tag}(\\([^)]*\\))?(?= |$)", case_sensitive)
-        if title =~ rx
+        if m.nil? && rename_to && force
+          title.tag!(rename_to, value: value, single: single)
+        elsif m
           title.gsub!(rx) do
-            m = Regexp.last_match
-            rename_to ? "#{m[1]}@#{rename_to}#{m[2]}" : m[1]
+            rename_to ? "@#{rename_to}#{value.nil? ? m['parens'] : "(#{value})"}" : ''
           end
 
           title.dedup_tags!
@@ -373,9 +400,16 @@ module Doing
       title
     end
 
-    # Returns the last escape sequence from a string
+    # Returns the last escape sequence from a string.
     #
-    # @param      string  The string to examine
+    # Actually returns all escape codes, with the assumption
+    # that the result of inserting them will generate the
+    # same color as was set at the end of the string.
+    # Because you can send modifiers like dark and bold
+    # separate from color codes, only using the last code
+    # may not render the same style.
+    #
+    # @return     [String]  All escape codes in string
     #
     def last_color
       scan(/\e\[[\d;]+m/).join('')
@@ -386,17 +420,20 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def link_urls!(opt = {})
-      replace link_urls(opt)
+    def link_urls!(**opt)
+      fmt = opt.fetch(:format, :html)
+      replace link_urls(format: fmt)
     end
 
-    def link_urls(opt = {})
-      opt[:format] ||= :html
+    def link_urls(**opt)
+      fmt = opt.fetch(:format, :html)
+      return self unless fmt
+
       str = dup
 
-      str = str.remove_self_links if opt[:format] == :markdown
+      str = str.remove_self_links if fmt == :markdown
 
-      str.replace_qualified_urls(format: opt[:format]).clean_unlinked_urls
+      str.replace_qualified_urls(format: fmt).clean_unlinked_urls
     end
 
     # Remove <self-linked> formatting
@@ -412,21 +449,24 @@ module Doing
     end
 
     # Replace qualified urls
-    def replace_qualified_urls(opt = {})
-      opt[:format] ||= :html
+    def replace_qualified_urls(**options)
+      fmt = options.fetch(:format, :html)
       gsub(%r{(?mi)(?x:
       (?<!["'\[(\\])
-      ((http|https)://)
-      ([\w\-]+(\.[\w\-]+)+)
-      ([\w\-.,@?^=%&;:/~+#]*[\w\-@^=%&;/~+#])?
+      (?<protocol>(?:http|https)://)
+      (?<domain>[\w\-]+(?:\.[\w\-]+)+)
+      (?<path>[\w\-.,@?^=%&;:/~+#]*[\w\-@^=%&;/~+#])?
       )}) do |_match|
         m = Regexp.last_match
-        proto = m[1].nil? ? 'http://' : ''
-        case opt[:format]
+        url = "#{m['domain']}#{m['path']}"
+        proto = m['protocol'].nil? ? 'http://' : m['protocol']
+        case fmt
+        when :terminal
+          TTY::Link.link_to("#{proto}#{url}", "#{proto}#{url}")
         when :html
-          %(<a href="#{proto}#{m[0]}" title="Link to #{m[0].sub(%r{^https?://}, '')}">[#{m[3]}]</a>)
+          %(<a href="#{proto}#{url}" title="Link to #{m['domain']}">[#{url}]</a>)
         when :markdown
-          "[#{m[0]}](#{proto}#{m[0]})"
+          "[#{url}](#{proto}#{url})"
         else
           m[0]
         end
@@ -441,6 +481,42 @@ module Doing
           match
         else
           %(<a href="#{m[1]}" title="Link to #{m[1]}">[link]</a>)
+        end
+      end
+    end
+
+    def set_type(kind = nil)
+      if kind
+        case kind.to_s
+        when /^a/i
+          gsub(/^\[ *| *\]$/, '').split(/ *, */)
+        when /^i/i
+          to_i
+        when /^f/i
+          to_f
+        when /^sy/i
+          sub(/^:/, '').to_sym
+        when /^b/i
+          self =~ /^(true|yes)$/ ? true : false
+        else
+          to_s
+        end
+      else
+        case self
+        when / *, */
+          gsub(/^\[ *| *\]$/, '').split(/ *, */)
+        when /^[0-9]+$/
+          to_i
+        when /^[0-9]+\.[0-9]+$/
+          to_f
+        when /^:\w+/
+          sub(/^:/, '').to_sym
+        when /^(true|yes)$/i
+          true
+        when /^(false|no)$/i
+          false
+        else
+          to_s
         end
       end
     end

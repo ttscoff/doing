@@ -41,11 +41,11 @@ module Doing
       all_items = []
       items.each do |i|
         if String.method_defined? :force_encoding
-          title = i.title.force_encoding('utf-8').link_urls({format: :markdown})
-          note = i.note.map { |line| line.force_encoding('utf-8').strip.link_urls({format: :markdown}) } if i.note
+          title = i.title.force_encoding('utf-8').link_urls(format: :markdown)
+          note = i.note.map { |line| line.force_encoding('utf-8').strip.link_urls(format: :markdown) } if i.note
         else
-          title = i.title.link_urls({format: :markdown})
-          note = i.note.map { |line| line.strip.link_urls({format: :markdown}) } if i.note
+          title = i.title.link_urls(format: :markdown)
+          note = i.note.map { |line| line.strip.link_urls(format: :markdown) } if i.note
         end
 
         title = "#{title} @project(#{i.section})" unless variables[:is_single]

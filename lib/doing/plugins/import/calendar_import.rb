@@ -27,7 +27,7 @@ module Doing
       options[:no_overlap] ||= false
       options[:autotag] ||= wwid.auto_tag
 
-      wwid.add_section(section) unless wwid.content.key?(section)
+      wwid.content.add_section(section) unless wwid.content.section?(section)
 
       tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '') } : []
       prefix = options[:prefix] || '[Calendar.app]'
@@ -59,7 +59,7 @@ module Doing
         title += " @done(#{end_time.strftime('%Y-%m-%d %H:%M')})"
         title.gsub!(/ +/, ' ')
         title.strip!
-        new_entry = { 'title' => title, 'date' => start_time, 'section' => section }
+        new_entry = Item.new(start_time, title, section)
         new_entry.note = entry['notes'].split(/\n/).map(&:chomp) if entry.key?('notes')
         new_items.push(new_entry)
       end
@@ -69,11 +69,11 @@ module Doing
       filtered = total - new_items.count
       Doing.logger.debug('Skipped:' , %(#{filtered} items that didn't match filter criteria)) if filtered.positive?
 
-      new_items = wwid.dedup(new_items, options[:no_overlap])
+      new_items = wwid.dedup(new_items, no_overlap: options[:no_overlap])
       dups = filtered - new_items.count
       Doing.logger.info(%(Skipped #{dups} items with overlapping times)) if dups.positive?
 
-      wwid.content[section][:items].concat(new_items)
+      wwid.content.concat(new_items)
       Doing.logger.info(%(Imported #{new_items.count} items to #{section}))
     end
 

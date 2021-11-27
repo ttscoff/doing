@@ -143,7 +143,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Add note contents, optionally replacing existing note.</p>
+</div></span>
   
 </li>
 
@@ -165,7 +166,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Append an array of strings to note.</p>
+</div></span>
   
 </li>
 
@@ -187,7 +189,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Append a string to the note content.</p>
+</div></span>
   
 </li>
 
@@ -195,7 +198,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#compress-instance_method" title="#compress (instance method)">#<strong>compress</strong>  &#x21d2; Object </a>
+      <a href="#compress-instance_method" title="#compress (instance method)">#<strong>compress</strong>  &#x21d2; Array </a>
     
 
     
@@ -209,7 +212,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Remove blank lines and comment lines (#).</p>
+</div></span>
   
 </li>
 
@@ -253,7 +257,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Test if a note is equal (compare string             representations).</p>
+</div></span>
   
 </li>
 
@@ -277,7 +282,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>A new instance of Note.</p>
+    <span class="summary_desc"><div class='inline'><p>Initializes a new note.</p>
 </div></span>
   
 </li>
@@ -286,7 +291,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#strip_lines-instance_method" title="#strip_lines (instance method)">#<strong>strip_lines</strong>  &#x21d2; Object </a>
+      <a href="#strip_lines-instance_method" title="#strip_lines (instance method)">#<strong>strip_lines</strong>  &#x21d2; Array </a>
     
 
     
@@ -300,7 +305,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Remove leading/trailing whitespace for             every line of note.</p>
+</div></span>
   
 </li>
 
@@ -344,7 +350,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Note as multi-line string.</p>
+</div></span>
   
 </li>
 
@@ -358,7 +365,12 @@
   
   
   
-  <div id="constructor_details" class="method_details_list">
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Array.html#highlight_tags-instance_method" title="Array#highlight_tags (method)">#highlight_tags</a></span>, <span class='object_link'><a href="../Array.html#log_tags-instance_method" title="Array#log_tags (method)">#log_tags</a></span>, <span class='object_link'><a href="../Array.html#nested_hash-instance_method" title="Array#nested_hash (method)">#nested_hash</a></span>, <span class='object_link'><a href="../Array.html#to_tags-instance_method" title="Array#to_tags (method)">#to_tags</a></span>, <span class='object_link'><a href="../Array.html#to_tags!-instance_method" title="Array#to_tags! (method)">#to_tags!</a></span></p>
+<div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
     <div class="method_details first">
@@ -372,13 +384,35 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns a new instance of Note.</p>
+    <p>Initializes a new note</p>
 
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>note</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Initial note, can be string
+or array</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 
 </div>
 </div>
@@ -399,7 +433,55 @@
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Add note contents, optionally replacing existing note</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>note</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The note to add, can be
+string or array (Note)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>replace</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>replace existing
+content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -411,7 +493,36 @@
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Append an array of strings to note</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>lines</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Array of strings</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -423,19 +534,76 @@
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Append a string to the note content</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>input</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The input string,
+newlines will be split</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
 </div>
     
       <div class="method_details ">
   <h3 class="signature " id="compress-instance_method">
   
-    #<strong>compress</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>compress</strong>  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Remove blank lines and comment lines (#)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>compressed array</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -461,12 +629,33 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
+    <p>Test if a note is equal (compare string
+            representations)</p>
+
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>other</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Doing::Note (class)">Note</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The other Note</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
   
@@ -476,6 +665,10 @@
         <span class='type'>(<tt>Boolean</tt>)</span>
       
       
+      
+        &mdash;
+        <div class='inline'><p>true if equal</p>
+</div>
       
     </li>
   
@@ -487,13 +680,41 @@
       <div class="method_details ">
   <h3 class="signature " id="strip_lines-instance_method">
   
-    #<strong>strip_lines</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>strip_lines</strong>  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Remove leading/trailing whitespace for
+            every line of note</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Stripped note</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -517,7 +738,17 @@
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Note as multi-line string</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 </div>
     
   </div>
@@ -525,7 +756,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Nov 18 16:39:11 2021 by
+  Generated on Sat Nov 27 10:06:03 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

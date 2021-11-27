@@ -136,9 +136,9 @@ module Doing
       # or :map to generate output.
       i = items[-1]
 
-      # Format the item. Items are a hash with 4 keys: date,
-      # title, section (parent section), and note. Start
-      # time is in item.date. The wwid object has some
+      # Format the item. Items are an object with 4 methods:
+      # date, title, section (parent section), and note.
+      # Start time is in item.date. The wwid object has some
       # methods for calculation and formatting, including
       # wwid.item.end_date to convert the @done timestamp to
       # an end date.

@@ -1,3 +1,31 @@
+### 2.1.0pre
+
+#### NEW
+
+- BREAKING CHANGE: custom classes for Section (hash) and Items (Array). @content is still a regular Hash. Sections have methods :original and :items. This will affect plugins as wwid.content[section][:items] is now wwid[section].items (same for :original)
+- `doing config set -r key.path` will delete a key from any config file, removing empty parent keys
+- `config list` will list detected .doingrc files and the main config file in order of precedence - refactoring
+- When modifying start dates or @done dates via an editor command, natural language strings can be used and will be parsed into doing-formatted dates automatically
+- When editor is invoked, entry titles include start date, which can be modified
+
+#### IMPROVED
+
+- Config -o raw outputs value as YAML if result is a Hash/mapping, unquoted string if a single value, comma-separated list if it's an Array.
+- Config -o json no longer includes key, only value.
+- System agnostic method for checking available executables (pager, editor)
+- Using `config set` and selecting a local config will no longer write the entire config to the local .doingrc. Instead, a nested path to the particular setting will be added to the config file.
+
+### 2.0.26
+
+#### NEW
+
+- BREAKING CHANGE: custom classes for Section (hash) and Items (Array). @content is still a regular Hash. Sections have methods :original and :items. This will affect plugins as wwid.content[section][:items] is now wwid[section].items (same for :original)
+
+#### IMPROVED
+
+- Config -o raw outputs value as YAML if result is a Hash/mapping, unquoted string if a single value, comma-separated list if it's an Array.
+- Config -o json no longer includes key, only value.
+
 ### 2.0.25
 
 #### NEW

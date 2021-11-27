@@ -31,6 +31,7 @@ class DoingEntryTest < Test::Unit::TestCase
     subject = 'Test new entry @tag1'
     doing('now', subject)
     assert_match(/#{subject}\s*$/, doing('show', '-c 1'), 'should have added entry')
+    assert_valid_file(@wwid_file)
   end
 
   def test_new_entry_finishing_last
@@ -42,6 +43,7 @@ class DoingEntryTest < Test::Unit::TestCase
       [/#{subject} @done/, 'First entry should be @done'],
       [/#{subject2}\s*$/, 'Second entry should be added']
     ], doing('show'))
+    assert_valid_file(@wwid_file)
   end
 
   def test_section_rejects_empty_args
@@ -52,6 +54,7 @@ class DoingEntryTest < Test::Unit::TestCase
     doing('add_section', 'Test Section')
     res = doing('--stdout', '--debug', 'show', 'Test').strip
     assert_match(/Assuming "Test Section"/, res, 'Should have guessed Test Section')
+    assert_valid_file(@wwid_file)
   end
 
   def test_invalid_section
@@ -61,6 +64,7 @@ class DoingEntryTest < Test::Unit::TestCase
   def test_add_section
     doing('add_section', 'Test Section')
     assert_match(/^Test Section$/, doing('sections', '-c'), 'should have added section')
+    assert_valid_file(@wwid_file)
   end
 
   def test_add_to_section
@@ -69,66 +73,16 @@ class DoingEntryTest < Test::Unit::TestCase
     doing('add_section', section)
     doing('now', '--section', section, subject)
     assert_match(/#{subject}/, doing('show', section), 'Entry should exist in new section')
+    assert_valid_file(@wwid_file)
   end
 
   def test_later_entry
     subject = 'Test later entry'
     result = doing('--stdout', 'later', subject)
     assert_matches([
-      [/New section: "Later"/, 'should have added Later section'],
       [/New entry: added "#{subject}" to Later/, 'should have added entry to Later section']
     ], result)
     assert_count_entries(1, doing('show', 'later'), 'There should be one later entry')
-  end
-
-  def test_cancel_entry
-    doing('now', 'Test entry')
-    doing('cancel')
-    assert_match(/@done$/, doing('show'), 'should have @done tag with no timestamp')
-  end
-
-  def test_cancel_search
-    unique = 'unique string'
-    doing('now', '1 Test entry @tag1')
-    doing('now', "3 Test entry #{unique}")
-    doing('now', '2 Test entry @tag2')
-    res = doing('--stdout', 'cancel', '--tag', 'tag1')
-    assert_match(/added tag @done to 1 Test/, res, 'should have cancelled tagged entry')
-    res = doing('--stdout', 'cancel', '--search', unique)
-    assert_match(/added tag @done to 3 Test/, res, 'should have @done tag with no timestamp')
-  end
-
-  def test_cancel_multiple_args
-    doing('now', 'Test entry')
-    assert_raises(RuntimeError, 'Multiple arguments should cause error') { doing('cancel', '1', 'arg2') }
-  end
-
-  def test_archive_entry
-    subject = 'Test entry'
-    doing('done', subject)
-    result = doing('--stdout', 'archive')
-
-    assert_match(/New section: "Archive"/, result, 'Archive section should have been added')
-    assert_match(/#{subject}/, doing('show', 'Archive'), 'Archive section should contain test entry')
-  end
-
-  def test_archive_by_search
-    prefixes = %w[consuming eating]
-    search_terms = %w[bagels bacon eggs brunch breakfast lunch]
-    search_terms.each do |food|
-      prefixes.each do |prefix|
-        doing('done', "#{prefix.capitalize} @#{food}")
-      end
-    end
-
-    result = doing('--stdout', 'archive', '--search', '/consuming.*?bagels/')
-
-    assert_match(/New section: "Archive"/, result, 'Archive section should have been added')
-    assert_match(/Archived: 1 item from #{@config['current_section']} to Archive/, result, '1 item should have been archived')
-    assert_match(/consuming @bagels/i, doing('show', 'Archive'), 'Archive section should contain test entry')
-
-    result = doing('--stdout', 'archive', '--search', 'eating')
-    assert_match(/Archived: 6 items from #{@config['current_section']} to Archive/, result, '6 items should have been archived')
   end
 
   private

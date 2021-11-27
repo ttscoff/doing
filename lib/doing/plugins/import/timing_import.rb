@@ -27,7 +27,7 @@ module Doing
       section = options[:section] || wwid.config['current_section']
       options[:no_overlap] ||= false
       options[:autotag] ||= wwid.auto_tag
-      wwid.add_section(section) unless wwid.content.key?(section)
+      wwid.content.add_section(section) unless wwid.content.section?(section)
 
       add_tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '') } : []
       prefix = options[:prefix] || '[Timing.app]'
@@ -73,11 +73,11 @@ module Doing
       filtered = skipped - new_items.count
       Doing.logger.debug('Skipped:' , %(#{filtered} items that didn't match filter criteria)) if filtered.positive?
 
-      new_items = wwid.dedup(new_items, options[:no_overlap])
+      new_items = wwid.dedup(new_items, no_overlap: options[:no_overlap])
       dups = filtered - new_items.count
       Doing.logger.debug('Skipped:' , %(#{dups} items with overlapping times)) if dups.positive?
 
-      wwid.content[section][:items].concat(new_items)
+      wwid.content.concat(new_items)
       Doing.logger.info('Imported:', %(#{new_items.count} items to #{section}))
     end
 
