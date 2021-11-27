@@ -1,3 +1,12 @@
+### 2.1.2pre
+
+#### NEW
+
+- Add %duration placeholder to template variables
+- Add `interval_format` setting to config (applies to root or any view/template) to set intervals/durations to human (2h 15m) or text (00:02:15)
+- Add `duration` key to config (root or view/template). If set to true, will display durations by default (no need for `--duration`)
+- Most display commands now have a `--duration` flag that will display an elapsed time if the entry is not marked @done
+
 ### 2.1.1pre
 
 #### NEW
