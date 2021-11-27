@@ -17,10 +17,12 @@ module Doing
                   end
     end
 
+    # Outputs section title
     def to_s
       @title
     end
 
+    # @private
     def inspect
       %(#<Doing::Section @title="#{@title}" @original="#{@original}">)
     end

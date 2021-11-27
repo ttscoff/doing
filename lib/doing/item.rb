@@ -7,6 +7,8 @@ module Doing
   class Item
     attr_accessor :date, :title, :section, :note
 
+    attr_reader :id
+
     ##
     ## Initialize an item with date, title, section, and
     ## optional note
@@ -48,8 +50,11 @@ module Doing
       @end_date ||= Time.parse(Regexp.last_match(1)) if @title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
     end
 
-    def hash_id
-      (@date.to_s + @title + @section + @note.join(' ')).hash
+    # Generate a hash that represents the entry
+    #
+    # @return [String] entry hash
+    def id
+      @id ||= (@date.to_s + @title + @section).hash
     end
 
     ##
@@ -103,15 +108,42 @@ module Doing
     ##
     ## Add (or remove) tags from the title of the item
     ##
-    ## @param      tag        [String] The tag to add
-    ## @param      value      [String] A value to include as @tag(value)
-    ## @param      remove     [Boolean] if true remove instead of adding
-    ## @param      rename_to  [String] if not nil, rename target tag to this tag name
-    ## @param      regex      [Boolean] treat target tag string as regex pattern
-    ## @param      force      [Boolean] with rename_to, add tag if it doesn't exist
+    ## @param      tags    [Array] The tags to apply
+    ## @param      **options Additional options
     ##
-    def tag(tag, **options)
-      @title.tag!(tag, **options).strip!
+    ## @option options :date       [Boolean] Include timestamp?
+    ## @option options :single     [Boolean] Log as a single change?
+    ## @option options :value      [String] A value to include as @tag(value)
+    ## @option options :remove     [Boolean] if true remove instead of adding
+    ## @option options :rename_to  [String] if not nil, rename target tag to this tag name
+    ## @option options :regex      [Boolean] treat target tag string as regex pattern
+    ## @option options :force      [Boolean] with rename_to, add tag if it doesn't exist
+    ##
+    def tag(tags, **options)
+      added = []
+      removed = []
+
+      date = options.fetch(:date, false)
+      options[:value] ||= date ? Time.now.strftime('%F %R') : nil
+      options.delete(:date)
+
+      single = options.fetch(:single, false)
+      options.delete(:single)
+
+      tags = tags.to_tags if tags.is_a? ::String
+
+      remove = options.fetch(:remove, false)
+      tags.each do |tag|
+        bool = remove ? :and : :not
+        if tags?(tag, bool)
+          @title.tag!(tag, **options).strip!
+          remove ? removed.push(tag) : added.push(tag)
+        end
+      end
+
+      Doing.logger.log_change(tags_added: added, tags_removed: removed, count: 1, item: self, single: single)
+
+      self
     end
 
     ##
@@ -120,7 +152,7 @@ module Doing
     ## @return     [Array] array of tags (no values)
     ##
     def tags
-      @title.scan(/(?<= |\A)@([^\s(]+)/).map {|tag| tag[0]}.sort.uniq
+      @title.scan(/(?<= |\A)@([^\s(]+)/).map { |tag| tag[0] }.sort.uniq
     end
 
     ##
@@ -189,22 +221,35 @@ module Doing
       should?('never_time')
     end
 
-    def move_to(section, label: true)
-      from = @section.title
+    ##
+    ## Move item from current section to destination section
+    ##
+    ## @param      new_section  [String] The destination
+    ##                          section
+    ## @param      label        [Boolean] add @from(original
+    ##                          section) tag
+    ## @param      log          [Boolean] log this action
+    ##
+    ## @return     nothing
+    ##
+    def move_to(new_section, label: true, log: true)
+      from = @section
 
-      @title.sub!(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{from})") if label
-      @section = section
+      tag('from', rename_to: 'from', value: from, force: true) if label
+      @section = new_section
 
-      Doing.logger.count(section == 'Archive' ? :archived : :moved)
-      Doing.logger.debug("#{section == 'Archive' ? 'Archived' : 'Moved'}:",
-                  "#{item.title.truncate(60)} from #{from} to #{section}")
+      Doing.logger.count(@section == 'Archive' ? :archived : :moved) if log
+      Doing.logger.debug("#{@section == 'Archive' ? 'Archived' : 'Moved'}:",
+                         "#{@title.truncate(60)} from #{from} to #{@section}")
+      self
     end
 
-
+    # outputs item in Doing file format, including leading tab
     def to_s
-      "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.empty? ? '' : "\n#{@note.to_s}"}"
+      "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.empty? ? '' : "\n#{@note}"}"
     end
 
+    # @private
     def inspect
       # %(<Doing::Item @date=#{@date} @title="#{@title}" @section:"#{@section}" @note:#{@note.to_s}>)
       %(<Doing::Item @date=#{@date}>)

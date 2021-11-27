@@ -457,17 +457,32 @@ module Doing
       "#{last_item.title}\n# EDIT BELOW THIS LINE ------------\n#{note}"
     end
 
+    # Reset start date to current time, optionally remove
+    # done tag (resume)
+    #
+    # @param      item    [Item] the item to reset/resume
+    # @param      resume  [Boolean] removing @done tag if true
+    #
     def reset_item(item, resume: false)
       item.date = Time.now
-      if resume
-        item.tag('done', remove: true)
-      end
+      item.tag('done', remove: true) if resume
       logger.info('Reset:', %(Reset #{resume ? 'and resumed ' : ''} "#{item.title}" in #{item.section}))
       item
     end
 
+    # Duplicate an item and add it as a new item
+    #
+    # @param      item    [Item] the item to duplicate
+    # @param      opt     [Hash] additional options
+    #
+    # @option opt :editor [Boolean] open new item in editor
+    # @option opt :date   [String] set start date
+    # @option opt :in     [String] add new item to section :in
+    # @option opt :note   [Note] add note to new item
+    #
+    # @return     nothing
+    #
     def repeat_item(item, opt = {})
-      original = item.dup
       if item.should_finish?
         if item.should_time?
           item.title.tag!('done', value: Time.now.strftime('%F %R'))
@@ -495,9 +510,8 @@ module Doing
         end
       end
 
-      update_item(original, item)
+      # @content.update_item(original, item)
       add_item(title, section, { note: note, back: opt[:date], timed: true })
-      write(@doing_file)
     end
 
     ##
@@ -507,6 +521,7 @@ module Doing
     ##
     def repeat_last(opt = {})
       opt[:section] ||= 'all'
+      opt[:section] = guess_section(opt[:section])
       opt[:note] ||= []
       opt[:tag] ||= []
       opt[:tag_bool] ||= :and
@@ -518,6 +533,7 @@ module Doing
       end
 
       repeat_item(last, opt)
+      write(@doing_file)
     end
 
     ##
@@ -789,10 +805,10 @@ module Doing
         actions.concat(['resume/repeat', 'begin/reset']) if items.count == 1
 
         choice = Prompt.choose_from(actions,
-                             prompt: 'What do you want to do with the selected items? > ',
-                             multiple: true,
-                             sorted: false,
-                             fzf_args: ["--height=#{actions.count + 3}", '--tac', '--no-sort', '--info=hidden'])
+                                    prompt: 'What do you want to do with the selected items? > ',
+                                    multiple: true,
+                                    sorted: false,
+                                    fzf_args: ["--height=#{actions.count + 3}", '--tac', '--no-sort', '--info=hidden'])
         return unless choice
 
         to_do = choice.strip.split(/\n/)
@@ -815,8 +831,13 @@ module Doing
           when /output formatted/
             plugins = Plugins.available_plugins(type: :export).sort
             output_format = Prompt.choose_from(plugins,
-                                        prompt: 'Which output format? > ',
-                                        fzf_args: ["--height=#{plugins.count + 3}", '--tac', '--no-sort', '--info=hidden'])
+                                               prompt: 'Which output format? > ',
+                                               fzf_args: [
+                                                 "--height=#{plugins.count + 3}",
+                                                 '--tac',
+                                                 '--no-sort',
+                                                 '--info=hidden'
+                                               ])
             next if tag =~ /^ *$/
 
             raise UserCancelled unless output_format
@@ -850,29 +871,28 @@ module Doing
       end
 
       if opt[:resume] || opt[:reset]
-        if items.count > 1
-          raise InvalidArgument, 'resume and restart can only be used on a single entry'
-        else
-          item = items[0]
-          if opt[:resume] && !opt[:reset]
-            repeat_item(item, { editor: opt[:editor] })
-          elsif opt[:reset]
-            if item.tags?('done', :and) && !opt[:resume]
-              res = opt[:force] ? true : Prompt.yn('Remove @done tag?', default_response: 'y')
-            else
-              res = opt[:resume]
-            end
-            update_item(item, reset_item(item, resume: res))
-          end
-          write(@doing_file)
+        raise InvalidArgument, 'resume and restart can only be used on a single entry' if items.count > 1
+
+        item = items[0]
+        if opt[:resume] && !opt[:reset]
+          repeat_item(item, { editor: opt[:editor] })
+        elsif opt[:reset]
+          res = if item.tags?('done', :and) && !opt[:resume]
+                  opt[:force] ? true : Prompt.yn('Remove @done tag?', default_response: 'y')
+                else
+                  opt[:resume]
+                end
+          @content.update_item(item, reset_item(item, resume: res))
         end
+        write(@doing_file)
+
         return
       end
 
       if opt[:delete]
         res = opt[:force] ? true : Prompt.yn("Delete #{items.size} items?", default_response: 'y')
         if res
-          items.each { |item| delete_item(item, single: items.count == 1) }
+          items.each { |i| @content.delete_item(i, single: items.count == 1) }
           write(@doing_file)
         end
         return
@@ -880,31 +900,31 @@ module Doing
 
       if opt[:flag]
         tag = @config['marker_tag'] || 'flagged'
-        items.map! do |item|
-          tag_item(item, tag, date: false, remove: opt[:remove], single: single)
+        items.map! do |i|
+          i.tag(tag, date: false, remove: opt[:remove], single: single)
         end
       end
 
       if opt[:finish] || opt[:cancel]
         tag = 'done'
-        items.map! do |item|
-          if item.should_finish?
-            should_date = !opt[:cancel] && item.should_time?
-            tag_item(item, tag, date: should_date, remove: opt[:remove], single: single)
+        items.map! do |i|
+          if i.should_finish?
+            should_date = !opt[:cancel] && i.should_time?
+            i.tag(tag, date: should_date, remove: opt[:remove], single: single)
           end
         end
       end
 
       if opt[:tag]
         tag = opt[:tag]
-        items.map! do |item|
-          tag_item(item, tag, date: false, remove: opt[:remove], single: single)
+        items.map! do |i|
+          i.tag(tag, date: false, remove: opt[:remove], single: single)
         end
       end
 
       if opt[:archive] || opt[:move]
         section = opt[:archive] ? 'Archive' : guess_section(opt[:move])
-        items.map! {|item| move_item(item, section) }
+        items.map! { |i| i.move_to(section, label: true) }
       end
 
       write(@doing_file)
@@ -913,24 +933,24 @@ module Doing
 
         editable_items = []
 
-        items.each do |item|
-          editable = "#{item.date} | #{item.title}"
-          old_note = item.note ? item.note.strip_lines.join("\n") : nil
+        items.each do |i|
+          editable = "#{i.date} | #{i.title}"
+          old_note = i.note ? i.note.strip_lines.join("\n") : nil
           editable += "\n#{old_note}" unless old_note.nil?
           editable_items << editable
         end
         divider = "\n-----------\n"
-        input = editable_items.map(&:strip).join(divider) + "\n\n# You may delete entries, but leave all divider lines in place"
+        notice = '# You may delete entries, but leave all divider lines in place'
+        input =  "#{editable_items.map(&:strip).join(divider)}\n\n#{notice}"
 
         new_items = fork_editor(input).split(/#{divider}/)
 
         new_items.each_with_index do |new_item, i|
-
           input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
           title = input_lines[0]&.strip
 
           if title.nil? || title =~ /^#{divider.strip}$/ || title.strip.empty?
-            delete_item(items[i], single: new_items.count == 1)
+            @content.delete_item(items[i], single: new_items.count == 1)
           else
             note = input_lines.length > 1 ? input_lines[1..-1] : []
 
@@ -950,76 +970,43 @@ module Doing
         write(@doing_file)
       end
 
-      if opt[:output]
-        items.map! do |item|
-          item.title = "#{item.title} @project(#{item.section})"
-          item
-        end
+      return unless opt[:output]
 
-        @content = Items.new
-        @content.concat(items)
-        @content.add_section(Section.new('Export'), log: false)
-        options = { section: 'Export' }
-
-
-        if opt[:output] =~ /doing/
-          options[:output] = 'template'
-          options[:template] = '- %date | %title%note'
-        else
-          options[:output] = opt[:output]
-          options[:template] = opt[:template] || nil
-        end
-
-        output = list_section(options)
-
-        if opt[:save_to]
-          file = File.expand_path(opt[:save_to])
-          if File.exist?(file)
-            # Create a backup copy for the undo command
-            FileUtils.cp(file, "#{file}~")
-          end
-
-          File.open(file, 'w+') do |f|
-            f.puts output
-          end
-
-          logger.warn('File written:', file)
-        else
-          Doing::Pager.page output
-        end
-      end
-    end
-
-    ##
-    ## Tag an item from the index
-    ##
-    ## @param      item    [Item] The item to tag
-    ## @param      tags    [String] The tag to apply
-    ## @param      remove  [Boolean] remove tags?
-    ## @param      date    [Boolean] Include timestamp?
-    ## @param      single  [Boolean] Log as a single change?
-    ##
-    ## @return     [Item] updated item
-    ##
-    def tag_item(item, tags, remove: false, date: false, single: false)
-      added = []
-      removed = []
-
-      tags = tags.to_tags if tags.is_a? ::String
-
-      done_date = Time.now
-
-      tags.each do |tag|
-        bool = remove ? :and : :not
-        if item.tags?(tag, bool)
-          item.tag(tag, remove: remove, value: date ? done_date.strftime('%F %R') : nil)
-          remove ? removed.push(tag) : added.push(tag)
-        end
+      items.map! do |i|
+        i.title = "#{i.title} @project(#{i.section})"
+        i
       end
 
-      log_change(tags_added: added, tags_removed: removed, count: 1, item: item, single: single)
+      @content = Items.new
+      @content.concat(items)
+      @content.add_section(Section.new('Export'), log: false)
+      options = { section: 'Export' }
 
-      item
+      if opt[:output] =~ /doing/
+        options[:output] = 'template'
+        options[:template] = '- %date | %title%note'
+      else
+        options[:output] = opt[:output]
+        options[:template] = opt[:template] || nil
+      end
+
+      output = list_section(options)
+
+      if opt[:save_to]
+        file = File.expand_path(opt[:save_to])
+        if File.exist?(file)
+          # Create a backup copy for the undo command
+          FileUtils.cp(file, "#{file}~")
+        end
+
+        File.open(file, 'w+') do |f|
+          f.puts output
+        end
+
+        logger.warn('File written:', file)
+      else
+        Doing::Pager.page output
+      end
     end
 
     ##
@@ -1132,40 +1119,18 @@ module Doing
           end
         end
 
-        log_change(tags_added: added, tags_removed: removed, item: item, single: items.count == 1)
+        logger.log_change(tags_added: added, tags_removed: removed, item: item, single: items.count == 1)
 
         item.note.add(opt[:note]) if opt[:note]
 
         if opt[:archive] && opt[:section] != 'Archive' && (opt[:count]).positive?
-          move_item(item, 'Archive', label: true)
+          item.move_to('Archive', label: true)
         elsif opt[:archive] && opt[:count].zero?
           logger.warn('Skipped:', 'Archiving is skipped when operating on all entries')
         end
       end
 
       write(@doing_file)
-    end
-
-    ##
-    ## Move item from current section to
-    ##             destination section
-    ##
-    ## @param      item     [Item] The item to move
-    ## @param      section  [String] The destination section
-    ##
-    ## @return     [Item] Updated item
-    ##
-    def move_item(item, section, label: true, log: true)
-      section = guess_section(section)
-      from = item.section
-
-      item.tag('from', rename_to: 'from', value: from, force: true) if label
-      item.section = section
-
-      logger.count(section == 'Archive' ? :archived : :moved) if log
-      logger.debug("#{section == 'Archive' ? 'Archived' : 'Moved'}:",
-                  "#{item.title.truncate(60)} from #{from} to #{section}")
-      item
     end
 
     ##
@@ -1183,38 +1148,6 @@ module Doing
       idx = items.index(item)
 
       idx.positive? ? items[idx - 1] : nil
-    end
-
-    ##
-    ## Delete an item from the index
-    ##
-    ## @param      item  The item
-    ##
-    def delete_item(item, single: false)
-      section = item.section
-
-      deleted = @content.delete(item)
-      logger.count(:deleted)
-      logger.info('Entry deleted:', deleted.title) if single
-    end
-
-    ##
-    ## Update an item in the index with a modified item
-    ##
-    ## @param      old_item  The old item
-    ## @param      new_item  The new item
-    ##
-    def update_item(old_item, new_item)
-      s_idx = @content.index { |item| item.equal?(old_item) }
-
-      raise ItemNotFound, 'Unable to find item in index, did it mutate?' unless s_idx
-
-      return if @content[s_idx].equal?(new_item)
-
-      @content[s_idx] = new_item
-      logger.count(:updated)
-      logger.info('Entry updated:', @content[s_idx].title.truncate(60))
-      new_item
     end
 
     ##
@@ -1291,7 +1224,7 @@ module Doing
 
         if opt[:archive] && opt[:section] != 'Archive'
           item.title = item.title.sub(/(?:@from\(.*?\))?(.*)$/, "\\1 @from(#{item.section})")
-          move_item(item, 'Archive', label: false, log: false)
+          item.move_to('Archive', label: false, log: false)
           logger.count(:completed_archived)
           logger.info('Completed/archived:', item.title)
         else
@@ -2081,7 +2014,7 @@ EOS
           item
         else
           counter += 1
-          move_item(item, destination, label: label, log: false)
+          item.move_to(destination, label: label, log: false)
         end
       end
 
@@ -2103,32 +2036,6 @@ EOS
 
       logger.log_now(:error, 'Script error:', "Error running #{@config['run_after']}")
       logger.log_now(:error, 'STDERR output:', stderr)
-    end
-
-    def log_change(tags_added: [], tags_removed: [], count: 1, item: nil, single: false)
-      if tags_added.empty? && tags_removed.empty?
-        logger.count(:skipped, level: :debug, message: '%count %items with no change', count: count)
-      else
-        if tags_added.empty?
-          logger.count(:skipped, level: :debug, message: 'no tags added to %count %items')
-        else
-          if single && item
-            logger.info('Tagged:', %(added #{tags_added.count == 1 ? 'tag' : 'tags'} #{tags_added.map {|t| "@#{t}"}.join(', ')} to #{item.title}))
-          else
-            logger.count(:added_tags, level: :info, tag: tags_added, message: '%tags added to %count %items')
-          end
-        end
-
-        if tags_removed.empty?
-          logger.count(:skipped, level: :debug, message: 'no tags removed from %count %items')
-        else
-          if single && item
-            logger.info('Untagged:', %(removed #{tags_removed.count == 1 ? 'tag' : 'tags'} #{tags_added.map {|t| "@#{t}"}.join(', ')} from #{item.title}))
-          else
-            logger.count(:removed_tags, level: :info, tag: tags_removed, message: '%tags removed from %count %items')
-          end
-        end
-      end
     end
   end
 end

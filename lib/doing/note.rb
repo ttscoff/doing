@@ -85,12 +85,13 @@ module Doing
 
     ##
     ## Note as multi-line string
-    ##
-    ## @return     [String] String representation of the
-    ##             Note
-    ##
     def to_s
       compress.strip_lines.map { |l| "\t\t#{l}" }.join("\n")
+    end
+
+    # @private
+    def inspect
+      "<Doing::Note - characters:#{compress.strip_lines.join(' ').length} lines:#{count}>"
     end
 
     ##

@@ -5,9 +5,16 @@ module Doing
   ## Log adapter
   ##
   class LogAdapter
-    attr_writer :logdev, :max_length
+    # Sets the log device
+    attr_writer :logdev
 
-    attr_reader :messages, :level, :results
+    # Max length of log messages (truncate in middle)
+    attr_writer :max_length
+
+    # Returns the current log level (debug, info, warn, error)
+    attr_reader :level
+
+    attr_reader :messages, :results
 
     TOPIC_WIDTH = 12
 
@@ -254,6 +261,32 @@ module Doing
       else
         results.each do |msg|
           @logdev.puts color_message(msg[:level], msg[:message])
+        end
+      end
+    end
+
+    def log_change(tags_added: [], tags_removed: [], count: 1, item: nil, single: false)
+      if tags_added.empty? && tags_removed.empty?
+        count(:skipped, level: :debug, message: '%count %items with no change', count: count)
+      else
+        if tags_added.empty?
+          count(:skipped, level: :debug, message: 'no tags added to %count %items')
+        elsif single && item
+          added = tags_added.log_tags
+          info('Tagged:',
+               %(added #{tags_added.count == 1 ? 'tag' : 'tags'} #{added} to #{item.title}))
+        else
+          count(:added_tags, level: :info, tag: tags_added, message: '%tags added to %count %items')
+        end
+
+        if tags_removed.empty?
+          count(:skipped, level: :debug, message: 'no tags removed from %count %items')
+        elsif single && item
+          added = tags_added.log_tags
+          info('Untagged:',
+               %(removed #{tags_removed.count == 1 ? 'tag' : 'tags'} #{added} from #{item.title}))
+        else
+          count(:removed_tags, level: :info, tag: tags_removed, message: '%tags removed from %count %items')
         end
       end
     end

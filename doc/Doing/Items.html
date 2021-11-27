@@ -174,7 +174,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Add a new section to the sections array.</p>
+</div></span>
   
 </li>
 
@@ -182,7 +183,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#in_section-instance_method" title="#in_section (instance method)">#<strong>in_section</strong>(section)  &#x21d2; Object </a>
+      <a href="#delete_item-instance_method" title="#delete_item (instance method)">#<strong>delete_item</strong>(item, single: false)  &#x21d2; Object </a>
     
 
     
@@ -196,7 +197,31 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Delete an item from the index.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#in_section-instance_method" title="#in_section (instance method)">#<strong>in_section</strong>(section)  &#x21d2; Items </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get a new Items object containing only items in a specified section.</p>
+</div></span>
   
 </li>
 
@@ -265,7 +290,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Test if section already exists.</p>
+</div></span>
   
 </li>
 
@@ -273,7 +299,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#section_titles-instance_method" title="#section_titles (instance method)">#<strong>section_titles</strong>  &#x21d2; Object </a>
+      <a href="#section_titles-instance_method" title="#section_titles (instance method)">#<strong>section_titles</strong>  &#x21d2; Array </a>
     
 
     
@@ -287,7 +313,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>List sections, title only.</p>
+</div></span>
   
 </li>
 
@@ -309,7 +336,31 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Output sections and items in Doing file format.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update_item-instance_method" title="#update_item (instance method)">#<strong>update_item</strong>(old_item, new_item)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Update an item in the index with a modified item.</p>
+</div></span>
   
 </li>
 
@@ -398,19 +449,176 @@
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Add a new section to the sections array. Accepts
+either a Section object, or a title string that will
+be converted into a Section.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>section</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Section.html" title="Doing::Section (class)">Section</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The section to add. A
+String value will be converted to
+Section automatically.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>log</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Add a log message
+notifying the user about the
+creation of the section.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>nothing</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="delete_item-instance_method">
+  
+    #<strong>delete_item</strong>(item, single: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Delete an item from the index</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>item</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The item</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
 </div>
     
       <div class="method_details ">
   <h3 class="signature " id="in_section-instance_method">
   
-    #<strong>in_section</strong>(section)  &#x21d2; <tt>Object</tt> 
+    #<strong>in_section</strong>(section)  &#x21d2; <tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get a new Items object containing only items in a
+specified section</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>section</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>section title</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Array of items</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -436,12 +644,32 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
+    <p>Test if section already exists</p>
+
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>section</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>section title</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
   
@@ -451,6 +679,10 @@
         <span class='type'>(<tt>Boolean</tt>)</span>
       
       
+      
+        &mdash;
+        <div class='inline'><p>true if section exists</p>
+</div>
       
     </li>
   
@@ -462,13 +694,40 @@
       <div class="method_details ">
   <h3 class="signature " id="section_titles-instance_method">
   
-    #<strong>section_titles</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>section_titles</strong>  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>List sections, title only</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>section titles</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -480,7 +739,86 @@
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Output sections and items in Doing file format</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="update_item-instance_method">
+  
+    #<strong>update_item</strong>(old_item, new_item)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Update an item in the index with a modified item</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>old_item</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The old item</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>new_item</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The new item</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ItemNotFound</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
   </div>
@@ -488,7 +826,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Nov 27 05:33:25 2021 by
+  Generated on Sat Nov 27 07:10:36 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

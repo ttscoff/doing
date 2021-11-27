@@ -12,6 +12,12 @@ module Doing
   # Completion script generator
   module Completion
     class << self
+      # Generate a completion script and output to file or
+      # stdout
+      #
+      # @param      type  [String] shell to generate for (zsh|bash|fish)
+      # @param      file  [String] Path to save to, or 'stdout'
+      #
       def generate_completion(type: 'zsh', file: 'stdout')
 
         generator = case type.to_s

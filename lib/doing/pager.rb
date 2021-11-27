@@ -5,32 +5,23 @@ module Doing
   # Pagination
   module Pager
     class << self
-      def command_exist?(command)
-        exts = ENV.fetch("PATHEXT", "").split(::File::PATH_SEPARATOR)
-        if Pathname.new(command).absolute?
-          ::File.exist?(command) ||
-            exts.any? { |ext| ::File.exist?("#{command}#{ext}")}
-        else
-          ENV.fetch("PATH", "").split(::File::PATH_SEPARATOR).any? do |dir|
-            file = ::File.join(dir, command)
-            ::File.exist?(file) ||
-              exts.any? { |ext| ::File.exist?("#{file}#{ext}") }
-          end
-        end
-      end
-
-      def git_pager
-        command_exist?("git") ? `git config --get-all core.pager` : nil
-      end
-
+      # Boolean determines whether output is paginated
       def paginate
         @paginate ||= false
       end
 
+      # Enable/disable pagination
+      #
+      # @param      should_paginate  [Boolean] true to paginate
       def paginate=(should_paginate)
         @paginate = should_paginate
       end
 
+      # Page output. If @paginate is false, just dump to
+      # STDOUT
+      #
+      # @param      text  [String] text to paginate
+      #
       def page(text)
         unless @paginate
           puts text
@@ -69,6 +60,26 @@ module Doing
 
         _, status = Process.waitpid2(pid)
         status.success?
+      end
+
+      private
+
+      def command_exist?(command)
+        exts = ENV.fetch("PATHEXT", "").split(::File::PATH_SEPARATOR)
+        if Pathname.new(command).absolute?
+          ::File.exist?(command) ||
+            exts.any? { |ext| ::File.exist?("#{command}#{ext}")}
+        else
+          ENV.fetch("PATH", "").split(::File::PATH_SEPARATOR).any? do |dir|
+            file = ::File.join(dir, command)
+            ::File.exist?(file) ||
+              exts.any? { |ext| ::File.exist?("#{file}#{ext}") }
+          end
+        end
+      end
+
+      def git_pager
+        command_exist?("git") ? `git config --get-all core.pager` : nil
       end
 
       def pagers

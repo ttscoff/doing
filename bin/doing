@@ -2627,6 +2627,16 @@ command :config do |c|
   c.desc 'DEPRECATED'
   c.switch %i[u update]
 
+  c.desc 'List configuration paths, including .doingrc files in the current and parent directories'
+  c.long_desc 'Config files are listed in order of precedence (if there are multiple configs detected).
+  Values defined in the top item in the list will override values in configutations below it.'
+  c.command :list do |list|
+    list.action do |global, options, args|
+      puts config.additional_configs.join("\n")
+      puts config.config_file
+    end
+  end
+
   c.desc 'Open config file in editor'
   c.command :edit do |edit|
     edit.example 'doing config edit', desc: 'Open a config file in the default editor'

@@ -99,6 +99,10 @@ module Doing
       @config_file ||= default_config_file
     end
 
+    def config_file=(file)
+      @config_file = file
+    end
+
     def config_dir
       @config_dir ||= File.join(Util.user_home, '.config', 'doing')
       # @config_dir ||= Util.user_home
@@ -115,11 +119,6 @@ module Doing
       # File.join(config_dir, 'config.yml')
       File.join(config_dir, 'config.yml')
     end
-
-    def config_file=(file)
-      @config_file = file
-    end
-
 
     def additional_configs
       @additional_configs ||= find_local_config
@@ -196,7 +195,7 @@ module Doing
       real_path = ['config']
       unless keypath =~ /^[.*]?$/
         real_path = resolve_key_path(keypath)
-        return nil unless real_path && real_path.count.positive?
+        return nil unless real_path&.count&.positive?
 
         cfg = cfg.dig(*real_path)
       end
@@ -227,22 +226,23 @@ module Doing
       Doing.logger.log_now(:warn, 'Deprecated:', "main config file location has changed to #{config_file}")
       res = wwid.yn("Move #{old_file} to new location, preserving settings?", default_response: true)
 
-      if res
-        if File.exist?(default_config_file)
-          res = wwid.yn("#{default_config_file} already exists, overwrite it?", default_response: false)
+      return unless res
 
-          unless res
-            @config_file = old_file
-            return
-          end
+      if File.exist?(default_config_file)
+        res = wwid.yn("#{default_config_file} already exists, overwrite it?", default_response: false)
+
+        unless res
+          @config_file = old_file
+          return
         end
-
-        FileUtils.mv old_file, default_config_file, force: true
-        Doing.logger.log_now(:warn, 'Config:', "Config file moved to #{default_config_file}")
-        Doing.logger.log_now(:warn, 'Config:', %(If ~/.config/doing/config.yml exists in the future, it will be considered a local
-                             config and its values will override the default configuration.))
-        Process.exit 0
       end
+
+      FileUtils.mv old_file, default_config_file, force: true
+      Doing.logger.log_now(:warn, 'Config:', "Config file moved to #{default_config_file}")
+      Doing.logger.log_now(:warn, 'Config:', %(If ~/.doingrc exists in the future,
+                           it will be considered a local config and its values will override the
+                           default configuration.))
+      Process.exit 0
     end
 
     ##
@@ -289,10 +289,12 @@ module Doing
       config
     end
 
+    # @private
     def inspect
       %(<Doing::Configuration #{@settings.hash}>)
     end
 
+    # @private
     def to_s
       YAML.dump(@settings)
     end
@@ -370,7 +372,7 @@ module Doing
     ##
     def read_config
       unless File.exist?(config_file)
-        Doing.logger.info('Config:', 'Config file doesn\'t exist, using default configuration' )
+        Doing.logger.info('Config:', 'Config file doesn\'t exist, using default configuration')
         return {}.deep_merge(DEFAULTS)
       end
 
@@ -415,11 +417,7 @@ module Doing
     end
 
     def load_plugins(add_dir = nil)
-      begin
-        FileUtils.mkdir_p(add_dir) if add_dir && !File.exist?(add_dir)
-      rescue
-        nil
-      end
+      FileUtils.mkdir_p(add_dir) if add_dir && !File.exist?(add_dir)
 
       Plugins.load_plugins(add_dir)
     end
