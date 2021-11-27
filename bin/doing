@@ -148,7 +148,7 @@ command %i[now next] do |c|
     if options[:back]
       date = options[:back].chronify(guess: :begin)
 
-      raise InvalidTimeExpression.new('unable to parse date string', topic: 'Date parser:') if date.nil?
+      raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if date.nil?
     else
       date = Time.now
     end
@@ -548,19 +548,22 @@ command :select do |c|
   c.arg_name 'QUERY'
   c.flag %i[q query search]
 
-  c.desc 'Select from entries older than date'
+  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'Select from entries newer than date'
+  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
 
   c.desc %(
-    Date range to show, or a single day to filter date on.
-    Date range argument should be quoted. Date specifications can be natural language.
-    To specify a range, use "to" or "through": `doing show --from "monday to friday"`
-  )
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing select --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
   c.arg_name 'DATE_OR_RANGE'
   c.flag [:from]
 
@@ -1498,13 +1501,25 @@ command :show do |c|
   c.arg_name 'AGE'
   c.flag %i[a age], default_value: 'newest'
 
-  c.desc 'View entries older than date'
+  c.desc 'Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'View entries newer than date'
+  c.desc 'Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
+
+  c.desc %(
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing show --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
+
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
 
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -1526,14 +1541,6 @@ command :show do |c|
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
   c.flag %i[s sort], must_match: REGEX_SORT_ORDER, default_value: 'asc'
-
-  c.desc %(
-    Date range to show, or a single day to filter date on.
-    Date range argument should be quoted. Date specifications can be natural language.
-    To specify a range, use "to" or "through": `doing show --from "monday to friday"`
-  )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag %i[f from]
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -1609,21 +1616,6 @@ command :show do |c|
       }
     end
 
-    if options[:from]
-
-      date_string = options[:from]
-      if date_string =~ / (to|through|thru|(un)?til|-+) /
-        dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-        start = dates[0].chronify(guess: :begin)
-        finish = dates[2].chronify(guess: :end)
-      else
-        start = date_string.chronify(guess: :begin)
-        finish = false
-      end
-      raise InvalidTimeExpression, 'Unrecognized date string' unless start
-      dates = [start, finish]
-    end
-
     options[:times] = true if options[:totals]
 
     template = settings['templates']['default'].deep_merge({
@@ -1644,7 +1636,6 @@ command :show do |c|
     opt = options.dup
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
-    opt[:date_filter] = dates
     opt[:highlight] = true
     opt[:order] = options[:sort].normalize_order
     opt[:section] = section
@@ -1675,13 +1666,24 @@ command %i[grep search] do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Constrain search to entries older than date'
+  c.desc 'Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'Constrain search to entries newer than date'
+  c.desc 'Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
+
+  c.desc %(
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing search --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
 
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
@@ -1842,19 +1844,20 @@ command :today do |c|
   c.arg_name 'TIME_STRING'
   c.flag [:after]
 
+  c.desc %(
+    Time range to show `doing today --from "12pm to 4pm"`
+  )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
+
   c.action do |_global_options, options, _args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-    opt = {
-      after: options[:after],
-      before: options[:before],
-      section: options[:section],
-      sort_tags: options[:sort_tags],
-      totals: options[:totals]
-    }
-    Doing::Pager.page wwid.today(options[:times], options[:output], opt).chomp
+    filter_options = %i[after before from section sort_tags totals].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
+
+    Doing::Pager.page wwid.today(options[:times], options[:output], filter_options).chomp
   end
 end
 
@@ -2004,6 +2007,12 @@ command :yesterday do |c|
   c.arg_name 'TIME_STRING'
   c.flag [:after]
 
+  c.desc %(
+      Time range to show, e.g. `doing yesterday --from "1am to 8am"`
+    )
+  c.arg_name 'TIME_RANGE'
+  c.flag [:from]
+
   c.desc 'Tag sort direction (asc|desc)'
   c.arg_name 'DIRECTION'
   c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
@@ -2013,9 +2022,16 @@ command :yesterday do |c|
 
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
+    if options[:from]
+      options[:from] = options[:from].split(/ (?:to|through|thru|(?:un)?til|-+) /).map do |time|
+        "yesterday #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}"
+      end.join(' to ')
+    end
+
     opt = {
       after: options[:after],
       before: options[:before],
+      from: options[:from],
       sort_tags: options[:sort_tags],
       tag_order: options[:tag_order].normalize_order,
       totals: options[:totals],
@@ -2262,13 +2278,24 @@ command :view do |c|
   c.arg_name 'DIRECTION'
   c.flag [:tag_order], must_match: REGEX_SORT_ORDER
 
-  c.desc 'View entries older than date'
+  c.desc 'View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'View entries newer than date'
+  c.desc 'View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
+
+  c.desc %(
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing view --from "monday 8am to friday 5pm" view_name`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
 
   c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -2363,27 +2390,8 @@ command :view do |c|
                             else
                               false
                             end
-      if view.key?('after') && !options[:after]
-        options[:after] = view['after']
-      end
 
-      if view.key?('before') && !options[:before]
-        options[:before] = view['before']
-      end
-
-      if view.key?('from')
-        date_string = view['from']
-        if date_string =~ / (to|through|thru|(un)?til|-+) /
-          dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-          start = dates[0].chronify(guess: :begin)
-          finish = dates[2].chronify(guess: :end)
-        else
-          start = date_string.chronify(guess: :begin)
-          finish = false
-        end
-        raise InvalidTimeExpression, 'Unrecognized date string' unless start
-        dates = [start, finish]
-      end
+      %w[before after from].each { |k| options[k.to_sym] = view[k] if view.key?(k) && !options[k.to_sym] }
 
       options[:case] = options[:case].normalize_case
 
@@ -2395,22 +2403,21 @@ command :view do |c|
       end
 
       opts = options.dup
-      opts[:search] = search
-      opts[:output] = output_format
       opts[:count] = count
       opts[:format] = date_format
       opts[:highlight] = options[:color]
       opts[:only_timed] = only_timed
       opts[:order] = order
+      opts[:output] = options[:interactive] ? nil : options[:output]
+      opts[:output] = output_format
+      opts[:page_title] = page_title
+      opts[:search] = search
       opts[:section] = section
       opts[:tag_filter] = tag_filter
       opts[:tag_order] = tag_order
       opts[:tags_color] = tags_color
       opts[:template] = template
       opts[:totals] = totals
-      opts[:page_title] = page_title
-      opts[:date_filter] = dates
-      opts[:output] = options[:interactive] ? nil : options[:output]
 
       Doing::Pager.page wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
@@ -2923,6 +2930,7 @@ command :import do |c|
   c.arg_name 'PREFIX'
   c.flag :prefix
 
+  # TODO: Allow time range filtering
   c.desc 'Import entries older than date'
   c.arg_name 'DATE_STRING'
   c.flag [:before]

@@ -1,3 +1,13 @@
+### 2.1.1pre
+
+#### NEW
+
+- --before, --after, and --from date filters for select command
+
+#### FIXED
+
+- `finish --took 60m` is supposed to backdate the start date if needed to finish at the current time and maintain an elapsed time
+
 ### 2.1.0pre
 
 #### NEW

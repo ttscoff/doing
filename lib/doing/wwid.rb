@@ -596,10 +596,53 @@ module Doing
     ## @option opt [String] :age  ('old' or 'new')
     ##
     def filter_items(items = Items.new, opt: {})
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+
       if items.nil? || items.empty?
         section = opt[:section] ? guess_section(opt[:section]) : 'All'
-
         items = section =~ /^all$/i ? @content.dup : @content.in_section(section)
+      end
+
+      opt[:time_filter] = [nil, nil]
+      if opt[:from] && !opt[:date_filter]
+        date_string = opt[:from]
+        case date_string
+        when / (to|through|thru|(un)?til|-+) /
+          dates = date_string.split(/ (?:to|through|thru|(?:un)?til|-+) /)
+          if dates[0].strip =~ time_rx && dates[-1].strip =~ time_rx
+            time_start = dates[0].strip
+            time_end = dates[-1].strip
+          else
+            start = dates[0].chronify(guess: :begin)
+            finish = dates[-1].chronify(guess: :end)
+          end
+        when time_rx
+          time_start = date_string
+          time_end = nil
+        else
+          start = date_string.chronify(guess: :begin)
+          finish = false
+        end
+
+        if time_start
+          opt[:time_filter] = [time_start, time_end]
+          Doing.logger.debug('Parser:', "--from string interpreted as time span, from #{time_start ? time_start : '12am'} to #{time_end ? time_end : '11:59pm'}")
+        else
+          raise InvalidTimeExpression, 'Unrecognized date string' unless start
+
+          opt[:date_filter] = [start, finish]
+          Doing.logger.debug('Parser:', "--from string interpreted as #{start.strftime('%F %R')} -- #{finish ? finish.strftime('%F %R') : 'now'}")
+        end
+      end
+
+      if opt[:before] =~ time_rx
+        opt[:time_filter][1] = opt[:before]
+        opt[:before] = nil
+      end
+
+      if opt[:after] =~ time_rx
+        opt[:time_filter][0] = opt[:after]
+        opt[:after] = nil
       end
 
       items.sort_by! { |item| [item.date, item.title.downcase] }.reverse
@@ -643,6 +686,26 @@ module Doing
           keep = opt[:not] ? !keep : keep
         end
 
+        if keep && opt[:time_filter][0] || opt[:time_filter][1]
+          start_string = if opt[:time_filter][0].nil?
+                           "#{item.date.strftime('%Y-%m-%d')} 12am"
+                         else
+                           "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][0]}"
+                         end
+          start_time = start_string.chronify(guess: :begin)
+
+          end_string = if opt[:time_filter][1].nil?
+                         "#{item.date.next_day.strftime('%Y-%m-%d')} 12am"
+                       else
+                         "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][1]}"
+                       end
+          end_time = end_string.chronify(guess: :end)
+
+          in_time_range = item.date >= start_time && item.date <= end_time
+          keep = false unless in_time_range
+          keep = opt[:not] ? !keep : keep
+        end
+
         keep = false if keep && opt[:only_timed] && !item.interval
 
         if keep && opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
@@ -652,14 +715,22 @@ module Doing
 
         if keep && opt[:before]
           time_string = opt[:before]
-          cutoff = time_string.chronify(guess: :begin)
+          if time_string =~ time_rx
+            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{time_string}".chronify(guess: :begin)
+          else
+            cutoff = time_string.chronify(guess: :begin)
+          end
           keep = cutoff && item.date <= cutoff
           keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:after]
           time_string = opt[:after]
-          cutoff = time_string.chronify(guess: :end)
+          if time_string =~ time_rx
+            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{time_string}".chronify(guess: :end)
+          else
+            cutoff = time_string.chronify(guess: :end)
+          end
           keep = cutoff && item.date >= cutoff
           keep = opt[:not] ? !keep : keep
         end
@@ -695,7 +766,7 @@ module Doing
     ## Options hash is shared with #filter_items and #act_on
     ##
     def interactive(opt = {})
-      section = opt[:section] ? guess_section(opt[:section]) : 'All'
+      opt[:section] = opt[:section] ? guess_section(opt[:section]) : 'All'
 
       search = nil
 
@@ -705,37 +776,16 @@ module Doing
         opt[:search] = search
       end
 
-      if opt[:from]
-        date_string = opt[:from]
-        if date_string =~ / (to|through|thru|(un)?til|-+) /
-          dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-          start = dates[0].chronify(guess: :begin)
-          finish = dates[2].chronify(guess: :end)
-        else
-          start = date_string.chronify(guess: :begin)
-          finish = false
-        end
-        raise InvalidTimeExpression, 'Unrecognized date string' unless start
-
-        opt[:date_filter] = [start, finish]
-      end
-
       opt[:query] = opt[:search] if opt[:search] && !opt[:query]
       opt[:query] = "!#{opt[:query]}" if opt[:not]
       opt[:multiple] = true
       opt[:show_if_single] = true
-      items = filter_items(Items.new, opt: {
-                             after: opt[:after],
-                             before: opt[:before],
-                             case: opt[:case],
-                             date_filter: opt[:date_filter],
-                             fuzzy: opt[:fuzzy],
-                             not: opt[:not],
-                             search: opt[:search],
-                             section: section
-                           })
+      filter_options = %i[after before case date_filter from fuzzy not search section].each_with_object({}) {
+        |k, hsh| hsh[k] = opt[k]
+      }
+      items = filter_items(Items.new, opt: filter_options)
 
-      selection = Prompt.choose_from_items(items, include_section: section =~ /^all$/i, **opt)
+      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **opt)
 
       raise NoResults, 'no items selected' if selection.nil? || selection.empty?
 
@@ -1483,10 +1533,12 @@ module Doing
         'order' => @config['order'] || 'asc',
         'tags_color' => @config['tags_color']
       })
+
       options = {
         after: opt[:after],
         before: opt[:before],
         count: 0,
+        from: opt[:from],
         format: cfg['date_format'],
         order: cfg['order'] || 'asc',
         output: output,
@@ -1543,6 +1595,7 @@ module Doing
         after: opt[:after],
         before: opt[:before],
         count: 0,
+        from: opt[:from],
         order: opt[:order],
         output: output,
         section: section,
