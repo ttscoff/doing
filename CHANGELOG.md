@@ -10,6 +10,7 @@
 #### FIXED
 
 - `finish --took 60m` is supposed to backdate the start date if needed to finish at the current time and maintain an elapsed time
+- If an editor was specified for config (or default as fallback) with command line options (e.g. `emacs -nw`), Doing would fail to recognize that the executable was available.
 
 ### 2.1.0pre
 
