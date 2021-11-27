@@ -171,7 +171,9 @@ module Doing
           end
 
           if new_cfg.nil?
-            Doing.logger.error("Key match not found: #{path}")
+            Doing.logger.warn("Key match not found: #{path}")
+            real_path << path
+            real_path.concat(paths)
             break
           end
           cfg = new_cfg

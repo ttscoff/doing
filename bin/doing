@@ -2882,9 +2882,21 @@ command :config do |c|
 
       value = options[:remove] ? nil : args.pop
       keypath = args.join('.')
-      old_value = config.value_for_key(keypath).map { |k, v| v.to_s }
+      old_value = config.value_for_key(keypath)
+      old_value = old_value ? old_value.map { |k, v| v.to_s } : 'unknown'
       real_path = config.resolve_key_path(keypath)
-      raise InvalidArgument, 'Invalid key path' if real_path.empty?
+
+      if real_path.empty?
+        res = false
+
+        unless options[:remove]
+          res = Prompt.yn('Key path not found, create it?', default_response: false)
+        end
+
+        raise InvalidArgument, 'Invalid key path' unless res
+
+        real_path = keypath.split(/\./)[0..-2]
+      end
 
       config_file = config.choose_config
       cfg = YAML.safe_load_file(config_file) || {}
