@@ -154,7 +154,7 @@ module Doing
     ##                      matched, first match wins)
     ## @return     [Array] ordered array of resolved keys
     ##
-    def resolve_key_path(keypath)
+    def resolve_key_path(keypath, create: false)
       cfg = @settings
       real_path = []
       unless keypath =~ /^[.*]?$/
@@ -171,6 +171,8 @@ module Doing
           end
 
           if new_cfg.nil?
+            return nil unless create
+
             resolved = real_path.count.positive? ? "Resolved #{real_path.join('->')}, but " : ''
             Doing.logger.log_now(:warn, "#{resolved}#{path} is unknown")
             new_path = [*real_path, path, *paths].join('->')
@@ -203,7 +205,7 @@ module Doing
       cfg = @settings
       real_path = ['config']
       unless keypath =~ /^[.*]?$/
-        real_path = resolve_key_path(keypath)
+        real_path = resolve_key_path(keypath, create: false)
         return nil unless real_path&.count&.positive?
 
         cfg = cfg.dig(*real_path)

@@ -2882,9 +2882,7 @@ command :config do |c|
 
       value = options[:remove] ? nil : args.pop
       keypath = args.join('.')
-      old_value = config.value_for_key(keypath)
-      old_value = old_value ? old_value.map { |k, v| v.to_s } : 'unknown'
-      real_path = config.resolve_key_path(keypath)
+      real_path = config.resolve_key_path(keypath, create: true)
 
       old_value = settings.dig(*real_path) || nil
 
