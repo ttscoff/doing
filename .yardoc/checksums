@@ -1,5 +1,5 @@
 lib/doing/hash.rb c2960de9603dcf90be85ce423d9430de27f4f893
-lib/doing/item.rb 0dfb18c94ec835692358a99cf866a7eace9802ee
+lib/doing/item.rb 857b714be7ad8f1ca802d57f63ea8fb0c897c868
 lib/doing/note.rb 99d7be3e45605d32da7e188d7ec749ba84a3d2f8
 lib/doing/time.rb d83c862e7fffd841e12150a3d954b445a6003da9
 lib/doing/util.rb 94fc3c3ac1cc0b3b4b1d832fe30bd6e882d1acb2
@@ -10,7 +10,7 @@ lib/doing/items.rb c7b81ce1fe6a8804c62af3c83e510add5f025a8c
 lib/doing/pager.rb 230c10dea5e9c68b5709a0f4cb088c76970965e4
 lib/doing/colors.rb 9a628d48c821313c502deedc5b61a046a2bf79ef
 lib/doing/errors.rb af07e482a5389924edc2337749c81cda501098f0
-lib/doing/prompt.rb a693a9270b16c06424614275781f85fb553b5714
+lib/doing/prompt.rb e86eeba5bae6610640d7de29fccf24b75cab0bdf
 lib/doing/string.rb 2c90835a9b567643ce57de0030b339cfea234f46
 lib/doing/symbol.rb 37f5b1f006181597703911494887a11fe0c63d39
 lib/doing/section.rb 206e119cf818f1e76798753e611180fe77bc299a

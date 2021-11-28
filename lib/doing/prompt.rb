@@ -127,16 +127,16 @@ module Doing
       ## Create an interactive menu to select from a set of Items
       ##
       ## @param      items            [Array] list of items
-      ## @param      opt              [Hash] options
-      ## @param      include_section  [Boolean] include section
+      ## @param      opt              Additional options
       ##
-      ## @option opt [String] :header
-      ## @option opt [String] :prompt
-      ## @option opt [String] :query
-      ## @option opt [Boolean] :show_if_single
-      ## @option opt [Boolean] :menu
-      ## @option opt [Boolean] :sort
-      ## @option opt [Boolean] :multiple
+      ## @option opt [Boolean] :include_section Include section name for each item in menu
+      ## @option opt [String] :header A custom header string
+      ## @option opt [String] :prompt A custom prompt string
+      ## @option opt [String] :query Initial query
+      ## @option opt [Boolean] :show_if_single Show menu even if there's only one option
+      ## @option opt [Boolean] :menu Show menu
+      ## @option opt [Boolean] :sort Sort options
+      ## @option opt [Boolean] :multiple Allow multiple selections
       ## @option opt [Symbol] :case (:sensitive, :ignore, :smart)
       ##
       def choose_from_items(items, **opt)

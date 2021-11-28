@@ -7,7 +7,7 @@ module Doing
   class Configuration
     attr_reader :settings
 
-    attr_writer :ignore_local
+    attr_writer :ignore_local, :config_file
 
     MissingConfigFile = Class.new(RuntimeError)
 
@@ -100,24 +100,21 @@ module Doing
       @config_file ||= default_config_file
     end
 
-    def config_file=(file)
-      @config_file = file
-    end
-
     def config_dir
       @config_dir ||= File.join(Util.user_home, '.config', 'doing')
-      # @config_dir ||= Util.user_home
     end
 
     def default_config_file
-      raise DoingRuntimeError, "#{config_dir} exists but is not a directory" if File.exist?(config_dir) && !File.directory?(config_dir)
+      if File.exist?(config_dir) && !File.directory?(config_dir)
+        raise DoingRuntimeError, "#{config_dir} exists but is not a directory"
+
+      end
 
       unless File.exist?(config_dir)
         FileUtils.mkdir_p(config_dir)
         Doing.logger.log_now(:warn, "Config directory created at #{config_dir}")
       end
 
-      # File.join(config_dir, 'config.yml')
       File.join(config_dir, 'config.yml')
     end
 

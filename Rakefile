@@ -15,6 +15,8 @@ YARD::Rake::YardocTask.new do |t|
  # t.stats_options = ['--list-undoc']
 end
 
+task :doc, [*Rake.application[:yard].arg_names] => [:yard]
+
 Rake::RDocTask.new do |rd|
   rd.main = 'README.md'
   rd.rdoc_files.include('README.md', 'lib/**/*.rb', 'bin/**/*')
