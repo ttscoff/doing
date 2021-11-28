@@ -171,10 +171,16 @@ module Doing
           end
 
           if new_cfg.nil?
-            Doing.logger.warn("Key match not found: #{path}")
-            real_path << path
-            real_path.concat(paths)
-            break
+            resolved = real_path.count.positive? ? "Resolved #{real_path.join('->')}, but " : ''
+            Doing.logger.log_now(:warn, "#{resolved}#{path} is unknown")
+            new_path = [*real_path, path, *paths].join('->')
+            Doing.logger.log_now(:warn, "Continuing will create the path #{new_path}")
+            res = Prompt.yn('Key path not found, create it?', default_response: true)
+            raise InvalidArgument, 'Invalid key path' unless res
+
+            real_path.push(path).concat(paths)
+            Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}")
+            return real_path
           end
           cfg = new_cfg
         end

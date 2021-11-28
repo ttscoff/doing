@@ -7,6 +7,10 @@
 - Add `duration` key to config (root or view/template). If set to true, will display durations by default (no need for `--duration`)
 - Most display commands now have a `--duration` flag that will display an elapsed time if the entry is not marked @done
 
+#### IMPROVED
+
+- Config set will create missing keys. Fuzzy matching will work until the path fails, then path elements after that point will be added as verbatim keys to the specified configuration (with confirmation)
+
 ### 2.1.1pre
 
 #### NEW

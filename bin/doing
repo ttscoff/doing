@@ -2886,16 +2886,17 @@ command :config do |c|
       old_value = old_value ? old_value.map { |k, v| v.to_s } : 'unknown'
       real_path = config.resolve_key_path(keypath)
 
-      if real_path.empty?
-        res = false
+      old_value = settings.dig(*real_path) || nil
 
-        unless options[:remove]
-          res = Prompt.yn('Key path not found, create it?', default_response: false)
+      if old_value.is_a?(Hash) && !options[:remove]
+        Doing.logger.log_now(:warn, 'Config:', "Config key must point to a single value, #{real_path.join('->').boldwhite} is a mapping")
+        didyou = 'Did you mean:'
+        old_value.keys.each do |k|
+          Doing.logger.log_now(:warn, "#{didyou}", "#{keypath}.#{k}?")
+          didyou = '..........or:'
         end
+        raise InvalidArgument, 'Config value is a mapping, can not be set to a single value'
 
-        raise InvalidArgument, 'Invalid key path' unless res
-
-        real_path = keypath.split(/\./)[0..-2]
       end
 
       config_file = config.choose_config
@@ -2907,10 +2908,12 @@ command :config do |c|
         cfg.deep_set(real_path, nil)
         $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('->').boldwhite}"
       else
-        old_value = cfg.dig(*real_path) || 'empty'
+
+        p real_path
         cfg.deep_set(real_path, value.set_type)
+
         $stderr.puts "#{'Key path:'.yellow} #{real_path.join('->').boldwhite}"
-        $stderr.puts "#{'Previous:'.yellow} #{old_value.to_s.boldwhite}"
+        $stderr.puts "#{'Previous:'.yellow} #{(old_value ? old_value .to_s : 'empty').boldwhite}"
         $stderr.puts "#{'     New:'.yellow} #{value.set_type.to_s.boldwhite}"
       end
 
