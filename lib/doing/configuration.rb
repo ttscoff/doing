@@ -32,28 +32,29 @@ module Doing
       'never_finish' => [],
 
       'timer_format' => 'text',
+      'interval_format' => 'text',
 
       'templates' => {
         'default' => {
           'date_format' => '%Y-%m-%d %H:%M',
-          'template' => '%date | %title%note',
+          'template' => '%date | %title %interval%duration%note',
           'wrap_width' => 0,
           'order' => 'asc'
         },
         'today' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%date: %title %interval%note',
+          'template' => '%date: %title %interval%duration%note',
           'wrap_width' => 0,
           'order' => 'asc'
         },
         'last' => {
           'date_format' => '%-I:%M%P on %a',
-          'template' => '%title (at %date)%odnote',
+          'template' => '%title (at %date) %interval%duration%odnote',
           'wrap_width' => 88
         },
         'recent' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%shortdate: %title (%section)',
+          'template' => '%shortdate: %title (%section) %interval%duration%note',
           'wrap_width' => 88,
           'count' => 10,
           'order' => 'asc'
@@ -153,7 +154,7 @@ module Doing
     ##                      matched, first match wins)
     ## @return     [Array] ordered array of resolved keys
     ##
-    def resolve_key_path(keypath)
+    def resolve_key_path(keypath, create: false)
       cfg = @settings
       real_path = []
       unless keypath =~ /^[.*]?$/
@@ -170,8 +171,18 @@ module Doing
           end
 
           if new_cfg.nil?
-            Doing.logger.error("Key match not found: #{path}")
-            break
+            return nil unless create
+
+            resolved = real_path.count.positive? ? "Resolved #{real_path.join('->')}, but " : ''
+            Doing.logger.log_now(:warn, "#{resolved}#{path} is unknown")
+            new_path = [*real_path, path, *paths].join('->')
+            Doing.logger.log_now(:warn, "Continuing will create the path #{new_path}")
+            res = Prompt.yn('Key path not found, create it?', default_response: true)
+            raise InvalidArgument, 'Invalid key path' unless res
+
+            real_path.push(path).concat(paths)
+            Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}")
+            return real_path
           end
           cfg = new_cfg
         end
@@ -194,7 +205,7 @@ module Doing
       cfg = @settings
       real_path = ['config']
       unless keypath =~ /^[.*]?$/
-        real_path = resolve_key_path(keypath)
+        real_path = resolve_key_path(keypath, create: false)
         return nil unless real_path&.count&.positive?
 
         cfg = cfg.dig(*real_path)

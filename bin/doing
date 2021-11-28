@@ -1545,6 +1545,9 @@ command :show do |c|
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
+
   c.desc 'Show intervals with totals at the end of output'
   c.switch [:totals], default_value: false, negatable: false
 
@@ -1692,6 +1695,9 @@ command %i[grep search] do |c|
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
+
   c.desc 'Show intervals with totals at the end of output'
   c.switch [:totals], default_value: false, negatable: false
 
@@ -1761,6 +1767,9 @@ command :recent do |c|
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
+
   c.desc 'Show intervals with totals at the end of output'
   c.switch [:totals], default_value: false, negatable: false
 
@@ -1800,7 +1809,8 @@ command :recent do |c|
         tags_color: tags_color,
         times: options[:times],
         totals: options[:totals],
-        interactive: options[:interactive]
+        interactive: options[:interactive],
+        duration: options[:duration]
       }
 
       Doing::Pager::page wwid.recent(count, section.cap_first, opts)
@@ -1822,6 +1832,9 @@ command :today do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
 
   c.desc 'Show time totals at the end of output'
   c.switch [:totals], default_value: false, negatable: false
@@ -1855,7 +1868,7 @@ command :today do |c|
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-    filter_options = %i[after before from section sort_tags totals].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
+    filter_options = %i[after before duration from section sort_tags totals].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
 
     Doing::Pager.page wwid.today(options[:times], options[:output], filter_options).chomp
   end
@@ -1877,6 +1890,9 @@ command :on do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
 
   c.desc 'Show time totals at the end of output'
   c.switch [:totals], default_value: false, negatable: false
@@ -1917,7 +1933,7 @@ command :on do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
-                        { totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+                        { duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
 
@@ -1935,6 +1951,9 @@ command :since do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
 
   c.desc 'Show time totals at the end of output'
   c.switch [:totals], default_value: false, negatable: false
@@ -1970,7 +1989,7 @@ command :since do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
-                        { totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+                        { duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
 
@@ -1990,6 +2009,9 @@ command :yesterday do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
 
   c.desc 'Show time totals at the end of output'
   c.switch [:totals], default_value: false, negatable: false
@@ -2031,6 +2053,7 @@ command :yesterday do |c|
     opt = {
       after: options[:after],
       before: options[:before],
+      duration: options[:duration],
       from: options[:from],
       sort_tags: options[:sort_tags],
       tag_order: options[:tag_order].normalize_order,
@@ -2069,6 +2092,9 @@ command :last do |c|
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Show elapsed time if entry is not tagged @done'
+  c.switch [:duration]
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -2115,7 +2141,15 @@ command :last do |c|
       wwid.edit_last(section: options[:section], options: { search: search, fuzzy: options[:fuzzy], case: options[:case], tag: tags, tag_bool: options[:bool], not: options[:not] })
     else
       Doing::Pager::page wwid.last(times: true, section: options[:section],
-                     options: { search: search, fuzzy: options[:fuzzy], case: options[:case], negate: options[:not], tag: tags, tag_bool: options[:bool] }).strip
+                     options: {
+                        duration: options[:duration],
+                        search: search,
+                        fuzzy: options[:fuzzy],
+                        case: options[:case],
+                        negate: options[:not],
+                        tag: tags,
+                        tag_bool: options[:bool]
+                      }).strip
     end
   end
 end
@@ -2238,6 +2272,9 @@ command :view do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
 
   c.desc 'Show intervals with totals at the end of output'
   c.switch [:totals], default_value: false, negatable: false
@@ -2391,7 +2428,7 @@ command :view do |c|
                               false
                             end
 
-      %w[before after from].each { |k| options[k.to_sym] = view[k] if view.key?(k) && !options[k.to_sym] }
+      %w[before after from duration].each { |k| options[k.to_sym] = view[k] if view.key?(k) && !options[k.to_sym] }
 
       options[:case] = options[:case].normalize_case
 
@@ -2845,9 +2882,20 @@ command :config do |c|
 
       value = options[:remove] ? nil : args.pop
       keypath = args.join('.')
-      old_value = config.value_for_key(keypath).map { |k, v| v.to_s }
-      real_path = config.resolve_key_path(keypath)
-      raise InvalidArgument, 'Invalid key path' if real_path.empty?
+      real_path = config.resolve_key_path(keypath, create: true)
+
+      old_value = settings.dig(*real_path) || nil
+
+      if old_value.is_a?(Hash) && !options[:remove]
+        Doing.logger.log_now(:warn, 'Config:', "Config key must point to a single value, #{real_path.join('->').boldwhite} is a mapping")
+        didyou = 'Did you mean:'
+        old_value.keys.each do |k|
+          Doing.logger.log_now(:warn, "#{didyou}", "#{keypath}.#{k}?")
+          didyou = '..........or:'
+        end
+        raise InvalidArgument, 'Config value is a mapping, can not be set to a single value'
+
+      end
 
       config_file = config.choose_config
       cfg = YAML.safe_load_file(config_file) || {}
@@ -2858,10 +2906,12 @@ command :config do |c|
         cfg.deep_set(real_path, nil)
         $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('->').boldwhite}"
       else
-        old_value = cfg.dig(*real_path) || 'empty'
+
+        p real_path
         cfg.deep_set(real_path, value.set_type)
+
         $stderr.puts "#{'Key path:'.yellow} #{real_path.join('->').boldwhite}"
-        $stderr.puts "#{'Previous:'.yellow} #{old_value.to_s.boldwhite}"
+        $stderr.puts "#{'Previous:'.yellow} #{(old_value ? old_value .to_s : 'empty').boldwhite}"
         $stderr.puts "#{'     New:'.yellow} #{value.set_type.to_s.boldwhite}"
       end
 
