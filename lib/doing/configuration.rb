@@ -37,24 +37,24 @@ module Doing
       'templates' => {
         'default' => {
           'date_format' => '%Y-%m-%d %H:%M',
-          'template' => '%date | %title%note',
+          'template' => '%date | %title %interval%duration%note',
           'wrap_width' => 0,
           'order' => 'asc'
         },
         'today' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%date: %title %interval%note',
+          'template' => '%date: %title %interval%duration%note',
           'wrap_width' => 0,
           'order' => 'asc'
         },
         'last' => {
           'date_format' => '%-I:%M%P on %a',
-          'template' => '%title (at %date)%odnote',
+          'template' => '%title (at %date) %interval%duration%odnote',
           'wrap_width' => 88
         },
         'recent' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%shortdate: %title (%section)',
+          'template' => '%shortdate: %title (%section) %interval%duration%note',
           'wrap_width' => 88,
           'count' => 10,
           'order' => 'asc'
