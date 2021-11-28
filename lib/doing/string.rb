@@ -187,6 +187,7 @@ module Doing
       end
       out.push(line.join(' '))
       note = ''
+      after = after.dup if after.frozen?
       after.sub!(note_rx) do
         note = Regexp.last_match(0)
         ''
@@ -197,6 +198,32 @@ module Doing
       left_pad = ' ' * offset
       left_pad += indent
       out.map { |l| "#{left_pad}#{color}#{l}#{last_color}" }.join("\n").strip + last_color + " #{note}".chomp
+    end
+
+    def wrap2(len, indent: '', color: nil)
+      if color && Doing::Color.respond_to?(color.sub(/^%/, ''))
+        color = Doing::Color.send(color.sub(/^%/, ''))
+      else
+        color = ''
+      end
+
+      # Don't break inside of tag values
+      str = uncolor.gsub(/@\S+\(.*?\)/) { |tag| tag.gsub(/\s/, '%%%%') }
+      words = str.split(/ /).map { |word| word.gsub(/%%%%/, ' ') }
+      out = []
+      line = []
+      words.each do |word|
+        if line.join(' ').length + word.length + 1 > len
+          out.push(line.join(' '))
+          line.clear
+        end
+
+        line << word
+      end
+      out.push(line.join(' '))
+
+      reset = Doing::Color.reset
+      out.map.with_index { |l, i| i > 0 ? "#{color}#{indent}#{l}#{reset}" : "#{color}#{l}#{reset}" }
     end
 
     ##

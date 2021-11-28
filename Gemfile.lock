@@ -9,6 +9,7 @@ PATH
       safe_yaml (~> 1.0)
       tty-link (~> 0.1, >= 0.1.1)
       tty-progressbar (~> 0.18, >= 0.18.2)
+      tty-screen (~> 0.8, >= 0.8.1)
       tty-which (~> 0.5, >= 0.5.0)
 
 GEM
