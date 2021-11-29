@@ -5,6 +5,7 @@
 # author: Brett Terpstra
 # url: https://brettterpstra.com
 module Doing
+  # Console export
   class TemplateExport
     include Doing::Color
     include Doing::Util
@@ -15,13 +16,32 @@ module Doing
       }
     end
 
-    def self.fetch_placeholders(config, template)
-      @placeholders ||= placeholders_from_config(config, template)
-      @elements ||= elements_from_config(config, template)
+    def self.elements
+      elements ||= elements_from_config
     end
 
-    def self.placeholders_from_config(config, template)
-      placeholders = {
+    def self.placeholders
+      @placeholders ||= placeholders_from_config
+    end
+
+    def self.config
+      @config
+    end
+
+    def self.config=(new_config)
+      @config = new_config
+    end
+
+    def self.template
+      @template
+    end
+
+    def self.template=(new_template)
+      @template = new_template
+    end
+
+    def self.placeholders_from_config
+      _placeholders = {
         date: {},
         duration: {},
         interval: {},
@@ -36,39 +56,37 @@ module Doing
       chain.each do |tpl|
         template_placeholders = config.dig('templates', tpl, 'placeholders')
 
-        placeholders.deep_merge(template_placeholders.symbolize_keys) if template_placeholders
+        _placeholders.deep_merge(template_placeholders.symbolize_keys) if template_placeholders
       end
 
-      placeholders
+      _placeholders
     end
 
-    def self.elements_from_config(config, template)
-      elements = %w[date title section interval duration note]
+    def self.elements_from_config
+      _elements = %w[date title section interval duration note]
 
       chain = ['default']
       chain << template unless template == 'default'
 
       chain.each do |tpl|
         template_elements = config.dig('templates', tpl, 'elements')
-        if template_elements
-          elements = template_elements.select { |el| elements.include?(el) }
-        end
+        _elements = template_elements.select { |el| _elements.include?(el) } if template_elements
       end
 
-      elements
+      _elements
     end
 
     def self.fetch(item, setting, default = nil)
       return nil if item.nil?
 
-      t = @placeholders.fetch(item.to_sym, nil)
+      t = placeholders.fetch(item.to_sym, nil)
       return nil if t.nil?
 
       t.fetch(setting.to_sym, default)
     end
 
     def self.format_placeholder(item, content)
-      return [content] if @placeholders.nil?
+      return [content] if placeholders.nil?
 
       content = content.dup if content.frozen?
       content ||= ''
@@ -77,23 +95,25 @@ module Doing
         return content.each.each_with_object([]) { |l, out| out.concat(format_placeholder(item, l)) }
       end
 
-
       return [] if fetch(item, :collapse, true) && content.strip.empty?
 
       wrap = fetch(item, :wrap, false)
       # color = fetch(item, :color, 'default')
-
 
       pad_char = fetch(item, :pad_char, ' ')
       left, right = get_columns(item)
       width = right - left
       width = width.negative? ? 0 : width
 
+      _template = fetch(item, :template, '%content')
+      content = _template.sub(/%content/, content)
+
       content = if fetch(item, :align, 'left') =~ /right/
                   content.rjust(width, pad_char)
                 else
                   content.ljust(width, pad_char)
                 end
+
 
       indent = fetch(item, :wrap_indent, '')
       content = if wrap
@@ -102,17 +122,7 @@ module Doing
                   [content]
                 end
 
-      template = fetch(item, :template, '%content')
 
-      # content.map! do |l|
-      #   template.sub(/%content/, l).gsub(/%[a-z]+/) do |m|
-      #     if Doing::Color.respond_to?(m.sub(/^%/, ''))
-      #       Doing::Color.send(m.sub(/^%/, ''))
-      #     else
-      #       m
-      #     end
-      #   end
-      # end
 
       content
     end
@@ -120,7 +130,7 @@ module Doing
     def self.get_columns(element)
       return [-1, -1] if element.nil?
 
-      return [-1, -1] unless @elements.index(element.to_s)
+      return [-1, -1] unless elements.index(element.to_s)
 
       max = TTY::Screen.columns
 
@@ -130,10 +140,10 @@ module Doing
         right = left + width
         right = right < max ? right : max
       else
-        right = if @elements[@elements.index(element.to_s) + 1] == 'note'
+        right = if elements[elements.index(element.to_s) + 1] == 'note'
                   TTY::Screen.columns
                 else
-                  fetch(@elements[@elements.index(element.to_s) + 1], :column, 0).to_i - 1
+                  fetch(elements[elements.index(element.to_s) + 1], :column, 0).to_i - 1
                 end
       end
 
@@ -141,17 +151,16 @@ module Doing
       [left, right]
     end
 
-    # TODO: Need to handle prefix and suffix
-
-    # TODO: Would be nice if colors could be used in
-    # template string, but not sure how to do that yet
-
-    # TODO: Note colors need separate handling, need to
-    # figure out what line the note starts on in the array
-    # and insert colors there
-
+    # TODO: This whole thing needs to be redone. It
+    # shouldn't use "column", it should use width, and
+    # elements should be stacked.
+    #
+    # <x-nvultra://open?notebook=/Users/ttscoff/Library/Mobile%20Documents/9CR7T2DMDG~com~ngocluu~onewriter/Documents/nvALT2.2&note=doing%20template%20version%202.md>
 
     def self.render2(wwid, items, opt)
+      @config = wwid.config
+      @template = opt.fetch(:config_template, 'default')
+
       lines = 1
       out = []
 
@@ -195,11 +204,10 @@ module Doing
                  item.date.strftime(opt[:format])
                end
         @date = format_placeholder(:date, date)
-        p @date
 
         lines = 1
         line_length = TTY::Screen.columns
-        lines = @elements.map do |e|
+        lines = elements.map do |e|
           el = instance_variable_get("@#{e}")
           el.nil? ? 0 : el.count
         end.max
@@ -210,7 +218,7 @@ module Doing
         right = line_length - 1
         colors = []
 
-        @elements.each do |e|
+        elements.each do |e|
           content = instance_variable_get("@#{e}")
           el_width = content.map(&:length).max || 0
           l, r = get_columns(e)
@@ -261,7 +269,6 @@ module Doing
 
       opt = variables[:options]
 
-      fetch_placeholders(wwid.config, opt.fetch(:config_template, 'default'))
       tpl_ver = wwid.config.fetch('template_version', 1).to_f
       return render2(wwid, items, opt) if tpl_ver >= 2.0
 
