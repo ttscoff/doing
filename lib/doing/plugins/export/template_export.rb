@@ -10,6 +10,51 @@ module Doing
     include Doing::Color
     include Doing::Util
 
+    attr_accessor :config, :template
+
+    VALID_ELEMENTS = %w[date title section duration note].freeze
+    PLACEHOLDER_DEFAULTS = {
+      date: {
+        width: 'auto',
+        truncate: 'end',
+        align: 'left',
+        template: '%content |',
+        format: '%Y-%m-%d %_I:%M%P'
+      },
+      title: {
+        width: 'stretch',
+        truncate: 'end',
+        align: 'left',
+        template: '%content',
+        wrap_indent: 0,
+        wrap_indent_char: ' '
+      },
+      section: {
+        width: 'auto',
+        truncate: 'end',
+        align: 'left',
+        template: '[%content]'
+      },
+      interval: {
+        width: 'auto',
+        truncate: 'end',
+        align: 'left',
+        template: '%content',
+        format: 'text'
+      },
+      note: {
+        width: 'stretch',
+        truncate: 'end',
+        align: 'left',
+        template: '%content',
+        column: 'title',
+        indent: 1,
+        indent_char: 'tab',
+        wrap_indent: 0,
+        wrap_indent_char: ' '
+      }
+    }.deep_freeze
+
     def self.settings
       {
         trigger: 'template|doing'
@@ -17,69 +62,41 @@ module Doing
     end
 
     def self.elements
-      elements ||= elements_from_config
+      @elements ||= elements_from_config
     end
 
     def self.placeholders
       @placeholders ||= placeholders_from_config
     end
 
-    def self.config
-      @config
-    end
-
-    def self.config=(new_config)
-      @config = new_config
-    end
-
-    def self.template
-      @template
-    end
-
-    def self.template=(new_template)
-      @template = new_template
-    end
-
     def self.placeholders_from_config
-      _placeholders = {
-        date: {},
-        duration: {},
-        interval: {},
-        note: {},
-        section: {},
-        title: {}
-      }
+      ph = {}
 
-      chain = ['default']
-      chain << template unless template == 'default'
-
-      chain.each do |tpl|
-        template_placeholders = config.dig('templates', tpl, 'placeholders')
-
-        _placeholders.deep_merge(template_placeholders.symbolize_keys) if template_placeholders
+      elements.each do |el|
+        ph = config.dig('templates', template, 'placeholders', el.to_s)
+        ph.deep_merge(config.dig('templates', 'default', 'placeholders', el.to_s))
+        ph.deep_merge(PLACEHOLDER_DEFAULTS[el.to_sym])
+        ph[el.to_sym] = ph.symbolize_keys
       end
 
-      _placeholders
+      ph
     end
 
     def self.elements_from_config
-      _elements = %w[date title section interval duration note]
+      raise 'Template is undefined' if template.nil?
 
-      chain = ['default']
-      chain << template unless template == 'default'
+      template_elements = config.dig('templates', template, 'elements')
+      template_elements ||= config.dig('templates', 'default', 'elements') if tpl != 'default'
 
-      chain.each do |tpl|
-        template_elements = config.dig('templates', tpl, 'elements')
-        _elements = template_elements.select { |el| _elements.include?(el) } if template_elements
-      end
+      raise "Elements is undefined for template #{template}" unless template_elements
 
-      _elements
+      template_elements.select { |el| VALID_ELEMENTS.include?(el) }.map(&:to_sym)
     end
 
-    def self.fetch(item, setting, default = nil)
-      return nil if item.nil?
+    def self.fetch(element, setting, default = nil)
+      return nil if element.nil?
 
-      t = placeholders.fetch(item.to_sym, nil)
+      t = placeholders.fetch(element.to_sym, nil)
       return nil if t.nil?
 
       t.fetch(setting.to_sym, default)
@@ -151,6 +168,58 @@ module Doing
       [left, right]
     end
 
+    def self.content_for(el, item)
+      case el
+      when :date
+        item.date
+      when :title
+        item.title
+      when :interval
+        item.interval || item.duration
+      when :section
+        item.section
+      when :note
+        item.note
+      else
+        nil
+      end
+    end
+
+    def self.max_widths(content)
+      # calculate max widths for each element
+      widths = {}
+
+      content.each do |item|
+        elements.each do |el|
+          e = item.select { |i| i[el] }
+          widths[el] ||= 0
+          widths[el] = e[:width] if e[:width] > widths[el]
+        end
+      end
+    end
+
+    def self.measure(content, width, tpl)
+      val = tpl.sub(/%content/, content.uncolor)
+      val.sub!(/%pad/, '')
+      val.gsub!(/%(\w+)/) { |m| Doing::Color.respond_to?(m[1]) ? '' : m[0] }
+      val.length
+    end
+
+    def self.item_array(item)
+      # gather content and widths for each element
+      elements.each_with_object([]) do |el, item_arr|
+        content = content_for(el, item)
+        tpl = fetch(el, :template, '%content')
+        item_arr << {
+          el: el,
+          template: tpl,
+          content: content,
+          width: measure(content, tpl),
+          placeholders: placeholders.fetch(el.to_sym)
+        }
+      end
+    end
+
     # TODO: This whole thing needs to be redone. It
     # shouldn't use "column", it should use width, and
     # elements should be stacked.
@@ -160,6 +229,83 @@ module Doing
     def self.render2(wwid, items, opt)
       @config = wwid.config
       @template = opt.fetch(:config_template, 'default')
+
+      # create an array of arrays
+      # each item is an array of hashes, one for each element
+      content = items.each_with_object([]) { |item, out| out << item_array(item) }
+
+      widths = max_widths(content)
+
+      max = TTY::Screen.columns
+
+      available_width = max
+
+      stretches = placeholders.select { |p, h| h[:width] =~ /^stretch/ }.map { |p, h| p }
+      autos = placeholders.select { |p, h| h[:width] =~ /^auto/ }.map { |p, h| p }
+
+      # calculate known widths
+      elements.each do |el|
+        known_width = 0
+        placeholders.each do |ph|
+          width = case ph[el][:width].to_s
+                  when /^[0-9]+$/
+                    ph[:width]
+                  when /^(\d+)%$/
+                    f = Regexp.last_match(1).to_f / 100
+                    max * f
+                  when /0?\.\d+/
+                    max * width.to_f
+                  else
+                    0
+                  end
+          known_width += width
+        end
+        available_width -= known_width
+      end
+
+      # calculate autos and stretches
+
+      auto_width = 0
+      autos.each { |a| auto_width += max_widths[a] }
+      content.map! do |item|
+        item.map! do |element|
+          item[:width] = case element[:placeholders][:width].to_s
+          when /^auto$/i
+            if stretches.count.positive?
+              max_widths[element]
+            else
+              available_width / autos.count
+            end
+          when /^stretch$/i
+            (available_width - auto_width) / stretches.count
+          when /^[0-9]+$/
+            Regexp.last_match(0).to_i
+          when /^(\d+)%$/
+            f = Regexp.last_match(1).to_f / 100
+            max * f
+          when /0?\.\d+/
+            max * width.to_f
+          end
+        end
+      end
+
+      # At this point we have an array of items
+      # each item is an array of elements
+      # each element has a :width
+      # create an array of arrays, one index for each of max lines, each line an array
+      # now we render each element to an array based on :template and :width, wrapping to multiple array elements for lines
+      # and padding to width based on :align and %pad in template. add each line to appropriate array.
+      # calculate longest array (of lines) and pad all element arrays to that length, make sure all elements are padded to :width
+      # one all content is rendered, just join the elements for each line
+
+      left_col = 0
+      content.map! do |item|
+        item.map! do |element|
+          element[:left_col] = left_col
+          left_col += element[:width]
+          element[:righ_col] = left_col
+        end
+      end
 
       lines = 1
       out = []
