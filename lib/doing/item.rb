@@ -116,7 +116,7 @@ module Doing
     ## Add (or remove) tags from the title of the item
     ##
     ## @param      tags    [Array] The tags to apply
-    ## @param      **options Additional options
+    ## @param      options Additional options
     ##
     ## @option options :date       [Boolean] Include timestamp?
     ## @option options :single     [Boolean] Log as a single change?

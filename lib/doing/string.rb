@@ -162,6 +162,29 @@ module Doing
       replace uncolor
     end
 
+    def simple_wrap(width)
+      str = gsub(/@\S+\(.*?\)/) { |tag| tag.gsub(/\s/, '%%%%') }
+      words = str.split(/ /).map { |word| word.gsub(/%%%%/, ' ') }
+      out = []
+      line = []
+
+      words.each do |word|
+        if word.uncolor.length >= width
+          chars = word.uncolor.split('')
+          out << chars.slice!(0, width - 1).join('') while chars.count >= width
+          line << chars.join('')
+          next
+        elsif line.join(' ').uncolor.length + word.uncolor.length + 1 > width
+          out.push(line.join(' '))
+          line.clear
+        end
+
+        line << word.uncolor
+      end
+      out.push(line.join(' '))
+      out.join("\n")
+    end
+
     ##
     ## Wrap string at word breaks, respecting tags
     ##
@@ -177,8 +200,14 @@ module Doing
       words = str.split(/ /).map { |word| word.gsub(/%%%%/, ' ') }
       out = []
       line = []
+
       words.each do |word|
-        if line.join(' ').uncolor.length + word.uncolor.length + 1 > len
+        if word.uncolor.length >= len
+          chars = word.uncolor.split('')
+          out << chars.slice!(0, len - 1).join('') while chars.count >= len
+          line << chars.join('')
+          next
+        elsif line.join(' ').uncolor.length + word.uncolor.length + 1 > len
           out.push(line.join(' '))
           line.clear
         end
@@ -187,6 +216,7 @@ module Doing
       end
       out.push(line.join(' '))
       note = ''
+      after = after.dup if after.frozen?
       after.sub!(note_rx) do
         note = Regexp.last_match(0)
         ''

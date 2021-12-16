@@ -36,7 +36,10 @@ module Doing
 
           if opt[:wrap_width]&.positive?
             width = opt[:wrap_width]
-            note.map! { |line| line.chomp.gsub(/(.{1,#{width}})(\s+|\Z)/, "\\1\n") }
+            note.map! do |line|
+              line.simple_wrap(width)
+              # line.chomp.gsub(/(.{1,#{width}})(\s+|\Z)/, "\\1\n")
+            end
             note = note.join("\n").split(/\n/).delete_if(&:empty?)
           end
         else

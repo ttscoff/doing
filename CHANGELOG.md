@@ -1,31 +1,4 @@
-### 2.1.2pre
-
-#### NEW
-
-- Add %duration placeholder to template variables
-- Add `interval_format` setting to config (applies to root or any view/template) to set intervals/durations to human (2h 15m) or text (00:02:15)
-- Add `duration` key to config (root or view/template). If set to true, will display durations by default (no need for `--duration`)
-- Most display commands now have a `--duration` flag that will display an elapsed time if the entry is not marked @done
-
-#### IMPROVED
-
-- Config set will create missing keys. Fuzzy matching will work until the path fails, then path elements after that point will be added as verbatim keys to the specified configuration (with confirmation)
-
-### 2.1.1pre
-
-#### NEW
-
-- --before, --after, and --from date filters for select command
-- --from flag for `doing today` and `doing yesterday`, filter by time range
-- --from flag for `doing search`, filter by date/time range
-- Commands that accept --before, --after, and --from can now filter on time ranges. If the date string given contains only a time (no day or date), it will be interpreted as a time range, meaning the date isn't filtered, but only entries within the time range are shown/processed
-
-#### FIXED
-
-- `finish --took 60m` is supposed to backdate the start date if needed to finish at the current time and maintain an elapsed time
-- If an editor was specified for config (or default as fallback) with command line options (e.g. `emacs -nw`), Doing would fail to recognize that the executable was available.
-
-### 2.1.0pre
+### 2.1.3
 
 #### NEW
 
@@ -34,6 +7,14 @@
 - `config list` will list detected .doingrc files and the main config file in order of precedence - refactoring
 - When modifying start dates or @done dates via an editor command, natural language strings can be used and will be parsed into doing-formatted dates automatically
 - When editor is invoked, entry titles include start date, which can be modified
+- --before, --after, and --from date filters for select command
+- --from flag for `doing today` and `doing yesterday`, filter by time range
+- --from flag for `doing search`, filter by date/time range
+- Commands that accept --before, --after, and --from can now filter on time ranges. If the date string given contains only a time (no day or date), it will be interpreted as a time range, meaning the date isn't filtered, but only entries within the time range are shown/processed
+- Add %duration placeholder to template variables
+- Add `interval_format` setting to config (applies to root or any view/template) to set intervals/durations to human (2h 15m) or text (00:02:15)
+- Add `duration` key to config (root or view/template). If set to true, will display durations by default (no need for `--duration`)
+- Most display commands now have a `--duration` flag that will display an elapsed time if the entry is not marked @done
 
 #### IMPROVED
 
@@ -41,6 +22,14 @@
 - Config -o json no longer includes key, only value.
 - System agnostic method for checking available executables (pager, editor)
 - Using `config set` and selecting a local config will no longer write the entire config to the local .doingrc. Instead, a nested path to the particular setting will be added to the config file.
+- Config set will create missing keys. Fuzzy matching will work until the path fails, then path elements after that point will be added as verbatim keys to the specified configuration (with confirmation)
+- Make menus only as tall as needed, so 5 options don't take up the whole screen
+- Better word wrap for long note lines
+
+#### FIXED
+
+- `finish --took 60m` is supposed to backdate the start date if needed to finish at the current time and maintain an elapsed time
+- If an editor was specified for config (or default as fallback) with command line options (e.g. `emacs -nw`), Doing would fail to recognize that the executable was available.
 
 ### 2.0.25
 
