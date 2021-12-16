@@ -2925,15 +2925,48 @@ command :config do |c|
   end
 end
 
-desc 'Undo the last change to the Doing file'
+desc 'Undo the last X changes to the Doing file'
+long_desc 'Reverts the last X commands that altered the doing file.
+All changes performed by a single command are undone at once.
+
+Specify a number to jump back multiple revisions, or use --select for an interactive menu.'
+arg_name 'COUNT'
 command :undo do |c|
   c.desc 'Specify alternate doing file'
   c.arg_name 'PATH'
   c.flag %i[f file], default_value: wwid.doing_file
 
-  c.action do |_global_options, options, _args|
+  c.desc 'Select from recent backups'
+  c.switch %i[s select], negatable: false
+
+  c.desc 'Remove old backups, retaining X files'
+  c.arg_name 'COUNT'
+  c.flag %i[p prune], type: Integer
+
+  c.action do |_global_options, options, args|
     file = options[:file] || wwid.doing_file
-    wwid.restore_backup(file)
+
+    if options[:prune]
+      Util.prune_backups(file, options[:prune])
+    else
+      count = args.empty? ? 1 : args[0].to_i
+      raise InvalidArgument, "Invalid count specified for undo" unless count&.positive?
+
+      wwid.restore_backup(file, options[:select], count: count)
+    end
+  end
+end
+
+command %i[changelog changes] do |c|
+  c.action do |_global_options, options, args|
+    changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', 'CHANGELOG.md'))
+    if File.exist?(changelog)
+      parsed = TTY::Markdown.parse(IO.read(changelog))
+      Doing::Pager.paginate = true
+      Doing::Pager.page parsed
+    else
+      raise "Error locating changelog"
+    end
   end
 end
 

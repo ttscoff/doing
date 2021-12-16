@@ -240,6 +240,10 @@ module Doing
       end
     end
 
+    def pluralize(number)
+      number == 1 ? self : "#{self}s"
+    end
+
     ##
     ## Convert a sort order string to a qualified type
     ##

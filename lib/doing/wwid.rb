@@ -1314,12 +1314,18 @@ module Doing
     ##
     ## @param      file  [String] The filepath to restore
     ##
-    def restore_backup(file)
-      if File.exist?("#{file}~")
-        FileUtils.cp("#{file}~", file)
-        logger.warn('File update:', "Restored #{file.sub(/^#{Util.user_home}/, '~')}")
+    def restore_backup(file, select = false, count: 1)
+      if select
+        Util.select_backup(file)
       else
-        logger.error('Restore error:', 'No backup file found')
+        Util.restore_last_backup(file, count: count)
+
+        # if File.exist?("#{file}~")
+        #   FileUtils.cp("#{file}~", file)
+        #   logger.warn('File update:', "Restored #{file.sub(/^#{Util.user_home}/, '~')}")
+        # else
+        #   logger.error('Restore error:', 'No backup file found')
+        # end
       end
     end
 
