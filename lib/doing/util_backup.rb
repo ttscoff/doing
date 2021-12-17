@@ -47,13 +47,36 @@ module Doing
       ##
       ## @param      filename  The filename
       ##
-      def redo_backup(filename = nil)
+      def redo_backup(filename = nil, count: 1)
         filename ||= Doing.config.settings['doing_file']
-        redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
-        raise DoingRuntimeError, 'No undo file' unless File.exist?(redo_file)
+        # redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
+        undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort
+        total = undones.count
+        count = total if count > total
+
+        skipped = undones.slice!(0, count)
+        undone = skipped.pop
+
+        raise DoingRuntimeError, 'End of redo history' if undone.nil?
+
+        redo_file = File.join(backup_dir, undone)
 
         FileUtils.move(redo_file, filename)
-        Doing.logger.warn('File update:', 'restored last undo')
+
+        skipped.each do |f|
+          FileUtils.mv(File.join(backup_dir, f), File.join(backup_dir, f.sub(/^undone/, '')))
+        end
+
+        Doing.logger.warn('File update:', "restored undo step #{count}/#{total}")
+        Doing.logger.debug('Backup:', "#{total - skipped.count - 1} redos remaining")
+      end
+
+      def clear_undone(filename = nil)
+        filename ||= Doing.config.settings['doing_file']
+        # redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
+        Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).each do |f|
+          FileUtils.rm(File.join(backup_dir, f))
+        end
       end
 
       ##
@@ -85,7 +108,7 @@ module Doing
           preview = 'git --no-pager diff -U1 --color=always --minimal --word-diff'
           pipe = ' | awk "(NR>4)"'
         else
-          preview = 'diff -u'
+          preview = 'diff -U 1'
           pipe = if TTY::Which.which('delta')
                    ' | delta --no-gitconfig --syntax-theme=1337'
                  elsif TTY::Which.which('diff-so-fancy')
@@ -93,7 +116,8 @@ module Doing
                  elsif TTY::Which.which('ydiff')
                    ' | ydiff -c always --wrap < /dev/tty'
                  else
-                   ''
+                   cmd = 'sed -e "s/^-/`echo -e "\033[31m"`-/;s/^+/`echo -e "\033[32m"`+/;s/^@/`echo -e "\033[34m"`@/;s/\$/`echo -e "\033[0m"`/"'
+                   "| bash -c #{Shellwords.escape(cmd)}"
                  end
           pipe += ' | awk "(NR>2)"'
         end
@@ -104,7 +128,8 @@ module Doing
                                              '--delimiter="\t"',
                                              '--with-nth=1',
                                              %(--preview='#{preview} "#{filename}" {2} #{pipe}'),
-                                             '--preview-window="right,70%,wrap,follow"'
+                                             '--disabled',
+                                             '--preview-window="right,70%,nowrap,follow"'
                                            ])
         raise UserCancelled unless result
 
@@ -125,15 +150,20 @@ module Doing
           return
         end
 
-        backup_file = File.join(backup_dir, "#{Time.now.strftime('%Y-%m-%d_%H.%M.%S')}___#{File.basename(filename)}")
+        backup_file = File.join(backup_dir, "#{timestamp_filename}___#{File.basename(filename)}")
         # compressed = Zlib::Deflate.deflate(content)
 
         FileUtils.cp(filename, backup_file)
 
         prune_backups(filename, 100)
+        clear_undone(filename)
       end
 
       private
+
+      def timestamp_filename
+        Time.now.strftime('%Y-%m-%d_%H.%M.%S')
+      end
 
       def get_backups(filename = nil)
         filename ||= Doing.config.settings['doing_file']
@@ -143,7 +173,7 @@ module Doing
 
       def save_undone(filename = nil)
         filename ||= Doing.config.settings['doing_file']
-        undone_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
+        undone_file = File.join(backup_dir, "undone#{timestamp_filename}___#{File.basename(filename)}")
         FileUtils.cp(filename, undone_file)
       end
 
@@ -194,7 +224,7 @@ module Doing
         get_backups(base).each do |file|
           date, _base = date_of_backup(file)
           if date && target_date < date
-            FileUtils.rm(File.join(backup_dir, file))
+            FileUtils.mv(File.join(backup_dir, file), File.join(backup_dir, "undone#{file}"))
             counter += 1
           end
         end
