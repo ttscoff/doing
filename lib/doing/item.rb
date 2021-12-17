@@ -291,28 +291,28 @@ module Doing
 
     def all_tags?(tags)
       tags.each do |tag|
-        return false unless @title =~ /@#{tag}/
+        return false unless @title =~ /@#{tag}\b/
       end
       true
     end
 
     def no_tags?(tags)
       tags.each do |tag|
-        return false if @title =~ /@#{tag}/
+        return false if @title =~ /@#{tag}\b/
       end
       true
     end
 
     def any_tags?(tags)
       tags.each do |tag|
-        return true if @title =~ /@#{tag}/
+        return true if @title =~ /@#{tag}\b/
       end
       false
     end
 
     def split_tags(tags)
       tags = tags.split(/ *, */) if tags.is_a? String
-      tags.map { |t| t.strip.sub(/^@/, '') }
+      tags.map { |t| t.strip.add_at }
     end
   end
 end

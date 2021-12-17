@@ -316,8 +316,16 @@ module Doing
       gsub(/\((?!\?:)/, '(?:').downcase
     end
 
+    def wildcard_to_rx
+      gsub(/\?/, '\S').gsub(/\*/, '\S+')
+    end
+
+    def add_at
+      strip.sub(/^@/, '').wildcard_to_rx
+    end
+
     def to_tags
-      gsub(/ *, */, ' ').gsub(/ +/, ' ').split(/ /).sort.uniq.map { |t| t.strip.sub(/^@/, '') }
+      gsub(/ *, */, ' ').gsub(/ +/, ' ').split(/ /).sort.uniq.map(&:add_at)
     end
 
     def add_tags!(tags, remove: false)
