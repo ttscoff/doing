@@ -105,6 +105,12 @@ module Doing
       new_item
     end
 
+    def all_tags
+      each_with_object([]) do |entry, tags|
+        tags.concat(entry.tags).sort!.uniq!
+      end
+    end
+
     # Output sections and items in Doing file format
     def to_s
       out = []

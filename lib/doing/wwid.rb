@@ -529,10 +529,25 @@ module Doing
       last_entry
     end
 
-    def all_tags(items, opt: {})
-      all_tags = []
-      items.each { |item| all_tags.concat(item.tags).uniq! }
-      all_tags.sort
+    def all_tags(items, opt: {}, counts: false)
+      if counts
+        all_tags = {}
+        items.each do |item|
+          item.tags.each do |tag|
+            if all_tags.key?(tag)
+              all_tags[tag] += 1
+            else
+              all_tags[tag] = 1
+            end
+          end
+        end
+
+        all_tags.sort_by { |tag, count| count }
+      else
+        all_tags = []
+        items.each { |item| all_tags.concat(item.tags).uniq! }
+        all_tags.sort
+      end
     end
 
     def tag_groups(items, opt: {})
@@ -1381,8 +1396,35 @@ module Doing
     ##
     ## @return     [String] The selected section name
     ##
-    def choose_section
-      choice = Prompt.choose_from(@content.section_titles.sort, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
+    def choose_section(include_all: false)
+      options = @content.section_titles.sort
+      options.unshift('All') if include_all
+      choice = Prompt.choose_from(options, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
+      choice ? choice.strip : choice
+    end
+
+    ##
+    ## Generate a menu of tags and allow user selection
+    ##
+    ## @return     [String] The selected tag name
+    ##
+    def choose_tag(section = 'All', include_all: false)
+      items = @content.in_section(section)
+      tags = all_tags(items).map { |t| "@#{t}" }
+      tags.unshift('No tag filter') if include_all
+      choice = Prompt.choose_from(tags, sorted: false, prompt: 'Choose a tag > ', fzf_args: ['--height=60%'])
+      choice ? choice.strip : choice
+    end
+
+    ##
+    ## Generate a menu of sections and tags and allow user selection
+    ##
+    ## @return     [String] The selected section or tag name
+    ##
+    def choose_section_tag
+      options = @content.section_titles.sort
+      options.concat(@content.all_tags.sort.map { |t| "@#{t}" })
+      choice = Prompt.choose_from(options, prompt: 'Choose a section or tag > ', fzf_args: ['--height=60%'])
       choice ? choice.strip : choice
     end
 

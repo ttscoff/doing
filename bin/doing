@@ -1227,6 +1227,46 @@ command %i[again resume] do |c|
   end
 end
 
+desc 'List all tags in the current Doing file'
+command :tags do |c|
+  c.desc 'Section'
+  c.arg_name 'SECTION_NAME'
+  c.flag %i[s section], default_value: 'All'
+
+  c.desc 'Show count of occurrences'
+  c.switch %i[c counts]
+
+  c.desc 'Sort by name or count'
+  c.arg_name 'SORT_ORDER'
+  c.flag %i[sort], default_value: 'name', must_match: /^(?:n(?:ame)?|c(?:ount)?)$/
+
+  c.desc 'Sort order (asc/desc)'
+  c.arg_name 'ORDER'
+  c.flag %i[o order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
+
+  c.action do |_global, options, args|
+    section = wwid.guess_section(options[:section]) || options[:section].cap_first
+
+    items = wwid.content.in_section(section)
+    tags = wwid.all_tags(items, counts: true)
+
+    if options[:sort] =~ /^n/i
+      tags = tags.sort_by { |tag, count| tag }
+    else
+      tags = tags.sort_by { |tag, count| count }
+    end
+
+    tags.reverse! if options[:order].normalize_order == 'desc'
+
+    if options[:counts]
+      tags.each { |t, c| puts "#{t} (#{c})" }
+    else
+      tags.each { |t, c| puts "#{t}" }
+    end
+  end
+end
+
+
 desc 'Add tag(s) to last entry'
 long_desc 'Add (or remove) tags from the last entry, or from multiple entries
           (with `--count`), entries matching a search (with `--search`), or entries
@@ -1527,7 +1567,7 @@ command :show do |c|
   c.example 'doing show Ideas @doing --from "mon to fri"', desc: 'Show entries tagged @doing from the Ideas section added between monday and friday of the current week.'
   c.example 'doing show --interactive Later @doing', desc: 'Create a menu from entries from the Later section tagged @doing to perform batch actions'
 
-  c.desc 'Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.'
+  c.desc 'Tag filter, combine multiple tags with a comma. Use `--tag pick` for a menu of available tags. Added for compatibility with other commands.'
   c.arg_name 'TAG'
   c.flag [:tag]
 
@@ -1606,6 +1646,9 @@ command :show do |c|
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
+  c.desc 'Select section or tag to display from a menu'
+  c.switch %i[m menu], negatable: false, default_value: false
+
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
 
@@ -1618,13 +1661,15 @@ command :show do |c|
 
     tag_filter = false
     tags = []
+
     if args.length.positive?
       case args[0]
       when /^all$/i
         section = 'All'
         args.shift
       when /^(choose|pick)$/i
-        section = wwid.choose_section
+        section = wwid.choose_section(include_all: true)
+
         args.shift
       when /^@/
         section = 'All'
@@ -1649,7 +1694,14 @@ command :show do |c|
         end
       end
     else
-      section = settings['current_section']
+      section = options[:menu] ? wwid.choose_section(include_all: true) : settings['current_section']
+    end
+
+    if options[:menu]
+      tag = wwid.choose_tag(section, include_all: true)
+      raise UserCancelled unless tag
+
+      tags.push(tag.strip.sub(/^@/, '')) if tag =~ /^@/
     end
 
     tags.concat(options[:tag].to_tags) if options[:tag]
@@ -1694,11 +1746,11 @@ command :show do |c|
 end
 
 desc 'Search for entries'
-long_desc <<~'EODESC'
-  Search all sections (or limit to a single section) for entries matching text or regular expression. Normal strings are fuzzy matched.
+long_desc %(
+Search all sections (or limit to a single section) for entries matching text or regular expression. Normal strings are fuzzy matched.
 
-  To search with regular expressions, single quote the string and surround with slashes: `doing search '/\bm.*?x\b/'`
-EODESC
+To search with regular expressions, single quote the string and surround with slashes: `doing search '/\bm.*?x\b/'`
+)
 
 arg_name 'SEARCH_PATTERN'
 command %i[grep search] do |c|
@@ -1862,6 +1914,8 @@ command :recent do |c|
 end
 
 desc 'List entries from today'
+long_desc 'List entries from the current day. Use --before, --after, and
+--from to specify time ranges.'
 command :today do |c|
   c.example 'doing today', desc: 'List all entries with start dates between 12am and 11:59PM for the current day'
   c.example 'doing today --section Later', desc: 'List today\'s entries in the Later section'
@@ -2036,6 +2090,8 @@ command :since do |c|
 end
 
 desc 'List entries from yesterday'
+desc 'Show only entries with start times within the previous 24 hour period. Use --before, --after, and --from to limit to
+time spans within the day.'
 command :yesterday do |c|
   c.example 'doing yesterday', desc: 'List all entries from the previous day'
   c.example 'doing yesterday --after 8am --before 5pm', desc: 'List entries from the previous day between 8am and 5pm'
@@ -2107,6 +2163,8 @@ command :yesterday do |c|
 end
 
 desc 'Show the last entry, optionally edit'
+long_desc 'Shows the last entry. Using --search and --tag filters, you can view/edit the last entry matching a filter,
+allowing `doing last` to target historical entries.'
 command :last do |c|
   c.example 'doing last', desc: 'Show the most recent entry in all sections'
   c.example 'doing last -s Later', desc: 'Show the most recent entry in the Later section'
@@ -2272,6 +2330,8 @@ command :plugins do |c|
 end
 
 desc 'Generate shell completion scripts'
+desc 'Generates the necessary scripts to add command line completion to various shells, so typing \'doing\' and hitting
+tab will offer completions of subcommands and their options.'
 command :completion do |c|
   c.example 'doing completion', desc: 'Output zsh (default) to STDOUT'
   c.example 'doing completion --type zsh --file ~/.zsh-completions/_doing.zsh', desc: 'Output zsh completions to file'
@@ -2294,7 +2354,8 @@ command :completion do |c|
 end
 
 desc 'Display a user-created view'
-long_desc 'Command line options override view configuration'
+long_desc 'Views are defined in your configuration (use `doing config` to edit).
+Command line options override view configuration.'
 arg_name 'VIEW_NAME'
 command :view do |c|
   c.example 'doing view color', desc: 'Display entries according to config for view "color"'
@@ -2611,6 +2672,9 @@ command %i[archive move] do |c|
 end
 
 desc 'Move entries to archive file'
+long_desc 'As your doing file grows, commands can get slow. Given that your historical data (and your archive section)
+probably aren\'t providing any useful insights a year later, use this command to "rotate" old entries out to an archive
+file. You\'ll still have access to all historical data, but it won\'t be slowing down daily operation.'
 command :rotate do |c|
   c.example 'doing rotate', desc: 'Move all entries in doing file to a dated secondary file'
   c.example 'doing rotate --section Archive --keep 10', desc: 'Move entries in the Archive section to a secondary file, keeping the most recent 10 entries'
@@ -2677,8 +2741,10 @@ command :rotate do |c|
 end
 
 desc 'Open the "doing" file in an editor'
-long_desc "`doing open` defaults to using the editor_app setting in #{config.config_file} (#{settings.key?('editor_app') ? settings['editor_app'] : 'not set'})."
+long_desc "`doing open` defaults to using the editors->doing_file setting
+in #{config.config_file} (#{Doing::Util.find_default_editor('doing_file')})."
 command :open do |c|
+  c.example 'doing open', desc: 'Open the doing file in the default editor'
   c.desc 'Open with editor command (e.g. vim, mate)'
   c.arg_name 'COMMAND'
   c.flag %i[e editor]
@@ -2972,6 +3038,11 @@ All changes performed by a single command are undone at once.
 Specify a number to jump back multiple revisions, or use --select for an interactive menu.'
 arg_name 'COUNT'
 command :undo do |c|
+  c.example 'doing undo', desc: 'Undo the most recent change to the doing file'
+  c.example 'doing undo 5', desc: 'Undo the last 5 changes to the doing file'
+  c.example 'doing undo --interactive', desc: 'Select from a menu of available revisions'
+  c.example 'doing undo --redo', desc: 'Undo the last undo command'
+
   c.desc 'Specify alternate doing file'
   c.arg_name 'PATH'
   c.flag %i[f file], default_value: wwid.doing_file
@@ -3018,6 +3089,8 @@ command :redo do |c|
   end
 end
 
+desc 'List recent changes in Doing'
+long_desc 'Display a formatted list of changes in recent versions, latest at the top'
 command %i[changelog changes] do |c|
   c.action do |_global_options, options, args|
     changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', 'CHANGELOG.md'))
@@ -3035,6 +3108,10 @@ desc 'Import entries from an external source'
 long_desc "Imports entries from other sources. Available plugins: #{Doing::Plugins.plugin_names(type: :import, separator: ', ')}"
 arg_name 'PATH'
 command :import do |c|
+  c.example 'doing import --type timing "~/Desktop/All Activities.json"', desc: 'Import a Timing.app JSON report'
+  c.example 'doing import --type doing --tag imported --no-autotag ~/doing_backup.md', desc: 'Import an Doing archive, tag all entries with @imported, skip autotagging'
+  c.example 'doing import --type doing --from "10/1 to 10/15" ~/doing_backup.md', desc: 'Import a Doing archive, only importing entries between two dates'
+
   c.desc "Import type (#{Doing::Plugins.plugin_names(type: :import)})"
   c.arg_name 'TYPE'
   c.flag :type, default_value: 'doing'
