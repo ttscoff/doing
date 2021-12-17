@@ -115,12 +115,7 @@ module Doing
 
       file = File.expand_path(file)
 
-      Backup.write_backup(content, file) if backup
-
-      if File.exist?(file) && backup
-        # Create a backup copy for the undo command
-        FileUtils.cp(file, "#{file}~")
-      end
+      Backup.write_backup(file) if backup
 
       File.open(file, 'w+') do |f|
         f.puts content
