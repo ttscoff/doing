@@ -17,6 +17,8 @@
 #### IMPROVED
 
 - Better diff output for fzf preview of `doing undo` history
+- Fall back to good ol' sed for colorizing diffs when no good tool is available
+- `doing redo` (a.k.a. `doing undo --redo`) can be run multiple times, stepping forward through undo history. Can also take a count to jump
 
 #### FIXED
 
