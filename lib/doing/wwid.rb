@@ -1310,26 +1310,6 @@ module Doing
     end
 
     ##
-    ## Restore a backed up version of a file
-    ##
-    ## @param      file  [String] The filepath to restore
-    ##
-    def restore_backup(file, select = false, count: 1)
-      if select
-        Util.select_backup(file)
-      else
-        Util.restore_last_backup(file, count: count)
-
-        # if File.exist?("#{file}~")
-        #   FileUtils.cp("#{file}~", file)
-        #   logger.warn('File update:', "Restored #{file.sub(/^#{Util.user_home}/, '~')}")
-        # else
-        #   logger.error('Restore error:', 'No backup file found')
-        # end
-      end
-    end
-
-    ##
     ## Rename doing file with date and start fresh one
     ##
     def rotate(opt = {})

@@ -2937,23 +2937,43 @@ command :undo do |c|
   c.flag %i[f file], default_value: wwid.doing_file
 
   c.desc 'Select from recent backups'
-  c.switch %i[s select], negatable: false
+  c.switch %i[i interactive], negatable: false
 
   c.desc 'Remove old backups, retaining X files'
   c.arg_name 'COUNT'
   c.flag %i[p prune], type: Integer
 
+  c.desc 'Redo last undo'
+  c.switch %i[r redo]
+
   c.action do |_global_options, options, args|
     file = options[:file] || wwid.doing_file
 
     if options[:prune]
-      Util.prune_backups(file, options[:prune])
+      Doing::Backup.prune_backups(file, options[:prune])
+    elsif options[:redo]
+      Doing::Backup.redo_backup(file)
     else
       count = args.empty? ? 1 : args[0].to_i
       raise InvalidArgument, "Invalid count specified for undo" unless count&.positive?
 
-      wwid.restore_backup(file, options[:select], count: count)
+      if options[:select]
+        Doing::Backup.select_backup(file)
+      else
+        Doing::Backup.restore_last_backup(file, count: count)
+      end
     end
+  end
+end
+
+command :redo do |c|
+  c.desc 'Specify alternate doing file'
+  c.arg_name 'PATH'
+  c.flag %i[f file], default_value: wwid.doing_file
+
+  c.action do |_global, options, _args|
+    file = options[:file] || wwid.doing_file
+    Doing::Backup.redo_backup(file)
   end
 end
 
