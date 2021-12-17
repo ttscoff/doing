@@ -7,7 +7,11 @@ module Doing
   class Configuration
     attr_reader :settings
 
-    attr_writer :ignore_local, :config_file
+    attr_writer :ignore_local, :config_file, :force_answer
+
+    def force_answer
+      @force_answer ||= false
+    end
 
     MissingConfigFile = Class.new(RuntimeError)
 
@@ -26,10 +30,12 @@ module Doing
         'command_path' => File.join(Util.user_home, '.config', 'doing', 'commands')
       },
       'doing_file' => '~/what_was_i_doing.md',
+      'backup_dir' => '~/.doing_backup',
       'current_section' => 'Currently',
       'paginate' => false,
       'never_time' => [],
       'never_finish' => [],
+      'date_tags' => ['done', 'defer(?:red)?', 'waiting'],
 
       'timer_format' => 'text',
       'interval_format' => 'text',
@@ -128,10 +134,13 @@ module Doing
     ## @return     [String] file path
     ##
     def choose_config
+      return @config_file if @force_answer
+
       if @additional_configs.count.positive?
-        choices = [@config_file]
-        choices.concat(@additional_configs)
-        res = Doing::Prompt.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to update > ')
+        choices = [@config_file].concat(@additional_configs)
+        res = Doing::Prompt.choose_from(choices.uniq.sort.reverse,
+                                        sorted: false,
+                                        prompt: 'Local configs found, select which to update > ')
 
         raise UserCancelled, 'Cancelled' unless res
 

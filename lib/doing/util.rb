@@ -115,10 +115,7 @@ module Doing
 
       file = File.expand_path(file)
 
-      if File.exist?(file) && backup
-        # Create a backup copy for the undo command
-        FileUtils.cp(file, "#{file}~")
-      end
+      Backup.write_backup(file) if backup
 
       File.open(file, 'w+') do |f|
         f.puts content
@@ -133,7 +130,7 @@ module Doing
     end
 
     def default_editor
-      @default_editor = find_default_editor
+      @default_editor ||= find_default_editor
     end
 
     def editor_with_args

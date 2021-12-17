@@ -172,6 +172,13 @@ module Doing
     ## @return     [Boolean] true if tag/bool combination passes
     ##
     def tags?(tags, bool = :and, negate: false)
+      if bool == :pattern
+        tags = tags.join(' ') if tags.is_a?(Array)
+        matches = tag_pattern?(tags.gsub(/ *, */, ' '))
+
+        return negate ? !matches : matches
+      end
+
       tags = split_tags(tags)
       bool = bool.normalize_bool
 
@@ -186,6 +193,10 @@ module Doing
       negate ? !matches : matches
     end
 
+    def ignore_case(search, case_type)
+      (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
+    end
+
     ##
     ## Test if item matches search string
     ##
@@ -197,9 +208,25 @@ module Doing
     ##
     ## @return     [Boolean] matches search criteria
     ##
-    def search(search, distance: 3, negate: false, case_type: :smart, fuzzy: false)
-      text = @title + @note.to_s
-      matches = text =~ search.to_rx(distance: distance, case_type: case_type)
+    def search(search, distance: 3, negate: false, case_type: :smart)
+      if search.is_rx?
+        matches = @title + @note.to_s =~ search.to_rx(distance: distance, case_type: case_type)
+      else
+        query = to_phrase_query(search.strip)
+
+        if query[:must].nil? && query[:must_not].nil?
+          query[:must] = query[:should]
+          query[:should] = []
+        end
+        matches = no_searches?(query[:must_not], case_type: case_type)
+        matches &&= all_searches?(query[:must], case_type: case_type)
+        matches &&= any_searches?(query[:should], case_type: case_type)
+      end
+      # if search =~ /(?<=\A| )[+-]\S/
+      # else
+      #   text = @title + @note.to_s
+      #   matches = text =~ search.to_rx(distance: distance, case_type: case_type)
+      # end
 
       # if search.is_rx? || !fuzzy
       #   matches = text =~ search.to_rx(distance: distance, case_type: case_type)
@@ -286,33 +313,92 @@ module Doing
       start = @date
 
       t = (done - start).to_i
-      t > 0 ? t : nil
+      t.positive? ? t : nil
+    end
+
+    def all_searches?(searches, case_type: :smart)
+      return true if searches.nil? || searches.empty?
+
+      text = @title + @note.to_s
+      searches.each do |s|
+        rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
+        return false unless text =~ rx
+      end
+      true
+    end
+
+    def no_searches?(searches, case_type: :smart)
+      return true if searches.nil? || searches.empty?
+
+      text = @title + @note.to_s
+      searches.each do |s|
+        rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
+        return false if text =~ rx
+      end
+      true
+    end
+
+    def any_searches?(searches, case_type: :smart)
+      return true if searches.nil? || searches.empty?
+
+      text = @title + @note.to_s
+      searches.each do |s|
+        rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
+        return true if text =~ rx
+      end
+      false
     end
 
     def all_tags?(tags)
+      return true if tags.nil? || tags.empty?
+
       tags.each do |tag|
-        return false unless @title =~ /@#{tag}/
+        return false unless @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       true
     end
 
     def no_tags?(tags)
+      return true if tags.nil? || tags.empty?
+
       tags.each do |tag|
-        return false if @title =~ /@#{tag}/
+        return false if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       true
     end
 
     def any_tags?(tags)
+      return true if tags.nil? || tags.empty?
+
       tags.each do |tag|
-        return true if @title =~ /@#{tag}/
+        return true if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       false
     end
 
+    def to_query(query)
+      parser = BooleanTermParser::QueryParser.new
+      transformer = BooleanTermParser::QueryTransformer.new
+      parse_tree = parser.parse(query)
+      transformer.apply(parse_tree).to_elasticsearch
+    end
+
+    def to_phrase_query(query)
+      parser = PhraseParser::QueryParser.new
+      transformer = PhraseParser::QueryTransformer.new
+      parse_tree = parser.parse(query)
+      transformer.apply(parse_tree).to_elasticsearch
+    end
+
+    def tag_pattern?(tags)
+      query = to_query(tags)
+
+      no_tags?(query[:must_not]) && all_tags?(query[:must]) && any_tags?(query[:should])
+    end
+
     def split_tags(tags)
       tags = tags.split(/ *, */) if tags.is_a? String
-      tags.map { |t| t.strip.sub(/^@/, '') }
+      tags.map { |t| t.strip.add_at }
     end
   end
 end

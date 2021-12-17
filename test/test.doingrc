@@ -10,7 +10,7 @@ default_tags: []
 autotag:
   transform:
   - "(deploy|merge)\\s+@(\\w+)-\\d+:$1-$2 @dev @dev-$2"
-  - "flubber:fraggle rock/r"
+  - flubber:fraggle rock/r
   whitelist:
   - autotag
   - overtired
@@ -110,3 +110,4 @@ editors:
   doing_file:
   config:
 paginate: false
+backup_dir: "/var/folders/q7/sps8n5_534q22bx1ts4xjjl00000gn/T/d20211217-89769-2n97hn/doing_backup"

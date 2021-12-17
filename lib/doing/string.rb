@@ -240,6 +240,10 @@ module Doing
       end
     end
 
+    def pluralize(number)
+      number == 1 ? self : "#{self}s"
+    end
+
     ##
     ## Convert a sort order string to a qualified type
     ##
@@ -299,6 +303,8 @@ module Doing
         :or
       when /(not|none)/i
         :not
+      when /^p/i
+        :pattern
       else
         default.is_a?(Symbol) ? default : default.normalize_bool
       end
@@ -312,8 +318,16 @@ module Doing
       gsub(/\((?!\?:)/, '(?:').downcase
     end
 
+    def wildcard_to_rx
+      gsub(/\?/, '\S').gsub(/\*/, '\S*?')
+    end
+
+    def add_at
+      strip.sub(/^([+-]*)@/, '\1')
+    end
+
     def to_tags
-      gsub(/ *, */, ' ').gsub(/ +/, ' ').split(/ /).sort.uniq.map { |t| t.strip.sub(/^@/, '') }
+      gsub(/ *, */, ' ').gsub(/ +/, ' ').split(/ /).sort.uniq.map(&:add_at)
     end
 
     def add_tags!(tags, remove: false)
@@ -533,7 +547,7 @@ module Doing
         end
       else
         case self
-        when / *, */
+        when /(^\[.*?\]$| *, *)/
           gsub(/^\[ *| *\]$/, '').split(/ *, */)
         when /^[0-9]+$/
           to_i

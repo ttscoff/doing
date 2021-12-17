@@ -183,7 +183,25 @@ module Doing
 
       date = nil
       iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
-      done_rx = /(?<=^| )@(?<tag>done|finished|completed?)\((?<date>.*?)\)/i
+      watch_tags = [
+        'start(?:ed)?',
+        'beg[ia]n',
+        'done',
+        'finished',
+        'completed?',
+        'waiting',
+        'defer(?:red)?'
+      ]
+      if @config['date_tags']
+        date_tags = @config['date_tags']
+        date_tags = date_tags.split(/ *, */) if date_tags.is_a?(String)
+        date_tags.map! do |tag|
+          tag.sub(/^@/, '').gsub(/\((?!\?:)(.*?)\)/, '(?:\1)').strip
+        end
+        watch_tags.concat(date_tags).uniq!
+      end
+
+      done_rx = /(?<=^| )@(?<tag>#{watch_tags.join('|')})\((?<date>.*?)\)/i
       date_rx = /^(?:\s*- )?(?<date>.*?) \| (?=\S)/
 
       title.gsub!(done_rx) do
@@ -423,8 +441,9 @@ module Doing
     # @param      item    [Item] the item to reset/resume
     # @param      resume  [Boolean] removing @done tag if true
     #
-    def reset_item(item, resume: false)
-      item.date = Time.now
+    def reset_item(item, date: nil, resume: false)
+      date ||= Time.now
+      item.date = date
       item.tag('done', remove: true) if resume
       logger.info('Reset:', %(Reset #{resume ? 'and resumed ' : ''} "#{item.title}" in #{item.section}))
       item
@@ -528,10 +547,25 @@ module Doing
       last_entry
     end
 
-    def all_tags(items, opt: {})
-      all_tags = []
-      items.each { |item| all_tags.concat(item.tags).uniq! }
-      all_tags.sort
+    def all_tags(items, opt: {}, counts: false)
+      if counts
+        all_tags = {}
+        items.each do |item|
+          item.tags.each do |tag|
+            if all_tags.key?(tag.downcase)
+              all_tags[tag.downcase] += 1
+            else
+              all_tags[tag.downcase] = 1
+            end
+          end
+        end
+
+        all_tags.sort_by { |tag, count| count }
+      else
+        all_tags = []
+        items.each { |item| all_tags.concat(item.tags.map(&:downcase)).uniq! }
+        all_tags.sort
+      end
     end
 
     def tag_groups(items, opt: {})
@@ -656,6 +690,7 @@ module Doing
         end
 
         if keep && opt[:tag]
+          opt[:tag_bool] = opt[:bool].normalize_bool if opt[:bool]
           opt[:tag_bool] ||= :and
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
           keep = false unless tag_match
@@ -666,7 +701,7 @@ module Doing
           search_match = if opt[:search].nil? || opt[:search].empty?
                            true
                          else
-                           item.search(opt[:search], case_type: opt[:case].normalize_case, fuzzy: opt[:fuzzy])
+                           item.search(opt[:search], case_type: opt[:case].normalize_case)
                          end
 
           keep = false unless search_match
@@ -708,7 +743,7 @@ module Doing
 
         keep = false if keep && opt[:only_timed] && !item.interval
 
-        if keep && opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
+        if keep && opt[:tag_filter]
           keep = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
           keep = opt[:not] ? !keep : keep
         end
@@ -914,12 +949,19 @@ module Doing
         if opt[:resume] && !opt[:reset]
           repeat_item(item, { editor: opt[:editor] })
         elsif opt[:reset]
+          res = Prompt.enter_text('Start date (blank for current time)', default_response: '')
+          if res =~ /^ *$/
+            date = Time.now
+          else
+            date = res.chronify(guess: :begin)
+          end
+
           res = if item.tags?('done', :and) && !opt[:resume]
                   opt[:force] ? true : Prompt.yn('Remove @done tag?', default_response: 'y')
                 else
                   opt[:resume]
                 end
-          @content.update_item(item, reset_item(item, resume: res))
+          @content.update_item(item, reset_item(item, date: date, resume: res))
         end
         write(@doing_file)
 
@@ -1310,20 +1352,6 @@ module Doing
     end
 
     ##
-    ## Restore a backed up version of a file
-    ##
-    ## @param      file  [String] The filepath to restore
-    ##
-    def restore_backup(file)
-      if File.exist?("#{file}~")
-        FileUtils.cp("#{file}~", file)
-        logger.warn('File update:', "Restored #{file.sub(/^#{Util.user_home}/, '~')}")
-      else
-        logger.error('Restore error:', 'No backup file found')
-      end
-    end
-
-    ##
     ## Rename doing file with date and start fresh one
     ##
     def rotate(opt = {})
@@ -1387,8 +1415,35 @@ module Doing
     ##
     ## @return     [String] The selected section name
     ##
-    def choose_section
-      choice = Prompt.choose_from(@content.section_titles.sort, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
+    def choose_section(include_all: false)
+      options = @content.section_titles.sort
+      options.unshift('All') if include_all
+      choice = Prompt.choose_from(options, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
+      choice ? choice.strip : choice
+    end
+
+    ##
+    ## Generate a menu of tags and allow user selection
+    ##
+    ## @return     [String] The selected tag name
+    ##
+    def choose_tag(section = 'All', include_all: false)
+      items = @content.in_section(section)
+      tags = all_tags(items, counts: true).map { |t, c| "@#{t} (#{c})" }
+      tags.unshift('No tag filter') if include_all
+      choice = Prompt.choose_from(tags, sorted: false, multiple: true, prompt: 'Choose a tag > ', fzf_args: ['--height=60%'])
+      choice ? choice.split(/\n/).map { |t| t.strip.sub(/ \(.*?\)$/, '')}.join(' ') : choice
+    end
+
+    ##
+    ## Generate a menu of sections and tags and allow user selection
+    ##
+    ## @return     [String] The selected section or tag name
+    ##
+    def choose_section_tag
+      options = @content.section_titles.sort
+      options.concat(@content.all_tags.sort.map { |t| "@#{t}" })
+      choice = Prompt.choose_from(options, prompt: 'Choose a section or tag > ', fzf_args: ['--height=60%'])
       choice ? choice.strip : choice
     end
 
