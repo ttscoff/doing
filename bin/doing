@@ -2981,7 +2981,7 @@ command %i[changelog changes] do |c|
   c.action do |_global_options, options, args|
     changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', 'CHANGELOG.md'))
     if File.exist?(changelog)
-      parsed = TTY::Markdown.parse(IO.read(changelog))
+      parsed = TTY::Markdown.parse(IO.read(changelog), width: 80, symbols: {override: {bullet: "•"}})
       Doing::Pager.paginate = true
       Doing::Pager.page parsed
     else

@@ -1,3 +1,11 @@
+### 2.1.4pre
+
+#### NEW
+
+- Multiple undo. Every time a command modifies the doing file, a backup is written. Running `doing undo` repeatedly steps back through history, `doing undo 5` jumps back 5 versions
+- `doing undo -i` offers a list of available versions for selection
+- `doing redo` undoes a redo
+
 ### 2.1.3
 
 #### NEW
