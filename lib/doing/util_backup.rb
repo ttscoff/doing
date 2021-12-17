@@ -13,7 +13,7 @@ module Doing
       ## @param      limit  Maximum number of backups to retain
       ##
       def prune_backups(filename, limit = 10)
-        backups = Dir.glob("*___#{File.basename(filename)}", base: backup_dir).delete_if { |f| f =~ /^undone/ }.sort.reverse
+        backups = get_backups(filename)
         return unless backups.count > limit
 
         backups[limit..-1].each do |file|
@@ -30,16 +30,13 @@ module Doing
       ##
       def restore_last_backup(filename = nil, count: 1)
         filename ||= Doing.config.settings['doing_file']
-        backups = Dir.glob("*___#{File.basename(filename)}", base: backup_dir).delete_if { |f| f =~ /^undone/ }.sort.reverse
-        raise DoingRuntimeError, "End of backup history" unless backups.count.positive?
 
-        result = backups.slice(count - 1)
-        raise DoingRuntimeError, 'End of undo history' unless result
+        result = get_backups(filename).slice(count - 1)
+        raise DoingRuntimeError, 'End of undo history' if result.nil?
 
         backup_file = File.join(backup_dir, result)
-        undone_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
 
-        FileUtils.cp(filename, undone_file)
+        save_undone(filename)
         FileUtils.mv(backup_file, filename)
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{result}")
@@ -67,12 +64,20 @@ module Doing
       ##
       def select_backup(filename = nil)
         filename ||= Doing.config.settings['doing_file']
-        backups = Dir.glob("*___#{File.basename(filename)}", base: backup_dir).delete_if { |f| f =~ /^undone/ }.sort.reverse
-        options = []
-        backups.each do |file|
+
+        options = get_backups(filename).each_with_object([]) do |file, arr|
           d, _base = date_of_backup(file)
-          options.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
+          arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
         end
+
+        backup_file = show_menu(options, filename)
+        write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
+        FileUtils.mv(backup_file, filename)
+        prune_backups_after(File.basename(backup_file))
+        Doing.logger.warn('File update:', "restored from #{backup_file}")
+      end
+
+      def show_menu(options, filename)
         result = Doing::Prompt.choose_from(options,
                                            sorted: false,
                                            fzf_args: [
@@ -83,12 +88,7 @@ module Doing
                                            ])
         raise UserCancelled unless result
 
-        backup_file = result.strip.split(/\t/).last
-        # backup_file = File.join(backup_dir, options[result])
-        write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
-        FileUtils.mv(backup_file, filename)
-        prune_backups_after(File.basename(backup_file))
-        Doing.logger.warn('File update:', "restored from #{backup_file}")
+        result.strip.split(/\t/).last
       end
 
       ##
@@ -115,6 +115,18 @@ module Doing
 
       private
 
+      def get_backups(filename = nil)
+        filename ||= Doing.config.settings['doing_file']
+        backups = Dir.glob("*___#{File.basename(filename)}", base: backup_dir).sort.reverse
+        backups.delete_if { |f| f =~ /^undone/ }
+      end
+
+      def save_undone(filename = nil)
+        filename ||= Doing.config.settings['doing_file']
+        undone_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
+        FileUtils.cp(filename, undone_file)
+      end
+
       ##
       ## Retrieve date from backup filename
       ##
@@ -137,7 +149,7 @@ module Doing
       end
 
       def create_backup_dir
-        dir = File.join(user_home, '.doing_backup')
+        dir = File.expand_path(Doing.config.settings['backup_dir']) || File.join(user_home, '.doing_backup')
         if File.exist?(dir) && !File.directory?(dir)
           raise DoingRuntimeError, "Backup error: #{dir} is not a directory"
 
@@ -159,7 +171,7 @@ module Doing
       def prune_backups_after(filename)
         target_date, base = date_of_backup(filename)
         counter = 0
-        Dir.glob("*___#{base}", base: backup_dir).delete_if { |f| f =~ /^undone/ }.each do |file|
+        get_backups(base).each do |file|
           date, _base = date_of_backup(file)
           if date && target_date < date
             FileUtils.rm(File.join(backup_dir, file))

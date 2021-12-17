@@ -423,8 +423,9 @@ module Doing
     # @param      item    [Item] the item to reset/resume
     # @param      resume  [Boolean] removing @done tag if true
     #
-    def reset_item(item, resume: false)
-      item.date = Time.now
+    def reset_item(item, date: nil, resume: false)
+      date ||= Time.now
+      item.date = date
       item.tag('done', remove: true) if resume
       logger.info('Reset:', %(Reset #{resume ? 'and resumed ' : ''} "#{item.title}" in #{item.section}))
       item
@@ -914,12 +915,19 @@ module Doing
         if opt[:resume] && !opt[:reset]
           repeat_item(item, { editor: opt[:editor] })
         elsif opt[:reset]
+          res = Prompt.enter_text('Start date (blank for current time)', default_response: '')
+          if res =~ /^ *$/
+            date = Time.now
+          else
+            date = res.chronify(guess: :begin)
+          end
+
           res = if item.tags?('done', :and) && !opt[:resume]
                   opt[:force] ? true : Prompt.yn('Remove @done tag?', default_response: 'y')
                 else
                   opt[:resume]
                 end
-          @content.update_item(item, reset_item(item, resume: res))
+          @content.update_item(item, reset_item(item, date: date, resume: res))
         end
         write(@doing_file)
 

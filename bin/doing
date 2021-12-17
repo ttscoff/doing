@@ -195,6 +195,10 @@ command %i[now next] do |c|
 end
 
 desc 'Reset the start time of an entry'
+long_desc 'Update the start time of the last entry or the last entry matching a tag/search filter.
+If no argument is provided, the start time will be reset to the current time.
+If a date string is provided as an argument, the start time will be set to the parsed result.'
+arg_name 'DATE_STRING'
 command %i[reset begin] do |c|
   c.desc 'Limit search to section'
   c.arg_name 'NAME'
@@ -232,6 +236,13 @@ command %i[reset begin] do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |global_options, options, args|
+    if args.count > 0
+      reset_date = args.join(' ').chronify(guess: :begin)
+      raise InvalidArgument, 'Invalid date string' unless reset_date
+    else
+      reset_date = Time.now
+    end
+
     options[:fuzzy] = false
     if options[:section]
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
@@ -259,7 +270,7 @@ command %i[reset begin] do |c|
         sort: false,
         show_if_single: true)
     else
-      last_entry = items.last
+      last_entry = items.reverse.last
     end
 
     unless last_entry
@@ -267,7 +278,7 @@ command %i[reset begin] do |c|
       return
     end
 
-    wwid.reset_item(last_entry, resume: options[:resume])
+    wwid.reset_item(last_entry, date: reset_date, resume: options[:resume])
 
     # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
 
@@ -2906,8 +2917,6 @@ command :config do |c|
         cfg.deep_set(real_path, nil)
         $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('->').boldwhite}"
       else
-
-        p real_path
         cfg.deep_set(real_path, value.set_type)
 
         $stderr.puts "#{'Key path:'.yellow} #{real_path.join('->').boldwhite}"
@@ -2943,7 +2952,7 @@ command :undo do |c|
   c.arg_name 'COUNT'
   c.flag %i[p prune], type: Integer
 
-  c.desc 'Redo last undo'
+  c.desc 'Redo last undo. Note: you cannot undo a redo.'
   c.switch %i[r redo]
 
   c.action do |_global_options, options, args|
@@ -2966,6 +2975,7 @@ command :undo do |c|
   end
 end
 
+long_desc 'Shortcut for `doing undo -r`, reverses the last undo command. You cannot undo a redo.'
 command :redo do |c|
   c.desc 'Specify alternate doing file'
   c.arg_name 'PATH'
@@ -3133,10 +3143,13 @@ around do |global, command, options, arguments, code|
 
   if global[:yes]
     Doing::Prompt.force_answer = true
+    Doing.config.force_answer = true
   elsif global[:no]
     Doing::Prompt.force_answer = false
+    Doing.config.force_answer = false
   else
     Doing::Prompt.default_answer = global[:default]
+    Doing.config.force_answer = global[:default] ? true : false
   end
 
   if global[:config_file] && global[:config_file] != config.config_file

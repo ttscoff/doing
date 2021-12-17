@@ -16,6 +16,14 @@ module Doing
         @default_answer ||= false
       end
 
+      def enter_text(prompt, default_response: '')
+        return default_response if @default_answer
+
+        print "#{yellow(prompt).sub(/:?$/, ':')} #{reset}"
+        $stdin.gets.strip
+      end
+
+
       ##
       ## Ask a yes or no question in the terminal
       ##
