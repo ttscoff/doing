@@ -183,7 +183,25 @@ module Doing
 
       date = nil
       iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
-      done_rx = /(?<=^| )@(?<tag>done|finished|completed?)\((?<date>.*?)\)/i
+      watch_tags = [
+        'start(?:ed)?',
+        'beg[ia]n',
+        'done',
+        'finished',
+        'completed?',
+        'waiting',
+        'defer(?:red)?'
+      ]
+      if @config['date_tags']
+        date_tags = @config['date_tags']
+        date_tags = date_tags.split(/ *, */) if date_tags.is_a?(String)
+        date_tags.map! do |tag|
+          tag.sub(/^@/, '').gsub(/\((?!\?:)(.*?)\)/, '(?:\1)').strip
+        end
+        watch_tags.concat(date_tags).uniq!
+      end
+
+      done_rx = /(?<=^| )@(?<tag>#{watch_tags.join('|')})\((?<date>.*?)\)/i
       date_rx = /^(?:\s*- )?(?<date>.*?) \| (?=\S)/
 
       title.gsub!(done_rx) do
@@ -672,7 +690,7 @@ module Doing
         end
 
         if keep && opt[:tag]
-          opt[:tag_bool] = opt[:bool] if opt[:bool]
+          opt[:tag_bool] = opt[:bool].normalize_bool if opt[:bool]
           opt[:tag_bool] ||= :and
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
           keep = false unless tag_match
@@ -683,7 +701,7 @@ module Doing
           search_match = if opt[:search].nil? || opt[:search].empty?
                            true
                          else
-                           item.search(opt[:search], case_type: opt[:case].normalize_case, fuzzy: opt[:fuzzy])
+                           item.search(opt[:search], case_type: opt[:case].normalize_case)
                          end
 
           keep = false unless search_match
@@ -725,7 +743,7 @@ module Doing
 
         keep = false if keep && opt[:only_timed] && !item.interval
 
-        if keep && opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
+        if keep && opt[:tag_filter]
           keep = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
           keep = opt[:not] ? !keep : keep
         end

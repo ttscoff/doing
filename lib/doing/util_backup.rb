@@ -78,12 +78,32 @@ module Doing
       end
 
       def show_menu(options, filename)
+        if TTY::Which.which('colordiff')
+          preview = 'colordiff -U 1'
+          pipe = '| awk "(NR>2)"'
+        elsif TTY::Which.which('git')
+          preview = 'git --no-pager diff -U1 --color=always --minimal --word-diff'
+          pipe = ' | awk "(NR>4)"'
+        else
+          preview = 'diff -u'
+          pipe = if TTY::Which.which('delta')
+                   ' | delta --no-gitconfig --syntax-theme=1337'
+                 elsif TTY::Which.which('diff-so-fancy')
+                   ' | diff-so-fancy'
+                 elsif TTY::Which.which('ydiff')
+                   ' | ydiff -c always --wrap < /dev/tty'
+                 else
+                   ''
+                 end
+          pipe += ' | awk "(NR>2)"'
+        end
+
         result = Doing::Prompt.choose_from(options,
                                            sorted: false,
                                            fzf_args: [
                                              '--delimiter="\t"',
                                              '--with-nth=1',
-                                             %(--preview='diff -u "#{filename}" {2} | awk "(NR>2)"'),
+                                             %(--preview='#{preview} "#{filename}" {2} #{pipe}'),
                                              '--preview-window="right,70%,wrap,follow"'
                                            ])
         raise UserCancelled unless result

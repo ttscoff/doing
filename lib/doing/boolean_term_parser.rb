@@ -80,7 +80,7 @@ module BooleanTermParser
     end
 
     def match(term)
-      term.wildcard_to_rx
+      term
     end
   end
 end

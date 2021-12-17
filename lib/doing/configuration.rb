@@ -35,6 +35,7 @@ module Doing
       'paginate' => false,
       'never_time' => [],
       'never_finish' => [],
+      'date_tags' => ['done', 'defer(?:red)?', 'waiting'],
 
       'timer_format' => 'text',
       'interval_format' => 'text',

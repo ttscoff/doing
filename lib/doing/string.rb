@@ -319,11 +319,11 @@ module Doing
     end
 
     def wildcard_to_rx
-      gsub(/\?/, '\S').gsub(/\*/, '\S+')
+      gsub(/\?/, '\S').gsub(/\*/, '\S*?')
     end
 
     def add_at
-      strip.sub(/^@/, '').wildcard_to_rx
+      strip.sub(/^([+-]*)@/, '\1')
     end
 
     def to_tags
@@ -547,7 +547,7 @@ module Doing
         end
       else
         case self
-        when / *, */
+        when /(^\[.*?\]$| *, *)/
           gsub(/^\[ *| *\]$/, '').split(/ *, */)
         when /^[0-9]+$/
           to_i
