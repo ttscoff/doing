@@ -200,6 +200,11 @@ If no argument is provided, the start time will be reset to the current time.
 If a date string is provided as an argument, the start time will be set to the parsed result.'
 arg_name 'DATE_STRING'
 command %i[reset begin] do |c|
+  c.example 'doing reset', desc: 'Reset the start time of the last entry to the current time'
+  c.example 'doing reset --tag project1', desc: 'Reset the start time of the most recent entry tagged @project1 to the current time'
+  c.example 'doing reset 3pm', desc: 'Reset the start time of the last entry to 3pm of the current day'
+  c.example 'doing begin --tag todo --resume', desc: 'alias for reset. Updates the last @todo entry to the current time, removing @done tag.'
+
   c.desc 'Limit search to section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -405,6 +410,10 @@ command :note do |c|
 end
 
 desc 'Finish any running @meanwhile tasks and optionally create a new one'
+long_desc 'The @meanwhile tag allows you to have long-running entries that encompass smaller entries.
+This command makes it easy to start and stop these overarching entries. Just run `doing meanwhile Starting work on this
+big project` to start a @meanwhile entry, add other entries as you work on the project, then use `doing meanwhile` by
+itself to mark the entry as @done.'
 arg_name 'ENTRY'
 command :meanwhile do |c|
   c.example 'doing meanwhile "Long task that will have others after it before it\'s done"', desc: 'Add a new long-running entry, completing any current @meanwhile entry'
@@ -532,8 +541,19 @@ long_desc 'List all entries and select with typeahead fuzzy matching.
 
 Multiple selections are allowed, hit tab to add the highlighted entry to the
 selection, and use ctrl-a to select all visible items. Return processes the
-selected entries.'
+selected entries.
+
+Search in the menu by typing:
+
+sbtrkt  fuzzy-match   Items that match sbtrkt
+
+\'wild   exact-match (quoted)  Items that include wild
+
+!fire   inverse-exact-match   Items that do not include fire'
 command :select do |c|
+  c.example 'doing select', desc: 'Select from all entries. A menu of available actions will be presented after confirming the selection.'
+  c.example 'doing select --editor', desc: 'Select entries from a menu and batch edit them in your default editor'
+  c.example 'doing select --after "yesterday 12pm" --tag project1', desc: 'Display a menu of entries created after noon yesterday, add @project1 to selected entries'
   c.desc 'Select from a specific section'
   c.arg_name 'SECTION'
   c.flag %i[s section]
@@ -691,6 +711,9 @@ command :later do |c|
 end
 
 desc 'Add a completed item with @done(date). No argument finishes last entry.'
+desc 'Use this command to add an entry after you\'ve already finished it. It will be immediately marked as @done.
+You can modify the start and end times of the entry using the --back, --took, and --at flags, making it an easy
+way to add entries in post and maintain accurate (albeit manual) time tracking.'
 arg_name 'ENTRY'
 command %i[done did] do |c|
   c.example 'doing done', desc: 'Tag the last entry @done'
@@ -1130,7 +1153,14 @@ command :finish do |c|
 end
 
 desc 'Repeat last entry as new entry'
+long_desc 'This command is designed to allow multiple time intervals to be created for an entry by duplicating it with a new start (and end, eventually) time.'
 command %i[again resume] do |c|
+  c.example 'doing resume', desc: 'Duplicate the most recent entry with a new start time, removing any @done tag'
+  c.example 'doing again', desc: 'again is an alias for resume'
+  c.example 'doing resume --editor', desc: 'Repeat the last entry, opening the new entry in the default editor'
+  c.example 'doing resume --tag project1 --in Projects', desc: 'Repeat the last entry tagged @project1, creating the new entry in the Projects section'
+  c.example 'doing resume --interactive', desc: 'Select the entry to repeat from a menu'
+
   c.desc 'Get last entry from a specific section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
@@ -1361,8 +1391,9 @@ command :tag do |c|
 end
 
 desc 'Mark last entry as flagged'
-command [:mark, :flag] do |c|
+command %i[mark flag] do |c|
   c.example 'doing flag', desc: 'Add @flagged to the last entry created'
+  c.example 'doing mark', desc: 'mark is an alias for flag'
   c.example 'doing flag --tag project1 --count 2', desc: 'Add @flagged to the last 2 entries tagged @project1'
   c.example 'doing flag --interactive --search "/(develop|cod)ing/"', desc: 'Find entries matching regular expression and create a menu allowing multiple selections, selected items will be @flagged'
 
