@@ -303,6 +303,8 @@ module Doing
         :or
       when /(not|none)/i
         :not
+      when /^p/i
+        :pattern
       else
         default.is_a?(Symbol) ? default : default.normalize_bool
       end

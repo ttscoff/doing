@@ -6,6 +6,7 @@ PATH
       deep_merge (~> 1.2, >= 1.2.1)
       gli (~> 2.19, >= 2.19.2)
       haml (~> 5.0.0, >= 5.0.0)
+      parslet (~> 2.0, >= 2.0.0)
       safe_yaml (~> 1.0)
       tty-link (~> 0.1, >= 0.1.1)
       tty-markdown (~> 0.7, >= 0.7.0)
@@ -81,6 +82,7 @@ GEM
     parallel (1.21.0)
     parallel_tests (3.7.3)
       parallel
+    parslet (2.0.0)
     pastel (0.8.0)
       tty-color (~> 0.5)
     power_assert (2.0.1)

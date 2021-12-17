@@ -534,10 +534,10 @@ module Doing
         all_tags = {}
         items.each do |item|
           item.tags.each do |tag|
-            if all_tags.key?(tag)
-              all_tags[tag] += 1
+            if all_tags.key?(tag.downcase)
+              all_tags[tag.downcase] += 1
             else
-              all_tags[tag] = 1
+              all_tags[tag.downcase] = 1
             end
           end
         end
@@ -545,7 +545,7 @@ module Doing
         all_tags.sort_by { |tag, count| count }
       else
         all_tags = []
-        items.each { |item| all_tags.concat(item.tags).uniq! }
+        items.each { |item| all_tags.concat(item.tags.map(&:downcase)).uniq! }
         all_tags.sort
       end
     end
@@ -672,6 +672,7 @@ module Doing
         end
 
         if keep && opt[:tag]
+          opt[:tag_bool] = opt[:bool] if opt[:bool]
           opt[:tag_bool] ||= :and
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
           keep = false unless tag_match
@@ -1410,10 +1411,10 @@ module Doing
     ##
     def choose_tag(section = 'All', include_all: false)
       items = @content.in_section(section)
-      tags = all_tags(items).map { |t| "@#{t}" }
+      tags = all_tags(items, counts: true).map { |t, c| "@#{t} (#{c})" }
       tags.unshift('No tag filter') if include_all
-      choice = Prompt.choose_from(tags, sorted: false, prompt: 'Choose a tag > ', fzf_args: ['--height=60%'])
-      choice ? choice.strip : choice
+      choice = Prompt.choose_from(tags, sorted: false, multiple: true, prompt: 'Choose a tag > ', fzf_args: ['--height=60%'])
+      choice ? choice.split(/\n/).map { |t| t.strip.sub(/ \(.*?\)$/, '')}.join(' ') : choice
     end
 
     ##

@@ -39,6 +39,7 @@ require 'doing/hooks'
 require 'doing/plugin_manager'
 require 'doing/pager'
 require 'doing/completion'
+require 'doing/boolean_term_parser'
 # require 'doing/markdown_document_listener'
 
 # Main doing module

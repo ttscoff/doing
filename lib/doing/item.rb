@@ -172,6 +172,12 @@ module Doing
     ## @return     [Boolean] true if tag/bool combination passes
     ##
     def tags?(tags, bool = :and, negate: false)
+      if bool == :pattern
+        tags = tags.join(' ') if tags.is_a?(Array)
+        matches = tag_pattern?(tags.gsub(/ *, */, ' '))
+        return negate ? !matches : matches
+      end
+
       tags = split_tags(tags)
       bool = bool.normalize_bool
 
@@ -290,24 +296,39 @@ module Doing
     end
 
     def all_tags?(tags)
+      return true if tags.nil? || tags.empty?
+
       tags.each do |tag|
-        return false unless @title =~ /@#{tag}\b/
+        return false unless @title =~ /@#{tag}\b/i
       end
       true
     end
 
     def no_tags?(tags)
+      return true if tags.nil? || tags.empty?
+
       tags.each do |tag|
-        return false if @title =~ /@#{tag}\b/
+        return false if @title =~ /@#{tag}\b/i
       end
       true
     end
 
     def any_tags?(tags)
+      return true if tags.nil? || tags.empty?
+
       tags.each do |tag|
-        return true if @title =~ /@#{tag}\b/
+        return true if @title =~ /@#{tag}\b/i
       end
       false
+    end
+
+    def tag_pattern?(tags)
+      parser = BooleanTermParser::QueryParser.new
+      transformer = BooleanTermParser::QueryTransformer.new
+      parse_tree = parser.parse(tags)
+      query = transformer.apply(parse_tree).to_elasticsearch
+
+      no_tags?(query[:must_not]) && all_tags?(query[:must]) && any_tags?(query[:should])
     end
 
     def split_tags(tags)
