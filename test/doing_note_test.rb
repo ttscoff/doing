@@ -63,7 +63,7 @@ class DoingNoteTest < Test::Unit::TestCase
     doing('now', "Test new entry @tag2 koolaid")
     doing('now', 'Test new entry @tag3 burly man')
     doing('note', '--search', unique_keyword, note)
-    assert_match(/.*?#{unique_keyword}.*?\n\t#{note}/, doing('show'), 'Tagged entry should contain note')
+    assert_match(/.*?#{unique_keyword}.*?\n#{note}/, doing('show'), 'Tagged entry should contain note')
   end
 
   def test_note_tag
@@ -74,7 +74,7 @@ class DoingNoteTest < Test::Unit::TestCase
     doing('now', "Test new entry @tag2 jumping jesus")
     doing('now', 'Test new entry @tag3 burly man')
     doing('note', '--tag', unique_tag, note)
-    assert_match(/#{unique_title}\n\t#{note}/, doing('show'), 'Tagged entry should contain note')
+    assert_match(/#{unique_title}\n#{note}/, doing('show'), 'Tagged entry should contain note')
   end
 
   private

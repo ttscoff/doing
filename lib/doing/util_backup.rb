@@ -123,13 +123,16 @@ module Doing
         end
 
         result = Doing::Prompt.choose_from(options,
+                                           prompt: 'Select a backup to restore',
                                            sorted: false,
                                            fzf_args: [
                                              '--delimiter="\t"',
                                              '--with-nth=1',
                                              %(--preview='#{preview} "#{filename}" {2} #{pipe}'),
                                              '--disabled',
-                                             '--preview-window="right,70%,nowrap,follow"'
+                                             '--height=10',
+                                             '--preview-window="right,70%,nowrap,follow"',
+                                             '--header="Select a revision to restore"'
                                            ])
         raise UserCancelled unless result
 
@@ -155,7 +158,7 @@ module Doing
 
         FileUtils.cp(filename, backup_file)
 
-        prune_backups(filename, 100)
+        prune_backups(filename, 15)
         clear_undone(filename)
       end
 

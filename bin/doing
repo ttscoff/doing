@@ -2920,7 +2920,7 @@ command :config do |c|
   c.command :undo do |undo|
     undo.action do |_global, options, args|
       config_file = config.choose_config
-      wwid.restore_backup(config_file)
+      Doing::Util::Backup.restore_last_backup(config_file, count: 1)
     end
   end
 
