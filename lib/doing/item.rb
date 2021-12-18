@@ -208,8 +208,13 @@ module Doing
     ##
     ## @return     [Boolean] matches search criteria
     ##
-    def search(search, distance: 3, negate: false, case_type: :smart)
-      if search.is_rx?
+    def search(search, distance: nil, negate: false, case_type: nil)
+      prefs = Doing.config.settings['search']
+      matching = prefs['matching'].normalize_matching
+      distance ||= prefs['distance'].to_i
+      case_type ||= prefs['case'].normalize_case
+
+      if search.is_rx? || matching == :fuzzy
         matches = @title + @note.to_s =~ search.to_rx(distance: distance, case_type: case_type)
       else
         query = to_phrase_query(search.strip)

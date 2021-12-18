@@ -3147,7 +3147,7 @@ command :import do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', '')
 
   c.desc 'Only import items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false

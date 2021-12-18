@@ -310,6 +310,28 @@ module Doing
       end
     end
 
+    ##
+    ## Convert a matching configuration string to a symbol
+    ##
+    ## @return     Symbol :fuzzy, :pattern, :exact
+    ##
+    def normalize_matching!(default = :pattern)
+      replace normalize_bool(default)
+    end
+
+    def normalize_matching(default = :pattern)
+      case self
+      when /^f/i
+        :fuzzy
+      when /^p/i
+        :pattern
+      when /^e/i
+        :exact
+      else
+        default.is_a?(Symbol) ? default : default.normalize_matching
+      end
+    end
+
     def normalize_trigger!
       replace normalize_trigger
     end

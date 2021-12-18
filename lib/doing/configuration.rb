@@ -93,6 +93,11 @@ module Doing
       'marker_color' => 'red',
       'default_tags' => [],
       'tag_sort' => 'name',
+      'search' => {
+        'matching' => 'pattern',
+        'distance' => 3,
+        'case_type' => 'smart'
+      },
       'include_notes' => true
     }
 
