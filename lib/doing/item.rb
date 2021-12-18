@@ -209,10 +209,10 @@ module Doing
     ## @return     [Boolean] matches search criteria
     ##
     def search(search, distance: nil, negate: false, case_type: nil)
-      prefs = Doing.config.settings['search']
-      matching = prefs['matching'].normalize_matching
-      distance ||= prefs['distance'].to_i
-      case_type ||= prefs['case'].normalize_case
+      prefs = Doing.config.settings['search'] || {}
+      matching = prefs.fetch('matching', 'pattern').normalize_matching
+      distance ||= prefs.fetch('distance', 3).to_i
+      case_type ||= prefs.fetch('case', 'smart').normalize_case
 
       if search.is_rx? || matching == :fuzzy
         matches = @title + @note.to_s =~ search.to_rx(distance: distance, case_type: case_type)

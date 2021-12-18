@@ -224,14 +224,14 @@ command %i[reset begin] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Reset items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
@@ -329,14 +329,14 @@ command :note do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Add note to item that *doesn\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -599,14 +599,14 @@ command :select do |c|
   c.flag [:from]
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Select items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.'
   c.switch %i[menu], negatable: true, default_value: true
@@ -940,14 +940,14 @@ command :cancel do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Cancel last entry (or entries) not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
@@ -1043,14 +1043,14 @@ command :finish do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -1182,14 +1182,14 @@ command %i[again resume] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Resume items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -1332,14 +1332,14 @@ command :tag do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Tag items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -1470,14 +1470,14 @@ command %i[mark flag] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Flag items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -1615,14 +1615,14 @@ command :show do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
@@ -1812,14 +1812,14 @@ command %i[grep search] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Display an interactive menu of results to perform further operations'
   c.switch %i[i interactive], default_value: false, negatable: false
@@ -2204,14 +2204,14 @@ command :last do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.action do |global_options, options, _args|
     options[:fuzzy] = false
@@ -2221,17 +2221,7 @@ command :last do |c|
       tags = []
     else
       tags = options[:tag].to_tags
-      options[:bool] = case options[:bool]
-                       when /^p/i
-                        :pattern
-                       when /(any|or)/i
-                        :or
-                       when /(not|none)/i
-                        :not
-                       else
-                        :and
-                       end
-
+      options[:bool] = options[:bool].normalize_bool
     end
 
     options[:case] = options[:case].normalize_case
@@ -2407,14 +2397,14 @@ command :view do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Sort tags by (name|time)'
   c.arg_name 'KEY'
@@ -2631,14 +2621,14 @@ command %i[archive move] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Archive entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
@@ -2716,14 +2706,14 @@ command :rotate do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Rotate items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Rotate entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
@@ -3140,14 +3130,14 @@ command :import do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Import items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', '')
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Only import items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false

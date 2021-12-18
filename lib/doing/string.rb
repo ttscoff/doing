@@ -28,7 +28,9 @@ module Doing
     ##
     ## @return     [Regexp] Regex pattern
     ##
-    def to_rx(distance: 3, case_type: :smart)
+    def to_rx(distance: nil, case_type: nil)
+      distance ||= Doing.config.settings.dig('search', 'distance').to_i || 3
+      case_type ||= Doing.config.settings.dig('search', 'case')&.normalize_case || :smart
       case_sensitive = case case_type
                        when :smart
                          self =~ /[A-Z]/ ? true : false
@@ -44,7 +46,9 @@ module Doing
                 when /^'/
                   sub(/^'(.*?)'?$/, '\1')
                 else
-                  split(/ +/).map { |w| w.split('').join(".{0,#{distance}}") }.join('.*?')
+                  split(/ +/).map do |w|
+                    w.split('').join(".{0,#{distance}}").gsub(/\+/, '\+').wildcard_to_rx
+                  end.join('.*?')
                 end
       Regexp.new(pattern, !case_sensitive)
     end
@@ -221,7 +225,7 @@ module Doing
         note = Regexp.last_match(0)
         ''
       end
-
+      last_color = ''
       out[0] = format("%-#{pad}s%s%s", out[0], last_color, after)
 
       left_pad = ' ' * offset
@@ -275,7 +279,7 @@ module Doing
 
     def normalize_case(default = :smart)
       case self
-      when /^c/i
+      when /^(c|sens)/i
         :sensitive
       when /^i/i
         :ignore

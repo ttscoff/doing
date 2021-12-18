@@ -94,9 +94,9 @@ module Doing
       'default_tags' => [],
       'tag_sort' => 'name',
       'search' => {
-        'matching' => 'pattern',
+        'matching' => 'pattern', # fuzzy, pattern, exact
         'distance' => 3,
-        'case_type' => 'smart'
+        'case' => 'smart' # sensitive, ignore, smart
       },
       'include_notes' => true
     }
@@ -113,6 +113,12 @@ module Doing
 
     def config_dir
       @config_dir ||= File.join(Util.user_home, '.config', 'doing')
+    end
+
+    def exact_match?
+      search_settings = @settings['search']
+      matching = search_settings.fetch('matching', 'pattern').normalize_matching
+      matching == :exact
     end
 
     def default_config_file

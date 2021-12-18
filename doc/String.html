@@ -100,7 +100,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/doing/string.rb<span class="defines">,<br />
-  lib/doing/string_chronify.rb</span>
+  lib/doing/string_chronify.rb,<br /> lib/doing/template_string.rb</span>
 </dd>
   </dl>
   
@@ -116,7 +116,11 @@
 <div class="tags">
   
 
+</div><div id="subclasses">
+  <h2>Direct Known Subclasses</h2>
+  <p class="children"><span class='object_link'><a href="Doing/TemplateString.html" title="Doing::TemplateString (class)">Doing::TemplateString</a></span></p>
 </div>
+
 
 
   <h2>Constant Summary</h2>
@@ -637,6 +641,51 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#normalize_matching-instance_method" title="#normalize_matching (instance method)">#<strong>normalize_matching</strong>(default = :pattern)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_matching!-instance_method" title="#normalize_matching! (instance method)">#<strong>normalize_matching!</strong>(default = :pattern)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert a matching configuration string to a symbol.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#normalize_order-instance_method" title="#normalize_order (instance method)">#<strong>normalize_order</strong>(default = &#39;asc&#39;)  &#x21d2; Object </a>
     
 
@@ -884,7 +933,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#to_rx-instance_method" title="#to_rx (instance method)">#<strong>to_rx</strong>(distance: 3, case_type: :smart)  &#x21d2; Regexp </a>
+      <a href="#to_rx-instance_method" title="#to_rx (instance method)">#<strong>to_rx</strong>(distance: nil, case_type: nil)  &#x21d2; Regexp </a>
     
 
     
@@ -1080,6 +1129,29 @@
 
   
     <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#validate_color-instance_method" title="#validate_color (instance method)">#<strong>validate_color</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Extract the longest valid color from a string.</p>
+</div></span>
   
 </li>
 
@@ -1869,6 +1941,57 @@ may not render the same style.</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="normalize_matching-instance_method">
+  
+    #<strong>normalize_matching</strong>(default = :pattern)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_matching!-instance_method">
+  
+    #<strong>normalize_matching!</strong>(default = :pattern)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert a matching configuration string to a symbol</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>Symbol :fuzzy, :pattern, :exact</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="normalize_order-instance_method">
   
     #<strong>normalize_order</strong>(default = &#39;asc&#39;)  &#x21d2; <tt>Object</tt> 
@@ -2215,7 +2338,7 @@ may not render the same style.</p>
       <div class="method_details ">
   <h3 class="signature " id="to_rx-instance_method">
   
-    #<strong>to_rx</strong>(distance: 3, case_type: :smart)  &#x21d2; <tt>Regexp</tt> 
+    #<strong>to_rx</strong>(distance: nil, case_type: nil)  &#x21d2; <tt>Regexp</tt> 
   
 
   
@@ -2253,7 +2376,7 @@ haystack, spaces indicate unlimited distance.</p>
         <span class='type'>(<tt>Integer</tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>3</tt>)</em>
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
       
       
         &mdash;
@@ -2271,7 +2394,7 @@ between characters</p>
         <span class='type'></span>
       
       
-        <em class="default">(defaults to: <tt>:smart</tt>)</em>
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
       
       
         &mdash;
@@ -2529,6 +2652,53 @@ between characters</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="validate_color-instance_method">
+  
+    #<strong>validate_color</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Extract the longest valid color from a string.</p>
+
+<p>Allows %colors to bleed into other text and still
+be recognized, e.g. %greensomething still finds
+%green.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>a valid color name</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="wildcard_to_rx-instance_method">
   
     #<strong>wildcard_to_rx</strong>  &#x21d2; <tt>Object</tt> 
@@ -2620,7 +2790,7 @@ between characters</p>
 </div>
 
       <div id="footer">
-  Generated on Fri Dec 17 16:17:19 2021 by
+  Generated on Sat Dec 18 09:49:19 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>
