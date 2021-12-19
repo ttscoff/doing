@@ -4,9 +4,15 @@
 
 _If you're one of the rare people like me who find this useful, feel free to [buy me some coffee](http://brettterpstra.com/donate/)._
 
-The current version of `doing` is <!--VER-->2.1.4<!--END VER-->.
+
+
+The current version of `doing` is 2.1.4.
 
 Find all of the documentation in the [doing wiki](https://github.com/ttscoff/doing/wiki).
+
+See [what's new in Doing 2.0](https://brettterpstra.com/2021/11/20/doing-2-dot-0/).
+
+Check out some craziness with Doing in the [iTerm status bar](https://brettterpstra.com/2021/10/15/see-what-youre-doing-in-the-iterm-status-bar/) and the [Mac Touch Bar/menu bar](https://brettterpstra.com/2021/07/21/crazy-bettertouchtool-touch-bar-simulator/).
 
 ## What and why
 
@@ -28,7 +34,14 @@ Pressing Spacebar and typing allows you to add a new entry to currently. You an 
 
 Point of interest, the LaunchBar Action makes use of the `-o json` flag for outputting JSON to the action's script for parsing.
 
+
+
 See the [doing project on BrettTerpstra.com](https://brettterpstra.com/projects/doing/) for the download.
+
+
+<!--JEKYLL
+{% download 117 %} 
+-->
 
 Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
 
@@ -37,6 +50,8 @@ Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/b
 If you [create a plugin](https://github.com/ttscoff/doing/wiki/Creating-Plugins), custom command, or hook you can share, please [let me know](https://brettterpstra.com/contact/). If I get a few plugin contributions, I'll set up a second repository for them.
 
 Feel free to fork [the repository](https://github.com/ttscoff/doing/) on GitHub and make pull requests with changes. Please target the `develop` branch with pull requests.
+
+
 
 ---
 
