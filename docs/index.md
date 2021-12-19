@@ -39,9 +39,7 @@ Point of interest, the LaunchBar Action makes use of the `-o json` flag for outp
 See the [doing project on BrettTerpstra.com](https://brettterpstra.com/projects/doing/) for the download.
 
 
-<!--JEKYLL
-{% download 117 %} 
--->
+
 
 Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
 
