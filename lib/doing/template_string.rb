@@ -30,13 +30,13 @@ module Doing
     attr_reader :original
 
     include Color
-    def initialize(string, placeholders: {}, force_color: false, wrap_width: 0)
+    def initialize(string, placeholders: {}, force_color: false, wrap_width: 0, color: '')
       Color.coloring = true if force_color
       @colors = nil
       @original = string
       super(string)
 
-      placeholders.each { |k, v| fill(k, v, wrap_width: wrap_width) }
+      placeholders.each { |k, v| fill(k, v, wrap_width: wrap_width, color: color) }
     end
 
     ##
@@ -115,10 +115,10 @@ module Doing
       str
     end
 
-    def fill(placeholder, value, wrap_width: 0)
+    def fill(placeholder, value, wrap_width: 0, color: '')
       reparse
       # /(?mi)%(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])?(?<icount>\d+))?(?<prefix>.[ _t]?)?note/
-      rx = /(?mi)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?#{placeholder.sub(/^%/, '')}(?<after>.*?)$/
+      rx = /(?mi)(?<!\\)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?#{placeholder.sub(/^%/, '')}(?<after>.*?)$/
       ph = raw.match(rx)
 
       return unless ph
@@ -148,13 +148,13 @@ module Doing
           if placeholder =~ /^title/
             if wrap_width.positive? || pad.positive?
               width = pad.positive? ? pad : wrap_width
-              value.gsub(/%/, '\%').wrap(width, pad: pad, indent: indent, offset: placeholder_offset, prefix: prefix, color: '', after: after, reset: reset)
+              value.gsub(/%/, '\%').wrap(width, pad: pad, indent: indent, offset: placeholder_offset, prefix: prefix, color: color, after: after, reset: reset)
               # flag + item.title.gsub(/(.{#{opt[:wrap_width]}})(?=\s+|\Z)/, "\\1\n ").sub(/\s*$/, '') + reset
             else
               format("%s%#{pad}s%s", prefix, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
             end
           elsif placeholder =~ /^note/
-            "\n#{value.map { |l| "#{mark}#{indent}#{prefix}#{l.strip}  " }.join("\n")}"
+            "\n#{value.map { |l| "#{mark}#{indent}#{prefix}#{l.gsub(/%/, '\%').strip}  " }.join("\n")}"
           else
             format("%s%#{pad}s%s", prefix, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
           end

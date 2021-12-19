@@ -1244,10 +1244,41 @@ command :tags do |c|
   c.arg_name 'ORDER'
   c.flag %i[o order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
 
+  c.desc 'Get tags for entries matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?).'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Get tags for items matching search. Surround with
+  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
+
+  c.desc 'Force exact search string matching (case sensitive)'
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
+
+  c.desc 'Get tags from items that *don\'t* match search/tag filters'
+  c.switch [:not], default_value: false, negatable: false
+
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
+
+  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+
+  c.desc 'Select items to scan from a menu of matching entries'
+  c.switch %i[i interactive], negatable: false, default_value: false
+
   c.action do |_global, options, args|
     section = wwid.guess_section(options[:section]) || options[:section].cap_first
 
-    items = wwid.content.in_section(section)
+    items = wwid.filter_items([], opt: options)
+
+    # items = wwid.content.in_section(section)
     tags = wwid.all_tags(items, counts: true)
 
     if options[:sort] =~ /^n/i

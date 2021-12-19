@@ -1,3 +1,16 @@
+### 2.1.5pre
+
+#### NEW
+
+- Interactive option for redo command
+- Plugins for Day One export
+
+#### IMPROVED
+
+- Matching algorithm can be configured in settings
+- All template placeholders can now use the "printf" formatting that %title and %note have, allowing for padding, prefixes, etc.
+- Move default locations for doing file and backups to ~/.local/share/doing
+
 ### 2.1.4pre
 
 #### NEW

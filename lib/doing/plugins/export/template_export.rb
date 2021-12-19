@@ -23,10 +23,10 @@ module Doing
       out = ''
       items.each do |item|
         if opt[:highlight] && item.title =~ /@#{wwid.config['marker_tag']}\b/i
-          # flag = Doing::Color.send(wwid.config['marker_color'])
+          flag = Doing::Color.send(wwid.config['marker_color'])
           reset = Doing::Color.default
         else
-          # flag = ''
+          flag = ''
           reset = ''
         end
 
@@ -42,7 +42,7 @@ module Doing
               line.simple_wrap(width)
               # line.chomp.gsub(/(.{1,#{width}})(\s+|\Z)/, "\\1\n")
             end
-            note = note.join("\n").split(/\n/).delete_if(&:empty?)
+            note = note.delete_if(&:empty?)
           end
         else
           note = []
@@ -152,21 +152,23 @@ module Doing
 
         template = opt[:template].dup
         template.sub!(/(?i-m)^([\s\S]*?)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)([\s\S]*?)$/, '\1\3\2')
-        output = Doing::TemplateString.new(template, placeholders: placeholders, wrap_width: opt[:wrap_width]).colored
+        output = Doing::TemplateString.new(template, placeholders: placeholders, wrap_width: opt[:wrap_width], color: flag).colored
 
         if opt[:tags_color]
           output.highlight_tags!(opt[:tags_color])
         end
 
-        output.gsub!(/%hr(_under)?/) do
+        output.gsub!(/(?<!\\)%hr(_under)?/) do
           o = ''
           `tput cols`.to_i.times do
             o += Regexp.last_match(1).nil? ? '-' : '_'
           end
           o
         end
-        output.gsub!(/%n/, "\n")
-        output.gsub!(/%t/, "\t")
+        output.gsub!(/(?<!\\)%n/, "\n")
+        output.gsub!(/(?<!\\)%t/, "\t")
+
+        output.gsub!(/\\%/, '%')
 
         out += "#{output}\n"
       end
