@@ -12,10 +12,8 @@ class DoingUndoTest < Test::Unit::TestCase
   def setup
     @tmpdirs = []
     @basedir = mktmpdir
-    @backup_dir = File.join(@basedir, 'doing_backup')
-    @wwid_file = File.join(@basedir, 'wwid.md')
+    @wwid_file = File.join(@basedir, 'wwid_undo.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
-    doing('--yes', 'config', 'set', 'backup_dir', @backup_dir)
   end
 
   def teardown

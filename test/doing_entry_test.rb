@@ -30,7 +30,7 @@ class DoingEntryTest < Test::Unit::TestCase
     # Add an entry
     subject = 'Test new entry @tag1'
     doing('now', subject)
-    assert_match(/#{subject}\s*$/, doing('show', '-c 1'), 'should have added entry')
+    assert_match(/#{subject}\s*$/, doing('show', '-c', '1'), 'should have added entry')
     assert_valid_file(@wwid_file)
   end
 

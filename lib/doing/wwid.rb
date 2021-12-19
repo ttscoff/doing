@@ -780,7 +780,7 @@ module Doing
 
         keep
       end
-      count = opt[:count]&.positive? ? opt[:count] : filtered_items.length
+      count = opt[:count].to_i&.positive? ? opt[:count].to_i : filtered_items.count
 
       output = Items.new
 
@@ -1523,9 +1523,9 @@ module Doing
                 end
       end
 
-      items = filter_items(items, opt: opt).reverse
+      items = filter_items(items, opt: opt)
 
-      items.reverse! if opt[:order] =~ /^d/i
+      items.reverse! unless opt[:order] =~ /^d/i
 
       if opt[:interactive]
         opt[:menu] = !opt[:force]

@@ -161,7 +161,7 @@ module Doing
                                                      after: after,
                                                      reset: reset,
                                                      pad_first: false)
-              out.highlight_tags!(tags_color, last_color: color) unless tags_color.nil? || tags_color.empty?
+              out.highlight_tags!(tags_color, last_color: color) if tags_color && !tags_color.empty?
               out
             else
               format("%s%s%#{pad}s%s", prefix, color, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
@@ -180,7 +180,7 @@ module Doing
               end.join("\n")
               "\n#{last_color}#{mark}#{outstring}  "
             else
-              format("%s%s%#{pad}s%s", prefix, last_color, value.join("\n").gsub(/%/, '\%').sub(/\s*$/, ''), after)
+              format("\n%s%s%s%#{pad}s%s", indent, prefix, last_color, value.join("\n").gsub(/%/, '\%').sub(/\s*$/, ''), after)
             end
           else
             format("%s%#{pad}s%s", prefix, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)

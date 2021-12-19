@@ -1616,7 +1616,7 @@ command :show do |c|
 
   c.desc 'Max count to show'
   c.arg_name 'MAX'
-  c.flag %i[c count], default_value: 0
+  c.flag %i[c count], default_value: 0, must_match: /^\d+$/, type: Integer
 
   c.desc 'Age (oldest|newest)'
   c.arg_name 'AGE'

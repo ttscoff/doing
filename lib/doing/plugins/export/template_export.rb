@@ -24,10 +24,10 @@ module Doing
       items.each do |item|
         if opt[:highlight] && item.title =~ /@#{wwid.config['marker_tag']}\b/i
           flag = Doing::Color.send(wwid.config['marker_color'])
-          reset = Doing::Color.default
+          # reset = Doing::Color.default
         else
           flag = ''
-          reset = ''
+          # reset = ''
         end
 
         placeholders = {}

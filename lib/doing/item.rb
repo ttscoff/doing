@@ -7,7 +7,7 @@ module Doing
   class Item
     attr_accessor :date, :title, :section, :note
 
-    attr_reader :id
+    # attr_reader :id
 
     ##
     ## Initialize an item with date, title, section, and
