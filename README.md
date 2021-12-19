@@ -10,6 +10,10 @@ The current version of `doing` is <!--VER-->2.1.4<!--END VER-->.
 
 Find all of the documentation in the [doing wiki](https://github.com/ttscoff/doing/wiki).
 
+See [what's new in Doing 2.0](https://brettterpstra.com/2021/11/20/doing-2-dot-0/).
+
+Check out some craziness with Doing in the [iTerm status bar](https://brettterpstra.com/2021/10/15/see-what-youre-doing-in-the-iterm-status-bar/) and the [Mac Touch Bar/menu bar](https://brettterpstra.com/2021/07/21/crazy-bettertouchtool-touch-bar-simulator/).
+
 ## What and why
 
 `doing` is a basic CLI for adding and listing "what was I doing" reminders in a [TaskPaper-formatted](https://www.taskpaper.com) text file. It allows for multiple sections/categories and flexible output formatting.
