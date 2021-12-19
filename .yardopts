@@ -1,1 +1,1 @@
---markup-provider=redcarpet --markup=markdown --no-private --exclude=README.md lib/doing/*.rb
+--output-dir docs/doc --markup-provider=redcarpet --markup=markdown --no-private --exclude=README.md lib/doing/*.rb
