@@ -2521,6 +2521,7 @@ command :view do |c|
     end
 
     view = wwid.get_view(title)
+
     if view
       page_title = view.key?('title') ? view['title'] : title.cap_first
       only_timed = if (view.key?('only_timed') && view['only_timed']) || options[:only_timed]
@@ -2600,6 +2601,7 @@ command :view do |c|
       end
 
       opts = options.dup
+      opts[:view_template] = title
       opts[:count] = count
       opts[:format] = date_format
       opts[:highlight] = options[:color]

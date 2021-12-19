@@ -1484,15 +1484,24 @@ module Doing
     ##
     def list_section(opt = {}, items: Items.new)
       opt[:config_template] ||= 'default'
-      cfg = @config.dig('templates',
-                        opt[:config_template]).deep_merge({
-                                                            'wrap_width' => @config['wrap_width'] || 0,
-                                                            'date_format' => @config['default_date_format'],
-                                                            'order' => @config['order'] || 'asc',
-                                                            'tags_color' => @config['tags_color'],
-                                                            'duration' => @config['duration'],
-                                                            'interval_format' => @config['interval_format']
-                                                          })
+
+      tpl_cfg = @config.dig('templates', opt[:config_template])
+
+      cfg = if opt[:view_template]
+              @config.dig('views', opt[:view_template]).deep_merge(tpl_cfg)
+            else
+              tpl_cfg
+            end
+
+      cfg.deep_merge({
+                       'wrap_width' => @config['wrap_width'] || 0,
+                       'date_format' => @config['default_date_format'],
+                       'order' => @config['order'] || 'asc',
+                       'tags_color' => @config['tags_color'],
+                       'duration' => @config['duration'],
+                       'interval_format' => @config['interval_format']
+                     })
+
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
       opt[:count] ||= 0
