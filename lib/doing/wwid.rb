@@ -262,7 +262,7 @@ module Doing
       return frag.cap_first if @content.section?(frag)
 
       section = nil
-      re = frag.split('').join('.*?')
+      re = frag.to_rx(distance: 2, case_type: :ignore)
       sections.each do |sect|
         next unless sect =~ /#{re}/i
 
@@ -304,7 +304,7 @@ module Doing
     def guess_view(frag, guessed: false, suggest: false)
       views.each { |view| return view if frag.downcase == view.downcase }
       view = false
-      re = frag.split('').join('.*?')
+      re = frag.to_rx(distance: 2, case_type: :ignore)
       views.each do |v|
         next unless v =~ /#{re}/i
 
@@ -780,7 +780,7 @@ module Doing
 
         keep
       end
-      count = opt[:count]&.positive? ? opt[:count] : filtered_items.length
+      count = opt[:count].to_i&.positive? ? opt[:count].to_i : filtered_items.count
 
       output = Items.new
 
@@ -1427,11 +1427,11 @@ module Doing
     ##
     ## @return     [String] The selected tag name
     ##
-    def choose_tag(section = 'All', include_all: false)
-      items = @content.in_section(section)
+    def choose_tag(section = 'All', items: nil, include_all: false)
+      items ||= @content.in_section(section)
       tags = all_tags(items, counts: true).map { |t, c| "@#{t} (#{c})" }
       tags.unshift('No tag filter') if include_all
-      choice = Prompt.choose_from(tags, sorted: false, multiple: true, prompt: 'Choose a tag > ', fzf_args: ['--height=60%'])
+      choice = Prompt.choose_from(tags, sorted: false, multiple: true, prompt: 'Choose tag(s) > ', fzf_args: ['--height=60%'])
       choice ? choice.split(/\n/).map { |t| t.strip.sub(/ \(.*?\)$/, '')}.join(' ') : choice
     end
 
@@ -1482,17 +1482,25 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def list_section(opt = {})
+    def list_section(opt = {}, items: Items.new)
       opt[:config_template] ||= 'default'
-      cfg = @config.dig('templates',
-                        opt[:config_template]).deep_merge({
-                                                            'wrap_width' => @config['wrap_width'] || 0,
-                                                            'date_format' => @config['default_date_format'],
-                                                            'order' => @config['order'] || 'asc',
-                                                            'tags_color' => @config['tags_color'],
-                                                            'duration' => @config['duration'],
-                                                            'interval_format' => @config['interval_format']
-                                                          })
+
+      tpl_cfg = @config.dig('templates', opt[:config_template])
+
+      cfg = if opt[:view_template]
+              @config.dig('views', opt[:view_template]).deep_merge(tpl_cfg)
+            else
+              tpl_cfg
+            end
+
+      cfg.deep_merge({
+                       'wrap_width' => @config['wrap_width'] || 0,
+                       'date_format' => @config['default_date_format'],
+                       'order' => @config['order'] || 'asc',
+                       'tags_color' => @config['tags_color'],
+                       'duration' => @config['duration'],
+                       'interval_format' => @config['interval_format']
+                     })
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
       opt[:count] ||= 0
@@ -1523,9 +1531,9 @@ module Doing
                 end
       end
 
-      items = filter_items(Items.new, opt: opt).reverse
+      items = filter_items(items, opt: opt)
 
-      items.reverse! if opt[:order] =~ /^d/i
+      items.reverse! unless opt[:order] =~ /^d/i
 
       if opt[:interactive]
         opt[:menu] = !opt[:force]
@@ -1924,6 +1932,7 @@ EOS
         output + tail
       when :markdown
         pad = sorted_tags_data.map {|k, v| k }.group_by(&:size).max.last[0].length
+        pad = 7 if pad < 7
         output = <<~EOS
   | #{' ' * (pad - 7) }project | time     |
   | #{'-' * (pad - 1)}: | :------- |

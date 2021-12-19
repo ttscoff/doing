@@ -1,0 +1,6 @@
+<% @items.each do |i| %>Doing on <%= i[:date_object].strftime('%A %m/%d/%y') %>
+
+<%= i[:title] %><% if i[:note].length.positive? %><%= "\n\n" + i[:note].map{|n| n.strip }.join("\n    ") %><% end %>
+
+<% if i[:human_time] && i[:time] != "00:00:00" %>_Took <%= i[:human_time] %>._<% end %>
+<% end %>

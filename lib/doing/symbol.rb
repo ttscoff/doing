@@ -16,5 +16,9 @@ module Doing
     def normalize_case
       self
     end
+
+    def normalize_matching(default = :pattern)
+      to_s.normalize_matching(default)
+    end
   end
 end

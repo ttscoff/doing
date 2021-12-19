@@ -7,7 +7,7 @@ module Doing
   class Item
     attr_accessor :date, :title, :section, :note
 
-    attr_reader :id
+    # attr_reader :id
 
     ##
     ## Initialize an item with date, title, section, and
@@ -162,6 +162,10 @@ module Doing
       @title.scan(/(?<= |\A)@([^\s(]+)/).map { |tag| tag[0] }.sort.uniq
     end
 
+    def tag_array
+      tags.tags_to_array
+    end
+
     ##
     ## Test if item contains tag(s)
     ##
@@ -208,8 +212,13 @@ module Doing
     ##
     ## @return     [Boolean] matches search criteria
     ##
-    def search(search, distance: 3, negate: false, case_type: :smart)
-      if search.is_rx?
+    def search(search, distance: nil, negate: false, case_type: nil)
+      prefs = Doing.config.settings['search'] || {}
+      matching = prefs.fetch('matching', 'pattern').normalize_matching
+      distance ||= prefs.fetch('distance', 3).to_i
+      case_type ||= prefs.fetch('case', 'smart').normalize_case
+
+      if search.is_rx? || matching == :fuzzy
         matches = @title + @note.to_s =~ search.to_rx(distance: distance, case_type: case_type)
       else
         query = to_phrase_query(search.strip)

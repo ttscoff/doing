@@ -1,3 +1,24 @@
+### 2.1.5pre
+
+#### NEW
+
+- Interactive option for redo command
+- Plugins for Day One export
+
+#### IMPROVED
+
+- Matching algorithm can be configured in settings
+- All template placeholders can now use the "printf" formatting that %title and %note have, allowing for padding, prefixes, etc.
+- Move default locations for doing file and backups to ~/.local/share/doing
+- `doing show --menu` will only offer tags that exist after any tag/search filters have been run
+- `doing show @tag` with `--menu` will first filter by the @tag, then do an OR search for tags selected from the menu
+
+#### FIXED
+
+- Preserve colors when wrapping text to new lines
+- Tag highlighting errors
+- Template options specified in views were being overriden by options in templates. View config now has precedence, but will fall back to template config for missing keys
+
 ### 2.1.4pre
 
 #### NEW

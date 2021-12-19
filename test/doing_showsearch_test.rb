@@ -7,7 +7,7 @@ require 'helpers/doing-helpers'
 require 'test_helper'
 
 # Tests for entry modifying commands
-class DoingShowDateTest < Test::Unit::TestCase
+class DoingShowSearchTest < Test::Unit::TestCase
   include DoingHelpers
   ENTRY_REGEX = /^\d{4}-\d\d-\d\d \d\d:\d\d \|/.freeze
   ENTRY_TS_REGEX = /\s*(?<ts>[^|]+) \s*\|/.freeze

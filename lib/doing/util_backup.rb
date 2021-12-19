@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'zlib'
 
 module Doing
   module Util
@@ -29,6 +30,7 @@ module Doing
       ##                       different from default
       ##
       def restore_last_backup(filename = nil, count: 1)
+        Doing.logger.benchmark(:restore_backup, :start)
         filename ||= Doing.config.settings['doing_file']
 
         result = get_backups(filename).slice(count - 1)
@@ -40,6 +42,7 @@ module Doing
         FileUtils.mv(backup_file, filename)
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{result}")
+        Doing.logger.benchmark(:restore_backup, :finish)
       end
 
       ##
@@ -80,6 +83,44 @@ module Doing
       end
 
       ##
+      ## Select from recent undos. If a filename is
+      ## provided, only backups of that filename will be used.
+      ##
+      ## @param      filename  The filename to restore
+      ##
+      def select_redo(filename = nil)
+        filename ||= Doing.config.settings['doing_file']
+
+        undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort
+
+        raise DoingRuntimeError, 'End of redo history' if undones.empty?
+
+        total = undones.count
+        options = undones.each_with_object([]) do |file, arr|
+          d, _base = date_of_backup(file)
+          next if d.nil?
+
+          arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
+        end
+
+        backup_file = show_menu(options, filename)
+        idx = undones.index(File.basename(backup_file))
+        skipped = undones.slice!(idx, undones.count - idx)
+        undone = skipped.shift
+
+        redo_file = File.join(backup_dir, undone)
+
+        FileUtils.move(redo_file, filename)
+
+        skipped.each do |f|
+          FileUtils.mv(File.join(backup_dir, f), File.join(backup_dir, f.sub(/^undone/, '')))
+        end
+
+        Doing.logger.warn('File update:', "restored undo step #{idx}/#{total}")
+        Doing.logger.debug('Backup:', "#{total - skipped.count - 1} redos remaining")
+      end
+
+      ##
       ## Select from recent backups. If a filename is
       ## provided, only backups of that filename will be used.
       ##
@@ -90,6 +131,7 @@ module Doing
 
         options = get_backups(filename).each_with_object([]) do |file, arr|
           d, _base = date_of_backup(file)
+          next if d.nil?
           arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
         end
 
@@ -123,13 +165,16 @@ module Doing
         end
 
         result = Doing::Prompt.choose_from(options,
+                                           prompt: 'Select a backup to restore',
                                            sorted: false,
                                            fzf_args: [
                                              '--delimiter="\t"',
                                              '--with-nth=1',
                                              %(--preview='#{preview} "#{filename}" {2} #{pipe}'),
                                              '--disabled',
-                                             '--preview-window="right,70%,nowrap,follow"'
+                                             '--height=10',
+                                             '--preview-window="right,70%,nowrap,follow"',
+                                             '--header="Select a revision to restore"'
                                            ])
         raise UserCancelled unless result
 
@@ -143,6 +188,7 @@ module Doing
       ## @param      content  The data to back up
       ##
       def write_backup(filename = nil)
+        Doing.logger.benchmark(:_write_backup, :start)
         filename ||= Doing.config.settings['doing_file']
 
         unless File.exist?(filename)
@@ -152,11 +198,15 @@ module Doing
 
         backup_file = File.join(backup_dir, "#{timestamp_filename}___#{File.basename(filename)}")
         # compressed = Zlib::Deflate.deflate(content)
+        # Zlib::GzipWriter.open(backup_file + '.gz') do |gz|
+        #   gz.write(IO.read(filename))
+        # end
 
         FileUtils.cp(filename, backup_file)
 
-        prune_backups(filename, 100)
+        prune_backups(filename, 15)
         clear_undone(filename)
+        Doing.logger.benchmark(:_write_backup, :finish)
       end
 
       private
@@ -183,7 +233,7 @@ module Doing
       ## @param      filename  The filename
       ##
       def date_of_backup(filename)
-        m = filename.match(/^(?<date>\d{4}-\d{2}-\d{2})_(?<time>\d{2}\.\d{2}\.\d{2})___(?<file>.*?)$/)
+        m = filename.match(/^(?:undone)?(?<date>\d{4}-\d{2}-\d{2})_(?<time>\d{2}\.\d{2}\.\d{2})___(?<file>.*?)$/)
         return nil if m.nil?
 
         [Time.parse("#{m['date']} #{m['time'].gsub(/\./, ':')}"), m['file']]
@@ -220,6 +270,8 @@ module Doing
       ##
       def prune_backups_after(filename)
         target_date, base = date_of_backup(filename)
+        return if target_date.nil?
+
         counter = 0
         get_backups(base).each do |file|
           date, _base = date_of_backup(file)

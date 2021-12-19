@@ -145,34 +145,6 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#id-instance_method" title="#id (instance method)">#<strong>id</strong>  &#x21d2; String </a>
-    
-
-    
-  </span>
-  
-  
-  
-    
-      <span class="note title readonly">readonly</span>
-    
-    
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Generate a hash that represents the entry.</p>
-</div></span>
-  
-</li>
-
-    
-      <li class="public ">
-  <span class="summary_signature">
-    
       <a href="#note-instance_method" title="#note (instance method)">#<strong>note</strong>  &#x21d2; Object </a>
     
 
@@ -333,6 +305,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#id-instance_method" title="#id (instance method)">#<strong>id</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Generate a hash that represents the entry.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#ignore_case-instance_method" title="#ignore_case (instance method)">#<strong>ignore_case</strong>(search, case_type)  &#x21d2; Object </a>
     
 
@@ -472,7 +467,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#search-instance_method" title="#search (instance method)">#<strong>search</strong>(search, distance: 3, negate: false, case_type: :smart)  &#x21d2; Boolean </a>
+      <a href="#search-instance_method" title="#search (instance method)">#<strong>search</strong>(search, distance: nil, negate: false, case_type: nil)  &#x21d2; Boolean </a>
     
 
     
@@ -555,6 +550,28 @@
   
     <span class="summary_desc"><div class='inline'><p>Add (or remove) tags from the title of the item.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#tag_array-instance_method" title="#tag_array (instance method)">#<strong>tag_array</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -755,47 +772,6 @@ the item belongs</p>
 </div>
     
       
-      <span id=""></span>
-      <div class="method_details ">
-  <h3 class="signature " id="id-instance_method">
-  
-    #<strong>id</strong>  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>  <span class="extras">(readonly)</span>
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Generate a hash that represents the entry</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>entry hash</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      
       <span id="note=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="note-instance_method">
@@ -984,6 +960,45 @@ the item belongs</p>
       
         &mdash;
         <div class='inline'><p>is equal?</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="id-instance_method">
+  
+    #<strong>id</strong>  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Generate a hash that represents the entry</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>entry hash</p>
 </div>
       
     </li>
@@ -1259,7 +1274,7 @@ value overlaps with another item&#39;s</p>
       <div class="method_details ">
   <h3 class="signature " id="search-instance_method">
   
-    #<strong>search</strong>(search, distance: 3, negate: false, case_type: :smart)  &#x21d2; <tt>Boolean</tt> 
+    #<strong>search</strong>(search, distance: nil, negate: false, case_type: nil)  &#x21d2; <tt>Boolean</tt> 
   
 
   
@@ -1316,7 +1331,7 @@ value overlaps with another item&#39;s</p>
         <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>:smart</tt>)</em>
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
       
       
         &mdash;
@@ -1570,6 +1585,18 @@ type (:sensitive,
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="tag_array-instance_method">
+  
+    #<strong>tag_array</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="tags-instance_method">
   
     #<strong>tags</strong>  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
@@ -1727,7 +1754,7 @@ type (:sensitive,
 </div>
 
       <div id="footer">
-  Generated on Fri Dec 17 16:17:18 2021 by
+  Generated on Sun Dec 19 12:35:33 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

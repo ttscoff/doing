@@ -51,11 +51,16 @@ if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DO
   end
 end
 
+Doing.logger.benchmark(:total, :start)
+
 if ENV['DOING_CONFIG']
   Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
 end
 
+Doing.logger.benchmark(:configure, :start)
 config = Doing.config
+Doing.logger.benchmark(:configure, :finish)
+
 settings = config.settings
 wwid.config = settings
 
@@ -224,14 +229,14 @@ command %i[reset begin] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Reset items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
   c.arg_name 'BOOLEAN'
@@ -329,14 +334,14 @@ command :note do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Add note to item that *doesn\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -599,14 +604,14 @@ command :select do |c|
   c.flag [:from]
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Select items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.'
   c.switch %i[menu], negatable: true, default_value: true
@@ -940,14 +945,14 @@ command :cancel do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Cancel last entry (or entries) not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
@@ -1043,14 +1048,14 @@ command :finish do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -1182,14 +1187,14 @@ command %i[again resume] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Resume items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -1244,10 +1249,41 @@ command :tags do |c|
   c.arg_name 'ORDER'
   c.flag %i[o order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
 
+  c.desc 'Get tags for entries matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?).'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Get tags for items matching search. Surround with
+  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
+
+  c.desc 'Force exact search string matching (case sensitive)'
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
+
+  c.desc 'Get tags from items that *don\'t* match search/tag filters'
+  c.switch [:not], default_value: false, negatable: false
+
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
+
+  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+
+  c.desc 'Select items to scan from a menu of matching entries'
+  c.switch %i[i interactive], negatable: false, default_value: false
+
   c.action do |_global, options, args|
     section = wwid.guess_section(options[:section]) || options[:section].cap_first
 
-    items = wwid.content.in_section(section)
+    items = wwid.filter_items([], opt: options)
+
+    # items = wwid.content.in_section(section)
     tags = wwid.all_tags(items, counts: true)
 
     if options[:sort] =~ /^n/i
@@ -1332,14 +1368,14 @@ command :tag do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Tag items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -1395,36 +1431,40 @@ command :tag do |c|
       options[:search] = search
     end
 
-    if count.zero? && !options[:force]
-      if options[:search]
-        section_q = ' matching your search terms'
-      elsif options[:tag]
-        section_q = ' matching your tag search'
-      elsif section == 'All'
-        section_q = ''
-      else
-        section_q = " in section #{section}"
-      end
-
-
-      question = if options[:aarchive]
-                   "Are you sure you want to autotag all records#{section_q}"
-                 elsif options[:remove]
-                   "Are you sure you want to remove #{tags.join(' and ')} from all records#{section_q}"
-                 else
-                   "Are you sure you want to add #{tags.join(' and ')} to all records#{section_q}"
-                 end
-
-      res = Doing::Prompt.yn(question, default_response: false)
-
-      raise UserCancelled unless res
-    end
-
     options[:count] = count
     options[:section] = section
     options[:tag] = search_tags
     options[:tags] = tags
     options[:tag_bool] = options[:bool].normalize_bool
+
+    if count.zero? && !options[:force]
+      matches = wwid.filter_items([], opt: options).count
+
+      if matches > 5
+        if options[:search]
+          section_q = ' matching your search terms'
+        elsif options[:tag]
+          section_q = ' matching your tag search'
+        elsif section == 'All'
+          section_q = ''
+        else
+          section_q = " in section #{section}"
+        end
+
+
+        question = if options[:autotag]
+                     "Are you sure you want to autotag #{matches} records#{section_q}"
+                   elsif options[:remove]
+                     "Are you sure you want to remove #{tags.join(' and ')} from #{matches} records#{section_q}"
+                   else
+                     "Are you sure you want to add #{tags.join(' and ')} to #{matches} records#{section_q}"
+                   end
+
+        res = Doing::Prompt.yn(question, default_response: false)
+
+        raise UserCancelled unless res
+      end
+    end
 
     wwid.tag_last(options)
   end
@@ -1470,14 +1510,14 @@ command %i[mark flag] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Flag items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
@@ -1581,7 +1621,7 @@ command :show do |c|
 
   c.desc 'Max count to show'
   c.arg_name 'MAX'
-  c.flag %i[c count], default_value: 0
+  c.flag %i[c count], default_value: 0, must_match: /^\d+$/, type: Integer
 
   c.desc 'Age (oldest|newest)'
   c.arg_name 'AGE'
@@ -1615,14 +1655,14 @@ command :show do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
@@ -1699,23 +1739,10 @@ command :show do |c|
       end
     else
       section = options[:menu] ? wwid.choose_section(include_all: true) : settings['current_section']
-    end
-
-    if options[:menu]
-      tag = wwid.choose_tag(section, include_all: true)
-      raise UserCancelled unless tag
-
-      tags.concat(tag.split(/ +/).map { |t| t.strip.sub(/^@/, '') }) if tag =~ /^@/
+      section ||= 'All'
     end
 
     tags.concat(options[:tag].to_tags) if options[:tag]
-
-    unless tags.empty?
-      tag_filter = {
-        'tags' => tags,
-        'bool' => options[:bool].normalize_bool
-      }
-    end
 
     options[:times] = true if options[:totals]
 
@@ -1734,18 +1761,46 @@ command :show do |c|
       options[:search] = search
     end
 
+    options[:section] = section
+
+    unless tags.empty?
+      tag_filter = {
+        'tags' => tags,
+        'bool' => options[:bool].normalize_bool
+      }
+    end
+
+    options[:tag_filter] = tag_filter
+    options[:tag] = nil
+
+    items = wwid.filter_items([], opt: options)
+
+    if options[:menu]
+      tag = wwid.choose_tag(section, items: items, include_all: true)
+      raise UserCancelled unless tag
+
+      # options[:bool] = :and unless tags.empty?
+
+      tags = tag.split(/ +/).map { |t| t.strip.sub(/^@?/, '') } if tag =~ /^@/
+      unless tags.empty?
+        tag_filter = {
+          'tags' => tags,
+          'bool' => options[:bool].normalize_bool
+        }
+        options[:tag_filter] = tag_filter
+      end
+    end
+
     opt = options.dup
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
     opt[:highlight] = true
     opt[:order] = options[:sort].normalize_order
-    opt[:section] = section
     opt[:tag] = nil
-    opt[:tag_filter] = tag_filter
     opt[:tag_order] = options[:tag_order].normalize_order
     opt[:tags_color] = template['tags_color']
 
-    Doing::Pager.page wwid.list_section(opt)
+    Doing::Pager.page wwid.list_section(opt, items: items)
   end
 end
 
@@ -1812,14 +1867,14 @@ command %i[grep search] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Display an interactive menu of results to perform further operations'
   c.switch %i[i interactive], default_value: false, negatable: false
@@ -2204,14 +2259,14 @@ command :last do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.action do |global_options, options, _args|
     options[:fuzzy] = false
@@ -2221,17 +2276,7 @@ command :last do |c|
       tags = []
     else
       tags = options[:tag].to_tags
-      options[:bool] = case options[:bool]
-                       when /^p/i
-                        :pattern
-                       when /(any|or)/i
-                        :or
-                       when /(not|none)/i
-                        :not
-                       else
-                        :and
-                       end
-
+      options[:bool] = options[:bool].normalize_bool
     end
 
     options[:case] = options[:case].normalize_case
@@ -2407,14 +2452,14 @@ command :view do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Sort tags by (name|time)'
   c.arg_name 'KEY'
@@ -2476,6 +2521,7 @@ command :view do |c|
     end
 
     view = wwid.get_view(title)
+
     if view
       page_title = view.key?('title') ? view['title'] : title.cap_first
       only_timed = if (view.key?('only_timed') && view['only_timed']) || options[:only_timed]
@@ -2555,6 +2601,7 @@ command :view do |c|
       end
 
       opts = options.dup
+      opts[:view_template] = title
       opts[:count] = count
       opts[:format] = date_format
       opts[:highlight] = options[:color]
@@ -2631,14 +2678,14 @@ command %i[archive move] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Archive entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
@@ -2716,14 +2763,14 @@ command :rotate do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Rotate items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Rotate entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
@@ -2930,7 +2977,7 @@ command :config do |c|
   c.command :undo do |undo|
     undo.action do |_global, options, args|
       config_file = config.choose_config
-      wwid.restore_backup(config_file)
+      Doing::Util::Backup.restore_last_backup(config_file, count: 1)
     end
   end
 
@@ -3078,7 +3125,11 @@ command :undo do |c|
     if options[:prune]
       Doing::Util::Backup.prune_backups(file, options[:prune])
     elsif options[:redo]
-      Doing::Util::Backup.redo_backup(file, count: count)
+      if options[:interactive]
+        Doing::Util::Backup.select_redo(file)
+      else
+        Doing::Util::Backup.redo_backup(file, count: count)
+      end
     else
       if options[:interactive]
         Doing::Util::Backup.select_backup(file)
@@ -3096,12 +3147,18 @@ command :redo do |c|
   c.arg_name 'PATH'
   c.flag %i[f file], default_value: wwid.doing_file
 
+  c.desc 'Select from an interactive menu'
+  c.switch %i[i interactive]
+
   c.action do |_global, options, args|
     file = options[:file] || wwid.doing_file
     count = args.empty? ? 1 : args[0].to_i
     raise InvalidArgument, "Invalid count specified for redo" unless count&.positive?
-
-    Doing::Util::Backup.redo_backup(file, count: count)
+    if options[:interactive]
+      Doing::Util::Backup.select_redo(file)
+    else
+      Doing::Util::Backup.redo_backup(file, count: count)
+    end
   end
 end
 
@@ -3140,14 +3197,14 @@ command :import do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: false, negatable: false
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
   c.desc 'Import items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: 'smart'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Only import items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -3222,7 +3279,6 @@ end
 
 pre do |global, _command, _options, _args|
   # global[:pager] ||= settings['paginate']
-
   Doing::Pager.paginate = global[:pager]
 
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
@@ -3253,6 +3309,8 @@ post do |global, _command, _options, _args|
   # Use skips_post before a command to skip this
   # block on that command only
   Doing.logger.output_results
+  Doing.logger.benchmark(:total, :finish)
+  Doing.logger.log_benchmarks
 end
 
 around do |global, command, options, arguments, code|
@@ -3286,13 +3344,13 @@ around do |global, command, options, arguments, code|
     config.config_file = cf
     settings = config.configure({ ignore_local: true })
   end
-
+  Doing.logger.benchmark(:init, :start)
   if global[:doing_file]
     wwid.init_doing_file(global[:doing_file])
   else
     wwid.init_doing_file
   end
-
+  Doing.logger.benchmark(:init, :finish)
   wwid.auto_tag = !global[:noauto]
 
   settings[:include_notes] = false unless global[:notes]

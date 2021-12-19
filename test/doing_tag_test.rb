@@ -51,7 +51,7 @@ class DoingTagTest < Test::Unit::TestCase
 
   def test_tag_transform
     doing('now', 'testing @flubber @deploy @test-4')
-    result = doing('show', '-c 1').strip
+    result = doing('show', '-c', '1').strip
     assert_match(/@deploy-test\b/, result, 'should have added @deploy-test')
     assert_match(/@dev-test\b/, result, 'should have added @dev-test')
     assert_no_match(/@flubber/, result, '@flubber should have been replaced')
@@ -60,7 +60,7 @@ class DoingTagTest < Test::Unit::TestCase
 
   def test_tag_autotag
     doing('now', 'this should autotag brettterpstra.com')
-    result = doing('show', '-c 1').strip
+    result = doing('show', '-c', '1').strip
     assert_match(/@autotag\b/, result, 'should have added @autotag from whitelist')
     assert_match(/@bt\b/, result, 'should have added @bt from synonyms')
   end

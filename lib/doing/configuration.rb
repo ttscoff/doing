@@ -29,8 +29,8 @@ module Doing
         'plugin_path' => File.join(Util.user_home, '.config', 'doing', 'plugins'),
         'command_path' => File.join(Util.user_home, '.config', 'doing', 'commands')
       },
-      'doing_file' => '~/what_was_i_doing.md',
-      'backup_dir' => '~/.doing_backup',
+      'doing_file' => '~/.local/share/doing/what_was_i_doing.md',
+      'backup_dir' => '~/.local/share/doing/doing_backup',
       'current_section' => 'Currently',
       'paginate' => false,
       'never_time' => [],
@@ -43,7 +43,8 @@ module Doing
       'templates' => {
         'default' => {
           'date_format' => '%Y-%m-%d %H:%M',
-          'template' => '%date | %title %interval%duration%note',
+          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset
+            %yellow%interval%boldred%duration%dark%white%80_14┃ note',
           'wrap_width' => 0,
           'order' => 'asc'
         },
@@ -60,7 +61,8 @@ module Doing
         },
         'recent' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%shortdate: %title (%section) %interval%duration%note',
+          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset
+            %yellow%interval%boldred%duration%dark%white%80_14┃ note',
           'wrap_width' => 88,
           'count' => 10,
           'order' => 'asc'
@@ -72,7 +74,7 @@ module Doing
       'views' => {
         'done' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%date | %title%note',
+          'template' => '%date | %title (%section)% 18: note',
           'wrap_width' => 0,
           'section' => 'All',
           'count' => 0,
@@ -93,6 +95,11 @@ module Doing
       'marker_color' => 'red',
       'default_tags' => [],
       'tag_sort' => 'name',
+      'search' => {
+        'matching' => 'pattern', # fuzzy, pattern, exact
+        'distance' => 3,
+        'case' => 'smart' # sensitive, ignore, smart
+      },
       'include_notes' => true
     }
 
@@ -108,6 +115,17 @@ module Doing
 
     def config_dir
       @config_dir ||= File.join(Util.user_home, '.config', 'doing')
+    end
+
+    ##
+    ## Check if configuration enforces exact string matching
+    ##
+    ## @return     [Boolean] exact matching enabled
+    ##
+    def exact_match?
+      search_settings = @settings['search']
+      matching = search_settings.fetch('matching', 'pattern').normalize_matching
+      matching == :exact
     end
 
     def default_config_file
@@ -220,11 +238,15 @@ module Doing
       cfg.nil? ? nil : { real_path[-1] => cfg }
     end
 
-    # It takes the input, fills in the defaults where values do not exist.
+    # It takes the input, fills in the defaults where values
+    # do not exist.
     #
-    # user_config - a Hash or Configuration of overrides.
+    # @param      user_config  a Hash or Configuration of
+    #                          overrides.
     #
-    # Returns a Configuration filled with defaults.
+    # @return     [Hash] a Configuration filled with
+    #             defaults.
+    #
     def from(user_config)
       Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
     end

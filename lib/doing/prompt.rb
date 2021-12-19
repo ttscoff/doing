@@ -118,14 +118,17 @@ module Doing
         return nil unless $stdout.isatty
 
         # fzf_args << '-1' # User is expecting a menu, and even if only one it seves as confirmation
-        fzf_args << %(--prompt="#{prompt}")
-        fzf_args << "--height=#{options.count + 2}"
-        fzf_args << '--info=inline'
-        fzf_args << '--multi' if multiple
+        default_args = []
+        default_args << %(--prompt="#{prompt}")
+        default_args << "--height=#{options.count + 2}"
+        default_args << '--info=inline'
+        default_args << '--multi' if multiple
         header = "esc: cancel,#{multiple ? ' tab: multi-select, ctrl-a: select all,' : ''} return: confirm"
-        fzf_args << %(--header="#{header}")
+        default_args << %(--header="#{header}")
+        default_args.concat(fzf_args)
         options.sort! if sorted
-        res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
+
+        res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{default_args.join(' ')}`
         return false if res.strip.size.zero?
 
         res
