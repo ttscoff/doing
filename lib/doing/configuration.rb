@@ -117,6 +117,11 @@ module Doing
       @config_dir ||= File.join(Util.user_home, '.config', 'doing')
     end
 
+    ##
+    ## Check if configuration enforces exact string matching
+    ##
+    ## @return     [Boolean] exact matching enabled
+    ##
     def exact_match?
       search_settings = @settings['search']
       matching = search_settings.fetch('matching', 'pattern').normalize_matching
@@ -233,11 +238,15 @@ module Doing
       cfg.nil? ? nil : { real_path[-1] => cfg }
     end
 
-    # It takes the input, fills in the defaults where values do not exist.
+    # It takes the input, fills in the defaults where values
+    # do not exist.
     #
-    # user_config - a Hash or Configuration of overrides.
+    # @param      user_config  a Hash or Configuration of
+    #                          overrides.
     #
-    # Returns a Configuration filled with defaults.
+    # @return     [Hash] a Configuration filled with
+    #             defaults.
+    #
     def from(user_config)
       Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
     end

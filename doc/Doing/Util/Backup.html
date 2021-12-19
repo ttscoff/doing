@@ -240,6 +240,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#select_redo-instance_method" title="#select_redo (instance method)">#<strong>select_redo</strong>(filename = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Select from recent undos.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#show_menu-instance_method" title="#show_menu (instance method)">#<strong>show_menu</strong>(options, filename)  &#x21d2; Object </a>
     
 
@@ -516,6 +539,63 @@ provided, only backups of that filename will be used.</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="select_redo-instance_method">
+  
+    #<strong>select_redo</strong>(filename = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Select from recent undos. If a filename is
+provided, only backups of that filename will be used.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>filename</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The filename to restore</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>DoingRuntimeError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="show_menu-instance_method">
   
     #<strong>show_menu</strong>(options, filename)  &#x21d2; <tt>Object</tt> 
@@ -596,7 +676,7 @@ in a hidden directory</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Dec 18 09:49:18 2021 by
+  Generated on Sun Dec 19 12:07:57 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

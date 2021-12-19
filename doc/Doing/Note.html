@@ -152,52 +152,6 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#append-instance_method" title="#append (instance method)">#<strong>append</strong>(lines)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Append an array of strings to note.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#append_string-instance_method" title="#append_string (instance method)">#<strong>append_string</strong>(input)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Append a string to the note content.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
       <a href="#compress-instance_method" title="#compress (instance method)">#<strong>compress</strong>  &#x21d2; Array </a>
     
 
@@ -212,7 +166,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Remove blank lines and comment lines (#).</p>
+    <span class="summary_desc"><div class='inline'><p>Remove blank lines and comments (#).</p>
 </div></span>
   
 </li>
@@ -369,7 +323,7 @@
   
   
   <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="../Array.html#highlight_tags-instance_method" title="Array#highlight_tags (method)">#highlight_tags</a></span>, <span class='object_link'><a href="../Array.html#log_tags-instance_method" title="Array#log_tags (method)">#log_tags</a></span>, <span class='object_link'><a href="../Array.html#nested_hash-instance_method" title="Array#nested_hash (method)">#nested_hash</a></span>, <span class='object_link'><a href="../Array.html#to_tags-instance_method" title="Array#to_tags (method)">#to_tags</a></span>, <span class='object_link'><a href="../Array.html#to_tags!-instance_method" title="Array#to_tags! (method)">#to_tags!</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="../Array.html#highlight_tags-instance_method" title="Array#highlight_tags (method)">#highlight_tags</a></span>, <span class='object_link'><a href="../Array.html#log_tags-instance_method" title="Array#log_tags (method)">#log_tags</a></span>, <span class='object_link'><a href="../Array.html#nested_hash-instance_method" title="Array#nested_hash (method)">#nested_hash</a></span>, <span class='object_link'><a href="../Array.html#tags_to_array-instance_method" title="Array#tags_to_array (method)">#tags_to_array</a></span>, <span class='object_link'><a href="../Array.html#to_tags-instance_method" title="Array#to_tags (method)">#to_tags</a></span>, <span class='object_link'><a href="../Array.html#to_tags!-instance_method" title="Array#to_tags! (method)">#to_tags!</a></span></p>
 <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
@@ -455,7 +409,7 @@ or array</p>
       
         &mdash;
         <div class='inline'><p>The note to add, can be
-string or array (Note)</p>
+String, Array, or Note</p>
 </div>
       
     </li>
@@ -485,89 +439,6 @@ content</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="append-instance_method">
-  
-    #<strong>append</strong>(lines)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Append an array of strings to note</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>lines</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>Array of strings</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="append_string-instance_method">
-  
-    #<strong>append_string</strong>(input)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Append a string to the note content</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>input</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>The input string,
-newlines will be split</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
   <h3 class="signature " id="compress-instance_method">
   
     #<strong>compress</strong>  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
@@ -578,7 +449,7 @@ newlines will be split</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Remove blank lines and comment lines (#)</p>
+    <p>Remove blank lines and comments (#)</p>
 
 
   </div>
@@ -756,7 +627,7 @@ newlines will be split</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Dec 18 09:49:18 2021 by
+  Generated on Sun Dec 19 12:07:57 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

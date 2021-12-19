@@ -203,7 +203,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#plugin_regex-class_method" title="plugin_regex (class method)">.<strong>plugin_regex</strong>(type: :export)  &#x21d2; Object </a>
+      <a href="#plugin_regex-class_method" title="plugin_regex (class method)">.<strong>plugin_regex</strong>(type: :export)  &#x21d2; Regexp </a>
     
 
     
@@ -217,7 +217,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Return a regular expression of all             plugin triggers for type.</p>
+    <span class="summary_desc"><div class='inline'><p>Return a regular expression of all plugin triggers for type.</p>
 </div></span>
   
 </li>
@@ -226,7 +226,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#plugin_templates-class_method" title="plugin_templates (class method)">.<strong>plugin_templates</strong>(type: :export)  &#x21d2; Object </a>
+      <a href="#plugin_templates-class_method" title="plugin_templates (class method)">.<strong>plugin_templates</strong>(type: :export)  &#x21d2; Array&lt;String&gt; </a>
     
 
     
@@ -240,7 +240,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Return array of available template names.</p>
+</div></span>
   
 </li>
 
@@ -270,7 +271,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#plugins_path-class_method" title="plugins_path (class method)">.<strong>plugins_path</strong>(add_dir = nil)  &#x21d2; Object </a>
+      <a href="#plugins_path-class_method" title="plugins_path (class method)">.<strong>plugins_path</strong>(add_dir = nil)  &#x21d2; Array </a>
     
 
     
@@ -284,7 +285,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Public: Setup the plugin search path.</p>
+    <span class="summary_desc"><div class='inline'><p>Setup the plugin search path.</p>
 </div></span>
   
 </li>
@@ -293,7 +294,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#register-class_method" title="register (class method)">.<strong>register</strong>(title, type, klass)  &#x21d2; Object </a>
+      <a href="#register-class_method" title="register (class method)">.<strong>register</strong>(title, type, klass)  &#x21d2; Boolean </a>
     
 
     
@@ -316,7 +317,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#template_for_trigger-class_method" title="template_for_trigger (class method)">.<strong>template_for_trigger</strong>(trigger, type: :export)  &#x21d2; Object </a>
+      <a href="#template_for_trigger-class_method" title="template_for_trigger (class method)">.<strong>template_for_trigger</strong>(trigger, type: :export)  &#x21d2; String </a>
     
 
     
@@ -330,7 +331,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Find and return the appropriate template for a trigger string.</p>
+</div></span>
   
 </li>
 
@@ -338,7 +340,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#template_regex-class_method" title="template_regex (class method)">.<strong>template_regex</strong>(type: :export)  &#x21d2; Object </a>
+      <a href="#template_regex-class_method" title="template_regex (class method)">.<strong>template_regex</strong>(type: :export)  &#x21d2; Regexp </a>
     
 
     
@@ -352,7 +354,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Return a regular expression of all template triggers for type.</p>
+</div></span>
   
 </li>
 
@@ -382,7 +385,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#valid_type-class_method" title="valid_type (class method)">.<strong>valid_type</strong>(type, default: nil)  &#x21d2; Object </a>
+      <a href="#valid_type-class_method" title="valid_type (class method)">.<strong>valid_type</strong>(type, default: nil)  &#x21d2; Symbol </a>
     
 
     
@@ -396,7 +399,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Converts a partial symbol to a valid plugin type, e.g.</p>
+</div></span>
   
 </li>
 
@@ -633,7 +637,7 @@
       <div class="method_details ">
   <h3 class="signature " id="plugin_regex-class_method">
   
-    .<strong>plugin_regex</strong>(type: :export)  &#x21d2; <tt>Object</tt> 
+    .<strong>plugin_regex</strong>(type: :export)  &#x21d2; <tt>Regexp</tt> 
   
 
   
@@ -641,8 +645,8 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Return a regular expression of all
-            plugin triggers for type</p>
+    <p>Return a regular expression of all plugin triggers
+for type</p>
 
 
   </div>
@@ -656,20 +660,38 @@
         <span class='name'>type</span>
       
       
-        <span class='type'></span>
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
       
       
         <em class="default">(defaults to: <tt>:export</tt>)</em>
       
       
         &mdash;
-        <div class='inline'><p>The type :import or :export</p>
+        <div class='inline'><p>The type :import or
+:export</p>
 </div>
       
     </li>
   
 </ul>
 
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>regular expression</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -677,13 +699,62 @@
       <div class="method_details ">
   <h3 class="signature " id="plugin_templates-class_method">
   
-    .<strong>plugin_templates</strong>(type: :export)  &#x21d2; <tt>Object</tt> 
+    .<strong>plugin_templates</strong>(type: :export)  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span>&lt;<span class='object_link'><a href="../String.html" title="String (class)">String</a></span>&gt;</tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return array of available template names</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:export</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Plugin type (:import,
+:export)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span>&lt;<span class='object_link'><a href="../String.html" title="String (class)">String</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>template names</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -701,7 +772,7 @@
       <div class="method_details ">
   <h3 class="signature " id="plugins_path-class_method">
   
-    .<strong>plugins_path</strong>(add_dir = nil)  &#x21d2; <tt>Object</tt> 
+    .<strong>plugins_path</strong>(add_dir = nil)  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
   
 
   
@@ -709,15 +780,52 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Public: Setup the plugin search path</p>
-
-<p>Returns an Array of plugin search paths</p>
+    <p>Setup the plugin search path</p>
 
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>add_dir</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>optional additional
+path to include</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Returns an Array of plugin search paths</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -725,7 +833,7 @@
       <div class="method_details ">
   <h3 class="signature " id="register-class_method">
   
-    .<strong>register</strong>(title, type, klass)  &#x21d2; <tt>Object</tt> 
+    .<strong>register</strong>(title, type, klass)  &#x21d2; <tt>Boolean</tt> 
   
 
   
@@ -735,19 +843,80 @@
   <div class="discussion">
     <p>Register a plugin</p>
 
-<p>param: +[String|Array]+ title  The name of the plugin (can be an array of names)</p>
-
-<p>param: +type+ The plugin type (:import, :export)</p>
-
-<p>param: +klass+ The class responding to :render or :import</p>
-
-<p>returns: Success boolean</p>
-
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>title</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span>|<span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The name of the
+plugin (can be an array of names)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The plugin type
+(:import, :export)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>klass</span>
+      
+      
+        <span class='type'>(<tt>Class</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The class responding to
+:render or :import</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Success boolean</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -755,7 +924,7 @@
       <div class="method_details ">
   <h3 class="signature " id="template_for_trigger-class_method">
   
-    .<strong>template_for_trigger</strong>(trigger, type: :export)  &#x21d2; <tt>Object</tt> 
+    .<strong>template_for_trigger</strong>(trigger, type: :export)  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
   
 
   
@@ -763,12 +932,69 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
+    <p>Find and return the appropriate template for a
+trigger string. Outputs a string that can be
+written out to the terminal for redirection</p>
+
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>trigger</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The trigger to test</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:export</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>the plugin type
+(:import, :export)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>string content of template for trigger</p>
+</div>
+      
+    </li>
+  
+</ul>
 <p class="tag_title">Raises:</p>
 <ul class="raise">
   
@@ -789,13 +1015,63 @@
       <div class="method_details ">
   <h3 class="signature " id="template_regex-class_method">
   
-    .<strong>template_regex</strong>(type: :export)  &#x21d2; <tt>Object</tt> 
+    .<strong>template_regex</strong>(type: :export)  &#x21d2; <tt>Regexp</tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return a regular expression of all template
+triggers for type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:export</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The type :import or
+:export</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>regular expression</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -813,13 +1089,77 @@
       <div class="method_details ">
   <h3 class="signature " id="valid_type-class_method">
   
-    .<strong>valid_type</strong>(type, default: nil)  &#x21d2; <tt>Object</tt> 
+    .<strong>valid_type</strong>(type, default: nil)  &#x21d2; <tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Converts a partial symbol to a valid plugin type,
+e.g. :imp =&gt; :import</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the symbol to test</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>default</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>fallback value</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:import or :export</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -839,7 +1179,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Dec 18 09:49:18 2021 by
+  Generated on Sun Dec 19 12:07:57 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>
