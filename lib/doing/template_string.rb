@@ -180,7 +180,7 @@ module Doing
               end.join("\n")
               "\n#{last_color}#{mark}#{outstring}  "
             else
-              format("\n%s%s%s%#{pad}s%s", indent, prefix, last_color, value.join("\n").gsub(/%/, '\%').sub(/\s*$/, ''), after)
+              format("\n%s%s%s%#{pad}s%s", indent, prefix, last_color, value.join("\n#{indent}").gsub(/%/, '\%').sub(/\s*$/, ''), after)
             end
           else
             format("%s%#{pad}s%s", prefix, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)

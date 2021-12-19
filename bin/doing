@@ -51,11 +51,16 @@ if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DO
   end
 end
 
+Doing.logger.benchmark(:total, :start)
+
 if ENV['DOING_CONFIG']
   Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
 end
 
+Doing.logger.benchmark(:configure, :start)
 config = Doing.config
+Doing.logger.benchmark(:configure, :finish)
+
 settings = config.settings
 wwid.config = settings
 
@@ -3272,7 +3277,6 @@ end
 
 pre do |global, _command, _options, _args|
   # global[:pager] ||= settings['paginate']
-
   Doing::Pager.paginate = global[:pager]
 
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
@@ -3303,6 +3307,8 @@ post do |global, _command, _options, _args|
   # Use skips_post before a command to skip this
   # block on that command only
   Doing.logger.output_results
+  Doing.logger.benchmark(:total, :finish)
+  Doing.logger.log_benchmarks
 end
 
 around do |global, command, options, arguments, code|
@@ -3336,13 +3342,13 @@ around do |global, command, options, arguments, code|
     config.config_file = cf
     settings = config.configure({ ignore_local: true })
   end
-
+  Doing.logger.benchmark(:init, :start)
   if global[:doing_file]
     wwid.init_doing_file(global[:doing_file])
   else
     wwid.init_doing_file
   end
-
+  Doing.logger.benchmark(:init, :finish)
   wwid.auto_tag = !global[:noauto]
 
   settings[:include_notes] = false unless global[:notes]

@@ -30,6 +30,7 @@ module Doing
       ##                       different from default
       ##
       def restore_last_backup(filename = nil, count: 1)
+        Doing.logger.benchmark(:restore_backup, :start)
         filename ||= Doing.config.settings['doing_file']
 
         result = get_backups(filename).slice(count - 1)
@@ -41,6 +42,7 @@ module Doing
         FileUtils.mv(backup_file, filename)
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{result}")
+        Doing.logger.benchmark(:restore_backup, :finish)
       end
 
       ##
@@ -186,6 +188,7 @@ module Doing
       ## @param      content  The data to back up
       ##
       def write_backup(filename = nil)
+        Doing.logger.benchmark(:_write_backup, :start)
         filename ||= Doing.config.settings['doing_file']
 
         unless File.exist?(filename)
@@ -203,6 +206,7 @@ module Doing
 
         prune_backups(filename, 15)
         clear_undone(filename)
+        Doing.logger.benchmark(:_write_backup, :finish)
       end
 
       private
@@ -266,6 +270,8 @@ module Doing
       ##
       def prune_backups_after(filename)
         target_date, base = date_of_backup(filename)
+        return if target_date.nil?
+
         counter = 0
         get_backups(base).each do |file|
           date, _base = date_of_backup(file)

@@ -266,6 +266,31 @@ module Doing
       end
     end
 
+    def benchmark(key, state)
+      return unless ENV['DOING_BENCHMARK']
+
+      @benchmarks ||= {}
+      @benchmarks[key] ||= { start: nil, finish: nil }
+      @benchmarks[key][state] = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+
+    def log_benchmarks
+      if ENV['DOING_BENCHMARK']
+        output = []
+        @benchmarks.each do |k, timers|
+          if timers[:finish] && timers[:start]
+            output << "#{k}: #{timers[:finish] - timers[:start]}"
+          else
+            output << "#{k}: error"
+          end
+        end
+        output.each do |msg|
+          $stdout.puts color_message(:debug, 'Benchmark:', msg)
+        end
+      end
+    end
+
+
     def log_change(tags_added: [], tags_removed: [], count: 1, item: nil, single: false)
       if tags_added.empty? && tags_removed.empty?
         count(:skipped, level: :debug, message: '%count %items with no change', count: count)
