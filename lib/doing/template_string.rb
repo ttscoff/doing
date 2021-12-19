@@ -122,9 +122,8 @@ module Doing
       ph = raw.match(rx)
 
       return unless ph
-
       placeholder_offset = ph.begin(0)
-      # last_color = parsed_colors[:colors].select { |v| v[:index] <= placeholder_offset }.last[:name]
+      last_color = parsed_colors[:colors].select { |v| v[:index] <= placeholder_offset }.map { |v| v[:color] }.join('')
       sub!(rx) do
         m = Regexp.last_match
 
@@ -143,18 +142,30 @@ module Doing
             char = m['ichar'] =~ /t/ ? "\t" : ' '
             indent = char * m['icount'].to_i
           end
-          indent ||= "\t"
+          indent ||= placeholder =~ /^title/ ? '' : "\t"
           prefix = m['prefix']
           if placeholder =~ /^title/
             if wrap_width.positive? || pad.positive?
               width = pad.positive? ? pad : wrap_width
-              value.gsub(/%/, '\%').wrap(width, pad: pad, indent: indent, offset: placeholder_offset, prefix: prefix, color: color, after: after, reset: reset)
-              # flag + item.title.gsub(/(.{#{opt[:wrap_width]}})(?=\s+|\Z)/, "\\1\n ").sub(/\s*$/, '') + reset
+              value.gsub(/%/, '\%').wrap(width, pad: pad, indent: indent, offset: placeholder_offset, prefix: prefix, color: color, after: after, reset: reset, pad_first: false)
             else
-              format("%s%#{pad}s%s", prefix, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
+              format("%s%s%#{pad}s%s", prefix, color, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
             end
           elsif placeholder =~ /^note/
-            "\n#{value.map { |l| "#{mark}#{indent}#{prefix}#{l.gsub(/%/, '\%').strip}  " }.join("\n")}"
+            if wrap_width.positive? || pad.positive?
+              width = pad.positive? ? pad : wrap_width
+              outstring = value.map do |l|
+                if l.empty?
+                  '  '
+                else
+                  line = l.gsub(/%/, '\%').strip.wrap(width, pad: pad, indent: indent, offset: 0, prefix: prefix, color: last_color, after: after, reset: reset, pad_first: true)
+                  "#{line}  "
+                end
+              end.join("\n")
+              "\n#{last_color}#{mark}#{outstring}  "
+            else
+              format("%s%s%#{pad}s%s", prefix, last_color, value.join("\n").gsub(/%/, '\%').sub(/\s*$/, ''), after)
+            end
           else
             format("%s%#{pad}s%s", prefix, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
           end

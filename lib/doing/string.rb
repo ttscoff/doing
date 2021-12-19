@@ -196,11 +196,26 @@ module Doing
     ## @param      offset  [Integer] (Optional) The width to pad each subsequent line
     ## @param      prefix  [String] (Optional) A prefix to add to each line
     ##
-    def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', color: '', after: '', reset: '')
+    def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', color: '', after: '', reset: '', pad_first: false)
       last_color = color.empty? ? '' : after.last_color
       note_rx = /(?i-m)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)/
+
+      note = ''
+      after = after.dup if after.frozen?
+      after.sub!(note_rx) do
+        note = Regexp.last_match(0)
+        ''
+      end
+
+      left_pad = ' ' * offset
+      left_pad += indent
+
+
+      # return "#{left_pad}#{prefix}#{color}#{self}#{last_color} #{note}" unless len.positive?
+
       # Don't break inside of tag values
-      str = gsub(/@\S+\(.*?\)/) { |tag| tag.gsub(/\s/, '%%%%') }
+      str = gsub(/@\S+\(.*?\)/) { |tag| tag.gsub(/\s/, '%%%%') }.gsub(/\n/, ' ')
+
       words = str.split(/ /).map { |word| word.gsub(/%%%%/, ' ') }
       out = []
       line = []
@@ -219,18 +234,18 @@ module Doing
         line << word.uncolor
       end
       out.push(line.join(' '))
-      note = ''
-      after = after.dup if after.frozen?
-      after.sub!(note_rx) do
-        note = Regexp.last_match(0)
-        ''
-      end
+
       last_color = ''
       out[0] = format("%-#{pad}s%s%s", out[0], last_color, after)
 
-      left_pad = ' ' * offset
-      left_pad += indent
-      out.map { |l| "#{left_pad}#{color}#{l}#{last_color}" }.join("\n").strip + last_color + " #{note}".chomp
+      out.map.with_index { |l, idx|
+        if !pad_first && idx == 0
+          "#{prefix}#{color}#{l}#{last_color}"
+        else
+          "#{left_pad}#{prefix}#{color}#{l}#{last_color}"
+        end
+      }.join("\n")  + " #{note}".chomp
+      # res.join("\n").strip + last_color + " #{note}".chomp
     end
 
     ##
