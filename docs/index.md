@@ -4,8 +4,6 @@
 
 _If you're one of the rare people like me who find this useful, feel free to [buy me some coffee](http://brettterpstra.com/donate/)._
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 
 The current version of `doing` is 2.1.4.
@@ -16,24 +14,6 @@ See [what's new in Doing 2.0](https://brettterpstra.com/2021/11/20/doing-2-dot-0
 
 Check out some craziness with Doing in the [iTerm status bar](https://brettterpstra.com/2021/10/15/see-what-youre-doing-in-the-iterm-status-bar/) and the [Mac Touch Bar/menu bar](https://brettterpstra.com/2021/07/21/crazy-bettertouchtool-touch-bar-simulator/).
 
-=======
-The current version of `doing` is <!--VER-->2.1.4<!--END VER-->.
-
-Find all of the documentation in the [doing wiki](https://github.com/ttscoff/doing/wiki).
-
->>>>>>> 0258469 (Adding docs)
-=======
-
-
-The current version of `doing` is 2.1.4.
-
-Find all of the documentation in the [doing wiki](https://github.com/ttscoff/doing/wiki).
-
-See [what's new in Doing 2.0](https://brettterpstra.com/2021/11/20/doing-2-dot-0/).
-
-Check out some craziness with Doing in the [iTerm status bar](https://brettterpstra.com/2021/10/15/see-what-youre-doing-in-the-iterm-status-bar/) and the [Mac Touch Bar/menu bar](https://brettterpstra.com/2021/07/21/crazy-bettertouchtool-touch-bar-simulator/).
-
->>>>>>> 78f6157 (Updating GH Pages and API docs)
 ## What and why
 
 `doing` is a basic CLI for adding and listing "what was I doing" reminders in a [TaskPaper-formatted](https://www.taskpaper.com) text file. It allows for multiple sections/categories and flexible output formatting.
@@ -54,26 +34,13 @@ Pressing Spacebar and typing allows you to add a new entry to currently. You an 
 
 Point of interest, the LaunchBar Action makes use of the `-o json` flag for outputting JSON to the action's script for parsing.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 78f6157 (Updating GH Pages and API docs)
 
 
 See the [doing project on BrettTerpstra.com](https://brettterpstra.com/projects/doing/) for the download.
 
 
-<!--JEKYLL
-{% download 117 %} 
--->
 
-<<<<<<< HEAD
-=======
-See the [doing project on BrettTerpstra.com](https://brettterpstra.com/projects/doing/) for the download.
 
->>>>>>> 0258469 (Adding docs)
-=======
->>>>>>> 78f6157 (Updating GH Pages and API docs)
 Evan Lovely has [created an Alfred workflow as well](http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/).
 
 ## Contributing
@@ -82,16 +49,8 @@ If you [create a plugin](https://github.com/ttscoff/doing/wiki/Creating-Plugins)
 
 Feel free to fork [the repository](https://github.com/ttscoff/doing/) on GitHub and make pull requests with changes. Please target the `develop` branch with pull requests.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 0258469 (Adding docs)
-=======
-
-
->>>>>>> 78f6157 (Updating GH Pages and API docs)
 ---
 
 PayPal link: [paypal.me/ttscoff](https://paypal.me/ttscoff)
