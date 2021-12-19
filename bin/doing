@@ -1734,23 +1734,10 @@ command :show do |c|
       end
     else
       section = options[:menu] ? wwid.choose_section(include_all: true) : settings['current_section']
-    end
-
-    if options[:menu]
-      tag = wwid.choose_tag(section, include_all: true)
-      raise UserCancelled unless tag
-
-      tags.concat(tag.split(/ +/).map { |t| t.strip.sub(/^@/, '') }) if tag =~ /^@/
+      section ||= 'All'
     end
 
     tags.concat(options[:tag].to_tags) if options[:tag]
-
-    unless tags.empty?
-      tag_filter = {
-        'tags' => tags,
-        'bool' => options[:bool].normalize_bool
-      }
-    end
 
     options[:times] = true if options[:totals]
 
@@ -1769,18 +1756,46 @@ command :show do |c|
       options[:search] = search
     end
 
+    options[:section] = section
+
+    unless tags.empty?
+      tag_filter = {
+        'tags' => tags,
+        'bool' => options[:bool].normalize_bool
+      }
+    end
+
+    options[:tag_filter] = tag_filter
+    options[:tag] = nil
+
+    items = wwid.filter_items([], opt: options)
+
+    if options[:menu]
+      tag = wwid.choose_tag(section, items: items, include_all: true)
+      raise UserCancelled unless tag
+
+      # options[:bool] = :and unless tags.empty?
+
+      tags = tag.split(/ +/).map { |t| t.strip.sub(/^@?/, '') } if tag =~ /^@/
+      unless tags.empty?
+        tag_filter = {
+          'tags' => tags,
+          'bool' => options[:bool].normalize_bool
+        }
+        options[:tag_filter] = tag_filter
+      end
+    end
+
     opt = options.dup
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
     opt[:highlight] = true
     opt[:order] = options[:sort].normalize_order
-    opt[:section] = section
     opt[:tag] = nil
-    opt[:tag_filter] = tag_filter
     opt[:tag_order] = options[:tag_order].normalize_order
     opt[:tags_color] = template['tags_color']
 
-    Doing::Pager.page wwid.list_section(opt)
+    Doing::Pager.page wwid.list_section(opt, items: items)
   end
 end
 

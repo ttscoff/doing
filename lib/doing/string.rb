@@ -76,7 +76,7 @@ module Doing
     end
 
     ## @param (see #highlight_tags)
-    def highlight_tags!(color = 'yellow')
+    def highlight_tags!(color = 'yellow', last_color: nil)
       replace highlight_tags(color)
     end
 
@@ -87,17 +87,18 @@ module Doing
     ##
     ## @return     [String] string with @tags highlighted
     ##
-    def highlight_tags(color = 'yellow')
-      escapes = scan(/(\e\[[\d;]+m)[^\e]+@/)
-      color = color.split(' ') unless color.is_a?(Array)
-      tag_color = ''
-      color.each { |c| tag_color += Doing::Color.send(c) }
-      last_color = if !escapes.empty?
-                     escapes[-1][0]
-                   else
-                     Doing::Color.default
-                   end
-      gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{Doing::Color.reset}#{last_color}")
+    def highlight_tags(color = 'yellow', last_color: nil)
+      unless last_color
+        escapes = scan(/(\e\[[\d;]+m)[^\e]+@/)
+        color = color.split(' ') unless color.is_a?(Array)
+        tag_color = color.each_with_object([]) { |c, arr| arr << Doing::Color.send(c) }.join('')
+        last_color = if !escapes.empty?
+                       (escapes.count > 1 ? escapes[-2..-1] : [escapes[-1]]).map { |v| v[0] }.join('')
+                     else
+                       Doing::Color.default
+                     end
+      end
+      gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{last_color}")
     end
 
     ##
@@ -198,8 +199,7 @@ module Doing
     ##
     def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', color: '', after: '', reset: '', pad_first: false)
       last_color = color.empty? ? '' : after.last_color
-      note_rx = /(?i-m)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)/
-
+      note_rx = /(?mi)(?<!\\)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?note/
       note = ''
       after = after.dup if after.frozen?
       after.sub!(note_rx) do
@@ -240,11 +240,11 @@ module Doing
 
       out.map.with_index { |l, idx|
         if !pad_first && idx == 0
-          "#{prefix}#{color}#{l}#{last_color}"
+          "#{color}#{prefix}#{l}#{last_color}"
         else
-          "#{left_pad}#{prefix}#{color}#{l}#{last_color}"
+          "#{left_pad}#{color}#{prefix}#{l}#{last_color}"
         end
-      }.join("\n")  + " #{note}".chomp
+      }.join("\n") + " #{note}".chomp
       # res.join("\n").strip + last_color + " #{note}".chomp
     end
 

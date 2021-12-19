@@ -127,7 +127,8 @@ module Doing
         default_args << %(--header="#{header}")
         default_args.concat(fzf_args)
         options.sort! if sorted
-        res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
+
+        res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{default_args.join(' ')}`
         return false if res.strip.size.zero?
 
         res

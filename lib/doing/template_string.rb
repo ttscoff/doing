@@ -30,13 +30,13 @@ module Doing
     attr_reader :original
 
     include Color
-    def initialize(string, placeholders: {}, force_color: false, wrap_width: 0, color: '')
+    def initialize(string, placeholders: {}, force_color: false, wrap_width: 0, color: '', tags_color: '')
       Color.coloring = true if force_color
       @colors = nil
       @original = string
       super(string)
 
-      placeholders.each { |k, v| fill(k, v, wrap_width: wrap_width, color: color) }
+      placeholders.each { |k, v| fill(k, v, wrap_width: wrap_width, color: color, tags_color: tags_color) }
     end
 
     ##
@@ -115,15 +115,18 @@ module Doing
       str
     end
 
-    def fill(placeholder, value, wrap_width: 0, color: '')
+    def fill(placeholder, value, wrap_width: 0, color: '', tags_color: '')
       reparse
       # /(?mi)%(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])?(?<icount>\d+))?(?<prefix>.[ _t]?)?note/
       rx = /(?mi)(?<!\\)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?#{placeholder.sub(/^%/, '')}(?<after>.*?)$/
-      ph = raw.match(rx)
+      ph = parsed_colors[:string].match(rx)
 
       return unless ph
       placeholder_offset = ph.begin(0)
-      last_color = parsed_colors[:colors].select { |v| v[:index] <= placeholder_offset }.map { |v| v[:color] }.join('')
+      last_colors = parsed_colors[:colors].select { |v| v[:index] <= placeholder_offset }
+
+      last_color = last_colors.map { |v| v[:color] }.pop(3).join('')
+
       sub!(rx) do
         m = Regexp.last_match
 
@@ -145,9 +148,21 @@ module Doing
           indent ||= placeholder =~ /^title/ ? '' : "\t"
           prefix = m['prefix']
           if placeholder =~ /^title/
+            color = last_color + color
+
             if wrap_width.positive? || pad.positive?
               width = pad.positive? ? pad : wrap_width
-              value.gsub(/%/, '\%').wrap(width, pad: pad, indent: indent, offset: placeholder_offset, prefix: prefix, color: color, after: after, reset: reset, pad_first: false)
+              out = value.gsub(/%/, '\%').strip.wrap(width,
+                                                     pad: pad,
+                                                     indent: indent,
+                                                     offset: placeholder_offset,
+                                                     prefix: prefix,
+                                                     color: color,
+                                                     after: after,
+                                                     reset: reset,
+                                                     pad_first: false)
+              out.highlight_tags!(tags_color, last_color: color) unless tags_color.nil? || tags_color.empty?
+              out
             else
               format("%s%s%#{pad}s%s", prefix, color, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
             end
@@ -159,6 +174,7 @@ module Doing
                   '  '
                 else
                   line = l.gsub(/%/, '\%').strip.wrap(width, pad: pad, indent: indent, offset: 0, prefix: prefix, color: last_color, after: after, reset: reset, pad_first: true)
+                  line.highlight_tags!(tags_color, last_color: last_color) unless tags_color.nil? || tags_color.empty?
                   "#{line}  "
                 end
               end.join("\n")

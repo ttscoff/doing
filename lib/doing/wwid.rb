@@ -1427,11 +1427,11 @@ module Doing
     ##
     ## @return     [String] The selected tag name
     ##
-    def choose_tag(section = 'All', include_all: false)
-      items = @content.in_section(section)
+    def choose_tag(section = 'All', items: nil, include_all: false)
+      items ||= @content.in_section(section)
       tags = all_tags(items, counts: true).map { |t, c| "@#{t} (#{c})" }
       tags.unshift('No tag filter') if include_all
-      choice = Prompt.choose_from(tags, sorted: false, multiple: true, prompt: 'Choose a tag > ', fzf_args: ['--height=60%'])
+      choice = Prompt.choose_from(tags, sorted: false, multiple: true, prompt: 'Choose tag(s) > ', fzf_args: ['--height=60%'])
       choice ? choice.split(/\n/).map { |t| t.strip.sub(/ \(.*?\)$/, '')}.join(' ') : choice
     end
 
@@ -1482,7 +1482,7 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def list_section(opt = {})
+    def list_section(opt = {}, items: Items.new)
       opt[:config_template] ||= 'default'
       cfg = @config.dig('templates',
                         opt[:config_template]).deep_merge({
@@ -1523,7 +1523,7 @@ module Doing
                 end
       end
 
-      items = filter_items(Items.new, opt: opt).reverse
+      items = filter_items(items, opt: opt).reverse
 
       items.reverse! if opt[:order] =~ /^d/i
 

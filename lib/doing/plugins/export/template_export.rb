@@ -152,11 +152,7 @@ module Doing
 
         template = opt[:template].dup
         template.sub!(/(?i-m)^([\s\S]*?)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)([\s\S]*?)$/, '\1\3\2')
-        output = Doing::TemplateString.new(template, placeholders: placeholders, wrap_width: opt[:wrap_width], color: flag).colored
-
-        if opt[:tags_color]
-          output.highlight_tags!(opt[:tags_color])
-        end
+        output = Doing::TemplateString.new(template, placeholders: placeholders, wrap_width: opt[:wrap_width], color: flag, tags_color: opt[:tags_color]).colored
 
         output.gsub!(/(?<!\\)%hr(_under)?/) do
           o = ''
