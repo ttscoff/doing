@@ -74,7 +74,7 @@ module Doing
       'views' => {
         'done' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%date | %title%note',
+          'template' => '%date | %title (%section)% 18: note',
           'wrap_width' => 0,
           'section' => 'All',
           'count' => 0,

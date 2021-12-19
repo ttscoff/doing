@@ -1501,7 +1501,6 @@ module Doing
                        'duration' => @config['duration'],
                        'interval_format' => @config['interval_format']
                      })
-
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
       opt[:count] ||= 0

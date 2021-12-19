@@ -30,11 +30,11 @@ module Doing
     attr_reader :original
 
     include Color
-    def initialize(string, placeholders: {}, force_color: false, wrap_width: 0, color: '', tags_color: '')
+    def initialize(string, placeholders: {}, force_color: false, wrap_width: 0, color: '', tags_color: '', reset: '')
       Color.coloring = true if force_color
       @colors = nil
       @original = string
-      super(string)
+      super(Color.reset + string)
 
       placeholders.each { |k, v| fill(k, v, wrap_width: wrap_width, color: color, tags_color: tags_color) }
     end
@@ -115,15 +115,14 @@ module Doing
       str
     end
 
-    def fill(placeholder, value, wrap_width: 0, color: '', tags_color: '')
+    def fill(placeholder, value, wrap_width: 0, color: '', tags_color: '', reset: '')
       reparse
-      # /(?mi)%(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])?(?<icount>\d+))?(?<prefix>.[ _t]?)?note/
       rx = /(?mi)(?<!\\)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?#{placeholder.sub(/^%/, '')}(?<after>.*?)$/
-      ph = parsed_colors[:string].match(rx)
+      ph = raw.match(rx)
 
       return unless ph
       placeholder_offset = ph.begin(0)
-      last_colors = parsed_colors[:colors].select { |v| v[:index] <= placeholder_offset }
+      last_colors = parsed_colors[:colors].select { |v| v[:index] <= placeholder_offset + 4 }
 
       last_color = last_colors.map { |v| v[:color] }.pop(3).join('')
 
@@ -152,6 +151,7 @@ module Doing
 
             if wrap_width.positive? || pad.positive?
               width = pad.positive? ? pad : wrap_width
+
               out = value.gsub(/%/, '\%').strip.wrap(width,
                                                      pad: pad,
                                                      indent: indent,
@@ -164,7 +164,9 @@ module Doing
               out.highlight_tags!(tags_color, last_color: color) if tags_color && !tags_color.empty?
               out
             else
-              format("%s%s%#{pad}s%s", prefix, color, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
+              out = format("%s%s%#{pad}s%s", prefix, color, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
+              out.highlight_tags!(tags_color, last_color: color) if tags_color && !tags_color.empty?
+              out
             end
           elsif placeholder =~ /^note/
             if wrap_width.positive? || pad.positive?
@@ -180,7 +182,9 @@ module Doing
               end.join("\n")
               "\n#{last_color}#{mark}#{outstring}  "
             else
-              format("\n%s%s%s%#{pad}s%s", indent, prefix, last_color, value.join("\n#{indent}").gsub(/%/, '\%').sub(/\s*$/, ''), after)
+              out = format("\n%s%s%s%#{pad}s%s", indent, prefix, last_color, value.join("\n#{indent}#{prefix}").gsub(/%/, '\%').sub(/\s*$/, ''), after)
+              out.highlight_tags!(tags_color, last_color: last_color) if tags_color && !tags_color.empty?
+              out
             end
           else
             format("%s%#{pad}s%s", prefix, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)

@@ -24,10 +24,10 @@ module Doing
       items.each do |item|
         if opt[:highlight] && item.title =~ /@#{wwid.config['marker_tag']}\b/i
           flag = Doing::Color.send(wwid.config['marker_color'])
-          # reset = Doing::Color.default
+          reset = Doing::Color.reset + Doing::Color.default
         else
           flag = ''
-          # reset = ''
+          reset = ''
         end
 
         placeholders = {}
@@ -152,7 +152,7 @@ module Doing
 
         template = opt[:template].dup
         template.sub!(/(?i-m)^([\s\S]*?)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)([\s\S]*?)$/, '\1\3\2')
-        output = Doing::TemplateString.new(template, placeholders: placeholders, wrap_width: opt[:wrap_width], color: flag, tags_color: opt[:tags_color]).colored
+        output = Doing::TemplateString.new(template, placeholders: placeholders, wrap_width: opt[:wrap_width], color: flag, tags_color: opt[:tags_color], reset: reset).colored
 
         output.gsub!(/(?<!\\)%hr(_under)?/) do
           o = ''
