@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.4pre
+v2.1.5pre
 
 === Global Options
 === --config_file arg
@@ -711,7 +711,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1204,7 +1204,7 @@ it will create a range.
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1532,7 +1532,7 @@ Move selected items to section
 
 ===== -o|--output FORMAT
 
-Output entries to format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output entries to format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1669,6 +1669,7 @@ Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all d
 Max count to show
 
 [Default Value] 0
+[Must Match] (?-mix:^\d+$)
 
 
 ===== --case TYPE
@@ -1693,7 +1694,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1784,7 +1785,7 @@ and "2d" would be interpreted as "two days ago."
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1939,6 +1940,22 @@ List all tags in the current Doing file
 
 
 ===== Options
+===== --bool BOOLEAN
+
+Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.
+
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
 ===== -o|--order ORDER
 
 Sort order (asc/desc)
@@ -1954,6 +1971,14 @@ Section
 [Default Value] All
 
 
+===== --search QUERY
+
+Get tags for items matching search. Surround with
+  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("'query").
+
+[Default Value] None
+
+
 ===== --sort SORT_ORDER
 
 Sort by name or count
@@ -1962,8 +1987,30 @@ Sort by name or count
 [Must Match] (?-mix:^(?:n(?:ame)?|c(?:ount)?)$)
 
 
+===== --tag TAG
+
+Get tags for entries matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?).
+
+[Default Value] None
+
+
 ===== -c|--[no-]counts
 Show count of occurrences
+
+
+
+===== -i|--interactive
+Select items to scan from a menu of matching entries
+
+
+
+===== --not
+Get tags from items that *don't* match search/tag filters
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -2016,7 +2063,7 @@ Time range to show `doing today --from "12pm to 4pm"`
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2141,7 +2188,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2324,7 +2371,7 @@ Time range to show, e.g. `doing yesterday --from "1am to 8am"`
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
