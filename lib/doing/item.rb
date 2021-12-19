@@ -162,6 +162,10 @@ module Doing
       @title.scan(/(?<= |\A)@([^\s(]+)/).map { |tag| tag[0] }.sort.uniq
     end
 
+    def tag_array
+      tags.tags_to_array
+    end
+
     ##
     ## Test if item contains tag(s)
     ##

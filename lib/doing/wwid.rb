@@ -262,7 +262,7 @@ module Doing
       return frag.cap_first if @content.section?(frag)
 
       section = nil
-      re = frag.split('').join('.*?')
+      re = frag.to_rx(distance: 2, case_type: :ignore)
       sections.each do |sect|
         next unless sect =~ /#{re}/i
 
@@ -304,7 +304,7 @@ module Doing
     def guess_view(frag, guessed: false, suggest: false)
       views.each { |view| return view if frag.downcase == view.downcase }
       view = false
-      re = frag.split('').join('.*?')
+      re = frag.to_rx(distance: 2, case_type: :ignore)
       views.each do |v|
         next unless v =~ /#{re}/i
 
@@ -1924,6 +1924,7 @@ EOS
         output + tail
       when :markdown
         pad = sorted_tags_data.map {|k, v| k }.group_by(&:size).max.last[0].length
+        pad = 7 if pad < 7
         output = <<~EOS
   | #{' ' * (pad - 7) }project | time     |
   | #{'-' * (pad - 1)}: | :------- |

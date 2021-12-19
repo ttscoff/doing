@@ -5,6 +5,15 @@ module Doing
   ## Array helpers
   ##
   class ::Array
+    ##
+    ## Convert an @tags to plain strings
+    ##
+    ## @return     [Array] array of strings
+    ##
+    def tags_to_array
+      map { |t| t.sub(/^@/, '') }
+    end
+
     # Convert strings to @tags
     #
     # @example `['one', '@two', 'three'].to_tags`

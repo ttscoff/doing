@@ -138,11 +138,12 @@ module Doing
           if placeholder == 'shortdate' && m['width'].nil?
             pad = 13
           end
-          indent = ''
+          indent = nil
           if m['ichar']
             char = m['ichar'] =~ /t/ ? "\t" : ' '
             indent = char * m['icount'].to_i
           end
+          indent ||= "\t"
           prefix = m['prefix']
           if placeholder =~ /^title/
             if wrap_width.positive? || pad.positive?

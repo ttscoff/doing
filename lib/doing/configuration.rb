@@ -29,8 +29,8 @@ module Doing
         'plugin_path' => File.join(Util.user_home, '.config', 'doing', 'plugins'),
         'command_path' => File.join(Util.user_home, '.config', 'doing', 'commands')
       },
-      'doing_file' => '~/what_was_i_doing.md',
-      'backup_dir' => '~/.doing_backup',
+      'doing_file' => '~/.local/share/doing/what_was_i_doing.md',
+      'backup_dir' => '~/.local/share/doing/doing_backup',
       'current_section' => 'Currently',
       'paginate' => false,
       'never_time' => [],

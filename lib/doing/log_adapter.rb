@@ -38,6 +38,7 @@ module Doing
       rotated
       skipped
       updated
+      exported
     ].freeze
 
     #
@@ -319,6 +320,8 @@ module Doing
         ['Archived:',  data[:message] || 'completed and archived %count %items']
       when :skipped
         ['Skipped:', data[:message] || '%count %items were unchanged']
+      when :exported
+        ['Exported:', data[:message] || '%count %items were exported']
       end
     end
 

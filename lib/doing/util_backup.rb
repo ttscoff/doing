@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'zlib'
 
 module Doing
   module Util
@@ -80,6 +81,44 @@ module Doing
       end
 
       ##
+      ## Select from recent undos. If a filename is
+      ## provided, only backups of that filename will be used.
+      ##
+      ## @param      filename  The filename to restore
+      ##
+      def select_redo(filename = nil)
+        filename ||= Doing.config.settings['doing_file']
+
+        undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort
+
+        raise DoingRuntimeError, 'End of redo history' if undones.empty?
+
+        total = undones.count
+        options = undones.each_with_object([]) do |file, arr|
+          d, _base = date_of_backup(file)
+          next if d.nil?
+
+          arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
+        end
+
+        backup_file = show_menu(options, filename)
+        idx = undones.index(File.basename(backup_file))
+        skipped = undones.slice!(idx, undones.count - idx)
+        undone = skipped.shift
+
+        redo_file = File.join(backup_dir, undone)
+
+        FileUtils.move(redo_file, filename)
+
+        skipped.each do |f|
+          FileUtils.mv(File.join(backup_dir, f), File.join(backup_dir, f.sub(/^undone/, '')))
+        end
+
+        Doing.logger.warn('File update:', "restored undo step #{idx}/#{total}")
+        Doing.logger.debug('Backup:', "#{total - skipped.count - 1} redos remaining")
+      end
+
+      ##
       ## Select from recent backups. If a filename is
       ## provided, only backups of that filename will be used.
       ##
@@ -90,6 +129,7 @@ module Doing
 
         options = get_backups(filename).each_with_object([]) do |file, arr|
           d, _base = date_of_backup(file)
+          next if d.nil?
           arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
         end
 
@@ -155,6 +195,9 @@ module Doing
 
         backup_file = File.join(backup_dir, "#{timestamp_filename}___#{File.basename(filename)}")
         # compressed = Zlib::Deflate.deflate(content)
+        # Zlib::GzipWriter.open(backup_file + '.gz') do |gz|
+        #   gz.write(IO.read(filename))
+        # end
 
         FileUtils.cp(filename, backup_file)
 
@@ -186,7 +229,7 @@ module Doing
       ## @param      filename  The filename
       ##
       def date_of_backup(filename)
-        m = filename.match(/^(?<date>\d{4}-\d{2}-\d{2})_(?<time>\d{2}\.\d{2}\.\d{2})___(?<file>.*?)$/)
+        m = filename.match(/^(?:undone)?(?<date>\d{4}-\d{2}-\d{2})_(?<time>\d{2}\.\d{2}\.\d{2})___(?<file>.*?)$/)
         return nil if m.nil?
 
         [Time.parse("#{m['date']} #{m['time'].gsub(/\./, ':')}"), m['file']]
