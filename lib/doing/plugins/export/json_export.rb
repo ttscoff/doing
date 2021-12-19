@@ -134,6 +134,7 @@ module Doing
       end
     end
 
+    Doing::Plugins.register 'json', :export, self
     Doing::Plugins.register 'timeline', :export, self
   end
 end
