@@ -136,7 +136,7 @@ module Doing
         end
 
         backup_file = show_menu(options, filename)
-        write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
+        Util.write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
         FileUtils.mv(backup_file, filename)
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{backup_file}")
