@@ -1,3 +1,9 @@
+### 2.1.9
+
+#### FIXED
+
+- Rotate command only archiving half of requested items
+
 ### 2.1.8
 
 #### NEW
