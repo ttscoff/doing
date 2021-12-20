@@ -32,6 +32,7 @@ module Doing
       'doing_file' => '~/.local/share/doing/what_was_i_doing.md',
       'backup_dir' => '~/.local/share/doing/doing_backup',
       'current_section' => 'Currently',
+      'history_size' => 15,
       'paginate' => false,
       'never_time' => [],
       'never_finish' => [],

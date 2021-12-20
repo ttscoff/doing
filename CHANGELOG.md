@@ -1,3 +1,18 @@
+### 2.1.8
+
+#### NEW
+
+- Hidden command `doing commands_accepting` which shows all commands that accept a given option, e.g. `doing commands_accepting search` shows all commands that take a search filter
+
+#### IMPROVED
+
+- The output of `doing template --list` now shows the file type of each template
+- Output templates can now be saved to a default location/filename using `doing template html --save`
+
+#### FIXED
+
+- Error running `doing recent` on certain older ruby versions
+
 ### 2.1.6
 
 #### NEW

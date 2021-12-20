@@ -1482,7 +1482,7 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def list_section(opt = {}, items: Items.new)
+    def list_section(opt, items: Items.new)
       opt[:config_template] ||= 'default'
 
       tpl_cfg = @config.dig('templates', opt[:config_template])
@@ -1720,10 +1720,16 @@ module Doing
       section ||= @config['current_section']
       section = guess_section(section)
 
-      list_section({ section: section, wrap_width: cfg['wrap_width'], count: count,
-                     format: cfg['date_format'], template: cfg['template'],
-                     order: 'asc', times: times, totals: opt[:totals],
-                     sort_tags: opt[:sort_tags], tags_color: opt[:tags_color], config_template: 'recent' })
+      opt[:section] = section
+      opt[:wrap_width] = cfg['wrap_width']
+      opt[:count] = count
+      opt[:format] = cfg['date_format']
+      opt[:template] = cfg['template']
+      opt[:order] = 'asc'
+      opt[:times] = times
+      opt[:config_template] = 'recent'
+
+      list_section(opt)
     end
 
     ##
