@@ -508,6 +508,13 @@ command :template do |c|
   c.desc 'List in single column for completion'
   c.switch %i[c column]
 
+  c.desc 'Save template to file instead of STDOUT'
+  c.switch %i[s save], default_value: false, negatable: false
+
+  c.desc 'Save template to alternate location'
+  c.arg_name 'DIRECTORY'
+  c.flag %i[p path], default_value: File.join(Doing::Util.user_home, '.config', 'doing', 'templates')
+
   c.action do |_global_options, options, args|
     if options[:list] || options[:column]
       if options[:column]
@@ -520,13 +527,19 @@ command :template do |c|
 
     if args.empty?
       type = Doing::Prompt.choose_from(Doing::Plugins.plugin_templates, sorted: false, prompt: 'Select template type > ')
+      type.sub!(/ \(.*?\)$/, '').strip!
+      options[:save] = Doing::Prompt.yn("Save to #{options[:path]}? (No outputs to STDOUT)", default_response: false)
     else
       type = args[0]
     end
 
     raise InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" unless type
 
-    $stdout.puts Doing::Plugins.template_for_trigger(type)
+    if options[:save]
+      Doing::Plugins.template_for_trigger(type, save_to: options[:path])
+    else
+      $stdout.puts Doing::Plugins.template_for_trigger(type, save_to: nil)
+    end
 
     # case args[0]
     # when /html|haml/i
@@ -3176,6 +3189,25 @@ command %i[changelog changes] do |c|
     end
   end
 end
+
+arg_name 'OPTION'
+command :commands_accepting do |c|
+  c.action do |g, o, a|
+    a.each do |option|
+      cmds = []
+      commands.each do |cmd, v|
+        v.flags.merge(v.switches).each do |n, flag|
+          if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
+            cmds.push(cmd)
+          end
+        end
+      end
+
+      puts "Commands accepting --#{option}: #{cmds.join(', ')}"
+    end
+  end
+end
+
 
 desc 'Import entries from an external source'
 long_desc "Imports entries from other sources. Available plugins: #{Doing::Plugins.plugin_names(type: :import, separator: ', ')}"
