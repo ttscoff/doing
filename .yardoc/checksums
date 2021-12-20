@@ -21,7 +21,7 @@ lib/doing/log_adapter.rb 9f2060c4f4c77b4facd94fc63aa9304c091c34d4
 lib/doing/util_backup.rb 3c206b96327d345ead2ea51e399180c590812490
 lib/doing/configuration.rb f6ef67164ec2e392fee5c510ab8d11cef3bedf52
 lib/doing/phrase_parser.rb 8f1789d7cf8326d8cc231b4a21505a93f8de20d2
-lib/doing/plugin_manager.rb 7fce2b1fa8a8ba6a42dd463f64c964dd37988a87
+lib/doing/plugin_manager.rb cb16a82c3182ef7008359670ab96ff6b39270ccc
 lib/doing/string_chronify.rb ccbb08389d2139c7121203f8585864e3026d1526
 lib/doing/template_string.rb 6dfb28b922059189b072e6d9fe1fcba8aad6c6fe
 lib/doing/boolean_term_parser.rb 075977892ac5c6e3435cb8877d8b8b68eb1962e3

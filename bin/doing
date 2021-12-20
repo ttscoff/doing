@@ -729,7 +729,7 @@ command :later do |c|
 end
 
 desc 'Add a completed item with @done(date). No argument finishes last entry.'
-desc 'Use this command to add an entry after you\'ve already finished it. It will be immediately marked as @done.
+long_desc 'Use this command to add an entry after you\'ve already finished it. It will be immediately marked as @done.
 You can modify the start and end times of the entry using the --back, --took, and --at flags, making it an easy
 way to add entries in post and maintain accurate (albeit manual) time tracking.'
 arg_name 'ENTRY'
@@ -2162,7 +2162,7 @@ command :since do |c|
 end
 
 desc 'List entries from yesterday'
-desc 'Show only entries with start times within the previous 24 hour period. Use --before, --after, and --from to limit to
+long_desc 'Show only entries with start times within the previous 24 hour period. Use --before, --after, and --from to limit to
 time spans within the day.'
 command :yesterday do |c|
   c.example 'doing yesterday', desc: 'List all entries from the previous day'
@@ -2394,7 +2394,7 @@ command :plugins do |c|
 end
 
 desc 'Generate shell completion scripts'
-desc 'Generates the necessary scripts to add command line completion to various shells, so typing \'doing\' and hitting
+long_desc 'Generates the necessary scripts to add command line completion to various shells, so typing \'doing\' and hitting
 tab will offer completions of subcommands and their options.'
 command :completion do |c|
   c.example 'doing completion', desc: 'Output zsh (default) to STDOUT'
@@ -3192,6 +3192,9 @@ end
 
 arg_name 'OPTION'
 command :commands_accepting do |c|
+  c.desc 'Output in single column for completion'
+  c.switch %i[c column]
+
   c.action do |g, o, a|
     a.each do |option|
       cmds = []
@@ -3203,7 +3206,11 @@ command :commands_accepting do |c|
         end
       end
 
-      puts "Commands accepting --#{option}: #{cmds.join(', ')}"
+      if o[:column]
+        puts cmds
+      else
+        puts "Commands accepting --#{option}: #{cmds.join(', ')}"
+      end
     end
   end
 end
