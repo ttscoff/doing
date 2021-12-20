@@ -3,6 +3,7 @@
 #### NEW
 
 - Hidden command `doing commands_accepting` which shows all commands that accept a given option, e.g. `doing commands_accepting search` shows all commands that take a search filter
+- Hidden command `doing changelog` which outputs a paginated, formatted version of the change history.
 
 #### IMPROVED
 
