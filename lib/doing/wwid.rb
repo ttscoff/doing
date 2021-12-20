@@ -1369,7 +1369,7 @@ module Doing
       counter = 0
       new_content = Items.new
 
-      @content.each do |item|
+      section_items.each do |item|
         break if counter >= max
         if opt[:before]
           time_string = opt[:before]
