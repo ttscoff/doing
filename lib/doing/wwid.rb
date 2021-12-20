@@ -1482,7 +1482,7 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def list_section(opt = {}, items: Items.new)
+    def list_section(opt, items: Items.new)
       opt[:config_template] ||= 'default'
 
       tpl_cfg = @config.dig('templates', opt[:config_template])
