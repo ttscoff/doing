@@ -261,14 +261,13 @@ module Doing
       old_file = File.join(Util.user_home, '.doingrc')
       return unless File.exist?(old_file)
 
-      wwid = Doing::WWID.new
       Doing.logger.log_now(:warn, 'Deprecated:', "main config file location has changed to #{config_file}")
-      res = wwid.yn("Move #{old_file} to new location, preserving settings?", default_response: true)
+      res = Prompt.yn("Move #{old_file} to new location, preserving settings?", default_response: true)
 
       return unless res
 
       if File.exist?(default_config_file)
-        res = wwid.yn("#{default_config_file} already exists, overwrite it?", default_response: false)
+        res = Prompt.yn("#{default_config_file} already exists, overwrite it?", default_response: false)
 
         unless res
           @config_file = old_file
