@@ -204,7 +204,7 @@ module Doing
 
         FileUtils.cp(filename, backup_file)
 
-        prune_backups(filename, 15)
+        prune_backups(filename, Doing.config.settings['history_size'].to_i)
         clear_undone(filename)
         Doing.logger.benchmark(:_write_backup, :finish)
       end
