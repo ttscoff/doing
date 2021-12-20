@@ -47,6 +47,8 @@ module Doing
     ##               - name: display name for template
     ##               - trigger: regular expression for
     ##                 `template --type FORMAT`
+    ##               - format: a descriptor of the file format (erb, haml, stylus, etc.)
+    ##               - filename: a default filename used when the template is written to disk
     ##
     ##   If a template is included, a config key will
     ##   automatically be added for the user to override
@@ -73,7 +75,7 @@ module Doing
       {
         trigger: 'say(?:it)?',
         templates: [
-          { name: 'say', trigger: 'say(?:it)?' }
+          { name: 'say', trigger: 'say(?:it)?', format: 'text', filename: 'say.txt' }
         ],
         config: {
           'say_voice' => 'Fiona'

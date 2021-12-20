@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.5pre
+v2.1.6pre
 
 === Global Options
 === --config_file arg
@@ -380,10 +380,10 @@ List available color variables for configuration templates and views
 
 
 ==== Command: <tt>completion </tt>
+Generate shell completion scripts
+
 Generates the necessary scripts to add command line completion to various shells, so typing 'doing' and hitting
 tab will offer completions of subcommands and their options.
-
-
 ===== Options
 ===== -f|--file PATH
 
@@ -493,11 +493,11 @@ Update default config file, adding any missing keys
 
 [Default Command] edit
 ==== Command: <tt>done|did  ENTRY</tt>
+Add a completed item with @done(date). No argument finishes last entry.
+
 Use this command to add an entry after you've already finished it. It will be immediately marked as @done.
 You can modify the start and end times of the entry using the --back, --took, and --at flags, making it an easy
 way to add entries in post and maintain accurate (albeit manual) time tracking.
-
-
 ===== Options
 ===== --at DATE_STRING
 
@@ -711,7 +711,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1204,7 +1204,7 @@ it will create a range.
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1532,7 +1532,7 @@ Move selected items to section
 
 ===== -o|--output FORMAT
 
-Output entries to format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output entries to format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1694,7 +1694,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1785,7 +1785,7 @@ and "2d" would be interpreted as "two days ago."
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2020,6 +2020,13 @@ Output HTML, CSS, and Markdown (ERB) templates for customization
 Templates are printed to STDOUT for piping to a file.
   Save them and use them in the configuration file under export_templates.
 ===== Options
+===== -p|--path DIRECTORY
+
+Save template to alternate location
+
+[Default Value] /Users/ttscoff/.config/doing/templates
+
+
 ===== -c|--[no-]column
 List in single column for completion
 
@@ -2027,6 +2034,11 @@ List in single column for completion
 
 ===== -l|--list
 List all available templates
+
+
+
+===== -s|--save
+Save template to file instead of STDOUT
 
 
 
@@ -2063,7 +2075,7 @@ Time range to show `doing today --from "12pm to 4pm"`
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2188,7 +2200,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2343,10 +2355,10 @@ Only show items with recorded time intervals
 
 
 ==== Command: <tt>yesterday </tt>
+List entries from yesterday
+
 Show only entries with start times within the previous 24 hour period. Use --before, --after, and --from to limit to
 time spans within the day.
-
-
 ===== Options
 ===== --after TIME_STRING
 
@@ -2371,7 +2383,7 @@ Time range to show, e.g. `doing yesterday --from "1am to 8am"`
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 

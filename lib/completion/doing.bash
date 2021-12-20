@@ -276,9 +276,9 @@ local words=$(doing sections)
 IFS="$OLD_IFS"
 
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--age --after --bool --before --count --case --duration --from --interactive --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--age --after --bool --before --count --case --duration --from --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -b -c -i -o -s -t -x --age --after --bool --before --count --case --duration --from --interactive --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -b -c -i -m -o -s -t -x --age --after --bool --before --count --case --duration --from --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
   else
   local nocasematchWasOff=0
   shopt nocasematch >/dev/null || nocasematchWasOff=1
@@ -318,12 +318,22 @@ _doing_tag() {
   fi
 }
 
+_doing_tags() {
+  
+  if [[ "$token" == --* ]]; then
+    COMPREPLY=( $( compgen -W '--bool --counts --case --interactive --not --order --section --search --sort --tag --exact' -- $token ) )
+  elif [[ "$token" == -* ]]; then
+    COMPREPLY=( $( compgen -W '-c -i -o -s -x --bool --counts --case --interactive --not --order --section --search --sort --tag --exact' -- $token ) )
+  
+  fi
+}
+
 _doing_template() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--column --list' -- $token ) )
+    COMPREPLY=( $( compgen -W '--column --list --path --save' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-c -l --column --list' -- $token ) )
+    COMPREPLY=( $( compgen -W '-c -l -p -s --column --list --path --save' -- $token ) )
   
   fi
 }
@@ -341,9 +351,9 @@ _doing_today() {
 _doing_undo() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--file' -- $token ) )
+    COMPREPLY=( $( compgen -W '--file --interactive --prune --redo' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-f --file' -- $token ) )
+    COMPREPLY=( $( compgen -W '-f -i -p -r --file --interactive --prune --redo' -- $token ) )
   
   fi
 }
@@ -441,6 +451,7 @@ _doing()
     elif [[ $last =~ (show) ]]; then _doing_show
     elif [[ $last =~ (since) ]]; then _doing_since
     elif [[ $last =~ (tag) ]]; then _doing_tag
+    elif [[ $last =~ (tags) ]]; then _doing_tags
     elif [[ $last =~ (template) ]]; then _doing_template
     elif [[ $last =~ (today) ]]; then _doing_today
     elif [[ $last =~ (undo) ]]; then _doing_undo

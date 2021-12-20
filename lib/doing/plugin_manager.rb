@@ -198,11 +198,13 @@ module Doing
         plugs = plugins[type].clone
         plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
           options[:templates].each do |t|
-            templates << t[:name]
+            out = t[:name]
+            out += " (#{t[:format]})" if t.key?(:format)
+            templates << out
           end
         end
 
-        templates
+        templates.sort.uniq
       end
 
       ##
@@ -218,7 +220,7 @@ module Doing
         type = valid_type(type)
         pattern = []
         plugs = plugins[type].clone
-        plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
+        plugs.delete_if { |_, o| o[:templates].nil? }.each do |_, options|
           options[:templates].each do |t|
             pattern << t[:trigger].normalize_trigger
           end
@@ -237,15 +239,32 @@ module Doing
       ##
       ## @return     [String] string content of template for trigger
       ##
-      def template_for_trigger(trigger, type: :export)
-        type = valid_type(type)
-        plugs = plugins[type].clone
-        plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
+      def template_for_trigger(trigger, type: :export, save_to: nil)
+        plugins[valid_type(type)].clone.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
           options[:templates].each do |t|
-            return options[:class].template(trigger) if trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
+            next unless trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
+
+            tpl = options[:class].template(trigger)
+            return tpl unless save_to
+
+            raise PluginException.new('No default filename defined', :export, t[:name]) unless t.key?(:filename)
+
+            return save_template(tpl, save_to, t[:filename])
           end
         end
         raise Errors::InvalidArgument, "No template type matched \"#{trigger}\""
+      end
+
+      def save_template(tpl, dir, filename)
+        dir = File.expand_path(dir)
+        FileUtils.mkdir_p(dir) unless File.exist?(dir)
+        raise DoingRuntimeError, "Path #{dir} exists but is not a directory" unless File.directory?(dir)
+
+        file = File.join(dir, filename)
+        File.open(file, 'w') do |f|
+          f.puts(tpl)
+          Doing.logger.warn('File update:', "Template written to #{file}")
+        end
       end
     end
   end

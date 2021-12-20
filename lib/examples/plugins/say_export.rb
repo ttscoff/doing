@@ -73,7 +73,7 @@ module Doing
       {
         trigger: 'say(?:it)?',
         templates: [
-          { name: 'say', trigger: 'say(?:it)?' }
+          { name: 'say', trigger: 'say(?:it)?', format: 'text', filename: 'say.txt' }
         ],
         config: {
           'say_voice' => 'Fiona'

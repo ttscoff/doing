@@ -1,25 +1,4 @@
-### 2.1.5pre
-
-#### NEW
-
-- Interactive option for redo command
-- Plugins for Day One export
-
-#### IMPROVED
-
-- Matching algorithm can be configured in settings
-- All template placeholders can now use the "printf" formatting that %title and %note have, allowing for padding, prefixes, etc.
-- Move default locations for doing file and backups to ~/.local/share/doing
-- `doing show --menu` will only offer tags that exist after any tag/search filters have been run
-- `doing show @tag` with `--menu` will first filter by the @tag, then do an OR search for tags selected from the menu
-
-#### FIXED
-
-- Preserve colors when wrapping text to new lines
-- Tag highlighting errors
-- Template options specified in views were being overriden by options in templates. View config now has precedence, but will fall back to template config for missing keys
-
-### 2.1.4pre
+### 2.1.6
 
 #### NEW
 
@@ -34,6 +13,27 @@
 - New boolean type for tag searches, PATTERN (which is now the default). Combine tags using symbols to create more complex boolean searches, e.g. "doing +coding -work"
 - You can now define `date_tags` in config, an array of tags/patterns that will be recognized when parsing for natural language dates which are converted when saving new entries
 - `--search` strings can contain quoted phrases and use +/- to require or ban terms, e.g. `--search 'doing +coding -writing'
+- Interactive option for redo command
+- Plugins for Day One export
+
+#### IMPROVED
+
+- Better diff output for fzf preview of `doing undo` history
+- Fall back to good ol' sed for colorizing diffs when no good tool is available
+- `doing redo` (a.k.a. `doing undo --redo`) can be run multiple times, stepping forward through undo history. Can also take a count to jump
+- Matching algorithm can be configured in settings
+- All template placeholders can now use the "printf" formatting that %title and %note have, allowing for padding, prefixes, etc.
+- Move default locations for doing file and backups to ~/.local/share/doing
+- `doing show --menu` will only offer tags that exist after any tag/search filters have been run
+- `doing show @tag` with `--menu` will first filter by the @tag, then do an OR search for tags selected from the menu
+
+#### FIXED
+
+- `doing reset` without filter not automatically affecting most recent entry
+- `config set` now preserves value type (string, array, mapping) of previous value, coercing new value if needed
+- Preserve colors when wrapping text to new lines
+- Tag highlighting errors
+- Template options specified in views were being overriden by options in templates. View config now has precedence, but will fall back to template config for missing keys
 
 #### IMPROVED
 

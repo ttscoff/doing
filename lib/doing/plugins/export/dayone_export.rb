@@ -28,8 +28,8 @@ module Doing
       {
         trigger: 'day(?:one)?(?:-(?:days?|entries))?',
         templates: [
-          { name: 'dayone', trigger: 'day(?:one)?$' },
-          { name: 'dayone_entry', trigger: 'day(?:one)-entr(?:y|ies)?$'}
+          { name: 'dayone', trigger: 'day(?:one)?$', format: 'erb', filename: 'dayone.erb' },
+          { name: 'dayone_entry', trigger: 'day(?:one)-entr(?:y|ies)?$', format: 'erb', filename: 'dayone-entry.erb' }
         ]
       }
     end
