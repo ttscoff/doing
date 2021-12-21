@@ -49,9 +49,9 @@ class DoingOutputTest < Test::Unit::TestCase
 
   def test_csv_output
     doing('import', '--type', 'timing', @import_file)
-    result = doing('show', '-c', '10', '-o', 'csv')
-    md_rx = /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s-\d{4},.*?,.*?,\d+,[^,]+$/
-    assert_equal(10, result.scan(md_rx).count, 'There should be 10 CSV-formatted entries shown')
+    result = doing('show', '-c', '9', '-o', 'csv')
+    md_rx = /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s[+-]\d{4},.*?,.*?,\d+,[^,]+$/
+    assert_equal(9, result.scan(md_rx).count, 'There should be 9 CSV-formatted entries shown')
   end
 
   def test_html_output

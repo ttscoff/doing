@@ -86,7 +86,38 @@ module Doing
         @fzf ||= install_fzf
       end
 
-      def install_fzf
+      def uninstall_fzf
+        fzf_bin = File.join(File.dirname(__FILE__), '../helpers/fzf/bin/fzf')
+        FileUtils.rm_f(fzf_bin) if File.exist?(fzf_bin)
+        Doing.logger.warn('fzf:', "removed #{fzf_bin}")
+      end
+
+      def which_fzf
+        fzf_dir = File.join(File.dirname(__FILE__), '../helpers/fzf')
+        fzf_bin = File.join(fzf_dir, 'bin/fzf')
+        return fzf_bin if File.exist?(fzf_bin)
+
+        Doing.logger.debug('fzf:', 'Using user-installed fzf')
+        TTY::Which.which('fzf')
+      end
+
+      def silence_std(file = '/dev/null')
+        $stdout = File.new(file, 'w')
+        $stderr = File.new(file, 'w')
+      end
+
+      def restore_std
+        $stdout = STDOUT
+        $stderr = STDERR
+      end
+
+      def install_fzf(force: false)
+        if force
+          uninstall_fzf
+        elsif which_fzf
+          return which_fzf
+        end
+
         fzf_dir = File.join(File.dirname(__FILE__), '../helpers/fzf')
         FileUtils.mkdir_p(fzf_dir) unless File.directory?(fzf_dir)
         fzf_bin = File.join(fzf_dir, 'bin/fzf')
@@ -94,17 +125,25 @@ module Doing
 
         prev_level = Doing.logger.level
         Doing.logger.adjust_verbosity({ log_level: :info })
-        Doing.logger.log_now(:warn, 'Compiling and installing fzf -- this will only happen once')
-        Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi, MIT License <https://github.com/junegunn/fzf/blob/master/LICENSE>')
+        Doing.logger.log_now(:warn, 'fzf:', 'Compiling and installing fzf -- this will only happen once')
+        Doing.logger.log_now(:warn, 'fzf:', 'fzf is copyright Junegunn Choi, MIT License <https://github.com/junegunn/fzf/blob/master/LICENSE>')
 
-        system("'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
+        silence_std
+        `'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null`
         unless File.exist?(fzf_bin)
+          restore_std
           Doing.logger.log_now(:warn, 'Error installing, trying again as root')
-          system("sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
+          silence_std
+          `sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null`
         end
-        raise RuntimeError.new('Error installing fzf, please report at https://github.com/ttscoff/doing/issues') unless File.exist?(fzf_bin)
+        restore_std
+        unless File.exist?(fzf_bin)
+          Doing.logger.error('fzf:', 'unable to install fzf. You can install manually and Doing will use the system version.')
+          Doing.logger.error('fzf:', 'see https://github.com/junegunn/fzf#installation')
+          raise RuntimeError.new('Error installing fzf, please report at https://github.com/ttscoff/doing/issues')
+        end
 
-        Doing.logger.info("fzf installed to #{fzf}")
+        Doing.logger.info('fzf:', "installed to #{fzf}")
         Doing.logger.adjust_verbosity({ log_level: prev_level })
         fzf_bin
       end
@@ -189,7 +228,7 @@ module Doing
           %(-q "#{query}"),
           '--info=inline'
         ]
-        fzf_args.push('-1') unless opt.fetch(:show_if_single)
+        fzf_args.push('-1') unless opt.fetch(:show_if_single, false)
         fzf_args << case case_sensitive
                     when :sensitive
                       '+i'

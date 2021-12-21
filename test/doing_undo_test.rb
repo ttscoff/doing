@@ -13,6 +13,7 @@ class DoingUndoTest < Test::Unit::TestCase
     @tmpdirs = []
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid_undo.md')
+    @backup_dir = File.join(@basedir, 'doing_backup')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
   end
 
@@ -22,6 +23,8 @@ class DoingUndoTest < Test::Unit::TestCase
 
   def test_undo
     entries = [
+      'backlog entry 1',
+      'backlog entry 2',
       'Begin history',
       'Test entry 1',
       'Test entry 2'
@@ -43,6 +46,9 @@ class DoingUndoTest < Test::Unit::TestCase
 
     doing('undo', '--redo')
     assert_contains_entry('Test entry 1', doing('show'))
+
+    doing('undo', '--prune', '0')
+    assert_equal(0, Dir.glob('*.md', base: @backup_dir).count)
   end
 
   private
@@ -67,6 +73,6 @@ class DoingUndoTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_BACKUP_DIR' => @backup_dir, 'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
   end
 end

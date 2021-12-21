@@ -126,6 +126,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#clear_redo-instance_method" title="#clear_redo (instance method)">#<strong>clear_redo</strong>(filename)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Delete all redo files.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#clear_undone-instance_method" title="#clear_undone (instance method)">#<strong>clear_undone</strong>(filename = nil)  &#x21d2; Object </a>
     
 
@@ -326,7 +349,48 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="clear_undone-instance_method">
+  <h3 class="signature first" id="clear_redo-instance_method">
+  
+    #<strong>clear_redo</strong>(filename)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Delete all redo files</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>limit</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Maximum number of backups to retain</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="clear_undone-instance_method">
   
     #<strong>clear_undone</strong>(filename = nil)  &#x21d2; <tt>Object</tt> 
   
@@ -534,6 +598,19 @@ provided, only backups of that filename will be used.</p>
   
 </ul>
 
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>DoingRuntimeError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -676,7 +753,7 @@ in a hidden directory</p>
 </div>
 
       <div id="footer">
-  Generated on Mon Dec 20 16:27:10 2021 by
+  Generated on Tue Dec 21 12:36:35 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

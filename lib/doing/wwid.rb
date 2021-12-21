@@ -338,7 +338,8 @@ module Doing
     ## @option opt :back [Date] backdate
     ## @option opt :timed [Boolean] new item is timed entry, marks previous entry as @done
     ##
-    def add_item(title, section = nil, opt = {})
+    def add_item(title, section = nil, opt)
+      opt ||= {}
       section ||= @config['current_section']
       @content.add_section(section, log: false)
       opt[:back] ||= opt[:date] ? opt[:date] : Time.now
@@ -401,7 +402,8 @@ module Doing
     ## @param      paths  [String] Path to JSON report file
     ## @param      opt    [Hash] Additional Options
     ##
-    def import(paths, opt = {})
+    def import(paths, opt)
+      opt ||= {}
       Plugins.plugins[:import].each do |_, options|
         next unless opt[:type] =~ /^(#{options[:trigger].normalize_trigger})$/i
 
@@ -461,7 +463,8 @@ module Doing
     #
     # @return     nothing
     #
-    def repeat_item(item, opt = {})
+    def repeat_item(item, opt)
+      opt ||= {}
       if item.should_finish?
         if item.should_time?
           item.title.tag!('done', value: Time.now.strftime('%F %R'))
@@ -501,7 +504,8 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def repeat_last(opt = {})
+    def repeat_last(opt)
+      opt ||= {}
       opt[:section] ||= 'all'
       opt[:section] = guess_section(opt[:section])
       opt[:note] ||= []
@@ -523,7 +527,8 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def last_entry(opt = {})
+    def last_entry(opt)
+      opt ||= {}
       opt[:tag_bool] ||= :and
       opt[:section] ||= @config['current_section']
 
@@ -800,7 +805,8 @@ module Doing
     ##
     ## Options hash is shared with #filter_items and #act_on
     ##
-    def interactive(opt = {})
+    def interactive(opt)
+      opt ||= {}
       opt[:section] = opt[:section] ? guess_section(opt[:section]) : 'All'
 
       search = nil
@@ -820,7 +826,11 @@ module Doing
       }
       items = filter_items(Items.new, opt: filter_options)
 
-      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **opt)
+      menu_options = %i[search query exact multiple show_if_single menu sort case].each_with_object({}) {
+        |k, hsh| hsh[k] = opt[k]
+      }
+
+      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **menu_options)
 
       raise NoResults, 'no items selected' if selection.nil? || selection.empty?
 
@@ -848,7 +858,8 @@ module Doing
     ## @option opt [Boolean] :again
     ## @option opt [Boolean] :resume
     ##
-    def act_on(items, opt = {})
+    def act_on(items, opt)
+      opt ||= {}
       actions = %i[editor delete tag flag finish cancel archive output save_to again resume]
       has_action = false
       single = items.count == 1
@@ -1105,7 +1116,8 @@ module Doing
     ##
     ## @see        #filter_items
     ##
-    def tag_last(opt = {})
+    def tag_last(opt)
+      opt ||= {}
       opt[:count] ||= 1
       opt[:archive] ||= false
       opt[:tags] ||= ['done']
@@ -1229,7 +1241,8 @@ module Doing
     ##
     ## @return     [Item] the next chronological item in the index
     ##
-    def next_item(item, options = {})
+    def next_item(item, options)
+      options ||= {}
       items = filter_items(Items.new, opt: options)
 
       idx = items.index(item)
@@ -1287,7 +1300,8 @@ module Doing
     ## @option opt :back [Date] backdate new item
     ## @option opt :new_item [String] content to use for new item
     ## @option opt :note [Array] note content for new item
-    def stop_start(target_tag, opt = {})
+    def stop_start(target_tag, opt)
+      opt ||= {}
       tag = target_tag.dup
       opt[:section] ||= @config['current_section']
       opt[:archive] ||= false
@@ -1354,7 +1368,8 @@ module Doing
     ##
     ## Rename doing file with date and start fresh one
     ##
-    def rotate(opt = {})
+    def rotate(opt)
+      opt ||= {}
       keep = opt[:keep] || 0
       tags = []
       tags.concat(opt[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if opt[:tag]
@@ -1369,7 +1384,7 @@ module Doing
       counter = 0
       new_content = Items.new
 
-      @content.each do |item|
+      section_items.each do |item|
         break if counter >= max
         if opt[:before]
           time_string = opt[:before]
@@ -1559,7 +1574,8 @@ module Doing
     ## @param      section      [String] The source section
     ## @param      options      [Hash] Options
     ##
-    def archive(section = @config['current_section'], options = {})
+    def archive(section = @config['current_section'], options)
+      options ||= {}
       count       = options[:keep] || 0
       destination = options[:destination] || 'Archive'
       tags        = options[:tags] || []
@@ -1589,7 +1605,8 @@ module Doing
     ## @param      output  [String] output format
     ## @param      opt     [Hash] Options
     ##
-    def today(times = true, output = nil, opt = {})
+    def today(times = true, output = nil, opt)
+      opt ||= {}
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
@@ -1637,7 +1654,8 @@ module Doing
     ## @param      output   [String] Output format
     ## @param      opt      [Hash] Additional Options
     ##
-    def list_date(dates, section, times = nil, output = nil, opt = {})
+    def list_date(dates, section, times = nil, output = nil, opt)
+      opt ||= {}
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
       section = guess_section(section)
@@ -1666,7 +1684,8 @@ module Doing
     ## @param      output   [String] Output format
     ## @param      opt      [Hash] Additional Options
     ##
-    def yesterday(section, times = nil, output = nil, opt = {})
+    def yesterday(section, times = nil, output = nil, opt)
+      opt ||= {}
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
       section = guess_section(section)
@@ -1701,7 +1720,8 @@ module Doing
     ## @param      section  [String] The section to show from, default Currently
     ## @param      opt      [Hash] Additional Options
     ##
-    def recent(count = 10, section = nil, opt = {})
+    def recent(count = 10, section = nil, opt)
+      opt ||= {}
       times = opt[:t] || true
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
@@ -1782,13 +1802,14 @@ module Doing
     ## Does not repeat tags in a title, and only converts the first instance of an
     ## untagged keyword
     ##
-    ## @param      text  [String] The text to tag
+    ## @param      string  [String] The text to tag
     ##
-    def autotag(text)
-      return unless text
-      return text unless @auto_tag
+    def autotag(string)
+      return unless string
+      return string unless @auto_tag
 
-      original = text.dup
+      original = string.dup
+      text = string.dup
 
       current_tags = text.scan(/@\w+/).map { |t| t.sub(/^@/, '') }
       tagged = {
@@ -2097,7 +2118,8 @@ EOS
     ## @return     [String] formatted output based on opt[:output]
     ##             template trigger
     ##
-    def output(items, title, is_single, opt = {})
+    def output(items, title, is_single, opt)
+      opt ||= {}
       out = nil
 
       raise InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
@@ -2141,7 +2163,8 @@ EOS
     ##                          section
     ## @param      opt          [Hash] Additional Options
     ##
-    def do_archive(section, destination, opt = {})
+    def do_archive(section, destination, opt)
+      opt ||= {}
       count = opt[:count] || 0
       tags  = opt[:tags] || []
       bool  = opt[:bool] || :and

@@ -259,6 +259,7 @@ module Doing
 
       if @logdev == $stdout
         $stdout.print results.map {|res| res[:message].uncolor }.join("\n")
+        $stdout.puts
       else
         results.each do |msg|
           @logdev.puts color_message(msg[:level], msg[:message])

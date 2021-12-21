@@ -61,6 +61,7 @@ Doing.logger.benchmark(:configure, :start)
 config = Doing.config
 Doing.logger.benchmark(:configure, :finish)
 
+config.settings['backup_dir'] = ENV['DOING_BACKUP_DIR'] if ENV['DOING_BACKUP_DIR']
 settings = config.settings
 wwid.config = settings
 
@@ -3215,6 +3216,22 @@ command :commands_accepting do |c|
   end
 end
 
+command :install_fzf do |c|
+  c.desc 'Force reinstall'
+  c.switch %i[r reinstall], default_value: false
+
+  c.desc 'Uninstall'
+  c.switch %i[u uninstall], default_value: false, negatable: false
+
+  c.action do |g, o, a|
+    if o[:uninstall]
+      Doing::Prompt.uninstall_fzf
+    else
+      Doing.logger.warn('fzf:', 'force reinstall') if o[:reinstall]
+      res = Doing::Prompt.install_fzf(force: o[:reinstall])
+    end
+  end
+end
 
 desc 'Import entries from an external source'
 long_desc "Imports entries from other sources. Available plugins: #{Doing::Plugins.plugin_names(type: :import, separator: ', ')}"
