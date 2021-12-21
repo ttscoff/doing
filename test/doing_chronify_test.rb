@@ -35,7 +35,7 @@ class DoingChronifyTest < Test::Unit::TestCase
   end
 
   def test_back_strftime
-    ts = '2016-03-15 15:32:04 EST'
+    ts = '2016-03-15 15:32:04'
     doing('now', '--back', ts, 'test strftime format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
