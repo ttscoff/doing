@@ -61,6 +61,7 @@ Doing.logger.benchmark(:configure, :start)
 config = Doing.config
 Doing.logger.benchmark(:configure, :finish)
 
+config.settings['backup_dir'] = ENV['DOING_BACKUP_DIR'] if ENV['DOING_BACKUP_DIR']
 settings = config.settings
 wwid.config = settings
 

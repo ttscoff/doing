@@ -1,8 +1,13 @@
 ### 2.1.9
 
+#### IMPROVED
+
+- Only attempt to install fzf if it doesn't exist on the system. In case of errors, this means a user can manually install fzf and still be able to access --interactive options
+
 #### FIXED
 
 - Rotate command only archiving half of requested items
+- Frozen string error in doing import plugin
 
 ### 2.1.8
 
