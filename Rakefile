@@ -55,15 +55,15 @@ task :dockertest, :version do |_, args|
   args.with_defaults(version: '2.7')
   file = case args[:version]
          when /^3/
-          'Dockerfile-3.0'
-        when /6$/
-          'Dockerfile-2.6'
-        when /7$/
-          'Dockerfile-2.7'
-        else
-          'Dockerfile'
-        end
-  `docker build --file #{file} . -t doingtest`
+           'Dockerfile-3.0'
+         when /6$/
+           'Dockerfile-2.6'
+         when /7$/
+           'Dockerfile-2.7'
+         else
+           'Dockerfile'
+         end
+  `docker build . --file #{file} -t doingtest`
   `docker run -it doingtest`
 end
 
