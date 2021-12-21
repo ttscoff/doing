@@ -826,7 +826,7 @@ module Doing
       }
       items = filter_items(Items.new, opt: filter_options)
 
-      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **opt)
+      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, multiple: true)
 
       raise NoResults, 'no items selected' if selection.nil? || selection.empty?
 
