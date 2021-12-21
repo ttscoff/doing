@@ -73,7 +73,18 @@ end
 
 desc 'Development version check'
 task :ver do
-  system 'grep VERSION lib/doing/version.rb'
+  gver = `git ver`
+  cver = IO.read(File.join(File.dirname(__FILE__), 'CHANGELOG.md')).match(/^#+ (\d+\.\d+\.\d+(\w+)?)/)[1]
+  res = `grep VERSION lib/doing/version.rb`
+  version = res.match(/VERSION *= *['"](\d+\.\d+\.\d+(\w+)?)/)[1]
+  puts "git tag: #{gver}"
+  puts "version.rb: #{version}"
+  puts "changelog: #{cver}"
+end
+
+desc 'Changelog version check'
+task :cver do
+  puts IO.read(File.join(File.dirname(__FILE__), 'CHANGELOG.md')).match(/^#+ (\d+\.\d+\.\d+(\w+)?)/)[1]
 end
 
 desc 'Bump incremental version number'
