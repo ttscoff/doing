@@ -366,9 +366,9 @@ local words=$(doing views)
 IFS="$OLD_IFS"
 
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--after --bool --before --count --case --color --duration --from --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --age --bool --before --count --case --color --duration --from --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-b -c -i -o -s -t -x --after --bool --before --count --case --color --duration --from --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-b -c -i -o -s -t -x --after --age --bool --before --count --case --color --duration --from --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --exact' -- $token ) )
   else
   local nocasematchWasOff=0
   shopt nocasematch >/dev/null || nocasematchWasOff=1

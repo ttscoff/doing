@@ -2406,7 +2406,7 @@ command :completion do |c|
 
   c.desc 'Shell to generate for (bash, zsh, fish)'
   c.arg_name 'SHELL'
-  c.flag %i[t type], must_match: /^[bzf](?:[ai]?sh)?$/i, default_value: 'zsh'
+  c.flag %i[t type], must_match: /^(?:[bzf](?:[ai]?sh)?|all)$/i, default_value: 'zsh'
 
   c.desc 'File to write output to'
   c.arg_name 'PATH'

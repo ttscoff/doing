@@ -371,6 +371,7 @@ complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command undo' -
 complete -c doing -l prune -s p -f -r -n '__fish_doing_using_command undo' -d Remove\ old\ backups
 complete -c doing -l redo -s r -f  -n '__fish_doing_using_command undo' -d Redo\ last\ undo
 complete -c doing -l after  -f -r -n '__fish_doing_using_command view' -d View\ entries\ newer\ than\ date
+complete -c doing -l age  -f -r -n '__fish_doing_using_command view' -d Age
 complete -c doing -l bool -s b -f -r -n '__fish_doing_using_command view' -d Tag\ boolean
 complete -c doing -l before  -f -r -n '__fish_doing_using_command view' -d View\ entries\ older\ than\ date
 complete -c doing -l count -s c -f -r -n '__fish_doing_using_command view' -d Count\ to\ display
@@ -414,5 +415,5 @@ complete -f -c doing -s b -l bool -x -n '__fish_doing_using_command again resume
 complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel finish grep search import last mark flag note reset begin rotate select show show tag tags tags view' -a 'case-sensitive ignore smart'
 complete -f -c doing -l tag_sort -x -n '__fish_doing_using_command grep search on recent show since today view yesterday' -a 'name time'
 complete -f -c doing -l tag_order -x -n '__fish_doing_using_command show view yesterday' -a 'asc desc'
-complete -f -c doing -s a -l age -x -n '__fish_doing_using_command show' -a 'oldest newest'
+complete -f -c doing -s a -l age -x -n '__fish_doing_using_command show view' -a 'oldest newest'
 complete -f -c doing -s s -l section -x -n '__fish_doing_using_command again resume autotag cancel done did finish grep search import last mark flag meanwhile note now next on recent reset begin rotate select since tag tags today view wiki yesterday' -a '(__fish_doing_complete_sections)'

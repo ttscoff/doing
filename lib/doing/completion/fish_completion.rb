@@ -132,7 +132,7 @@ module Doing
         need_section = []
 
         @commands.each_with_index do |cmd, i|
-          @bar.advance
+          @bar.advance(status: cmd[:commands].first)
           data = get_help_sections(cmd[:commands].first)
 
           if data[:synopsis].join(' ').strip.split(/ /).last =~ /(path|file)/i
@@ -200,7 +200,7 @@ module Doing
         data = get_help_sections
         @global_options = parse_options(data[:global_options])
         @commands = parse_commands(data[:commands])
-        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Fish completions: \033[0;35;40m[:bar]\033[0m", total: @commands.count, bar_format: :blade)
+        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Fish completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count, bar_format: :blade, status: 'processing subcommands')
         @bar.resize(25)
       end
 
