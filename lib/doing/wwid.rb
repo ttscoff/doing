@@ -620,19 +620,19 @@ module Doing
     ## @param      items  [Array] The items to filter (if empty, filters all items)
     ## @param      opt    [Hash] The filter parameters
     ##
-    ## @option opt [String] :section
-    ## @option opt [Boolean] :unfinished
-    ## @option opt [Array or String] :tag  (Array or comma-separated string)
-    ## @option opt [Symbol] :tag_bool  (:and, :or, :not)
-    ## @option opt [String] :search  (string, optional regex with //)
-    ## @option opt [Array] :date_filter  [[Time]start, [Time]end]
-    ## @option opt [Boolean] :only_timed
-    ## @option opt [String] :before  (Date/Time string, unparsed)
-    ## @option opt [String] :after  (Date/Time string, unparsed)
-    ## @option opt [Boolean] :today
-    ## @option opt [Boolean] :yesterday
-    ## @option opt [Number] :count  (Number to return)
-    ## @option opt [String] :age  ('old' or 'new')
+    ## @option opt [String] :section ('all')
+    ## @option opt [Boolean] :unfinished (false)
+    ## @option opt [Array or String] :tag ([]) Array or comma-separated string
+    ## @option opt [Symbol] :tag_bool (:and) :and, :or, :not
+    ## @option opt [String] :search ('') string, optional regex with `/string/`
+    ## @option opt [Array] :date_filter (nil) [[Time]start, [Time]end]
+    ## @option opt [Boolean] :only_timed (false)
+    ## @option opt [String] :before (nil) Date/Time string, unparsed
+    ## @option opt [String] :after  (nil) Date/Time string, unparsed
+    ## @option opt [Boolean] :today (false) limit to entries from today
+    ## @option opt [Boolean] :yesterday (false) limit to entries from yesterday
+    ## @option opt [Number] :count (0) max entries to return
+    ## @option opt [String] :age (new) 'old' or 'new'
     ##
     def filter_items(items = Items.new, opt: {})
       time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
@@ -789,7 +789,7 @@ module Doing
 
       output = Items.new
 
-      if opt[:age] =~ /^o/i
+      if opt[:age].normalize_age == :oldest
         output.concat(filtered_items.slice(0, count).reverse)
       else
         output.concat(filtered_items.reverse.slice(0, count))
@@ -1519,7 +1519,8 @@ module Doing
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
       opt[:count] ||= 0
-      opt[:age] ||= 'newest'
+      opt[:age] ||= :newest
+      opt[:age] = opt[:age].normalize_age
       opt[:format] ||= cfg['date_format']
       opt[:order] ||= cfg['order'] || 'asc'
       opt[:tag_order] ||= 'asc'

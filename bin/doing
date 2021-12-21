@@ -827,7 +827,7 @@ command %i[done did] do |c|
       is_new = false
 
       if args.empty?
-        last_entry = wwid.filter_items([], opt: {unfinished: options[:unfinished], section: section, count: 1, age: 'new'}).max_by { |item| item.date }
+        last_entry = wwid.filter_items([], opt: { unfinished: options[:unfinished], section: section, count: 1, age: :newest }).max_by { |item| item.date }
 
         unless last_entry
           Doing.logger.debug('Skipped:', options[:unfinished] ? 'No unfinished entry' : 'Last entry already @done')
@@ -1806,6 +1806,7 @@ command :show do |c|
     end
 
     opt = options.dup
+    opt[:age] = options[:age].normalize_age(:newest)
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
     opt[:highlight] = true
@@ -2438,6 +2439,10 @@ command :view do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc 'Age (oldest|newest)'
+  c.arg_name 'AGE'
+  c.flag %i[age], default_value: 'newest'
+
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
@@ -2615,6 +2620,7 @@ command :view do |c|
       end
 
       opts = options.dup
+      opts[:age] = opts[:age].normalize_age(:newest)
       opts[:view_template] = title
       opts[:count] = count
       opts[:format] = date_format

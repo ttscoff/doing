@@ -264,6 +264,26 @@ module Doing
     end
 
     ##
+    ## Convert an age string to a qualified type
+    ##
+    ## @return     [Symbol] :oldest or :newest
+    ##
+    def normalize_age!(default = :newest)
+      replace normalize_age(default)
+    end
+
+    def normalize_age(default = :newest)
+      case self
+      when /^o/i
+        :oldest
+      when /^n/i
+        :newest
+      else
+        default
+      end
+    end
+
+    ##
     ## Convert a sort order string to a qualified type
     ##
     ## @return     [String] 'asc' or 'desc'
