@@ -826,7 +826,11 @@ module Doing
       }
       items = filter_items(Items.new, opt: filter_options)
 
-      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, multiple: true)
+      menu_options = %i[search query exact multiple show_if_single menu sort case].each_with_object({}) {
+        |k, hsh| hsh[k] = opt[k]
+      }
+
+      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **menu_options)
 
       raise NoResults, 'no items selected' if selection.nil? || selection.empty?
 

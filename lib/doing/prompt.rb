@@ -189,7 +189,7 @@ module Doing
           %(-q "#{query}"),
           '--info=inline'
         ]
-        fzf_args.push('-1') unless opt.fetch(:show_if_single)
+        fzf_args.push('-1') unless opt.fetch(:show_if_single, false)
         fzf_args << case case_sensitive
                     when :sensitive
                       '+i'
