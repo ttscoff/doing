@@ -416,7 +416,10 @@ module Doing
       end
 
       begin
+
         user_config = Util.safe_load_file(config_file)
+        raise StandardError, 'Invalid config file format' unless user_config.is_a?(Hash)
+
         if user_config.key?('html_template')
           user_config['export_templates'] ||= {}
           user_config['export_templates'].deep_merge(user_config.delete('html_template'))
