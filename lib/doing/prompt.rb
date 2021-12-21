@@ -87,6 +87,11 @@ module Doing
       end
 
       def install_fzf
+        if TTY::Which.exist?('fzf')
+          Doing.logger.debug('Select:', 'Using user-installed fzf')
+          return TTY::Which.which('fzf')
+        end
+
         fzf_dir = File.join(File.dirname(__FILE__), '../helpers/fzf')
         FileUtils.mkdir_p(fzf_dir) unless File.directory?(fzf_dir)
         fzf_bin = File.join(fzf_dir, 'bin/fzf')
