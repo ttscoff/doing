@@ -38,21 +38,26 @@ end
 namespace :test do
 
   FileList['test/*_test.rb'].each do |rakefile|
-    test_name = File.basename(rakefile, '.rb').sub(%r{^.*?_(.*?)_.*?$}, '\1')
+    test_name = File.basename(rakefile, '.rb').sub(/^.*?_(.*?)_.*?$/, '\1')
 
     Rake::TestTask.new(:"#{test_name}") do |t|
       t.libs << ['test', 'test/helpers']
       t.pattern = rakefile
       t.verbose = ENV['VERBOSE'] =~ /(true|1)/i ? true : false
     end
-    #Define default task for :test
-    task :default => test_name
+    # Define default task for :test
+    task default: test_name
   end
-
 end
 
-desc "Run all tests"
-task :test => 'test:default'
+desc 'Run Docker test (Ruby 2.6)'
+task :dockertest do
+  `docker build . -t doingtest`
+  `docker run -it doingtest`
+end
+
+desc 'Run all tests'
+task test: 'test:default'
 
 desc 'Run one test verbosely'
 task :test_one, :test do |_, args|
