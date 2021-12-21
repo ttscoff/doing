@@ -1,3 +1,9 @@
+### 2.1.10
+
+#### NEW
+
+- --age (oldest|newest) option for view command
+
 ### 2.1.9
 
 #### IMPROVED
