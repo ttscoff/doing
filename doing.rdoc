@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.9
+v2.1.10
 
 === Global Options
 === --config_file arg
@@ -397,7 +397,7 @@ File to write output to
 Shell to generate for (bash, zsh, fish)
 
 [Default Value] zsh
-[Must Match] (?i-mx:^[bzf](?:[ai]?sh)?$)
+[Must Match] (?i-mx:^(?:[bzf](?:[ai]?sh)?|all)$)
 
 
 ==== Command: <tt>config </tt>
@@ -2153,6 +2153,13 @@ Command line options override view configuration.
 View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
 
 [Default Value] None
+
+
+===== --age AGE
+
+Age (oldest|newest)
+
+[Default Value] newest
 
 
 ===== -b|--bool BOOLEAN

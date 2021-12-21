@@ -827,7 +827,7 @@ command %i[done did] do |c|
       is_new = false
 
       if args.empty?
-        last_entry = wwid.filter_items([], opt: {unfinished: options[:unfinished], section: section, count: 1, age: 'new'}).max_by { |item| item.date }
+        last_entry = wwid.filter_items([], opt: { unfinished: options[:unfinished], section: section, count: 1, age: :newest }).max_by { |item| item.date }
 
         unless last_entry
           Doing.logger.debug('Skipped:', options[:unfinished] ? 'No unfinished entry' : 'Last entry already @done')
@@ -1805,7 +1805,10 @@ command :show do |c|
       end
     end
 
+    options[:age] ||= :newest
+
     opt = options.dup
+    opt[:age] = options[:age].normalize_age(:newest) if options[:age]
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
     opt[:highlight] = true
@@ -2405,7 +2408,7 @@ command :completion do |c|
 
   c.desc 'Shell to generate for (bash, zsh, fish)'
   c.arg_name 'SHELL'
-  c.flag %i[t type], must_match: /^[bzf](?:[ai]?sh)?$/i, default_value: 'zsh'
+  c.flag %i[t type], must_match: /^(?:[bzf](?:[ai]?sh)?|all)$/i, default_value: 'zsh'
 
   c.desc 'File to write output to'
   c.arg_name 'PATH'
@@ -2437,6 +2440,10 @@ command :view do |c|
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
+
+  c.desc 'Age (oldest|newest)'
+  c.arg_name 'AGE'
+  c.flag %i[age], default_value: 'newest'
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -2614,7 +2621,10 @@ command :view do |c|
         search.sub!(/^'?/, "'") if options[:exact]
       end
 
+      options[:age] ||= :newest
+
       opts = options.dup
+      opts[:age] = options[:age].normalize_age(:newest)
       opts[:view_template] = title
       opts[:count] = count
       opts[:format] = date_format

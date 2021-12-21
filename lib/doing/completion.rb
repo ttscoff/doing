@@ -19,11 +19,21 @@ module Doing
       # @param      file  [String] Path to save to, or 'stdout'
       #
       def generate_completion(type: 'zsh', file: 'stdout')
+        if type =~ /^all$/i
+          Doing.logger.log_now(:warn, 'Generating:', 'all completion types, will use default paths')
+          generate_completion(type: 'fish', file: 'lib/completion/doing.fish')
+          Doing.logger.warn('File written:', "fish completions written to lib/completion/doing.fish")
+          generate_completion(type: 'zsh', file: 'lib/completion/_doing.zsh')
+          Doing.logger.warn('File written:', "zsh completions written to lib/completion/_doing.zsh")
+          generate_completion(type: 'bash', file: 'lib/completion/doing.bash')
+          Doing.logger.warn('File written:', "bash completions written to lib/completion/doing.bash")
+          return
+        end
 
         generator = case type.to_s
-                    when /^f/
+                    when /^f/i
                       FishCompletions.new
-                    when /^b/
+                    when /^b/i
                       BashCompletions.new
                     else
                       ZshCompletions.new
