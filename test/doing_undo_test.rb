@@ -23,6 +23,8 @@ class DoingUndoTest < Test::Unit::TestCase
 
   def test_undo
     entries = [
+      'backlog entry 1',
+      'backlog entry 2',
       'Begin history',
       'Test entry 1',
       'Test entry 2'
@@ -44,6 +46,11 @@ class DoingUndoTest < Test::Unit::TestCase
 
     doing('undo', '--redo')
     assert_contains_entry('Test entry 1', doing('show'))
+
+    $stderr.puts(Dir.glob('*.md', base: @backup_dir))
+    doing('undo', '--prune', '0')
+    $stderr.puts(Dir.glob('*.md', base: @backup_dir))
+    assert_equal(0, Dir.glob('*.md', base: @backup_dir).count)
   end
 
   private

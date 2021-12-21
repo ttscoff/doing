@@ -20,6 +20,21 @@ module Doing
         backups[limit..-1].each do |file|
           FileUtils.rm(File.join(backup_dir, file))
         end
+
+        clear_redo(filename)
+      end
+
+      ##
+      ## Delete all redo files
+      ##
+      ## @param      limit  Maximum number of backups to retain
+      ##
+      def clear_redo(filename)
+        filename ||= Doing.config.settings['doing_file']
+        backups = Dir.glob("undone*___#{File.basename(filename)}", base: backup_dir).sort.reverse
+        backups.each do |file|
+          FileUtils.rm(File.join(backup_dir, file))
+        end
       end
 
       ##
@@ -103,6 +118,8 @@ module Doing
           arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
         end
 
+        raise DoingRuntimeError, 'No backup files to load' if options.empty?
+
         backup_file = show_menu(options, filename)
         idx = undones.index(File.basename(backup_file))
         skipped = undones.slice!(idx, undones.count - idx)
@@ -134,6 +151,8 @@ module Doing
           next if d.nil?
           arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
         end
+
+        raise DoingRuntimeError, 'No backup files to load' if options.empty?
 
         backup_file = show_menu(options, filename)
         Util.write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
@@ -215,10 +234,10 @@ module Doing
         Time.now.strftime('%Y-%m-%d_%H.%M.%S')
       end
 
-      def get_backups(filename = nil)
+      def get_backups(filename = nil, include_forward: false)
         filename ||= Doing.config.settings['doing_file']
         backups = Dir.glob("*___#{File.basename(filename)}", base: backup_dir).sort.reverse
-        backups.delete_if { |f| f =~ /^undone/ }
+        backups.delete_if { |f| f =~ /^undone/ } unless include_forward
       end
 
       def save_undone(filename = nil)
