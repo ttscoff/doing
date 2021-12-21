@@ -115,7 +115,6 @@ module Doing
         if force
           uninstall_fzf
         elsif which_fzf
-          Doing.logger.info('fzf:', "using #{which_fzf}")
           return which_fzf
         end
 
