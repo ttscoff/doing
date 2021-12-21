@@ -47,9 +47,7 @@ class DoingUndoTest < Test::Unit::TestCase
     doing('undo', '--redo')
     assert_contains_entry('Test entry 1', doing('show'))
 
-    $stderr.puts(Dir.glob('*.md', base: @backup_dir))
     doing('undo', '--prune', '0')
-    $stderr.puts(Dir.glob('*.md', base: @backup_dir))
     assert_equal(0, Dir.glob('*.md', base: @backup_dir).count)
   end
 
