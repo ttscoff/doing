@@ -789,7 +789,7 @@ module Doing
 
       output = Items.new
 
-      if opt[:age].normalize_age == :oldest
+      if opt[:age] && opt[:age].normalize_age == :oldest
         output.concat(filtered_items.slice(0, count).reverse)
       else
         output.concat(filtered_items.reverse.slice(0, count))

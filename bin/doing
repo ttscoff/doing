@@ -1805,8 +1805,10 @@ command :show do |c|
       end
     end
 
+    options[:age] ||= :newest
+
     opt = options.dup
-    opt[:age] = options[:age].normalize_age(:newest)
+    opt[:age] = options[:age].normalize_age(:newest) if options[:age]
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
     opt[:highlight] = true
@@ -2619,8 +2621,10 @@ command :view do |c|
         search.sub!(/^'?/, "'") if options[:exact]
       end
 
+      options[:age] ||= :newest
+
       opts = options.dup
-      opts[:age] = opts[:age].normalize_age(:newest)
+      opts[:age] = options[:age].normalize_age(:newest)
       opts[:view_template] = title
       opts[:count] = count
       opts[:format] = date_format
