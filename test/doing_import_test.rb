@@ -65,6 +65,7 @@ class DoingImportTest < Test::Unit::TestCase
     json = JSON.parse(IO.read(@timing_import_file))
     target = json.count
     doing('done', '--back', '2021-07-22 11:20', '--took', '30m', 'Testing overlapping entry')
+    doing('done', '--back', '2021-07-22 15:20', '--took', '30m', 'Testing overlapping entry')
     result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--no-overlap', @timing_import_file)
     assert_match(/Skipped: 1 overlapping item/, result, "Should have skipped #{target} duplicate entries")
     assert_match(/Imported: #{target - 1} items/, result, "Should have imported #{target - 1} entries")
