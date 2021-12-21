@@ -101,6 +101,16 @@ module Doing
         TTY::Which.which('fzf')
       end
 
+      def silence_std(file = '/dev/null')
+        $stdout = File.new(file, 'w')
+        $stderr = File.new(file, 'w')
+      end
+
+      def restore_std
+        $stdout = STDOUT
+        $stderr = STDERR
+      end
+
       def install_fzf(force: false)
         if force
           uninstall_fzf
@@ -118,11 +128,15 @@ module Doing
         Doing.logger.log_now(:warn, 'fzf:', 'Compiling and installing fzf -- this will only happen once')
         Doing.logger.log_now(:warn, 'fzf:', 'fzf is copyright Junegunn Choi, MIT License <https://github.com/junegunn/fzf/blob/master/LICENSE>')
 
-        system("'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
+        silence_std
+        `'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null`
         unless File.exist?(fzf_bin)
+          restore_std
           Doing.logger.log_now(:warn, 'Error installing, trying again as root')
-          system("sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
+          silence_std
+          `sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null`
         end
+        restore_std
         unless File.exist?(fzf_bin)
           Doing.logger.error('fzf:', 'unable to install fzf. You can install manually and Doing will use the system version.')
           Doing.logger.error('fzf:', 'see https://github.com/junegunn/fzf#installation')
