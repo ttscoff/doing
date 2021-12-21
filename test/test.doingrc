@@ -110,4 +110,4 @@ editors:
   doing_file:
   config:
 paginate: false
-backup_dir: "~/Desktop/Code/doing/test/doing_test_backup"
+backup_dir: "test/doing_test_backup"

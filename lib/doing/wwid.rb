@@ -1802,13 +1802,14 @@ module Doing
     ## Does not repeat tags in a title, and only converts the first instance of an
     ## untagged keyword
     ##
-    ## @param      text  [String] The text to tag
+    ## @param      string  [String] The text to tag
     ##
-    def autotag(text)
-      return unless text
-      return text unless @auto_tag
+    def autotag(string)
+      return unless string
+      return string unless @auto_tag
 
-      original = text.dup
+      original = string.dup
+      text = string.dup
 
       current_tags = text.scan(/@\w+/).map { |t| t.sub(/^@/, '') }
       tagged = {
