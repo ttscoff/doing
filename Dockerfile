@@ -4,6 +4,6 @@ RUN mkdir /doing
 WORKDIR /doing
 COPY ./ /doing/
 RUN gem install bundler:2.2.17
-RUN bundle update --bundler
+# RUN bundle update --bundler
 RUN bundle install
 CMD ["rake", "parallel:test"]

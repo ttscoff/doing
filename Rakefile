@@ -8,6 +8,7 @@ require 'open3'
 require 'yard'
 require 'parallel_tests'
 require 'parallel_tests/tasks'
+require 'tty-spinner'
 
 YARD::Rake::YardocTask.new do |t|
  t.files = ['lib/doing/*.rb']
@@ -53,18 +54,33 @@ end
 desc 'Run tests in Docker'
 task :dockertest, :version do |_, args|
   args.with_defaults(version: '2.7')
-  file = case args[:version]
-         when /^3/
-           'Dockerfile-3.0'
-         when /6$/
-           'Dockerfile-2.6'
-         when /7$/
-           'Dockerfile-2.7'
-         else
-           'Dockerfile'
-         end
-  `docker build . --file #{file} -t doingtest`
-  `docker run -it doingtest`
+  case args[:version]
+  when /^3/
+    img = 'doingtest3'
+    file = 'Dockerfile-3.0'
+  when /6$/
+    img = 'doingtest26'
+    file = 'Dockerfile-2.6'
+  when /(^2|7$)/
+    img = 'doingtest27'
+    file = 'Dockerfile-2.7'
+  else
+    img = 'doingtest'
+    file = 'Dockerfile'
+  end
+
+  puts `docker build . --file #{file} -t #{img}`
+
+  spinner = TTY::Spinner.new('[:spinner] Running tests ...', hide_cursor: true)
+
+  spinner.auto_spin # Automatic animation with default interval
+  res = `docker run -it #{img} 2>1`
+  commit = puts `bash -c "docker commit $(docker ps -a|grep #{img}|awk '{print $1}'|head -n 1) #{img}"`.strip
+  spinner.success
+  spinner.stop
+
+  puts res
+  puts commit.empty? ? "Error commiting Docker tag #{img}" : "Committed Docker tag #{img}"
 end
 
 desc 'Run all tests'
