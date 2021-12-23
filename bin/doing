@@ -3089,7 +3089,8 @@ command :config do |c|
 
       end
 
-      config_file = config.choose_config
+      config_file = config.choose_config(create: true)
+
       cfg = YAML.safe_load_file(config_file) || {}
 
       $stderr.puts "Updating #{config_file}".yellow
@@ -3098,11 +3099,13 @@ command :config do |c|
         cfg.deep_set(real_path, nil)
         $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('->').boldwhite}"
       else
+        current_value = cfg.dig(*real_path)
         cfg.deep_set(real_path, value.set_type(old_type))
 
-        $stderr.puts "#{'Key path:'.yellow} #{real_path.join('->').boldwhite}"
-        $stderr.puts "#{'Previous:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
-        $stderr.puts "#{'     New:'.yellow} #{value.set_type(old_type).to_s.boldwhite}"
+        $stderr.puts "#{' Key path:'.yellow} #{real_path.join('->').boldwhite}"
+        $stderr.puts "#{'Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
+        $stderr.puts "#{'  Current:'.yellow} #{ (current_value ? current_value.to_s : 'empty').boldwhite }"
+        $stderr.puts "#{'      New:'.yellow} #{value.set_type(old_type).to_s.boldwhite}"
       end
 
       res = Doing::Prompt.yn('Update selected config', default_response: true)
@@ -3242,6 +3245,30 @@ command :install_fzf do |c|
     end
   end
 end
+
+desc 'Set the default tags for the current directory'
+long_desc 'Adds default_tags to a .doingrc file in the current directory. Any entry created in this directory or its
+subdirectories will be tagged with the default tags. You can modify these any time using the `config set` commnand or
+manually editing the .doingrc file.'
+arg_name 'TAG [TAG..]'
+command :tag_dir do |c|
+  c.example 'doing tag_dir project1 project2', desc: 'Add @project1 and @project to to any entries in the current directory'
+
+  c.desc 'Remove all default_tags from the local .doingrc'
+  c.switch %i[r remove], negatable: false
+
+  c.action do |global, options, args|
+    tags = args.join(' ').gsub(/ *, */, ' ').split(' ')
+
+    cfg_cmd = commands[:config]
+    set_cmd = cfg_cmd.commands[:set]
+    set_args = ['default_tags', tags.join(',')]
+    action = set_cmd.send(:get_action, nil)
+    return action.call(global, {}, set_args)
+  end
+end
+
+
 
 desc 'Import entries from an external source'
 long_desc "Imports entries from other sources. Available plugins: #{Doing::Plugins.plugin_names(type: :import, separator: ', ')}"

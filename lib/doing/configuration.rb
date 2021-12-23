@@ -152,16 +152,22 @@ module Doing
     ##
     ## @return     [String] file path
     ##
-    def choose_config
+    def choose_config(create: false)
       return @config_file if @force_answer
 
-      if @additional_configs.count.positive?
+      if @additional_configs.count.positive? || create
         choices = [@config_file].concat(@additional_configs)
+        choices.push('Create a new .doingrc in the current directory') if create && !File.exist?('.doingrc')
         res = Doing::Prompt.choose_from(choices.uniq.sort.reverse,
                                         sorted: false,
                                         prompt: 'Local configs found, select which to update > ')
 
         raise UserCancelled, 'Cancelled' unless res
+
+        if res =~ /^Create a new/
+          res = File.expand_path('.doingrc')
+          FileUtils.touch(res)
+        end
 
         res.strip || @config_file
       else
