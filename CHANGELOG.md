@@ -1,3 +1,9 @@
+### 2.1.11
+
+#### NEW
+
+- Tag_dir command creates/updates .doingrc files in the current directory with default_tags values. Then all entries created within that directory (or subdirs) get tagged with that value.
+
 ### 2.1.10
 
 #### NEW

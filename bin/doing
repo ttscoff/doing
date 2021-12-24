@@ -3262,9 +3262,15 @@ command :tag_dir do |c|
 
     cfg_cmd = commands[:config]
     set_cmd = cfg_cmd.commands[:set]
-    set_args = ['default_tags', tags.join(',')]
+    set_options = {}
+    if options[:remove]
+      set_args = ['default_tags']
+      set_options[:remove] = true
+    else
+      set_args = ['default_tags', tags.join(',')]
+    end
     action = set_cmd.send(:get_action, nil)
-    return action.call(global, {}, set_args)
+    return action.call(global, set_options, set_args)
   end
 end
 
