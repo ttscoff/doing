@@ -980,11 +980,7 @@ module Doing
       end
 
       if opt[:delete]
-        res = opt[:force] ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
-        if res
-          items.each { |i| @content.delete_item(i, single: items.count == 1) }
-          write(@doing_file)
-        end
+        delete_items(items, force: opt[:force])
         return
       end
 
@@ -1020,50 +1016,7 @@ module Doing
       write(@doing_file)
 
       if opt[:editor]
-
-        editable_items = []
-
-        items.each do |i|
-          editable = "#{i.date.strftime('%F %R')} | #{i.title}"
-          old_note = i.note ? i.note.strip_lines.join("\n") : nil
-          editable += "\n#{old_note}" unless old_note.nil?
-          editable_items << editable
-        end
-        divider = "\n-----------\n"
-        notice =<<~EONOTICE
-        # - You may delete entries, but leave all divider lines (---) in place.
-        # - Start and @done dates replaced with a time string (yesterday 3pm) will
-        #   be parsed automatically. Do not delete the pipe (|) between start date
-        #   and entry title.
-        EONOTICE
-        input =  "#{editable_items.map(&:strip).join(divider)}\n\n#{notice}"
-
-        new_items = fork_editor(input).split(/#{divider}/)
-
-        new_items.each_with_index do |new_item, i|
-          input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
-          first_line = input_lines[0]&.strip
-
-          if first_line.nil? || first_line =~ /^#{divider.strip}$/ || first_line.strip.empty?
-            @content.delete_item(items[i], single: new_items.count == 1)
-            Doing.logger.count(:deleted)
-          else
-            date, title, note = format_input(new_item)
-
-            note.map!(&:strip)
-            note.delete_if(&:ignore?)
-            item = items[i]
-            old_item = item.dup
-            item.date = date || items[i].date
-            item.title = title
-            item.note = note
-            if (item.equal?(old_item))
-              Doing.logger.count(:skipped, level: :debug)
-            else
-              Doing.logger.count(:updated)
-            end
-          end
-        end
+        edit_items(items)
 
         write(@doing_file)
       end
@@ -1104,6 +1057,60 @@ module Doing
         logger.warn('File written:', file)
       else
         Doing::Pager.page output
+      end
+    end
+
+    def delete_items(items, force: false)
+      res = force ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
+      if res
+        items.each { |i| @content.delete_item(i, single: items.count == 1) }
+        write(@doing_file)
+      end
+    end
+
+    def edit_items(items)
+      editable_items = []
+
+      items.each do |i|
+        editable = "#{i.date.strftime('%F %R')} | #{i.title}"
+        old_note = i.note ? i.note.strip_lines.join("\n") : nil
+        editable += "\n#{old_note}" unless old_note.nil?
+        editable_items << editable
+      end
+      divider = "\n-----------\n"
+      notice =<<~EONOTICE
+      # - You may delete entries, but leave all divider lines (---) in place.
+      # - Start and @done dates replaced with a time string (yesterday 3pm) will
+      #   be parsed automatically. Do not delete the pipe (|) between start date
+      #   and entry title.
+      EONOTICE
+      input =  "#{editable_items.map(&:strip).join(divider)}\n\n#{notice}"
+
+      new_items = fork_editor(input).split(/#{divider}/)
+
+      new_items.each_with_index do |new_item, i|
+        input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
+        first_line = input_lines[0]&.strip
+
+        if first_line.nil? || first_line =~ /^#{divider.strip}$/ || first_line.strip.empty?
+          @content.delete_item(items[i], single: new_items.count == 1)
+          Doing.logger.count(:deleted)
+        else
+          date, title, note = format_input(new_item)
+
+          note.map!(&:strip)
+          note.delete_if(&:ignore?)
+          item = items[i]
+          old_item = item.dup
+          item.date = date || items[i].date
+          item.title = title
+          item.note = note
+          if (item.equal?(old_item))
+            Doing.logger.count(:skipped, level: :debug)
+          else
+            Doing.logger.count(:updated)
+          end
+        end
       end
     end
 
@@ -1552,11 +1559,10 @@ module Doing
       items.reverse! unless opt[:order] =~ /^d/i
 
       if opt[:delete]
-        res = opt[:force] ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
-        if res
-          items.each { |i| @content.delete_item(i, single: items.count == 1) }
-          write(@doing_file)
-        end
+        delete_items(items, force: opt[:force])
+        return
+      elsif opt[:editor]
+        edit_items(items)
         return
       elsif opt[:interactive]
         opt[:menu] = !opt[:force]
