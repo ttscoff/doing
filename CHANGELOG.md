@@ -5,10 +5,12 @@
 - Tag_dir command creates/updates .doingrc files in the current directory with default_tags values. Then all entries created within that directory (or subdirs) get tagged with that value.
 - Synonym triggers allow `*` and `?` wildcards
 - Add `--delete` flag for `doing last` to delete last entry
+- --delete and --editor flags for `doing search`, batch edit and delete
 
 #### IMPROVED
 
 - If you need to use a colon in an autotag transform pattern, you can split with double colon, e.g. pattern::replacement
+- Arrays defined in local configurations merge with main config instead of overwriting
 
 ### 2.1.10
 
