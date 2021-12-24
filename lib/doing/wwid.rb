@@ -798,6 +798,60 @@ module Doing
       output
     end
 
+    def delete_items(items, force: false)
+      res = force ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
+      if res
+        items.each { |i| @content.delete_item(i, single: items.count == 1) }
+        write(@doing_file)
+      end
+    end
+
+    def edit_items(items)
+      editable_items = []
+
+      items.each do |i|
+        editable = "#{i.date.strftime('%F %R')} | #{i.title}"
+        old_note = i.note ? i.note.strip_lines.join("\n") : nil
+        editable += "\n#{old_note}" unless old_note.nil?
+        editable_items << editable
+      end
+      divider = "\n-----------\n"
+      notice =<<~EONOTICE
+      # - You may delete entries, but leave all divider lines (---) in place.
+      # - Start and @done dates replaced with a time string (yesterday 3pm) will
+      #   be parsed automatically. Do not delete the pipe (|) between start date
+      #   and entry title.
+      EONOTICE
+      input =  "#{editable_items.map(&:strip).join(divider)}\n\n#{notice}"
+
+      new_items = fork_editor(input).split(/#{divider}/)
+
+      new_items.each_with_index do |new_item, i|
+        input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
+        first_line = input_lines[0]&.strip
+
+        if first_line.nil? || first_line =~ /^#{divider.strip}$/ || first_line.strip.empty?
+          @content.delete_item(items[i], single: new_items.count == 1)
+          Doing.logger.count(:deleted)
+        else
+          date, title, note = format_input(new_item)
+
+          note.map!(&:strip)
+          note.delete_if(&:ignore?)
+          item = items[i]
+          old_item = item.dup
+          item.date = date || items[i].date
+          item.title = title
+          item.note = note
+          if (item.equal?(old_item))
+            Doing.logger.count(:skipped, level: :debug)
+          else
+            Doing.logger.count(:updated)
+          end
+        end
+      end
+    end
+
     ##
     ## Display an interactive menu of entries
     ##
@@ -1057,60 +1111,6 @@ module Doing
         logger.warn('File written:', file)
       else
         Doing::Pager.page output
-      end
-    end
-
-    def delete_items(items, force: false)
-      res = force ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
-      if res
-        items.each { |i| @content.delete_item(i, single: items.count == 1) }
-        write(@doing_file)
-      end
-    end
-
-    def edit_items(items)
-      editable_items = []
-
-      items.each do |i|
-        editable = "#{i.date.strftime('%F %R')} | #{i.title}"
-        old_note = i.note ? i.note.strip_lines.join("\n") : nil
-        editable += "\n#{old_note}" unless old_note.nil?
-        editable_items << editable
-      end
-      divider = "\n-----------\n"
-      notice =<<~EONOTICE
-      # - You may delete entries, but leave all divider lines (---) in place.
-      # - Start and @done dates replaced with a time string (yesterday 3pm) will
-      #   be parsed automatically. Do not delete the pipe (|) between start date
-      #   and entry title.
-      EONOTICE
-      input =  "#{editable_items.map(&:strip).join(divider)}\n\n#{notice}"
-
-      new_items = fork_editor(input).split(/#{divider}/)
-
-      new_items.each_with_index do |new_item, i|
-        input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
-        first_line = input_lines[0]&.strip
-
-        if first_line.nil? || first_line =~ /^#{divider.strip}$/ || first_line.strip.empty?
-          @content.delete_item(items[i], single: new_items.count == 1)
-          Doing.logger.count(:deleted)
-        else
-          date, title, note = format_input(new_item)
-
-          note.map!(&:strip)
-          note.delete_if(&:ignore?)
-          item = items[i]
-          old_item = item.dup
-          item.date = date || items[i].date
-          item.title = title
-          item.note = note
-          if (item.equal?(old_item))
-            Doing.logger.count(:skipped, level: :debug)
-          else
-            Doing.logger.count(:updated)
-          end
-        end
       end
     end
 
@@ -1510,7 +1510,7 @@ module Doing
       tpl_cfg = @config.dig('templates', opt[:config_template])
 
       cfg = if opt[:view_template]
-              @config.dig('views', opt[:view_template]).deep_merge(tpl_cfg)
+              @config.dig('views', opt[:view_template]).deep_merge(tpl_cfg, { extend_existing_arrays: true, sort_merged_arrays: true })
             else
               tpl_cfg
             end
@@ -1522,7 +1522,7 @@ module Doing
                        'tags_color' => @config['tags_color'],
                        'duration' => @config['duration'],
                        'interval_format' => @config['interval_format']
-                     })
+                     }, { extend_existing_arrays: true, sort_merged_arrays: true })
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
       opt[:count] ||= 0
@@ -1624,14 +1624,14 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates']['today'].deep_merge(@config['templates']['default']).deep_merge({
+      cfg = @config['templates']['today'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
-      })
+      }, { extend_existing_arrays: true, sort_merged_arrays: true })
 
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
@@ -1740,14 +1740,14 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates']['recent'].deep_merge(@config['templates']['default']).deep_merge({
+      cfg = @config['templates']['recent'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
-      })
+      }, { extend_existing_arrays: true, sort_merged_arrays: true })
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
 
@@ -1774,14 +1774,14 @@ module Doing
     ##
     def last(times: true, section: nil, options: {})
       section = section.nil? || section =~ /all/i ? 'All' : guess_section(section)
-      cfg = @config['templates']['last'].deep_merge(@config['templates']['default']).deep_merge({
+      cfg = @config['templates']['last'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
-      })
+      }, { extend_existing_arrays: true, sort_merged_arrays: true })
       options[:duration] ||= cfg['duration'] || false
       options[:interval_format] ||= cfg['interval_format'] || 'text'
 
