@@ -1297,6 +1297,16 @@ command :tags do |c|
 
     items = wwid.filter_items([], opt: options)
 
+    if options[:interactive]
+      items = Doing::Prompt.choose_from_items(items, include_section: options[:section].nil?,
+        menu: true,
+        header: '',
+        prompt: 'Select entries to scan > ',
+        multiple: true,
+        sort: true,
+        show_if_single: true)
+    end
+
     # items = wwid.content.in_section(section)
     tags = wwid.all_tags(items, counts: true)
 
