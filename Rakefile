@@ -80,7 +80,7 @@ task :dockertest, :version do |_, args|
   spinner.stop
 
   puts res
-  puts commit.empty? ? "Error commiting Docker tag #{img}" : "Committed Docker tag #{img}"
+  puts commit&.empty? ? "Error commiting Docker tag #{img}" : "Committed Docker tag #{img}"
 end
 
 desc 'Run all tests'

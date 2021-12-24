@@ -2257,6 +2257,9 @@ command :last do |c|
   c.desc "Edit entry with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
+  c.desc "Delete the last entry"
+  c.switch %i[d delete], negatable: false, default_value: false
+
   c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?).'
   c.arg_name 'TAG'
   c.flag [:tag]
@@ -2290,34 +2293,39 @@ command :last do |c|
     raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
 
     if options[:tag].nil?
-      tags = []
+      options[:tag] = []
     else
-      tags = options[:tag].to_tags
+      options[:tag] = options[:tag].to_tags
       options[:bool] = options[:bool].normalize_bool
     end
 
     options[:case] = options[:case].normalize_case
 
-    search = nil
-
-    if options[:search]
-      search = options[:search]
-      search.sub!(/^'?/, "'") if options[:exact]
-    end
+    options[:search] = options[:search].sub(/^'?/, "'") if options[:search] && options[:exact]
 
     if options[:editor]
-      wwid.edit_last(section: options[:section], options: { search: search, fuzzy: options[:fuzzy], case: options[:case], tag: tags, tag_bool: options[:bool], not: options[:not] })
+      wwid.edit_last(section: options[:section],
+                     options: {
+                       search: search,
+                       fuzzy: options[:fuzzy],
+                       case: options[:case],
+                       tag: tags,
+                       tag_bool: options[:bool],
+                       not: options[:not]
+                     })
     else
-      Doing::Pager::page wwid.last(times: true, section: options[:section],
+      last = wwid.last(times: true, section: options[:section],
                      options: {
                         duration: options[:duration],
-                        search: search,
+                        search: options[:search],
                         fuzzy: options[:fuzzy],
                         case: options[:case],
                         negate: options[:not],
-                        tag: tags,
-                        tag_bool: options[:bool]
-                      }).strip
+                        tag: options[:tag],
+                        tag_bool: options[:bool],
+                        delete: options[:delete]
+                      })
+      Doing::Pager::page last.strip if last
     end
   end
 end
@@ -3253,6 +3261,7 @@ manually editing the .doingrc file.'
 arg_name 'TAG [TAG..]'
 command :tag_dir do |c|
   c.example 'doing tag_dir project1 project2', desc: 'Add @project1 and @project to to any entries in the current directory'
+  c.example 'doing tag_dir --remove', desc: 'Clear the default tags for the directory'
 
   c.desc 'Remove all default_tags from the local .doingrc'
   c.switch %i[r remove], negatable: false

@@ -980,7 +980,7 @@ module Doing
       end
 
       if opt[:delete]
-        res = opt[:force] ? true : Prompt.yn("Delete #{items.size} items?", default_response: 'y')
+        res = opt[:force] ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
         if res
           items.each { |i| @content.delete_item(i, single: items.count == 1) }
           write(@doing_file)
@@ -1551,7 +1551,14 @@ module Doing
 
       items.reverse! unless opt[:order] =~ /^d/i
 
-      if opt[:interactive]
+      if opt[:delete]
+        res = opt[:force] ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
+        if res
+          items.each { |i| @content.delete_item(i, single: items.count == 1) }
+          write(@doing_file)
+        end
+        return
+      elsif opt[:interactive]
         opt[:menu] = !opt[:force]
         opt[:query] = '' # opt[:search]
         opt[:multiple] = true
@@ -1783,7 +1790,8 @@ module Doing
         interval_format: options[:interval_format],
         case: options[:case],
         not: options[:negate],
-        config_template: 'last'
+        config_template: 'last',
+        delete: options[:delete]
       }
 
       if options[:tag]
@@ -1832,6 +1840,7 @@ module Doing
 
       @config['autotag']['synonyms'].each do |tag, v|
         v.each do |word|
+          word = word.wildcard_to_rx
           next unless text =~ /\b#{word}\b/i
 
           unless current_tags.include?(tag) || tagged[:whitelisted].include?(tag)
@@ -1845,7 +1854,12 @@ module Doing
         @config['autotag']['transform'].each do |tag|
           next unless tag =~ /\S+:\S+/
 
-          rx, r = tag.split(/:/)
+          if tag =~ /::/
+            rx, r = tag.split(/::/)
+          else
+            rx, r = tag.split(/:/)
+          end
+
           flag_rx = %r{/([r]+)$}
           if r =~ flag_rx
             flags = r.match(flag_rx)[1].split(//)
