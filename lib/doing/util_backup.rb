@@ -38,6 +38,19 @@ module Doing
       end
 
       ##
+      ## Retrieve the most recent backup
+      ##
+      ## @param      filename  The filename
+      ## @return     [String] filename
+      ##
+      def last_backup(filename = nil, count: 1)
+        filename ||= Doing.config.settings['doing_file']
+
+        backup = get_backups(filename).slice(count - 1)
+        backup.nil? ? nil : File.join(backup_dir, backup)
+      end
+
+      ##
       ## Restore the most recent backup. If a filename is
       ## provided, only backups of that filename will be used.
       ##
@@ -48,15 +61,13 @@ module Doing
         Doing.logger.benchmark(:restore_backup, :start)
         filename ||= Doing.config.settings['doing_file']
 
-        result = get_backups(filename).slice(count - 1)
-        raise DoingRuntimeError, 'End of undo history' if result.nil?
-
-        backup_file = File.join(backup_dir, result)
+        backup_file = last_backup(filename, count: count)
+        raise DoingRuntimeError, 'End of undo history' if backup_file.nil?
 
         save_undone(filename)
         FileUtils.mv(backup_file, filename)
         prune_backups_after(File.basename(backup_file))
-        Doing.logger.warn('File update:', "restored from #{result}")
+        Doing.logger.warn('File update:', "restored from #{backup_file}")
         Doing.logger.benchmark(:restore_backup, :finish)
       end
 

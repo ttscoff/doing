@@ -78,6 +78,8 @@ view your entries with myriad options, with a focus on a "natural" language synt
 default_command :recent
 # sort_help :manually
 
+## Global options
+
 desc 'Output notes if included in the template'
 switch [:notes], default_value: true, negatable: true
 
@@ -114,115 +116,32 @@ flag [:config_file], default_value: config.config_file
 desc 'Specify a different doing_file'
 flag %i[f doing_file]
 
-desc 'Add an entry'
-long_desc %(Record what you're starting now, or backdate the start time using natural language.
+## Add/modify commands
 
-A parenthetical at the end of the entry will be converted to a note.
+# @@again @@resume
+desc 'Repeat last entry as new entry'
+long_desc 'This command is designed to allow multiple time intervals to be created for an entry by duplicating it with a new start (and end, eventually) time.'
+command %i[again resume] do |c|
+  c.example 'doing resume', desc: 'Duplicate the most recent entry with a new start time, removing any @done tag'
+  c.example 'doing again', desc: 'again is an alias for resume'
+  c.example 'doing resume --editor', desc: 'Repeat the last entry, opening the new entry in the default editor'
+  c.example 'doing resume --tag project1 --in Projects', desc: 'Repeat the last entry tagged @project1, creating the new entry in the Projects section'
+  c.example 'doing resume --interactive', desc: 'Select the entry to repeat from a menu'
 
-Run with no argument to create a new entry using #{Doing::Util.default_editor}.)
-arg_name 'ENTRY'
-command %i[now next] do |c|
-  c.example 'doing now', desc: "Open #{Doing::Util.default_editor} to input an entry and optional note."
-  c.example 'doing now working on a new project', desc: 'Add a new entry at the current time'
-  c.example 'doing now debugging @project2', desc: 'Add an entry with a tag'
-  c.example 'doing now adding an entry (with a note)', desc: 'Parenthetical at end is converted to note'
-  c.example 'doing now --back 2pm A thing I started at 2:00 and am still doing...', desc: 'Backdate an entry'
-
-  c.desc 'Section'
-  c.arg_name 'NAME'
-  c.flag %i[s section]
-
-  c.desc "Edit entry with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc 'Backdate start time [4pm|20m|2h|"yesterday noon"]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back started]
-
-  c.desc 'Timed entry, marks last entry in section as @done'
-  c.switch %i[f finish_last], negatable: false, default_value: false
-
-  c.desc 'Include a note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  # c.desc "Edit entry with specified app"
-  # c.arg_name 'editor_app'
-  # # c.flag [:a, :app]
-
-  c.action do |_global_options, options, args|
-    if options[:back]
-      date = options[:back].chronify(guess: :begin)
-
-      raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if date.nil?
-    else
-      date = Time.now
-    end
-
-    if options[:section]
-      section = wwid.guess_section(options[:section]) || options[:section].cap_first
-    else
-      options[:section] = settings['current_section']
-    end
-
-    if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
-      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
-      input = date.strftime('%F %R | ')
-      input += args.join(' ') unless args.empty?
-      input = wwid.fork_editor(input).strip
-
-      raise EmptyInput, 'No content' if input.empty?
-
-      date, title, note = wwid.format_input(input)
-      note.add(options[:note]) if options[:note]
-      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
-      wwid.write(wwid.doing_file)
-    elsif args.length.positive?
-      d, title, note = wwid.format_input(args.join(' '))
-      date = d.nil? ? date : d
-      note.add(options[:note]) if options[:note]
-      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
-      wwid.write(wwid.doing_file)
-    elsif $stdin.stat.size.positive?
-      input = $stdin.read.strip
-      d, title, note = wwid.format_input(input)
-      unless d.nil?
-        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
-        date = d
-      end
-      note.add(options[:note]) if options[:note]
-      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
-      wwid.write(wwid.doing_file)
-    else
-      raise EmptyInput, 'You must provide content when creating a new entry'
-    end
-  end
-end
-
-desc 'Reset the start time of an entry'
-long_desc 'Update the start time of the last entry or the last entry matching a tag/search filter.
-If no argument is provided, the start time will be reset to the current time.
-If a date string is provided as an argument, the start time will be set to the parsed result.'
-arg_name 'DATE_STRING'
-command %i[reset begin] do |c|
-  c.example 'doing reset', desc: 'Reset the start time of the last entry to the current time'
-  c.example 'doing reset --tag project1', desc: 'Reset the start time of the most recent entry tagged @project1 to the current time'
-  c.example 'doing reset 3pm', desc: 'Reset the start time of the last entry to 3pm of the current day'
-  c.example 'doing begin --tag todo --resume', desc: 'alias for reset. Updates the last @todo entry to the current time, removing @done tag.'
-
-  c.desc 'Limit search to section'
+  c.desc 'Get last entry from a specific section'
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Resume entry (remove @done)'
-  c.switch %i[r resume], default_value: true
+  c.desc 'Add new entry to section (default: same section as repeated entry)'
+  c.arg_name 'SECTION_NAME'
+  c.flag [:in]
 
-  c.desc 'Reset last entry matching tag. Wildcards allowed (*, ?).'
+  c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?).'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Reset last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.desc 'Repeat last entry matching search. Surround with
+  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
   c.arg_name 'QUERY'
   c.flag [:search]
 
@@ -232,34 +151,30 @@ command %i[reset begin] do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
-  c.desc 'Reset items that *don\'t* match search/tag filters'
+  c.desc 'Resume items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
-  c.desc 'Select from a menu of matching entries'
+  c.desc "Edit duplicated entry with #{Doing::Util.default_editor} before adding"
+  c.switch %i[e editor], negatable: false, default_value: false
+
+  c.desc 'Note'
+  c.arg_name 'TEXT'
+  c.flag %i[n note]
+
+  c.desc 'Select item to resume from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
-  c.action do |global_options, options, args|
-    if args.count > 0
-      reset_date = args.join(' ').chronify(guess: :begin)
-      raise InvalidArgument, 'Invalid date string' unless reset_date
-    else
-      reset_date = Time.now
-    end
-
+  c.action do |_global_options, options, _args|
     options[:fuzzy] = false
-    if options[:section]
-      options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
-    end
-
-    options[:bool] = options[:bool].normalize_bool
+    tags = options[:tag].nil? ? [] : options[:tag].to_tags
 
     options[:case] = options[:case].normalize_case
 
@@ -269,466 +184,115 @@ command %i[reset begin] do |c|
       options[:search] = search
     end
 
+    opts = options.dup
 
-    items = wwid.filter_items([], opt: options)
+    opts[:tag] = tags
+    opts[:tag_bool] = options[:bool].normalize_bool
+    opts[:interactive] = options[:interactive]
 
-    if options[:interactive]
-      last_entry = Doing::Prompt.choose_from_items(items, include_section: options[:section].nil?,
-        menu: true,
-        header: '',
-        prompt: 'Select an entry to start/reset > ',
-        multiple: false,
-        sort: false,
-        show_if_single: true)
-    else
-      last_entry = items.reverse.last
-    end
-
-    unless last_entry
-      Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
-      return
-    end
-
-    wwid.reset_item(last_entry, date: reset_date, resume: options[:resume])
-
-    # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
-
-    wwid.write(wwid.doing_file)
+    wwid.repeat_last(opts)
   end
 end
 
+# @@cancel
+desc 'End last X entries with no time tracked'
+long_desc 'Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doing finish --no-date`.'
+arg_name 'COUNT'
+command :cancel do |c|
+  c.example 'doing cancel', desc: 'Cancel the last entry'
+  c.example 'doing cancel --tag project1 -u 5', desc: 'Cancel the last 5 unfinished entries containing @project1'
 
-desc 'Add a note to the last entry'
-long_desc %(
-  If -r is provided with no other arguments, the last note is removed.
-  If new content is specified through arguments or STDIN, any previous
-  note will be replaced with the new one.
-
-  Use -e to load the last entry in a text editor where you can append a note.
-)
-arg_name 'NOTE_TEXT'
-command :note do |c|
-  c.example 'doing note', desc: 'Open the last entry in $EDITOR to append a note'
-  c.example 'doing note "Just a quick annotation"', desc: 'Add a quick note to the last entry'
-  c.example 'doing note --tag done "Keeping it real or something"', desc: 'Add a note to the last item tagged @done'
-  c.example 'doing note --search "late night" -e', desc: 'Open $EDITOR to add a note to the last item containing "late night" (fuzzy matched)'
+  c.desc 'Archive entries'
+  c.switch %i[a archive], negatable: false, default_value: false
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section]
 
-  c.desc "Edit entry with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc "Replace/Remove last entry's note (default append)"
-  c.switch %i[r remove], negatable: false, default_value: false
-
-  c.desc 'Add/remove note from last entry matching tag. Wildcards allowed (*, ?).'
+  c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2). Wildcards allowed (*, ?).'
   c.arg_name 'TAG'
   c.flag [:tag]
-
-  c.desc 'Add/remove note from last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
-
-  c.desc 'Add note to item that *doesn\'t* match search/tag filters'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
-  c.desc 'Select item for new note from a menu of matching entries'
-  c.switch %i[i interactive], negatable: false, default_value: false
-
-  c.action do |_global_options, options, args|
-    options[:fuzzy] = false
-    if options[:section]
-      options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
-    end
-
-    options[:tag_bool] = options[:bool].normalize_bool
-
-    options[:case] = options[:case].normalize_case
-
-    if options[:search]
-      search = options[:search]
-      search.sub!(/^'?/, "'") if options[:exact]
-      options[:search] = search
-    end
-
-
-    last_entry = wwid.last_entry(options)
-
-    unless last_entry
-      Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
-      return
-    end
-
-    last_note = last_entry.note || Doing::Note.new
-    new_note = Doing::Note.new
-
-    if options[:editor] || (args.empty? && $stdin.stat.size.zero? && !options[:remove])
-      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
-      input = !args.empty? ? args.join(' ') : ''
-
-      if options[:remove]
-        prev_input = Doing::Note.new
-      else
-        prev_input = last_entry.note || Doing::Note.new
-      end
-
-      input = prev_input.add(input)
-
-      input = wwid.fork_editor(prev_input.strip_lines.join("\n"), message: nil).strip
-      note = input
-      options[:remove] = true
-      new_note.add(note)
-    elsif !args.empty?
-      new_note.add(args.join(' '))
-    elsif $stdin.stat.size.positive?
-      new_note.add($stdin.read.strip)
-    else
-      raise EmptyInput, 'You must provide content when adding a note' unless options[:remove]
-    end
-
-    if last_note.equal?(new_note)
-      Doing.logger.debug('Skipped:', 'No note change')
-    else
-      last_note.add(new_note, replace: options[:remove])
-      Doing.logger.info('Entry updated:', last_entry.title)
-    end
-    # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
-
-    wwid.write(wwid.doing_file)
-  end
-end
-
-desc 'Finish any running @meanwhile tasks and optionally create a new one'
-long_desc 'The @meanwhile tag allows you to have long-running entries that encompass smaller entries.
-This command makes it easy to start and stop these overarching entries. Just run `doing meanwhile Starting work on this
-big project` to start a @meanwhile entry, add other entries as you work on the project, then use `doing meanwhile` by
-itself to mark the entry as @done.'
-arg_name 'ENTRY'
-command :meanwhile do |c|
-  c.example 'doing meanwhile "Long task that will have others after it before it\'s done"', desc: 'Add a new long-running entry, completing any current @meanwhile entry'
-  c.example 'doing meanwhile', desc: 'Finish any open @meanwhile entry'
-  c.example 'doing meanwhile --archive', desc: 'Finish any open @meanwhile entry and archive it'
-  c.example 'doing meanwhile --back 2h "Something I\'ve been working on for a while', desc: 'Add a @meanwhile entry with a start date 2 hours ago'
-
-  c.desc 'Section'
-  c.arg_name 'NAME'
-  c.flag %i[s section]
-
-  c.desc "Edit entry with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc 'Archive previous @meanwhile entry'
-  c.switch %i[a archive], negatable: false, default_value: false
-
-  c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back]
-
-  c.desc 'Note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  c.action do |_global_options, options, args|
-    if options[:back]
-      date = options[:back].chronify(guess: :begin)
-
-      raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
-    else
-      date = Time.now
-    end
-
-    if options[:section]
-      section = wwid.guess_section(options[:section]) || options[:section].cap_first
-    else
-      section = settings['current_section']
-    end
-    input = ''
-
-    if options[:editor]
-      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-      input += date.strftime('%F %R | ')
-      input += args.join(' ') unless args.empty?
-      input = wwid.fork_editor(input).strip
-    elsif !args.empty?
-      input = args.join(' ')
-    elsif $stdin.stat.size.positive?
-      input = $stdin.read.strip
-    end
-
-    if input && !input.empty?
-      d, input, note = wwid.format_input(input)
-      unless d.nil?
-        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
-        date = d
-      end
-    else
-      input = nil
-      note = []
-    end
-
-    if options[:note]
-      note.push(options[:note])
-    elsif note.empty?
-      note = nil
-    end
-
-    wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:archive], note: note })
-    wwid.write(wwid.doing_file)
-  end
-end
-
-desc 'Output HTML, CSS, and Markdown (ERB) templates for customization'
-long_desc %(
-  Templates are printed to STDOUT for piping to a file.
-  Save them and use them in the configuration file under export_templates.
-)
-arg_name 'TYPE', must_match: Doing::Plugins.template_regex
-command :template do |c|
-  c.example 'doing template haml > ~/styles/my_doing.haml', desc: 'Output the haml template and save it to a file'
-
-  c.desc 'List all available templates'
-  c.switch %i[l list], negatable: false
-
-  c.desc 'List in single column for completion'
-  c.switch %i[c column]
-
-  c.desc 'Save template to file instead of STDOUT'
-  c.switch %i[s save], default_value: false, negatable: false
-
-  c.desc 'Save template to alternate location'
-  c.arg_name 'DIRECTORY'
-  c.flag %i[p path], default_value: File.join(Doing::Util.user_home, '.config', 'doing', 'templates')
-
-  c.action do |_global_options, options, args|
-    if options[:list] || options[:column]
-      if options[:column]
-        $stdout.print Doing::Plugins.plugin_templates.join("\n")
-      else
-        $stdout.puts "Available templates: #{Doing::Plugins.plugin_templates.join(', ')}"
-      end
-      return
-    end
-
-    if args.empty?
-      type = Doing::Prompt.choose_from(Doing::Plugins.plugin_templates, sorted: false, prompt: 'Select template type > ')
-      type.sub!(/ \(.*?\)$/, '').strip!
-      options[:save] = Doing::Prompt.yn("Save to #{options[:path]}? (No outputs to STDOUT)", default_response: false)
-    else
-      type = args[0]
-    end
-
-    raise InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" unless type
-
-    if options[:save]
-      Doing::Plugins.template_for_trigger(type, save_to: options[:path])
-    else
-      $stdout.puts Doing::Plugins.template_for_trigger(type, save_to: nil)
-    end
-
-    # case args[0]
-    # when /html|haml/i
-    #   $stdout.puts wwid.haml_template
-    # when /css/i
-    #   $stdout.puts wwid.css_template
-    # when /markdown|md|erb/i
-    #   $stdout.puts wwid.markdown_template
-    # else
-    #   exit_now! 'Invalid type specified, must be HAML or CSS'
-    # end
-  end
-end
-
-desc 'Display an interactive menu to perform operations'
-long_desc 'List all entries and select with typeahead fuzzy matching.
-
-Multiple selections are allowed, hit tab to add the highlighted entry to the
-selection, and use ctrl-a to select all visible items. Return processes the
-selected entries.
-
-Search in the menu by typing:
-
-sbtrkt  fuzzy-match   Items that match sbtrkt
-
-\'wild   exact-match (quoted)  Items that include wild
-
-!fire   inverse-exact-match   Items that do not include fire'
-command :select do |c|
-  c.example 'doing select', desc: 'Select from all entries. A menu of available actions will be presented after confirming the selection.'
-  c.example 'doing select --editor', desc: 'Select entries from a menu and batch edit them in your default editor'
-  c.example 'doing select --after "yesterday 12pm" --tag project1', desc: 'Display a menu of entries created after noon yesterday, add @project1 to selected entries'
-  c.desc 'Select from a specific section'
-  c.arg_name 'SECTION'
-  c.flag %i[s section]
-
-  c.desc 'Tag selected entries'
-  c.arg_name 'TAG'
-  c.flag %i[t tag]
-
-  c.desc 'Reverse -c, -f, --flag, and -t (remove instead of adding)'
-  c.switch %i[r remove], negatable: false
-
-  # c.desc 'Add @done to selected item(s), using start time of next item as the finish time'
-  # c.switch %i[a auto], negatable: false, default_value: false
-
-  c.desc 'Archive selected items'
-  c.switch %i[a archive], negatable: false, default_value: false
-
-  c.desc 'Move selected items to section'
-  c.arg_name 'SECTION'
-  c.flag %i[m move]
-
-  c.desc 'Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "\'search"'
+  c.desc 'Cancel the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
-  c.flag %i[q query search]
+  c.flag [:search]
 
-  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
-  c.arg_name 'DATE_STRING'
-  c.flag [:before]
-
-  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
-  c.arg_name 'DATE_STRING'
-  c.flag [:after]
-
-  c.desc %(
-      Date range to show, or a single day to filter date on.
-      Date range argument should be quoted. Date specifications can be natural language.
-      To specify a range, use "to" or "through": `doing select --from "monday 8am to friday 5pm"`.
-
-      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
-      by time of day.
-    )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
-  c.desc 'Select items that *don\'t* match search/tag filters'
+  c.desc 'Finish items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.'
-  c.switch %i[menu], negatable: true, default_value: true
+  c.desc 'Cancel last entry (or entries) not already marked @done'
+  c.switch %i[u unfinished], negatable: false, default_value: false
 
-  c.desc 'Cancel selected items (add @done without timestamp)'
-  c.switch %i[c cancel], negatable: false, default_value: false
-
-  c.desc 'Delete selected items'
-  c.switch %i[d delete], negatable: false, default_value: false
-
-  c.desc 'Edit selected item(s)'
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc 'Add @done with current time to selected item(s)'
-  c.switch %i[f finish], negatable: false, default_value: false
-
-  c.desc 'Add flag to selected item(s)'
-  c.switch %i[flag], negatable: false, default_value: false
-
-  c.desc 'Perform action without confirmation.'
-  c.switch %i[force], negatable: false, default_value: false
-
-  c.desc 'Save selected entries to file using --output format'
-  c.arg_name 'FILE'
-  c.flag %i[save_to]
-
-  c.desc "Output entries to format (#{Doing::Plugins.plugin_names(type: :export)})"
-  c.arg_name 'FORMAT'
-  c.flag %i[o output]
-
-  c.desc "Copy selection as a new entry with current time and no @done tag. Only works with single selections. Can be combined with --editor."
-  c.switch %i[again resume], negatable: false, default_value: false
+  c.desc 'Select item(s) to cancel from a menu of matching entries'
+  c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    options[:fuzzy] = false
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      section = settings['current_section']
+    end
 
-    raise InvalidArgument, '--no-menu requires --query' if !options[:menu] && !options[:query]
+    if options[:tag].nil?
+      tags = []
+    else
+      tags = options[:tag].to_tags
+    end
 
-    options[:case] = options[:case].normalize_case
+    raise InvalidArgument, 'Only one argument allowed' if args.length > 1
 
-    wwid.interactive(options)
+    raise InvalidArgument, 'Invalid argument (specify number of recent items to mark @done)' unless args.empty? || args[0] =~ /\d+/
+
+    if options[:interactive]
+      count = 0
+    else
+      count = args[0] ? args[0].to_i : 1
+    end
+
+    search = nil
+
+    if options[:search]
+      search = options[:search]
+      search.sub!(/^'?/, "'") if options[:exact]
+    end
+
+    opts = {
+      archive: options[:archive],
+      case: options[:case].normalize_case,
+      count: count,
+      date: false,
+      fuzzy: options[:fuzzy],
+      interactive: options[:interactive],
+      not: options[:not],
+      search: search,
+      section: section,
+      sequential: false,
+      tag: tags,
+      tag_bool: options[:bool].normalize_bool,
+      tags: ['done'],
+      unfinished: options[:unfinished]
+    }
+
+    wwid.tag_last(opts)
   end
 end
 
-desc 'Add an item to the Later section'
-arg_name 'ENTRY'
-command :later do |c|
-  c.example 'doing later "Something I\'ll think about tomorrow"', desc: 'Add an entry to the Later section'
-  c.example 'doing later -e', desc: 'Open $EDITOR to create an entry and optional note'
-
-  c.desc "Edit entry with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back]
-
-  c.desc 'Note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  c.action do |_global_options, options, args|
-    if options[:back]
-      date = options[:back].chronify(guess: :begin)
-      raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
-    else
-      date = Time.now
-    end
-
-    if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
-      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
-      input += date.strftime('%F %R | ')
-      input += args.empty? ? '' : args.join(' ')
-      input = wwid.fork_editor(input).strip
-      raise EmptyInput, 'No content' unless input && !input.empty?
-
-      d, title, note = wwid.format_input(input)
-      date = d.nil? ? date : d
-      note.add(options[:note]) if options[:note]
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    elsif !args.empty?
-      d, title, note = wwid.format_input(args.join(' '))
-      date = d.nil? ? date : d
-      note.add(options[:note]) if options[:note]
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    elsif $stdin.stat.size.positive?
-      d, title, note = wwid.format_input($stdin.read)
-      unless d.nil?
-        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
-        date = d
-      end
-      note.add(options[:note]) if options[:note]
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    else
-      raise EmptyInput, 'You must provide content when creating a new entry'
-    end
-  end
-end
-
+# @@done @@did
 desc 'Add a completed item with @done(date). No argument finishes last entry.'
 long_desc 'Use this command to add an entry after you\'ve already finished it. It will be immediately marked as @done.
 You can modify the start and end times of the entry using the --back, --took, and --at flags, making it an easy
@@ -857,13 +421,17 @@ command %i[done did] do |c|
       end
 
       if (is_new)
+        Doing::Hooks.trigger :pre_entry_add, wwid, new_entry
         wwid.content.push(new_entry)
+        Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
       else
         wwid.content.update_item(old_entry, new_entry)
+        Doing::Hooks.trigger :post_entry_updated, wwid, new_entry unless options[:archive]
       end
 
       if options[:archive]
         wwid.move_item(new_entry, 'Archive', label: true)
+        Doing::Hooks.trigger :post_entry_updated, wwid, new_entry
       end
 
       wwid.write(wwid.doing_file)
@@ -899,7 +467,9 @@ command %i[done did] do |c|
           new_entry.tag('done')
         end
       end
+      Doing::Hooks.trigger :pre_entry_add, wwid, new_entry
       wwid.content.push(new_entry)
+      Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     elsif $stdin.stat.size.positive?
@@ -920,7 +490,10 @@ command %i[done did] do |c|
         end
       end
 
+      Doing::Hooks.trigger :pre_entry_add, wwid, new_entry
       wwid.content.push(new_entry)
+      Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
+
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     else
@@ -929,103 +502,7 @@ command %i[done did] do |c|
   end
 end
 
-desc 'End last X entries with no time tracked'
-long_desc 'Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doing finish --no-date`.'
-arg_name 'COUNT'
-command :cancel do |c|
-  c.example 'doing cancel', desc: 'Cancel the last entry'
-  c.example 'doing cancel --tag project1 -u 5', desc: 'Cancel the last 5 unfinished entries containing @project1'
-
-  c.desc 'Archive entries'
-  c.switch %i[a archive], negatable: false, default_value: false
-
-  c.desc 'Section'
-  c.arg_name 'NAME'
-  c.flag %i[s section]
-
-  c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2). Wildcards allowed (*, ?).'
-  c.arg_name 'TAG'
-  c.flag [:tag]
-
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
-
-  c.desc 'Cancel the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
-
-  c.desc 'Finish items that *don\'t* match search/tag filters'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
-
-  c.desc 'Cancel last entry (or entries) not already marked @done'
-  c.switch %i[u unfinished], negatable: false, default_value: false
-
-  c.desc 'Select item(s) to cancel from a menu of matching entries'
-  c.switch %i[i interactive], negatable: false, default_value: false
-
-  c.action do |_global_options, options, args|
-    options[:fuzzy] = false
-    if options[:section]
-      section = wwid.guess_section(options[:section]) || options[:section].cap_first
-    else
-      section = settings['current_section']
-    end
-
-    if options[:tag].nil?
-      tags = []
-    else
-      tags = options[:tag].to_tags
-    end
-
-    raise InvalidArgument, 'Only one argument allowed' if args.length > 1
-
-    raise InvalidArgument, 'Invalid argument (specify number of recent items to mark @done)' unless args.empty? || args[0] =~ /\d+/
-
-    if options[:interactive]
-      count = 0
-    else
-      count = args[0] ? args[0].to_i : 1
-    end
-
-    search = nil
-
-    if options[:search]
-      search = options[:search]
-      search.sub!(/^'?/, "'") if options[:exact]
-    end
-
-    opts = {
-      archive: options[:archive],
-      case: options[:case].normalize_case,
-      count: count,
-      date: false,
-      fuzzy: options[:fuzzy],
-      interactive: options[:interactive],
-      not: options[:not],
-      search: search,
-      section: section,
-      sequential: false,
-      tag: tags,
-      tag_bool: options[:bool].normalize_bool,
-      tags: ['done'],
-      unfinished: options[:unfinished]
-    }
-
-    wwid.tag_last(opts)
-  end
-end
-
+# @@finish
 desc 'Mark last X entries as @done'
 long_desc 'Marks the last X entries with a @done tag and current date. Does not alter already completed entries.'
 arg_name 'COUNT'
@@ -1171,29 +648,100 @@ command :finish do |c|
   end
 end
 
-desc 'Repeat last entry as new entry'
-long_desc 'This command is designed to allow multiple time intervals to be created for an entry by duplicating it with a new start (and end, eventually) time.'
-command %i[again resume] do |c|
-  c.example 'doing resume', desc: 'Duplicate the most recent entry with a new start time, removing any @done tag'
-  c.example 'doing again', desc: 'again is an alias for resume'
-  c.example 'doing resume --editor', desc: 'Repeat the last entry, opening the new entry in the default editor'
-  c.example 'doing resume --tag project1 --in Projects', desc: 'Repeat the last entry tagged @project1, creating the new entry in the Projects section'
-  c.example 'doing resume --interactive', desc: 'Select the entry to repeat from a menu'
+# @@later
+desc 'Add an item to the Later section'
+arg_name 'ENTRY'
+command :later do |c|
+  c.example 'doing later "Something I\'ll think about tomorrow"', desc: 'Add an entry to the Later section'
+  c.example 'doing later -e', desc: 'Open $EDITOR to create an entry and optional note'
 
-  c.desc 'Get last entry from a specific section'
-  c.arg_name 'NAME'
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
+  c.switch %i[e editor], negatable: false, default_value: false
+
+  c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
+  c.arg_name 'DATE_STRING'
+  c.flag %i[b back]
+
+  c.desc 'Note'
+  c.arg_name 'TEXT'
+  c.flag %i[n note]
+
+  c.action do |_global_options, options, args|
+    if options[:back]
+      date = options[:back].chronify(guess: :begin)
+      raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
+    else
+      date = Time.now
+    end
+
+    if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+
+      input += date.strftime('%F %R | ')
+      input += args.empty? ? '' : args.join(' ')
+      input = wwid.fork_editor(input).strip
+      raise EmptyInput, 'No content' unless input && !input.empty?
+
+      d, title, note = wwid.format_input(input)
+      date = d.nil? ? date : d
+      note.add(options[:note]) if options[:note]
+      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
+      wwid.write(wwid.doing_file)
+    elsif !args.empty?
+      d, title, note = wwid.format_input(args.join(' '))
+      date = d.nil? ? date : d
+      note.add(options[:note]) if options[:note]
+      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
+      wwid.write(wwid.doing_file)
+    elsif $stdin.stat.size.positive?
+      d, title, note = wwid.format_input($stdin.read)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
+      note.add(options[:note]) if options[:note]
+      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
+      wwid.write(wwid.doing_file)
+    else
+      raise EmptyInput, 'You must provide content when creating a new entry'
+    end
+  end
+end
+
+# @@mark @@flag
+desc 'Mark last entry as flagged'
+command %i[mark flag] do |c|
+  c.example 'doing flag', desc: 'Add @flagged to the last entry created'
+  c.example 'doing mark', desc: 'mark is an alias for flag'
+  c.example 'doing flag --tag project1 --count 2', desc: 'Add @flagged to the last 2 entries tagged @project1'
+  c.example 'doing flag --interactive --search "/(develop|cod)ing/"', desc: 'Find entries matching regular expression and create a menu allowing multiple selections, selected items will be @flagged'
+
+  c.desc 'Section'
+  c.arg_name 'SECTION_NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Add new entry to section (default: same section as repeated entry)'
-  c.arg_name 'SECTION_NAME'
-  c.flag [:in]
+  c.desc 'How many recent entries to tag (0 for all)'
+  c.arg_name 'COUNT'
+  c.flag %i[c count], default_value: 1, must_match: /^\d+$/, type: Integer
 
-  c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?).'
+  c.desc 'Don\'t ask permission to flag all entries when count is 0'
+  c.switch %i[force], negatable: false, default_value: false
+
+  c.desc 'Include current date/time with tag'
+  c.switch %i[d date], negatable: false, default_value: false
+
+  c.desc 'Remove flag'
+  c.switch %i[r remove], negatable: false, default_value: false
+
+  c.desc 'Flag last entry (or entries) not marked @done'
+  c.switch %i[u unfinished], negatable: false, default_value: false
+
+  c.desc 'Flag the last entry containing TAG.
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Repeat last entry matching search. Surround with
-  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
+  c.desc 'Flag the last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
 
@@ -1203,30 +751,44 @@ command %i[again resume] do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
-  c.desc 'Resume items that *don\'t* match search/tag filters'
+  c.desc 'Flag items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
-  c.desc "Edit duplicated entry with #{Doing::Util.default_editor} before adding"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc 'Note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  c.desc 'Select item to resume from a menu of matching entries'
+  c.desc 'Select item(s) to flag from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |_global_options, options, _args|
     options[:fuzzy] = false
-    tags = options[:tag].nil? ? [] : options[:tag].to_tags
+    mark = settings['marker_tag'] || 'flagged'
+
+    raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
+
+    section = 'All'
+
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    end
+
+    if options[:tag].nil?
+      search_tags = []
+    else
+      search_tags = options[:tag].to_tags
+    end
+
+    if options[:interactive]
+      count = 0
+      options[:force] = true
+    else
+      count = options[:count].to_i
+    end
 
     options[:case] = options[:case].normalize_case
 
@@ -1236,39 +798,150 @@ command %i[again resume] do |c|
       options[:search] = search
     end
 
-    opts = options.dup
+    if count.zero? && !options[:force]
+      if options[:search]
+        section_q = ' matching your search terms'
+      elsif options[:tag]
+        section_q = ' matching your tag search'
+      elsif section == 'All'
+        section_q = ''
+      else
+        section_q = " in section #{section}"
+      end
 
-    opts[:tag] = tags
-    opts[:tag_bool] = options[:bool].normalize_bool
-    opts[:interactive] = options[:interactive]
 
-    wwid.repeat_last(opts)
+      question = if options[:remove]
+                   "Are you sure you want to unflag all entries#{section_q}"
+                 else
+                   "Are you sure you want to flag all records#{section_q}"
+                 end
+
+      res = Doing::Prompt.yn(question, default_response: false)
+
+      exit_now! 'Cancelled' unless res
+    end
+
+    options[:count] = count
+    options[:section] = section
+    options[:tag] = search_tags
+    options[:tags] = [mark]
+    options[:tag_bool] = options[:bool].normalize_bool
+
+    wwid.tag_last(options)
   end
 end
 
-desc 'List all tags in the current Doing file'
-command :tags do |c|
+# @@meanwhile
+desc 'Finish any running @meanwhile tasks and optionally create a new one'
+long_desc 'The @meanwhile tag allows you to have long-running entries that encompass smaller entries.
+This command makes it easy to start and stop these overarching entries. Just run `doing meanwhile Starting work on this
+big project` to start a @meanwhile entry, add other entries as you work on the project, then use `doing meanwhile` by
+itself to mark the entry as @done.'
+arg_name 'ENTRY'
+command :meanwhile do |c|
+  c.example 'doing meanwhile "Long task that will have others after it before it\'s done"', desc: 'Add a new long-running entry, completing any current @meanwhile entry'
+  c.example 'doing meanwhile', desc: 'Finish any open @meanwhile entry'
+  c.example 'doing meanwhile --archive', desc: 'Finish any open @meanwhile entry and archive it'
+  c.example 'doing meanwhile --back 2h "Something I\'ve been working on for a while', desc: 'Add a @meanwhile entry with a start date 2 hours ago'
+
   c.desc 'Section'
-  c.arg_name 'SECTION_NAME'
+  c.arg_name 'NAME'
+  c.flag %i[s section]
+
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
+  c.switch %i[e editor], negatable: false, default_value: false
+
+  c.desc 'Archive previous @meanwhile entry'
+  c.switch %i[a archive], negatable: false, default_value: false
+
+  c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
+  c.arg_name 'DATE_STRING'
+  c.flag %i[b back]
+
+  c.desc 'Note'
+  c.arg_name 'TEXT'
+  c.flag %i[n note]
+
+  c.action do |_global_options, options, args|
+    if options[:back]
+      date = options[:back].chronify(guess: :begin)
+
+      raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
+    else
+      date = Time.now
+    end
+
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      section = settings['current_section']
+    end
+    input = ''
+
+    if options[:editor]
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+      input += date.strftime('%F %R | ')
+      input += args.join(' ') unless args.empty?
+      input = wwid.fork_editor(input).strip
+    elsif !args.empty?
+      input = args.join(' ')
+    elsif $stdin.stat.size.positive?
+      input = $stdin.read.strip
+    end
+
+    if input && !input.empty?
+      d, input, note = wwid.format_input(input)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
+    else
+      input = nil
+      note = []
+    end
+
+    if options[:note]
+      note.push(options[:note])
+    elsif note.empty?
+      note = nil
+    end
+
+    wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:archive], note: note })
+    wwid.write(wwid.doing_file)
+  end
+end
+
+# @@note
+desc 'Add a note to the last entry'
+long_desc %(
+  If -r is provided with no other arguments, the last note is removed.
+  If new content is specified through arguments or STDIN, any previous
+  note will be replaced with the new one.
+
+  Use -e to load the last entry in a text editor where you can append a note.
+)
+arg_name 'NOTE_TEXT'
+command :note do |c|
+  c.example 'doing note', desc: 'Open the last entry in $EDITOR to append a note'
+  c.example 'doing note "Just a quick annotation"', desc: 'Add a quick note to the last entry'
+  c.example 'doing note --tag done "Keeping it real or something"', desc: 'Add a note to the last item tagged @done'
+  c.example 'doing note --search "late night" -e', desc: 'Open $EDITOR to add a note to the last item containing "late night" (fuzzy matched)'
+
+  c.desc 'Section'
+  c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Show count of occurrences'
-  c.switch %i[c counts]
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
+  c.switch %i[e editor], negatable: false, default_value: false
 
-  c.desc 'Sort by name or count'
-  c.arg_name 'SORT_ORDER'
-  c.flag %i[sort], default_value: 'name', must_match: /^(?:n(?:ame)?|c(?:ount)?)$/
+  c.desc "Replace/Remove last entry's note (default append)"
+  c.switch %i[r remove], negatable: false, default_value: false
 
-  c.desc 'Sort order (asc/desc)'
-  c.arg_name 'ORDER'
-  c.flag %i[o order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
-
-  c.desc 'Get tags for entries matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?).'
+  c.desc 'Add/remove note from last entry matching tag. Wildcards allowed (*, ?).'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Get tags for items matching search. Surround with
-  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
+  c.desc 'Add/remove note from last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
 
@@ -1278,55 +951,386 @@ command :tags do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
-  c.desc 'Get tags from items that *don\'t* match search/tag filters'
+  c.desc 'Add note to item that *doesn\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
-  c.desc 'Select items to scan from a menu of matching entries'
+  c.desc 'Select item for new note from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
-  c.action do |_global, options, args|
-    section = wwid.guess_section(options[:section]) || options[:section].cap_first
-
-    items = wwid.filter_items([], opt: options)
-
-    if options[:interactive]
-      items = Doing::Prompt.choose_from_items(items, include_section: options[:section].nil?,
-        menu: true,
-        header: '',
-        prompt: 'Select entries to scan > ',
-        multiple: true,
-        sort: true,
-        show_if_single: true)
+  c.action do |_global_options, options, args|
+    options[:fuzzy] = false
+    if options[:section]
+      options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
 
-    # items = wwid.content.in_section(section)
-    tags = wwid.all_tags(items, counts: true)
+    options[:tag_bool] = options[:bool].normalize_bool
 
-    if options[:sort] =~ /^n/i
-      tags = tags.sort_by { |tag, count| tag }
-    else
-      tags = tags.sort_by { |tag, count| count }
+    options[:case] = options[:case].normalize_case
+
+    if options[:search]
+      search = options[:search]
+      search.sub!(/^'?/, "'") if options[:exact]
+      options[:search] = search
     end
 
-    tags.reverse! if options[:order].normalize_order == 'desc'
 
-    if options[:counts]
-      tags.each { |t, c| puts "#{t} (#{c})" }
+    last_entry = wwid.last_entry(options)
+
+    unless last_entry
+      Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
+      return
+    end
+
+    last_note = last_entry.note || Doing::Note.new
+    new_note = Doing::Note.new
+
+    if options[:editor] || (args.empty? && $stdin.stat.size.zero? && !options[:remove])
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+
+      input = !args.empty? ? args.join(' ') : ''
+
+      if options[:remove]
+        prev_input = Doing::Note.new
+      else
+        prev_input = last_entry.note || Doing::Note.new
+      end
+
+      input = prev_input.add(input)
+
+      input = wwid.fork_editor(prev_input.strip_lines.join("\n"), message: nil).strip
+      note = input
+      options[:remove] = true
+      new_note.add(note)
+    elsif !args.empty?
+      new_note.add(args.join(' '))
+    elsif $stdin.stat.size.positive?
+      new_note.add($stdin.read.strip)
     else
-      tags.each { |t, c| puts "#{t}" }
+      raise EmptyInput, 'You must provide content when adding a note' unless options[:remove]
+    end
+
+    if last_note.equal?(new_note)
+      Doing.logger.debug('Skipped:', 'No note change')
+    else
+      last_note.add(new_note, replace: options[:remove])
+      Doing.logger.info('Entry updated:', last_entry.title)
+      Doing::Hooks.trigger :post_entry_updated, wwid, last_entry
+    end
+    # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
+    wwid.write(wwid.doing_file)
+  end
+end
+
+# @@now @@next
+desc 'Add an entry'
+long_desc %(Record what you're starting now, or backdate the start time using natural language.
+
+A parenthetical at the end of the entry will be converted to a note.
+
+Run with no argument to create a new entry using #{Doing::Util.default_editor}.)
+arg_name 'ENTRY'
+command %i[now next] do |c|
+  c.example 'doing now', desc: "Open #{Doing::Util.default_editor} to input an entry and optional note."
+  c.example 'doing now working on a new project', desc: 'Add a new entry at the current time'
+  c.example 'doing now debugging @project2', desc: 'Add an entry with a tag'
+  c.example 'doing now adding an entry (with a note)', desc: 'Parenthetical at end is converted to note'
+  c.example 'doing now --back 2pm A thing I started at 2:00 and am still doing...', desc: 'Backdate an entry'
+
+  c.desc 'Section'
+  c.arg_name 'NAME'
+  c.flag %i[s section]
+
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
+  c.switch %i[e editor], negatable: false, default_value: false
+
+  c.desc 'Backdate start time [4pm|20m|2h|"yesterday noon"]'
+  c.arg_name 'DATE_STRING'
+  c.flag %i[b back started]
+
+  c.desc 'Timed entry, marks last entry in section as @done'
+  c.switch %i[f finish_last], negatable: false, default_value: false
+
+  c.desc 'Include a note'
+  c.arg_name 'TEXT'
+  c.flag %i[n note]
+
+  # c.desc "Edit entry with specified app"
+  # c.arg_name 'editor_app'
+  # # c.flag [:a, :app]
+
+  c.action do |_global_options, options, args|
+    if options[:back]
+      date = options[:back].chronify(guess: :begin)
+
+      raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if date.nil?
+    else
+      date = Time.now
+    end
+
+    if options[:section]
+      section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      options[:section] = settings['current_section']
+    end
+
+    if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+
+      input = date.strftime('%F %R | ')
+      input += args.join(' ') unless args.empty?
+      input = wwid.fork_editor(input).strip
+
+      raise EmptyInput, 'No content' if input.empty?
+
+      date, title, note = wwid.format_input(input)
+      note.add(options[:note]) if options[:note]
+      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      wwid.write(wwid.doing_file)
+    elsif args.length.positive?
+      d, title, note = wwid.format_input(args.join(' '))
+      date = d.nil? ? date : d
+      note.add(options[:note]) if options[:note]
+      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      wwid.write(wwid.doing_file)
+    elsif $stdin.stat.size.positive?
+      input = $stdin.read.strip
+      d, title, note = wwid.format_input(input)
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        date = d
+      end
+      note.add(options[:note]) if options[:note]
+      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      wwid.write(wwid.doing_file)
+    else
+      raise EmptyInput, 'You must provide content when creating a new entry'
     end
   end
 end
 
+# @@reset @@begin
+desc 'Reset the start time of an entry'
+long_desc 'Update the start time of the last entry or the last entry matching a tag/search filter.
+If no argument is provided, the start time will be reset to the current time.
+If a date string is provided as an argument, the start time will be set to the parsed result.'
+arg_name 'DATE_STRING'
+command %i[reset begin] do |c|
+  c.example 'doing reset', desc: 'Reset the start time of the last entry to the current time'
+  c.example 'doing reset --tag project1', desc: 'Reset the start time of the most recent entry tagged @project1 to the current time'
+  c.example 'doing reset 3pm', desc: 'Reset the start time of the last entry to 3pm of the current day'
+  c.example 'doing begin --tag todo --resume', desc: 'alias for reset. Updates the last @todo entry to the current time, removing @done tag.'
 
+  c.desc 'Limit search to section'
+  c.arg_name 'NAME'
+  c.flag %i[s section], default_value: 'All'
+
+  c.desc 'Resume entry (remove @done)'
+  c.switch %i[r resume], default_value: true
+
+  c.desc 'Reset last entry matching tag. Wildcards allowed (*, ?).'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Reset last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
+
+  c.desc 'Force exact search string matching (case sensitive)'
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
+
+  c.desc 'Reset items that *don\'t* match search/tag filters'
+  c.switch [:not], default_value: false, negatable: false
+
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
+
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+
+  c.desc 'Select from a menu of matching entries'
+  c.switch %i[i interactive], negatable: false, default_value: false
+
+  c.action do |global_options, options, args|
+    if args.count > 0
+      reset_date = args.join(' ').chronify(guess: :begin)
+      raise InvalidArgument, 'Invalid date string' unless reset_date
+    else
+      reset_date = Time.now
+    end
+
+    options[:fuzzy] = false
+    if options[:section]
+      options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
+    end
+
+    options[:bool] = options[:bool].normalize_bool
+
+    options[:case] = options[:case].normalize_case
+
+    if options[:search]
+      search = options[:search]
+      search.sub!(/^'?/, "'") if options[:exact]
+      options[:search] = search
+    end
+
+
+    items = wwid.filter_items([], opt: options)
+
+    if options[:interactive]
+      last_entry = Doing::Prompt.choose_from_items(items, include_section: options[:section].nil?,
+        menu: true,
+        header: '',
+        prompt: 'Select an entry to start/reset > ',
+        multiple: false,
+        sort: false,
+        show_if_single: true)
+    else
+      last_entry = items.reverse.last
+    end
+
+    unless last_entry
+      Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
+      return
+    end
+
+    wwid.reset_item(last_entry, date: reset_date, resume: options[:resume])
+    Doing::Hooks.trigger :post_entry_updated, wwid, last_entry
+    # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
+
+    wwid.write(wwid.doing_file)
+  end
+end
+
+# @@select
+desc 'Display an interactive menu to perform operations'
+long_desc 'List all entries and select with typeahead fuzzy matching.
+
+Multiple selections are allowed, hit tab to add the highlighted entry to the
+selection, and use ctrl-a to select all visible items. Return processes the
+selected entries.
+
+Search in the menu by typing:
+
+sbtrkt  fuzzy-match   Items that match s*b*t*r*k*t
+
+\'wild   exact-match (quoted)  Items that include wild
+
+!fire   inverse-exact-match   Items that do not include fire'
+command :select do |c|
+  c.example 'doing select', desc: 'Select from all entries. A menu of available actions will be presented after confirming the selection.'
+  c.example 'doing select --editor', desc: 'Select entries from a menu and batch edit them in your default editor'
+  c.example 'doing select --after "yesterday 12pm" --tag project1', desc: 'Display a menu of entries created after noon yesterday, add @project1 to selected entries'
+  c.desc 'Select from a specific section'
+  c.arg_name 'SECTION'
+  c.flag %i[s section]
+
+  c.desc 'Tag selected entries'
+  c.arg_name 'TAG'
+  c.flag %i[t tag]
+
+  c.desc 'Reverse -c, -f, --flag, and -t (remove instead of adding)'
+  c.switch %i[r remove], negatable: false
+
+  # c.desc 'Add @done to selected item(s), using start time of next item as the finish time'
+  # c.switch %i[a auto], negatable: false, default_value: false
+
+  c.desc 'Archive selected items'
+  c.switch %i[a archive], negatable: false, default_value: false
+
+  c.desc 'Move selected items to section'
+  c.arg_name 'SECTION'
+  c.flag %i[m move]
+
+  c.desc 'Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "\'search"'
+  c.arg_name 'QUERY'
+  c.flag %i[q query search]
+
+  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
+
+  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.arg_name 'DATE_STRING'
+  c.flag [:after]
+
+  c.desc %(
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing select --from "monday 8am to friday 5pm"`.
+
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
+
+  c.desc 'Force exact search string matching (case sensitive)'
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
+
+  c.desc 'Select items that *don\'t* match search/tag filters'
+  c.switch [:not], default_value: false, negatable: false
+
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
+
+  c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.'
+  c.switch %i[menu], negatable: true, default_value: true
+
+  c.desc 'Cancel selected items (add @done without timestamp)'
+  c.switch %i[c cancel], negatable: false, default_value: false
+
+  c.desc 'Delete selected items'
+  c.switch %i[d delete], negatable: false, default_value: false
+
+  c.desc 'Edit selected item(s)'
+  c.switch %i[e editor], negatable: false, default_value: false
+
+  c.desc 'Add @done with current time to selected item(s)'
+  c.switch %i[f finish], negatable: false, default_value: false
+
+  c.desc 'Add flag to selected item(s)'
+  c.switch %i[flag], negatable: false, default_value: false
+
+  c.desc 'Perform action without confirmation.'
+  c.switch %i[force], negatable: false, default_value: false
+
+  c.desc 'Save selected entries to file using --output format'
+  c.arg_name 'FILE'
+  c.flag %i[save_to]
+
+  c.desc "Output entries to format (#{Doing::Plugins.plugin_names(type: :export)})"
+  c.arg_name 'FORMAT'
+  c.flag %i[o output]
+
+  c.desc "Copy selection as a new entry with current time and no @done tag. Only works with single selections. Can be combined with --editor."
+  c.switch %i[again resume], negatable: false, default_value: false
+
+  c.action do |_global_options, options, args|
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+
+    raise InvalidArgument, '--no-menu requires --query' if !options[:menu] && !options[:query]
+
+    options[:case] = options[:case].normalize_case
+
+    wwid.interactive(options) # hooked
+  end
+end
+
+# @@tag
 desc 'Add tag(s) to last entry'
 long_desc 'Add (or remove) tags from the last entry, or from multiple entries
           (with `--count`), entries matching a search (with `--search`), or entries
@@ -1494,41 +1498,161 @@ command :tag do |c|
   end
 end
 
-desc 'Mark last entry as flagged'
-command %i[mark flag] do |c|
-  c.example 'doing flag', desc: 'Add @flagged to the last entry created'
-  c.example 'doing mark', desc: 'mark is an alias for flag'
-  c.example 'doing flag --tag project1 --count 2', desc: 'Add @flagged to the last 2 entries tagged @project1'
-  c.example 'doing flag --interactive --search "/(develop|cod)ing/"', desc: 'Find entries matching regular expression and create a menu allowing multiple selections, selected items will be @flagged'
+## View commands
+
+# @@choose
+desc 'Select a section to display from a menu'
+command :choose do |c|
+  c.action do |_global_options, _options, _args|
+    section = wwid.choose_section
+
+    Doing::Pager.page wwid.list_section({ section: section.cap_first, count: 0 }) if section
+  end
+end
+
+# @@grep @@search
+desc 'Search for entries'
+long_desc %(
+Search all sections (or limit to a single section) for entries matching text or regular expression. Normal strings are fuzzy matched.
+
+To search with regular expressions, single quote the string and surround with slashes: `doing search '/\bm.*?x\b/'`
+)
+arg_name 'SEARCH_PATTERN'
+command %i[grep search] do |c|
+  c.example 'doing grep "doing wiki"', desc: 'Find entries containing "doing wiki" using fuzzy matching'
+  c.example 'doing search "\'search command"', desc: 'Find entries containing "search command" using exact matching (search is an alias for grep)'
+  c.example 'doing grep "/do.*?wiki.*?@done/"', desc: 'Find entries matching regular expression'
+  c.example 'doing search --before 12/21 "doing wiki"', desc: 'Find entries containing "doing wiki" with entry dates before 12/21 of the current year'
 
   c.desc 'Section'
-  c.arg_name 'SECTION_NAME'
+  c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'How many recent entries to tag (0 for all)'
-  c.arg_name 'COUNT'
-  c.flag %i[c count], default_value: 1, must_match: /^\d+$/, type: Integer
+  c.desc 'Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
 
-  c.desc 'Don\'t ask permission to flag all entries when count is 0'
-  c.switch %i[force], negatable: false, default_value: false
+  c.desc 'Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.arg_name 'DATE_STRING'
+  c.flag [:after]
 
-  c.desc 'Include current date/time with tag'
-  c.switch %i[d date], negatable: false, default_value: false
+  c.desc %(
+      Date range to show, or a single day to filter date on.
+      Date range argument should be quoted. Date specifications can be natural language.
+      To specify a range, use "to" or "through": `doing search --from "monday 8am to friday 5pm"`.
 
-  c.desc 'Remove flag'
-  c.switch %i[r remove], negatable: false, default_value: false
+      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+      by time of day.
+    )
+  c.arg_name 'DATE_OR_RANGE'
+  c.flag [:from]
 
-  c.desc 'Flag last entry (or entries) not marked @done'
-  c.switch %i[u unfinished], negatable: false, default_value: false
+  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
+  c.arg_name 'FORMAT'
+  c.flag %i[o output]
 
-  c.desc 'Flag the last entry containing TAG.
-  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).'
+  c.desc 'Show time intervals on @done tasks'
+  c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
+
+  c.desc 'Show intervals with totals at the end of output'
+  c.switch [:totals], default_value: false, negatable: false
+
+  c.desc 'Sort tags by (name|time)'
+  default = 'time'
+  default = settings['tag_sort'] || 'name'
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+
+  c.desc 'Only show items with recorded time intervals'
+  c.switch [:only_timed], default_value: false, negatable: false
+
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
+
+  c.desc 'Force exact string matching (case sensitive)'
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
+
+  c.desc 'Show items that *don\'t* match search string'
+  c.switch [:not], default_value: false, negatable: false
+
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
+
+  c.desc "Edit matching entries with #{Doing::Util.default_editor}"
+  c.switch %i[e editor], negatable: false, default_value: false
+
+  c.desc "Delete matching entries"
+  c.switch %i[d delete], negatable: false, default_value: false
+
+  c.desc 'Display an interactive menu of results to perform further operations'
+  c.switch %i[i interactive], default_value: false, negatable: false
+
+  c.action do |_global_options, options, args|
+    options[:fuzzy] = false
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+
+    template = settings['templates']['default'].deep_merge(settings)
+    tags_color = template.key?('tags_color') ? template['tags_color'] : nil
+
+    section = wwid.guess_section(options[:section]) if options[:section]
+
+    options[:case] = options[:case].normalize_case
+
+    search = args.join(' ')
+    search.sub!(/^'?/, "'") if options[:exact]
+
+    options[:times] = true if options[:totals]
+    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    options[:highlight] = true
+    options[:search] = search
+    options[:section] = section
+    options[:tags_color] = tags_color
+
+    Doing::Pager.page wwid.list_section(options)
+  end
+end
+
+# @@last
+desc 'Show the last entry, optionally edit'
+long_desc 'Shows the last entry. Using --search and --tag filters, you can view/edit the last entry matching a filter,
+allowing `doing last` to target historical entries.'
+command :last do |c|
+  c.example 'doing last', desc: 'Show the most recent entry in all sections'
+  c.example 'doing last -s Later', desc: 'Show the most recent entry in the Later section'
+  c.example 'doing last --tag project1,work --bool AND', desc: 'Show most recent entry tagged @project1 and @work'
+  c.example 'doing last --search "side hustle"', desc: 'Show most recent entry containing "side hustle" (fuzzy matching)'
+  c.example 'doing last --search "\'side hustle"', desc: 'Show most recent entry containing "side hustle" (exact match)'
+  c.example 'doing last --edit', desc: 'Open the most recent entry in an editor for modifications'
+  c.example 'doing last --search "\'side hustle" --edit', desc: 'Open most recent entry containing "side hustle" (exact match) in editor'
+
+  c.desc 'Specify a section'
+  c.arg_name 'NAME'
+  c.flag %i[s section], default_value: 'All'
+
+  c.desc "Edit entry with #{Doing::Util.default_editor}"
+  c.switch %i[e editor], negatable: false, default_value: false
+
+  c.desc "Delete the last entry"
+  c.switch %i[d delete], negatable: false, default_value: false
+
+  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?).'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Flag the last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans.'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+
+  c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Show elapsed time if entry is not tagged @done'
+  c.switch [:duration]
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -1536,86 +1660,125 @@ command %i[mark flag] do |c|
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
-  c.desc 'Flag items that *don\'t* match search/tag/date filters'
+  c.desc 'Show items that *don\'t* match search string or tag filter'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
-
-  c.desc 'Select item(s) to flag from a menu of matching entries'
-  c.switch %i[i interactive], negatable: false, default_value: false
-
-  c.action do |_global_options, options, _args|
+  c.action do |global_options, options, _args|
     options[:fuzzy] = false
-    mark = settings['marker_tag'] || 'flagged'
-
-    raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
-
-    section = 'All'
-
-    if options[:section]
-      section = wwid.guess_section(options[:section]) || options[:section].cap_first
-    end
+    raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
 
     if options[:tag].nil?
-      search_tags = []
+      options[:tag] = []
     else
-      search_tags = options[:tag].to_tags
-    end
-
-    if options[:interactive]
-      count = 0
-      options[:force] = true
-    else
-      count = options[:count].to_i
+      options[:tag] = options[:tag].to_tags
+      options[:bool] = options[:bool].normalize_bool
     end
 
     options[:case] = options[:case].normalize_case
 
-    if options[:search]
-      search = options[:search]
-      search.sub!(/^'?/, "'") if options[:exact]
-      options[:search] = search
+    options[:search] = options[:search].sub(/^'?/, "'") if options[:search] && options[:exact]
+
+    if options[:editor]
+      wwid.edit_last(section: options[:section],
+                     options: {
+                       search: search,
+                       fuzzy: options[:fuzzy],
+                       case: options[:case],
+                       tag: tags,
+                       tag_bool: options[:bool],
+                       not: options[:not]
+                     })
+    else
+      last = wwid.last(times: true, section: options[:section],
+                     options: {
+                        duration: options[:duration],
+                        search: options[:search],
+                        fuzzy: options[:fuzzy],
+                        case: options[:case],
+                        negate: options[:not],
+                        tag: options[:tag],
+                        tag_bool: options[:bool],
+                        delete: options[:delete]
+                      })
+      Doing::Pager::page last.strip if last
     end
-
-    if count.zero? && !options[:force]
-      if options[:search]
-        section_q = ' matching your search terms'
-      elsif options[:tag]
-        section_q = ' matching your tag search'
-      elsif section == 'All'
-        section_q = ''
-      else
-        section_q = " in section #{section}"
-      end
-
-
-      question = if options[:remove]
-                   "Are you sure you want to unflag all entries#{section_q}"
-                 else
-                   "Are you sure you want to flag all records#{section_q}"
-                 end
-
-      res = Doing::Prompt.yn(question, default_response: false)
-
-      exit_now! 'Cancelled' unless res
-    end
-
-    options[:count] = count
-    options[:section] = section
-    options[:tag] = search_tags
-    options[:tags] = [mark]
-    options[:tag_bool] = options[:bool].normalize_bool
-
-    wwid.tag_last(options)
   end
 end
 
+# @@recent
+desc 'List recent entries'
+default_value 10
+arg_name 'COUNT'
+command :recent do |c|
+  c.example 'doing recent', desc: 'Show the 10 most recent entries across all sections'
+  c.example 'doing recent 20', desc: 'Show the 20 most recent entries across all sections'
+  c.example 'doing recent --section Currently 20', desc: 'List the 20 most recent entries from the Currently section'
+  c.example 'doing recent --interactive 20', desc: 'Create a menu from the 20 most recent entries to perform batch actions on'
+
+  c.desc 'Section'
+  c.arg_name 'NAME'
+  c.flag %i[s section], default_value: 'All'
+
+  c.desc 'Show time intervals on @done tasks'
+  c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
+
+  c.desc 'Show intervals with totals at the end of output'
+  c.switch [:totals], default_value: false, negatable: false
+
+  c.desc 'Sort tags by (name|time)'
+  default = 'time'
+  default = settings['tag_sort'] || 'name'
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+
+  c.desc 'Select from a menu of matching entries to perform additional operations'
+  c.switch %i[i interactive], negatable: false, default_value: false
+
+  c.action do |global_options, options, args|
+    section = wwid.guess_section(options[:section]) || options[:section].cap_first
+
+    unless global_options[:version]
+      if settings['templates']['recent'].key?('count')
+        config_count = settings['templates']['recent']['count'].to_i
+      else
+        config_count = 10
+      end
+
+      if options[:interactive]
+        count = 0
+      else
+        count = args.empty? ? config_count : args[0].to_i
+      end
+
+      options[:times] = true if options[:totals]
+      options[:sort_tags] = options[:tag_sort] =~ /^n/i
+
+      template = settings['templates']['recent'].deep_merge(settings['templates']['default'])
+      tags_color = template.key?('tags_color') ? template['tags_color'] : nil
+
+      opts = {
+        sort_tags: options[:sort_tags],
+        tags_color: tags_color,
+        times: options[:times],
+        totals: options[:totals],
+        interactive: options[:interactive],
+        duration: options[:duration]
+      }
+
+      Doing::Pager::page wwid.recent(count, section.cap_first, opts)
+
+    end
+  end
+end
+
+# @@show
 desc 'List all entries'
 long_desc %(
   The argument can be a section name, @tag(s) or both.
@@ -1831,180 +1994,88 @@ command :show do |c|
   end
 end
 
-desc 'Search for entries'
-long_desc %(
-Search all sections (or limit to a single section) for entries matching text or regular expression. Normal strings are fuzzy matched.
-
-To search with regular expressions, single quote the string and surround with slashes: `doing search '/\bm.*?x\b/'`
-)
-
-arg_name 'SEARCH_PATTERN'
-command %i[grep search] do |c|
-  c.example 'doing grep "doing wiki"', desc: 'Find entries containing "doing wiki" using fuzzy matching'
-  c.example 'doing search "\'search command"', desc: 'Find entries containing "search command" using exact matching (search is an alias for grep)'
-  c.example 'doing grep "/do.*?wiki.*?@done/"', desc: 'Find entries matching regular expression'
-  c.example 'doing search --before 12/21 "doing wiki"', desc: 'Find entries containing "doing wiki" with entry dates before 12/21 of the current year'
-
+# @@tags
+desc 'List all tags in the current Doing file'
+command :tags do |c|
   c.desc 'Section'
-  c.arg_name 'NAME'
+  c.arg_name 'SECTION_NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
-  c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.desc 'Show count of occurrences'
+  c.switch %i[c counts]
 
-  c.desc 'Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
-  c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.desc 'Sort by name or count'
+  c.arg_name 'SORT_ORDER'
+  c.flag %i[sort], default_value: 'name', must_match: /^(?:n(?:ame)?|c(?:ount)?)$/
 
-  c.desc %(
-      Date range to show, or a single day to filter date on.
-      Date range argument should be quoted. Date specifications can be natural language.
-      To specify a range, use "to" or "through": `doing search --from "monday 8am to friday 5pm"`.
+  c.desc 'Sort order (asc/desc)'
+  c.arg_name 'ORDER'
+  c.flag %i[o order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
 
-      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
-      by time of day.
-    )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.desc 'Get tags for entries matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?).'
+  c.arg_name 'TAG'
+  c.flag [:tag]
 
-  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
-  c.arg_name 'FORMAT'
-  c.flag %i[o output]
-
-  c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true, negatable: true
-
-  c.desc 'Show elapsed time on entries without @done tag'
-  c.switch [:duration]
-
-  c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: false
-
-  c.desc 'Sort tags by (name|time)'
-  default = 'time'
-  default = settings['tag_sort'] || 'name'
-  c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
-
-  c.desc 'Only show items with recorded time intervals'
-  c.switch [:only_timed], default_value: false, negatable: false
+  c.desc 'Get tags for items matching search. Surround with
+  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
+  c.arg_name 'QUERY'
+  c.flag [:search]
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
 
-  c.desc 'Force exact string matching (case sensitive)'
+  c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
 
-  c.desc 'Show items that *don\'t* match search string'
+  c.desc 'Get tags from items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc "Edit matching entries with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
+  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
-  c.desc "Delete matching entries"
-  c.switch %i[d delete], negatable: false, default_value: false
-
-  c.desc 'Display an interactive menu of results to perform further operations'
-  c.switch %i[i interactive], default_value: false, negatable: false
-
-  c.action do |_global_options, options, args|
-    options[:fuzzy] = false
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
-
-    template = settings['templates']['default'].deep_merge(settings)
-    tags_color = template.key?('tags_color') ? template['tags_color'] : nil
-
-    section = wwid.guess_section(options[:section]) if options[:section]
-
-    options[:case] = options[:case].normalize_case
-
-    search = args.join(' ')
-    search.sub!(/^'?/, "'") if options[:exact]
-
-    options[:times] = true if options[:totals]
-    options[:sort_tags] = options[:tag_sort] =~ /^n/i
-    options[:highlight] = true
-    options[:search] = search
-    options[:section] = section
-    options[:tags_color] = tags_color
-
-    Doing::Pager.page wwid.list_section(options)
-  end
-end
-
-desc 'List recent entries'
-default_value 10
-arg_name 'COUNT'
-command :recent do |c|
-  c.example 'doing recent', desc: 'Show the 10 most recent entries across all sections'
-  c.example 'doing recent 20', desc: 'Show the 20 most recent entries across all sections'
-  c.example 'doing recent --section Currently 20', desc: 'List the 20 most recent entries from the Currently section'
-  c.example 'doing recent --interactive 20', desc: 'Create a menu from the 20 most recent entries to perform batch actions on'
-
-  c.desc 'Section'
-  c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
-
-  c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true, negatable: true
-
-  c.desc 'Show elapsed time on entries without @done tag'
-  c.switch [:duration]
-
-  c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: false
-
-  c.desc 'Sort tags by (name|time)'
-  default = 'time'
-  default = settings['tag_sort'] || 'name'
-  c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
-
-  c.desc 'Select from a menu of matching entries to perform additional operations'
+  c.desc 'Select items to scan from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
-  c.action do |global_options, options, args|
+  c.action do |_global, options, args|
     section = wwid.guess_section(options[:section]) || options[:section].cap_first
 
-    unless global_options[:version]
-      if settings['templates']['recent'].key?('count')
-        config_count = settings['templates']['recent']['count'].to_i
-      else
-        config_count = 10
-      end
+    items = wwid.filter_items([], opt: options)
 
-      if options[:interactive]
-        count = 0
-      else
-        count = args.empty? ? config_count : args[0].to_i
-      end
+    if options[:interactive]
+      items = Doing::Prompt.choose_from_items(items, include_section: options[:section].nil?,
+        menu: true,
+        header: '',
+        prompt: 'Select entries to scan > ',
+        multiple: true,
+        sort: true,
+        show_if_single: true)
+    end
 
-      options[:times] = true if options[:totals]
-      options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    # items = wwid.content.in_section(section)
+    tags = wwid.all_tags(items, counts: true)
 
-      template = settings['templates']['recent'].deep_merge(settings['templates']['default'])
-      tags_color = template.key?('tags_color') ? template['tags_color'] : nil
+    if options[:sort] =~ /^n/i
+      tags = tags.sort_by { |tag, count| tag }
+    else
+      tags = tags.sort_by { |tag, count| count }
+    end
 
-      opts = {
-        sort_tags: options[:sort_tags],
-        tags_color: tags_color,
-        times: options[:times],
-        totals: options[:totals],
-        interactive: options[:interactive],
-        duration: options[:duration]
-      }
+    tags.reverse! if options[:order].normalize_order == 'desc'
 
-      Doing::Pager::page wwid.recent(count, section.cap_first, opts)
-
+    if options[:counts]
+      tags.each { |t, c| puts "#{t} (#{c})" }
+    else
+      tags.each { |t, c| puts "#{t}" }
     end
   end
 end
 
+# @@today
 desc 'List entries from today'
 long_desc 'List entries from the current day. Use --before, --after, and
 --from to specify time ranges.'
@@ -2062,6 +2133,7 @@ command :today do |c|
   end
 end
 
+# @on
 desc 'List entries for a date'
 long_desc %(Date argument can be natural language. "thursday" would be interpreted as "last thursday,"
 and "2d" would be interpreted as "two days ago." If you use "to" or "through" between two dates,
@@ -2125,6 +2197,7 @@ command :on do |c|
   end
 end
 
+# @since
 desc 'List entries since a date'
 long_desc %(Date argument can be natural language and are always interpreted as being in the past. "thursday" would be interpreted as "last thursday,"
 and "2d" would be interpreted as "two days ago.")
@@ -2181,270 +2254,7 @@ command :since do |c|
   end
 end
 
-desc 'List entries from yesterday'
-long_desc 'Show only entries with start times within the previous 24 hour period. Use --before, --after, and --from to limit to
-time spans within the day.'
-command :yesterday do |c|
-  c.example 'doing yesterday', desc: 'List all entries from the previous day'
-  c.example 'doing yesterday --after 8am --before 5pm', desc: 'List entries from the previous day between 8am and 5pm'
-  c.example 'doing yesterday --totals', desc: 'List entries from previous day, including tag timers'
-
-  c.desc 'Specify a section'
-  c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
-
-  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
-  c.arg_name 'FORMAT'
-  c.flag %i[o output]
-
-  c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true, negatable: true
-
-  c.desc 'Show elapsed time on entries without @done tag'
-  c.switch [:duration]
-
-  c.desc 'Show time totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: false
-
-  c.desc 'Sort tags by (name|time)'
-  default = settings['tag_sort'] || 'name'
-  c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
-
-  c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
-  c.arg_name 'TIME_STRING'
-  c.flag [:before]
-
-  c.desc 'View entries after specified time (e.g. 8am, 12:30pm, 15:00)'
-  c.arg_name 'TIME_STRING'
-  c.flag [:after]
-
-  c.desc %(
-      Time range to show, e.g. `doing yesterday --from "1am to 8am"`
-    )
-  c.arg_name 'TIME_RANGE'
-  c.flag [:from]
-
-  c.desc 'Tag sort direction (asc|desc)'
-  c.arg_name 'DIRECTION'
-  c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
-
-  c.action do |_global_options, options, _args|
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
-
-    options[:sort_tags] = options[:tag_sort] =~ /^n/i
-
-    if options[:from]
-      options[:from] = options[:from].split(/ (?:to|through|thru|(?:un)?til|-+) /).map do |time|
-        "yesterday #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}"
-      end.join(' to ')
-    end
-
-    opt = {
-      after: options[:after],
-      before: options[:before],
-      duration: options[:duration],
-      from: options[:from],
-      sort_tags: options[:sort_tags],
-      tag_order: options[:tag_order].normalize_order,
-      totals: options[:totals],
-      order: settings.dig('templates', 'today', 'order')
-    }
-    Doing::Pager.page wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
-  end
-end
-
-desc 'Show the last entry, optionally edit'
-long_desc 'Shows the last entry. Using --search and --tag filters, you can view/edit the last entry matching a filter,
-allowing `doing last` to target historical entries.'
-command :last do |c|
-  c.example 'doing last', desc: 'Show the most recent entry in all sections'
-  c.example 'doing last -s Later', desc: 'Show the most recent entry in the Later section'
-  c.example 'doing last --tag project1,work --bool AND', desc: 'Show most recent entry tagged @project1 and @work'
-  c.example 'doing last --search "side hustle"', desc: 'Show most recent entry containing "side hustle" (fuzzy matching)'
-  c.example 'doing last --search "\'side hustle"', desc: 'Show most recent entry containing "side hustle" (exact match)'
-  c.example 'doing last --edit', desc: 'Open the most recent entry in an editor for modifications'
-  c.example 'doing last --search "\'side hustle" --edit', desc: 'Open most recent entry containing "side hustle" (exact match) in editor'
-
-  c.desc 'Specify a section'
-  c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
-
-  c.desc "Edit entry with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc "Delete the last entry"
-  c.switch %i[d delete], negatable: false, default_value: false
-
-  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?).'
-  c.arg_name 'TAG'
-  c.flag [:tag]
-
-  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans.'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
-
-  c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  c.desc 'Show elapsed time if entry is not tagged @done'
-  c.switch [:duration]
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
-
-  c.desc 'Show items that *don\'t* match search string or tag filter'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
-
-  c.action do |global_options, options, _args|
-    options[:fuzzy] = false
-    raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
-
-    if options[:tag].nil?
-      options[:tag] = []
-    else
-      options[:tag] = options[:tag].to_tags
-      options[:bool] = options[:bool].normalize_bool
-    end
-
-    options[:case] = options[:case].normalize_case
-
-    options[:search] = options[:search].sub(/^'?/, "'") if options[:search] && options[:exact]
-
-    if options[:editor]
-      wwid.edit_last(section: options[:section],
-                     options: {
-                       search: search,
-                       fuzzy: options[:fuzzy],
-                       case: options[:case],
-                       tag: tags,
-                       tag_bool: options[:bool],
-                       not: options[:not]
-                     })
-    else
-      last = wwid.last(times: true, section: options[:section],
-                     options: {
-                        duration: options[:duration],
-                        search: options[:search],
-                        fuzzy: options[:fuzzy],
-                        case: options[:case],
-                        negate: options[:not],
-                        tag: options[:tag],
-                        tag_bool: options[:bool],
-                        delete: options[:delete]
-                      })
-      Doing::Pager::page last.strip if last
-    end
-  end
-end
-
-desc 'List sections'
-command :sections do |c|
-  c.desc 'List in single column'
-  c.switch %i[c column], negatable: false, default_value: false
-
-  c.action do |_global_options, options, _args|
-    joiner = options[:column] ? "\n" : "\t"
-    print wwid.content.section_titles.join(joiner)
-  end
-end
-
-desc 'Select a section to display from a menu'
-command :choose do |c|
-  c.action do |_global_options, _options, _args|
-    section = wwid.choose_section
-
-    Doing::Pager.page wwid.list_section({ section: section.cap_first, count: 0 }) if section
-  end
-end
-
-desc 'Add a new section to the "doing" file'
-arg_name 'SECTION_NAME'
-command :add_section do |c|
-  c.example 'doing add_section Ideas', desc: 'Add a section called Ideas to the doing file'
-
-  c.action do |_global_options, _options, args|
-    raise InvalidArgument, "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
-
-    wwid.content.add_section(args.join(' ').cap_first, log: true)
-    wwid.write(wwid.doing_file)
-  end
-end
-
-desc 'List available color variables for configuration templates and views'
-command :colors do |c|
-  c.action do |_global_options, _options, _args|
-    bgs = []
-    fgs = []
-    colors::attributes.each do |color|
-      if color.to_s =~ /bg/
-        bgs.push("#{colors.send(color, "    ")}#{colors.default} <-- #{color.to_s}")
-      else
-        fgs.push("#{colors.send(color, "XXXX")}#{colors.default} <-- #{color.to_s}")
-      end
-    end
-    out = []
-    out << fgs.join("\n")
-    out << bgs.join("\n")
-    Doing::Pager.page out.join("\n")
-  end
-end
-
-desc 'List installed plugins'
-long_desc %(Lists available plugins, including user-installed plugins.
-
-Export plugins are available with the `--output` flag on commands that support it.
-
-Import plugins are available using `doing import --type PLUGIN`.
-)
-command :plugins do |c|
-  c.example 'doing plugins', desc: 'List all plugins'
-  c.example 'doing plugins -t import', desc: 'List all import plugins'
-
-  c.desc 'List plugins of type (import, export)'
-  c.arg_name 'TYPE'
-  c.flag %i[t type], must_match: /^(?:[iea].*)$/i, default_value: 'all'
-
-  c.desc 'List in single column for completion'
-  c.switch %i[c column], negatable: false, default_value: false
-
-  c.action do |_global_options, options, _args|
-    Doing::Plugins.list_plugins(options)
-  end
-end
-
-desc 'Generate shell completion scripts'
-long_desc 'Generates the necessary scripts to add command line completion to various shells, so typing \'doing\' and hitting
-tab will offer completions of subcommands and their options.'
-command :completion do |c|
-  c.example 'doing completion', desc: 'Output zsh (default) to STDOUT'
-  c.example 'doing completion --type zsh --file ~/.zsh-completions/_doing.zsh', desc: 'Output zsh completions to file'
-  c.example 'doing completion --type fish --file ~/.config/fish/completions/doing.fish', desc: 'Output fish completions to file'
-  c.example 'doing completion --type bash --file ~/.bash_it/completion/enabled/doing.bash', desc: 'Output bash completions to file'
-
-  c.desc 'Shell to generate for (bash, zsh, fish)'
-  c.arg_name 'SHELL'
-  c.flag %i[t type], must_match: /^(?:[bzf](?:[ai]?sh)?|all)$/i, default_value: 'zsh'
-
-  c.desc 'File to write output to'
-  c.arg_name 'PATH'
-  c.flag %i[f file], default_value: 'STDOUT'
-
-  c.action do |_global_options, options, _args|
-    script_dir = File.join(File.dirname(__FILE__), '..', 'scripts')
-
-    Doing::Completion.generate_completion(type: options[:type], file: options[:file])
-  end
-end
-
+# @@view
 desc 'Display a user-created view'
 long_desc 'Views are defined in your configuration (use `doing config` to edit).
 Command line options override view configuration.'
@@ -2668,24 +2478,439 @@ command :view do |c|
 
       Doing::Pager.page wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
-      raise UserCancelled, 'Cancelled' unless res
+      raise UserCancelled, 'Cancelled'
     else
       raise InvalidView, "View #{title} not found in config"
     end
   end
 end
 
-desc 'List available custom views'
-command :views do |c|
-  c.desc 'List in single column'
-  c.switch %i[c column], default_value: false
+# @@yesterday
+desc 'List entries from yesterday'
+long_desc 'Show only entries with start times within the previous 24 hour period. Use --before, --after, and --from to limit to
+time spans within the day.'
+command :yesterday do |c|
+  c.example 'doing yesterday', desc: 'List all entries from the previous day'
+  c.example 'doing yesterday --after 8am --before 5pm', desc: 'List entries from the previous day between 8am and 5pm'
+  c.example 'doing yesterday --totals', desc: 'List entries from previous day, including tag timers'
+
+  c.desc 'Specify a section'
+  c.arg_name 'NAME'
+  c.flag %i[s section], default_value: 'All'
+
+  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
+  c.arg_name 'FORMAT'
+  c.flag %i[o output]
+
+  c.desc 'Show time intervals on @done tasks'
+  c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc 'Show elapsed time on entries without @done tag'
+  c.switch [:duration]
+
+  c.desc 'Show time totals at the end of output'
+  c.switch [:totals], default_value: false, negatable: false
+
+  c.desc 'Sort tags by (name|time)'
+  default = settings['tag_sort'] || 'name'
+  c.arg_name 'KEY'
+  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+
+  c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
+  c.arg_name 'TIME_STRING'
+  c.flag [:before]
+
+  c.desc 'View entries after specified time (e.g. 8am, 12:30pm, 15:00)'
+  c.arg_name 'TIME_STRING'
+  c.flag [:after]
+
+  c.desc %(
+      Time range to show, e.g. `doing yesterday --from "1am to 8am"`
+    )
+  c.arg_name 'TIME_RANGE'
+  c.flag [:from]
+
+  c.desc 'Tag sort direction (asc|desc)'
+  c.arg_name 'DIRECTION'
+  c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
 
   c.action do |_global_options, options, _args|
-    joiner = options[:column] ? "\n" : "\t"
-    print wwid.views.join(joiner)
+    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+
+    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+
+    if options[:from]
+      options[:from] = options[:from].split(/ (?:to|through|thru|(?:un)?til|-+) /).map do |time|
+        "yesterday #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}"
+      end.join(' to ')
+    end
+
+    opt = {
+      after: options[:after],
+      before: options[:before],
+      duration: options[:duration],
+      from: options[:from],
+      sort_tags: options[:sort_tags],
+      tag_order: options[:tag_order].normalize_order,
+      totals: options[:totals],
+      order: settings.dig('templates', 'today', 'order')
+    }
+    Doing::Pager.page wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
   end
 end
 
+## Utility commands
+
+# @@add_section
+desc 'Add a new section to the "doing" file'
+arg_name 'SECTION_NAME'
+command :add_section do |c|
+  c.example 'doing add_section Ideas', desc: 'Add a section called Ideas to the doing file'
+
+  c.action do |_global_options, _options, args|
+    raise InvalidArgument, "Section #{args[0]} already exists" if wwid.sections.include?(args[0])
+
+    wwid.content.add_section(args.join(' ').cap_first, log: true)
+    wwid.write(wwid.doing_file)
+  end
+end
+
+# @@config
+desc 'Edit the configuration file or output a value from it'
+long_desc %(Run without arguments, `doing config` opens your `config.yml` in an editor.
+If local configurations are found in the path between the current directory
+and the root (/), a menu will allow you to select which to open in the editor.
+
+It will use the editor defined in `config_editor_app`, or one specified with `--editor`.
+
+Use `doing config get` to output the configuration to the terminal, and
+provide a dot-separated key path to get a specific value. Shows the current value
+including keys/overrides set by local configs.)
+command :config do |c|
+  c.example 'doing config', desc: "Open an active configuration in #{Doing::Util.find_default_editor('config')}"
+  c.example 'doing config get doing_file', desc: 'Output the value of a config key as YAML'
+  c.example 'doing config get plugins.plugin_path -o json', desc: 'Output the value of a key path as JSON'
+  c.example 'doing config set plugins.say.say_voice Alex', desc: 'Set the value of a key path and update config file'
+  c.example 'doing config set plug.say.voice Zarvox', desc: 'Key paths for get and set are fuzzy matched'
+
+  c.default_command :edit
+
+  c.desc 'DEPRECATED'
+  c.switch %i[d dump]
+
+  c.desc 'DEPRECATED'
+  c.switch %i[u update]
+
+  # @@config.list
+  c.desc 'List configuration paths, including .doingrc files in the current and parent directories'
+  c.long_desc 'Config files are listed in order of precedence (if there are multiple configs detected).
+  Values defined in the top item in the list will override values in configutations below it.'
+  c.command :list do |list|
+    list.action do |global, options, args|
+      puts config.additional_configs.join("\n")
+      puts config.config_file
+    end
+  end
+
+  # @@config.edit
+  c.desc 'Open config file in editor'
+  c.command :edit do |edit|
+    edit.example 'doing config edit', desc: 'Open a config file in the default editor'
+    edit.example 'doing config edit --editor vim', desc: 'Open config in specific editor'
+
+    edit.desc 'Editor to use'
+    edit.arg_name 'EDITOR'
+    edit.flag %i[e editor], default_value: nil
+
+    if `uname` =~ /Darwin/
+      edit.desc 'Application to use'
+      edit.arg_name 'APP_NAME'
+      edit.flag %i[a app]
+
+      edit.desc 'Application bundle id to use'
+      edit.arg_name 'BUNDLE_ID'
+      edit.flag %i[b bundle_id]
+
+      edit.desc "Use the config_editor_app defined in ~/.config/doing/config.yml (#{settings.key?('config_editor_app') ? settings['config_editor_app'] : 'config_editor_app not set'})"
+      edit.switch %i[x default]
+    end
+
+    edit.action do |global, options, args|
+      if options[:update] || options[:dump]
+        cmd = commands[:config]
+        if options[:update]
+          cmd = cmd.commands[:update]
+        elsif options[:dump]
+          cmd = cmd.commands[:get]
+        end
+        action = cmd.send(:get_action, nil)
+        action.call(global, options, args)
+        Doing.logger.warn('Deprecated:', '--dump and --update are deprecated,
+                             use `doing config get` and `doing config update`')
+        Doing.logger.output_results
+        return
+      end
+
+      config_file = config.choose_config
+
+      if `uname` =~ /Darwin/
+        if options[:default]
+          editor = Doing::Util.find_default_editor('config')
+          if editor
+            if Doing::Util.exec_available(editor.split(/ /).first)
+              system %(#{editor} "#{config_file}")
+            else
+              `open -a "#{editor}" "#{config_file}"`
+            end
+          else
+            raise InvalidArgument, 'No viable editor found in config or environment.'
+          end
+        elsif options[:app] || options[:bundle_id]
+          if options[:app]
+            `open -a "#{options[:app]}" "#{config_file}"`
+          elsif options[:bundle_id]
+            `open -b #{options[:bundle_id]} "#{config_file}"`
+          end
+        else
+          editor = options[:editor] || Doing::Util.find_default_editor('config')
+
+          raise MissingEditor, 'No viable editor defined in config or environment' unless editor
+
+          if Doing::Util.exec_available(editor.split(/ /).first)
+            system %(#{editor} "#{config_file}")
+          else
+            `open -a "#{editor}" "#{config_file}"`
+          end
+        end
+      else
+        editor = options[:editor] || Doing::Util.default_editor
+        raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor.split(/ /).first)
+
+        system %(#{editor} "#{config_file}")
+      end
+    end
+  end
+
+  # @@config.update @@config.refresh
+  c.desc 'Update default config file, adding any missing keys'
+  c.command %i[update refresh] do |update|
+    update.action do |_global, options, args|
+      config.configure({rewrite: true, ignore_local: true})
+      Doing.logger.warn('Config:', 'config refreshed')
+    end
+  end
+
+  # @@config.undo
+  c.desc 'Undo the last change to a config file'
+  c.command :undo do |undo|
+    undo.action do |_global, options, args|
+      config_file = config.choose_config
+      Doing::Util::Backup.restore_last_backup(config_file, count: 1)
+    end
+  end
+
+  # @@config.get @@config.dump
+  c.desc 'Output a key\'s value'
+  c.arg 'KEY_PATH'
+  c.command %i[get dump] do |dump|
+    dump.example 'doing config get', desc: 'Output the entire configuration'
+    dump.example 'doing config get timer_format --output raw', desc: 'Output the value of timer_format as a plain string'
+    dump.example 'doing config get doing_file', desc: 'Output the value of the doing_file setting, respecting local configurations'
+    dump.example 'doing config get -o json plug.plugpath', desc: 'Key path is fuzzy matched: output the value of plugins->plugin_path as JSON'
+
+    dump.desc 'Format for output (json|yaml|raw)'
+    dump.arg_name 'FORMAT'
+    dump.flag %i[o output], default_value: 'yaml', must_match: /^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$/
+
+    dump.action do |_global, options, args|
+
+      keypath = args.join('.')
+      cfg = config.value_for_key(keypath)
+      real_path = config.resolve_key_path(keypath)
+
+      if cfg
+        val = cfg.map {|k, v| v }[0]
+        if real_path.count.positive?
+          nested_cfg = {}
+          nested_cfg.deep_set(real_path, val)
+        else
+          nested_cfg = val
+        end
+
+        if options[:output] =~ /^r/
+          if val.is_a?(Hash)
+            $stdout.puts YAML.dump(val)
+          elsif val.is_a?(Array)
+            $stdout.puts val.join(', ')
+          else
+            $stdout.puts val.to_s
+          end
+        else
+          $stdout.puts case options[:output]
+                       when /^j/
+                         JSON.pretty_generate(val)
+                       else
+                         YAML.dump(nested_cfg)
+                       end
+        end
+      else
+        Doing.logger.log_now(:error, 'Config:', "Key #{keypath} not found")
+      end
+      Doing.logger.output_results
+      return
+    end
+  end
+
+  # @@config.set
+  c.desc 'Set a key\'s value in the config file'
+  c.arg 'KEY VALUE'
+  c.command :set do |set|
+    set.example 'doing config set timer_format human', desc: 'Set the value of timer_format to "human"'
+    set.example 'doing config set plug.plugpath ~/my_plugins', desc: 'Key path is fuzzy matched: set the value of plugins->plugin_path'
+
+    set.desc 'Delete specified key'
+    set.switch %i[r remove], default_value: false, negatable: false
+
+    set.action do |_global, options, args|
+      if args.count < 2 && !options[:remove]
+        raise InvalidArgument, 'config set requires at least two arguments, key path and value'
+
+      end
+
+      value = options[:remove] ? nil : args.pop
+      keypath = args.join('.')
+      real_path = config.resolve_key_path(keypath, create: true)
+
+      old_value = settings.dig(*real_path) || nil
+      old_type = old_value&.class.to_s || nil
+
+      if old_value.is_a?(Hash) && !options[:remove]
+        Doing.logger.log_now(:warn, 'Config:', "Config key must point to a single value, #{real_path.join('->').boldwhite} is a mapping")
+        didyou = 'Did you mean:'
+        old_value.keys.each do |k|
+          Doing.logger.log_now(:warn, "#{didyou}", "#{keypath}.#{k}?")
+          didyou = '..........or:'
+        end
+        raise InvalidArgument, 'Config value is a mapping, can not be set to a single value'
+
+      end
+
+      config_file = config.choose_config(create: true)
+
+      cfg = YAML.safe_load_file(config_file) || {}
+
+      $stderr.puts "Updating #{config_file}".yellow
+
+      if options[:remove]
+        cfg.deep_set(real_path, nil)
+        $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('->').boldwhite}"
+      else
+        current_value = cfg.dig(*real_path)
+        cfg.deep_set(real_path, value.set_type(old_type))
+
+        $stderr.puts "#{' Key path:'.yellow} #{real_path.join('->').boldwhite}"
+        $stderr.puts "#{'Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
+        $stderr.puts "#{'  Current:'.yellow} #{ (current_value ? current_value.to_s : 'empty').boldwhite }"
+        $stderr.puts "#{'      New:'.yellow} #{value.set_type(old_type).to_s.boldwhite}"
+      end
+
+      res = Doing::Prompt.yn('Update selected config', default_response: true)
+
+      raise UserCancelled, 'Cancelled' unless res
+
+      Doing::Util.write_to_file(config_file, YAML.dump(cfg), backup: true)
+      Doing.logger.warn('Config:', "#{config_file} updated")
+    end
+  end
+end
+
+# @@open
+desc 'Open the "doing" file in an editor'
+long_desc "`doing open` defaults to using the editors->doing_file setting
+in #{config.config_file} (#{Doing::Util.find_default_editor('doing_file')})."
+command :open do |c|
+  c.example 'doing open', desc: 'Open the doing file in the default editor'
+  c.desc 'Open with editor command (e.g. vim, mate)'
+  c.arg_name 'COMMAND'
+  c.flag %i[e editor]
+
+  if `uname` =~ /Darwin/
+    c.desc 'Open with app name'
+    c.arg_name 'APP_NAME'
+    c.flag %i[a app]
+
+    c.desc 'Open with app bundle id'
+    c.arg_name 'BUNDLE_ID'
+    c.flag %i[b bundle_id]
+  end
+
+  c.action do |_global_options, options, _args|
+    params = options.dup
+    params.delete_if do |k, v|
+      k.instance_of?(String) || v.nil? || v == false
+    end
+
+    if options[:editor]
+      raise MissingEditor, "Editor #{options[:editor]} not found" unless Doing::Util.exec_available(options[:editor].split(/ /).first)
+
+      editor = TTY::Which.which(options[:editor])
+      system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
+    elsif `uname` =~ /Darwin/
+      if options[:app]
+        system %(open -a "#{options[:app]}" "#{File.expand_path(wwid.doing_file)}")
+      elsif options[:bundle_id]
+        system %(open -b "#{options[:bundle_id]}" "#{File.expand_path(wwid.doing_file)}")
+      elsif Doing::Util.find_default_editor('doing_file')
+        editor = Doing::Util.find_default_editor('doing_file')
+        if Doing::Util.exec_available(editor.split(/ /).first)
+          system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
+        else
+          system %(open -a "#{editor}" "#{File.expand_path(wwid.doing_file)}")
+        end
+      else
+        system %(open "#{File.expand_path(wwid.doing_file)}")
+      end
+    else
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+
+      system %(#{Doing::Util.default_editor} "#{File.expand_path(wwid.doing_file)}")
+    end
+  end
+end
+
+# @@tag_dir
+desc 'Set the default tags for the current directory'
+long_desc 'Adds default_tags to a .doingrc file in the current directory. Any entry created in this directory or its
+subdirectories will be tagged with the default tags. You can modify these any time using the `config set` commnand or
+manually editing the .doingrc file.'
+arg_name 'TAG [TAG..]'
+command :tag_dir do |c|
+  c.example 'doing tag_dir project1 project2', desc: 'Add @project1 and @project to to any entries in the current directory'
+  c.example 'doing tag_dir --remove', desc: 'Clear the default tags for the directory'
+
+  c.desc 'Remove all default_tags from the local .doingrc'
+  c.switch %i[r remove], negatable: false
+
+  c.action do |global, options, args|
+    tags = args.join(' ').gsub(/ *, */, ' ').split(' ')
+
+    cfg_cmd = commands[:config]
+    set_cmd = cfg_cmd.commands[:set]
+    set_options = {}
+    if options[:remove]
+      set_args = ['default_tags']
+      set_options[:remove] = true
+    else
+      set_args = ['default_tags', tags.join(',')]
+    end
+    action = set_cmd.send(:get_action, nil)
+    return action.call(global, set_options, set_args)
+  end
+end
+
+## File handling/batch modification commands
+
+# @@archive @@move
 desc 'Move entries between sections'
 long_desc %(Argument can be a section name to move all entries from a section,
 or start with an "@" to move entries matching a tag.
@@ -2778,529 +3003,7 @@ command %i[archive move] do |c|
   end
 end
 
-desc 'Move entries to archive file'
-long_desc 'As your doing file grows, commands can get slow. Given that your historical data (and your archive section)
-probably aren\'t providing any useful insights a year later, use this command to "rotate" old entries out to an archive
-file. You\'ll still have access to all historical data, but it won\'t be slowing down daily operation.'
-command :rotate do |c|
-  c.example 'doing rotate', desc: 'Move all entries in doing file to a dated secondary file'
-  c.example 'doing rotate --section Archive --keep 10', desc: 'Move entries in the Archive section to a secondary file, keeping the most recent 10 entries'
-  c.example 'doing rotate --tag project1,done --bool AND', desc: 'Move entries tagged @project1 and @done to a secondary file'
-
-  c.desc 'How many items to keep in each section (most recent)'
-  c.arg_name 'X'
-  c.flag %i[k keep], must_match: /^\d+$/, type: Integer
-
-  c.desc 'Section to rotate'
-  c.arg_name 'SECTION_NAME'
-  c.flag %i[s section], default_value: 'All'
-
-  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands.'
-  c.arg_name 'TAG'
-  c.flag [:tag]
-
-  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans.'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
-
-  c.desc 'Search filter'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
-
-  c.desc 'Rotate items that *don\'t* match search string or tag filter'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
-
-  c.desc 'Rotate entries older than date
-    (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
-  c.arg_name 'DATE_STRING'
-  c.flag [:before]
-
-  c.action do |_global_options, options, args|
-    options[:fuzzy] = false
-    if options[:section] && options[:section] !~ /^all$/i
-      options[:section] = wwid.guess_section(options[:section])
-    end
-
-    options[:bool] = options[:bool].normalize_bool
-
-    options[:case] = options[:case].normalize_case
-
-    search = nil
-
-    if options[:search]
-      search = options[:search]
-      search.sub!(/^'?/, "'") if options[:exact]
-      options[:search] = search
-    end
-
-    wwid.rotate(options)
-  end
-end
-
-desc 'Open the "doing" file in an editor'
-long_desc "`doing open` defaults to using the editors->doing_file setting
-in #{config.config_file} (#{Doing::Util.find_default_editor('doing_file')})."
-command :open do |c|
-  c.example 'doing open', desc: 'Open the doing file in the default editor'
-  c.desc 'Open with editor command (e.g. vim, mate)'
-  c.arg_name 'COMMAND'
-  c.flag %i[e editor]
-
-  if `uname` =~ /Darwin/
-    c.desc 'Open with app name'
-    c.arg_name 'APP_NAME'
-    c.flag %i[a app]
-
-    c.desc 'Open with app bundle id'
-    c.arg_name 'BUNDLE_ID'
-    c.flag %i[b bundle_id]
-  end
-
-  c.action do |_global_options, options, _args|
-    params = options.dup
-    params.delete_if do |k, v|
-      k.instance_of?(String) || v.nil? || v == false
-    end
-
-    if options[:editor]
-      raise MissingEditor, "Editor #{options[:editor]} not found" unless Doing::Util.exec_available(options[:editor].split(/ /).first)
-
-      editor = TTY::Which.which(options[:editor])
-      system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
-    elsif `uname` =~ /Darwin/
-      if options[:app]
-        system %(open -a "#{options[:app]}" "#{File.expand_path(wwid.doing_file)}")
-      elsif options[:bundle_id]
-        system %(open -b "#{options[:bundle_id]}" "#{File.expand_path(wwid.doing_file)}")
-      elsif Doing::Util.find_default_editor('doing_file')
-        editor = Doing::Util.find_default_editor('doing_file')
-        if Doing::Util.exec_available(editor.split(/ /).first)
-          system %(#{editor} "#{File.expand_path(wwid.doing_file)}")
-        else
-          system %(open -a "#{editor}" "#{File.expand_path(wwid.doing_file)}")
-        end
-      else
-        system %(open "#{File.expand_path(wwid.doing_file)}")
-      end
-    else
-      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
-      system %(#{Doing::Util.default_editor} "#{File.expand_path(wwid.doing_file)}")
-    end
-  end
-end
-
-desc 'Edit the configuration file or output a value from it'
-long_desc %(Run without arguments, `doing config` opens your `config.yml` in an editor.
-If local configurations are found in the path between the current directory
-and the root (/), a menu will allow you to select which to open in the editor.
-
-It will use the editor defined in `config_editor_app`, or one specified with `--editor`.
-
-Use `doing config get` to output the configuration to the terminal, and
-provide a dot-separated key path to get a specific value. Shows the current value
-including keys/overrides set by local configs.)
-command :config do |c|
-  c.example 'doing config', desc: "Open an active configuration in #{Doing::Util.find_default_editor('config')}"
-  c.example 'doing config get doing_file', desc: 'Output the value of a config key as YAML'
-  c.example 'doing config get plugins.plugin_path -o json', desc: 'Output the value of a key path as JSON'
-  c.example 'doing config set plugins.say.say_voice Alex', desc: 'Set the value of a key path and update config file'
-  c.example 'doing config set plug.say.voice Zarvox', desc: 'Key paths for get and set are fuzzy matched'
-
-  c.default_command :edit
-
-  c.desc 'DEPRECATED'
-  c.switch %i[d dump]
-
-  c.desc 'DEPRECATED'
-  c.switch %i[u update]
-
-  c.desc 'List configuration paths, including .doingrc files in the current and parent directories'
-  c.long_desc 'Config files are listed in order of precedence (if there are multiple configs detected).
-  Values defined in the top item in the list will override values in configutations below it.'
-  c.command :list do |list|
-    list.action do |global, options, args|
-      puts config.additional_configs.join("\n")
-      puts config.config_file
-    end
-  end
-
-  c.desc 'Open config file in editor'
-  c.command :edit do |edit|
-    edit.example 'doing config edit', desc: 'Open a config file in the default editor'
-    edit.example 'doing config edit --editor vim', desc: 'Open config in specific editor'
-
-    edit.desc 'Editor to use'
-    edit.arg_name 'EDITOR'
-    edit.flag %i[e editor], default_value: nil
-
-    if `uname` =~ /Darwin/
-      edit.desc 'Application to use'
-      edit.arg_name 'APP_NAME'
-      edit.flag %i[a app]
-
-      edit.desc 'Application bundle id to use'
-      edit.arg_name 'BUNDLE_ID'
-      edit.flag %i[b bundle_id]
-
-      edit.desc "Use the config_editor_app defined in ~/.config/doing/config.yml (#{settings.key?('config_editor_app') ? settings['config_editor_app'] : 'config_editor_app not set'})"
-      edit.switch %i[x default]
-    end
-
-    edit.action do |global, options, args|
-      if options[:update] || options[:dump]
-        cmd = commands[:config]
-        if options[:update]
-          cmd = cmd.commands[:update]
-        elsif options[:dump]
-          cmd = cmd.commands[:get]
-        end
-        action = cmd.send(:get_action, nil)
-        action.call(global, options, args)
-        Doing.logger.warn('Deprecated:', '--dump and --update are deprecated,
-                             use `doing config get` and `doing config update`')
-        Doing.logger.output_results
-        return
-      end
-
-      config_file = config.choose_config
-
-      if `uname` =~ /Darwin/
-        if options[:default]
-          editor = Doing::Util.find_default_editor('config')
-          if editor
-            if Doing::Util.exec_available(editor.split(/ /).first)
-              system %(#{editor} "#{config_file}")
-            else
-              `open -a "#{editor}" "#{config_file}"`
-            end
-          else
-            raise InvalidArgument, 'No viable editor found in config or environment.'
-          end
-        elsif options[:app] || options[:bundle_id]
-          if options[:app]
-            `open -a "#{options[:app]}" "#{config_file}"`
-          elsif options[:bundle_id]
-            `open -b #{options[:bundle_id]} "#{config_file}"`
-          end
-        else
-          editor = options[:editor] || Doing::Util.find_default_editor('config')
-
-          raise MissingEditor, 'No viable editor defined in config or environment' unless editor
-
-          if Doing::Util.exec_available(editor.split(/ /).first)
-            system %(#{editor} "#{config_file}")
-          else
-            `open -a "#{editor}" "#{config_file}"`
-          end
-        end
-      else
-        editor = options[:editor] || Doing::Util.default_editor
-        raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor.split(/ /).first)
-
-        system %(#{editor} "#{config_file}")
-      end
-    end
-  end
-
-  c.desc 'Update default config file, adding any missing keys'
-  c.command %i[update refresh] do |update|
-    update.action do |_global, options, args|
-      config.configure({rewrite: true, ignore_local: true})
-      Doing.logger.warn('Config:', 'config refreshed')
-    end
-  end
-
-  c.desc 'Undo the last change to a config file'
-  c.command :undo do |undo|
-    undo.action do |_global, options, args|
-      config_file = config.choose_config
-      Doing::Util::Backup.restore_last_backup(config_file, count: 1)
-    end
-  end
-
-  c.desc 'Output a key\'s value'
-  c.arg 'KEY_PATH'
-  c.command %i[get dump] do |dump|
-    dump.example 'doing config get', desc: 'Output the entire configuration'
-    dump.example 'doing config get timer_format --output raw', desc: 'Output the value of timer_format as a plain string'
-    dump.example 'doing config get doing_file', desc: 'Output the value of the doing_file setting, respecting local configurations'
-    dump.example 'doing config get -o json plug.plugpath', desc: 'Key path is fuzzy matched: output the value of plugins->plugin_path as JSON'
-
-    dump.desc 'Format for output (json|yaml|raw)'
-    dump.arg_name 'FORMAT'
-    dump.flag %i[o output], default_value: 'yaml', must_match: /^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$/
-
-    dump.action do |_global, options, args|
-
-      keypath = args.join('.')
-      cfg = config.value_for_key(keypath)
-      real_path = config.resolve_key_path(keypath)
-
-      if cfg
-        val = cfg.map {|k, v| v }[0]
-        if real_path.count.positive?
-          nested_cfg = {}
-          nested_cfg.deep_set(real_path, val)
-        else
-          nested_cfg = val
-        end
-
-        if options[:output] =~ /^r/
-          if val.is_a?(Hash)
-            $stdout.puts YAML.dump(val)
-          elsif val.is_a?(Array)
-            $stdout.puts val.join(', ')
-          else
-            $stdout.puts val.to_s
-          end
-        else
-          $stdout.puts case options[:output]
-                       when /^j/
-                         JSON.pretty_generate(val)
-                       else
-                         YAML.dump(nested_cfg)
-                       end
-        end
-      else
-        Doing.logger.log_now(:error, 'Config:', "Key #{keypath} not found")
-      end
-      Doing.logger.output_results
-      return
-    end
-  end
-
-  c.desc 'Set a key\'s value in the config file'
-  c.arg 'KEY VALUE'
-  c.command :set do |set|
-    set.example 'doing config set timer_format human', desc: 'Set the value of timer_format to "human"'
-    set.example 'doing config set plug.plugpath ~/my_plugins', desc: 'Key path is fuzzy matched: set the value of plugins->plugin_path'
-
-    set.desc 'Delete specified key'
-    set.switch %i[r remove], default_value: false, negatable: false
-
-    set.action do |_global, options, args|
-      if args.count < 2 && !options[:remove]
-        raise InvalidArgument, 'config set requires at least two arguments, key path and value'
-
-      end
-
-      value = options[:remove] ? nil : args.pop
-      keypath = args.join('.')
-      real_path = config.resolve_key_path(keypath, create: true)
-
-      old_value = settings.dig(*real_path) || nil
-      old_type = old_value&.class.to_s || nil
-
-      if old_value.is_a?(Hash) && !options[:remove]
-        Doing.logger.log_now(:warn, 'Config:', "Config key must point to a single value, #{real_path.join('->').boldwhite} is a mapping")
-        didyou = 'Did you mean:'
-        old_value.keys.each do |k|
-          Doing.logger.log_now(:warn, "#{didyou}", "#{keypath}.#{k}?")
-          didyou = '..........or:'
-        end
-        raise InvalidArgument, 'Config value is a mapping, can not be set to a single value'
-
-      end
-
-      config_file = config.choose_config(create: true)
-
-      cfg = YAML.safe_load_file(config_file) || {}
-
-      $stderr.puts "Updating #{config_file}".yellow
-
-      if options[:remove]
-        cfg.deep_set(real_path, nil)
-        $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('->').boldwhite}"
-      else
-        current_value = cfg.dig(*real_path)
-        cfg.deep_set(real_path, value.set_type(old_type))
-
-        $stderr.puts "#{' Key path:'.yellow} #{real_path.join('->').boldwhite}"
-        $stderr.puts "#{'Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
-        $stderr.puts "#{'  Current:'.yellow} #{ (current_value ? current_value.to_s : 'empty').boldwhite }"
-        $stderr.puts "#{'      New:'.yellow} #{value.set_type(old_type).to_s.boldwhite}"
-      end
-
-      res = Doing::Prompt.yn('Update selected config', default_response: true)
-
-      raise UserCancelled, 'Cancelled' unless res
-
-      Doing::Util.write_to_file(config_file, YAML.dump(cfg), backup: true)
-      Doing.logger.warn('Config:', "#{config_file} updated")
-    end
-  end
-end
-
-desc 'Undo the last X changes to the Doing file'
-long_desc 'Reverts the last X commands that altered the doing file.
-All changes performed by a single command are undone at once.
-
-Specify a number to jump back multiple revisions, or use --select for an interactive menu.'
-arg_name 'COUNT'
-command :undo do |c|
-  c.example 'doing undo', desc: 'Undo the most recent change to the doing file'
-  c.example 'doing undo 5', desc: 'Undo the last 5 changes to the doing file'
-  c.example 'doing undo --interactive', desc: 'Select from a menu of available revisions'
-  c.example 'doing undo --redo', desc: 'Undo the last undo command'
-
-  c.desc 'Specify alternate doing file'
-  c.arg_name 'PATH'
-  c.flag %i[f file], default_value: wwid.doing_file
-
-  c.desc 'Select from recent backups'
-  c.switch %i[i interactive], negatable: false
-
-  c.desc 'Remove old backups, retaining X files'
-  c.arg_name 'COUNT'
-  c.flag %i[p prune], type: Integer
-
-  c.desc 'Redo last undo. Note: you cannot undo a redo.'
-  c.switch %i[r redo]
-
-  c.action do |_global_options, options, args|
-    file = options[:file] || wwid.doing_file
-    count = args.empty? ? 1 : args[0].to_i
-    raise InvalidArgument, "Invalid count specified for undo" unless count&.positive?
-
-    if options[:prune]
-      Doing::Util::Backup.prune_backups(file, options[:prune])
-    elsif options[:redo]
-      if options[:interactive]
-        Doing::Util::Backup.select_redo(file)
-      else
-        Doing::Util::Backup.redo_backup(file, count: count)
-      end
-    else
-      if options[:interactive]
-        Doing::Util::Backup.select_backup(file)
-      else
-        Doing::Util::Backup.restore_last_backup(file, count: count)
-      end
-    end
-  end
-end
-
-long_desc 'Shortcut for `doing undo -r`, reverses the last undo command. You cannot undo a redo.'
-arg_name 'COUNT'
-command :redo do |c|
-  c.desc 'Specify alternate doing file'
-  c.arg_name 'PATH'
-  c.flag %i[f file], default_value: wwid.doing_file
-
-  c.desc 'Select from an interactive menu'
-  c.switch %i[i interactive]
-
-  c.action do |_global, options, args|
-    file = options[:file] || wwid.doing_file
-    count = args.empty? ? 1 : args[0].to_i
-    raise InvalidArgument, "Invalid count specified for redo" unless count&.positive?
-    if options[:interactive]
-      Doing::Util::Backup.select_redo(file)
-    else
-      Doing::Util::Backup.redo_backup(file, count: count)
-    end
-  end
-end
-
-desc 'List recent changes in Doing'
-long_desc 'Display a formatted list of changes in recent versions, latest at the top'
-command %i[changelog changes] do |c|
-  c.action do |_global_options, options, args|
-    changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', 'CHANGELOG.md'))
-    if File.exist?(changelog)
-      parsed = TTY::Markdown.parse(IO.read(changelog), width: 80, symbols: {override: {bullet: "•"}})
-      Doing::Pager.paginate = true
-      Doing::Pager.page parsed
-    else
-      raise "Error locating changelog"
-    end
-  end
-end
-
-arg_name 'OPTION'
-command :commands_accepting do |c|
-  c.desc 'Output in single column for completion'
-  c.switch %i[c column]
-
-  c.action do |g, o, a|
-    a.each do |option|
-      cmds = []
-      commands.each do |cmd, v|
-        v.flags.merge(v.switches).each do |n, flag|
-          if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
-            cmds.push(cmd)
-          end
-        end
-      end
-
-      if o[:column]
-        puts cmds
-      else
-        puts "Commands accepting --#{option}: #{cmds.join(', ')}"
-      end
-    end
-  end
-end
-
-command :install_fzf do |c|
-  c.desc 'Force reinstall'
-  c.switch %i[r reinstall], default_value: false
-
-  c.desc 'Uninstall'
-  c.switch %i[u uninstall], default_value: false, negatable: false
-
-  c.action do |g, o, a|
-    if o[:uninstall]
-      Doing::Prompt.uninstall_fzf
-    else
-      Doing.logger.warn('fzf:', 'force reinstall') if o[:reinstall]
-      res = Doing::Prompt.install_fzf(force: o[:reinstall])
-    end
-  end
-end
-
-desc 'Set the default tags for the current directory'
-long_desc 'Adds default_tags to a .doingrc file in the current directory. Any entry created in this directory or its
-subdirectories will be tagged with the default tags. You can modify these any time using the `config set` commnand or
-manually editing the .doingrc file.'
-arg_name 'TAG [TAG..]'
-command :tag_dir do |c|
-  c.example 'doing tag_dir project1 project2', desc: 'Add @project1 and @project to to any entries in the current directory'
-  c.example 'doing tag_dir --remove', desc: 'Clear the default tags for the directory'
-
-  c.desc 'Remove all default_tags from the local .doingrc'
-  c.switch %i[r remove], negatable: false
-
-  c.action do |global, options, args|
-    tags = args.join(' ').gsub(/ *, */, ' ').split(' ')
-
-    cfg_cmd = commands[:config]
-    set_cmd = cfg_cmd.commands[:set]
-    set_options = {}
-    if options[:remove]
-      set_args = ['default_tags']
-      set_options[:remove] = true
-    else
-      set_args = ['default_tags', tags.join(',')]
-    end
-    action = set_cmd.send(:get_action, nil)
-    return action.call(global, set_options, set_args)
-  end
-end
-
-
-
+# @@import
 desc 'Import entries from an external source'
 long_desc "Imports entries from other sources. Available plugins: #{Doing::Plugins.plugin_names(type: :import, separator: ', ')}"
 arg_name 'PATH'
@@ -3400,6 +3103,372 @@ command :import do |c|
     end
   end
 end
+
+# @@rotate
+desc 'Move entries to archive file'
+long_desc 'As your doing file grows, commands can get slow. Given that your historical data (and your archive section)
+probably aren\'t providing any useful insights a year later, use this command to "rotate" old entries out to an archive
+file. You\'ll still have access to all historical data, but it won\'t be slowing down daily operation.'
+command :rotate do |c|
+  c.example 'doing rotate', desc: 'Move all entries in doing file to a dated secondary file'
+  c.example 'doing rotate --section Archive --keep 10', desc: 'Move entries in the Archive section to a secondary file, keeping the most recent 10 entries'
+  c.example 'doing rotate --tag project1,done --bool AND', desc: 'Move entries tagged @project1 and @done to a secondary file'
+
+  c.desc 'How many items to keep in each section (most recent)'
+  c.arg_name 'X'
+  c.flag %i[k keep], must_match: /^\d+$/, type: Integer
+
+  c.desc 'Section to rotate'
+  c.arg_name 'SECTION_NAME'
+  c.flag %i[s section], default_value: 'All'
+
+  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands.'
+  c.arg_name 'TAG'
+  c.flag [:tag]
+
+  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans.'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+
+  c.desc 'Search filter'
+  c.arg_name 'QUERY'
+  c.flag [:search]
+
+  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
+  # c.switch [:fuzzy], default_value: false, negatable: false
+
+  c.desc 'Force exact search string matching (case sensitive)'
+  c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
+
+  c.desc 'Rotate items that *don\'t* match search string or tag filter'
+  c.switch [:not], default_value: false, negatable: false
+
+  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
+  c.arg_name 'TYPE'
+  c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
+
+  c.desc 'Rotate entries older than date
+    (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
+  c.arg_name 'DATE_STRING'
+  c.flag [:before]
+
+  c.action do |_global_options, options, args|
+    options[:fuzzy] = false
+    if options[:section] && options[:section] !~ /^all$/i
+      options[:section] = wwid.guess_section(options[:section])
+    end
+
+    options[:bool] = options[:bool].normalize_bool
+
+    options[:case] = options[:case].normalize_case
+
+    search = nil
+
+    if options[:search]
+      search = options[:search]
+      search.sub!(/^'?/, "'") if options[:exact]
+      options[:search] = search
+    end
+
+    wwid.rotate(options)
+  end
+end
+
+## Utility commands
+
+# @@colors
+desc 'List available color variables for configuration templates and views'
+command :colors do |c|
+  c.action do |_global_options, _options, _args|
+    bgs = []
+    fgs = []
+    colors::attributes.each do |color|
+      if color.to_s =~ /bg/
+        bgs.push("#{colors.send(color, "    ")}#{colors.default} <-- #{color.to_s}")
+      else
+        fgs.push("#{colors.send(color, "XXXX")}#{colors.default} <-- #{color.to_s}")
+      end
+    end
+    out = []
+    out << fgs.join("\n")
+    out << bgs.join("\n")
+    Doing::Pager.page out.join("\n")
+  end
+end
+
+# @@completion
+desc 'Generate shell completion scripts'
+long_desc 'Generates the necessary scripts to add command line completion to various shells, so typing \'doing\' and hitting
+tab will offer completions of subcommands and their options.'
+command :completion do |c|
+  c.example 'doing completion', desc: 'Output zsh (default) to STDOUT'
+  c.example 'doing completion --type zsh --file ~/.zsh-completions/_doing.zsh', desc: 'Output zsh completions to file'
+  c.example 'doing completion --type fish --file ~/.config/fish/completions/doing.fish', desc: 'Output fish completions to file'
+  c.example 'doing completion --type bash --file ~/.bash_it/completion/enabled/doing.bash', desc: 'Output bash completions to file'
+
+  c.desc 'Shell to generate for (bash, zsh, fish)'
+  c.arg_name 'SHELL'
+  c.flag %i[t type], must_match: /^(?:[bzf](?:[ai]?sh)?|all)$/i, default_value: 'zsh'
+
+  c.desc 'File to write output to'
+  c.arg_name 'PATH'
+  c.flag %i[f file], default_value: 'STDOUT'
+
+  c.action do |_global_options, options, _args|
+    script_dir = File.join(File.dirname(__FILE__), '..', 'scripts')
+
+    Doing::Completion.generate_completion(type: options[:type], file: options[:file])
+  end
+end
+
+# @@plugins
+desc 'List installed plugins'
+long_desc %(Lists available plugins, including user-installed plugins.
+
+Export plugins are available with the `--output` flag on commands that support it.
+
+Import plugins are available using `doing import --type PLUGIN`.
+)
+command :plugins do |c|
+  c.example 'doing plugins', desc: 'List all plugins'
+  c.example 'doing plugins -t import', desc: 'List all import plugins'
+
+  c.desc 'List plugins of type (import, export)'
+  c.arg_name 'TYPE'
+  c.flag %i[t type], must_match: /^(?:[iea].*)$/i, default_value: 'all'
+
+  c.desc 'List in single column for completion'
+  c.switch %i[c column], negatable: false, default_value: false
+
+  c.action do |_global_options, options, _args|
+    Doing::Plugins.list_plugins(options)
+  end
+end
+
+# @@sections
+desc 'List sections'
+command :sections do |c|
+  c.desc 'List in single column'
+  c.switch %i[c column], negatable: false, default_value: false
+
+  c.action do |_global_options, options, _args|
+    joiner = options[:column] ? "\n" : "\t"
+    print wwid.content.section_titles.join(joiner)
+  end
+end
+
+# @@template
+desc 'Output HTML, CSS, and Markdown (ERB) templates for customization'
+long_desc %(
+  Templates are printed to STDOUT for piping to a file.
+  Save them and use them in the configuration file under export_templates.
+)
+arg_name 'TYPE', must_match: Doing::Plugins.template_regex
+command :template do |c|
+  c.example 'doing template haml > ~/styles/my_doing.haml', desc: 'Output the haml template and save it to a file'
+
+  c.desc 'List all available templates'
+  c.switch %i[l list], negatable: false
+
+  c.desc 'List in single column for completion'
+  c.switch %i[c column]
+
+  c.desc 'Save template to file instead of STDOUT'
+  c.switch %i[s save], default_value: false, negatable: false
+
+  c.desc 'Save template to alternate location'
+  c.arg_name 'DIRECTORY'
+  c.flag %i[p path], default_value: File.join(Doing::Util.user_home, '.config', 'doing', 'templates')
+
+  c.action do |_global_options, options, args|
+    if options[:list] || options[:column]
+      if options[:column]
+        $stdout.print Doing::Plugins.plugin_templates.join("\n")
+      else
+        $stdout.puts "Available templates: #{Doing::Plugins.plugin_templates.join(', ')}"
+      end
+      return
+    end
+
+    if args.empty?
+      type = Doing::Prompt.choose_from(Doing::Plugins.plugin_templates, sorted: false, prompt: 'Select template type > ')
+      type.sub!(/ \(.*?\)$/, '').strip!
+      options[:save] = Doing::Prompt.yn("Save to #{options[:path]}? (No outputs to STDOUT)", default_response: false)
+    else
+      type = args[0]
+    end
+
+    raise InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" unless type
+
+    if options[:save]
+      Doing::Plugins.template_for_trigger(type, save_to: options[:path])
+    else
+      $stdout.puts Doing::Plugins.template_for_trigger(type, save_to: nil)
+    end
+
+    # case args[0]
+    # when /html|haml/i
+    #   $stdout.puts wwid.haml_template
+    # when /css/i
+    #   $stdout.puts wwid.css_template
+    # when /markdown|md|erb/i
+    #   $stdout.puts wwid.markdown_template
+    # else
+    #   exit_now! 'Invalid type specified, must be HAML or CSS'
+    # end
+  end
+end
+
+# @@views
+desc 'List available custom views'
+command :views do |c|
+  c.desc 'List in single column'
+  c.switch %i[c column], default_value: false
+
+  c.action do |_global_options, options, _args|
+    joiner = options[:column] ? "\n" : "\t"
+    print wwid.views.join(joiner)
+  end
+end
+
+## History commands
+
+# @@undo
+desc 'Undo the last X changes to the Doing file'
+long_desc 'Reverts the last X commands that altered the doing file.
+All changes performed by a single command are undone at once.
+
+Specify a number to jump back multiple revisions, or use --select for an interactive menu.'
+arg_name 'COUNT'
+command :undo do |c|
+  c.example 'doing undo', desc: 'Undo the most recent change to the doing file'
+  c.example 'doing undo 5', desc: 'Undo the last 5 changes to the doing file'
+  c.example 'doing undo --interactive', desc: 'Select from a menu of available revisions'
+  c.example 'doing undo --redo', desc: 'Undo the last undo command'
+
+  c.desc 'Specify alternate doing file'
+  c.arg_name 'PATH'
+  c.flag %i[f file], default_value: wwid.doing_file
+
+  c.desc 'Select from recent backups'
+  c.switch %i[i interactive], negatable: false
+
+  c.desc 'Remove old backups, retaining X files'
+  c.arg_name 'COUNT'
+  c.flag %i[p prune], type: Integer
+
+  c.desc 'Redo last undo. Note: you cannot undo a redo.'
+  c.switch %i[r redo]
+
+  c.action do |_global_options, options, args|
+    file = options[:file] || wwid.doing_file
+    count = args.empty? ? 1 : args[0].to_i
+    raise InvalidArgument, "Invalid count specified for undo" unless count&.positive?
+
+    if options[:prune]
+      Doing::Util::Backup.prune_backups(file, options[:prune])
+    elsif options[:redo]
+      if options[:interactive]
+        Doing::Util::Backup.select_redo(file)
+      else
+        Doing::Util::Backup.redo_backup(file, count: count)
+      end
+    else
+      if options[:interactive]
+        Doing::Util::Backup.select_backup(file)
+      else
+        Doing::Util::Backup.restore_last_backup(file, count: count)
+      end
+    end
+  end
+end
+
+# @@redo
+long_desc 'Shortcut for `doing undo -r`, reverses the last undo command. You cannot undo a redo.'
+arg_name 'COUNT'
+command :redo do |c|
+  c.desc 'Specify alternate doing file'
+  c.arg_name 'PATH'
+  c.flag %i[f file], default_value: wwid.doing_file
+
+  c.desc 'Select from an interactive menu'
+  c.switch %i[i interactive]
+
+  c.action do |_global, options, args|
+    file = options[:file] || wwid.doing_file
+    count = args.empty? ? 1 : args[0].to_i
+    raise InvalidArgument, "Invalid count specified for redo" unless count&.positive?
+    if options[:interactive]
+      Doing::Util::Backup.select_redo(file)
+    else
+      Doing::Util::Backup.redo_backup(file, count: count)
+    end
+  end
+end
+
+# @@changelog @@changes
+desc 'List recent changes in Doing'
+long_desc 'Display a formatted list of changes in recent versions, latest at the top'
+command %i[changelog changes] do |c|
+  c.action do |_global_options, options, args|
+    changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', 'CHANGELOG.md'))
+    if File.exist?(changelog)
+      parsed = TTY::Markdown.parse(IO.read(changelog), width: 80, symbols: {override: {bullet: "•"}})
+      Doing::Pager.paginate = true
+      Doing::Pager.page parsed
+    else
+      raise "Error locating changelog"
+    end
+  end
+end
+
+## Hidden commands
+
+# @@commands_accepting
+arg_name 'OPTION'
+command :commands_accepting do |c|
+  c.desc 'Output in single column for completion'
+  c.switch %i[c column]
+
+  c.action do |g, o, a|
+    a.each do |option|
+      cmds = []
+      commands.each do |cmd, v|
+        v.flags.merge(v.switches).each do |n, flag|
+          if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
+            cmds.push(cmd)
+          end
+        end
+      end
+
+      if o[:column]
+        puts cmds
+      else
+        puts "Commands accepting --#{option}: #{cmds.join(', ')}"
+      end
+    end
+  end
+end
+
+# @@install_fzf
+command :install_fzf do |c|
+  c.desc 'Force reinstall'
+  c.switch %i[r reinstall], default_value: false
+
+  c.desc 'Uninstall'
+  c.switch %i[u uninstall], default_value: false, negatable: false
+
+  c.action do |g, o, a|
+    if o[:uninstall]
+      Doing::Prompt.uninstall_fzf
+    else
+      Doing.logger.warn('fzf:', 'force reinstall') if o[:reinstall]
+      res = Doing::Prompt.install_fzf(force: o[:reinstall])
+    end
+  end
+end
+
+## Doing::Hooks
 
 pre do |global, _command, _options, _args|
   # global[:pager] ||= settings['paginate']

@@ -372,9 +372,13 @@ module Doing
         end
       end
 
+      Hooks.trigger :pre_entry_add, self, entry
+
       @content.push(entry)
       # logger.count(:added, level: :debug)
       logger.info('New entry:', %(added "#{entry.title}" to #{section}))
+
+      Hooks.trigger :post_entry_added, self, entry.dup
     end
 
     ##
@@ -471,6 +475,7 @@ module Doing
         else
           item.title.tag!('done')
         end
+        Hooks.trigger :post_entry_updated, self, item
       end
 
       # Remove @done tag
@@ -801,7 +806,10 @@ module Doing
     def delete_items(items, force: false)
       res = force ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
       if res
-        items.each { |i| @content.delete_item(i, single: items.count == 1) }
+        items.each do |i|
+          deleted = @content.delete_item(i, single: items.count == 1)
+          Hooks.trigger :post_entry_removed, self, deleted
+        end
         write(@doing_file)
       end
     end
@@ -831,7 +839,8 @@ module Doing
         first_line = input_lines[0]&.strip
 
         if first_line.nil? || first_line =~ /^#{divider.strip}$/ || first_line.strip.empty?
-          @content.delete_item(items[i], single: new_items.count == 1)
+          deleted = @content.delete_item(items[i], single: new_items.count == 1)
+          Hooks.trigger :post_entry_removed, self, deleted
           Doing.logger.count(:deleted)
         else
           date, title, note = format_input(new_item)
@@ -847,6 +856,7 @@ module Doing
             Doing.logger.count(:skipped, level: :debug)
           else
             Doing.logger.count(:updated)
+            Hooks.trigger :post_entry_updated, self, item
           end
         end
       end
@@ -1012,7 +1022,7 @@ module Doing
 
         item = items[0]
         if opt[:resume] && !opt[:reset]
-          repeat_item(item, { editor: opt[:editor] })
+          repeat_item(item, { editor: opt[:editor] }) # hooked
         elsif opt[:reset]
           res = Prompt.enter_text('Start date (blank for current time)', default_response: '')
           if res =~ /^ *$/
@@ -1026,7 +1036,9 @@ module Doing
                 else
                   opt[:resume]
                 end
-          @content.update_item(item, reset_item(item, date: date, resume: res))
+          new_entry = reset_item(item, date: date, resume: res)
+          @content.update_item(item, new_entry)
+          Hooks.trigger :post_entry_updated, self, new_entry
         end
         write(@doing_file)
 
@@ -1034,7 +1046,7 @@ module Doing
       end
 
       if opt[:delete]
-        delete_items(items, force: opt[:force])
+        delete_items(items, force: opt[:force]) # hooked
         return
       end
 
@@ -1042,6 +1054,7 @@ module Doing
         tag = @config['marker_tag'] || 'flagged'
         items.map! do |i|
           i.tag(tag, date: false, remove: opt[:remove], single: single)
+          Hooks.trigger :post_entry_updated, self, i
         end
       end
 
@@ -1051,6 +1064,7 @@ module Doing
           if i.should_finish?
             should_date = !opt[:cancel] && i.should_time?
             i.tag(tag, date: should_date, remove: opt[:remove], single: single)
+            Hooks.trigger :post_entry_updated, self, i
           end
         end
       end
@@ -1059,18 +1073,22 @@ module Doing
         tag = opt[:tag]
         items.map! do |i|
           i.tag(tag, date: false, remove: opt[:remove], single: single)
+          Hooks.trigger :post_entry_updated, self, i
         end
       end
 
       if opt[:archive] || opt[:move]
         section = opt[:archive] ? 'Archive' : guess_section(opt[:move])
-        items.map! { |i| i.move_to(section, label: true) }
+        items.map! do |i|
+          i.move_to(section, label: true)
+          Hooks.trigger :post_entry_updated, self, i
+        end
       end
 
       write(@doing_file)
 
       if opt[:editor]
-        edit_items(items)
+        edit_items(items) # hooked
 
         write(@doing_file)
       end
@@ -1095,7 +1113,7 @@ module Doing
         options[:template] = opt[:template] || nil
       end
 
-      output = list_section(options)
+      output = list_section(options) # hooked
 
       if opt[:save_to]
         file = File.expand_path(opt[:save_to])
@@ -1123,7 +1141,7 @@ module Doing
     ##
     ## @see        #filter_items
     ##
-    def tag_last(opt)
+    def tag_last(opt) # hooked
       opt ||= {}
       opt[:count] ||= 1
       opt[:archive] ||= false
@@ -1234,6 +1252,8 @@ module Doing
         elsif opt[:archive] && opt[:count].zero?
           logger.warn('Skipped:', 'Archiving is skipped when operating on all entries')
         end
+
+        Hooks.trigger :post_entry_updated, self, item
       end
 
       write(@doing_file)
@@ -1287,6 +1307,7 @@ module Doing
         item.title = title
         item.note.add(note, replace: true)
         logger.info('Edited:', item.title)
+        Hooks.trigger :post_entry_updated, self, item.dup
 
         write(@doing_file)
       end
@@ -1341,7 +1362,9 @@ module Doing
           logger.count(:completed)
           logger.info('Completed:', item.title)
         end
+        Hooks.trigger :post_entry_updated, self, item
       end
+
 
       logger.debug('Skipped:', "No active @#{tag} tasks found.") if found_items.zero?
 
@@ -1400,6 +1423,7 @@ module Doing
 
         unless ((!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s)) || (opt[:before] && item.date >= cutoff))
           new_item = @content.delete(item)
+          Hooks.trigger :post_entry_removed, self, item.dup
           raise DoingRuntimeError, "Error deleting item: #{item}" if new_item.nil?
 
           new_content.add_section(new_item.section, log: false)
@@ -2107,6 +2131,36 @@ EOS
       end
     end
 
+    def configure(filename = nil)
+      if filename
+        Doing.config_with(filename, { ignore_local: true })
+      elsif ENV['DOING_CONFIG']
+        Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
+      end
+
+      Doing.logger.benchmark(:configure, :start)
+      config = Doing.config
+      Doing.logger.benchmark(:configure, :finish)
+
+      config.settings['backup_dir'] = ENV['DOING_BACKUP_DIR'] if ENV['DOING_BACKUP_DIR']
+      @config = config.settings
+    end
+
+    def get_diff(filename = nil)
+      configure if @config.nil?
+
+      filename ||= @config['doing_file']
+      init_doing_file(filename)
+      current_content = @content.dup
+      backup_file = Util::Backup.last_backup(filename, count: 1)
+      raise DoingRuntimeError, 'No undo history to diff' if backup_file.nil?
+
+      backup = WWID.new
+      backup.config = @config
+      backup.init_doing_file(backup_file)
+      current_content.diff(backup.content)
+    end
+
     private
 
     ##
@@ -2146,6 +2200,8 @@ EOS
       raise InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
 
       export_options = { page_title: title, is_single: is_single, options: opt }
+
+      Hooks.trigger :pre_export, self, opt[:output], items
 
       Plugins.plugins[:export].each do |_, options|
         next unless opt[:output] =~ /^(#{options[:trigger].normalize_trigger})$/i
@@ -2213,6 +2269,7 @@ EOS
         else
           counter += 1
           item.move_to(destination, label: label, log: false)
+          Hooks.trigger :post_entry_updated, self, item.dup
         end
       end
 

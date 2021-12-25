@@ -84,6 +84,7 @@ module Doing
       deleted = delete(item)
       Doing.logger.count(:deleted)
       Doing.logger.info('Entry deleted:', deleted.title) if single
+      deleted
     end
 
     ##
@@ -109,6 +110,20 @@ module Doing
       each_with_object([]) do |entry, tags|
         tags.concat(entry.tags).sort!.uniq!
       end
+    end
+
+    ##
+    ## Return Items containing items that don't exist in receiver
+    ##
+    ## @param      items  [Items] Receiver
+    ##
+    def diff(items)
+      diff = Items.new
+      each do |item|
+        res = items.select { |i| i.equal?(item) }
+        diff.push(item) unless res.count.positive?
+      end
+      diff
     end
 
     # Output sections and items in Doing file format

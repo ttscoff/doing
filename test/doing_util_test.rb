@@ -55,6 +55,10 @@ class DoingUtilTest < Test::Unit::TestCase
     assert_no_match(/<a href/, res, 'Markdown URL should not be linked')
   end
 
+  def test_exec_available
+    assert(Util.exec_available('ls'), 'ls should be available on any system')
+  end
+
   private
 
   def mktmpdir

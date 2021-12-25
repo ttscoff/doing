@@ -6,11 +6,16 @@ module Doing
     DEFAULT_PRIORITY = 20
 
     @registry = {
-      post_config: [],
-      post_local_config: [],
-      post_read: [],
-      pre_write: [],
-      post_write: []
+      post_config: [],        # wwid
+      post_local_config: [],  # wwid
+      post_read: [],          # wwid
+      pre_entry_add: [],      # wwid, new_entry
+      post_entry_added: [],   # wwid, new_entry.dup
+      post_entry_updated: [], # wwid, entry
+      post_entry_removed: [], # wwid, entry.dup
+      pre_export: [],         # wwid, format, entries
+      pre_write: [],          # wwid, file
+      post_write: []          # wwid, file
     }
 
     # map of all hooks and their priorities
