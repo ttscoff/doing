@@ -6,11 +6,17 @@
 - Synonym triggers allow `*` and `?` wildcards
 - Add `--delete` flag for `doing last` to delete last entry
 - --delete and --editor flags for `doing search`, batch edit and delete
+- Example hook to add new entries containing a certain tag to Day One - Reorganize bin/doing command order. That file is unmanageable and really needs to be split up
+- New hooks: pre_entry_add, post_entry_added, post_entry_updated, post_entry_removed, pre_export
 
 #### IMPROVED
 
 - If you need to use a colon in an autotag transform pattern, you can split with double colon, e.g. pattern::replacement
 - Arrays defined in local configurations merge with main config instead of overwriting
+
+#### FIXED
+
+- `doing tags --interactive` wasn't showing menu
 
 ### 2.1.10
 
