@@ -2252,10 +2252,11 @@ EOS
 
       section_items = @content.in_section(section)
       max = section_items.count - count.to_i
+      moved_items = []
 
       counter = 0
 
-      @content.map! do |item|
+      @content.map do |item|
         break if counter >= max
         if opt[:before]
           time_string = opt[:before]
@@ -2269,7 +2270,8 @@ EOS
         else
           counter += 1
           item.move_to(destination, label: label, log: false)
-          # Hooks.trigger :post_entry_updated, self, item.dup
+          Hooks.trigger :post_entry_updated, self, item.dup
+          item
         end
       end
 
