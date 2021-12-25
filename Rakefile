@@ -74,7 +74,7 @@ task :dockertest, :version do |_, args|
   spinner = TTY::Spinner.new('[:spinner] Running tests ...', hide_cursor: true)
 
   spinner.auto_spin # Automatic animation with default interval
-  res = `docker run -it #{img} 2>1`
+  res = `docker run -it #{img}`
   commit = puts `bash -c "docker commit $(docker ps -a|grep #{img}|awk '{print $1}'|head -n 1) #{img}"`.strip
   spinner.success
   spinner.stop
