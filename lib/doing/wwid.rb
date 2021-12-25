@@ -2269,7 +2269,7 @@ EOS
         else
           counter += 1
           item.move_to(destination, label: label, log: false)
-          Hooks.trigger :post_entry_updated, self, item.dup
+          # Hooks.trigger :post_entry_updated, self, item.dup
         end
       end
 

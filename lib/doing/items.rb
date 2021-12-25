@@ -69,7 +69,7 @@ module Doing
       if section =~ /^all$/i
         dup
       else
-        items = Items.new.concat(select { |item| item.section == section })
+        items = Items.new.concat(select { |item| !item.nil? && item.section == section })
         items.add_section(section, log: false)
         items
       end
