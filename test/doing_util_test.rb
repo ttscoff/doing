@@ -18,9 +18,11 @@ class DoingUtilTest < Test::Unit::TestCase
 
   def setup
     @tmpdirs = []
-    @wwid_file = File.join(mktmpdir, 'wwid.md')
+    @basedir = mktmpdir
+    @wwid_file = File.join(@basedir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @config = Util.safe_load_file(@config_file)
+    @backup_dir = File.join(@basedir, 'doing_backup')
     import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
     doing('import', '--type', 'timing', import_file)
     @wwid = WWID.new
@@ -53,6 +55,10 @@ class DoingUtilTest < Test::Unit::TestCase
     assert_no_match(/<a href/, res, 'Markdown URL should not be linked')
   end
 
+  def test_exec_available
+    assert(Util.exec_available('ls'), 'ls should be available on any system')
+  end
+
   private
 
   def mktmpdir
@@ -63,7 +69,7 @@ class DoingUtilTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({ 'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file }, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file, *args)
   end
 end
 

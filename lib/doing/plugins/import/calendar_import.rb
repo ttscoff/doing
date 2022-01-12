@@ -73,7 +73,12 @@ module Doing
       dups = filtered - new_items.count
       Doing.logger.info(%(Skipped #{dups} items with overlapping times)) if dups.positive?
 
+      new_items.map { |item| Hooks.trigger :pre_entry_add, self, item }
+
       wwid.content.concat(new_items)
+
+      new_items.map { |item| Hooks.trigger :post_entry_added, self, item.dup }
+
       Doing.logger.info(%(Imported #{new_items.count} items to #{section}))
     end
 

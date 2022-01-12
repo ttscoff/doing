@@ -152,16 +152,22 @@ module Doing
     ##
     ## @return     [String] file path
     ##
-    def choose_config
+    def choose_config(create: false)
       return @config_file if @force_answer
 
-      if @additional_configs.count.positive?
+      if @additional_configs.count.positive? || create
         choices = [@config_file].concat(@additional_configs)
+        choices.push('Create a new .doingrc in the current directory') if create && !File.exist?('.doingrc')
         res = Doing::Prompt.choose_from(choices.uniq.sort.reverse,
                                         sorted: false,
                                         prompt: 'Local configs found, select which to update > ')
 
         raise UserCancelled, 'Cancelled' unless res
+
+        if res =~ /^Create a new/
+          res = File.expand_path('.doingrc')
+          FileUtils.touch(res)
+        end
 
         res.strip || @config_file
       else
@@ -249,7 +255,8 @@ module Doing
     #             defaults.
     #
     def from(user_config)
-      Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
+      # Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
+      Configuration[user_config].stringify_keys.deep_merge(DEFAULTS, { extend_existing_arrays: true, sort_merged_arrays: true })
     end
 
     ##
@@ -320,8 +327,8 @@ module Doing
 
       Hooks.trigger :post_config, self
 
-      # config = local_config.deep_merge(config) unless @ignore_local
-      config = Util.deep_merge_hashes(config, local_config) unless @ignore_local
+      config = local_config.deep_merge(config, { extend_existing_arrays: true, sort_merged_arrays: true }) unless @ignore_local
+      # config = Util.deep_merge_hashes(config, local_config) unless @ignore_local
 
       Hooks.trigger :post_local_config, self
 
@@ -397,7 +404,7 @@ module Doing
 
       begin
         additional_configs.each do |cfg|
-          local_configs.deep_merge(Util.safe_load_file(cfg))
+          local_configs.deep_merge(Util.safe_load_file(cfg), { extend_existing_arrays: true, sort_merged_arrays: true })
         end
       rescue StandardError
         Doing.logger.error('Config:', 'Error reading local configuration(s)')
@@ -416,15 +423,18 @@ module Doing
       end
 
       begin
+
         user_config = Util.safe_load_file(config_file)
+        raise StandardError, 'Invalid config file format' unless user_config.is_a?(Hash)
+
         if user_config.key?('html_template')
           user_config['export_templates'] ||= {}
-          user_config['export_templates'].deep_merge(user_config.delete('html_template'))
+          user_config['export_templates'].deep_merge(user_config.delete('html_template'), { extend_existing_arrays: true, sort_merged_arrays: true })
         end
 
         user_config['include_notes'] = user_config.delete(':include_notes') if user_config.key?(':include_notes')
 
-        user_config.deep_merge(DEFAULTS)
+        user_config.deep_merge(DEFAULTS, { extend_existing_arrays: true, sort_merged_arrays: true })
       rescue StandardError => e
         Doing.logger.error('Config:', 'Error reading default configuration')
         Doing.logger.error('Error:', e.message)

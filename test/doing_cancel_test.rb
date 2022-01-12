@@ -18,6 +18,7 @@ class DoingEntryTest < Test::Unit::TestCase
     @result = ''
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
+    @backup_dir = File.join(@basedir, 'doing_backup')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @config = YAML.load(IO.read(@config_file))
   end
@@ -72,7 +73,7 @@ class DoingEntryTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
   end
 end
 

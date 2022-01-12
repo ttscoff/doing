@@ -64,22 +64,8 @@ module Doing
 
       private
 
-      def command_exist?(command)
-        exts = ENV.fetch("PATHEXT", "").split(::File::PATH_SEPARATOR)
-        if Pathname.new(command).absolute?
-          ::File.exist?(command) ||
-            exts.any? { |ext| ::File.exist?("#{command}#{ext}")}
-        else
-          ENV.fetch("PATH", "").split(::File::PATH_SEPARATOR).any? do |dir|
-            file = ::File.join(dir, command)
-            ::File.exist?(file) ||
-              exts.any? { |ext| ::File.exist?("#{file}#{ext}") }
-          end
-        end
-      end
-
       def git_pager
-        command_exist?("git") ? `git config --get-all core.pager` : nil
+        TTY::Which.exist?('git') ? `#{TTY::Which.which('git')} config --get-all core.pager` : nil
       end
 
       def pagers
@@ -91,11 +77,7 @@ module Doing
         execs = commands.empty? ? pagers : commands
         execs
           .compact.map(&:strip).reject(&:empty?).uniq
-          .find { |cmd| command_exist?(cmd.split.first) }
-      end
-
-      def exec_available?(*commands)
-        !find_executable(*commands).nil?
+          .find { |cmd| TTY::Which.exist?(cmd.split.first) }
       end
 
       def which_pager
