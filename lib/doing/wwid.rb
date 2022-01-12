@@ -114,6 +114,8 @@ module Doing
       filename = @doing_file if filename.nil?
       return if File.exist?(filename) && File.stat(filename).size.positive?
 
+      FileUtils.mkdir_p(File.dirname(filename)) unless File.directory?(File.dirname(filename))
+
       File.open(filename, 'w+') do |f|
         f.puts "#{@config['current_section']}:"
       end

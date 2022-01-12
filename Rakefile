@@ -52,8 +52,8 @@ namespace :test do
 end
 
 desc 'Run tests in Docker'
-task :dockertest, :version do |_, args|
-  args.with_defaults(version: '2.7')
+task :dockertest, :version, :login do |_, args|
+  args.with_defaults(version: '2.7', login: false)
   case args[:version]
   when /^3/
     img = 'doingtest3'
@@ -69,18 +69,20 @@ task :dockertest, :version do |_, args|
     file = 'Dockerfile'
   end
 
+  exec "docker run -it #{img} /bin/bash -l" if args[:login]
+
   puts `docker build . --file #{file} -t #{img}`
 
   spinner = TTY::Spinner.new('[:spinner] Running tests ...', hide_cursor: true)
 
-  spinner.auto_spin # Automatic animation with default interval
-  res = `docker run -it #{img}`
-  commit = puts `bash -c "docker commit $(docker ps -a|grep #{img}|awk '{print $1}'|head -n 1) #{img}"`.strip
+  spinner.auto_spin
+  res = `docker run --rm -it #{img}`
+  # commit = puts `bash -c "docker commit $(docker ps -a|grep #{img}|awk '{print $1}'|head -n 1) #{img}"`.strip
   spinner.success
   spinner.stop
 
   puts res
-  puts commit&.empty? ? "Error commiting Docker tag #{img}" : "Committed Docker tag #{img}"
+  # puts commit&.empty? ? "Error commiting Docker tag #{img}" : "Committed Docker tag #{img}"
 end
 
 desc 'Run all tests'
