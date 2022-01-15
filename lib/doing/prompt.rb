@@ -23,12 +23,12 @@ module Doing
         $stdin.gets.strip
       end
 
-      def request_note(prompt: nil)
+      def request_lines(prompt: 'Enter text')
         ask_note = []
-        reader = TTY::Reader.new
-        puts prompt || 'Add a note. Multiple lines are ok, enter a blank line to end editing'
+        reader = TTY::Reader.new(interrupt: ->() { raise Errors::UserCancelled }, track_history: false)
+        puts "#{boldgreen(prompt.sub(/:?$/, ':'))} #{yellow("Hit return for a new line, ")}#{boldwhite("enter a blank line (")}#{boldyellow("return twice")}#{boldwhite(") to end editing")}"
         loop do
-          res = reader.read_line('> ')
+          res = reader.read_line(green('> '))
           break if res.strip.empty?
 
           ask_note.push(res)

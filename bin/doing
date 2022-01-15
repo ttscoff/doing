@@ -180,7 +180,7 @@ command %i[again resume] do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
-  c.desc 'Ask for a note to be entered before saving'
+  c.desc 'Prompt for note via multi-line input'
   c.switch %i[ask], negatable: false, default_value: false
 
   c.desc 'Select item to resume from a menu of matching entries'
@@ -199,7 +199,7 @@ command %i[again resume] do |c|
     end
 
     note = Doing::Note.new(options[:note])
-    note.add(Doing::Prompt.request_note) if options[:ask]
+    note.add(Doing::Prompt.request_lines(prompt: 'Add a note')) if options[:ask]
 
     options[:note] = note
 
@@ -363,7 +363,7 @@ command %i[done did] do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
-  c.desc 'Ask for a note to be entered before saving'
+  c.desc 'Prompt for note via multi-line input'
   c.switch %i[ask], negatable: false, default_value: false
 
   c.desc 'Finish last entry not already marked @done'
@@ -412,7 +412,7 @@ command %i[done did] do |c|
 
     note = Doing::Note.new
     note.add(options[:note]) if options[:note]
-    note.add(Doing::Prompt.request_note) if options[:ask]
+    note.add(Doing::Prompt.request_lines(prompt: 'Add a note')) if options[:ask]
 
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
@@ -699,7 +699,7 @@ command :later do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
-  c.desc 'Ask for a note to be entered before saving'
+  c.desc 'Prompt for note via multi-line input'
   c.switch %i[ask], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
@@ -710,7 +710,7 @@ command :later do |c|
       date = Time.now
     end
 
-    ask_note = options[:ask] ? Doing::Prompt.request_note : ''
+    ask_note = options[:ask] ? Doing::Prompt.request_lines(prompt: 'Add a note') : ''
 
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
@@ -909,7 +909,7 @@ command :meanwhile do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
-  c.desc 'Ask for a note to be entered before saving'
+  c.desc 'Prompt for note via multi-line input'
   c.switch %i[ask], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
@@ -928,7 +928,7 @@ command :meanwhile do |c|
     end
     input = ''
 
-    ask_note = options[:ask] ? Doing::Prompt.request_note : []
+    ask_note = options[:ask] ? Doing::Prompt.request_lines(prompt: 'Add a note') : []
 
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
@@ -1023,6 +1023,9 @@ command :note do |c|
   c.desc 'Select item for new note from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
+  c.desc 'Prompt for note via multi-line input'
+  c.switch %i[ask], negatable: false, default_value: false
+
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
     if options[:section]
@@ -1049,8 +1052,9 @@ command :note do |c|
 
     last_note = last_entry.note || Doing::Note.new
     new_note = Doing::Note.new
+    ask_note = options[:ask] ? Doing::Prompt.request_lines(prompt: 'Add a note') : ''
 
-    if options[:editor] || (args.empty? && $stdin.stat.size.zero? && !options[:remove])
+    if options[:editor] || (args.empty? && $stdin.stat.size.zero? && !options[:remove] && !options[:ask])
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input = !args.empty? ? args.join(' ') : ''
@@ -1061,7 +1065,9 @@ command :note do |c|
         prev_input = last_entry.note || Doing::Note.new
       end
 
+
       input = prev_input.add(input)
+      input.add(ask_note) unless ask_note.empty?
 
       input = wwid.fork_editor(prev_input.strip_lines.join("\n"), message: nil).strip
       note = input
@@ -1072,8 +1078,11 @@ command :note do |c|
     elsif $stdin.stat.size.positive?
       new_note.add($stdin.read.strip)
     else
-      raise EmptyInput, 'You must provide content when adding a note' unless options[:remove]
+      raise EmptyInput, 'You must provide content when adding a note' unless options[:remove] || !ask_note.empty?
+
     end
+
+    new_note.add(ask_note) unless ask_note.empty?
 
     if last_note.equal?(new_note)
       Doing.logger.debug('Skipped:', 'No note change')
@@ -1120,7 +1129,7 @@ command %i[now next] do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
-  c.desc 'Ask for a note to be entered before saving'
+  c.desc 'Prompt for note via multi-line input'
   c.switch %i[ask], negatable: false, default_value: false
 
   # c.desc "Edit entry with specified app"
@@ -1142,7 +1151,7 @@ command %i[now next] do |c|
       options[:section] = settings['current_section']
     end
 
-    ask_note = options[:ask] ? Doing::Prompt.request_note : ''
+    ask_note = options[:ask] ? Doing::Prompt.request_lines(prompt: 'Add a note') : ''
 
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
