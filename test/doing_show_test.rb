@@ -95,6 +95,10 @@ class DoingShowTest < Test::Unit::TestCase
     result = doing('--stdout', 'show', '--tag_sort=name', '--tag_order=desc', '--totals')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/writing/, first_tag[1], 'First tag should be writing')
+
+    # test show --val queries
+    result = doing('--stdout', 'show', '--val', 'done < 9/14/21 12:30', '--val', 'done > 9/14/21 10am')
+    assert_count_entries(8, result, 'There should be 8 entries matching query')
   end
 
   private
