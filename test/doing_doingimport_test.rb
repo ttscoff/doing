@@ -29,59 +29,6 @@ class DoingImportTest < Test::Unit::TestCase
     FileUtils.rm_rf(@tmpdirs)
   end
 
-  ## Timing import
-
-  def test_timing_import
-    json = JSON.parse(IO.read(@timing_import_file))
-    target = json.count
-    result = doing('--stdout', '--debug', 'import', '--type', 'timing', @timing_import_file)
-    assert_match(/Imported: #{target} items/, result, "Should have imported #{target} entries")
-    result = doing('--stdout', '--debug', 'import', '--type', 'timing', @timing_import_file)
-    assert_match(/Skipped: #{target} overlapping items/, result, "Should have skipped #{target} duplicate entries")
-  end
-
-  def test_timing_import_date_range
-    result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--from', '7/19/21', @timing_import_file)
-    assert_match(/Imported: 2 items/, result, "Should have imported 2 entries")
-  end
-
-  def test_timing_import_search_filter
-    result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--search', 'overtired', @timing_import_file)
-    assert_match(/Imported: 2 items/, result, "Should have imported 2 entries")
-  end
-
-  def test_timing_import_no_arg
-    assert_raises(RuntimeError) { doing('import', '--type', 'timing') }
-  end
-
-  def test_timing_import_autotag
-    whitelist_word = 'overtired'
-    synonym_word = 'guntzel'
-    synonym_tag = 'terpzel'
-
-    json = JSON.parse(IO.read(@timing_import_file))
-    whitelisted_entries = json.select { |entry| entry['activityTitle'] =~ /#{whitelist_word}/i }.length
-    synonym_entries = json.select { |entry| entry['activityTitle'] =~ /#{synonym_word}/i }.length
-
-    doing('import', '--autotag', '--type', 'timing', @timing_import_file)
-    whitelisted = doing('show', "@#{whitelist_word}")
-    assert_count_entries(whitelisted_entries, whitelisted,
-                         "Should have tagged #{whitelisted_entries} entries with @#{whitelist_word}")
-    synonyms = doing('show', "@#{synonym_tag}")
-    assert_count_entries(synonym_entries, synonyms,
-                         "Should have tagged #{synonym_entries} entries with @#{synonym_tag}")
-  end
-
-  def test_timing_import_no_overlap
-    json = JSON.parse(IO.read(@timing_import_file))
-    target = json.count
-    doing('done', '--back', '2021-07-22 11:20', '--took', '30m', 'Testing overlapping entry')
-    doing('done', '--back', '2021-07-22 15:20', '--took', '30m', 'Testing overlapping entry')
-    result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--no-overlap', @timing_import_file)
-    assert_match(/Skipped: 1 overlapping item/, result, "Should have skipped #{target} duplicate entries")
-    assert_match(/Imported: #{target - 1} items/, result, "Should have imported #{target - 1} entries")
-  end
-
   ## Doing Import
 
   def test_doing_import
