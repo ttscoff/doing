@@ -579,6 +579,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#tag_values%3F-instance_method" title="#tag_values? (instance method)">#<strong>tag_values?</strong>(queries, bool = :and, negate: false)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Test if item matches tag values.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#tags-instance_method" title="#tags (instance method)">#<strong>tags</strong>  &#x21d2; Array </a>
     
 
@@ -1597,6 +1620,98 @@ type (:sensitive,
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="tag_values?-instance_method">
+  
+    #<strong>tag_values?</strong>(queries, bool = :and, negate: false)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Test if item matches tag values</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>queries</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The tag value queries to test</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>bool</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:and</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The boolean to use for multiple tags (:and, :or, :not)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>negate</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>negate the result?</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if tag/bool combination passes</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="tags-instance_method">
   
     #<strong>tags</strong>  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
@@ -1754,7 +1869,7 @@ type (:sensitive,
 </div>
 
       <div id="footer">
-  Generated on Tue Dec 21 14:44:17 2021 by
+  Generated on Fri Jan 14 21:59:14 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

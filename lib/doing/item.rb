@@ -197,6 +197,29 @@ module Doing
       negate ? !matches : matches
     end
 
+    ##
+    ## Test if item matches tag values
+    ##
+    ## @param      queries (Array) The tag value queries to test
+    ## @param      bool    (Symbol) The boolean to use for multiple tags (:and, :or, :not)
+    ## @param      negate  [Boolean] negate the result?
+    ##
+    ## @return     [Boolean] true if tag/bool combination passes
+    ##
+    def tag_values?(queries, bool = :and, negate: false)
+      bool = bool.normalize_bool
+
+      matches = case bool
+                when :and
+                  all_values?(queries)
+                when :not
+                  no_values?(queries)
+                else
+                  any_values?(queries)
+                end
+      negate ? !matches : matches
+    end
+
     def ignore_case(search, case_type)
       (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
     end
@@ -383,6 +406,102 @@ module Doing
         return true if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       false
+    end
+
+    def tag_value(tag)
+      res = @title.match(/@#{tag.sub(/^@/, '').wildcard_to_rx}\((.*?)\)/)
+      res ? res[1] : nil
+    end
+
+    def number_or_date(value)
+      return nil unless value
+
+      if value.strip =~ /^[0-9.]+%?$/
+        value.strip.to_f
+      else
+        value.strip.chronify(guess: :end)
+      end
+    end
+
+    def split_value_query(query)
+      val_rx = /^(!)?@?(\S+) +(!?[<>=][=*]?|[$*^]=) +(.*?)$/
+      query.match(val_rx)
+    end
+
+    def any_values?(queries)
+      return true if queries.nil? || queries.empty?
+
+      queries.each do |q|
+        parts = split_value_query(q)
+        return true if tag_value_matches?(parts[2], parts[3], parts[4], parts[1])
+      end
+      false
+    end
+
+    def all_values?(queries)
+      return true if queries.nil? || queries.empty?
+
+      queries.each do |q|
+        parts = split_value_query(q)
+        return false unless tag_value_matches?(parts[2], parts[3], parts[4], parts[1])
+      end
+      true
+    end
+
+    def no_values?(queries)
+      return true if queries.nil? || queries.empty?
+
+      queries.each do |q|
+        parts = split_value_query(q)
+        return false if tag_value_matches?(parts[2], parts[3], parts[4], parts[1])
+      end
+      true
+    end
+
+    def tag_value_matches?(tag, comp, value, negate)
+      if all_tags?([tag])
+        tag_val = tag_value(tag)
+
+        if (value.chronify.nil? && value =~ /[a-z]/i && comp =~ /^!?==?$/) || comp =~ /[$*^]=/
+          is_match = case comp
+                     when /\^=/
+                       tag_val =~ /^#{value.wildcard_to_rx}/i
+                     when /\$=/
+                       tag_val =~ /#{value.wildcard_to_rx}$/i
+                     when %r{==}
+                       tag_val =~ /^#{value.wildcard_to_rx}$/i
+                     else
+                       tag_val =~ /#{value.wildcard_to_rx}/i
+                     end
+
+          comp =~ /!/ || negate ? !is_match : is_match
+        else
+          tag_val = number_or_date(tag_val)
+          val = number_or_date(value)
+
+          return false if val.nil? || tag_val.nil?
+
+          return false unless val.class == tag_val.class
+
+          matches = case comp
+                    when /^<$/
+                      tag_val < val
+                    when /^<=$/
+                      tag_val <= val
+                    when /^>$/
+                      tag_val > val
+                    when /^>=$/
+                      tag_val >= val
+                    when /^!=/
+                      tag_val != val
+                    when /^=/
+                      tag_val == val
+                    end
+          negate.nil? ? matches : !matches
+        end
+      else
+        false
+      end
     end
 
     def to_query(query)

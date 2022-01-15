@@ -640,6 +640,7 @@ module Doing
     ## @option opt [Boolean] :yesterday (false) limit to entries from yesterday
     ## @option opt [Number] :count (0) max entries to return
     ## @option opt [String] :age (new) 'old' or 'new'
+    ## @option opt [Array] :val (nil) Array of tag value queries
     ##
     def filter_items(items = Items.new, opt: {})
       time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
@@ -699,6 +700,16 @@ module Doing
           finished = item.tags?('done', :and)
           finished = opt[:not] ? !finished : finished
           keep = false if finished
+        end
+
+        if keep && opt[:val]&.count&.positive?
+          bool = opt[:bool].normalize_bool if opt[:bool]
+          bool ||= :and
+          bool = :and if bool == :pattern
+
+          val_match = opt[:val].nil? || opt[:val].empty? ? true : item.tag_values?(opt[:val], bool)
+          keep = false unless val_match
+          keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:tag]
@@ -887,7 +898,7 @@ module Doing
       opt[:query] = "!#{opt[:query]}" if opt[:not]
       opt[:multiple] = true
       opt[:show_if_single] = true
-      filter_options = %i[after before case date_filter from fuzzy not search section].each_with_object({}) {
+      filter_options = %i[after before case date_filter from fuzzy not search section val].each_with_object({}) {
         |k, hsh| hsh[k] = opt[k]
       }
       items = filter_items(Items.new, opt: filter_options)
@@ -1221,14 +1232,17 @@ module Doing
             end
 
             tag = tag.strip
-            if opt[:remove] || opt[:rename]
+            if opt[:remove] || opt[:rename] || opt[:value]
               rename_to = nil
-              if opt[:rename]
+              if opt[:value]
+                rename_to = tag
+              elsif opt[:rename]
                 rename_to = tag
                 tag = opt[:rename]
               end
               old_title = item.title.dup
-              item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex])
+              force = opt[:value].nil? ? false : true
+              item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex], value: opt[:value], force: force)
               if old_title != item.title
                 removed << tag
                 added << rename_to if rename_to
@@ -1823,7 +1837,8 @@ module Doing
         case: options[:case],
         not: options[:negate],
         config_template: 'last',
-        delete: options[:delete]
+        delete: options[:delete],
+        val: options[:val]
       }
 
       if options[:tag]

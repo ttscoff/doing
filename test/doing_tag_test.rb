@@ -36,9 +36,21 @@ class DoingTagTest < Test::Unit::TestCase
   def test_tag_entry
     subject = 'Test new entry'
     tag = 'testtag'
+
     doing('now', subject)
     doing('tag', tag)
     assert_match(/@#{tag}/, doing('last').uncolor, "should have added @#{tag} to last entry")
+
+    # Test with a value
+    value = 'testvalue'
+    doing('now', subject)
+    doing('tag', '--value', value, tag)
+    assert_match(/@#{tag}\(#{value}\)/, doing('last').uncolor, "should have added @#{tag}(#{value}) to last entry")
+
+    # Test updating value
+    value = 'newvalue'
+    doing('tag', '--value', value, tag)
+    assert_match(/@#{tag}\(#{value}\)/, doing('last').uncolor, "should have updated @#{tag} value to #{value}")
   end
 
   def test_flag_entry
