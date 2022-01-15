@@ -3,6 +3,7 @@
 #### NEW
 
 - --val flag for all display commands, allows tag value queries. Tag values are contained in parenthesis after the tag, e.g. @progress(50). Queries look like `--val "done < two weeks ago"`, "project *= oracle" or "progress >= 50". Wildcards allowed in value, comparators can be <, >, <=, >=, ==, *= (contains), ^= (begins with), $= (ends with). Numeric and date comparisons are detected automatically. Text comparisons are case insensitive. --val can be used multiple times in a command and you can use --bool to specify AND, OR, or NOT (default AND)
+- `doing tag` now accepts a `--value` flag to define a value for a single tag, e.g. @tag(value)
 
 #### FIXED
 
