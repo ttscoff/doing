@@ -328,7 +328,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#ignore_case-instance_method" title="#ignore_case (instance method)">#<strong>ignore_case</strong>(search, case_type)  &#x21d2; Object </a>
+      <a href="#ignore_case-instance_method" title="#ignore_case (instance method)">#<strong>ignore_case</strong>(search, case_type)  &#x21d2; Boolean </a>
     
 
     
@@ -342,7 +342,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Determine if case should be ignored for searches.</p>
+</div></span>
   
 </li>
 
@@ -504,7 +505,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Test if item is included in never_finish config and thus should not receive a @done tag.</p>
+</div></span>
   
 </li>
 
@@ -526,7 +528,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Test if item is included in never_time config and thus should not receive a date on the @done tag.</p>
+</div></span>
   
 </li>
 
@@ -557,7 +560,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#tag_array-instance_method" title="#tag_array (instance method)">#<strong>tag_array</strong>  &#x21d2; Object </a>
+      <a href="#tag_array-instance_method" title="#tag_array (instance method)">#<strong>tag_array</strong>  &#x21d2; Array </a>
     
 
     
@@ -571,7 +574,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>convert tags on item to an array with @ symbols removed.</p>
+</div></span>
   
 </li>
 
@@ -1034,13 +1038,74 @@ the item belongs</p>
       <div class="method_details ">
   <h3 class="signature " id="ignore_case-instance_method">
   
-    #<strong>ignore_case</strong>(search, case_type)  &#x21d2; <tt>Object</tt> 
+    #<strong>ignore_case</strong>(search, case_type)  &#x21d2; <tt>Boolean</tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Determine if case should be ignored for searches</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>search</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The search string</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>case_type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The case type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>case should be ignored</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -1399,7 +1464,9 @@ type (:sensitive,
   
 </h3><div class="docstring">
   <div class="discussion">
-    
+    <p>Test if item is included in never_finish config and
+thus should not receive a @done tag</p>
+
 
   </div>
 </div>
@@ -1414,6 +1481,10 @@ type (:sensitive,
         <span class='type'>(<tt>Boolean</tt>)</span>
       
       
+      
+        &mdash;
+        <div class='inline'><p>item should receive @done tag</p>
+</div>
       
     </li>
   
@@ -1433,7 +1504,9 @@ type (:sensitive,
   
 </h3><div class="docstring">
   <div class="discussion">
-    
+    <p>Test if item is included in never_time config and
+thus should not receive a date on the @done tag</p>
+
 
   </div>
 </div>
@@ -1448,6 +1521,10 @@ type (:sensitive,
         <span class='type'>(<tt>Boolean</tt>)</span>
       
       
+      
+        &mdash;
+        <div class='inline'><p>item should receive @done date</p>
+</div>
       
     </li>
   
@@ -1610,13 +1687,40 @@ type (:sensitive,
       <div class="method_details ">
   <h3 class="signature " id="tag_array-instance_method">
   
-    #<strong>tag_array</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>tag_array</strong>  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>convert tags on item to an array with @ symbols removed</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>array of tags</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -1869,7 +1973,7 @@ type (:sensitive,
 </div>
 
       <div id="footer">
-  Generated on Fri Jan 14 22:01:46 2022 by
+  Generated on Sat Jan 15 17:27:48 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

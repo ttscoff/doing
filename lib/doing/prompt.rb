@@ -23,6 +23,18 @@ module Doing
         $stdin.gets.strip
       end
 
+      def request_lines(prompt: 'Enter text')
+        ask_note = []
+        reader = TTY::Reader.new(interrupt: -> { raise Errors::UserCancelled }, track_history: false)
+        puts "#{boldgreen(prompt.sub(/:?$/, ':'))} #{yellow('Hit return for a new line, ')}#{boldwhite('enter a blank line (')}#{boldyellow('return twice')}#{boldwhite(') to end editing')}"
+        loop do
+          res = reader.read_line(green('> '))
+          break if res.strip.empty?
+
+          ask_note.push(res)
+        end
+        ask_note.join("\n").strip
+      end
 
       ##
       ## Ask a yes or no question in the terminal
@@ -205,7 +217,7 @@ module Doing
           out = [
             format("%#{pad}d", i),
             ') ',
-            format('%13s', item.date.relative_date),
+            format('%16s', item.date.strftime('%Y-%m-%d %H:%M')),
             ' | ',
             item.title
           ]

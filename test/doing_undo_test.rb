@@ -31,21 +31,23 @@ class DoingUndoTest < Test::Unit::TestCase
     ]
     entries.each do |e|
       doing('now', e)
-      sleep 1
     end
 
     assert_count_entries(entries.count, doing('show'))
 
     doing('undo')
-    assert_not_contains_entry('Test entry 2', doing('show'))
-    assert_contains_entry('Test entry 1', doing('show'))
+    shown = doing('show')
+    assert_not_contains_entry('Test entry 2', shown)
+    assert_contains_entry('Test entry 1', shown)
 
     doing('undo')
-    assert_not_contains_entry('Test entry 1', doing('show'))
-    assert_contains_entry('Begin history', doing('show'))
+    shown = doing('show')
+    assert_not_contains_entry('Test entry 1', shown)
+    assert_contains_entry('Begin history', shown)
 
     doing('undo', '--redo')
-    assert_contains_entry('Test entry 1', doing('show'))
+    shown = doing('show')
+    assert_contains_entry('Test entry 1', shown)
 
     doing('undo', '--prune', '0')
     assert_equal(0, Dir.glob('*.md', base: @backup_dir).count)

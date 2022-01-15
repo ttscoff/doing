@@ -1,3 +1,17 @@
+### 2.1.14
+
+#### NEW
+
+- All commands that accept --note now accept --ask, which requests input via readline after creating the note. Multiple lines are allowed, hit return twice to end editing. Works alongside --note and --editor
+
+#### IMPROVED
+
+- Implement --search and --from filtering for import plugins
+- UTC format date strings in select menus for consistency (was relative date formatting)
+- Don't populate the fzf search with --search, it's already filtered. Separated --query from --search if you do want to populate the query string in addition to --search filtering
+- When showing relative dates, don't include the year if the date is the previous year but a later month than the current month (less than a year old)
+- When using --editor while adding an entry, include any note specified on the command line or via --ask for further editing
+
 ### 2.1.13
 
 #### NEW
