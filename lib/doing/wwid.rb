@@ -1232,14 +1232,17 @@ module Doing
             end
 
             tag = tag.strip
-            if opt[:remove] || opt[:rename]
+            if opt[:remove] || opt[:rename] || opt[:value]
               rename_to = nil
-              if opt[:rename]
+              if opt[:value]
+                rename_to = tag
+              elsif opt[:rename]
                 rename_to = tag
                 tag = opt[:rename]
               end
               old_title = item.title.dup
-              item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex])
+              force = opt[:value].nil? ? false : true
+              item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex], value: opt[:value], force: force)
               if old_title != item.title
                 removed << tag
                 added << rename_to if rename_to

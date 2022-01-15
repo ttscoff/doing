@@ -1396,6 +1396,10 @@ command :tag do |c|
   c.arg_name 'ORIG_TAG'
   c.flag %i[rename]
 
+  c.desc 'Include a value, e.g. @tag(value)'
+  c.arg_name 'VALUE'
+  c.flag %i[v value]
+
   c.desc 'Don\'t ask permission to tag all entries when count is 0'
   c.switch %i[force], negatable: false, default_value: false
 
