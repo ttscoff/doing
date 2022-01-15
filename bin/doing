@@ -176,9 +176,12 @@ command %i[again resume] do |c|
   c.desc "Edit duplicated entry with #{Doing::Util.default_editor} before adding"
   c.switch %i[e editor], negatable: false, default_value: false
 
-  c.desc 'Note'
+  c.desc 'Add a note'
   c.arg_name 'TEXT'
   c.flag %i[n note]
+
+  c.desc 'Ask for a note to be entered before saving'
+  c.switch %i[ask], negatable: false, default_value: false
 
   c.desc 'Select item to resume from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
@@ -194,6 +197,11 @@ command %i[again resume] do |c|
       search.sub!(/^'?/, "'") if options[:exact]
       options[:search] = search
     end
+
+    note = Doing::Note.new(options[:note])
+    note.add(Doing::Prompt.request_note) if options[:ask]
+
+    options[:note] = note
 
     opts = options.dup
 
@@ -355,6 +363,9 @@ command %i[done did] do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
+  c.desc 'Ask for a note to be entered before saving'
+  c.switch %i[ask], negatable: false, default_value: false
+
   c.desc 'Finish last entry not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
 
@@ -401,6 +412,7 @@ command %i[done did] do |c|
 
     note = Doing::Note.new
     note.add(options[:note]) if options[:note]
+    note.add(Doing::Prompt.request_note) if options[:ask]
 
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
@@ -687,6 +699,9 @@ command :later do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
+  c.desc 'Ask for a note to be entered before saving'
+  c.switch %i[ask], negatable: false, default_value: false
+
   c.action do |_global_options, options, args|
     if options[:back]
       date = options[:back].chronify(guess: :begin)
@@ -695,11 +710,16 @@ command :later do |c|
       date = Time.now
     end
 
+    ask_note = options[:ask] ? Doing::Prompt.request_note : ''
+
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input += date.strftime('%F %R | ')
       input += args.empty? ? '' : args.join(' ')
+      input += "\n#{options[:note]}" if options[:note]
+      input += "\n#{ask_note}" unless ask_note.empty?
+
       input = wwid.fork_editor(input).strip
       raise EmptyInput, 'No content' unless input && !input.empty?
 
@@ -712,6 +732,7 @@ command :later do |c|
       d, title, note = wwid.format_input(args.join(' '))
       date = d.nil? ? date : d
       note.add(options[:note]) if options[:note]
+      note.add(ask_note) unless ask_note.empty?
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
     elsif $stdin.stat.size.positive?
@@ -721,6 +742,7 @@ command :later do |c|
         date = d
       end
       note.add(options[:note]) if options[:note]
+      note.add(ask_note) unless ask_note.empty?
       wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
       wwid.write(wwid.doing_file)
     else
@@ -887,6 +909,9 @@ command :meanwhile do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
+  c.desc 'Ask for a note to be entered before saving'
+  c.switch %i[ask], negatable: false, default_value: false
+
   c.action do |_global_options, options, args|
     if options[:back]
       date = options[:back].chronify(guess: :begin)
@@ -903,10 +928,15 @@ command :meanwhile do |c|
     end
     input = ''
 
+    ask_note = options[:ask] ? Doing::Prompt.request_note : []
+
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
       input += date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
+      input += "\n#{options[:note]}" if options[:note]
+      input += "\n#{ask_note}" unless ask_note.empty?
+
       input = wwid.fork_editor(input).strip
     elsif !args.empty?
       input = args.join(' ')
@@ -925,10 +955,9 @@ command :meanwhile do |c|
       note = []
     end
 
-    if options[:note]
-      note.push(options[:note])
-    elsif note.empty?
-      note = nil
+    unless options[:editor]
+      note.add(options[:note]) if options[:note]
+      note.add(ask_note) unless ask_note.empty?
     end
 
     wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:archive], note: note })
@@ -1091,6 +1120,9 @@ command %i[now next] do |c|
   c.arg_name 'TEXT'
   c.flag %i[n note]
 
+  c.desc 'Ask for a note to be entered before saving'
+  c.switch %i[ask], negatable: false, default_value: false
+
   # c.desc "Edit entry with specified app"
   # c.arg_name 'editor_app'
   # # c.flag [:a, :app]
@@ -1110,23 +1142,28 @@ command %i[now next] do |c|
       options[:section] = settings['current_section']
     end
 
+    ask_note = options[:ask] ? Doing::Prompt.request_note : ''
+
     if options[:editor] || (args.empty? && $stdin.stat.size.zero?)
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
       input = date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
+      input += "\n#{options[:note]}" if options[:note]
+      input += "\n#{ask_note}" unless ask_note.empty?
       input = wwid.fork_editor(input).strip
 
       raise EmptyInput, 'No content' if input.empty?
 
       date, title, note = wwid.format_input(input)
-      note.add(options[:note]) if options[:note]
+
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     elsif args.length.positive?
       d, title, note = wwid.format_input(args.join(' '))
       date = d.nil? ? date : d
       note.add(options[:note]) if options[:note]
+      note.add(ask_note) unless ask_note.empty?
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     elsif $stdin.stat.size.positive?
@@ -1137,6 +1174,7 @@ command %i[now next] do |c|
         date = d
       end
       note.add(options[:note]) if options[:note]
+      note.add(ask_note) unless ask_note.empty?
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     else

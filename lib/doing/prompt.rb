@@ -23,6 +23,18 @@ module Doing
         $stdin.gets.strip
       end
 
+      def request_note(prompt: nil)
+        ask_note = []
+        reader = TTY::Reader.new
+        puts prompt || 'Add a note. Multiple lines are ok, enter a blank line to end editing'
+        loop do
+          res = reader.read_line('> ')
+          break if res.strip.empty?
+
+          ask_note.push(res)
+        end
+        ask_note.join("\n").strip
+      end
 
       ##
       ## Ask a yes or no question in the terminal
