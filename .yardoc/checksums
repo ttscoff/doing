@@ -10,7 +10,7 @@ lib/doing/items.rb 8cda7caaef10645893267262f5eee681e35046ce
 lib/doing/pager.rb b58e478b0cb8d400ddb97988ba741e3a127b53c3
 lib/doing/colors.rb 9a628d48c821313c502deedc5b61a046a2bf79ef
 lib/doing/errors.rb af07e482a5389924edc2337749c81cda501098f0
-lib/doing/prompt.rb 88ecaa2104ac5dd49571499eb3b0a1c26b070428
+lib/doing/prompt.rb 075dc22031e0f1cd5b2a8dd4cb6e6c3b3dfd2c36
 lib/doing/string.rb 7cbe3e0bd136c52f7b12d4d6133afe20fe204be2
 lib/doing/symbol.rb 309799458a1bc715c2707307c9a62ab26086275e
 lib/doing/section.rb 206e119cf818f1e76798753e611180fe77bc299a
