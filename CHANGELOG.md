@@ -1,3 +1,9 @@
+### 2.1.14
+
+#### IMPROVED
+
+- Implement --search and --from filtering for import plugins
+
 ### 2.1.13
 
 #### NEW
