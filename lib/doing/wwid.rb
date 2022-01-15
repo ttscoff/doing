@@ -897,8 +897,8 @@ module Doing
         opt[:search] = search
       end
 
-      opt[:query] = opt[:search] if opt[:search] && !opt[:query]
-      opt[:query] = "!#{opt[:query]}" if opt[:not]
+      # opt[:query] = opt[:search] if opt[:search] && !opt[:query]
+      opt[:query] = "!#{opt[:query]}" if opt[:query] && opt[:not]
       opt[:multiple] = true
       opt[:show_if_single] = true
       filter_options = %i[after before case date_filter from fuzzy not search section val].each_with_object({}) {

@@ -205,7 +205,7 @@ module Doing
           out = [
             format("%#{pad}d", i),
             ') ',
-            format('%13s', item.date.relative_date),
+            format('%16s', item.date.strftime('%Y-%m-%d %H:%M')),
             ' | ',
             item.title
           ]

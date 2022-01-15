@@ -3,6 +3,8 @@
 #### IMPROVED
 
 - Implement --search and --from filtering for import plugins
+- UTC format date strings in select menus for consistency (was relative date formatting)
+- Don't populate the fzf search with --search, it's already filtered. Separated --query from --search if you do want to populate the query string in addition to --search filtering
 
 ### 2.1.13
 

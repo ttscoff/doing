@@ -1289,7 +1289,11 @@ command :select do |c|
 
   c.desc 'Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "\'search"'
   c.arg_name 'QUERY'
-  c.flag %i[q query search]
+  c.flag %i[q query]
+
+  c.desc 'Select from entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.arg_name 'QUERY'
+  c.flag [:search]
 
   c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
   c.arg_name 'QUERY'
