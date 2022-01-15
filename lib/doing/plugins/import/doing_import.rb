@@ -68,7 +68,18 @@ module Doing
         new_item = Item.new(item.date, title, section)
         new_item.note = item.note
 
-        imported.push(new_item)
+        is_match = true
+
+        if options[:search]
+          is_match = new_item.search(options[:search], case_type: options[:case], negate: options[:not])
+        end
+
+        if is_match && options[:date_filter]
+          is_match = new_item.date > options[:date_filter][0] && new_item.date < options[:date_filter][1]
+          is_match = options[:not] ? !is_match : is_match
+        end
+
+        imported.push(new_item) if is_match
       end
 
       dups = new_items.count - imported.count
@@ -80,7 +91,9 @@ module Doing
 
       imported.each do |item|
         wwid.content.add_section(item.section) unless wwid.content.section?(item.section)
+        Hooks.trigger :pre_entry_add, self, item
         wwid.content.push(item)
+        Hooks.trigger :post_entry_added, self, item.dup
       end
 
       Doing.logger.info('Imported:', "#{imported.count} items")

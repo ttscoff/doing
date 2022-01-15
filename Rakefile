@@ -8,12 +8,15 @@ require 'open3'
 require 'yard'
 require 'parallel_tests'
 require 'parallel_tests/tasks'
+require 'tty-spinner'
 
 YARD::Rake::YardocTask.new do |t|
  t.files = ['lib/doing/*.rb']
  t.options = ['--markup-provider=redcarpet', '--markup=markdown', '--no-private', '-p', 'yard_templates']
  # t.stats_options = ['--list-undoc']
 end
+
+task :doc, [*Rake.application[:yard].arg_names] => [:yard]
 
 Rake::RDocTask.new do |rd|
   rd.main = 'README.md'
@@ -36,21 +39,54 @@ end
 namespace :test do
 
   FileList['test/*_test.rb'].each do |rakefile|
-    test_name = File.basename(rakefile, '.rb').sub(%r{^.*?_(.*?)_.*?$}, '\1')
+    test_name = File.basename(rakefile, '.rb').sub(/^.*?_(.*?)_.*?$/, '\1')
 
     Rake::TestTask.new(:"#{test_name}") do |t|
       t.libs << ['test', 'test/helpers']
       t.pattern = rakefile
       t.verbose = ENV['VERBOSE'] =~ /(true|1)/i ? true : false
     end
-    #Define default task for :test
-    task :default => test_name
+    # Define default task for :test
+    task default: test_name
   end
-
 end
 
-desc "Run all tests"
-task :test => 'test:default'
+desc 'Run tests in Docker'
+task :dockertest, :version, :login do |_, args|
+  args.with_defaults(version: '2.7', login: false)
+  case args[:version]
+  when /^3/
+    img = 'doingtest3'
+    file = 'Dockerfile-3.0'
+  when /6$/
+    img = 'doingtest26'
+    file = 'Dockerfile-2.6'
+  when /(^2|7$)/
+    img = 'doingtest27'
+    file = 'Dockerfile-2.7'
+  else
+    img = 'doingtest'
+    file = 'Dockerfile'
+  end
+
+  exec "docker run -it #{img} /bin/bash -l" if args[:login]
+
+  puts `docker build . --file #{file} -t #{img}`
+
+  spinner = TTY::Spinner.new('[:spinner] Running tests ...', hide_cursor: true)
+
+  spinner.auto_spin
+  res = `docker run --rm -it #{img}`
+  # commit = puts `bash -c "docker commit $(docker ps -a|grep #{img}|awk '{print $1}'|head -n 1) #{img}"`.strip
+  spinner.success
+  spinner.stop
+
+  puts res
+  # puts commit&.empty? ? "Error commiting Docker tag #{img}" : "Committed Docker tag #{img}"
+end
+
+desc 'Run all tests'
+task test: 'test:default'
 
 desc 'Run one test verbosely'
 task :test_one, :test do |_, args|
@@ -71,7 +107,18 @@ end
 
 desc 'Development version check'
 task :ver do
-  system 'grep VERSION lib/doing/version.rb'
+  gver = `git ver`
+  cver = IO.read(File.join(File.dirname(__FILE__), 'CHANGELOG.md')).match(/^#+ (\d+\.\d+\.\d+(\w+)?)/)[1]
+  res = `grep VERSION lib/doing/version.rb`
+  version = res.match(/VERSION *= *['"](\d+\.\d+\.\d+(\w+)?)/)[1]
+  puts "git tag: #{gver}"
+  puts "version.rb: #{version}"
+  puts "changelog: #{cver}"
+end
+
+desc 'Changelog version check'
+task :cver do
+  puts IO.read(File.join(File.dirname(__FILE__), 'CHANGELOG.md')).match(/^#+ (\d+\.\d+\.\d+(\w+)?)/)[1]
 end
 
 desc 'Bump incremental version number'

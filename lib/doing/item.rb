@@ -7,7 +7,7 @@ module Doing
   class Item
     attr_accessor :date, :title, :section, :note
 
-    attr_reader :id
+    # attr_reader :id
 
     ##
     ## Initialize an item with date, title, section, and
@@ -116,7 +116,7 @@ module Doing
     ## Add (or remove) tags from the title of the item
     ##
     ## @param      tags    [Array] The tags to apply
-    ## @param      **options Additional options
+    ## @param      options Additional options
     ##
     ## @option options :date       [Boolean] Include timestamp?
     ## @option options :single     [Boolean] Log as a single change?
@@ -163,6 +163,15 @@ module Doing
     end
 
     ##
+    ## convert tags on item to an array with @ symbols removed
+    ##
+    ## @return     [Array] array of tags
+    ##
+    def tag_array
+      tags.tags_to_array
+    end
+
+    ##
     ## Test if item contains tag(s)
     ##
     ## @param      tags    (Array or String) The tags to test. Can be an array or a comma-separated string.
@@ -172,6 +181,13 @@ module Doing
     ## @return     [Boolean] true if tag/bool combination passes
     ##
     def tags?(tags, bool = :and, negate: false)
+      if bool == :pattern
+        tags = tags.join(' ') if tags.is_a?(Array)
+        matches = tag_pattern?(tags.gsub(/ *, */, ' '))
+
+        return negate ? !matches : matches
+      end
+
       tags = split_tags(tags)
       bool = bool.normalize_bool
 
@@ -187,6 +203,41 @@ module Doing
     end
 
     ##
+    ## Test if item matches tag values
+    ##
+    ## @param      queries (Array) The tag value queries to test
+    ## @param      bool    (Symbol) The boolean to use for multiple tags (:and, :or, :not)
+    ## @param      negate  [Boolean] negate the result?
+    ##
+    ## @return     [Boolean] true if tag/bool combination passes
+    ##
+    def tag_values?(queries, bool = :and, negate: false)
+      bool = bool.normalize_bool
+
+      matches = case bool
+                when :and
+                  all_values?(queries)
+                when :not
+                  no_values?(queries)
+                else
+                  any_values?(queries)
+                end
+      negate ? !matches : matches
+    end
+
+    ##
+    ## Determine if case should be ignored for searches
+    ##
+    ## @param      search     [String] The search string
+    ## @param      case_type  [Symbol] The case type
+    ##
+    ## @return     [Boolean] case should be ignored
+    ##
+    def ignore_case(search, case_type)
+      (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
+    end
+
+    ##
     ## Test if item matches search string
     ##
     ## @param      search     [String] The search string
@@ -197,9 +248,30 @@ module Doing
     ##
     ## @return     [Boolean] matches search criteria
     ##
-    def search(search, distance: 3, negate: false, case_type: :smart, fuzzy: false)
-      text = @title + @note.to_s
-      matches = text =~ search.to_rx(distance: distance, case_type: case_type)
+    def search(search, distance: nil, negate: false, case_type: nil)
+      prefs = Doing.config.settings['search'] || {}
+      matching = prefs.fetch('matching', 'pattern').normalize_matching
+      distance ||= prefs.fetch('distance', 3).to_i
+      case_type ||= prefs.fetch('case', 'smart').normalize_case
+
+      if search.is_rx? || matching == :fuzzy
+        matches = @title + @note.to_s =~ search.to_rx(distance: distance, case_type: case_type)
+      else
+        query = to_phrase_query(search.strip)
+
+        if query[:must].nil? && query[:must_not].nil?
+          query[:must] = query[:should]
+          query[:should] = []
+        end
+        matches = no_searches?(query[:must_not], case_type: case_type)
+        matches &&= all_searches?(query[:must], case_type: case_type)
+        matches &&= any_searches?(query[:should], case_type: case_type)
+      end
+      # if search =~ /(?<=\A| )[+-]\S/
+      # else
+      #   text = @title + @note.to_s
+      #   matches = text =~ search.to_rx(distance: distance, case_type: case_type)
+      # end
 
       # if search.is_rx? || !fuzzy
       #   matches = text =~ search.to_rx(distance: distance, case_type: case_type)
@@ -220,10 +292,22 @@ module Doing
       negate ? !matches : matches
     end
 
+    ##
+    ## Test if item is included in never_finish config and
+    ## thus should not receive a @done tag
+    ##
+    ## @return     [Boolean] item should receive @done tag
+    ##
     def should_finish?
       should?('never_finish')
     end
 
+    ##
+    ## Test if item is included in never_time config and
+    ## thus should not receive a date on the @done tag
+    ##
+    ## @return     [Boolean] item should receive @done date
+    ##
     def should_time?
       should?('never_time')
     end
@@ -286,33 +370,188 @@ module Doing
       start = @date
 
       t = (done - start).to_i
-      t > 0 ? t : nil
+      t.positive? ? t : nil
+    end
+
+    def all_searches?(searches, case_type: :smart)
+      return true if searches.nil? || searches.empty?
+
+      text = @title + @note.to_s
+      searches.each do |s|
+        rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
+        return false unless text =~ rx
+      end
+      true
+    end
+
+    def no_searches?(searches, case_type: :smart)
+      return true if searches.nil? || searches.empty?
+
+      text = @title + @note.to_s
+      searches.each do |s|
+        rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
+        return false if text =~ rx
+      end
+      true
+    end
+
+    def any_searches?(searches, case_type: :smart)
+      return true if searches.nil? || searches.empty?
+
+      text = @title + @note.to_s
+      searches.each do |s|
+        rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
+        return true if text =~ rx
+      end
+      false
     end
 
     def all_tags?(tags)
+      return true if tags.nil? || tags.empty?
+
       tags.each do |tag|
-        return false unless @title =~ /@#{tag}/
+        return false unless @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       true
     end
 
     def no_tags?(tags)
+      return true if tags.nil? || tags.empty?
+
       tags.each do |tag|
-        return false if @title =~ /@#{tag}/
+        return false if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       true
     end
 
     def any_tags?(tags)
+      return true if tags.nil? || tags.empty?
+
       tags.each do |tag|
-        return true if @title =~ /@#{tag}/
+        return true if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       false
     end
 
+    def tag_value(tag)
+      res = @title.match(/@#{tag.sub(/^@/, '').wildcard_to_rx}\((.*?)\)/)
+      res ? res[1] : nil
+    end
+
+    def number_or_date(value)
+      return nil unless value
+
+      if value.strip =~ /^[0-9.]+%?$/
+        value.strip.to_f
+      else
+        value.strip.chronify(guess: :end)
+      end
+    end
+
+    def split_value_query(query)
+      val_rx = /^(!)?@?(\S+) +(!?[<>=][=*]?|[$*^]=) +(.*?)$/
+      query.match(val_rx)
+    end
+
+    def any_values?(queries)
+      return true if queries.nil? || queries.empty?
+
+      queries.each do |q|
+        parts = split_value_query(q)
+        return true if tag_value_matches?(parts[2], parts[3], parts[4], parts[1])
+      end
+      false
+    end
+
+    def all_values?(queries)
+      return true if queries.nil? || queries.empty?
+
+      queries.each do |q|
+        parts = split_value_query(q)
+        return false unless tag_value_matches?(parts[2], parts[3], parts[4], parts[1])
+      end
+      true
+    end
+
+    def no_values?(queries)
+      return true if queries.nil? || queries.empty?
+
+      queries.each do |q|
+        parts = split_value_query(q)
+        return false if tag_value_matches?(parts[2], parts[3], parts[4], parts[1])
+      end
+      true
+    end
+
+    def tag_value_matches?(tag, comp, value, negate)
+      if all_tags?([tag])
+        tag_val = tag_value(tag)
+
+        if (value.chronify.nil? && value =~ /[a-z]/i && comp =~ /^!?==?$/) || comp =~ /[$*^]=/
+          is_match = case comp
+                     when /\^=/
+                       tag_val =~ /^#{value.wildcard_to_rx}/i
+                     when /\$=/
+                       tag_val =~ /#{value.wildcard_to_rx}$/i
+                     when %r{==}
+                       tag_val =~ /^#{value.wildcard_to_rx}$/i
+                     else
+                       tag_val =~ /#{value.wildcard_to_rx}/i
+                     end
+
+          comp =~ /!/ || negate ? !is_match : is_match
+        else
+          tag_val = number_or_date(tag_val)
+          val = number_or_date(value)
+
+          return false if val.nil? || tag_val.nil?
+
+          return false unless val.class == tag_val.class
+
+          matches = case comp
+                    when /^<$/
+                      tag_val < val
+                    when /^<=$/
+                      tag_val <= val
+                    when /^>$/
+                      tag_val > val
+                    when /^>=$/
+                      tag_val >= val
+                    when /^!=/
+                      tag_val != val
+                    when /^=/
+                      tag_val == val
+                    end
+          negate.nil? ? matches : !matches
+        end
+      else
+        false
+      end
+    end
+
+    def to_query(query)
+      parser = BooleanTermParser::QueryParser.new
+      transformer = BooleanTermParser::QueryTransformer.new
+      parse_tree = parser.parse(query)
+      transformer.apply(parse_tree).to_elasticsearch
+    end
+
+    def to_phrase_query(query)
+      parser = PhraseParser::QueryParser.new
+      transformer = PhraseParser::QueryTransformer.new
+      parse_tree = parser.parse(query)
+      transformer.apply(parse_tree).to_elasticsearch
+    end
+
+    def tag_pattern?(tags)
+      query = to_query(tags)
+
+      no_tags?(query[:must_not]) && all_tags?(query[:must]) && any_tags?(query[:should])
+    end
+
     def split_tags(tags)
       tags = tags.split(/ *, */) if tags.is_a? String
-      tags.map { |t| t.strip.sub(/^@/, '') }
+      tags.map { |t| t.strip.add_at }
     end
   end
 end

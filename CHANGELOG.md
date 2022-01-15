@@ -1,31 +1,124 @@
-### 2.1.2pre
-
-#### NEW
-
-- Add %duration placeholder to template variables
-- Add `interval_format` setting to config (applies to root or any view/template) to set intervals/durations to human (2h 15m) or text (00:02:15)
-- Add `duration` key to config (root or view/template). If set to true, will display durations by default (no need for `--duration`)
-- Most display commands now have a `--duration` flag that will display an elapsed time if the entry is not marked @done
+### 2.1.14
 
 #### IMPROVED
 
-- Config set will create missing keys. Fuzzy matching will work until the path fails, then path elements after that point will be added as verbatim keys to the specified configuration (with confirmation)
+- Implement --search and --from filtering for import plugins
+- UTC format date strings in select menus for consistency (was relative date formatting)
+- Don't populate the fzf search with --search, it's already filtered. Separated --query from --search if you do want to populate the query string in addition to --search filtering
 
-### 2.1.1pre
+### 2.1.13
 
 #### NEW
 
-- --before, --after, and --from date filters for select command
-- --from flag for `doing today` and `doing yesterday`, filter by time range
-- --from flag for `doing search`, filter by date/time range
-- Commands that accept --before, --after, and --from can now filter on time ranges. If the date string given contains only a time (no day or date), it will be interpreted as a time range, meaning the date isn't filtered, but only entries within the time range are shown/processed
+- --val flag for all display commands, allows tag value queries. Tag values are contained in parenthesis after the tag, e.g. @progress(50). Queries look like `--val "done < two weeks ago"`, "project *= oracle" or "progress >= 50". Wildcards allowed in value, comparators can be <, >, <=, >=, ==, *= (contains), ^= (begins with), $= (ends with). Numeric and date comparisons are detected automatically. Text comparisons are case insensitive. --val can be used multiple times in a command and you can use --bool to specify AND, OR, or NOT (default AND)
+- `doing tag` now accepts a `--value` flag to define a value for a single tag, e.g. @tag(value)
 
 #### FIXED
 
-- `finish --took 60m` is supposed to backdate the start date if needed to finish at the current time and maintain an elapsed time
-- If an editor was specified for config (or default as fallback) with command line options (e.g. `emacs -nw`), Doing would fail to recognize that the executable was available.
+- `doing last --editor` errors
 
-### 2.1.0pre
+### 2.1.12
+
+#### NEW
+
+- Tag_dir command creates/updates .doingrc files in the current directory with default_tags values. Then all entries created within that directory (or subdirs) get tagged with that value.
+- Synonym triggers allow `*` and `?` wildcards
+- Add `--delete` flag for `doing last` to delete last entry
+- --delete and --editor flags for `doing search`, batch edit and delete
+- Example hook to add new entries containing a certain tag to Day One
+- New hooks: pre_entry_add, post_entry_added, post_entry_updated, post_entry_removed, pre_export
+
+#### IMPROVED
+
+- If you need to use a colon in an autotag transform pattern, you can split with double colon, e.g. pattern::replacement
+- Arrays defined in local configurations merge with main config instead of overwriting
+
+#### FIXED
+
+- `doing tags --interactive` wasn't showing menu
+
+### 2.1.10
+
+#### NEW
+
+- --age (oldest|newest) option for view command
+
+### 2.1.9
+
+#### IMPROVED
+
+- Only attempt to install fzf if it doesn't exist on the system. In case of errors, this means a user can manually install fzf and still be able to access --interactive options
+
+#### FIXED
+
+- Rotate command only archiving half of requested items
+- Frozen string error in doing import plugin
+
+### 2.1.8
+
+#### NEW
+
+- Hidden command `doing commands_accepting` which shows all commands that accept a given option, e.g. `doing commands_accepting search` shows all commands that take a search filter
+- Hidden command `doing changelog` which outputs a paginated, formatted version of the change history.
+
+#### IMPROVED
+
+- The output of `doing template --list` now shows the file type of each template
+- Output templates can now be saved to a default location/filename using `doing template html --save`
+
+#### FIXED
+
+- Error running `doing recent` on certain older ruby versions
+
+### 2.1.6
+
+#### NEW
+
+- `doing redo` undoes a redo
+- `doing undo -i` offers a list of available versions for selection
+- Multiple undo. Every time a command modifies the doing file, a backup is written. Running `doing undo` repeatedly steps back through history, `doing undo 5` jumps back 5 versions
+- When resetting via `doing select`, prompt for a date string
+- `doing reset` accepts a date string argument to use as start date instead of current time if provided
+- `doing tags` lists tags used in any/all sections, sortable, with or without frequency counts
+- `doing show --menu` offers an interactive menu for selecting section and tag filters
+- All commands that accept a `--tag` filter can now handle wildcards in the tag names. * to match any number of characters, ? to match a single character.
+- New boolean type for tag searches, PATTERN (which is now the default). Combine tags using symbols to create more complex boolean searches, e.g. "doing +coding -work"
+- You can now define `date_tags` in config, an array of tags/patterns that will be recognized when parsing for natural language dates which are converted when saving new entries
+- `--search` strings can contain quoted phrases and use +/- to require or ban terms, e.g. `--search 'doing +coding -writing'
+- Interactive option for redo command
+- Plugins for Day One export
+
+#### IMPROVED
+
+- Better diff output for fzf preview of `doing undo` history
+- Fall back to good ol' sed for colorizing diffs when no good tool is available
+- `doing redo` (a.k.a. `doing undo --redo`) can be run multiple times, stepping forward through undo history. Can also take a count to jump
+- Matching algorithm can be configured in settings
+- All template placeholders can now use the "printf" formatting that %title and %note have, allowing for padding, prefixes, etc.
+- Move default locations for doing file and backups to ~/.local/share/doing
+- `doing show --menu` will only offer tags that exist after any tag/search filters have been run
+- `doing show @tag` with `--menu` will first filter by the @tag, then do an OR search for tags selected from the menu
+
+#### FIXED
+
+- `doing reset` without filter not automatically affecting most recent entry
+- `config set` now preserves value type (string, array, mapping) of previous value, coercing new value if needed
+- Preserve colors when wrapping text to new lines
+- Tag highlighting errors
+- Template options specified in views were being overriden by options in templates. View config now has precedence, but will fall back to template config for missing keys
+
+#### IMPROVED
+
+- Better diff output for fzf preview of `doing undo` history
+- Fall back to good ol' sed for colorizing diffs when no good tool is available
+- `doing redo` (a.k.a. `doing undo --redo`) can be run multiple times, stepping forward through undo history. Can also take a count to jump
+
+#### FIXED
+
+- `doing reset` without filter not automatically affecting most recent entry
+- `config set` now preserves value type (string, array, mapping) of previous value, coercing new value if needed
+
+### 2.1.3
 
 #### NEW
 
@@ -34,6 +127,14 @@
 - `config list` will list detected .doingrc files and the main config file in order of precedence - refactoring
 - When modifying start dates or @done dates via an editor command, natural language strings can be used and will be parsed into doing-formatted dates automatically
 - When editor is invoked, entry titles include start date, which can be modified
+- --before, --after, and --from date filters for select command
+- --from flag for `doing today` and `doing yesterday`, filter by time range
+- --from flag for `doing search`, filter by date/time range
+- Commands that accept --before, --after, and --from can now filter on time ranges. If the date string given contains only a time (no day or date), it will be interpreted as a time range, meaning the date isn't filtered, but only entries within the time range are shown/processed
+- Add %duration placeholder to template variables
+- Add `interval_format` setting to config (applies to root or any view/template) to set intervals/durations to human (2h 15m) or text (00:02:15)
+- Add `duration` key to config (root or view/template). If set to true, will display durations by default (no need for `--duration`)
+- Most display commands now have a `--duration` flag that will display an elapsed time if the entry is not marked @done
 
 #### IMPROVED
 
@@ -41,6 +142,14 @@
 - Config -o json no longer includes key, only value.
 - System agnostic method for checking available executables (pager, editor)
 - Using `config set` and selecting a local config will no longer write the entire config to the local .doingrc. Instead, a nested path to the particular setting will be added to the config file.
+- Config set will create missing keys. Fuzzy matching will work until the path fails, then path elements after that point will be added as verbatim keys to the specified configuration (with confirmation)
+- Make menus only as tall as needed, so 5 options don't take up the whole screen
+- Better word wrap for long note lines
+
+#### FIXED
+
+- `finish --took 60m` is supposed to backdate the start date if needed to finish at the current time and maintain an elapsed time
+- If an editor was specified for config (or default as fallback) with command line options (e.g. `emacs -nw`), Doing would fail to recognize that the executable was available.
 
 ### 2.0.25
 

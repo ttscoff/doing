@@ -12,8 +12,8 @@ module Doing
       {
         trigger: 'html?|web(?:page)?',
         templates: [
-          { name: 'haml', trigger: 'h[ta]ml?|web' },
-          { name: 'css', trigger: 'css|styl(?:e|us)' }
+          { name: 'html', trigger: 'h[ta]ml?|web', format: 'haml', filename: 'html_export.haml' },
+          { name: 'html_style', trigger: 'css|styl(?:e|us)', format: 'css', filename: 'html_export.css' }
         ]
       }
     end

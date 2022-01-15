@@ -69,7 +69,7 @@ module Doing
       if section =~ /^all$/i
         dup
       else
-        items = Items.new.concat(select { |item| item.section == section })
+        items = Items.new.concat(select { |item| !item.nil? && item.section == section })
         items.add_section(section, log: false)
         items
       end
@@ -84,6 +84,7 @@ module Doing
       deleted = delete(item)
       Doing.logger.count(:deleted)
       Doing.logger.info('Entry deleted:', deleted.title) if single
+      deleted
     end
 
     ##
@@ -103,6 +104,26 @@ module Doing
       Doing.logger.count(:updated)
       Doing.logger.info('Entry updated:', self[s_idx].title.truncate(60))
       new_item
+    end
+
+    def all_tags
+      each_with_object([]) do |entry, tags|
+        tags.concat(entry.tags).sort!.uniq!
+      end
+    end
+
+    ##
+    ## Return Items containing items that don't exist in receiver
+    ##
+    ## @param      items  [Items] Receiver
+    ##
+    def diff(items)
+      diff = Items.new
+      each do |item|
+        res = items.select { |i| i.equal?(item) }
+        diff.push(item) unless res.count.positive?
+      end
+      diff
     end
 
     # Output sections and items in Doing file format

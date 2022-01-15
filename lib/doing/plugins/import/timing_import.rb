@@ -63,7 +63,19 @@ module Doing
         title.strip!
         new_item = Item.new(start_time, title, section)
         new_item.note.add(entry['notes']) if entry.key?('notes')
-        new_items.push(new_item)
+
+        is_match = true
+
+        if options[:search]
+          is_match = new_item.search(options[:search], case_type: options[:case], negate: options[:not])
+        end
+
+        if is_match && options[:date_filter]
+          is_match = start_time > options[:date_filter][0] && start_time < options[:date_filter][1]
+          is_match = options[:not] ? !is_match : is_match
+        end
+
+        new_items.push(new_item) if is_match
       end
       total = new_items.count
       skipped = data.count - total
@@ -77,7 +89,12 @@ module Doing
       dups = filtered - new_items.count
       Doing.logger.debug('Skipped:' , %(#{dups} items with overlapping times)) if dups.positive?
 
+      new_items.map { |item| Hooks.trigger :pre_entry_add, self, item }
+
       wwid.content.concat(new_items)
+
+      new_items.map { |item| Hooks.trigger :post_entry_added, self, item.dup }
+
       Doing.logger.info('Imported:', %(#{new_items.count} items to #{section}))
     end
 

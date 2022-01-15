@@ -41,7 +41,11 @@ module Doing
       if secs_ago
         now - secs_ago
       else
-        Chronic.parse(self, { guess: options.fetch(:guess, :begin), context: options.fetch(:future, false) ? :future : :past, ambiguous_time_range: 8 })
+        Chronic.parse(self, {
+                        guess: options.fetch(:guess, :begin),
+                        context: options.fetch(:future, false) ? :future : :past,
+                        ambiguous_time_range: 8
+                      })
       end
     end
 

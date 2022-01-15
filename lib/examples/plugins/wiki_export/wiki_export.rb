@@ -11,9 +11,9 @@ module Doing
       {
         trigger: 'wiki',
         templates: [
-          { name: 'wiki_page', trigger: 'wiki.?page' },
-          { name: 'wiki_index', trigger: 'wiki.?index' },
-          { name: 'wiki_css', trigger: 'wiki.?css' }
+          { name: 'wiki_page', trigger: 'wiki.?page', format: 'haml', filename: 'wiki.haml' },
+          { name: 'wiki_index', trigger: 'wiki.?index', format: 'haml', filename: 'wiki_index.haml' },
+          { name: 'wiki_css', trigger: 'wiki.?css', format: 'css', filename: 'wiki.css' }
         ]
       }
     end

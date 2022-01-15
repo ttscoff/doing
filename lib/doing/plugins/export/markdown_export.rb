@@ -25,7 +25,7 @@ module Doing
     def self.settings
       {
         trigger: 'markdown|mk?d|gfm',
-        templates: [{ name: 'markdown', trigger: 'mk?d|markdown' }]
+        templates: [{ name: 'markdown', trigger: 'mk?d|markdown', format: 'erb', filename: 'doing-markdown.erb' }]
       }
     end
 

@@ -7,7 +7,11 @@ module Doing
   class Configuration
     attr_reader :settings
 
-    attr_writer :ignore_local
+    attr_writer :ignore_local, :config_file, :force_answer
+
+    def force_answer
+      @force_answer ||= false
+    end
 
     MissingConfigFile = Class.new(RuntimeError)
 
@@ -25,11 +29,14 @@ module Doing
         'plugin_path' => File.join(Util.user_home, '.config', 'doing', 'plugins'),
         'command_path' => File.join(Util.user_home, '.config', 'doing', 'commands')
       },
-      'doing_file' => '~/what_was_i_doing.md',
+      'doing_file' => '~/.local/share/doing/what_was_i_doing.md',
+      'backup_dir' => '~/.local/share/doing/doing_backup',
+      'history_size' => 15,
       'current_section' => 'Currently',
       'paginate' => false,
       'never_time' => [],
       'never_finish' => [],
+      'date_tags' => ['done', 'defer(?:red)?', 'waiting'],
 
       'timer_format' => 'text',
       'interval_format' => 'text',
@@ -37,7 +44,8 @@ module Doing
       'templates' => {
         'default' => {
           'date_format' => '%Y-%m-%d %H:%M',
-          'template' => '%date | %title %interval%duration%note',
+          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset
+            %yellow%interval%boldred%duration%dark%white%80_14┃ note',
           'wrap_width' => 0,
           'order' => 'asc'
         },
@@ -54,7 +62,8 @@ module Doing
         },
         'recent' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%shortdate: %title (%section) %interval%duration%note',
+          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset
+            %yellow%interval%boldred%duration%dark%white%80_14┃ note',
           'wrap_width' => 88,
           'count' => 10,
           'order' => 'asc'
@@ -66,7 +75,7 @@ module Doing
       'views' => {
         'done' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%date | %title%note',
+          'template' => '%date | %title (%section)% 18: note',
           'wrap_width' => 0,
           'section' => 'All',
           'count' => 0,
@@ -87,6 +96,11 @@ module Doing
       'marker_color' => 'red',
       'default_tags' => [],
       'tag_sort' => 'name',
+      'search' => {
+        'matching' => 'pattern', # fuzzy, pattern, exact
+        'distance' => 3,
+        'case' => 'smart' # sensitive, ignore, smart
+      },
       'include_notes' => true
     }
 
@@ -100,24 +114,32 @@ module Doing
       @config_file ||= default_config_file
     end
 
-    def config_file=(file)
-      @config_file = file
-    end
-
     def config_dir
       @config_dir ||= File.join(Util.user_home, '.config', 'doing')
-      # @config_dir ||= Util.user_home
+    end
+
+    ##
+    ## Check if configuration enforces exact string matching
+    ##
+    ## @return     [Boolean] exact matching enabled
+    ##
+    def exact_match?
+      search_settings = @settings['search']
+      matching = search_settings.fetch('matching', 'pattern').normalize_matching
+      matching == :exact
     end
 
     def default_config_file
-      raise DoingRuntimeError, "#{config_dir} exists but is not a directory" if File.exist?(config_dir) && !File.directory?(config_dir)
+      if File.exist?(config_dir) && !File.directory?(config_dir)
+        raise DoingRuntimeError, "#{config_dir} exists but is not a directory"
+
+      end
 
       unless File.exist?(config_dir)
         FileUtils.mkdir_p(config_dir)
         Doing.logger.log_now(:warn, "Config directory created at #{config_dir}")
       end
 
-      # File.join(config_dir, 'config.yml')
       File.join(config_dir, 'config.yml')
     end
 
@@ -130,13 +152,22 @@ module Doing
     ##
     ## @return     [String] file path
     ##
-    def choose_config
-      if @additional_configs.count.positive?
-        choices = [@config_file]
-        choices.concat(@additional_configs)
-        res = Doing::Prompt.choose_from(choices.uniq.sort.reverse, sorted: false, prompt: 'Local configs found, select which to update > ')
+    def choose_config(create: false)
+      return @config_file if @force_answer
+
+      if @additional_configs.count.positive? || create
+        choices = [@config_file].concat(@additional_configs)
+        choices.push('Create a new .doingrc in the current directory') if create && !File.exist?('.doingrc')
+        res = Doing::Prompt.choose_from(choices.uniq.sort.reverse,
+                                        sorted: false,
+                                        prompt: 'Local configs found, select which to update > ')
 
         raise UserCancelled, 'Cancelled' unless res
+
+        if res =~ /^Create a new/
+          res = File.expand_path('.doingrc')
+          FileUtils.touch(res)
+        end
 
         res.strip || @config_file
       else
@@ -214,13 +245,18 @@ module Doing
       cfg.nil? ? nil : { real_path[-1] => cfg }
     end
 
-    # It takes the input, fills in the defaults where values do not exist.
+    # It takes the input, fills in the defaults where values
+    # do not exist.
     #
-    # user_config - a Hash or Configuration of overrides.
+    # @param      user_config  a Hash or Configuration of
+    #                          overrides.
     #
-    # Returns a Configuration filled with defaults.
+    # @return     [Hash] a Configuration filled with
+    #             defaults.
+    #
     def from(user_config)
-      Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
+      # Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
+      Configuration[user_config].stringify_keys.deep_merge(DEFAULTS, { extend_existing_arrays: true, sort_merged_arrays: true })
     end
 
     ##
@@ -233,14 +269,13 @@ module Doing
       old_file = File.join(Util.user_home, '.doingrc')
       return unless File.exist?(old_file)
 
-      wwid = Doing::WWID.new
       Doing.logger.log_now(:warn, 'Deprecated:', "main config file location has changed to #{config_file}")
-      res = wwid.yn("Move #{old_file} to new location, preserving settings?", default_response: true)
+      res = Prompt.yn("Move #{old_file} to new location, preserving settings?", default_response: true)
 
       return unless res
 
       if File.exist?(default_config_file)
-        res = wwid.yn("#{default_config_file} already exists, overwrite it?", default_response: false)
+        res = Prompt.yn("#{default_config_file} already exists, overwrite it?", default_response: false)
 
         unless res
           @config_file = old_file
@@ -292,8 +327,8 @@ module Doing
 
       Hooks.trigger :post_config, self
 
-      # config = local_config.deep_merge(config) unless @ignore_local
-      config = Util.deep_merge_hashes(config, local_config) unless @ignore_local
+      config = local_config.deep_merge(config, { extend_existing_arrays: true, sort_merged_arrays: true }) unless @ignore_local
+      # config = Util.deep_merge_hashes(config, local_config) unless @ignore_local
 
       Hooks.trigger :post_local_config, self
 
@@ -369,7 +404,7 @@ module Doing
 
       begin
         additional_configs.each do |cfg|
-          local_configs.deep_merge(Util.safe_load_file(cfg))
+          local_configs.deep_merge(Util.safe_load_file(cfg), { extend_existing_arrays: true, sort_merged_arrays: true })
         end
       rescue StandardError
         Doing.logger.error('Config:', 'Error reading local configuration(s)')
@@ -388,15 +423,18 @@ module Doing
       end
 
       begin
+
         user_config = Util.safe_load_file(config_file)
+        raise StandardError, 'Invalid config file format' unless user_config.is_a?(Hash)
+
         if user_config.key?('html_template')
           user_config['export_templates'] ||= {}
-          user_config['export_templates'].deep_merge(user_config.delete('html_template'))
+          user_config['export_templates'].deep_merge(user_config.delete('html_template'), { extend_existing_arrays: true, sort_merged_arrays: true })
         end
 
         user_config['include_notes'] = user_config.delete(':include_notes') if user_config.key?(':include_notes')
 
-        user_config.deep_merge(DEFAULTS)
+        user_config.deep_merge(DEFAULTS, { extend_existing_arrays: true, sort_merged_arrays: true })
       rescue StandardError => e
         Doing.logger.error('Config:', 'Error reading default configuration')
         Doing.logger.error('Error:', e.message)

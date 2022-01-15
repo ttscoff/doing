@@ -18,5 +18,36 @@ module Doing
   Hooks.register :post_write do |filename|
     res = `/bin/bash /Users/ttscoff/scripts/after_doing.sh`.strip
     Doing.logger.debug('Hooks:', res) unless res =~ /^\.\.\.$/
+
+    wwid = WWID.new
+    wwid.configure
+    if filename == wwid.config['doing_file']
+      diff = wwid.get_diff(filename)
+      puts diff
+    end
+  end
+
+  Hooks.register :post_entry_added do |wwid, entry|
+    if wwid.config.key?('day_one_trigger') && entry.tags?(wwid.config['day_one_trigger'], :and)
+
+      logger.info('New entry:', 'Adding to Day One')
+      add_to_day_one(entry, wwid.config)
+    end
+  end
+
+  ##
+  ## Add the entry to Day One using the CLI
+  ##
+  ## @param      entry  The entry to add
+  ##
+  def self.add_to_day_one(entry, config)
+    dayone = TTY::Which.which('dayone2')
+    flagged = entry.tags?('flagged') ? ' -s' : ''
+    tags = entry.tags.map { |t| Shellwords.escape(t) }.join(' ')
+    tags = tags.length.positive? ? " -t #{tags}" : ''
+    date = " -d '#{entry.date.strftime('%Y-%m-%d %H:%M:%S')}'"
+    title = entry.title.tag(config['day_one_trigger'], remove: true)
+    title += "\n#{entry.note}" unless entry.note.empty?
+    `echo #{Shellwords.escape(title)} | #{dayone} new#{flagged}#{date}#{tags}`
   end
 end

@@ -28,26 +28,30 @@ module Doing
         plugins
       end
 
-      # Public: Setup the plugin search path
+      # Setup the plugin search path
       #
-      # Returns an Array of plugin search paths
+      # @param      add_dir  [String] optional additional
+      #                      path to include
+      #
+      # @return     [Array] Returns an Array of plugin search paths
+      #
       def plugins_path(add_dir = nil)
         paths = Array(File.join(File.dirname(__FILE__), 'plugins'))
         paths << File.join(add_dir) if add_dir
         paths.map { |d| File.expand_path(d) }
       end
 
-      ##
+
       # Register a plugin
       #
-      # param: +[String|Array]+ title  The name of the plugin (can be an array of names)
+      # @param      title  [String|Array] The name of the
+      #                    plugin (can be an array of names)
+      # @param      type   [Symbol] The plugin type
+      #                    (:import, :export)
+      # @param      klass  [Class] The class responding to
+      #                    :render or :import
       #
-      # param: +type+ The plugin type (:import, :export)
-      #
-      # param: +klass+ The class responding to :render or :import
-      #
-      #
-      # returns: Success boolean
+      # @return     [Boolean] Success boolean
       #
       def register(title, type, klass)
         type = validate_plugin(title, type, klass)
@@ -90,6 +94,15 @@ module Doing
         type
       end
 
+      ##
+      ## Converts a partial symbol to a valid plugin type,
+      ## e.g. :imp => :import
+      ##
+      ## @param      type     [Symbol] the symbol to test
+      ## @param      default  [Symbol] fallback value
+      ##
+      ## @return     [Symbol] :import or :export
+      ##
       def valid_type(type, default: nil)
         type ||= default
 
@@ -154,10 +167,13 @@ module Doing
       end
 
       ##
-      ## Return a regular expression of all
-      ##             plugin triggers for type
+      ## Return a regular expression of all plugin triggers
+      ## for type
       ##
-      ## @param      type  The type :import or :export
+      ## @param      type  [Symbol] The type :import or
+      ##                   :export
+      ##
+      ## @return     [Regexp] regular expression
       ##
       def plugin_regex(type: :export)
         type = valid_type(type)
@@ -168,24 +184,43 @@ module Doing
         Regexp.new("^(?:#{pattern.join('|')})$", true)
       end
 
+      ##
+      ## Return array of available template names
+      ##
+      ## @param      type  [Symbol] Plugin type (:import,
+      ##                   :export)
+      ##
+      ## @return     [Array<String>] template names
+      ##
       def plugin_templates(type: :export)
         type = valid_type(type)
         templates = []
         plugs = plugins[type].clone
         plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
           options[:templates].each do |t|
-            templates << t[:name]
+            out = t[:name]
+            out += " (#{t[:format]})" if t.key?(:format)
+            templates << out
           end
         end
 
-        templates
+        templates.sort.uniq
       end
 
+      ##
+      ## Return a regular expression of all template
+      ## triggers for type
+      ##
+      ## @param      type  [Symbol] The type :import or
+      ##                   :export
+      ##
+      ## @return     [Regexp] regular expression
+      ##
       def template_regex(type: :export)
         type = valid_type(type)
         pattern = []
         plugs = plugins[type].clone
-        plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
+        plugs.delete_if { |_, o| o[:templates].nil? }.each do |_, options|
           options[:templates].each do |t|
             pattern << t[:trigger].normalize_trigger
           end
@@ -193,15 +228,43 @@ module Doing
         Regexp.new("^(?:#{pattern.join('|')})$", true)
       end
 
-      def template_for_trigger(trigger, type: :export)
-        type = valid_type(type)
-        plugs = plugins[type].clone
-        plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
+      ##
+      ## Find and return the appropriate template for a
+      ## trigger string. Outputs a string that can be
+      ## written out to the terminal for redirection
+      ##
+      ## @param      trigger  [String] The trigger to test
+      ## @param      type     [Symbol] the plugin type
+      ##                      (:import, :export)
+      ##
+      ## @return     [String] string content of template for trigger
+      ##
+      def template_for_trigger(trigger, type: :export, save_to: nil)
+        plugins[valid_type(type)].clone.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
           options[:templates].each do |t|
-            return options[:class].template(trigger) if trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
+            next unless trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
+
+            tpl = options[:class].template(trigger)
+            return tpl unless save_to
+
+            raise PluginException.new('No default filename defined', :export, t[:name]) unless t.key?(:filename)
+
+            return save_template(tpl, save_to, t[:filename])
           end
         end
         raise Errors::InvalidArgument, "No template type matched \"#{trigger}\""
+      end
+
+      def save_template(tpl, dir, filename)
+        dir = File.expand_path(dir)
+        FileUtils.mkdir_p(dir) unless File.exist?(dir)
+        raise DoingRuntimeError, "Path #{dir} exists but is not a directory" unless File.directory?(dir)
+
+        file = File.join(dir, filename)
+        File.open(file, 'w') do |f|
+          f.puts(tpl)
+          Doing.logger.warn('File update:', "Template written to #{file}")
+        end
       end
     end
   end

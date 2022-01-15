@@ -38,6 +38,7 @@ module Doing
       rotated
       skipped
       updated
+      exported
     ].freeze
 
     #
@@ -258,12 +259,38 @@ module Doing
 
       if @logdev == $stdout
         $stdout.print results.map {|res| res[:message].uncolor }.join("\n")
+        $stdout.puts
       else
         results.each do |msg|
           @logdev.puts color_message(msg[:level], msg[:message])
         end
       end
     end
+
+    def benchmark(key, state)
+      return unless ENV['DOING_BENCHMARK']
+
+      @benchmarks ||= {}
+      @benchmarks[key] ||= { start: nil, finish: nil }
+      @benchmarks[key][state] = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+
+    def log_benchmarks
+      if ENV['DOING_BENCHMARK']
+        output = []
+        @benchmarks.each do |k, timers|
+          if timers[:finish] && timers[:start]
+            output << "#{k}: #{timers[:finish] - timers[:start]}"
+          else
+            output << "#{k}: error"
+          end
+        end
+        output.each do |msg|
+          $stdout.puts color_message(:debug, 'Benchmark:', msg)
+        end
+      end
+    end
+
 
     def log_change(tags_added: [], tags_removed: [], count: 1, item: nil, single: false)
       if tags_added.empty? && tags_removed.empty?
@@ -319,6 +346,8 @@ module Doing
         ['Archived:',  data[:message] || 'completed and archived %count %items']
       when :skipped
         ['Skipped:', data[:message] || '%count %items were unchanged']
+      when :exported
+        ['Exported:', data[:message] || '%count %items were exported']
       end
     end
 

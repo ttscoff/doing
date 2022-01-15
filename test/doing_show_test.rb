@@ -18,6 +18,7 @@ class DoingShowTest < Test::Unit::TestCase
     @result = ''
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
+    @backup_dir = File.join(@basedir, 'doing_backup')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
     @config = YAML.load(IO.read(@config_file))
@@ -94,6 +95,10 @@ class DoingShowTest < Test::Unit::TestCase
     result = doing('--stdout', 'show', '--tag_sort=name', '--tag_order=desc', '--totals')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/writing/, first_tag[1], 'First tag should be writing')
+
+    # test show --val queries
+    result = doing('--stdout', 'show', '--val', 'done < 9/14/21 12:30', '--val', 'done > 9/14/21 10am')
+    assert_count_entries(8, result, 'There should be 8 entries matching query')
   end
 
   private
@@ -127,7 +132,7 @@ class DoingShowTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
   end
 end
 

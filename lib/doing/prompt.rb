@@ -16,6 +16,14 @@ module Doing
         @default_answer ||= false
       end
 
+      def enter_text(prompt, default_response: '')
+        return default_response if @default_answer
+
+        print "#{yellow(prompt).sub(/:?$/, ':')} #{reset}"
+        $stdin.gets.strip
+      end
+
+
       ##
       ## Ask a yes or no question in the terminal
       ##
@@ -78,7 +86,38 @@ module Doing
         @fzf ||= install_fzf
       end
 
-      def install_fzf
+      def uninstall_fzf
+        fzf_bin = File.join(File.dirname(__FILE__), '../helpers/fzf/bin/fzf')
+        FileUtils.rm_f(fzf_bin) if File.exist?(fzf_bin)
+        Doing.logger.warn('fzf:', "removed #{fzf_bin}")
+      end
+
+      def which_fzf
+        fzf_dir = File.join(File.dirname(__FILE__), '../helpers/fzf')
+        fzf_bin = File.join(fzf_dir, 'bin/fzf')
+        return fzf_bin if File.exist?(fzf_bin)
+
+        Doing.logger.debug('fzf:', 'Using user-installed fzf')
+        TTY::Which.which('fzf')
+      end
+
+      def silence_std(file = '/dev/null')
+        $stdout = File.new(file, 'w')
+        $stderr = File.new(file, 'w')
+      end
+
+      def restore_std
+        $stdout = STDOUT
+        $stderr = STDERR
+      end
+
+      def install_fzf(force: false)
+        if force
+          uninstall_fzf
+        elsif which_fzf
+          return which_fzf
+        end
+
         fzf_dir = File.join(File.dirname(__FILE__), '../helpers/fzf')
         FileUtils.mkdir_p(fzf_dir) unless File.directory?(fzf_dir)
         fzf_bin = File.join(fzf_dir, 'bin/fzf')
@@ -86,17 +125,25 @@ module Doing
 
         prev_level = Doing.logger.level
         Doing.logger.adjust_verbosity({ log_level: :info })
-        Doing.logger.log_now(:warn, 'Compiling and installing fzf -- this will only happen once')
-        Doing.logger.log_now(:warn, 'fzf is copyright Junegunn Choi, MIT License <https://github.com/junegunn/fzf/blob/master/LICENSE>')
+        Doing.logger.log_now(:warn, 'fzf:', 'Compiling and installing fzf -- this will only happen once')
+        Doing.logger.log_now(:warn, 'fzf:', 'fzf is copyright Junegunn Choi, MIT License <https://github.com/junegunn/fzf/blob/master/LICENSE>')
 
-        system("'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
+        silence_std
+        `'#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null`
         unless File.exist?(fzf_bin)
+          restore_std
           Doing.logger.log_now(:warn, 'Error installing, trying again as root')
-          system("sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null")
+          silence_std
+          `sudo '#{fzf_dir}/install' --bin --no-key-bindings --no-completion --no-update-rc --no-bash --no-zsh --no-fish &> /dev/null`
         end
-        raise RuntimeError.new('Error installing fzf, please report at https://github.com/ttscoff/doing/issues') unless File.exist?(fzf_bin)
+        restore_std
+        unless File.exist?(fzf_bin)
+          Doing.logger.error('fzf:', 'unable to install fzf. You can install manually and Doing will use the system version.')
+          Doing.logger.error('fzf:', 'see https://github.com/junegunn/fzf#installation')
+          raise RuntimeError.new('Error installing fzf, please report at https://github.com/ttscoff/doing/issues')
+        end
 
-        Doing.logger.info("fzf installed to #{fzf}")
+        Doing.logger.info('fzf:', "installed to #{fzf}")
         Doing.logger.adjust_verbosity({ log_level: prev_level })
         fzf_bin
       end
@@ -110,14 +157,17 @@ module Doing
         return nil unless $stdout.isatty
 
         # fzf_args << '-1' # User is expecting a menu, and even if only one it seves as confirmation
-        fzf_args << %(--prompt="#{prompt}")
-        fzf_args << "--height=#{options.count + 2}"
-        fzf_args << '--info=inline'
-        fzf_args << '--multi' if multiple
+        default_args = []
+        default_args << %(--prompt="#{prompt}")
+        default_args << "--height=#{options.count + 2}"
+        default_args << '--info=inline'
+        default_args << '--multi' if multiple
         header = "esc: cancel,#{multiple ? ' tab: multi-select, ctrl-a: select all,' : ''} return: confirm"
-        fzf_args << %(--header="#{header}")
+        default_args << %(--header="#{header}")
+        default_args.concat(fzf_args)
         options.sort! if sorted
-        res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
+
+        res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{default_args.join(' ')}`
         return false if res.strip.size.zero?
 
         res
@@ -127,16 +177,16 @@ module Doing
       ## Create an interactive menu to select from a set of Items
       ##
       ## @param      items            [Array] list of items
-      ## @param      opt              [Hash] options
-      ## @param      include_section  [Boolean] include section
+      ## @param      opt              Additional options
       ##
-      ## @option opt [String] :header
-      ## @option opt [String] :prompt
-      ## @option opt [String] :query
-      ## @option opt [Boolean] :show_if_single
-      ## @option opt [Boolean] :menu
-      ## @option opt [Boolean] :sort
-      ## @option opt [Boolean] :multiple
+      ## @option opt [Boolean] :include_section Include section name for each item in menu
+      ## @option opt [String] :header A custom header string
+      ## @option opt [String] :prompt A custom prompt string
+      ## @option opt [String] :query Initial query
+      ## @option opt [Boolean] :show_if_single Show menu even if there's only one option
+      ## @option opt [Boolean] :menu Show menu
+      ## @option opt [Boolean] :sort Sort options
+      ## @option opt [Boolean] :multiple Allow multiple selections
       ## @option opt [Symbol] :case (:sensitive, :ignore, :smart)
       ##
       def choose_from_items(items, **opt)
@@ -155,7 +205,7 @@ module Doing
           out = [
             format("%#{pad}d", i),
             ') ',
-            format('%13s', item.date.relative_date),
+            format('%16s', item.date.strftime('%Y-%m-%d %H:%M')),
             ' | ',
             item.title
           ]
@@ -178,7 +228,7 @@ module Doing
           %(-q "#{query}"),
           '--info=inline'
         ]
-        fzf_args.push('-1') unless opt.fetch(:show_if_single)
+        fzf_args.push('-1') unless opt.fetch(:show_if_single, false)
         fzf_args << case case_sensitive
                     when :sensitive
                       '+i'

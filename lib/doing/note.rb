@@ -22,7 +22,7 @@ module Doing
     ## Add note contents, optionally replacing existing note
     ##
     ## @param      note     [Array] The note to add, can be
-    ##                      string or array (Note)
+    ##                      String, Array, or Note
     ## @param      replace  [Boolean] replace existing
     ##                      content
     ##
@@ -36,32 +36,7 @@ module Doing
     end
 
     ##
-    ## Append an array of strings to note
-    ##
-    ## @param      lines  [Array] Array of strings
-    ##
-    def append(lines)
-      concat(lines)
-      replace compress
-    end
-
-    ##
-    ## Append a string to the note content
-    ##
-    ## @param      input  [String] The input string,
-    ##                    newlines will be split
-    ##
-    def append_string(input)
-      concat(input.split(/\n/).map(&:strip))
-      replace compress
-    end
-
-    def compress!
-      replace compress
-    end
-
-    ##
-    ## Remove blank lines and comment lines (#)
+    ## Remove blank lines and comments (#)
     ##
     ## @return     [Array] compressed array
     ##
@@ -69,8 +44,8 @@ module Doing
       delete_if { |l| l =~ /^\s*$/ || l =~ /^#/ }
     end
 
-    def strip_lines!
-      replace strip_lines
+    def compress!
+      replace compress
     end
 
     ##
@@ -81,6 +56,10 @@ module Doing
     ##
     def strip_lines
       map(&:strip)
+    end
+
+    def strip_lines!
+      replace strip_lines
     end
 
     ##
@@ -101,11 +80,33 @@ module Doing
     ## @param      other  [Note] The other Note
     ##
     ## @return     [Boolean] true if equal
-    ##
     def equal?(other)
       return false unless other.is_a?(Note)
 
       to_s == other.to_s
+    end
+
+    private
+
+    ##
+    ## Append an array of strings to note
+    ##
+    ## @param      lines  [Array] Array of strings
+    ##
+    def append(lines)
+      concat(lines)
+      replace compress
+    end
+
+    ##
+    ## Append a string to the note content
+    ##
+    ## @param      input  [String] The input string,
+    ##                    newlines will be split
+    ##
+    def append_string(input)
+      concat(input.split(/\n/).map(&:strip))
+      replace compress
     end
   end
 end

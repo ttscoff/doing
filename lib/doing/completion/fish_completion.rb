@@ -9,7 +9,7 @@ module Doing
           function __fish_doing_needs_command
             # Figure out if the current invocation already has a command.
 
-            set -l opts h-help config_file= f-doing_file= n-notes v-version stdout d-debug default x-noauto
+            set -l opts color h-help config_file= f-doing_file= n-notes v-version stdout debug default x-noauto no p-pager q-quiet yes
             set cmd (commandline -opc)
             set -e cmd[1]
             argparse -s $opts -- $cmd 2>/dev/null
@@ -80,12 +80,13 @@ module Doing
       end
 
       def parse_option(option)
-        res = option.match(/(?:-(?<short>\w), )?(?:--(?:\[no-\])?(?<long>w+)(?:=(?<arg>\w+))?)\s+- (?<desc>.*?)$/)
+        res = option.match(/(?:-(?<short>\w), )?(?:--(?:\[no-\])?(?<long>\w+)(?:=(?<arg>\w+))?)\s+- (?<desc>.*?)$/)
         return nil unless res
+
         {
           short: res['short'],
           long: res['long'],
-          arg: res[:arg],
+          arg: res['arg'],
           description: res['desc'].short_desc
         }
       end
@@ -122,9 +123,16 @@ module Doing
 
         out = []
         need_export = []
+        need_bool = []
+        need_case = []
+        need_sort = []
+        need_tag_sort = []
+        need_tag_order = []
+        need_age = []
+        need_section = []
 
         @commands.each_with_index do |cmd, i|
-          @bar.advance
+          @bar.advance(status: cmd[:commands].first)
           data = get_help_sections(cmd[:commands].first)
 
           if data[:synopsis].join(' ').strip.split(/ /).last =~ /(path|file)/i
@@ -141,12 +149,47 @@ module Doing
               out << "complete -c doing #{long} #{short} -f #{arg} -n '__fish_doing_using_command #{cmd[:commands].join(' ')}' -d #{Shellwords.escape(option[:description])}"
 
               need_export.concat(cmd[:commands]) if option[:long] == 'output'
+              need_bool.concat(cmd[:commands]) if option[:long] == 'bool'
+              need_case.concat(cmd[:commands]) if option[:long] == 'case'
+              need_case.concat(cmd[:commands]) if option[:long] == 'sort'
+              need_tag_sort.concat(cmd[:commands]) if option[:long] == 'tag_sort'
+              need_tag_order.concat(cmd[:commands]) if option[:long] == 'tag_order'
+              need_age.concat(cmd[:commands]) if option[:long] == 'age'
+              need_section.concat(cmd[:commands]) if option[:long] == 'section'
             end
           end
         end
 
         unless need_export.empty?
           out << "complete -f -c doing -s o -l output -x -n '__fish_doing_using_command #{need_export.join(' ')}' -a '(__fish_doing_export_plugins)'"
+        end
+
+        unless need_bool.empty?
+          out << "complete -f -c doing -s b -l bool -x -n '__fish_doing_using_command #{need_bool.join(' ')}' -a 'and or not pattern'"
+        end
+
+        unless need_case.empty?
+          out << "complete -f -c doing -l case -x -n '__fish_doing_using_command #{need_case.join(' ')}' -a 'case-sensitive ignore smart'"
+        end
+
+        unless need_sort.empty?
+          out << "complete -f -c doing -l sort -x -n '__fish_doing_using_command #{need_sort.join(' ')}' -a 'asc desc'"
+        end
+
+        unless need_tag_sort.empty?
+          out << "complete -f -c doing -l tag_sort -x -n '__fish_doing_using_command #{need_tag_sort.join(' ')}' -a 'name time'"
+        end
+
+        unless need_tag_order.empty?
+          out << "complete -f -c doing -l tag_order -x -n '__fish_doing_using_command #{need_tag_order.join(' ')}' -a 'asc desc'"
+        end
+
+        unless need_age.empty?
+          out << "complete -f -c doing -s a -l age -x -n '__fish_doing_using_command #{need_age.join(' ')}' -a 'oldest newest'"
+        end
+
+        unless need_section.empty?
+          out << "complete -f -c doing -s s -l section -x -n '__fish_doing_using_command #{need_section.join(' ')}' -a '(__fish_doing_complete_sections)'"
         end
 
         # clear
@@ -157,7 +200,7 @@ module Doing
         data = get_help_sections
         @global_options = parse_options(data[:global_options])
         @commands = parse_commands(data[:commands])
-        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Fish completions: \033[0;35;40m[:bar]\033[0m", total: @commands.count, bar_format: :blade)
+        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Fish completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count, bar_format: :blade, status: 'processing subcommands')
         @bar.resize(25)
       end
 

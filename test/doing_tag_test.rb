@@ -17,6 +17,7 @@ class DoingTagTest < Test::Unit::TestCase
     @result = ''
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
+    @backup_dir = File.join(@basedir, 'doing_backup')
     @config_file = File.join(File.dirname(__FILE__), 'test2.doingrc')
     @import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
   end
@@ -35,9 +36,21 @@ class DoingTagTest < Test::Unit::TestCase
   def test_tag_entry
     subject = 'Test new entry'
     tag = 'testtag'
+
     doing('now', subject)
     doing('tag', tag)
     assert_match(/@#{tag}/, doing('last').uncolor, "should have added @#{tag} to last entry")
+
+    # Test with a value
+    value = 'testvalue'
+    doing('now', subject)
+    doing('tag', '--value', value, tag)
+    assert_match(/@#{tag}\(#{value}\)/, doing('last').uncolor, "should have added @#{tag}(#{value}) to last entry")
+
+    # Test updating value
+    value = 'newvalue'
+    doing('tag', '--value', value, tag)
+    assert_match(/@#{tag}\(#{value}\)/, doing('last').uncolor, "should have updated @#{tag} value to #{value}")
   end
 
   def test_flag_entry
@@ -51,7 +64,7 @@ class DoingTagTest < Test::Unit::TestCase
 
   def test_tag_transform
     doing('now', 'testing @flubber @deploy @test-4')
-    result = doing('show', '-c 1').strip
+    result = doing('show', '-c', '1').strip
     assert_match(/@deploy-test\b/, result, 'should have added @deploy-test')
     assert_match(/@dev-test\b/, result, 'should have added @dev-test')
     assert_no_match(/@flubber/, result, '@flubber should have been replaced')
@@ -60,7 +73,7 @@ class DoingTagTest < Test::Unit::TestCase
 
   def test_tag_autotag
     doing('now', 'this should autotag brettterpstra.com')
-    result = doing('show', '-c 1').strip
+    result = doing('show', '-c', '1').strip
     assert_match(/@autotag\b/, result, 'should have added @autotag from whitelist')
     assert_match(/@bt\b/, result, 'should have added @bt from synonyms')
   end
@@ -118,7 +131,7 @@ class DoingTagTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
   end
 end
 

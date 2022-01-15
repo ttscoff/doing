@@ -5,12 +5,12 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.2pre
+v2.1.13
 
 === Global Options
 === --config_file arg
 
-Use a specific configuration file. Deprecated, set $DOING_CONFIG instead.
+Use a specific configuration file. Deprecated, set $DOING_CONFIG instead
 
 [Default Value] /Users/ttscoff/.config/doing/config.yml
 
@@ -90,14 +90,14 @@ Add a new section to the "doing" file
 ==== Command: <tt>again|resume </tt>
 Repeat last entry as new entry
 
-
+This command is designed to allow multiple time intervals to be created for an entry by duplicating it with a new start (and end, eventually) time
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags
+Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --case TYPE
@@ -139,9 +139,17 @@ Repeat last entry matching search. Surround with
 
 ===== --tag TAG
 
-Repeat last entry matching tags. Combine multiple tags with a comma.
+Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== -e|--editor
@@ -182,10 +190,10 @@ Archive entries older than date
 
 ===== --bool BOOLEAN
 
-Tag boolean (AND|OR|NOT)
+Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --case TYPE
@@ -220,9 +228,17 @@ Move entries to
 
 ===== --tag TAG
 
-Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
+Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== --[no-]label
@@ -250,7 +266,7 @@ Autotag last entry or filtered entries
 Boolean (AND|OR|NOT) with which to combine multiple tag filters
 
 [Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== -c|--count COUNT
@@ -303,14 +319,14 @@ Autotag last entry (or entries) not marked @done
 ==== Command: <tt>cancel  COUNT</tt>
 End last X entries with no time tracked
 
-Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doing finish --no-date`.
+Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doing finish --no-date`
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean (AND|OR|NOT) with which to combine multiple tag filters
+Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --case TYPE
@@ -337,9 +353,17 @@ Cancel the last X entries matching search filter, surround with slashes for rege
 
 ===== --tag TAG
 
-Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2)
+Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2). Wildcards allowed (*, ?)
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== -a|--archive
@@ -367,6 +391,10 @@ Force exact search string matching (case sensitive)
 
 
 
+==== Command: <tt>changelog|changes </tt>
+List recent changes in Doing
+
+Display a formatted list of changes in recent versions, latest at the top
 ==== Command: <tt>choose </tt>
 Select a section to display from a menu
 
@@ -378,7 +406,8 @@ List available color variables for configuration templates and views
 ==== Command: <tt>completion </tt>
 Generate shell completion scripts
 
-
+Generates the necessary scripts to add command line completion to various shells, so typing 'doing' and hitting
+tab will offer completions of subcommands and their options.
 ===== Options
 ===== -f|--file PATH
 
@@ -392,7 +421,7 @@ File to write output to
 Shell to generate for (bash, zsh, fish)
 
 [Default Value] zsh
-[Must Match] (?i-mx:^[bzf](?:[ai]?sh)?$)
+[Must Match] (?i-mx:^(?:[bzf](?:[ai]?sh)?|all)$)
 
 
 ==== Command: <tt>config </tt>
@@ -488,9 +517,11 @@ Update default config file, adding any missing keys
 
 [Default Command] edit
 ==== Command: <tt>done|did  ENTRY</tt>
-Add a completed item with @done(date). No argument finishes last entry.
+Add a completed item with @done(date). No argument finishes last entry
 
-
+Use this command to add an entry after you've already finished it. It will be immediately marked as @done.
+You can modify the start and end times of the entry using the --back, --took, and --at flags, making it an easy
+way to add entries in post and maintain accurate (albeit manual) time tracking.
 ===== Options
 ===== --at DATE_STRING
 
@@ -576,10 +607,10 @@ Backdate completed date to date string [4pm|20m|2h|yesterday noon]
 
 ===== --bool BOOLEAN
 
-Boolean (AND|OR|NOT) with which to combine multiple tag filters
+Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --case TYPE
@@ -614,9 +645,17 @@ Set the completed date to the start date plus XX[hmd]
 ===== --tag TAG
 
 Finish the last X entries containing TAG.
-  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== -a|--archive
@@ -666,20 +705,28 @@ Search for entries
 
 Search all sections (or limit to a single section) for entries matching text or regular expression. Normal strings are fuzzy matched.
 
-To search with regular expressions, single quote the string and surround with slashes: `doing search '/\bm.*?x\b/'`
+To search with regular expressions, single quote the string and surround with slashes: `doing search '/m.*?x/'`
 ===== Options
 ===== --after DATE_STRING
 
-Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day
 
 [Default Value] None
 
 
 ===== --before DATE_STRING
 
-Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day
 
 [Default Value] None
+
+
+===== --bool arg
+
+Combine multiple tags or value queries using AND, OR, or NOT
+
+[Default Value] AND
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --case TYPE
@@ -704,7 +751,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -724,8 +771,26 @@ Sort tags by (name|time)
 [Must Match] (?i-mx:^(?:name|time)$)
 
 
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
+
+
+===== -d|--delete
+Delete matching entries
+
+
+
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
+
+
+
+===== -e|--editor
+Edit matching entries with vim
 
 
 
@@ -868,14 +933,15 @@ Force exact search string matching (case sensitive)
 ==== Command: <tt>last </tt>
 Show the last entry, optionally edit
 
-
+Shows the last entry. Using --search and --tag filters, you can view/edit the last entry matching a filter,
+allowing `doing last` to target historical entries.
 ===== Options
 ===== --bool BOOLEAN
 
-Tag boolean
+Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --case TYPE
@@ -902,9 +968,22 @@ Search filter, surround with slashes for regex (/query/), start with single quot
 
 ===== --tag TAG
 
-Tag filter, combine multiple tags with a comma.
+Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?)
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
+
+
+===== -d|--delete
+Delete the last entry
+
 
 
 ===== --[no-]duration
@@ -958,10 +1037,10 @@ Mark last entry as flagged
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean (AND|OR|NOT) with which to combine multiple tag filters
+Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== -c|--count COUNT
@@ -997,9 +1076,17 @@ Flag the last entry matching search filter, surround with slashes for regex (e.g
 ===== --tag TAG
 
 Flag the last entry containing TAG.
-  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== -d|--date
@@ -1040,7 +1127,10 @@ Force exact search string matching (case sensitive)
 ==== Command: <tt>meanwhile  ENTRY</tt>
 Finish any running @meanwhile tasks and optionally create a new one
 
-
+The @meanwhile tag allows you to have long-running entries that encompass smaller entries.
+This command makes it easy to start and stop these overarching entries. Just run `doing meanwhile Starting work on this
+big project` to start a @meanwhile entry, add other entries as you work on the project, then use `doing meanwhile` by
+itself to mark the entry as @done.
 ===== Options
 ===== -b|--back DATE_STRING
 
@@ -1084,10 +1174,10 @@ If -r is provided with no other arguments, the last note is removed.
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean (AND|OR|NOT) with which to combine multiple tag filters
+Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --case TYPE
@@ -1114,9 +1204,17 @@ Add/remove note from last entry matching search filter, surround with slashes fo
 
 ===== --tag TAG
 
-Add/remove note from last entry matching tag
+Add/remove note from last entry matching tag. Wildcards allowed (*, ?)
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== -e|--editor
@@ -1193,7 +1291,7 @@ it will create a range.
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1231,7 +1329,8 @@ Show time totals at the end of output
 ==== Command: <tt>open </tt>
 Open the "doing" file in an editor
 
-`doing open` defaults to using the editor_app setting in /Users/ttscoff/.config/doing/config.yml (not set).
+`doing open` defaults to using the editors->doing_file setting
+in /Users/ttscoff/.config/doing/config.yml (TaskPaper).
 ===== Options
 ===== -a|--app APP_NAME
 
@@ -1316,17 +1415,19 @@ Show intervals with totals at the end of output
 
 
 
-==== Command: <tt>reset|begin </tt>
+==== Command: <tt>reset|begin  DATE_STRING</tt>
 Reset the start time of an entry
 
-
+Update the start time of the last entry or the last entry matching a tag/search filter.
+If no argument is provided, the start time will be reset to the current time.
+If a date string is provided as an argument, the start time will be set to the parsed result.
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean (AND|OR|NOT) with which to combine multiple tag filters
+Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --case TYPE
@@ -1353,9 +1454,17 @@ Reset last entry matching search filter, surround with slashes for regex (e.g. "
 
 ===== --tag TAG
 
-Reset last entry matching tag
+Reset last entry matching tag. Wildcards allowed (*, ?)
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== -i|--interactive
@@ -1381,7 +1490,9 @@ Force exact search string matching (case sensitive)
 ==== Command: <tt>rotate </tt>
 Move entries to archive file
 
-
+As your doing file grows, commands can get slow. Given that your historical data (and your archive section)
+probably aren't providing any useful insights a year later, use this command to "rotate" old entries out to an archive
+file. You'll still have access to all historical data, but it won't be slowing down daily operation.
 ===== Options
 ===== --before DATE_STRING
 
@@ -1393,10 +1504,10 @@ Rotate entries older than date
 
 ===== --bool BOOLEAN
 
-Tag boolean (AND|OR|NOT)
+Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --case TYPE
@@ -1431,9 +1542,17 @@ Search filter
 
 ===== --tag TAG
 
-Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
+Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== --not
@@ -1464,17 +1583,25 @@ List all entries and select with typeahead fuzzy matching.
 Multiple selections are allowed, hit tab to add the highlighted entry to the
 selection, and use ctrl-a to select all visible items. Return processes the
 selected entries.
+
+Search in the menu by typing:
+
+sbtrkt  fuzzy-match   Items that match s*b*t*r*k*t
+
+'wild   exact-match (quoted)  Items that include wild
+
+!fire   inverse-exact-match   Items that do not include fire
 ===== Options
 ===== --after DATE_STRING
 
-Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day
 
 [Default Value] None
 
 
 ===== --before DATE_STRING
 
-Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day
 
 [Default Value] None
 
@@ -1508,7 +1635,7 @@ Move selected items to section
 
 ===== -o|--output FORMAT
 
-Output entries to format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output entries to format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1539,6 +1666,14 @@ Save selected entries to file using --output format
 Tag selected entries
 
 [Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== -a|--archive
@@ -1577,12 +1712,12 @@ Add flag to selected item(s)
 
 
 ===== --force
-Perform action without confirmation.
+Perform action without confirmation
 
 
 
 ===== --[no-]menu
-Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.
+Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches
 
 
 
@@ -1605,7 +1740,11 @@ Force exact search string matching (case sensitive)
 List all entries
 
 The argument can be a section name, @tag(s) or both.
-  "pick" or "choose" as an argument will offer a section menu.
+  "pick" or "choose" as an argument will offer a section menu. Run with `--menu` to get a menu of available tags.
+
+  Show tags by passing @tagname arguments. Multiple tags can be combined, and you can specify the boolean used to
+  combine them with `--bool (AND|OR|NOT)`. You can also use @+tagname to require a tag to match, or @-tagname to ignore
+  entries containing tagname. +/- operators require `--bool PATTERN` (which is the default).
 ===== Options
 ===== -a|--age AGE
 
@@ -1616,22 +1755,22 @@ Age (oldest|newest)
 
 ===== --after DATE_STRING
 
-Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day
 
 [Default Value] None
 
 
 ===== -b|--bool BOOLEAN
 
-Tag boolean (AND,OR,NOT)
+Tag boolean (AND,OR,NOT). Use PATTERN to parse + and - as booleans
 
-[Default Value] OR
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --before DATE_STRING
 
-Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day
 
 [Default Value] None
 
@@ -1641,6 +1780,7 @@ Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all d
 Max count to show
 
 [Default Value] 0
+[Must Match] (?-mix:^\d+$)
 
 
 ===== --case TYPE
@@ -1665,7 +1805,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1687,7 +1827,7 @@ Search filter, surround with slashes for regex (/query/), start with single quot
 
 ===== --tag TAG
 
-Tag filter, combine multiple tags with a comma. Added for compatibility with other commands.
+Tag filter, combine multiple tags with a comma. Use `--tag pick` for a menu of available tags. Wildcards allowed (*, ?). Added for compatibility with other commands
 
 [Default Value] None
 
@@ -1708,6 +1848,14 @@ Sort tags by (name|time)
 [Must Match] (?i-mx:^(?:name|time))
 
 
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
+
+
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
 
@@ -1715,6 +1863,11 @@ Show elapsed time on entries without @done tag
 
 ===== -i|--interactive
 Select from a menu of matching entries to perform additional operations
+
+
+
+===== -m|--menu
+Select section or tag to display from a menu
 
 
 
@@ -1751,7 +1904,7 @@ and "2d" would be interpreted as "two days ago."
 ===== Options
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1805,10 +1958,10 @@ Add (or remove) tags from the last entry, or from multiple entries
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean (AND|OR|NOT) with which to combine multiple tag filters
+Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans
 
-[Default Value] AND
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== -c|--count COUNT
@@ -1851,9 +2004,24 @@ Tag entries matching search filter, surround with slashes for regex (e.g. "/quer
 ===== --tag TAG
 
 Tag the last X entries containing TAG.
-  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool
+  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).
 
 [Default Value] None
+
+
+===== -v|--value VALUE
+
+Include a value, e.g. @tag(value)
+
+[Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== -a|--autotag
@@ -1901,12 +2069,118 @@ Force exact search string matching (case sensitive)
 
 
 
+==== Command: <tt>tag_dir  TAG [TAG..]</tt>
+Set the default tags for the current directory
+
+Adds default_tags to a .doingrc file in the current directory. Any entry created in this directory or its
+subdirectories will be tagged with the default tags. You can modify these any time using the `config set` commnand or
+manually editing the .doingrc file.
+===== Options
+===== -r|--remove
+Remove all default_tags from the local .doingrc
+
+
+
+==== Command: <tt>tags </tt>
+List all tags in the current Doing file
+
+
+===== Options
+===== --bool BOOLEAN
+
+Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
+
+[Default Value] smart
+[Must Match] (?-mix:^[csi])
+
+
+===== -o|--order ORDER
+
+Sort order (asc/desc)
+
+[Default Value] asc
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
+
+
+===== -s|--section SECTION_NAME
+
+Section
+
+[Default Value] All
+
+
+===== --search QUERY
+
+Get tags for items matching search. Surround with
+  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("'query").
+
+[Default Value] None
+
+
+===== --sort SORT_ORDER
+
+Sort by name or count
+
+[Default Value] name
+[Must Match] (?-mix:^(?:n(?:ame)?|c(?:ount)?)$)
+
+
+===== --tag TAG
+
+Get tags for entries matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)
+
+[Default Value] None
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
+
+
+===== -c|--[no-]counts
+Show count of occurrences
+
+
+
+===== -i|--interactive
+Select items to scan from a menu of matching entries
+
+
+
+===== --not
+Get tags from items that *don't* match search/tag filters
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
+
+
+
 ==== Command: <tt>template  TYPE</tt>
 Output HTML, CSS, and Markdown (ERB) templates for customization
 
 Templates are printed to STDOUT for piping to a file.
   Save them and use them in the configuration file under export_templates.
 ===== Options
+===== -p|--path DIRECTORY
+
+Save template to alternate location
+
+[Default Value] /Users/ttscoff/.config/doing/templates
+
+
 ===== -c|--[no-]column
 List in single column for completion
 
@@ -1917,6 +2191,11 @@ List all available templates
 
 
 
+===== -s|--save
+Save template to file instead of STDOUT
+
+
+
 ==== Command: <tt>test </tt>
 Test Stuff
 
@@ -1924,7 +2203,8 @@ This command is coming from /Users/ttscoff/.config/doing/commands/test.rb
 ==== Command: <tt>today </tt>
 List entries from today
 
-
+List entries from the current day. Use --before, --after, and
+--from to specify time ranges.
 ===== Options
 ===== --after TIME_STRING
 
@@ -1949,7 +2229,7 @@ Time range to show `doing today --from "12pm to 4pm"`
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1984,10 +2264,13 @@ Show time totals at the end of output
 
 
 
-==== Command: <tt>undo </tt>
-Undo the last change to the Doing file
+==== Command: <tt>undo  COUNT</tt>
+Undo the last X changes to the Doing file
 
+Reverts the last X commands that altered the doing file.
+All changes performed by a single command are undone at once.
 
+Specify a number to jump back multiple revisions, or use --select for an interactive menu.
 ===== Options
 ===== -f|--file PATH
 
@@ -1996,29 +2279,54 @@ Specify alternate doing file
 [Default Value] None
 
 
-==== Command: <tt>view  VIEW_NAME</tt>
-Display a user-created view
+===== -p|--prune COUNT
 
-Command line options override view configuration
-===== Options
-===== --after DATE_STRING
-
-View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+Remove old backups, retaining X files
 
 [Default Value] None
 
 
+===== -i|--interactive
+Select from recent backups
+
+
+
+===== -r|--[no-]redo
+Redo last undo. Note: you cannot undo a redo
+
+
+
+==== Command: <tt>view  VIEW_NAME</tt>
+Display a user-created view
+
+Views are defined in your configuration (use `doing config` to edit).
+Command line options override view configuration.
+===== Options
+===== --after DATE_STRING
+
+View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day
+
+[Default Value] None
+
+
+===== --age AGE
+
+Age (oldest|newest)
+
+[Default Value] newest
+
+
 ===== -b|--bool BOOLEAN
 
-Tag boolean (AND,OR,NOT)
+Tag boolean (AND,OR,NOT). Use PATTERN to parse + and - as booleans
 
-[Default Value] OR
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Default Value] PATTERN
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --before DATE_STRING
 
-View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.
+View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day
 
 [Default Value] None
 
@@ -2053,7 +2361,7 @@ Date range to show, or a single day to filter date on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2074,7 +2382,7 @@ Search filter, surround with slashes for regex (/query/), start with single quot
 
 ===== --tag TAG
 
-Tag filter, combine multiple tags with a comma.
+Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?)
 
 [Default Value] None
 
@@ -2093,6 +2401,14 @@ Sort tags by (name|time)
 
 [Default Value] None
 [Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
 
 
 ===== --[no-]color
@@ -2162,7 +2478,7 @@ Include entries newer than date
 Tag boolean (AND,OR,NOT)
 
 [Default Value] OR
-[Must Match] (?i-mx:^(?:and|all|any|or|not|none)$)
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
 ===== --before DATE_STRING
@@ -2210,7 +2526,8 @@ Only show items with recorded time intervals
 ==== Command: <tt>yesterday </tt>
 List entries from yesterday
 
-
+Show only entries with start times within the previous 24 hour period. Use --before, --after, and --from to limit to
+time spans within the day.
 ===== Options
 ===== --after TIME_STRING
 
@@ -2235,7 +2552,7 @@ Time range to show, e.g. `doing yesterday --from "1am to 8am"`
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|doing|html|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 

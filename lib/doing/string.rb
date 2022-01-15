@@ -28,7 +28,9 @@ module Doing
     ##
     ## @return     [Regexp] Regex pattern
     ##
-    def to_rx(distance: 3, case_type: :smart)
+    def to_rx(distance: nil, case_type: nil)
+      distance ||= Doing.config.settings.dig('search', 'distance').to_i || 3
+      case_type ||= Doing.config.settings.dig('search', 'case')&.normalize_case || :smart
       case_sensitive = case case_type
                        when :smart
                          self =~ /[A-Z]/ ? true : false
@@ -44,7 +46,9 @@ module Doing
                 when /^'/
                   sub(/^'(.*?)'?$/, '\1')
                 else
-                  split(/ +/).map { |w| w.split('').join(".{0,#{distance}}") }.join('.*?')
+                  split(/ +/).map do |w|
+                    w.split('').join(".{0,#{distance}}").gsub(/\+/, '\+').wildcard_to_rx
+                  end.join('.*?')
                 end
       Regexp.new(pattern, !case_sensitive)
     end
@@ -72,7 +76,7 @@ module Doing
     end
 
     ## @param (see #highlight_tags)
-    def highlight_tags!(color = 'yellow')
+    def highlight_tags!(color = 'yellow', last_color: nil)
       replace highlight_tags(color)
     end
 
@@ -83,17 +87,18 @@ module Doing
     ##
     ## @return     [String] string with @tags highlighted
     ##
-    def highlight_tags(color = 'yellow')
-      escapes = scan(/(\e\[[\d;]+m)[^\e]+@/)
-      color = color.split(' ') unless color.is_a?(Array)
-      tag_color = ''
-      color.each { |c| tag_color += Doing::Color.send(c) }
-      last_color = if !escapes.empty?
-                     escapes[-1][0]
-                   else
-                     Doing::Color.default
-                   end
-      gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{Doing::Color.reset}#{last_color}")
+    def highlight_tags(color = 'yellow', last_color: nil)
+      unless last_color
+        escapes = scan(/(\e\[[\d;]+m)[^\e]+@/)
+        color = color.split(' ') unless color.is_a?(Array)
+        tag_color = color.each_with_object([]) { |c, arr| arr << Doing::Color.send(c) }.join('')
+        last_color = if !escapes.empty?
+                       (escapes.count > 1 ? escapes[-2..-1] : [escapes[-1]]).map { |v| v[0] }.join('')
+                     else
+                       Doing::Color.default
+                     end
+      end
+      gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{last_color}")
     end
 
     ##
@@ -162,23 +167,19 @@ module Doing
       replace uncolor
     end
 
-    ##
-    ## Wrap string at word breaks, respecting tags
-    ##
-    ## @param      len     [Integer] The length
-    ## @param      offset  [Integer] (Optional) The width to pad each subsequent line
-    ## @param      prefix  [String] (Optional) A prefix to add to each line
-    ##
-    def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', color: '', after: '', reset: '')
-      last_color = color.empty? ? '' : after.last_color
-      note_rx = /(?i-m)(%(?:[io]d|(?:\^[\s\S])?(?:(?:[ _t]|[^a-z0-9])?\d+)?(?:[\s\S][ _t]?)?)?note)/
-      # Don't break inside of tag values
+    def simple_wrap(width)
       str = gsub(/@\S+\(.*?\)/) { |tag| tag.gsub(/\s/, '%%%%') }
       words = str.split(/ /).map { |word| word.gsub(/%%%%/, ' ') }
       out = []
       line = []
+
       words.each do |word|
-        if line.join(' ').uncolor.length + word.uncolor.length + 1 > len
+        if word.uncolor.length >= width
+          chars = word.uncolor.split('')
+          out << chars.slice!(0, width - 1).join('') while chars.count >= width
+          line << chars.join('')
+          next
+        elsif line.join(' ').uncolor.length + word.uncolor.length + 1 > width
           out.push(line.join(' '))
           line.clear
         end
@@ -186,6 +187,19 @@ module Doing
         line << word.uncolor
       end
       out.push(line.join(' '))
+      out.join("\n")
+    end
+
+    ##
+    ## Wrap string at word breaks, respecting tags
+    ##
+    ## @param      len     [Integer] The length
+    ## @param      offset  [Integer] (Optional) The width to pad each subsequent line
+    ## @param      prefix  [String] (Optional) A prefix to add to each line
+    ##
+    def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', color: '', after: '', reset: '', pad_first: false)
+      last_color = color.empty? ? '' : after.last_color
+      note_rx = /(?mi)(?<!\\)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?note/
       note = ''
       after = after.dup if after.frozen?
       after.sub!(note_rx) do
@@ -193,11 +207,45 @@ module Doing
         ''
       end
 
-      out[0] = format("%-#{pad}s%s%s", out[0], last_color, after)
-
       left_pad = ' ' * offset
       left_pad += indent
-      out.map { |l| "#{left_pad}#{color}#{l}#{last_color}" }.join("\n").strip + last_color + " #{note}".chomp
+
+
+      # return "#{left_pad}#{prefix}#{color}#{self}#{last_color} #{note}" unless len.positive?
+
+      # Don't break inside of tag values
+      str = gsub(/@\S+\(.*?\)/) { |tag| tag.gsub(/\s/, '%%%%') }.gsub(/\n/, ' ')
+
+      words = str.split(/ /).map { |word| word.gsub(/%%%%/, ' ') }
+      out = []
+      line = []
+
+      words.each do |word|
+        if word.uncolor.length >= len
+          chars = word.uncolor.split('')
+          out << chars.slice!(0, len - 1).join('') while chars.count >= len
+          line << chars.join('')
+          next
+        elsif line.join(' ').uncolor.length + word.uncolor.length + 1 > len
+          out.push(line.join(' '))
+          line.clear
+        end
+
+        line << word.uncolor
+      end
+      out.push(line.join(' '))
+
+      last_color = ''
+      out[0] = format("%-#{pad}s%s%s", out[0], last_color, after)
+
+      out.map.with_index { |l, idx|
+        if !pad_first && idx == 0
+          "#{color}#{prefix}#{l}#{last_color}"
+        else
+          "#{left_pad}#{color}#{prefix}#{l}#{last_color}"
+        end
+      }.join("\n") + " #{note}".chomp
+      # res.join("\n").strip + last_color + " #{note}".chomp
     end
 
     def wrap2(len, indent: '', color: nil)
@@ -237,6 +285,30 @@ module Doing
       end
     end
 
+    def pluralize(number)
+      number == 1 ? self : "#{self}s"
+    end
+
+    ##
+    ## Convert an age string to a qualified type
+    ##
+    ## @return     [Symbol] :oldest or :newest
+    ##
+    def normalize_age!(default = :newest)
+      replace normalize_age(default)
+    end
+
+    def normalize_age(default = :newest)
+      case self
+      when /^o/i
+        :oldest
+      when /^n/i
+        :newest
+      else
+        default
+      end
+    end
+
     ##
     ## Convert a sort order string to a qualified type
     ##
@@ -268,7 +340,7 @@ module Doing
 
     def normalize_case(default = :smart)
       case self
-      when /^c/i
+      when /^(c|sens)/i
         :sensitive
       when /^i/i
         :ignore
@@ -296,8 +368,32 @@ module Doing
         :or
       when /(not|none)/i
         :not
+      when /^p/i
+        :pattern
       else
         default.is_a?(Symbol) ? default : default.normalize_bool
+      end
+    end
+
+    ##
+    ## Convert a matching configuration string to a symbol
+    ##
+    ## @return     Symbol :fuzzy, :pattern, :exact
+    ##
+    def normalize_matching!(default = :pattern)
+      replace normalize_bool(default)
+    end
+
+    def normalize_matching(default = :pattern)
+      case self
+      when /^f/i
+        :fuzzy
+      when /^p/i
+        :pattern
+      when /^e/i
+        :exact
+      else
+        default.is_a?(Symbol) ? default : default.normalize_matching
       end
     end
 
@@ -309,8 +405,16 @@ module Doing
       gsub(/\((?!\?:)/, '(?:').downcase
     end
 
+    def wildcard_to_rx
+      gsub(/\?/, '\S').gsub(/\*/, '\S*?')
+    end
+
+    def add_at
+      strip.sub(/^([+-]*)@/, '\1')
+    end
+
     def to_tags
-      gsub(/ *, */, ' ').gsub(/ +/, ' ').split(/ /).sort.uniq.map { |t| t.strip.sub(/^@/, '') }
+      gsub(/ *, */, ' ').gsub(/ +/, ' ').split(/ /).sort.uniq.map(&:add_at)
     end
 
     def add_tags!(tags, remove: false)
@@ -530,7 +634,7 @@ module Doing
         end
       else
         case self
-        when / *, */
+        when /(^\[.*?\]$| *, *)/
           gsub(/^\[ *| *\]$/, '').split(/ *, */)
         when /^[0-9]+$/
           to_i

@@ -20,6 +20,7 @@ class DoingConfigTest < Test::Unit::TestCase
     @wwid_file = File.join(@basedir, 'wwid.md')
     @temp_config = File.join(@basedir, 'temp.doingrc')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
+    @backup_dir = File.join(@basedir, 'doing_backup')
     @bad_config = File.join(File.dirname(__FILE__), 'bad.doingrc')
   end
 
@@ -32,11 +33,11 @@ class DoingConfigTest < Test::Unit::TestCase
     assert_match(/Config file written to .*?#{File.basename(@temp_config)}/, res, 'Missing config file should have been written')
   end
 
-  def test_bad_config
-    res = doing_with_env({'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @bad_config}, '--stdout', 'config', '-d', 'doing_file')
-    assert_match(/Error reading default configuration/, res, 'Non-YAML file should log an error')
-    assert_match(/what_was_i_doing.md/, res, 'Default config should have been loaded')
-  end
+  # def test_bad_config
+  #   res = doing_with_env({'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @bad_config}, '--stdout', 'config', '-d', 'doing_file')
+  #   assert_match(/Error reading default configuration/, res, 'Non-YAML file should log an error')
+  #   assert_match(/what_was_i_doing.md/, res, 'Default config should have been loaded')
+  # end
 
   def test_user_config
     user_config = YAML.load(IO.read(@config_file))
@@ -56,7 +57,7 @@ class DoingConfigTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
   end
 end
 

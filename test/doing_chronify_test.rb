@@ -15,6 +15,7 @@ class DoingChronifyTest < Test::Unit::TestCase
     @tmpdirs = []
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
+    @backup_dir = File.join(@basedir, 'doing_backup')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
   end
 
@@ -35,7 +36,7 @@ class DoingChronifyTest < Test::Unit::TestCase
   end
 
   def test_back_strftime
-    ts = '2016-03-15 15:32:04 EST'
+    ts = '2016-03-15 15:32:04'
     doing('now', '--back', ts, 'test strftime format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
@@ -65,6 +66,6 @@ class DoingChronifyTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
   end
 end

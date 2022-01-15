@@ -19,6 +19,7 @@ class DoingOutputTest < Test::Unit::TestCase
     @result = ''
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
+    @backup_dir = File.join(@basedir, 'doing_backup')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
     @config = YAML.load(IO.read(@config_file))
@@ -49,9 +50,9 @@ class DoingOutputTest < Test::Unit::TestCase
 
   def test_csv_output
     doing('import', '--type', 'timing', @import_file)
-    result = doing('show', '-c', '10', '-o', 'csv')
-    md_rx = /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s-\d{4},.*?,.*?,\d+,[^,]+$/
-    assert_equal(10, result.scan(md_rx).count, 'There should be 10 CSV-formatted entries shown')
+    result = doing('show', '-c', '9', '-o', 'csv')
+    md_rx = /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s[+-]\d{4},.*?,.*?,\d+,[^,]+$/
+    assert_equal(9, result.scan(md_rx).count, 'There should be 9 CSV-formatted entries shown')
   end
 
   def test_html_output
@@ -141,7 +142,7 @@ class DoingOutputTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
   end
 end
 

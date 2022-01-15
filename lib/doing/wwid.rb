@@ -114,6 +114,8 @@ module Doing
       filename = @doing_file if filename.nil?
       return if File.exist?(filename) && File.stat(filename).size.positive?
 
+      FileUtils.mkdir_p(File.dirname(filename)) unless File.directory?(File.dirname(filename))
+
       File.open(filename, 'w+') do |f|
         f.puts "#{@config['current_section']}:"
       end
@@ -183,7 +185,25 @@ module Doing
 
       date = nil
       iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
-      done_rx = /(?<=^| )@(?<tag>done|finished|completed?)\((?<date>.*?)\)/i
+      watch_tags = [
+        'start(?:ed)?',
+        'beg[ia]n',
+        'done',
+        'finished',
+        'completed?',
+        'waiting',
+        'defer(?:red)?'
+      ]
+      if @config['date_tags']
+        date_tags = @config['date_tags']
+        date_tags = date_tags.split(/ *, */) if date_tags.is_a?(String)
+        date_tags.map! do |tag|
+          tag.sub(/^@/, '').gsub(/\((?!\?:)(.*?)\)/, '(?:\1)').strip
+        end
+        watch_tags.concat(date_tags).uniq!
+      end
+
+      done_rx = /(?<=^| )@(?<tag>#{watch_tags.join('|')})\((?<date>.*?)\)/i
       date_rx = /^(?:\s*- )?(?<date>.*?) \| (?=\S)/
 
       title.gsub!(done_rx) do
@@ -244,7 +264,7 @@ module Doing
       return frag.cap_first if @content.section?(frag)
 
       section = nil
-      re = frag.split('').join('.*?')
+      re = frag.to_rx(distance: 2, case_type: :ignore)
       sections.each do |sect|
         next unless sect =~ /#{re}/i
 
@@ -286,7 +306,7 @@ module Doing
     def guess_view(frag, guessed: false, suggest: false)
       views.each { |view| return view if frag.downcase == view.downcase }
       view = false
-      re = frag.split('').join('.*?')
+      re = frag.to_rx(distance: 2, case_type: :ignore)
       views.each do |v|
         next unless v =~ /#{re}/i
 
@@ -320,7 +340,8 @@ module Doing
     ## @option opt :back [Date] backdate
     ## @option opt :timed [Boolean] new item is timed entry, marks previous entry as @done
     ##
-    def add_item(title, section = nil, opt = {})
+    def add_item(title, section = nil, opt)
+      opt ||= {}
       section ||= @config['current_section']
       @content.add_section(section, log: false)
       opt[:back] ||= opt[:date] ? opt[:date] : Time.now
@@ -353,16 +374,23 @@ module Doing
         end
       end
 
+      Hooks.trigger :pre_entry_add, self, entry
+
       @content.push(entry)
       # logger.count(:added, level: :debug)
       logger.info('New entry:', %(added "#{entry.title}" to #{section}))
+
+      Hooks.trigger :post_entry_added, self, entry.dup
     end
 
     ##
-    ## Remove items from a list that already exist in @content
+    ## Remove items from an array that already exist in
+    ## @content based on start and end times
     ##
-    ## @param      items       [Array] The items to deduplicate
-    ## @param      no_overlap  [Boolean] Remove items with overlapping time spans
+    ## @param      items       [Array] The items to
+    ##                         deduplicate
+    ## @param      no_overlap  [Boolean] Remove items with
+    ##                         overlapping time spans
     ##
     def dedup(items, no_overlap: false)
       items.delete_if do |item|
@@ -383,7 +411,8 @@ module Doing
     ## @param      paths  [String] Path to JSON report file
     ## @param      opt    [Hash] Additional Options
     ##
-    def import(paths, opt = {})
+    def import(paths, opt)
+      opt ||= {}
       Plugins.plugins[:import].each do |_, options|
         next unless opt[:type] =~ /^(#{options[:trigger].normalize_trigger})$/i
 
@@ -423,8 +452,9 @@ module Doing
     # @param      item    [Item] the item to reset/resume
     # @param      resume  [Boolean] removing @done tag if true
     #
-    def reset_item(item, resume: false)
-      item.date = Time.now
+    def reset_item(item, date: nil, resume: false)
+      date ||= Time.now
+      item.date = date
       item.tag('done', remove: true) if resume
       logger.info('Reset:', %(Reset #{resume ? 'and resumed ' : ''} "#{item.title}" in #{item.section}))
       item
@@ -442,13 +472,15 @@ module Doing
     #
     # @return     nothing
     #
-    def repeat_item(item, opt = {})
+    def repeat_item(item, opt)
+      opt ||= {}
       if item.should_finish?
         if item.should_time?
           item.title.tag!('done', value: Time.now.strftime('%F %R'))
         else
           item.title.tag!('done')
         end
+        Hooks.trigger :post_entry_updated, self, item
       end
 
       # Remove @done tag
@@ -482,7 +514,8 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def repeat_last(opt = {})
+    def repeat_last(opt)
+      opt ||= {}
       opt[:section] ||= 'all'
       opt[:section] = guess_section(opt[:section])
       opt[:note] ||= []
@@ -504,7 +537,8 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def last_entry(opt = {})
+    def last_entry(opt)
+      opt ||= {}
       opt[:tag_bool] ||= :and
       opt[:section] ||= @config['current_section']
 
@@ -528,10 +562,25 @@ module Doing
       last_entry
     end
 
-    def all_tags(items, opt: {})
-      all_tags = []
-      items.each { |item| all_tags.concat(item.tags).uniq! }
-      all_tags.sort
+    def all_tags(items, opt: {}, counts: false)
+      if counts
+        all_tags = {}
+        items.each do |item|
+          item.tags.each do |tag|
+            if all_tags.key?(tag.downcase)
+              all_tags[tag.downcase] += 1
+            else
+              all_tags[tag.downcase] = 1
+            end
+          end
+        end
+
+        all_tags.sort_by { |tag, count| count }
+      else
+        all_tags = []
+        items.each { |item| all_tags.concat(item.tags.map(&:downcase)).uniq! }
+        all_tags.sort
+      end
     end
 
     def tag_groups(items, opt: {})
@@ -581,19 +630,20 @@ module Doing
     ## @param      items  [Array] The items to filter (if empty, filters all items)
     ## @param      opt    [Hash] The filter parameters
     ##
-    ## @option opt [String] :section
-    ## @option opt [Boolean] :unfinished
-    ## @option opt [Array or String] :tag  (Array or comma-separated string)
-    ## @option opt [Symbol] :tag_bool  (:and, :or, :not)
-    ## @option opt [String] :search  (string, optional regex with //)
-    ## @option opt [Array] :date_filter  [[Time]start, [Time]end]
-    ## @option opt [Boolean] :only_timed
-    ## @option opt [String] :before  (Date/Time string, unparsed)
-    ## @option opt [String] :after  (Date/Time string, unparsed)
-    ## @option opt [Boolean] :today
-    ## @option opt [Boolean] :yesterday
-    ## @option opt [Number] :count  (Number to return)
-    ## @option opt [String] :age  ('old' or 'new')
+    ## @option opt [String] :section ('all')
+    ## @option opt [Boolean] :unfinished (false)
+    ## @option opt [Array or String] :tag ([]) Array or comma-separated string
+    ## @option opt [Symbol] :tag_bool (:and) :and, :or, :not
+    ## @option opt [String] :search ('') string, optional regex with `/string/`
+    ## @option opt [Array] :date_filter (nil) [[Time]start, [Time]end]
+    ## @option opt [Boolean] :only_timed (false)
+    ## @option opt [String] :before (nil) Date/Time string, unparsed
+    ## @option opt [String] :after  (nil) Date/Time string, unparsed
+    ## @option opt [Boolean] :today (false) limit to entries from today
+    ## @option opt [Boolean] :yesterday (false) limit to entries from yesterday
+    ## @option opt [Number] :count (0) max entries to return
+    ## @option opt [String] :age (new) 'old' or 'new'
+    ## @option opt [Array] :val (nil) Array of tag value queries
     ##
     def filter_items(items = Items.new, opt: {})
       time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
@@ -655,7 +705,18 @@ module Doing
           keep = false if finished
         end
 
+        if keep && opt[:val]&.count&.positive?
+          bool = opt[:bool].normalize_bool if opt[:bool]
+          bool ||= :and
+          bool = :and if bool == :pattern
+
+          val_match = opt[:val].nil? || opt[:val].empty? ? true : item.tag_values?(opt[:val], bool)
+          keep = false unless val_match
+          keep = opt[:not] ? !keep : keep
+        end
+
         if keep && opt[:tag]
+          opt[:tag_bool] = opt[:bool].normalize_bool if opt[:bool]
           opt[:tag_bool] ||= :and
           tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
           keep = false unless tag_match
@@ -666,7 +727,7 @@ module Doing
           search_match = if opt[:search].nil? || opt[:search].empty?
                            true
                          else
-                           item.search(opt[:search], case_type: opt[:case].normalize_case, fuzzy: opt[:fuzzy])
+                           item.search(opt[:search], case_type: opt[:case].normalize_case)
                          end
 
           keep = false unless search_match
@@ -708,7 +769,7 @@ module Doing
 
         keep = false if keep && opt[:only_timed] && !item.interval
 
-        if keep && opt[:tag_filter] && !opt[:tag_filter]['tags'].empty?
+        if keep && opt[:tag_filter]
           keep = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
           keep = opt[:not] ? !keep : keep
         end
@@ -745,17 +806,76 @@ module Doing
 
         keep
       end
-      count = opt[:count]&.positive? ? opt[:count] : filtered_items.length
+      count = opt[:count].to_i&.positive? ? opt[:count].to_i : filtered_items.count
 
       output = Items.new
 
-      if opt[:age] =~ /^o/i
+      if opt[:age] && opt[:age].normalize_age == :oldest
         output.concat(filtered_items.slice(0, count).reverse)
       else
         output.concat(filtered_items.reverse.slice(0, count))
       end
 
       output
+    end
+
+    def delete_items(items, force: false)
+      res = force ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
+      if res
+        items.each do |i|
+          deleted = @content.delete_item(i, single: items.count == 1)
+          Hooks.trigger :post_entry_removed, self, deleted
+        end
+        write(@doing_file)
+      end
+    end
+
+    def edit_items(items)
+      editable_items = []
+
+      items.each do |i|
+        editable = "#{i.date.strftime('%F %R')} | #{i.title}"
+        old_note = i.note ? i.note.strip_lines.join("\n") : nil
+        editable += "\n#{old_note}" unless old_note.nil?
+        editable_items << editable
+      end
+      divider = "\n-----------\n"
+      notice =<<~EONOTICE
+      # - You may delete entries, but leave all divider lines (---) in place.
+      # - Start and @done dates replaced with a time string (yesterday 3pm) will
+      #   be parsed automatically. Do not delete the pipe (|) between start date
+      #   and entry title.
+      EONOTICE
+      input =  "#{editable_items.map(&:strip).join(divider)}\n\n#{notice}"
+
+      new_items = fork_editor(input).split(/#{divider}/)
+
+      new_items.each_with_index do |new_item, i|
+        input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
+        first_line = input_lines[0]&.strip
+
+        if first_line.nil? || first_line =~ /^#{divider.strip}$/ || first_line.strip.empty?
+          deleted = @content.delete_item(items[i], single: new_items.count == 1)
+          Hooks.trigger :post_entry_removed, self, deleted
+          Doing.logger.count(:deleted)
+        else
+          date, title, note = format_input(new_item)
+
+          note.map!(&:strip)
+          note.delete_if(&:ignore?)
+          item = items[i]
+          old_item = item.dup
+          item.date = date || items[i].date
+          item.title = title
+          item.note = note
+          if (item.equal?(old_item))
+            Doing.logger.count(:skipped, level: :debug)
+          else
+            Doing.logger.count(:updated)
+            Hooks.trigger :post_entry_updated, self, item
+          end
+        end
+      end
     end
 
     ##
@@ -765,7 +885,8 @@ module Doing
     ##
     ## Options hash is shared with #filter_items and #act_on
     ##
-    def interactive(opt = {})
+    def interactive(opt)
+      opt ||= {}
       opt[:section] = opt[:section] ? guess_section(opt[:section]) : 'All'
 
       search = nil
@@ -776,16 +897,20 @@ module Doing
         opt[:search] = search
       end
 
-      opt[:query] = opt[:search] if opt[:search] && !opt[:query]
-      opt[:query] = "!#{opt[:query]}" if opt[:not]
+      # opt[:query] = opt[:search] if opt[:search] && !opt[:query]
+      opt[:query] = "!#{opt[:query]}" if opt[:query] && opt[:not]
       opt[:multiple] = true
       opt[:show_if_single] = true
-      filter_options = %i[after before case date_filter from fuzzy not search section].each_with_object({}) {
+      filter_options = %i[after before case date_filter from fuzzy not search section val].each_with_object({}) {
         |k, hsh| hsh[k] = opt[k]
       }
       items = filter_items(Items.new, opt: filter_options)
 
-      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **opt)
+      menu_options = %i[search query exact multiple show_if_single menu sort case].each_with_object({}) {
+        |k, hsh| hsh[k] = opt[k]
+      }
+
+      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **menu_options)
 
       raise NoResults, 'no items selected' if selection.nil? || selection.empty?
 
@@ -813,7 +938,8 @@ module Doing
     ## @option opt [Boolean] :again
     ## @option opt [Boolean] :resume
     ##
-    def act_on(items, opt = {})
+    def act_on(items, opt)
+      opt ||= {}
       actions = %i[editor delete tag flag finish cancel archive output save_to again resume]
       has_action = false
       single = items.count == 1
@@ -912,14 +1038,23 @@ module Doing
 
         item = items[0]
         if opt[:resume] && !opt[:reset]
-          repeat_item(item, { editor: opt[:editor] })
+          repeat_item(item, { editor: opt[:editor] }) # hooked
         elsif opt[:reset]
+          res = Prompt.enter_text('Start date (blank for current time)', default_response: '')
+          if res =~ /^ *$/
+            date = Time.now
+          else
+            date = res.chronify(guess: :begin)
+          end
+
           res = if item.tags?('done', :and) && !opt[:resume]
                   opt[:force] ? true : Prompt.yn('Remove @done tag?', default_response: 'y')
                 else
                   opt[:resume]
                 end
-          @content.update_item(item, reset_item(item, resume: res))
+          new_entry = reset_item(item, date: date, resume: res)
+          @content.update_item(item, new_entry)
+          Hooks.trigger :post_entry_updated, self, new_entry
         end
         write(@doing_file)
 
@@ -927,11 +1062,7 @@ module Doing
       end
 
       if opt[:delete]
-        res = opt[:force] ? true : Prompt.yn("Delete #{items.size} items?", default_response: 'y')
-        if res
-          items.each { |i| @content.delete_item(i, single: items.count == 1) }
-          write(@doing_file)
-        end
+        delete_items(items, force: opt[:force]) # hooked
         return
       end
 
@@ -939,6 +1070,7 @@ module Doing
         tag = @config['marker_tag'] || 'flagged'
         items.map! do |i|
           i.tag(tag, date: false, remove: opt[:remove], single: single)
+          Hooks.trigger :post_entry_updated, self, i
         end
       end
 
@@ -948,6 +1080,7 @@ module Doing
           if i.should_finish?
             should_date = !opt[:cancel] && i.should_time?
             i.tag(tag, date: should_date, remove: opt[:remove], single: single)
+            Hooks.trigger :post_entry_updated, self, i
           end
         end
       end
@@ -956,61 +1089,22 @@ module Doing
         tag = opt[:tag]
         items.map! do |i|
           i.tag(tag, date: false, remove: opt[:remove], single: single)
+          Hooks.trigger :post_entry_updated, self, i
         end
       end
 
       if opt[:archive] || opt[:move]
         section = opt[:archive] ? 'Archive' : guess_section(opt[:move])
-        items.map! { |i| i.move_to(section, label: true) }
+        items.map! do |i|
+          i.move_to(section, label: true)
+          Hooks.trigger :post_entry_updated, self, i
+        end
       end
 
       write(@doing_file)
 
       if opt[:editor]
-
-        editable_items = []
-
-        items.each do |i|
-          editable = "#{i.date.strftime('%F %R')} | #{i.title}"
-          old_note = i.note ? i.note.strip_lines.join("\n") : nil
-          editable += "\n#{old_note}" unless old_note.nil?
-          editable_items << editable
-        end
-        divider = "\n-----------\n"
-        notice =<<~EONOTICE
-        # - You may delete entries, but leave all divider lines (---) in place.
-        # - Start and @done dates replaced with a time string (yesterday 3pm) will
-        #   be parsed automatically. Do not delete the pipe (|) between start date
-        #   and entry title.
-        EONOTICE
-        input =  "#{editable_items.map(&:strip).join(divider)}\n\n#{notice}"
-
-        new_items = fork_editor(input).split(/#{divider}/)
-
-        new_items.each_with_index do |new_item, i|
-          input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
-          first_line = input_lines[0]&.strip
-
-          if first_line.nil? || first_line =~ /^#{divider.strip}$/ || first_line.strip.empty?
-            @content.delete_item(items[i], single: new_items.count == 1)
-            Doing.logger.count(:deleted)
-          else
-            date, title, note = format_input(new_item)
-
-            note.map!(&:strip)
-            note.delete_if(&:ignore?)
-            item = items[i]
-            old_item = item.dup
-            item.date = date || items[i].date
-            item.title = title
-            item.note = note
-            if (item.equal?(old_item))
-              Doing.logger.count(:skipped, level: :debug)
-            else
-              Doing.logger.count(:updated)
-            end
-          end
-        end
+        edit_items(items) # hooked
 
         write(@doing_file)
       end
@@ -1035,7 +1129,7 @@ module Doing
         options[:template] = opt[:template] || nil
       end
 
-      output = list_section(options)
+      output = list_section(options) # hooked
 
       if opt[:save_to]
         file = File.expand_path(opt[:save_to])
@@ -1063,7 +1157,8 @@ module Doing
     ##
     ## @see        #filter_items
     ##
-    def tag_last(opt = {})
+    def tag_last(opt) # hooked
+      opt ||= {}
       opt[:count] ||= 1
       opt[:archive] ||= false
       opt[:tags] ||= ['done']
@@ -1140,14 +1235,17 @@ module Doing
             end
 
             tag = tag.strip
-            if opt[:remove] || opt[:rename]
+            if opt[:remove] || opt[:rename] || opt[:value]
               rename_to = nil
-              if opt[:rename]
+              if opt[:value]
+                rename_to = tag
+              elsif opt[:rename]
                 rename_to = tag
                 tag = opt[:rename]
               end
               old_title = item.title.dup
-              item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex])
+              force = opt[:value].nil? ? false : true
+              item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex], value: opt[:value], force: force)
               if old_title != item.title
                 removed << tag
                 added << rename_to if rename_to
@@ -1173,6 +1271,8 @@ module Doing
         elsif opt[:archive] && opt[:count].zero?
           logger.warn('Skipped:', 'Archiving is skipped when operating on all entries')
         end
+
+        Hooks.trigger :post_entry_updated, self, item
       end
 
       write(@doing_file)
@@ -1187,7 +1287,8 @@ module Doing
     ##
     ## @return     [Item] the next chronological item in the index
     ##
-    def next_item(item, options = {})
+    def next_item(item, options)
+      options ||= {}
       items = filter_items(Items.new, opt: options)
 
       idx = items.index(item)
@@ -1225,6 +1326,7 @@ module Doing
         item.title = title
         item.note.add(note, replace: true)
         logger.info('Edited:', item.title)
+        Hooks.trigger :post_entry_updated, self, item.dup
 
         write(@doing_file)
       end
@@ -1245,7 +1347,8 @@ module Doing
     ## @option opt :back [Date] backdate new item
     ## @option opt :new_item [String] content to use for new item
     ## @option opt :note [Array] note content for new item
-    def stop_start(target_tag, opt = {})
+    def stop_start(target_tag, opt)
+      opt ||= {}
       tag = target_tag.dup
       opt[:section] ||= @config['current_section']
       opt[:archive] ||= false
@@ -1278,7 +1381,9 @@ module Doing
           logger.count(:completed)
           logger.info('Completed:', item.title)
         end
+        Hooks.trigger :post_entry_updated, self, item
       end
+
 
       logger.debug('Skipped:', "No active @#{tag} tasks found.") if found_items.zero?
 
@@ -1310,23 +1415,10 @@ module Doing
     end
 
     ##
-    ## Restore a backed up version of a file
-    ##
-    ## @param      file  [String] The filepath to restore
-    ##
-    def restore_backup(file)
-      if File.exist?("#{file}~")
-        FileUtils.cp("#{file}~", file)
-        logger.warn('File update:', "Restored #{file.sub(/^#{Util.user_home}/, '~')}")
-      else
-        logger.error('Restore error:', 'No backup file found')
-      end
-    end
-
-    ##
     ## Rename doing file with date and start fresh one
     ##
-    def rotate(opt = {})
+    def rotate(opt)
+      opt ||= {}
       keep = opt[:keep] || 0
       tags = []
       tags.concat(opt[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if opt[:tag]
@@ -1341,7 +1433,7 @@ module Doing
       counter = 0
       new_content = Items.new
 
-      @content.each do |item|
+      section_items.each do |item|
         break if counter >= max
         if opt[:before]
           time_string = opt[:before]
@@ -1350,6 +1442,7 @@ module Doing
 
         unless ((!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s)) || (opt[:before] && item.date >= cutoff))
           new_item = @content.delete(item)
+          Hooks.trigger :post_entry_removed, self, item.dup
           raise DoingRuntimeError, "Error deleting item: #{item}" if new_item.nil?
 
           new_content.add_section(new_item.section, log: false)
@@ -1387,8 +1480,35 @@ module Doing
     ##
     ## @return     [String] The selected section name
     ##
-    def choose_section
-      choice = Prompt.choose_from(@content.section_titles.sort, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
+    def choose_section(include_all: false)
+      options = @content.section_titles.sort
+      options.unshift('All') if include_all
+      choice = Prompt.choose_from(options, prompt: 'Choose a section > ', fzf_args: ['--height=60%'])
+      choice ? choice.strip : choice
+    end
+
+    ##
+    ## Generate a menu of tags and allow user selection
+    ##
+    ## @return     [String] The selected tag name
+    ##
+    def choose_tag(section = 'All', items: nil, include_all: false)
+      items ||= @content.in_section(section)
+      tags = all_tags(items, counts: true).map { |t, c| "@#{t} (#{c})" }
+      tags.unshift('No tag filter') if include_all
+      choice = Prompt.choose_from(tags, sorted: false, multiple: true, prompt: 'Choose tag(s) > ', fzf_args: ['--height=60%'])
+      choice ? choice.split(/\n/).map { |t| t.strip.sub(/ \(.*?\)$/, '')}.join(' ') : choice
+    end
+
+    ##
+    ## Generate a menu of sections and tags and allow user selection
+    ##
+    ## @return     [String] The selected section or tag name
+    ##
+    def choose_section_tag
+      options = @content.section_titles.sort
+      options.concat(@content.all_tags.sort.map { |t| "@#{t}" })
+      choice = Prompt.choose_from(options, prompt: 'Choose a section or tag > ', fzf_args: ['--height=60%'])
       choice ? choice.strip : choice
     end
 
@@ -1427,21 +1547,30 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def list_section(opt = {})
+    def list_section(opt, items: Items.new)
       opt[:config_template] ||= 'default'
-      cfg = @config.dig('templates',
-                        opt[:config_template]).deep_merge({
-                                                            'wrap_width' => @config['wrap_width'] || 0,
-                                                            'date_format' => @config['default_date_format'],
-                                                            'order' => @config['order'] || 'asc',
-                                                            'tags_color' => @config['tags_color'],
-                                                            'duration' => @config['duration'],
-                                                            'interval_format' => @config['interval_format']
-                                                          })
+
+      tpl_cfg = @config.dig('templates', opt[:config_template])
+
+      cfg = if opt[:view_template]
+              @config.dig('views', opt[:view_template]).deep_merge(tpl_cfg, { extend_existing_arrays: true, sort_merged_arrays: true })
+            else
+              tpl_cfg
+            end
+
+      cfg.deep_merge({
+                       'wrap_width' => @config['wrap_width'] || 0,
+                       'date_format' => @config['default_date_format'],
+                       'order' => @config['order'] || 'asc',
+                       'tags_color' => @config['tags_color'],
+                       'duration' => @config['duration'],
+                       'interval_format' => @config['interval_format']
+                     }, { extend_existing_arrays: true, sort_merged_arrays: true })
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
       opt[:count] ||= 0
-      opt[:age] ||= 'newest'
+      opt[:age] ||= :newest
+      opt[:age] = opt[:age].normalize_age
       opt[:format] ||= cfg['date_format']
       opt[:order] ||= cfg['order'] || 'asc'
       opt[:tag_order] ||= 'asc'
@@ -1468,11 +1597,17 @@ module Doing
                 end
       end
 
-      items = filter_items(Items.new, opt: opt).reverse
+      items = filter_items(items, opt: opt)
 
-      items.reverse! if opt[:order] =~ /^d/i
+      items.reverse! unless opt[:order] =~ /^d/i
 
-      if opt[:interactive]
+      if opt[:delete]
+        delete_items(items, force: opt[:force])
+        return
+      elsif opt[:editor]
+        edit_items(items)
+        return
+      elsif opt[:interactive]
         opt[:menu] = !opt[:force]
         opt[:query] = '' # opt[:search]
         opt[:multiple] = true
@@ -1496,7 +1631,8 @@ module Doing
     ## @param      section      [String] The source section
     ## @param      options      [Hash] Options
     ##
-    def archive(section = @config['current_section'], options = {})
+    def archive(section = @config['current_section'], options)
+      options ||= {}
       count       = options[:keep] || 0
       destination = options[:destination] || 'Archive'
       tags        = options[:tags] || []
@@ -1526,18 +1662,19 @@ module Doing
     ## @param      output  [String] output format
     ## @param      opt     [Hash] Options
     ##
-    def today(times = true, output = nil, opt = {})
+    def today(times = true, output = nil, opt)
+      opt ||= {}
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates']['today'].deep_merge(@config['templates']['default']).deep_merge({
+      cfg = @config['templates']['today'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
-      })
+      }, { extend_existing_arrays: true, sort_merged_arrays: true })
 
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
@@ -1574,7 +1711,8 @@ module Doing
     ## @param      output   [String] Output format
     ## @param      opt      [Hash] Additional Options
     ##
-    def list_date(dates, section, times = nil, output = nil, opt = {})
+    def list_date(dates, section, times = nil, output = nil, opt)
+      opt ||= {}
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
       section = guess_section(section)
@@ -1603,7 +1741,8 @@ module Doing
     ## @param      output   [String] Output format
     ## @param      opt      [Hash] Additional Options
     ##
-    def yesterday(section, times = nil, output = nil, opt = {})
+    def yesterday(section, times = nil, output = nil, opt)
+      opt ||= {}
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
       section = guess_section(section)
@@ -1638,29 +1777,36 @@ module Doing
     ## @param      section  [String] The section to show from, default Currently
     ## @param      opt      [Hash] Additional Options
     ##
-    def recent(count = 10, section = nil, opt = {})
+    def recent(count = 10, section = nil, opt)
+      opt ||= {}
       times = opt[:t] || true
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates']['recent'].deep_merge(@config['templates']['default']).deep_merge({
+      cfg = @config['templates']['recent'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
-      })
+      }, { extend_existing_arrays: true, sort_merged_arrays: true })
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
 
       section ||= @config['current_section']
       section = guess_section(section)
 
-      list_section({ section: section, wrap_width: cfg['wrap_width'], count: count,
-                     format: cfg['date_format'], template: cfg['template'],
-                     order: 'asc', times: times, totals: opt[:totals],
-                     sort_tags: opt[:sort_tags], tags_color: opt[:tags_color], config_template: 'recent' })
+      opt[:section] = section
+      opt[:wrap_width] = cfg['wrap_width']
+      opt[:count] = count
+      opt[:format] = cfg['date_format']
+      opt[:template] = cfg['template']
+      opt[:order] = 'asc'
+      opt[:times] = times
+      opt[:config_template] = 'recent'
+
+      list_section(opt)
     end
 
     ##
@@ -1671,14 +1817,14 @@ module Doing
     ##
     def last(times: true, section: nil, options: {})
       section = section.nil? || section =~ /all/i ? 'All' : guess_section(section)
-      cfg = @config['templates']['last'].deep_merge(@config['templates']['default']).deep_merge({
+      cfg = @config['templates']['last'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
-      })
+      }, { extend_existing_arrays: true, sort_merged_arrays: true })
       options[:duration] ||= cfg['duration'] || false
       options[:interval_format] ||= cfg['interval_format'] || 'text'
 
@@ -1693,7 +1839,9 @@ module Doing
         interval_format: options[:interval_format],
         case: options[:case],
         not: options[:negate],
-        config_template: 'last'
+        config_template: 'last',
+        delete: options[:delete],
+        val: options[:val]
       }
 
       if options[:tag]
@@ -1713,13 +1861,14 @@ module Doing
     ## Does not repeat tags in a title, and only converts the first instance of an
     ## untagged keyword
     ##
-    ## @param      text  [String] The text to tag
+    ## @param      string  [String] The text to tag
     ##
-    def autotag(text)
-      return unless text
-      return text unless @auto_tag
+    def autotag(string)
+      return unless string
+      return string unless @auto_tag
 
-      original = text.dup
+      original = string.dup
+      text = string.dup
 
       current_tags = text.scan(/@\w+/).map { |t| t.sub(/^@/, '') }
       tagged = {
@@ -1741,6 +1890,7 @@ module Doing
 
       @config['autotag']['synonyms'].each do |tag, v|
         v.each do |word|
+          word = word.wildcard_to_rx
           next unless text =~ /\b#{word}\b/i
 
           unless current_tags.include?(tag) || tagged[:whitelisted].include?(tag)
@@ -1754,7 +1904,12 @@ module Doing
         @config['autotag']['transform'].each do |tag|
           next unless tag =~ /\S+:\S+/
 
-          rx, r = tag.split(/:/)
+          if tag =~ /::/
+            rx, r = tag.split(/::/)
+          else
+            rx, r = tag.split(/:/)
+          end
+
           flag_rx = %r{/([r]+)$}
           if r =~ flag_rx
             flags = r.match(flag_rx)[1].split(//)
@@ -1869,6 +2024,7 @@ EOS
         output + tail
       when :markdown
         pad = sorted_tags_data.map {|k, v| k }.group_by(&:size).max.last[0].length
+        pad = 7 if pad < 7
         output = <<~EOS
   | #{' ' * (pad - 7) }project | time     |
   | #{'-' * (pad - 1)}: | :------- |
@@ -1995,6 +2151,36 @@ EOS
       end
     end
 
+    def configure(filename = nil)
+      if filename
+        Doing.config_with(filename, { ignore_local: true })
+      elsif ENV['DOING_CONFIG']
+        Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
+      end
+
+      Doing.logger.benchmark(:configure, :start)
+      config = Doing.config
+      Doing.logger.benchmark(:configure, :finish)
+
+      config.settings['backup_dir'] = ENV['DOING_BACKUP_DIR'] if ENV['DOING_BACKUP_DIR']
+      @config = config.settings
+    end
+
+    def get_diff(filename = nil)
+      configure if @config.nil?
+
+      filename ||= @config['doing_file']
+      init_doing_file(filename)
+      current_content = @content.dup
+      backup_file = Util::Backup.last_backup(filename, count: 1)
+      raise DoingRuntimeError, 'No undo history to diff' if backup_file.nil?
+
+      backup = WWID.new
+      backup.config = @config
+      backup.init_doing_file(backup_file)
+      current_content.diff(backup.content)
+    end
+
     private
 
     ##
@@ -2027,12 +2213,15 @@ EOS
     ## @return     [String] formatted output based on opt[:output]
     ##             template trigger
     ##
-    def output(items, title, is_single, opt = {})
+    def output(items, title, is_single, opt)
+      opt ||= {}
       out = nil
 
       raise InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
 
       export_options = { page_title: title, is_single: is_single, options: opt }
+
+      Hooks.trigger :pre_export, self, opt[:output], items
 
       Plugins.plugins[:export].each do |_, options|
         next unless opt[:output] =~ /^(#{options[:trigger].normalize_trigger})$/i
@@ -2040,6 +2229,8 @@ EOS
         out = options[:class].render(self, items, variables: export_options)
         break
       end
+
+      logger.debug('Output:', "#{items.count} #{items.count == 1 ? 'item' : 'items'} shown")
 
       out
     end
@@ -2071,7 +2262,8 @@ EOS
     ##                          section
     ## @param      opt          [Hash] Additional Options
     ##
-    def do_archive(section, destination, opt = {})
+    def do_archive(section, destination, opt)
+      opt ||= {}
       count = opt[:count] || 0
       tags  = opt[:tags] || []
       bool  = opt[:bool] || :and
@@ -2082,10 +2274,11 @@ EOS
 
       section_items = @content.in_section(section)
       max = section_items.count - count.to_i
+      moved_items = []
 
       counter = 0
 
-      @content.map! do |item|
+      @content.map do |item|
         break if counter >= max
         if opt[:before]
           time_string = opt[:before]
@@ -2099,6 +2292,8 @@ EOS
         else
           counter += 1
           item.move_to(destination, label: label, log: false)
+          Hooks.trigger :post_entry_updated, self, item.dup
+          item
         end
       end
 
