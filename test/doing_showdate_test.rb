@@ -33,7 +33,7 @@ class DoingShowDateTest < Test::Unit::TestCase
     raw = IO.read(@wwid_file)
     # test show --from
     date_matches = raw.scan(/^\t+- 2021-09-15/).count
-    res = doing('show', '--from', '9/15')
+    res = doing('show', '--from', '9/15/21')
     assert_count_entries(date_matches, res, "There should be #{date_matches} entries shown")
 
     # test show --from range

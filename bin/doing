@@ -27,6 +27,7 @@ autocomplete_commands true
 
 REGEX_BOOL = /^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$/i
 REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
+REGEX_VALUE_QUERY = /^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$/
 
 InvalidExportType = Class.new(RuntimeError)
 MissingConfigFile = Class.new(RuntimeError)
@@ -110,7 +111,7 @@ switch %i[q quiet], default_value: false, negatable: false
 desc 'Verbose output'
 switch %i[debug], default_value: false, negatable: false
 
-desc 'Use a specific configuration file. Deprecated, set $DOING_CONFIG instead.'
+desc 'Use a specific configuration file. Deprecated, set $DOING_CONFIG instead'
 flag [:config_file], default_value: config.config_file
 
 desc 'Specify a different doing_file'
@@ -120,7 +121,7 @@ flag %i[f doing_file]
 
 # @@again @@resume
 desc 'Repeat last entry as new entry'
-long_desc 'This command is designed to allow multiple time intervals to be created for an entry by duplicating it with a new start (and end, eventually) time.'
+long_desc 'This command is designed to allow multiple time intervals to be created for an entry by duplicating it with a new start (and end, eventually) time'
 command %i[again resume] do |c|
   c.example 'doing resume', desc: 'Duplicate the most recent entry with a new start time, removing any @done tag'
   c.example 'doing again', desc: 'again is an alias for resume'
@@ -136,7 +137,7 @@ command %i[again resume] do |c|
   c.arg_name 'SECTION_NAME'
   c.flag [:in]
 
-  c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?).'
+  c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
   c.flag [:tag]
 
@@ -144,6 +145,10 @@ command %i[again resume] do |c|
   slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -158,7 +163,7 @@ command %i[again resume] do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
+  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
@@ -196,7 +201,7 @@ end
 
 # @@cancel
 desc 'End last X entries with no time tracked'
-long_desc 'Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doing finish --no-date`.'
+long_desc 'Adds @done tag without datestamp so no elapsed time is recorded. Alias for `doing finish --no-date`'
 arg_name 'COUNT'
 command :cancel do |c|
   c.example 'doing cancel', desc: 'Cancel the last entry'
@@ -209,17 +214,21 @@ command :cancel do |c|
   c.arg_name 'NAME'
   c.flag %i[s section]
 
-  c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2). Wildcards allowed (*, ?).'
+  c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2). Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
   c.desc 'Cancel the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -285,7 +294,8 @@ command :cancel do |c|
       tag: tags,
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],
-      unfinished: options[:unfinished]
+      unfinished: options[:unfinished],
+      val: options[:val]
     }
 
     wwid.tag_last(opts)
@@ -293,7 +303,7 @@ command :cancel do |c|
 end
 
 # @@done @@did
-desc 'Add a completed item with @done(date). No argument finishes last entry.'
+desc 'Add a completed item with @done(date). No argument finishes last entry'
 long_desc 'Use this command to add an entry after you\'ve already finished it. It will be immediately marked as @done.
 You can modify the start and end times of the entry using the --back, --took, and --at flags, making it an easy
 way to add entries in post and maintain accurate (albeit manual) time tracking.'
@@ -535,6 +545,10 @@ command :finish do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
+
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
 
@@ -548,7 +562,7 @@ command :finish do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
@@ -641,7 +655,8 @@ command :finish do |c|
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],
       took: options[:took],
-      unfinished: options[:unfinished]
+      unfinished: options[:unfinished],
+      val: options[:val]
     }
 
     wwid.tag_last(opts)
@@ -745,6 +760,10 @@ command %i[mark flag] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
+
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
 
@@ -758,7 +777,7 @@ command %i[mark flag] do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
@@ -937,13 +956,17 @@ command :note do |c|
   c.desc "Replace/Remove last entry's note (default append)"
   c.switch %i[r remove], negatable: false, default_value: false
 
-  c.desc 'Add/remove note from last entry matching tag. Wildcards allowed (*, ?).'
+  c.desc 'Add/remove note from last entry matching tag. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
   c.flag [:tag]
 
   c.desc 'Add/remove note from last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -958,7 +981,7 @@ command :note do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
@@ -1135,13 +1158,17 @@ command %i[reset begin] do |c|
   c.desc 'Resume entry (remove @done)'
   c.switch %i[r resume], default_value: true
 
-  c.desc 'Reset last entry matching tag. Wildcards allowed (*, ?).'
+  c.desc 'Reset last entry matching tag. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
   c.flag [:tag]
 
   c.desc 'Reset last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -1156,7 +1183,7 @@ command %i[reset begin] do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters'
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
@@ -1258,11 +1285,15 @@ command :select do |c|
   c.arg_name 'QUERY'
   c.flag %i[q query search]
 
-  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
+
+  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
 
@@ -1287,7 +1318,7 @@ command :select do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches.'
+  c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches'
   c.switch %i[menu], negatable: true, default_value: true
 
   c.desc 'Cancel selected items (add @done without timestamp)'
@@ -1305,7 +1336,7 @@ command :select do |c|
   c.desc 'Add flag to selected item(s)'
   c.switch %i[flag], negatable: false, default_value: false
 
-  c.desc 'Perform action without confirmation.'
+  c.desc 'Perform action without confirmation'
   c.switch %i[force], negatable: false, default_value: false
 
   c.desc 'Save selected entries to file using --output format'
@@ -1392,6 +1423,10 @@ command :tag do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
+
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
 
@@ -1405,7 +1440,7 @@ command :tag do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans.'
+  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
@@ -1528,11 +1563,11 @@ command %i[grep search] do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.desc 'Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.desc 'Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
 
@@ -1591,6 +1626,13 @@ command %i[grep search] do |c|
   c.desc 'Display an interactive menu of results to perform further operations'
   c.switch %i[i interactive], default_value: false, negatable: false
 
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
+
+  c.desc 'Combine multiple tags or value queries using AND, OR, or NOT'
+  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
+
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
@@ -1601,6 +1643,7 @@ command %i[grep search] do |c|
     section = wwid.guess_section(options[:section]) if options[:section]
 
     options[:case] = options[:case].normalize_case
+    options[:bool] = options[:bool].normalize_bool
 
     search = args.join(' ')
     search.sub!(/^'?/, "'") if options[:exact]
@@ -1639,17 +1682,21 @@ command :last do |c|
   c.desc "Delete the last entry"
   c.switch %i[d delete], negatable: false, default_value: false
 
-  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?).'
+  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans.'
+  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
   c.desc 'Show elapsed time if entry is not tagged @done'
   c.switch [:duration]
@@ -1685,12 +1732,14 @@ command :last do |c|
     if options[:editor]
       wwid.edit_last(section: options[:section],
                      options: {
-                       search: search,
+                       search: options[:search],
                        fuzzy: options[:fuzzy],
                        case: options[:case],
-                       tag: tags,
+                       tag: options[:tag],
                        tag_bool: options[:bool],
-                       not: options[:not]
+                       not: options[:not],
+                       val: options[:val],
+                       bool: options[:bool]
                      })
     else
       last = wwid.last(times: true, section: options[:section],
@@ -1702,7 +1751,9 @@ command :last do |c|
                         negate: options[:not],
                         tag: options[:tag],
                         tag_bool: options[:bool],
-                        delete: options[:delete]
+                        delete: options[:delete],
+                        bool: options[:bool],
+                        val: options[:val]
                       })
       Doing::Pager::page last.strip if last
     end
@@ -1798,11 +1849,15 @@ command :show do |c|
   c.example 'doing show Ideas @doing --from "mon to fri"', desc: 'Show entries tagged @doing from the Ideas section added between monday and friday of the current week.'
   c.example 'doing show --interactive Later @doing', desc: 'Create a menu from entries from the Later section tagged @doing to perform batch actions'
 
-  c.desc 'Tag filter, combine multiple tags with a comma. Use `--tag pick` for a menu of available tags. Wildcards allowed (*, ?). Added for compatibility with other commands.'
+  c.desc 'Tag filter, combine multiple tags with a comma. Use `--tag pick` for a menu of available tags. Wildcards allowed (*, ?). Added for compatibility with other commands'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Tag boolean (AND,OR,NOT). Use PATTERN to parse + and - as booleans.'
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
+
+  c.desc 'Tag boolean (AND,OR,NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag %i[b bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
@@ -1814,11 +1869,11 @@ command :show do |c|
   c.arg_name 'AGE'
   c.flag %i[a age], default_value: 'newest'
 
-  c.desc 'Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.desc 'Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.desc 'Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
 
@@ -2012,7 +2067,7 @@ command :tags do |c|
   c.arg_name 'ORDER'
   c.flag %i[o order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
 
-  c.desc 'Get tags for entries matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?).'
+  c.desc 'Get tags for entries matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
   c.flag [:tag]
 
@@ -2020,6 +2075,10 @@ command :tags do |c|
   slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -2034,7 +2093,7 @@ command :tags do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
-  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans.'
+  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
@@ -2291,11 +2350,15 @@ command :view do |c|
   c.desc 'Include colors in output'
   c.switch [:color], default_value: true, negatable: true
 
-  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?).'
+  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Tag boolean (AND,OR,NOT). Use PATTERN to parse + and - as booleans.'
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
+
+  c.desc 'Tag boolean (AND,OR,NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag %i[b bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
@@ -2324,11 +2387,11 @@ command :view do |c|
   c.arg_name 'DIRECTION'
   c.flag [:tag_order], must_match: REGEX_SORT_ORDER
 
-  c.desc 'View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.desc 'View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.desc 'View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day.'
+  c.desc 'View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:after]
 
@@ -2935,17 +2998,21 @@ command %i[archive move] do |c|
   c.desc 'Label moved items with @from(SECTION_NAME)'
   c.switch [:label], default_value: true, negatable: true
 
-  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands.'
+  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans.'
+  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
   c.desc 'Search filter'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -3122,17 +3189,21 @@ command :rotate do |c|
   c.arg_name 'SECTION_NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands.'
+  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands'
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans.'
+  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
 
   c.desc 'Search filter'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.arg_name 'QUERY'
+  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -3357,7 +3428,7 @@ command :undo do |c|
   c.arg_name 'COUNT'
   c.flag %i[p prune], type: Integer
 
-  c.desc 'Redo last undo. Note: you cannot undo a redo.'
+  c.desc 'Redo last undo. Note: you cannot undo a redo'
   c.switch %i[r redo]
 
   c.action do |_global_options, options, args|
@@ -3384,7 +3455,7 @@ command :undo do |c|
 end
 
 # @@redo
-long_desc 'Shortcut for `doing undo -r`, reverses the last undo command. You cannot undo a redo.'
+long_desc 'Shortcut for `doing undo -r`, reverses the last undo command. You cannot undo a redo'
 arg_name 'COUNT'
 command :redo do |c|
   c.desc 'Specify alternate doing file'
