@@ -40,6 +40,16 @@ class DoingImportTest < Test::Unit::TestCase
     assert_match(/Skipped: #{target} overlapping items/, result, "Should have skipped #{target} duplicate entries")
   end
 
+  def test_timing_import_date_range
+    result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--from', '7/19/21', @timing_import_file)
+    assert_match(/Imported: 2 items/, result, "Should have imported 2 entries")
+  end
+
+  def test_timing_import_search_filter
+    result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--search', 'overtired', @timing_import_file)
+    assert_match(/Imported: 2 items/, result, "Should have imported 2 entries")
+  end
+
   def test_timing_import_no_arg
     assert_raises(RuntimeError) { doing('import', '--type', 'timing') }
   end
@@ -79,6 +89,16 @@ class DoingImportTest < Test::Unit::TestCase
     assert_match(/Imported: 126 items/, result, "Should have imported 126 entries")
     result = doing('--stdout', '--debug', 'import', '--type', 'doing', @doing_import_file)
     assert_match(/Skipped: 126 duplicate items/, result, "Should have skipped 126 duplicate entries")
+  end
+
+  def test_doing_import_date_range
+    result = doing('--stdout', '--debug', 'import', '--type', 'doing', '--from', '9/29/21', @doing_import_file)
+    assert_match(/Imported: 2 items/, result, "Should have imported 2 entries")
+  end
+
+  def test_doing_import_search_filter
+    result = doing('--stdout', '--debug', 'import', '--type', 'doing', '--search', 'cool.devo.build', @doing_import_file)
+    assert_match(/Imported: 3 items/, result, "Should have imported 3 entries")
   end
 
   def test_doing_import_no_overlap

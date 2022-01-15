@@ -61,7 +61,19 @@ module Doing
         title.strip!
         new_entry = Item.new(start_time, title, section)
         new_entry.note = entry['notes'].split(/\n/).map(&:chomp) if entry.key?('notes')
-        new_items.push(new_entry)
+
+        is_match = true
+
+        if options[:search]
+          is_match = new_entry.search(options[:search], case_type: options[:date], negate: options[:not])
+        end
+
+        if is_match && options[:date_filter]
+          is_match = start_time > options[:date_filter][0] && start_time < options[:date_filter][1]
+          is_match = options[:not] ? !is_match : is_match
+        end
+
+        new_items.push(new_entry) if is_match
       end
       total = new_items.count
 

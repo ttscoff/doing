@@ -70,6 +70,12 @@ if settings.dig('plugins', 'command_path')
   commands_from File.expand_path(settings.dig('plugins', 'command_path'))
 end
 
+class TagArray < Array; end
+
+accept TagArray do |value|
+  value.gsub(/[, ]+/, ' ').split(' ').map { |tag| tag.sub(/^@/, '')}.map(&:strip)
+end
+
 program_desc 'A CLI for a What Was I Doing system'
 program_long_desc %(Doing uses a TaskPaper-like formatting to keep a plain text
 record of what you've been doing, complete with tag-based time tracking. The
@@ -139,7 +145,7 @@ command %i[again resume] do |c|
 
   c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
-  c.flag [:tag]
+  c.flag [:tag], type: TagArray
 
   c.desc 'Repeat last entry matching search. Surround with
   slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
@@ -179,7 +185,7 @@ command %i[again resume] do |c|
 
   c.action do |_global_options, options, _args|
     options[:fuzzy] = false
-    tags = options[:tag].nil? ? [] : options[:tag].to_tags
+    tags = options[:tag].nil? ? [] : options[:tag]
 
     options[:case] = options[:case].normalize_case
 
@@ -216,7 +222,7 @@ command :cancel do |c|
 
   c.desc 'Cancel the last X entries containing TAG. Separate multiple tags with comma (--tag=tag1,tag2). Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
-  c.flag [:tag]
+  c.flag [:tag], type: TagArray
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
@@ -260,7 +266,7 @@ command :cancel do |c|
     if options[:tag].nil?
       tags = []
     else
-      tags = options[:tag].to_tags
+      tags = options[:tag]
     end
 
     raise InvalidArgument, 'Only one argument allowed' if args.length > 1
@@ -539,7 +545,7 @@ command :finish do |c|
   c.desc 'Finish the last X entries containing TAG.
   Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).'
   c.arg_name 'TAG'
-  c.flag [:tag]
+  c.flag [:tag], type: TagArray
 
   c.desc 'Finish the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -618,7 +624,7 @@ command :finish do |c|
     if options[:tag].nil?
       tags = []
     else
-      tags = options[:tag].to_tags
+      tags = options[:tag]
     end
 
     raise InvalidArgument, 'Only one argument allowed' if args.length > 1
@@ -754,7 +760,7 @@ command %i[mark flag] do |c|
   c.desc 'Flag the last entry containing TAG.
   Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).'
   c.arg_name 'TAG'
-  c.flag [:tag]
+  c.flag [:tag], type: TagArray
 
   c.desc 'Flag the last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -799,7 +805,7 @@ command %i[mark flag] do |c|
     if options[:tag].nil?
       search_tags = []
     else
-      search_tags = options[:tag].to_tags
+      search_tags = options[:tag]
     end
 
     if options[:interactive]
@@ -958,7 +964,7 @@ command :note do |c|
 
   c.desc 'Add/remove note from last entry matching tag. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
-  c.flag [:tag]
+  c.flag [:tag], type: TagArray
 
   c.desc 'Add/remove note from last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -1421,7 +1427,7 @@ command :tag do |c|
   c.desc 'Tag the last X entries containing TAG.
   Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).'
   c.arg_name 'TAG'
-  c.flag [:tag]
+  c.flag [:tag], type: TagArray
 
   c.desc 'Tag entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -1467,7 +1473,7 @@ command :tag do |c|
     if options[:tag].nil?
       search_tags = []
     else
-      search_tags = options[:tag].to_tags
+      search_tags = options[:tag]
     end
 
     if options[:autotag]
@@ -1688,7 +1694,7 @@ command :last do |c|
 
   c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
-  c.flag [:tag]
+  c.flag [:tag], type: TagArray
 
   c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
@@ -1725,7 +1731,7 @@ command :last do |c|
     if options[:tag].nil?
       options[:tag] = []
     else
-      options[:tag] = options[:tag].to_tags
+      options[:tag] = options[:tag]
       options[:bool] = options[:bool].normalize_bool
     end
 
@@ -1855,7 +1861,7 @@ command :show do |c|
 
   c.desc 'Tag filter, combine multiple tags with a comma. Use `--tag pick` for a menu of available tags. Wildcards allowed (*, ?). Added for compatibility with other commands'
   c.arg_name 'TAG'
-  c.flag [:tag]
+  c.flag [:tag], type: TagArray
 
   c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
   c.arg_name 'QUERY'
@@ -1988,7 +1994,7 @@ command :show do |c|
       section ||= 'All'
     end
 
-    tags.concat(options[:tag].to_tags) if options[:tag]
+    tags.concat(options[:tag]) if options[:tag]
 
     options[:times] = true if options[:totals]
 
@@ -3004,7 +3010,7 @@ command %i[archive move] do |c|
 
   c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands'
   c.arg_name 'TAG'
-  c.flag [:tag]
+  c.flag [:tag], type: TagArray
 
   c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
@@ -3053,7 +3059,7 @@ command %i[archive move] do |c|
 
     raise InvalidArgument, '--keep and --count can not be used together' if options[:keep] && options[:count]
 
-    tags.concat(options[:tag].to_tags) if options[:tag]
+    tags.concat(options[:tag]) if options[:tag]
 
     search = nil
 
@@ -3113,7 +3119,7 @@ command :import do |c|
 
   c.desc 'Tag all imported entries'
   c.arg_name 'TAGS'
-  c.flag :tag
+  c.flag %i[t tag]
 
   c.desc 'Autotag entries'
   c.switch :autotag, negatable: true, default_value: true
@@ -3148,6 +3154,12 @@ command :import do |c|
       options[:section] = wwid.guess_section(options[:section]) || options[:section].cap_first
     end
 
+    if options[:search]
+      search = options[:search]
+      search.sub!(/^'?/, "'") if options[:exact]
+      options[:search] = search
+    end
+
     if options[:from]
       date_string = options[:from]
       if date_string =~ / (to|through|thru|(un)?til|-+) /
@@ -3156,7 +3168,7 @@ command :import do |c|
         finish = dates[2].chronify(guess: :end)
       else
         start = date_string.chronify(guess: :begin)
-        finish = false
+        finish = date_string.chronify(guess: :end)
       end
       raise InvalidTimeExpression, 'Unrecognized date string' unless start
       dates = [start, finish]

@@ -384,10 +384,13 @@ module Doing
     end
 
     ##
-    ## Remove items from a list that already exist in @content
+    ## Remove items from an array that already exist in
+    ## @content based on start and end times
     ##
-    ## @param      items       [Array] The items to deduplicate
-    ## @param      no_overlap  [Boolean] Remove items with overlapping time spans
+    ## @param      items       [Array] The items to
+    ##                         deduplicate
+    ## @param      no_overlap  [Boolean] Remove items with
+    ##                         overlapping time spans
     ##
     def dedup(items, no_overlap: false)
       items.delete_if do |item|
@@ -2226,6 +2229,8 @@ EOS
         out = options[:class].render(self, items, variables: export_options)
         break
       end
+
+      logger.debug('Output:', "#{items.count} #{items.count == 1 ? 'item' : 'items'} shown")
 
       out
     end

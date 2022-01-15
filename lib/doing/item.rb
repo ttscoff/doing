@@ -162,6 +162,11 @@ module Doing
       @title.scan(/(?<= |\A)@([^\s(]+)/).map { |tag| tag[0] }.sort.uniq
     end
 
+    ##
+    ## convert tags on item to an array with @ symbols removed
+    ##
+    ## @return     [Array] array of tags
+    ##
     def tag_array
       tags.tags_to_array
     end
@@ -220,6 +225,14 @@ module Doing
       negate ? !matches : matches
     end
 
+    ##
+    ## Determine if case should be ignored for searches
+    ##
+    ## @param      search     [String] The search string
+    ## @param      case_type  [Symbol] The case type
+    ##
+    ## @return     [Boolean] case should be ignored
+    ##
     def ignore_case(search, case_type)
       (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
     end
@@ -279,10 +292,22 @@ module Doing
       negate ? !matches : matches
     end
 
+    ##
+    ## Test if item is included in never_finish config and
+    ## thus should not receive a @done tag
+    ##
+    ## @return     [Boolean] item should receive @done tag
+    ##
     def should_finish?
       should?('never_finish')
     end
 
+    ##
+    ## Test if item is included in never_time config and
+    ## thus should not receive a date on the @done tag
+    ##
+    ## @return     [Boolean] item should receive @done date
+    ##
     def should_time?
       should?('never_time')
     end
