@@ -35,7 +35,7 @@ module Doing
         align: 'left',
         template: '[%content]'
       },
-      interval: {
+      duration: {
         width: 'auto',
         truncate: 'end',
         align: 'left',
@@ -53,7 +53,7 @@ module Doing
         wrap_indent: 0,
         wrap_indent_char: ' '
       }
-    }.deep_freeze
+    }
 
     def self.settings
       {
@@ -73,22 +73,22 @@ module Doing
       ph = {}
 
       elements.each do |el|
-        ph = config.dig('templates', template, 'placeholders', el.to_s)
-        ph.deep_merge(config.dig('templates', 'default', 'placeholders', el.to_s))
-        ph.deep_merge(PLACEHOLDER_DEFAULTS[el.to_sym])
-        ph[el.to_sym] = ph.symbolize_keys
+        eph = @config.dig('templates', @template, 'placeholders', el.to_s).symbolize_keys || {}
+        eph.deep_merge(@config.dig('templates', 'default', 'placeholders', el.to_s).symbolize_keys || {})
+        eph.deep_merge(PLACEHOLDER_DEFAULTS[el.to_sym])
+        ph[el.to_sym] = eph.symbolize_keys
       end
 
       ph
     end
 
     def self.elements_from_config
-      raise 'Template is undefined' if template.nil?
+      raise 'Template is undefined' if @template.nil?
 
-      template_elements = config.dig('templates', template, 'elements')
-      template_elements ||= config.dig('templates', 'default', 'elements') if tpl != 'default'
+      template_elements = @config.dig('templates', @template, 'elements')
+      template_elements ||= @config.dig('templates', 'default', 'elements') if @template != 'default'
 
-      raise "Elements is undefined for template #{template}" unless template_elements
+      raise "Elements is undefined for template #{@template}" unless template_elements
 
       template_elements.select { |el| VALID_ELEMENTS.include?(el) }.map(&:to_sym)
     end
@@ -97,7 +97,7 @@ module Doing
       return nil if element.nil?
 
       t = placeholders.fetch(element.to_sym, nil)
-      return nil if t.nil?
+      return default if t.nil?
 
       t.fetch(setting.to_sym, default)
     end
@@ -122,8 +122,8 @@ module Doing
       width = right - left
       width = width.negative? ? 0 : width
 
-      _template = fetch(item, :template, '%content')
-      content = _template.sub(/%content/, content)
+      template = fetch(item, :template, '%content')
+      content = template.sub(/%content/, content)
 
       content = if fetch(item, :align, 'left') =~ /right/
                   content.rjust(width, pad_char)
@@ -174,7 +174,7 @@ module Doing
         item.date
       when :title
         item.title
-      when :interval
+      when :duration
         item.interval || item.duration
       when :section
         item.section
@@ -191,15 +191,19 @@ module Doing
 
       content.each do |item|
         elements.each do |el|
-          e = item.select { |i| i[el] }
+          e = item.select { |i| i[:el].to_s == el.to_s }.first
+
           widths[el] ||= 0
           widths[el] = e[:width] if e[:width] > widths[el]
         end
       end
+
+      widths
     end
 
     def self.measure(content, width, tpl)
-      val = tpl.sub(/%content/, content.uncolor)
+      content ||= ''
+      val = tpl.sub(/%content/, content.to_s.uncolor)
       val.sub!(/%pad/, '')
       val.gsub!(/%(\w+)/) { |m| Doing::Color.respond_to?(m[1]) ? '' : m[0] }
       val.length
@@ -210,12 +214,13 @@ module Doing
       elements.each_with_object([]) do |el, item_arr|
         content = content_for(el, item)
         tpl = fetch(el, :template, '%content')
+        ph = placeholders.fetch(el.to_sym)
         item_arr << {
           el: el,
           template: tpl,
           content: content,
-          width: measure(content, tpl),
-          placeholders: placeholders.fetch(el.to_sym)
+          width: measure(content, ph.fetch(:width), tpl) || 0,
+          placeholders: ph
         }
       end
     end
@@ -246,46 +251,50 @@ module Doing
       # calculate known widths
       elements.each do |el|
         known_width = 0
-        placeholders.each do |ph|
-          width = case ph[el][:width].to_s
-                  when /^[0-9]+$/
-                    ph[:width]
-                  when /^(\d+)%$/
-                    f = Regexp.last_match(1).to_f / 100
-                    max * f
-                  when /0?\.\d+/
-                    max * width.to_f
-                  else
-                    0
-                  end
-          known_width += width
-        end
+
+        ph = placeholders.fetch(el.to_sym)
+
+        width = case ph[:width].to_s
+                when /^[0-9]+$/
+                  ph[:width].to_i
+                when /^(\d+)%$/
+                  f = Regexp.last_match(1).to_f / 100
+                  max * f
+                else
+                  0
+                end
+        known_width += width
         available_width -= known_width
       end
 
       # calculate autos and stretches
 
       auto_width = 0
-      autos.each { |a| auto_width += max_widths[a] }
+      autos.each { |a| auto_width += widths[a] }
+
       content.map! do |item|
         item.map! do |element|
-          item[:width] = case element[:placeholders][:width].to_s
-          when /^auto$/i
-            if stretches.count.positive?
-              max_widths[element]
-            else
-              available_width / autos.count
-            end
-          when /^stretch$/i
-            (available_width - auto_width) / stretches.count
-          when /^[0-9]+$/
-            Regexp.last_match(0).to_i
-          when /^(\d+)%$/
-            f = Regexp.last_match(1).to_f / 100
-            max * f
-          when /0?\.\d+/
-            max * width.to_f
-          end
+          new_el = element.dup
+
+          # puts element[:placeholders][:width].to_s
+          new_el[:width] = case element[:placeholders][:width].to_s
+                            when /^auto$/i
+                              if stretches.count.positive?
+                                widths[element[:el].to_s]
+                              else
+                                available_width / autos.count
+                              end
+                            when /^stretch$/i
+                              (available_width - auto_width) / stretches.count
+                            when /^[0-9]+$/
+                              Regexp.last_match(0).to_i
+                            when /^(\d+)%$/
+                              f = Regexp.last_match(1).to_f / 100
+                              max * f
+                            else
+                              element[:width] || 0
+                            end
+          new_el
         end
       end
 
