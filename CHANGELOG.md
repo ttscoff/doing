@@ -1,6 +1,6 @@
 ### 2.1.15
 
-2022-01-16 06:08
+2022-01-16 11:48
 
 #### NEW
 
@@ -9,6 +9,12 @@
 #### IMPROVED
 
 - When entering intervals, you can now use 1h30m in addition to 1.5h or 90m
+- Date expansion works in more circumstances
+- You can include date tags with natural language values when adding tags via `doing select`
+
+#### FIXED
+
+- Tags containing values with spaces no longer cause errors
 
 ### 2.1.14
 
