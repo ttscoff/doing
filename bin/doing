@@ -401,6 +401,8 @@ command %i[done did] do |c|
     end
 
     if options[:date]
+      finish_date = wwid.verify_duration(date, finish_date) unless options[:took]
+
       donedate = finish_date.strftime('%F %R')
     end
 
@@ -467,7 +469,6 @@ command %i[done did] do |c|
       if options[:remove]
         wwid.tag_last({ tags: ['done'], count: 1, section: section, remove: true })
       else
-        note = options[:note] ? Doing::Note.new(options[:note]) : nil
         opt = {
           archive: options[:archive],
           back: finish_date,

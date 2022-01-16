@@ -263,6 +263,21 @@ module Doing
       number == 1 ? self : "#{self}s"
     end
 
+    def clock_to_seconds
+      mtch = match(/(\d+):(\d+):(\d+)/)
+
+      raise Errors::DoingRuntimeError, "Invalid time string: #{self}" unless mtch
+
+      h = mtch[1]
+      m = mtch[2]
+      s = mtch[3]
+      (h.to_i * 60 * 60) + (m.to_i * 60) + s.to_i
+    end
+
+    def time_string(format: :dhm)
+      clock_to_seconds.time_string(format: format)
+    end
+
     ##
     ## Convert an age string to a qualified type
     ##

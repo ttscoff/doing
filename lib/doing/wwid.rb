@@ -369,7 +369,8 @@ module Doing
         items.each_with_index do |i, x|
           next if i.title =~ / @done/
 
-          items[x].title = "#{i.title} @done(#{opt[:back].strftime('%F %R')})"
+          finish_date = verify_duration(i.date, opt[:back], title: i.title)
+          items[x].tag('done', value: finish_date.strftime('%F %R'))
           break
         end
       end
@@ -1148,6 +1149,26 @@ module Doing
       end
     end
 
+    def verify_duration(date, finish_date, title: nil)
+      max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
+      max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
+      elapsed = finish_date - date
+
+      if max_elapsed.positive? && (elapsed > max_elapsed)
+        puts boldwhite(title) if title
+        human = elapsed.time_string(format: :natural)
+        res = Prompt.yn(yellow("Did this entry actually take #{human}"), default_response: true)
+        unless res
+          new_elapsed = Prompt.enter_text('How long did it take?').chronify_qty
+          raise InvalidTimeExpression, 'Unrecognized time span entry' unless new_elapsed.positive?
+
+          finish_date = date + new_elapsed if new_elapsed
+        end
+      end
+
+      finish_date
+    end
+
     ##
     ## Tag the last entry or X entries
     ##
@@ -1231,12 +1252,8 @@ module Doing
 
               if max_elapsed.positive? && (elapsed > max_elapsed) && !opt[:took]
                 puts boldwhite(item.title)
-                d, h, m = format_time(elapsed, human: true)
-                human = []
-                human.push(format('%<d>2d days', d: d)) if d.positive?
-                human.push(format('%<h>2d hours', h: h)) if h.positive?
-                human.push(format('%<m>2d minutes', m: m)) if m.positive?
-                res = Prompt.yn(yellow("Did this actually take #{human.join(', ')}"), default_response: true)
+                human = elapsed.time_string(format: :natural)
+                res = Prompt.yn(yellow("Did this actually take #{human}"), default_response: true)
                 unless res
                   new_elapsed = Prompt.enter_text('How long did it take?').chronify_qty
                   raise InvalidTimeExpression, 'Unrecognized time span entry' unless new_elapsed > 0
@@ -2051,11 +2068,10 @@ EOS
       when :json
         output = []
         sorted_tags_data.reverse.each do |k, v|
-          d, h, m = format_time(v)
           output << {
             'tag' => k,
             'seconds' => v,
-            'formatted' => format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
+            'formatted' => v.time_string(format: :clock)
           }
         end
         output
@@ -2066,8 +2082,7 @@ EOS
           (max - k.length).times do
             spacer += ' '
           end
-          _d, h, m = format_time(v, human: true)
-          output.push("┃ #{spacer}#{k}:#{format('%<h> 4dh %<m>02dm', h: h, m: m)} ┃")
+          output.push("┃ #{spacer}#{k}:#{v.time_string(format: :hm)} ┃")
         end
 
         header = '┏━━ Tag Totals '
@@ -2080,14 +2095,14 @@ EOS
         (max + 12).times { divider += '━' }
         divider += '┫'
         output = output.empty? ? '' : "\n#{header}\n#{output.join("\n")}"
-        d, h, m = format_time(total, human: true)
         output += "\n#{divider}"
         spacer = ''
         (max - 6).times do
           spacer += ' '
         end
+        total_time = total.time_string(format: :hm)
         total = "┃ #{spacer}total: "
-        total += format('%<h> 4dh %<m>02dm', h: h, m: m)
+        total += total_time
         total += ' ┃'
         output += "\n#{total}"
         output += "\n#{footer}"
@@ -2099,13 +2114,11 @@ EOS
           (max - k.length).times do
             spacer += ' '
           end
-          d, h, m = format_time(v)
-          output.push("#{k}:#{spacer}#{format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)}")
+          output.push("#{k}:#{spacer}#{v.time_string(format: :clock)}")
         end
 
         output = output.empty? ? '' : "\n--- Tag Totals ---\n#{output.join("\n")}"
-        d, h, m = format_time(total)
-        output += "\n\nTotal tracked: #{format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)}\n"
+        output += "\n\nTotal tracked: #{total.time_string(format: :clock)}\n"
         output
       end
     end
@@ -2130,7 +2143,7 @@ EOS
         record_tag_times(item, seconds) if record
         return seconds.positive? ? seconds : false unless formatted
 
-        return seconds.positive? ? format('%02d:%02d:%02d', *format_time(seconds)) : false
+        return seconds.positive? ? seconds.time_string(format: :clock) : false
       end
 
       false

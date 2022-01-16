@@ -58,11 +58,9 @@ module Doing
         if interval
           case opt[:interval_format].to_sym
           when :human
-            _d, h, m = wwid.format_time(interval, human: true)
-            interval = format('%<h> 4dh %<m>02dm', h: h, m: m)
+            interval = interval.time_string(format: :hm)
           else
-            d, h, m = wwid.format_time(interval)
-            interval = format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
+            interval = interval.time_string(format: :clock)
           end
         end
 
@@ -74,11 +72,9 @@ module Doing
         if duration
           case opt[:interval_format].to_sym
           when :human
-            _d, h, m = wwid.format_time(duration, human: true)
-            duration = format('%<h> 4dh %<m>02dm', h: h, m: m)
+            duration = duration.time_string(format: :hm)
           else
-            d, h, m = wwid.format_time(duration)
-            duration = format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
+            duration = duration.time_string(format: :clock)
           end
         end
         duration ||= ''

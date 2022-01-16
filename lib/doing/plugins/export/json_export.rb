@@ -56,7 +56,7 @@ module Doing
             end_date: end_date,
             title: title.strip, #+ " #{note}"
             note: note.instance_of?(Array) ? note.to_s : note,
-            time: '%02d:%02d:%02d' % wwid.format_time(interval),
+            time: interval.time_string(format: :clock),
             tags: tags
           }
 
@@ -68,7 +68,7 @@ module Doing
           new_item = {
             'id' => index + 1,
             'content' => title.strip, #+ " #{note}"
-            'title' => title.strip + " (#{'%02d:%02d:%02d' % wwid.format_time(interval)})",
+            'title' => title.strip + " (#{interval.time_string(format: :clock)})",
             'start' => i.date.strftime('%F %T'),
             'type' => 'box',
             'style' => 'color:#4c566b;background-color:#d8dee9;'
