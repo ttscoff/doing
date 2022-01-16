@@ -1209,21 +1209,8 @@ module Doing
                         else
                           next_entry.date - 60
                         end
-          elsif opt[:took]
-            if item.date + opt[:took] > Time.now
-              item.date = Time.now - opt[:took]
-              done_date = Time.now
-            else
-              done_date = item.date + opt[:took]
-            end
-          elsif opt[:back]
-            done_date = if opt[:back].is_a? Integer
-                          item.date + opt[:back]
-                        else
-                          item.date + (opt[:back] - item.date)
-                        end
           else
-            done_date = Time.now
+            done_date = item.calculate_end_date(opt)
           end
 
           opt[:tags].each do |tag|
@@ -1234,7 +1221,32 @@ module Doing
               next
             end
 
+
             tag = tag.strip
+
+            if tag =~ /^done$/
+              max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
+              max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
+              elapsed = done_date - item.date
+
+              if max_elapsed.positive? && (elapsed > max_elapsed) && !opt[:took]
+                puts boldwhite(item.title)
+                d, h, m = format_time(elapsed, human: true)
+                human = []
+                human.push(format('%<d>2d days', d: d)) if d.positive?
+                human.push(format('%<h>2d hours', h: h)) if h.positive?
+                human.push(format('%<m>2d minutes', m: m)) if m.positive?
+                res = Prompt.yn(yellow("Did this actually take #{human.join(', ')}"), default_response: true)
+                unless res
+                  new_elapsed = Prompt.enter_text('How long did it take?').chronify_qty
+                  raise InvalidTimeExpression, 'Unrecognized time span entry' unless new_elapsed > 0
+
+                  opt[:took] = new_elapsed
+                  done_date = item.calculate_end_date(opt) if opt[:took]
+                end
+              end
+            end
+
             if opt[:remove] || opt[:rename] || opt[:value]
               rename_to = nil
               if opt[:value]

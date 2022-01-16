@@ -64,20 +64,22 @@ module Doing
       when /^(\d+):(\d\d)$/
         minutes += Regexp.last_match(1).to_i * 60
         minutes += Regexp.last_match(2).to_i
-      when /^(\d+(?:\.\d+)?)([hmd])?$/
-        amt = Regexp.last_match(1)
-        type = Regexp.last_match(2).nil? ? 'm' : Regexp.last_match(2)
+      when /^(\d+(?:\.\d+)?)([hmd])?/
+        scan(/(\d+(?:\.\d+)?)([hmd])?/).each do |m|
+          amt = m[0]
+          type = m[1].nil? ? 'm' : m[1]
 
-        minutes = case type.downcase
-                  when 'm'
-                    amt.to_i
-                  when 'h'
-                    (amt.to_f * 60).round
-                  when 'd'
-                    (amt.to_f * 60 * 24).round
-                  else
-                    minutes
-                  end
+          minutes += case type.downcase
+                     when 'm'
+                       amt.to_i
+                     when 'h'
+                       (amt.to_f * 60).round
+                     when 'd'
+                       (amt.to_f * 60 * 24).round
+                     else
+                       0
+                     end
+        end
       end
       minutes * 60
     end

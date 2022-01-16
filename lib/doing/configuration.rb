@@ -101,7 +101,10 @@ module Doing
         'distance' => 3,
         'case' => 'smart' # sensitive, ignore, smart
       },
-      'include_notes' => true
+      'include_notes' => true,
+      'interaction' => {
+        'confirm_longer_than' => '5h'
+      }
     }
 
     def initialize(file = nil, options: {})
