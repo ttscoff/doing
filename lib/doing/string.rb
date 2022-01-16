@@ -403,7 +403,41 @@ module Doing
     end
 
     def to_tags
-      gsub(/ *, */, ' ').gsub(/ +/, ' ').split(/ /).sort.uniq.map(&:add_at)
+      gsub(/ *, */, ' ').scan(/(@?(?:\S+(?:\(.+\)))|@?(?:\S+))/).map(&:first).sort.uniq.map(&:add_at)
+    end
+
+    def expand_date_tags(additional_tags = nil)
+      iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
+
+      watch_tags = [
+        'start(?:ed)?',
+        'beg[ia]n',
+        'done',
+        'finished',
+        'completed?',
+        'waiting',
+        'defer(?:red)?'
+      ]
+
+      if additional_tags
+        date_tags = additional_tags
+        date_tags = date_tags.split(/ *, */) if date_tags.is_a?(String)
+        date_tags.map! do |tag|
+          tag.sub(/^@/, '').gsub(/\((?!\?:)(.*?)\)/, '(?:\1)').strip
+        end
+        watch_tags.concat(date_tags).uniq!
+      end
+
+      done_rx = /(?<=^| )@(?<tag>#{watch_tags.join('|')})\((?<date>.*?)\)/i
+
+      gsub!(done_rx) do
+        m = Regexp.last_match
+        t = m['tag']
+        d = m['date']
+        future = t =~ /^(done|complete)/ ? false : true
+        parsed_date = d =~ iso_rx ? Time.parse(d) : d.chronify(guess: :begin, future: future)
+        parsed_date.nil? ? m[0] : "@#{t}(#{parsed_date.strftime('%F %R')})"
+      end
     end
 
     def add_tags!(tags, remove: false)

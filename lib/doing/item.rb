@@ -131,6 +131,10 @@ module Doing
       (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
     end
 
+    def expand_date_tags(additional_tags = nil)
+      @title.expand_date_tags(additional_tags)
+    end
+
     ##
     ## Add (or remove) tags from the title of the item
     ##

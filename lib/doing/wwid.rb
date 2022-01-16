@@ -185,34 +185,9 @@ module Doing
 
       date = nil
       iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
-      watch_tags = [
-        'start(?:ed)?',
-        'beg[ia]n',
-        'done',
-        'finished',
-        'completed?',
-        'waiting',
-        'defer(?:red)?'
-      ]
-      if @config['date_tags']
-        date_tags = @config['date_tags']
-        date_tags = date_tags.split(/ *, */) if date_tags.is_a?(String)
-        date_tags.map! do |tag|
-          tag.sub(/^@/, '').gsub(/\((?!\?:)(.*?)\)/, '(?:\1)').strip
-        end
-        watch_tags.concat(date_tags).uniq!
-      end
-
-      done_rx = /(?<=^| )@(?<tag>#{watch_tags.join('|')})\((?<date>.*?)\)/i
       date_rx = /^(?:\s*- )?(?<date>.*?) \| (?=\S)/
 
-      title.gsub!(done_rx) do
-        m = Regexp.last_match
-        t = m['tag']
-        d = m['date']
-        parsed_date = d =~ date_rx ? Time.parse(d) : d.chronify(guess: :begin)
-        parsed_date.nil? ? m[0] : "@#{t}(#{parsed_date.strftime('%F %R')})"
-      end
+      title.expand_date_tags(@config['date_tags'])
 
       if title =~ date_rx
         m = title.match(date_rx)
@@ -1002,7 +977,7 @@ module Doing
                                                  '--no-sort',
                                                  '--info=hidden'
                                                ])
-            next if tag =~ /^ *$/
+            next if output_format =~ /^ *$/
 
             raise UserCancelled unless output_format
 
@@ -1090,6 +1065,7 @@ module Doing
         tag = opt[:tag]
         items.map! do |i|
           i.tag(tag, date: false, remove: opt[:remove], single: single)
+          i.expand_date_tags(@config['date_tags'])
           Hooks.trigger :post_entry_updated, self, i
         end
       end
@@ -1301,6 +1277,7 @@ module Doing
           logger.warn('Skipped:', 'Archiving is skipped when operating on all entries')
         end
 
+        item.expand_date_tags(@config['date_tags'])
         Hooks.trigger :post_entry_updated, self, item
       end
 
@@ -2034,7 +2011,7 @@ module Doing
 EOS
         sorted_tags_data.reverse.each do |k, v|
           if v > 0
-            output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{'%02d:%02d:%02d' % format_time(v)}</td></tr>\n"
+            output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{v.time_string(format: :clock)}</td></tr>\n"
           end
         end
         tail = <<EOS
@@ -2045,7 +2022,7 @@ EOS
         <tfoot>
         <tr>
           <td style="text-align:left;"><strong>Total</strong></td>
-          <td style="text-align:left;">#{'%02d:%02d:%02d' % format_time(total)}</td>
+          <td style="text-align:left;">#{total.time_string(format: :clock)}</td>
         </tr>
         </tfoot>
         </table>
@@ -2060,7 +2037,7 @@ EOS
         EOS
         sorted_tags_data.reverse.each do |k, v|
           if v > 0
-            output += "| #{' ' * (pad - k.length)}#{k} | #{'%02d:%02d:%02d' % format_time(v)} |\n"
+            output += "| #{' ' * (pad - k.length)}#{k} | #{v.time_string(format: :clock)} |\n"
           end
         end
         tail = "[Tag Totals]"
@@ -2147,33 +2124,6 @@ EOS
       end
 
       false
-    end
-
-    ##
-    ## Format human readable time from seconds
-    ##
-    ## @param      seconds  [Integer] Seconds
-    ##
-    def format_time(seconds, human: false)
-      return [0, 0, 0] if seconds.nil?
-
-      if seconds.instance_of?(String) && seconds =~ /(\d+):(\d+):(\d+)/
-        h = Regexp.last_match(1)
-        m = Regexp.last_match(2)
-        s = Regexp.last_match(3)
-        seconds = (h.to_i * 60 * 60) + (m.to_i * 60) + s.to_i
-      end
-      minutes = (seconds / 60).to_i
-      hours = (minutes / 60).to_i
-      if human
-        minutes = (minutes % 60).to_i
-        [0, hours, minutes]
-      else
-        days = (hours / 24).to_i
-        hours = (hours % 24).to_i
-        minutes = (minutes % 60).to_i
-        [days, hours, minutes]
-      end
     end
 
     def configure(filename = nil)
