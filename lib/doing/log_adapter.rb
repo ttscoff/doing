@@ -52,7 +52,7 @@ module Doing
       COUNT_KEYS.each { |key| @counters[key] = { tag: [], count: 0 } }
       @results = []
       @logdev = $stderr
-      @max_length = `tput cols`.strip.to_i - 5 || 85
+      @max_length = TTY::Screen.columns - 5 || 85
       self.log_level = level
       @prev_level = level
     end
