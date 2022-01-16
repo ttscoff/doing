@@ -1,3 +1,15 @@
+### 2.1.15
+
+2022-01-16 06:08
+
+#### NEW
+
+- When completing an entry, if the elapsed time would be greater than a (configurable) amount, doing will now ask for confirmation and allow you to enter a new duration before setting the @done date
+
+#### IMPROVED
+
+- When entering intervals, you can now use 1h30m in addition to 1.5h or 90m
+
 ### 2.1.14
 
 #### NEW
