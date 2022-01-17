@@ -33,9 +33,9 @@ module Doing
         format('%<m> 4dm', m: m)
       when :natural
         human = []
-        human.push(format('%<d>2d days', d: d)) if d.positive?
-        human.push(format('%<h>2d hours', h: h)) if h.positive?
-        human.push(format('%<m>2d minutes', m: m)) if m.positive?
+        human.push(format('%<d>2d %<s>s', d: d, s: 'day'.to_p(d))) if d.positive?
+        human.push(format('%<h>2d %<s>s', h: h, s: 'hour'.to_p(h))) if h.positive?
+        human.push(format('%<m>2d %<s>s', m: m, s: 'minute'.to_p(m))) if m.positive?
         human.join(', ')
       end
     end

@@ -259,7 +259,13 @@ module Doing
       end
     end
 
-    def pluralize(number)
+    ##
+    ## Pluralize a string based on quantity
+    ##
+    ## @param      number  [Integer] the quantity of the
+    ##                     object the string represents
+    ##
+    def to_p(number)
       number == 1 ? self : "#{self}s"
     end
 
@@ -268,10 +274,6 @@ module Doing
     ##
     ## @return     [Symbol] :oldest or :newest
     ##
-    def normalize_age!(default = :newest)
-      replace normalize_age(default)
-    end
-
     def normalize_age(default = :newest)
       case self
       when /^o/i
@@ -281,6 +283,11 @@ module Doing
       else
         default
       end
+    end
+
+    ## @see #normalize_age
+    def normalize_age!(default = :newest)
+      replace normalize_age(default)
     end
 
     ##
@@ -308,10 +315,6 @@ module Doing
     ##
     ## @return     Symbol :smart, :sensitive, :ignore
     ##
-    def normalize_case!
-      replace normalize_case
-    end
-
     def normalize_case(default = :smart)
       case self
       when /^(c|sens)/i
@@ -325,15 +328,16 @@ module Doing
       end
     end
 
+    ## @see #normalize_case
+    def normalize_case!
+      replace normalize_case
+    end
+
     ##
     ## Convert a boolean string to a symbol
     ##
     ## @return     Symbol :and, :or, or :not
     ##
-    def normalize_bool!(default = :and)
-      replace normalize_bool(default)
-    end
-
     def normalize_bool(default = :and)
       case self
       when /(and|all)/i
@@ -349,15 +353,19 @@ module Doing
       end
     end
 
-    ##
-    ## Convert a matching configuration string to a symbol
-    ##
-    ## @return     Symbol :fuzzy, :pattern, :exact
-    ##
-    def normalize_matching!(default = :pattern)
+    ## @see #normalize_bool
+    def normalize_bool!(default = :and)
       replace normalize_bool(default)
     end
 
+    ##
+    ## Convert a matching configuration string to a symbol
+    ##
+    ## @param      default  [Symbol] the default matching
+    ##                      type to return if the string
+    ##                      doesn't match a known symbol
+    ## @return     Symbol :fuzzy, :pattern, :exact
+    ##
     def normalize_matching(default = :pattern)
       case self
       when /^f/i
@@ -371,69 +379,74 @@ module Doing
       end
     end
 
-    def normalize_trigger!
-      replace normalize_trigger
+    ## @see #normalize_matching
+    def normalize_matching!(default = :pattern)
+      replace normalize_bool(default)
     end
 
+    ##
+    ## Adds ?: to any parentheticals in a regular expression
+    ## to avoid match groups
+    ##
+    ## @return     [String] modified regular expression
+    ##
     def normalize_trigger
       gsub(/\((?!\?:)/, '(?:').downcase
     end
 
+    ## @see #normalize_trigger
+    def normalize_trigger!
+      replace normalize_trigger
+    end
+
+    ##
+    ## Convert ? and * wildcards to regular expressions.
+    ## Uses \S (non-whitespace) instead of . (any character)
+    ##
+    ## @return     [String] Regular expression string
+    ##
     def wildcard_to_rx
       gsub(/\?/, '\S').gsub(/\*/, '\S*?')
     end
 
+    ##
+    ## Add @ prefix to string if needed, maintains +/- prefix
+    ##
+    ## @return     [String] @string
+    ##
     def add_at
       strip.sub(/^([+-]*)@/, '\1')
     end
 
+    ##
+    ## Convert a list of tags to an array. Tags can be with
+    ## or without @ symbols, separated by any character, and
+    ## can include parenthetical values (with spaces)
+    ##
+    ## @return     [Array] array of tags including @ symbols
+    ##
     def to_tags
       gsub(/ *, */, ' ').scan(/(@?(?:\S+(?:\(.+\)))|@?(?:\S+))/).map(&:first).sort.uniq.map(&:add_at)
     end
 
-    def expand_date_tags(additional_tags = nil)
-      iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
-
-      watch_tags = [
-        'start(?:ed)?',
-        'beg[ia]n',
-        'done',
-        'finished',
-        'completed?',
-        'waiting',
-        'defer(?:red)?'
-      ]
-
-      if additional_tags
-        date_tags = additional_tags
-        date_tags = date_tags.split(/ *, */) if date_tags.is_a?(String)
-        date_tags.map! do |tag|
-          tag.sub(/^@/, '').gsub(/\((?!\?:)(.*?)\)/, '(?:\1)').strip
-        end
-        watch_tags.concat(date_tags).uniq!
-      end
-
-      done_rx = /(?<=^| )@(?<tag>#{watch_tags.join('|')})\((?<date>.*?)\)/i
-
-      gsub!(done_rx) do
-        m = Regexp.last_match
-        t = m['tag']
-        d = m['date']
-        future = t =~ /^(done|complete)/ ? false : true
-        parsed_date = d =~ iso_rx ? Time.parse(d) : d.chronify(guess: :begin, future: future)
-        parsed_date.nil? ? m[0] : "@#{t}(#{parsed_date.strftime('%F %R')})"
-      end
-    end
-
-    def add_tags!(tags, remove: false)
-      replace add_tags(tags, remove: remove)
-    end
-
+    ##
+    ## @brief      Adds tags to a string
+    ##
+    ## @param      tags    [String or Array] List of tags to add. @ symbol optional
+    ## @param      remove  [Boolean] remove tags instead of adding
+    ##
+    ## @return     [String] the tagged string
+    ##
     def add_tags(tags, remove: false)
       title = self.dup
       tags = tags.to_tags
       tags.each { |tag| title.tag!(tag, remove: remove) }
       title
+    end
+
+    ## @see #add_tags
+    def add_tags!(tags, remove: false)
+      replace add_tags(tags, remove: remove)
     end
 
     ##
@@ -518,10 +531,6 @@ module Doing
     ##
     ## @return     Deduplicated string
     ##
-    def dedup_tags!
-      replace dedup_tags
-    end
-
     def dedup_tags
       title = dup
       tags = title.scan(/(?<=\A| )(@(\S+?)(\([^)]+\))?)(?= |\Z)/).uniq
@@ -537,6 +546,11 @@ module Doing
         end
       end
       title
+    end
+
+    ## @see #dedup_tags
+    def dedup_tags!
+      replace dedup_tags
     end
 
     # Returns the last escape sequence from a string.
@@ -559,11 +573,9 @@ module Doing
     ##
     ## @param      opt   [Hash] Additional Options
     ##
-    def link_urls!(**opt)
-      fmt = opt.fetch(:format, :html)
-      replace link_urls(format: fmt)
-    end
-
+    ## @option opt [Symbol] :format can be :markdown or
+    ## :html (default)
+    ##
     def link_urls(**opt)
       fmt = opt.fetch(:format, :html)
       return self unless fmt
@@ -573,6 +585,12 @@ module Doing
       str = str.remove_self_links if fmt == :markdown
 
       str.replace_qualified_urls(format: fmt).clean_unlinked_urls
+    end
+
+    ## @see #link_urls
+    def link_urls!(**opt)
+      fmt = opt.fetch(:format, :html)
+      replace link_urls(format: fmt)
     end
 
     # Remove <self-linked> formatting
@@ -624,6 +642,18 @@ module Doing
       end
     end
 
+    ##
+    ## Convert a string value to an appropriate type. If
+    ## kind is not specified, '[one, two]' becomes an Array,
+    ## '1' becomes Integer, '1.5' becomes Float, 'true' or
+    ## 'yes' becomes TrueClass, 'false' or 'no' becomes
+    ## FalseClass.
+    ##
+    ## @param      kind  [String] specify string, array,
+    ##                   integer, float, symbol, or boolean
+    ##                   (falls back to string if value is
+    ##                   not recognized)
+    ## @return Converted object type
     def set_type(kind = nil)
       if kind
         case kind.to_s

@@ -1,1 +1,1 @@
-require './lib/doing'
+require_relative 'lib/doing'

@@ -59,9 +59,11 @@
 
       <div id="content"><div id='filecontents'><h1 id="doing">doing</h1>
 
-<p><strong>A command line tool for remembering what you were doing and tracking what you&#39;ve done.</strong></p>
+<p><strong>A command line tool for remembering what you were doing and tracking what
+you&#39;ve done.</strong></p>
 
-<p><em>If you&#39;re one of the rare people like me who find this useful, feel free to <a href="http://brettterpstra.com/donate/">buy me some coffee</a>.</em></p>
+<p><em>If you&#39;re one of the rare people like me who find this useful, feel free to
+<a href="http://brettterpstra.com/donate/">buy me some coffee</a>.</em></p>
 
 <!--README-->
 
@@ -71,27 +73,48 @@
 
 <p>See <a href="https://brettterpstra.com/2021/11/20/doing-2-dot-0/">what&#39;s new in Doing 2.0</a>.</p>
 
-<p>Check out some craziness with Doing in the <a href="https://brettterpstra.com/2021/10/15/see-what-youre-doing-in-the-iterm-status-bar/">iTerm status bar</a> and the <a href="https://brettterpstra.com/2021/07/21/crazy-bettertouchtool-touch-bar-simulator/">Mac Touch Bar/menu bar</a>.</p>
+<p>Check out some craziness with Doing in the <a href="https://brettterpstra.com/2021/10/15/see-what-youre-doing-in-the-iterm-status-bar/">iTerm status bar</a> and
+the <a href="https://brettterpstra.com/2021/07/21/crazy-bettertouchtool-touch-bar-simulator/">Mac Touch Bar/menu bar</a>.</p>
 
 <h2 id="what-and-why">What and why</h2>
 
-<p><code>doing</code> is a basic CLI for adding and listing &quot;what was I doing&quot; reminders in a <a href="https://www.taskpaper.com">TaskPaper-formatted</a> text file. It allows for multiple sections/categories and flexible output formatting.</p>
+<p><code>doing</code> is a basic CLI for adding and listing &quot;what was I doing&quot; reminders in a
+<a href="https://www.taskpaper.com">TaskPaper-formatted</a> text file. It allows for
+multiple sections/categories and flexible output formatting.</p>
 
-<p>While I&#39;m working, I have hourly reminders to record what I&#39;m working on, and I try to remember to punch in quick notes if I&#39;m unexpectedly called away from a project. I can do this just by typing <code>doing now tracking down the CG bug</code>. </p>
+<p>While I&#39;m working, I have hourly reminders to record what I&#39;m working on, and I
+try to remember to punch in quick notes if I&#39;m unexpectedly called away from a
+project. I can do this just by typing <code>doing now tracking down the CG bug</code>.</p>
 
-<p>If there&#39;s something I want to look at later but doesn&#39;t need to be added to a task list or tracker, I can type <code>doing later check out the pinboard bookmarks from macdrifter</code>. When I get back to my computer --- or just need a refresher after a distraction --- I can type <code>doing last</code> to see what the last thing on my plate was. I can also type <code>doing recent</code> (or just <code>doing</code>) to get a list of the last few entries. <code>doing today</code> gives me everything since midnight for the current day, making it easy to see what I&#39;ve accomplished over a sleepless night. </p>
+<p>If there&#39;s something I want to look at later but doesn&#39;t need to be added to a
+task list or tracker, I can type <code>doing later check out the pinboard bookmarks
+from macdrifter</code>. When I get back to my computer --- or just need a refresher
+after a distraction --- I can type <code>doing last</code> to see what the last thing on
+my plate was. I can also type <code>doing recent</code> (or just <code>doing</code>) to get a list of
+the last few entries. <code>doing today</code> gives me everything since midnight for the
+current day, making it easy to see what I&#39;ve accomplished over a sleepless
+night.</p>
 
-<p>Doing has over 30 commands for tracking your status, recording your time, and analyzing the results.</p>
+<p>Doing has over 30 commands for tracking your status, recording your time, and
+analyzing the results.</p>
 
 <p>See <a href="https://github.com/ttscoff/doing/wiki">the wiki</a> for installation and usage instructions.</p>
 
 <h2 id="launchbar-alfred">Launchbar/Alfred</h2>
 
-<p>The LaunchBar action requires that <code>doing</code> be available in <code>/usr/local/bin/doing</code>. If it&#39;s not (because you&#39;re using RVM or similar), you&#39;ll need to symlink it there. Running the action with Return will show the latest 9 items from Currently, along with any time intervals recorded, and includes a submenu of Timers for each tag.</p>
+<p>The LaunchBar action requires that <code>doing</code> be available in
+<code>/usr/local/bin/doing</code>. If it&#39;s not (because you&#39;re using RVM or similar),
+you&#39;ll need to symlink it there. Running the action with Return will show the
+latest 9 items from Currently, along with any time intervals recorded, and
+includes a submenu of Timers for each tag.</p>
 
-<p>Pressing Spacebar and typing allows you to add a new entry to currently. You an also trigger a custom show command by typing &quot;show [section/tag]&quot; and hitting return. Include any command line flags at the end of the string, and if you add text in parenthesis, it will be processed as a note on the entry.</p>
+<p>Pressing Spacebar and typing allows you to add a new entry to currently. You an
+also trigger a custom show command by typing &quot;show [section/tag]&quot; and hitting
+return. Include any command line flags at the end of the string, and if you add
+text in parenthesis, it will be processed as a note on the entry.</p>
 
-<p>Point of interest, the LaunchBar Action makes use of the <code>-o json</code> flag for outputting JSON to the action&#39;s script for parsing.</p>
+<p>Point of interest, the LaunchBar Action makes use of the <code>-o json</code> flag for
+outputting JSON to the action&#39;s script for parsing.</p>
 
 <!--GITHUB-->
 
@@ -103,13 +126,16 @@
 download 117 % 
 -->
 
-<p>Evan Lovely has <a href="http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/">created an Alfred workflow as well</a>.</p>
+<p>Evan Lovely has created an <a href="http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/">Alfred workflow</a> as well.</p>
 
 <h2 id="contributing">Contributing</h2>
 
-<p>If you <a href="https://github.com/ttscoff/doing/wiki/Creating-Plugins">create a plugin</a>, custom command, or hook you can share, please <a href="https://brettterpstra.com/contact/">let me know</a>. If I get a few plugin contributions, I&#39;ll set up a second repository for them.</p>
+<p>If you <a href="https://github.com/ttscoff/doing/wiki/Creating-Plugins">create a plugin</a>, custom command, or hook you can share, please
+<a href="https://brettterpstra.com/contact/">let me know</a>. If I get a few plugin contributions, I&#39;ll set up a
+second repository for them.</p>
 
-<p>Feel free to fork <a href="https://github.com/ttscoff/doing/">the repository</a> on GitHub and make pull requests with changes. Please target the <code>develop</code> branch with pull requests.</p>
+<p>Feel free to fork <a href="https://github.com/ttscoff/doing/">the repository</a> on GitHub and make pull requests
+with changes. Please target the <code>develop</code> branch with pull requests.</p>
 
 <!--END README-->
 
@@ -123,7 +149,7 @@ download 117 %
 </div></div>
 
       <div id="footer">
-  Generated on Sat Jan 15 17:27:48 2022 by
+  Generated on Mon Jan 17 06:23:37 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

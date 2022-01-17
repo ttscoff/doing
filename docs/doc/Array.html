@@ -94,14 +94,16 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/doing/array.rb</dd>
+    <dd>lib/doing/array.rb<span class="defines">,<br />
+  lib/doing/array_chronify.rb</span>
+</dd>
   </dl>
   
 </div>
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Array helpers</p>
+    <p>Chronify array helpers</p>
 
 
   </div>
@@ -215,6 +217,29 @@
 
   
     <span class="summary_desc"><div class='inline'><p>Convert an @tags to plain strings.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#time_string-instance_method" title="#time_string (instance method)">#<strong>time_string</strong>(format: :dhm)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Format [d, h, m] as string.</p>
 </div></span>
   
 </li>
@@ -468,6 +493,95 @@ with</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="time_string-instance_method">
+  
+    #<strong>time_string</strong>(format: :dhm)  &#x21d2; <tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Format [d, h, m] as string</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>time</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Array of [days, hours,
+minutes]</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>format</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:dhm</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The format, :dhm, :hm, :m, :clock, :natural</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>formatted string</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>InvalidArgument</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="to_tags-instance_method">
   
     #<strong>to_tags</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="Array (class)">Array</a></span></tt> 
@@ -540,7 +654,7 @@ with</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Jan 15 17:27:48 2022 by
+  Generated on Mon Jan 17 06:23:38 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

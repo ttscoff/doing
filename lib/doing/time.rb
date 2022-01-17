@@ -25,10 +25,10 @@ module Doing
       h = h % 24
 
       output = []
-      output.push("#{d} #{'day'.pluralize(d)}") if d.positive?
-      output.push("#{h} #{'hour'.pluralize(h)}") if h.positive?
-      output.push("#{m} #{'minute'.pluralize(m)}") if m.positive?
-      output.push("#{s} #{'second'.pluralize(s)}") if s.positive?
+      output.push("#{d} #{'day'.to_p(d)}") if d.positive?
+      output.push("#{h} #{'hour'.to_p(h)}") if h.positive?
+      output.push("#{m} #{'minute'.to_p(m)}") if m.positive?
+      output.push("#{s} #{'second'.to_p(s)}") if s.positive?
       output.join(', ')
     end
 

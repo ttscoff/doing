@@ -108,5 +108,48 @@ module Doing
     def time_string(format: :dhm)
       to_seconds.time_string(format: format)
     end
+
+    ##
+    ## Convert (chronify) natural language dates
+    ## within configured date tags (tags whose value is
+    ## expected to be a date). Modifies string in place.
+    ##
+    ## @param      additional_tags  [Array] An array of
+    ##                              additional tags to
+    ##                              consider date_tags
+    ##
+    def expand_date_tags(additional_tags = nil)
+      iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
+
+      watch_tags = [
+        'start(?:ed)?',
+        'beg[ia]n',
+        'done',
+        'finished',
+        'completed?',
+        'waiting',
+        'defer(?:red)?'
+      ]
+
+      if additional_tags
+        date_tags = additional_tags
+        date_tags = date_tags.split(/ *, */) if date_tags.is_a?(String)
+        date_tags.map! do |tag|
+          tag.sub(/^@/, '').gsub(/\((?!\?:)(.*?)\)/, '(?:\1)').strip
+        end
+        watch_tags.concat(date_tags).uniq!
+      end
+
+      done_rx = /(?<=^| )@(?<tag>#{watch_tags.join('|')})\((?<date>.*?)\)/i
+
+      gsub!(done_rx) do
+        m = Regexp.last_match
+        t = m['tag']
+        d = m['date']
+        future = t =~ /^(done|complete)/ ? false : true
+        parsed_date = d =~ iso_rx ? Time.parse(d) : d.chronify(guess: :begin, future: future)
+        parsed_date.nil? ? m[0] : "@#{t}(#{parsed_date.strftime('%F %R')})"
+      end
+    end
   end
 end
