@@ -236,6 +236,28 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#calculate_end_date-instance_method" title="#calculate_end_date (instance method)">#<strong>calculate_end_date</strong>(opt)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#duration-instance_method" title="#duration (instance method)">#<strong>duration</strong>  &#x21d2; Object </a>
     
 
@@ -297,6 +319,29 @@
 
   
     <span class="summary_desc"><div class='inline'><p>Test for equality between items.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#expand_date_tags-instance_method" title="#expand_date_tags (instance method)">#<strong>expand_date_tags</strong>(additional_tags = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Updates the title of the Item by expanding natural language dates within configured date tags (tags whose value is expected to be a date).</p>
 </div></span>
   
 </li>
@@ -878,7 +923,19 @@ the item belongs</p>
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="duration-instance_method">
+  <h3 class="signature first" id="calculate_end_date-instance_method">
+  
+    #<strong>calculate_end_date</strong>(opt)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="duration-instance_method">
   
     #<strong>duration</strong>  &#x21d2; <tt>Object</tt> 
   
@@ -992,6 +1049,53 @@ the item belongs</p>
     </li>
   
 </ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="expand_date_tags-instance_method">
+  
+    #<strong>expand_date_tags</strong>(additional_tags = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Updates the title of the Item by expanding natural
+language dates within configured date tags (tags
+whose value is expected to be a date)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>additional_tags</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>An array of additional
+tag names to consider
+dates</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 
 </div>
 </div>
@@ -1973,7 +2077,7 @@ thus should not receive a date on the @done tag</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Jan 15 17:27:48 2022 by
+  Generated on Mon Jan 17 07:58:57 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

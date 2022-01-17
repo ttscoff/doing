@@ -144,7 +144,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#add_at-instance_method" title="#add_at (instance method)">#<strong>add_at</strong>  &#x21d2; Object </a>
+      <a href="#add_at-instance_method" title="#add_at (instance method)">#<strong>add_at</strong>  &#x21d2; String </a>
     
 
     
@@ -158,7 +158,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Add @ prefix to string if needed, maintains +/- prefix.</p>
+</div></span>
   
 </li>
 
@@ -166,7 +167,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#add_tags-instance_method" title="#add_tags (instance method)">#<strong>add_tags</strong>(tags, remove: false)  &#x21d2; Object </a>
+      <a href="#add_tags-instance_method" title="#add_tags (instance method)">#<strong>add_tags</strong>(tags, remove: false)  &#x21d2; String </a>
     
 
     
@@ -180,7 +181,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>The tagged string.</p>
+</div></span>
   
 </li>
 
@@ -361,7 +363,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Remove duplicate tags, leaving only first occurrence.</p>
+</div></span>
   
 </li>
 
@@ -383,7 +386,29 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Remove duplicate tags, leaving only first occurrence.</p>
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#expand_date_tags-instance_method" title="#expand_date_tags (instance method)">#<strong>expand_date_tags</strong>(additional_tags = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert (chronify) natural language dates within configured date tags (tags whose value is expected to be a date).</p>
 </div></span>
   
 </li>
@@ -520,7 +545,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Turn raw urls into HTML links.</p>
+</div></span>
   
 </li>
 
@@ -542,29 +568,6 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Turn raw urls into HTML links.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#normalize_age-instance_method" title="#normalize_age (instance method)">#<strong>normalize_age</strong>(default = :newest)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
     <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
@@ -573,7 +576,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_age!-instance_method" title="#normalize_age! (instance method)">#<strong>normalize_age!</strong>(default = :newest)  &#x21d2; Symbol </a>
+      <a href="#normalize_age-instance_method" title="#normalize_age (instance method)">#<strong>normalize_age</strong>(default = :newest)  &#x21d2; Symbol </a>
     
 
     
@@ -596,7 +599,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_bool-instance_method" title="#normalize_bool (instance method)">#<strong>normalize_bool</strong>(default = :and)  &#x21d2; Object </a>
+      <a href="#normalize_age!-instance_method" title="#normalize_age! (instance method)">#<strong>normalize_age!</strong>(default = :newest)  &#x21d2; Object </a>
     
 
     
@@ -618,7 +621,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_bool!-instance_method" title="#normalize_bool! (instance method)">#<strong>normalize_bool!</strong>(default = :and)  &#x21d2; Object </a>
+      <a href="#normalize_bool-instance_method" title="#normalize_bool (instance method)">#<strong>normalize_bool</strong>(default = :and)  &#x21d2; Object </a>
     
 
     
@@ -641,7 +644,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_case-instance_method" title="#normalize_case (instance method)">#<strong>normalize_case</strong>(default = :smart)  &#x21d2; Object </a>
+      <a href="#normalize_bool!-instance_method" title="#normalize_bool! (instance method)">#<strong>normalize_bool!</strong>(default = :and)  &#x21d2; Object </a>
     
 
     
@@ -663,7 +666,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_case!-instance_method" title="#normalize_case! (instance method)">#<strong>normalize_case!</strong>  &#x21d2; Object </a>
+      <a href="#normalize_case-instance_method" title="#normalize_case (instance method)">#<strong>normalize_case</strong>(default = :smart)  &#x21d2; Object </a>
     
 
     
@@ -686,7 +689,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_matching-instance_method" title="#normalize_matching (instance method)">#<strong>normalize_matching</strong>(default = :pattern)  &#x21d2; Object </a>
+      <a href="#normalize_case!-instance_method" title="#normalize_case! (instance method)">#<strong>normalize_case!</strong>  &#x21d2; Object </a>
     
 
     
@@ -708,7 +711,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_matching!-instance_method" title="#normalize_matching! (instance method)">#<strong>normalize_matching!</strong>(default = :pattern)  &#x21d2; Object </a>
+      <a href="#normalize_matching-instance_method" title="#normalize_matching (instance method)">#<strong>normalize_matching</strong>(default = :pattern)  &#x21d2; Object </a>
     
 
     
@@ -724,6 +727,28 @@
   
     <span class="summary_desc"><div class='inline'><p>Convert a matching configuration string to a symbol.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_matching!-instance_method" title="#normalize_matching! (instance method)">#<strong>normalize_matching!</strong>(default = :pattern)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -776,7 +801,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_trigger-instance_method" title="#normalize_trigger (instance method)">#<strong>normalize_trigger</strong>  &#x21d2; Object </a>
+      <a href="#normalize_trigger-instance_method" title="#normalize_trigger (instance method)">#<strong>normalize_trigger</strong>  &#x21d2; String </a>
     
 
     
@@ -790,7 +815,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Adds ?: to any parentheticals in a regular expression to avoid match groups.</p>
+</div></span>
   
 </li>
 
@@ -799,28 +825,6 @@
   <span class="summary_signature">
     
       <a href="#normalize_trigger!-instance_method" title="#normalize_trigger! (instance method)">#<strong>normalize_trigger!</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#pluralize-instance_method" title="#pluralize (instance method)">#<strong>pluralize</strong>(number)  &#x21d2; Object </a>
     
 
     
@@ -902,7 +906,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Convert a string value to an appropriate type.</p>
+</div></span>
   
 </li>
 
@@ -978,6 +983,52 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#time_string-instance_method" title="#time_string (instance method)">#<strong>time_string</strong>(format: :dhm)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert DD:HH:MM to a natural language string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_p-instance_method" title="#to_p (instance method)">#<strong>to_p</strong>(number)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Pluralize a string based on quantity.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#to_rx-instance_method" title="#to_rx (instance method)">#<strong>to_rx</strong>(distance: nil, case_type: nil)  &#x21d2; Regexp </a>
     
 
@@ -1001,7 +1052,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#to_tags-instance_method" title="#to_tags (instance method)">#<strong>to_tags</strong>  &#x21d2; Object </a>
+      <a href="#to_seconds-instance_method" title="#to_seconds (instance method)">#<strong>to_seconds</strong>  &#x21d2; Integer </a>
     
 
     
@@ -1015,7 +1066,31 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Convert DD:HH:MM to seconds.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_tags-instance_method" title="#to_tags (instance method)">#<strong>to_tags</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert a list of tags to an array.</p>
+</div></span>
   
 </li>
 
@@ -1204,7 +1279,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#wildcard_to_rx-instance_method" title="#wildcard_to_rx (instance method)">#<strong>wildcard_to_rx</strong>  &#x21d2; Object </a>
+      <a href="#wildcard_to_rx-instance_method" title="#wildcard_to_rx (instance method)">#<strong>wildcard_to_rx</strong>  &#x21d2; String </a>
     
 
     
@@ -1218,7 +1293,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Convert ? and * wildcards to regular expressions.</p>
+</div></span>
   
 </li>
 
@@ -1269,25 +1345,115 @@
       <div class="method_details first">
   <h3 class="signature first" id="add_at-instance_method">
   
-    #<strong>add_at</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>add_at</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Add @ prefix to string if needed, maintains +/- prefix</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>@string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
   <h3 class="signature " id="add_tags-instance_method">
   
-    #<strong>add_tags</strong>(tags, remove: false)  &#x21d2; <tt>Object</tt> 
+    #<strong>add_tags</strong>(tags, remove: false)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the tagged string.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>tags</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span> or <span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>List of tags to add. @ symbol optional</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remove</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>remove tags instead of adding</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the tagged string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -1299,7 +1465,23 @@
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#add_tags-instance_method" title="String#add_tags (method)">#add_tags</a></span></li>
+    
+  </ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -1562,18 +1744,6 @@ added to a Time object</p>
   
 
   
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="dedup_tags!-instance_method">
-  
-    #<strong>dedup_tags!</strong>  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
 </h3><div class="docstring">
   <div class="discussion">
     <p>Remove duplicate tags, leaving only first occurrence</p>
@@ -1600,6 +1770,81 @@ added to a Time object</p>
     </li>
   
 </ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="dedup_tags!-instance_method">
+  
+    #<strong>dedup_tags!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#dedup_tags-instance_method" title="String#dedup_tags (method)">#dedup_tags</a></span></li>
+    
+  </ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="expand_date_tags-instance_method">
+  
+    #<strong>expand_date_tags</strong>(additional_tags = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert (chronify) natural language dates
+within configured date tags (tags whose value is
+expected to be a date). Modifies string in place.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>additional_tags</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>An array of
+additional tags to
+consider date_tags</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 
 </div>
 </div>
@@ -1839,21 +2084,11 @@ may not render the same style.</p>
   
 
   
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="link_urls!-instance_method">
-  
-    #<strong>link_urls!</strong>(**opt)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
 </h3><div class="docstring">
   <div class="discussion">
     <p>Turn raw urls into HTML links</p>
+
+<p>:html (default)</p>
 
 
   </div>
@@ -1879,6 +2114,55 @@ may not render the same style.</p>
   
 </ul>
 
+  
+    
+    
+    <p class="tag_title">Options Hash (<tt>**opt</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:format</span>
+          <span class="type">(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'><p>can be :markdown or</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="link_urls!-instance_method">
+  
+    #<strong>link_urls!</strong>(**opt)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#link_urls-instance_method" title="String#link_urls (method)">#link_urls</a></span></li>
+    
+  </ul>
 
 </div>
 </div>
@@ -1886,19 +2170,7 @@ may not render the same style.</p>
       <div class="method_details ">
   <h3 class="signature " id="normalize_age-instance_method">
   
-    #<strong>normalize_age</strong>(default = :newest)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="normalize_age!-instance_method">
-  
-    #<strong>normalize_age!</strong>(default = :newest)  &#x21d2; <tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt> 
+    #<strong>normalize_age</strong>(default = :newest)  &#x21d2; <tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt> 
   
 
   
@@ -1935,21 +2207,37 @@ may not render the same style.</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="normalize_bool-instance_method">
+  <h3 class="signature " id="normalize_age!-instance_method">
   
-    #<strong>normalize_bool</strong>(default = :and)  &#x21d2; <tt>Object</tt> 
-  
-
+    #<strong>normalize_age!</strong>(default = :newest)  &#x21d2; <tt>Object</tt> 
   
 
   
-</h3>
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#normalize_age-instance_method" title="String#normalize_age (method)">#normalize_age</a></span></li>
+    
+  </ul>
+
+</div>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="normalize_bool!-instance_method">
+  <h3 class="signature " id="normalize_bool-instance_method">
   
-    #<strong>normalize_bool!</strong>(default = :and)  &#x21d2; <tt>Object</tt> 
+    #<strong>normalize_bool</strong>(default = :and)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1986,21 +2274,37 @@ may not render the same style.</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="normalize_case-instance_method">
+  <h3 class="signature " id="normalize_bool!-instance_method">
   
-    #<strong>normalize_case</strong>(default = :smart)  &#x21d2; <tt>Object</tt> 
-  
-
+    #<strong>normalize_bool!</strong>(default = :and)  &#x21d2; <tt>Object</tt> 
   
 
   
-</h3>
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#normalize_bool-instance_method" title="String#normalize_bool (method)">#normalize_bool</a></span></li>
+    
+  </ul>
+
+</div>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="normalize_case!-instance_method">
+  <h3 class="signature " id="normalize_case-instance_method">
   
-    #<strong>normalize_case!</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>normalize_case</strong>(default = :smart)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -2037,21 +2341,37 @@ may not render the same style.</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="normalize_matching-instance_method">
+  <h3 class="signature " id="normalize_case!-instance_method">
   
-    #<strong>normalize_matching</strong>(default = :pattern)  &#x21d2; <tt>Object</tt> 
-  
-
+    #<strong>normalize_case!</strong>  &#x21d2; <tt>Object</tt> 
   
 
   
-</h3>
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#normalize_case-instance_method" title="String#normalize_case (method)">#normalize_case</a></span></li>
+    
+  </ul>
+
+</div>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="normalize_matching!-instance_method">
+  <h3 class="signature " id="normalize_matching-instance_method">
   
-    #<strong>normalize_matching!</strong>(default = :pattern)  &#x21d2; <tt>Object</tt> 
+    #<strong>normalize_matching</strong>(default = :pattern)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -2065,7 +2385,30 @@ may not render the same style.</p>
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>default</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:pattern</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>the default matching
+type to return if the string
+doesn&#39;t match a known symbol</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
   
@@ -2083,6 +2426,34 @@ may not render the same style.</p>
     </li>
   
 </ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_matching!-instance_method">
+  
+    #<strong>normalize_matching!</strong>(default = :pattern)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#normalize_matching-instance_method" title="String#normalize_matching (method)">#normalize_matching</a></span></li>
+    
+  </ul>
 
 </div>
 </div>
@@ -2141,13 +2512,41 @@ may not render the same style.</p>
       <div class="method_details ">
   <h3 class="signature " id="normalize_trigger-instance_method">
   
-    #<strong>normalize_trigger</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>normalize_trigger</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Adds ?: to any parentheticals in a regular expression
+to avoid match groups</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>modified regular expression</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -2159,19 +2558,23 @@ may not render the same style.</p>
   
 
   
-</h3>
-</div>
+</h3><div class="docstring">
+  <div class="discussion">
     
-      <div class="method_details ">
-  <h3 class="signature " id="pluralize-instance_method">
-  
-    #<strong>pluralize</strong>(number)  &#x21d2; <tt>Object</tt> 
+
+  </div>
+</div>
+<div class="tags">
   
 
-  
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#normalize_trigger-instance_method" title="String#normalize_trigger (method)">#normalize_trigger</a></span></li>
+    
+  </ul>
 
-  
-</h3>
+</div>
 </div>
     
       <div class="method_details ">
@@ -2227,7 +2630,62 @@ may not render the same style.</p>
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert a string value to an appropriate type. If
+kind is not specified, &#39;[one, two]&#39; becomes an Array,
+&#39;1&#39; becomes Integer, &#39;1.5&#39; becomes Float, &#39;true&#39; or
+&#39;yes&#39; becomes TrueClass, &#39;false&#39; or &#39;no&#39; becomes
+FalseClass.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>kind</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>specify string, array,
+integer, float, symbol, or boolean
+(falls back to string if value is
+not recognized)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>Converted object type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -2432,6 +2890,91 @@ may not render the same style.</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="time_string-instance_method">
+  
+    #<strong>time_string</strong>(format: :dhm)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert DD:HH:MM to a natural language string</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>format</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:dhm</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The format to output (:dhm, :hm, :m, :clock, :natural)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_p-instance_method">
+  
+    #<strong>to_p</strong>(number)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Pluralize a string based on quantity</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>number</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the quantity of the
+object the string represents</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="to_rx-instance_method">
   
     #<strong>to_rx</strong>(distance: nil, case_type: nil)  &#x21d2; <tt>Regexp</tt> 
@@ -2523,15 +3066,96 @@ between characters</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="to_seconds-instance_method">
+  
+    #<strong>to_seconds</strong>  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert DD:HH:MM to seconds</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>rounded number of seconds</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Errors::DoingRuntimeError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="to_tags-instance_method">
   
-    #<strong>to_tags</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>to_tags</strong>  &#x21d2; <tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert a list of tags to an array. Tags can be with
+or without @ symbols, separated by any character, and
+can include parenthetical values (with spaces)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>array of tags including @ symbols</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -2797,13 +3421,41 @@ be recognized, e.g. %greensomething still finds
       <div class="method_details ">
   <h3 class="signature " id="wildcard_to_rx-instance_method">
   
-    #<strong>wildcard_to_rx</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>wildcard_to_rx</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert ? and * wildcards to regular expressions.
+Uses \S (non-whitespace) instead of . (any character)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Regular expression string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -2886,7 +3538,7 @@ be recognized, e.g. %greensomething still finds
 </div>
 
       <div id="footer">
-  Generated on Sat Jan 15 17:27:48 2022 by
+  Generated on Mon Jan 17 07:58:57 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>
