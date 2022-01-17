@@ -57,6 +57,25 @@ module Doing
       @end_date ||= Time.parse(Regexp.last_match(1)) if @title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/
     end
 
+    def calculate_end_date(opt)
+      if opt[:took]
+        if @date + opt[:took] > Time.now
+          @date = Time.now - opt[:took]
+          Time.now
+        else
+          @date + opt[:took]
+        end
+      elsif opt[:back]
+        if opt[:back].is_a? Integer
+          @date + opt[:back]
+        else
+          @date + (opt[:back] - @date)
+        end
+      else
+        Time.now
+      end
+    end
+
     # Generate a hash that represents the entry
     #
     # @return [String] entry hash
@@ -110,6 +129,19 @@ module Doing
       interval = item_b.interval
       end_b = interval ? start_b + interval.to_i : start_b
       (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
+    end
+
+    ##
+    ## Updates the title of the Item by expanding natural
+    ## language dates within configured date tags (tags
+    ## whose value is expected to be a date)
+    ##
+    ## @param      additional_tags  An array of additional
+    ##                              tag names to consider
+    ##                              dates
+    ##
+    def expand_date_tags(additional_tags = nil)
+      @title.expand_date_tags(additional_tags)
     end
 
     ##

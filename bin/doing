@@ -350,7 +350,7 @@ command %i[done did] do |c|
   If used without the --back option, the start date will be moved back to allow
   the completion date to be the current time.)
   c.arg_name 'INTERVAL'
-  c.flag %i[t took]
+  c.flag %i[t took for]
 
   c.desc 'Section'
   c.arg_name 'NAME'
@@ -401,6 +401,8 @@ command %i[done did] do |c|
     end
 
     if options[:date]
+      finish_date = wwid.verify_duration(date, finish_date) unless options[:took]
+
       donedate = finish_date.strftime('%F %R')
     end
 
@@ -467,7 +469,6 @@ command %i[done did] do |c|
       if options[:remove]
         wwid.tag_last({ tags: ['done'], count: 1, section: section, remove: true })
       else
-        note = options[:note] ? Doing::Note.new(options[:note]) : nil
         opt = {
           archive: options[:archive],
           back: finish_date,
@@ -548,7 +549,7 @@ command :finish do |c|
 
   c.desc 'Set the completed date to the start date plus XX[hmd]'
   c.arg_name 'INTERVAL'
-  c.flag %i[t took]
+  c.flag %i[t took for]
 
   c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.)
   c.arg_name 'DATE_STRING'

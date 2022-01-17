@@ -41,8 +41,28 @@ class DoingUtilTest < Test::Unit::TestCase
     interval = @wwid.get_interval(item, formatted: false, record: false)
     assert_equal(distance, interval, 'Interval should match')
     minutes = interval / 60 % 60
-    res = @wwid.format_time(interval)
+    res = interval.format_time
     assert_equal(minutes, res[2], 'Interval array should match')
+  end
+
+  def test_format_time_string
+    res = [0, 0, 15].time_string(format: :clock)
+    assert_equal('00:00:15', res, 'Format should match')
+
+    res = [0, 0, 15].time_string(format: :natural)
+    assert_equal('15 minutes', res, 'Format should match')
+
+    res = [0, 1, 15].time_string(format: :natural)
+    assert_equal('1 hour, 15 minutes', res, 'Format should match')
+
+    res = [1, 2, 15].time_string(format: :natural)
+    assert_equal('1 day, 2 hours, 15 minutes', res, 'Format should match')
+
+    res = [1, 2, 15].time_string(format: :dhm)
+    assert_equal('1d 2h 15m', res, 'Format should match')
+
+    res = [1, 2, 15].time_string(format: :hm)
+    assert_equal('  26h 15m', res, 'Format should match')
   end
 
   def test_link_urls

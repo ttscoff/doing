@@ -84,7 +84,7 @@ module Doing
         interval ||= false
         human_time = false
         if interval
-          d, h, m = wwid.format_time(wwid.get_interval(i, formatted: false))
+          d, h, m = wwid.get_interval(i, formatted: false).format_time
           human_times = []
           human_times << format('%<d>d day%<p>s', d: d, p: d == 1 ? '' : 's') if d > 0
           human_times << format('%<h>d hour%<p>s', h: h, p: h == 1 ? '' : 's') if h > 0

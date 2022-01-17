@@ -79,7 +79,7 @@ module Doing
       def redo_backup(filename = nil, count: 1)
         filename ||= Doing.config.settings['doing_file']
         # redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
-        undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort
+        undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort.reverse
         total = undones.count
         count = total if count > total
 

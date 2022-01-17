@@ -185,34 +185,9 @@ module Doing
 
       date = nil
       iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
-      watch_tags = [
-        'start(?:ed)?',
-        'beg[ia]n',
-        'done',
-        'finished',
-        'completed?',
-        'waiting',
-        'defer(?:red)?'
-      ]
-      if @config['date_tags']
-        date_tags = @config['date_tags']
-        date_tags = date_tags.split(/ *, */) if date_tags.is_a?(String)
-        date_tags.map! do |tag|
-          tag.sub(/^@/, '').gsub(/\((?!\?:)(.*?)\)/, '(?:\1)').strip
-        end
-        watch_tags.concat(date_tags).uniq!
-      end
-
-      done_rx = /(?<=^| )@(?<tag>#{watch_tags.join('|')})\((?<date>.*?)\)/i
       date_rx = /^(?:\s*- )?(?<date>.*?) \| (?=\S)/
 
-      title.gsub!(done_rx) do
-        m = Regexp.last_match
-        t = m['tag']
-        d = m['date']
-        parsed_date = d =~ date_rx ? Time.parse(d) : d.chronify(guess: :begin)
-        parsed_date.nil? ? m[0] : "@#{t}(#{parsed_date.strftime('%F %R')})"
-      end
+      title.expand_date_tags(@config['date_tags'])
 
       if title =~ date_rx
         m = title.match(date_rx)
@@ -369,7 +344,8 @@ module Doing
         items.each_with_index do |i, x|
           next if i.title =~ / @done/
 
-          items[x].title = "#{i.title} @done(#{opt[:back].strftime('%F %R')})"
+          finish_date = verify_duration(i.date, opt[:back], title: i.title)
+          items[x].tag('done', value: finish_date.strftime('%F %R'))
           break
         end
       end
@@ -1001,7 +977,7 @@ module Doing
                                                  '--no-sort',
                                                  '--info=hidden'
                                                ])
-            next if tag =~ /^ *$/
+            next if output_format =~ /^ *$/
 
             raise UserCancelled unless output_format
 
@@ -1089,6 +1065,7 @@ module Doing
         tag = opt[:tag]
         items.map! do |i|
           i.tag(tag, date: false, remove: opt[:remove], single: single)
+          i.expand_date_tags(@config['date_tags'])
           Hooks.trigger :post_entry_updated, self, i
         end
       end
@@ -1146,6 +1123,26 @@ module Doing
       else
         Doing::Pager.page output
       end
+    end
+
+    def verify_duration(date, finish_date, title: nil)
+      max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
+      max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
+      elapsed = finish_date - date
+
+      if max_elapsed.positive? && (elapsed > max_elapsed)
+        puts boldwhite(title) if title
+        human = elapsed.time_string(format: :natural)
+        res = Prompt.yn(yellow("Did this entry actually take #{human}"), default_response: true)
+        unless res
+          new_elapsed = Prompt.enter_text('How long did it take?').chronify_qty
+          raise InvalidTimeExpression, 'Unrecognized time span entry' unless new_elapsed.positive?
+
+          finish_date = date + new_elapsed if new_elapsed
+        end
+      end
+
+      finish_date
     end
 
     ##
@@ -1209,21 +1206,8 @@ module Doing
                         else
                           next_entry.date - 60
                         end
-          elsif opt[:took]
-            if item.date + opt[:took] > Time.now
-              item.date = Time.now - opt[:took]
-              done_date = Time.now
-            else
-              done_date = item.date + opt[:took]
-            end
-          elsif opt[:back]
-            done_date = if opt[:back].is_a? Integer
-                          item.date + opt[:back]
-                        else
-                          item.date + (opt[:back] - item.date)
-                        end
           else
-            done_date = Time.now
+            done_date = item.calculate_end_date(opt)
           end
 
           opt[:tags].each do |tag|
@@ -1234,7 +1218,28 @@ module Doing
               next
             end
 
+
             tag = tag.strip
+
+            if tag =~ /^done$/
+              max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
+              max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
+              elapsed = done_date - item.date
+
+              if max_elapsed.positive? && (elapsed > max_elapsed) && !opt[:took]
+                puts boldwhite(item.title)
+                human = elapsed.time_string(format: :natural)
+                res = Prompt.yn(yellow("Did this actually take #{human}"), default_response: true)
+                unless res
+                  new_elapsed = Prompt.enter_text('How long did it take?').chronify_qty
+                  raise InvalidTimeExpression, 'Unrecognized time span entry' unless new_elapsed > 0
+
+                  opt[:took] = new_elapsed
+                  done_date = item.calculate_end_date(opt) if opt[:took]
+                end
+              end
+            end
+
             if opt[:remove] || opt[:rename] || opt[:value]
               rename_to = nil
               if opt[:value]
@@ -1272,6 +1277,7 @@ module Doing
           logger.warn('Skipped:', 'Archiving is skipped when operating on all entries')
         end
 
+        item.expand_date_tags(@config['date_tags'])
         Hooks.trigger :post_entry_updated, self, item
       end
 
@@ -2005,7 +2011,7 @@ module Doing
 EOS
         sorted_tags_data.reverse.each do |k, v|
           if v > 0
-            output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{'%02d:%02d:%02d' % format_time(v)}</td></tr>\n"
+            output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{v.time_string(format: :clock)}</td></tr>\n"
           end
         end
         tail = <<EOS
@@ -2016,7 +2022,7 @@ EOS
         <tfoot>
         <tr>
           <td style="text-align:left;"><strong>Total</strong></td>
-          <td style="text-align:left;">#{'%02d:%02d:%02d' % format_time(total)}</td>
+          <td style="text-align:left;">#{total.time_string(format: :clock)}</td>
         </tr>
         </tfoot>
         </table>
@@ -2031,7 +2037,7 @@ EOS
         EOS
         sorted_tags_data.reverse.each do |k, v|
           if v > 0
-            output += "| #{' ' * (pad - k.length)}#{k} | #{'%02d:%02d:%02d' % format_time(v)} |\n"
+            output += "| #{' ' * (pad - k.length)}#{k} | #{v.time_string(format: :clock)} |\n"
           end
         end
         tail = "[Tag Totals]"
@@ -2039,11 +2045,10 @@ EOS
       when :json
         output = []
         sorted_tags_data.reverse.each do |k, v|
-          d, h, m = format_time(v)
           output << {
             'tag' => k,
             'seconds' => v,
-            'formatted' => format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
+            'formatted' => v.time_string(format: :clock)
           }
         end
         output
@@ -2054,8 +2059,7 @@ EOS
           (max - k.length).times do
             spacer += ' '
           end
-          _d, h, m = format_time(v, human: true)
-          output.push("┃ #{spacer}#{k}:#{format('%<h> 4dh %<m>02dm', h: h, m: m)} ┃")
+          output.push("┃ #{spacer}#{k}:#{v.time_string(format: :hm)} ┃")
         end
 
         header = '┏━━ Tag Totals '
@@ -2068,14 +2072,14 @@ EOS
         (max + 12).times { divider += '━' }
         divider += '┫'
         output = output.empty? ? '' : "\n#{header}\n#{output.join("\n")}"
-        d, h, m = format_time(total, human: true)
         output += "\n#{divider}"
         spacer = ''
         (max - 6).times do
           spacer += ' '
         end
+        total_time = total.time_string(format: :hm)
         total = "┃ #{spacer}total: "
-        total += format('%<h> 4dh %<m>02dm', h: h, m: m)
+        total += total_time
         total += ' ┃'
         output += "\n#{total}"
         output += "\n#{footer}"
@@ -2087,13 +2091,11 @@ EOS
           (max - k.length).times do
             spacer += ' '
           end
-          d, h, m = format_time(v)
-          output.push("#{k}:#{spacer}#{format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)}")
+          output.push("#{k}:#{spacer}#{v.time_string(format: :clock)}")
         end
 
         output = output.empty? ? '' : "\n--- Tag Totals ---\n#{output.join("\n")}"
-        d, h, m = format_time(total)
-        output += "\n\nTotal tracked: #{format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)}\n"
+        output += "\n\nTotal tracked: #{total.time_string(format: :clock)}\n"
         output
       end
     end
@@ -2118,37 +2120,10 @@ EOS
         record_tag_times(item, seconds) if record
         return seconds.positive? ? seconds : false unless formatted
 
-        return seconds.positive? ? format('%02d:%02d:%02d', *format_time(seconds)) : false
+        return seconds.positive? ? seconds.time_string(format: :clock) : false
       end
 
       false
-    end
-
-    ##
-    ## Format human readable time from seconds
-    ##
-    ## @param      seconds  [Integer] Seconds
-    ##
-    def format_time(seconds, human: false)
-      return [0, 0, 0] if seconds.nil?
-
-      if seconds.instance_of?(String) && seconds =~ /(\d+):(\d+):(\d+)/
-        h = Regexp.last_match(1)
-        m = Regexp.last_match(2)
-        s = Regexp.last_match(3)
-        seconds = (h.to_i * 60 * 60) + (m.to_i * 60) + s.to_i
-      end
-      minutes = (seconds / 60).to_i
-      hours = (minutes / 60).to_i
-      if human
-        minutes = (minutes % 60).to_i
-        [0, hours, minutes]
-      else
-        days = (hours / 24).to_i
-        hours = (hours % 24).to_i
-        minutes = (minutes % 60).to_i
-        [days, hours, minutes]
-      end
     end
 
     def configure(filename = nil)
