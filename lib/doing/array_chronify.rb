@@ -20,10 +20,10 @@ module Doing
         format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
       when :dhm
         output = []
-        output.push(format('%<d>2dd', d: d)) if d.positive?
-        output.push(format('%<h>2dh', h: h)) if h.positive?
-        output.push(format('%<m>2dm', m: m)) if m.positive?
-        output.join('')
+        output.push(format('%<d>dd', d: d)) if d.positive?
+        output.push(format('%<h>dh', h: h)) if h.positive?
+        output.push(format('%<m>dm', m: m)) if m.positive?
+        output.join(' ')
       when :hm
         h += d * 24 if d.positive?
         format('%<h> 4dh %<m>02dm', h: h, m: m)
@@ -33,10 +33,24 @@ module Doing
         format('%<m> 4dm', m: m)
       when :natural
         human = []
-        human.push(format('%<d>2d %<s>s', d: d, s: 'day'.to_p(d))) if d.positive?
-        human.push(format('%<h>2d %<s>s', h: h, s: 'hour'.to_p(h))) if h.positive?
-        human.push(format('%<m>2d %<s>s', m: m, s: 'minute'.to_p(m))) if m.positive?
+        human.push(format('%<d>d %<s>s', d: d, s: 'day'.to_p(d))) if d.positive?
+        human.push(format('%<h>d %<s>s', h: h, s: 'hour'.to_p(h))) if h.positive?
+        human.push(format('%<m>d %<s>s', m: m, s: 'minute'.to_p(m))) if m.positive?
         human.join(', ')
+      when :speech
+        human = []
+        human.push(format('%<d>d %<s>s', d: d, s: 'day'.to_p(d))) if d.positive?
+        human.push(format('%<h>d %<s>s', h: h, s: 'hour'.to_p(h))) if h.positive?
+        human.push(format('%<m>d %<s>s', m: m, s: 'minute'.to_p(m))) if m.positive?
+        last = human.pop
+        case human.count
+        when 2
+          human.join(', ') + ", and #{last}"
+        when 1
+          "#{human[0]} and #{last}"
+        when 0
+          last
+        end
       end
     end
   end

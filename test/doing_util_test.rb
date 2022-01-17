@@ -45,6 +45,26 @@ class DoingUtilTest < Test::Unit::TestCase
     assert_equal(minutes, res[2], 'Interval array should match')
   end
 
+  def test_format_time_string
+    res = [0, 0, 15].time_string(format: :clock)
+    assert_equal('00:00:15', res, 'Format should match')
+
+    res = [0, 0, 15].time_string(format: :natural)
+    assert_equal('15 minutes', res, 'Format should match')
+
+    res = [0, 1, 15].time_string(format: :natural)
+    assert_equal('1 hour, 15 minutes', res, 'Format should match')
+
+    res = [1, 2, 15].time_string(format: :natural)
+    assert_equal('1 day, 2 hours, 15 minutes', res, 'Format should match')
+
+    res = [1, 2, 15].time_string(format: :dhm)
+    assert_equal('1d 2h 15m', res, 'Format should match')
+
+    res = [1, 2, 15].time_string(format: :hm)
+    assert_equal('  26h 15m', res, 'Format should match')
+  end
+
   def test_link_urls
     res = 'Raw https://brettterpstra.com url'.link_urls
     assert_match(%r{<a href="https://brettterpstra.com" title="Link to brettterpstra.com">\[brettterpstra.com\]</a>},
