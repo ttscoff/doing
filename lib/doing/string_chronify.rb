@@ -151,5 +151,33 @@ module Doing
         parsed_date.nil? ? m[0] : "@#{t}(#{parsed_date.strftime('%F %R')})"
       end
     end
+
+    ##
+    ## Splits a range string and returns an array of
+    ## DateTime objects as [start, end]. If only one date is
+    ## given, end time is nil.
+    ##
+    ## @return     [Array<DateTime>] Start and end dates as
+    ##             array
+    ## @example    Process a natural language date range
+    ## "mon 3pm to mon 5pm".split_date_range
+    ##
+    def split_date_range
+      date_string = dup
+      case date_string
+      when / (to|through|thru|(un)?til|-+) /
+        dates = date_string.split(/ (?:to|through|thru|(?:un)?til|-+) /)
+        start = dates[0].chronify(guess: :begin)
+        finish = dates[-1].chronify(guess: :end)
+      else
+        start = date_string.chronify(guess: :begin)
+        finish = nil
+      end
+
+      raise InvalidTimeExpression, 'Unrecognized date string' unless start
+
+      Doing.logger.debug('Parser:', "date range interpreted as #{start.strftime('%F %R')} -- #{finish ? finish.strftime('%F %R') : 'now'}")
+      [start, finish]
+    end
   end
 end

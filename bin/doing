@@ -338,13 +338,20 @@ command %i[done did] do |c|
   c.switch %i[a archive], negatable: false, default_value: false
 
   c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
-  If used, ignores --back. Used with --took, backdates start date)
+  Used with --took, backdates start date)
   c.arg_name 'DATE_STRING'
-  c.flag [:at]
+  c.flag %i[at finished]
 
   c.desc 'Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]'
   c.arg_name 'DATE_STRING'
   c.flag %i[b back started]
+
+  c.desc %(
+        Start and end times as a date/time range `doing done --from "1am to 8am"`.
+        Overrides other date flags.
+      )
+  c.arg_name 'TIME_RANGE'
+  c.flag [:from]
 
   c.desc %(Set completion date to start date plus interval (XX[mhd] or HH:MM).
   If used without the --back option, the start date will be moved back to allow
@@ -377,31 +384,40 @@ command %i[done did] do |c|
     took = 0
     donedate = nil
 
-    if options[:took]
-      took = options[:took].chronify_qty
-      raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
-    end
-
-    if options[:back]
-      date = options[:back].chronify(guess: :begin)
-      raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
+    if options[:from]
+      date, finish_date = options[:from].split_date_range
+      finish_date ||= Time.now
     else
-      date = options[:took] ? Time.now - took : Time.now
-    end
+      if options[:took]
+        took = options[:took].chronify_qty
+        raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
+      end
 
-    if options[:at]
-      finish_date = options[:at].chronify(guess: :begin)
-      raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
+      if options[:back]
+        date = options[:back].chronify(guess: :begin)
+        raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
+      else
+        date = options[:took] ? Time.now - took : Time.now
+      end
 
-      date = options[:took] ? finish_date - took : finish_date
-    elsif options[:took]
-      finish_date = date + took
-    else
-      finish_date = Time.now
+      if options[:at]
+        finish_date = options[:at].chronify(guess: :begin)
+        raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
+
+        if options[:took]
+          date = finish_date - took
+        else
+          date ||= finish_date
+        end
+      elsif options[:took]
+        finish_date = date + took
+      else
+        finish_date = Time.now
+      end
     end
 
     if options[:date]
-      finish_date = wwid.verify_duration(date, finish_date) unless options[:took]
+      finish_date = wwid.verify_duration(date, finish_date) unless options[:took] || options[:from]
 
       donedate = finish_date.strftime('%F %R')
     end
@@ -412,9 +428,13 @@ command %i[done did] do |c|
       section = settings['current_section']
     end
 
+
     note = Doing::Note.new
     note.add(options[:note]) if options[:note]
-    note.add(Doing::Prompt.read_lines(prompt: 'Add a note')) if options[:ask]
+
+    if options[:ask] && !options[:editor]
+      note.add(Doing::Prompt.read_lines(prompt: 'Add a note'))
+    end
 
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
@@ -440,6 +460,12 @@ command %i[done did] do |c|
       raise EmptyInput, 'No content' unless input && !input.empty?
 
       d, title, note = wwid.format_input(input)
+
+      if options[:ask]
+        ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
+        note.add(ask_note) unless ask_note.empty?
+      end
+
       date = d.nil? ? date : d
       new_entry = Doing::Item.new(date, title, section, note)
       if new_entry.should_finish?
@@ -483,12 +509,13 @@ command %i[done did] do |c|
         wwid.tag_last(opt)
       end
     elsif !args.empty?
-      note = Doing::Note.new(options[:note])
       d, title, new_note = wwid.format_input([args.join(' '), note.strip_lines.join("\n")].join("\n"))
       date = d.nil? ? date : d
+      new_note.add(options[:note])
       title.chomp!
       section = 'Archive' if options[:archive]
       new_entry = Doing::Item.new(date, title, section, new_note)
+
       if new_entry.should_finish?
         if new_entry.should_time?
           new_entry.tag('done', value: donedate)
@@ -496,12 +523,14 @@ command %i[done did] do |c|
           new_entry.tag('done')
         end
       end
+
       Doing::Hooks.trigger :pre_entry_add, wwid, new_entry
       wwid.content.push(new_entry)
       Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
       wwid.write(wwid.doing_file)
       Doing.logger.info('Entry Added:', new_entry.title)
     elsif $stdin.stat.size.positive?
+      note = Doing::Note.new(options[:note])
       d, title, note = wwid.format_input($stdin.read.strip)
       unless d.nil?
         Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
@@ -1124,7 +1153,8 @@ Run without arguments to create a new entry interactively.
 Run with --editor to create a new entry using #{Doing::Util.default_editor}.)
 arg_name 'ENTRY'
 command %i[now next] do |c|
-  c.example 'doing now', desc: "Open #{Doing::Util.default_editor} to input an entry and optional note."
+  c.example 'doing now', desc: 'Create a new entry with interactive prompts'
+  c.example 'doing now -e', desc: "Open #{Doing::Util.default_editor} to input an entry and optional note"
   c.example 'doing now working on a new project', desc: 'Add a new entry at the current time'
   c.example 'doing now debugging @project2', desc: 'Add an entry with a tag'
   c.example 'doing now adding an entry (with a note)', desc: 'Parenthetical at end is converted to note'
