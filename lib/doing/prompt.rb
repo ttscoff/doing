@@ -23,6 +23,47 @@ module Doing
         $stdin.gets.strip
       end
 
+      def read_line(prompt: 'Enter text', completions: [], default_response: '')
+        return default_response if @default_answer
+
+        unless completions.empty?
+          completions.sort!
+          comp = proc { |s| completions.grep(/^#{Regexp.escape(s)}/) }
+          Readline.completion_append_character = " "
+          Readline.completion_proc = comp
+        end
+
+        begin
+          Readline.readline("#{yellow(prompt).sub(/:?$/, ':')} #{reset}", true).strip
+        rescue Interrupt
+          raise UserCancelled
+        end
+      end
+
+      def read_lines(prompt: 'Enter text', completions: [])
+        return default_response if @default_answer
+
+        completions.sort!
+        comp = proc { |s| completions.grep(/^#{Regexp.escape(s)}/) }
+        Readline.completion_append_character = " "
+        Readline.completion_proc = comp
+
+        puts "#{boldgreen(prompt.sub(/:?$/, ':'))} #{yellow('Hit return for a new line, ')}#{boldwhite('enter a blank line (')}#{boldyellow('return twice')}#{boldwhite(') to end editing')}"
+
+        res = []
+
+        begin
+          while line = Readline.readline('> ', true)
+            break if line.strip.empty?
+            res << line.chomp
+          end
+        rescue Interrupt
+          raise UserCancelled
+        end
+
+        res.join("\n").strip
+      end
+
       def request_lines(prompt: 'Enter text')
         ask_note = []
         reader = TTY::Reader.new(interrupt: -> { raise Errors::UserCancelled }, track_history: false)
