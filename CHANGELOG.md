@@ -1,3 +1,22 @@
+### 2.1.16
+
+2022-01-17 10:38
+
+#### IMPROVED
+
+- Running `doing tag` without arguments takes command line input
+- If `doing now` or `doing later` are run without arguments, interactively request necessary information (you can still use --editor to edit in your preferred editor)
+- Tab completion for tags when entering at prompt
+- Use readline when requesting input text, better editing features
+
+#### FIXED
+
+- `doing select` -> output formatted empty output
+- Sort items by date when using `doing select --editor` (was loading in selection order instead)
+- Ruby 2.7 error in template output (.empty? on FalseClass)
+- Don't add empty entry when cancelling --editor
+- Batch editing bugs
+
 ### 2.1.15
 
 2022-01-17 07:25
