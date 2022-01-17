@@ -27,6 +27,12 @@ module Doing
       end
     end
 
+    ##
+    ## Format seconds as natural language time string
+    ##
+    ## @param      format  [Symbol] The format to output
+    ##                     (:dhm, :hm, :m, :clock, :natural)
+    ##
     def time_string(format: :dhm)
       format_time(human: true).time_string(format: format)
     end

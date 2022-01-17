@@ -131,6 +131,15 @@ module Doing
       (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
     end
 
+    ##
+    ## Updates the title of the Item by expanding natural
+    ## language dates within configured date tags (tags
+    ## whose value is expected to be a date)
+    ##
+    ## @param      additional_tags  An array of additional
+    ##                              tag names to consider
+    ##                              dates
+    ##
     def expand_date_tags(additional_tags = nil)
       @title.expand_date_tags(additional_tags)
     end
