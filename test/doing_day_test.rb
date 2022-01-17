@@ -59,9 +59,9 @@ class DoingDayTest < Test::Unit::TestCase
 
     doing('done', today)
     doing('done', '--back', 'yesterday 3pm', yesterday3)
-    doing('done', '--at', 'yesterday 4pm', yesterday4)
+    doing('done', '--started', 'yesterday 4pm', yesterday4)
     doing('done', '--back', '48h', twodays)
-    doing('done', '--at', '3 days ago at 1pm', threedays)
+    doing('done', '--started', '3 days ago at 1pm', threedays)
 
     res = doing('since', 'yesterday')
     assert_count_entries(3, res, 'There should be 3 entries shown')

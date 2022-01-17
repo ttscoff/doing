@@ -31,6 +31,7 @@ class DoingUndoTest < Test::Unit::TestCase
     ]
     entries.each do |e|
       doing('now', e)
+      sleep 0.5
     end
 
     assert_count_entries(entries.count, doing('show'))

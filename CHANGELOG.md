@@ -1,6 +1,10 @@
 ### 2.1.16
 
-2022-01-17 10:38
+2022-01-17 16:01
+
+#### NEW
+
+- `doing done --from "3pm to 3:15pm"` to set start and end times with natural language string
 
 #### IMPROVED
 
@@ -8,6 +12,7 @@
 - If `doing now` or `doing later` are run without arguments, interactively request necessary information (you can still use --editor to edit in your preferred editor)
 - Tab completion for tags when entering at prompt
 - Use readline when requesting input text, better editing features
+- `doing done --at` no longer overrides `--back`
 
 #### FIXED
 
