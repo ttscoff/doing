@@ -155,7 +155,7 @@ complete -c doing -l editor -s e -f  -n '__fish_doing_using_command done did' -d
 complete -c doing -l note -s n -f -r -n '__fish_doing_using_command done did' -d Include\ a\ note
 complete -c doing -l remove -s r -f  -n '__fish_doing_using_command done did' -d Remove\ @done\ tag
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command done did' -d Section
-complete -c doing -l took -s t -f -r -n '__fish_doing_using_command done did' -d Set\ completion\ date\ to\ start\ date\ plus\ interval
+complete -c doing -l for  -f -r -n '__fish_doing_using_command done did' -d Set\ completion\ date\ to\ start\ date\ plus\ interval
 complete -c doing -l unfinished -s u -f  -n '__fish_doing_using_command done did' -d Finish\ last\ entry\ not\ already\ marked\ @done
 complete -c doing -l archive -s a -f  -n '__fish_doing_using_command finish' -d Archive\ entries
 complete -c doing -l at  -f -r -n '__fish_doing_using_command finish' -d Set\ finish\ date\ to\ specific\ date/time
@@ -169,7 +169,7 @@ complete -c doing -l not  -f  -n '__fish_doing_using_command finish' -d Finish\ 
 complete -c doing -l remove -s r -f  -n '__fish_doing_using_command finish' -d Remove\ done\ tag
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command finish' -d Section
 complete -c doing -l search  -f -r -n '__fish_doing_using_command finish' -d Finish\ the\ last\ X\ entries\ matching\ search\ filter
-complete -c doing -l took -s t -f -r -n '__fish_doing_using_command finish' -d Set\ the\ completed\ date\ to\ the\ start\ date\ plus\ XX\[hmd\]
+complete -c doing -l for  -f -r -n '__fish_doing_using_command finish' -d Set\ the\ completed\ date\ to\ the\ start\ date\ plus\ XX\[hmd\]
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command finish' -d Finish\ the\ last\ X\ entries\ containing\ TAG
 complete -c doing -l unfinished -s u -f  -n '__fish_doing_using_command finish' -d Finish\ last\ entry
 complete -c doing -l val  -f -r -n '__fish_doing_using_command finish' -d Perform\ a\ tag\ value\ query

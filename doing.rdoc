@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.14
+v2.1.15
 
 === Global Options
 === --config_file arg
@@ -557,7 +557,7 @@ Section
 [Default Value] None
 
 
-===== -t|--took INTERVAL
+===== -t|--took|--for INTERVAL
 
 Set completion date to start date plus interval (XX[mhd] or HH:MM).
   If used without the --back option, the start date will be moved back to allow
@@ -645,7 +645,7 @@ Finish the last X entries matching search filter, surround with slashes for rege
 [Default Value] None
 
 
-===== -t|--took INTERVAL
+===== -t|--took|--for INTERVAL
 
 Set the completed date to the start date plus XX[hmd]
 
