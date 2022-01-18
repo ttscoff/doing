@@ -9,6 +9,8 @@ module Doing
 
     # attr_reader :id
 
+    include Color
+
     ##
     ## Initialize an item with date, title, section, and
     ## optional note
@@ -370,6 +372,27 @@ module Doing
     # outputs item in Doing file format, including leading tab
     def to_s
       "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.empty? ? '' : "\n#{@note}"}"
+    end
+
+    ##
+    ## outputs a colored string with relative date and highlighted tags
+    ##
+    ## @return     Pretty representation of the object.
+    ##
+    def to_pretty(elements: %i[date title section])
+      output = []
+      elements.each do |e|
+        case e
+        when :date
+          output << format('%13s |', @date.relative_date).cyan
+        when :section
+          output << "#{magenta}(#{white(@section)}#{magenta})"
+        when :title
+          output << @title.white.highlight_tags('cyan')
+        end
+      end
+
+      output.join(' ')
     end
 
     # @private

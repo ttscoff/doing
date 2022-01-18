@@ -1236,14 +1236,20 @@ command %i[now next] do |c|
         date = d
       end
       note.add(options[:note]) if options[:note]
-      note.add(ask_note) unless ask_note.empty?
+      if ask_note.empty? && options[:ask]
+        ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
+        note.add(ask_note) unless ask_note.empty?
+      end
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     else
-      title = Doing::Prompt.read_line(prompt: 'Entry content')
+      tags = wwid.all_tags(wwid.content)
+      $stderr.puts Doing::Color.boldgreen("Add a new entry. Tab will autocomplete known tags. Ctrl-c to cancel.")
+      title = Doing::Prompt.read_line(prompt: 'Entry content', completions: tags)
       raise EmptyInput, 'You must provide content when creating a new entry' if title.strip.empty?
 
       note = Doing::Note.new
+      note.add(options[:note]) if options[:note]
       res = Doing::Prompt.yn('Add a note', default_response: false)
       ask_note = res ? Doing::Prompt.read_lines(prompt: 'Enter note') : []
       note.add(ask_note)

@@ -17,6 +17,7 @@ module Doing
       end
 
       def enter_text(prompt, default_response: '')
+        $stdin.reopen('/dev/tty')
         return default_response if @default_answer
 
         print "#{yellow(prompt).sub(/:?$/, ':')} #{reset}"
@@ -24,12 +25,13 @@ module Doing
       end
 
       def read_line(prompt: 'Enter text', completions: [], default_response: '')
+        $stdin.reopen('/dev/tty')
         return default_response if @default_answer
 
         unless completions.empty?
           completions.sort!
           comp = proc { |s| completions.grep(/^#{Regexp.escape(s)}/) }
-          Readline.completion_append_character = " "
+          Readline.completion_append_character = ' '
           Readline.completion_proc = comp
         end
 
@@ -41,20 +43,26 @@ module Doing
       end
 
       def read_lines(prompt: 'Enter text', completions: [])
+        $stdin.reopen('/dev/tty')
         return default_response if @default_answer
 
         completions.sort!
         comp = proc { |s| completions.grep(/^#{Regexp.escape(s)}/) }
-        Readline.completion_append_character = " "
+        Readline.completion_append_character = ' '
         Readline.completion_proc = comp
-
-        puts "#{boldgreen(prompt.sub(/:?$/, ':'))} #{yellow('Hit return for a new line, ')}#{boldwhite('enter a blank line (')}#{boldyellow('return twice')}#{boldwhite(') to end editing')}"
+        prompt_text = []
+        prompt_text << boldgreen(prompt.sub(/:?$/, ':'))
+        prompt_text << yellow(' Enter a blank line (')
+        prompt_text << boldwhite('return twice')
+        prompt_text << yellow(') to end editing')
+        puts prompt_text.join('')
 
         res = []
 
         begin
-          while line = Readline.readline('> ', true)
+          while (line = Readline.readline('> ', true))
             break if line.strip.empty?
+
             res << line.chomp
           end
         rescue Interrupt
@@ -65,6 +73,7 @@ module Doing
       end
 
       def request_lines(prompt: 'Enter text')
+        $stdin.reopen('/dev/tty')
         ask_note = []
         reader = TTY::Reader.new(interrupt: -> { raise Errors::UserCancelled }, track_history: false)
         puts "#{boldgreen(prompt.sub(/:?$/, ':'))} #{yellow('Hit return for a new line, ')}#{boldwhite('enter a blank line (')}#{boldyellow('return twice')}#{boldwhite(') to end editing')}"
@@ -91,6 +100,8 @@ module Doing
         unless @force_answer.nil?
           return @force_answer
         end
+
+        $stdin.reopen('/dev/tty')
 
         default = if default_response.is_a?(String)
                     default_response =~ /y/i ? true : false

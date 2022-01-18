@@ -798,14 +798,14 @@ module Doing
     end
 
     def delete_items(items, force: false)
-      res = force ? true : Prompt.yn("Delete #{items.size} #{items.size == 1 ? 'item' : 'items'}?", default_response: 'y')
-      if res
-        items.each do |i|
-          deleted = @content.delete_item(i, single: items.count == 1)
-          Hooks.trigger :post_entry_removed, self, deleted
-        end
-        write(@doing_file)
-      end
+      items.slice(0, 5).each { |i| puts i.to_pretty } unless force
+      puts softpurple("+ #{items.size - 5} additional #{'item'.to_p(items.size - 5)}") if items.size > 5 && !force
+
+      res = force ? true : Prompt.yn("Delete #{items.size} #{'item'.to_p(items.size)}?", default_response: 'y')
+      return unless res
+
+      items.each { |i| Hooks.trigger :post_entry_removed, self, @content.delete_item(i, single: items.count == 1) }
+      write(@doing_file)
     end
 
     def edit_items(items)

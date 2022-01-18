@@ -24,6 +24,7 @@ module Doing
       [:yellow, 33],
       [:blue, 34],
       [:magenta, 35],
+      [:purple, 35],
       [:cyan, 36],
       [:white, 37],
       [:bgblack, 40],
@@ -32,6 +33,7 @@ module Doing
       [:bgyellow, 43],
       [:bgblue, 44],
       [:bgmagenta, 45],
+      [:bgpurple, 45],
       [:bgcyan, 46],
       [:bgwhite, 47],
       [:boldblack, 90], # High intensity, aixterm (works in OS X)
@@ -40,6 +42,7 @@ module Doing
       [:boldyellow, 93],
       [:boldblue, 94],
       [:boldmagenta, 95],
+      [:boldpurple, 95],
       [:boldcyan, 96],
       [:boldwhite, 97],
       [:boldbgblack, 100], # High intensity background, aixterm (works in OS X)
@@ -48,6 +51,7 @@ module Doing
       [:boldbgyellow, 103],
       [:boldbgblue, 104],
       [:boldbgmagenta, 105],
+      [:boldbgpurple, 105],
       [:boldbgcyan, 106],
       [:boldbgwhite, 107],
       [:softpurple, '0;35;40'],

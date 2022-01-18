@@ -398,9 +398,9 @@ module Doing
       return topic.ljust(TOPIC_WIDTH) if topic && message.strip.empty?
 
       topic = formatted_topic(topic, colon: block_given?)
-      message.truncmiddle!(@max_length - TOPIC_WIDTH - 5)
+      # message.truncmiddle!(@max_length - TOPIC_WIDTH - 5)
       out = topic + message
-      out.truncate!(@max_length) if @max_length.positive?
+      # out.truncate!(@max_length) if @max_length.positive?
       messages << out
       out
     end
