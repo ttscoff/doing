@@ -1,6 +1,10 @@
 ### 2.1.17
 
-2022-01-18 04:13
+2022-01-18 07:17
+
+#### NEW
+
+- `--hilite` option for `doing search` to highlight matches in search results (terminal output only)
 
 #### IMPROVED
 

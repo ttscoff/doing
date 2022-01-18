@@ -125,7 +125,7 @@ module Doing
 
       if search.is_rx? || matching == :fuzzy
         rx = search.to_rx(distance: distance, case_type: case_type)
-        out.gsub!(rx) { |m| yellow(m) }
+        out.gsub!(rx) { |m| m.bgyellow.black }
       else
         query = to_phrase_query(search.strip)
 
@@ -135,7 +135,7 @@ module Doing
         end
         query[:must].concat(query[:should]).each do |s|
           rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
-          out.gsub!(rx) { |m| yellow(m) }
+          out.gsub!(rx) { |m| m.bgyellow.black }
         end
       end
       out

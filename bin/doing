@@ -1788,7 +1788,6 @@ command %i[grep search] do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
     options[:highlight] = true
     options[:search] = search
-    options[:highlight_search] = options[:hilite]
     options[:section] = section
     options[:tags_color] = tags_color
 
@@ -1830,6 +1829,9 @@ command :last do |c|
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc "Highlight search matches in output. Only affects command line output"
+  c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
 
   c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
   c.arg_name 'QUERY'
@@ -1885,6 +1887,7 @@ command :last do |c|
                         search: options[:search],
                         fuzzy: options[:fuzzy],
                         case: options[:case],
+                        hilite: options[:hilite],
                         negate: options[:not],
                         tag: options[:tag],
                         tag_bool: options[:bool],
@@ -2029,6 +2032,9 @@ command :show do |c|
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc "Highlight search matches in output. Only affects command line output"
+  c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -2177,6 +2183,7 @@ command :show do |c|
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
     opt[:highlight] = true
+    opt[:hilite] = options[:hilite]
     opt[:order] = options[:sort].normalize_order
     opt[:tag] = nil
     opt[:tag_order] = options[:tag_order].normalize_order
@@ -2503,6 +2510,9 @@ command :view do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc "Highlight search matches in output. Only affects command line output"
+  c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
+
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
 
@@ -2663,6 +2673,7 @@ command :view do |c|
       opts[:count] = count
       opts[:format] = date_format
       opts[:highlight] = options[:color]
+      opts[:hilite] = options[:hilite]
       opts[:only_timed] = only_timed
       opts[:order] = order
       opts[:output] = options[:interactive] ? nil : options[:output]
