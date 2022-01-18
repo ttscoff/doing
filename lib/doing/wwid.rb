@@ -934,6 +934,7 @@ module Doing
         actions = [
           'add tag',
           'remove tag',
+          'autotag',
           'cancel',
           'delete',
           'finish',
@@ -960,6 +961,8 @@ module Doing
             opt[:resume] = true
           when /reset/
             opt[:reset] = true
+          when /autotag/
+            opt[:autotag] = true
           when /(add|remove) tag/
             type = action =~ /^add/ ? 'add' : 'remove'
             raise InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
@@ -1066,6 +1069,21 @@ module Doing
           if i.should_finish?
             should_date = !opt[:cancel] && i.should_time?
             i.tag(tag, date: should_date, remove: opt[:remove], single: single)
+            Hooks.trigger :post_entry_updated, self, i
+          end
+        end
+      end
+
+      if opt[:autotag]
+        items.map! do |i|
+          new_title = autotag(i.title)
+          if new_title == i.title
+            logger.count(:skipped, level: :debug, message: '%count unchaged %items')
+            # logger.debug('Autotag:', 'No changes')
+          else
+            logger.count(:added_tags)
+            logger.write(items.count == 1 ? :info : :debug, 'Tagged:', new_title)
+            i.title = new_title
             Hooks.trigger :post_entry_updated, self, i
           end
         end
