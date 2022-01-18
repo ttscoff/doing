@@ -3,7 +3,7 @@ lib/doing/item.rb 276880933fef8a4e1ef7a80e92f0f2b029f8a6e7
 lib/doing/note.rb bbadd9e34e6dc43a2af1110a5107f46c39d2547f
 lib/doing/time.rb 60183c3c31532ffea1440c766de0f90042e0fd10
 lib/doing/util.rb 33ad79455893213a0f2993edec0e158526657f09
-lib/doing/wwid.rb 58998ec0fccfa8450f7c065e1994acc6f314e819
+lib/doing/wwid.rb d19e494bc42eb031d8e5e570c76c12c1d180fc9e
 lib/doing/array.rb a17004c4811d239932254f9ed94a6eb10456c8e8
 lib/doing/hooks.rb acf6e0615ccf1949f84915c979297845242c1205
 lib/doing/items.rb 8cda7caaef10645893267262f5eee681e35046ce
@@ -11,10 +11,10 @@ lib/doing/pager.rb b58e478b0cb8d400ddb97988ba741e3a127b53c3
 lib/doing/colors.rb b7239a69e10c5df9378a5843441af5b93c1872f8
 lib/doing/errors.rb af07e482a5389924edc2337749c81cda501098f0
 lib/doing/prompt.rb 1c48923fc61d8714e3fc1f24b52fb8f358a8cc24
-lib/doing/string.rb f5327c42aa2563d95f93d4c77a099b7076c3ea5f
+lib/doing/string.rb d24f0972d0304e3d3bd3c38f14dd873165e7ebff
 lib/doing/symbol.rb 309799458a1bc715c2707307c9a62ab26086275e
 lib/doing/section.rb 206e119cf818f1e76798753e611180fe77bc299a
-lib/doing/version.rb 6eb3677d6f172bbce4a060ade7e2401b01ebe9ef
+lib/doing/version.rb f1ee23047a433e9ce6fe3cbae1c16d634e230cc0
 lib/doing/cli_status.rb dbedd454c4cbbd0fed9ef30120f6ec85d18b9356
 lib/doing/completion.rb c658e7dc7898fb022a21b2bd77bedb958ca3b067
 lib/doing/log_adapter.rb 57d831259f48d0757307244d35b87e9ffa9099d9
