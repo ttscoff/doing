@@ -1019,6 +1019,11 @@ Edit entry with vim
 
 
 
+===== -h|--[no-]hilite
+Highlight search matches in output. Only affects command line output
+
+
+
 ===== --not
 Show items that *don't* match search string or tag filter
 
@@ -1913,6 +1918,11 @@ Show elapsed time on entries without @done tag
 
 
 
+===== -h|--[no-]hilite
+Highlight search matches in output. Only affects command line output
+
+
+
 ===== -i|--interactive
 Select from a menu of matching entries to perform additional operations
 
@@ -2470,6 +2480,11 @@ Include colors in output
 
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
+
+
+
+===== -h|--[no-]hilite
+Highlight search matches in output. Only affects command line output
 
 
 

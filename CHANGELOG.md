@@ -9,8 +9,8 @@
 
 #### IMPROVED
 
-- Show up to 5 items when confirming delete operation so you actually know what you're deleting
-- Allow --ask when creating new entry via STDIN pipe
+- Show preview of up to 5 items when confirming a delete operation so you actually know what you're deleting
+- Allow `--ask` when creating new entry via STDIN pipe
 - Tab completion for known tags when creating an entry interactively
 - Add purple as an alias for magenta in template colors
 

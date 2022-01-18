@@ -183,6 +183,7 @@ complete -c doing -l delete -s d -f  -n '__fish_doing_using_command grep search'
 complete -c doing -l duration  -f  -n '__fish_doing_using_command grep search' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command grep search' -d Edit\ matching\ entries\ with\ vim
 complete -c doing -l from  -f -r -n '__fish_doing_using_command grep search' -d Date\ range\ to\ show
+complete -c doing -l hilite -s h -f  -n '__fish_doing_using_command grep search' -d Highlight\ search\ matches\ in\ output
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command grep search' -d Display\ an\ interactive\ menu\ of\ results\ to\ perform\ further\ operations
 complete -c doing -l not  -f  -n '__fish_doing_using_command grep search' -d Show\ items\ that\ \*don\'t\*\ match\ search\ string
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command grep search' -d Output\ to\ export\ format
@@ -213,6 +214,7 @@ complete -c doing -l case  -f -r -n '__fish_doing_using_command last' -d Case\ s
 complete -c doing -l delete -s d -f  -n '__fish_doing_using_command last' -d Delete\ the\ last\ entry
 complete -c doing -l duration  -f  -n '__fish_doing_using_command last' -d Show\ elapsed\ time\ if\ entry\ is\ not\ tagged\ @done
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command last' -d Edit\ entry\ with\ vim
+complete -c doing -l hilite -s h -f  -n '__fish_doing_using_command last' -d Highlight\ search\ matches\ in\ output
 complete -c doing -l not  -f  -n '__fish_doing_using_command last' -d Show\ items\ that\ \*don\'t\*\ match\ search\ string\ or\ tag\ filter
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command last' -d Specify\ a\ section
 complete -c doing -l search  -f -r -n '__fish_doing_using_command last' -d Search\ filter
@@ -331,6 +333,7 @@ complete -c doing -l count -s c -f -r -n '__fish_doing_using_command show' -d Ma
 complete -c doing -l case  -f -r -n '__fish_doing_using_command show' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l duration  -f  -n '__fish_doing_using_command show' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
 complete -c doing -l from  -f -r -n '__fish_doing_using_command show' -d Date\ range\ to\ show
+complete -c doing -l hilite -s h -f  -n '__fish_doing_using_command show' -d Highlight\ search\ matches\ in\ output
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command show' -d Select\ from\ a\ menu\ of\ matching\ entries\ to\ perform\ additional\ operations
 complete -c doing -l menu -s m -f  -n '__fish_doing_using_command show' -d Select\ section\ or\ tag\ to\ display\ from\ a\ menu
 complete -c doing -l not  -f  -n '__fish_doing_using_command show' -d Show\ items\ that\ \*don\'t\*\ match\ search/tag/date\ filters
@@ -408,6 +411,7 @@ complete -c doing -l case  -f -r -n '__fish_doing_using_command view' -d Case\ s
 complete -c doing -l color  -f  -n '__fish_doing_using_command view' -d Include\ colors\ in\ output
 complete -c doing -l duration  -f  -n '__fish_doing_using_command view' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
 complete -c doing -l from  -f -r -n '__fish_doing_using_command view' -d Date\ range\ to\ show
+complete -c doing -l hilite -s h -f  -n '__fish_doing_using_command view' -d Highlight\ search\ matches\ in\ output
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command view' -d Select\ from\ a\ menu\ of\ matching\ entries\ to\ perform\ additional\ operations
 complete -c doing -l not  -f  -n '__fish_doing_using_command view' -d Show\ items\ that\ \*don\'t\*\ match\ search\ string
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command view' -d Output\ to\ export\ format
