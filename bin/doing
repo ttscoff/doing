@@ -143,6 +143,10 @@ command %i[again resume] do |c|
   c.arg_name 'SECTION_NAME'
   c.flag [:in]
 
+  c.desc 'Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]'
+  c.arg_name 'DATE_STRING'
+  c.flag %i[b back started]
+
   c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
   c.flag [:tag], type: TagArray
@@ -198,6 +202,13 @@ command %i[again resume] do |c|
       options[:search] = search
     end
 
+    if options[:back]
+      date = options[:back].chronify(guess: :begin)
+      raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
+    else
+      date = Time.now
+    end
+
     note = Doing::Note.new(options[:note])
     note.add(Doing::Prompt.read_lines(prompt: 'Add a note')) if options[:ask]
 
@@ -208,6 +219,7 @@ command %i[again resume] do |c|
     opts[:tag] = tags
     opts[:tag_bool] = options[:bool].normalize_bool
     opts[:interactive] = options[:interactive]
+    opts[:date] = date
 
     wwid.repeat_last(opts)
   end
@@ -3667,9 +3679,9 @@ command :commands_accepting do |c|
       end
 
       if o[:column]
-        puts cmds
+        puts cmds.sort
       else
-        puts "Commands accepting --#{option}: #{cmds.join(', ')}"
+        puts "Commands accepting --#{option}: #{cmds.sort.join(', ')}"
       end
     end
   end

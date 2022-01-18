@@ -31,28 +31,89 @@ module Doing
             and return 0
           end
 
-          function __fish_doing_complete_sections
-            doing sections -c
-          end
+          function __fish_doing_cache_timer_expired
+            set -l timer __fish_doing_cache_timer_$argv[1]
+            if not set -q $timer
+              set -g $timer (date '+%s')
+            end
 
-          function __fish_doing_complete_views
-            doing views -c
+            if test (math (date '+%s') - $$timer) -gt $argv[2]
+              set -g $timer (date '+%s')
+              return 1
+            end
+
+            return 0
           end
 
           function __fish_doing_subcommands
-            doing help -c
+            if not set -q __fish_doing_subcommands_cache
+              or __fish_doing_cache_timer_expired subcommands 86400
+              set -g -a __fish_doing_subcommands_cache (doing help -c)
+            end
+            printf '%s\n' $__fish_doing_subcommands_cache
           end
 
-          function __fish_doing_export_plugins
-            doing plugins --type export -c
+          function __fish_doing_complete_sections
+            if not set -q __fish_doing_sections_cache
+              or __fish_doing_cache_timer_expired sections 3600
+              set -g -a __fish_doing_sections_cache (doing sections -c)
+            end
+            printf '%s\n' $__fish_doing_sections_cache
+            __fish_doing_complete_show_tag
           end
 
-          function __fish_doing_import_plugins
-            doing plugins --type import -c
+          function __fish_doing_complete_views
+            if not set -q __fish_doing_views_cache
+              or __fish_doing_cache_timer_expired views 3600
+              set -g -a __fish_doing_views_cache (doing views -c)
+            end
+            printf '%s\n' $__fish_doing_views_cache
           end
 
-          function __fish_doing_complete_templates
-            doing template -c
+          function __fish_doing_export_plugin
+            if not set -q __fish_doing_export_plugin_cache
+              or __fish_doing_cache_timer_expired export_plugins 3600
+              set -g -a __fish_doing_export_plugin_cache (doing plugins --type export -c)
+            end
+            printf '%s\n' $__fish_doing_export_plugin_cache
+          end
+
+          function __fish_doing_import_plugin
+            if not set -q __fish_doing_import_plugin_cache
+              or __fish_doing_cache_timer_expired import_plugins 3600
+              set -g -a __fish_doing_import_plugin_cache (doing plugins --type import -c)
+            end
+            printf '%s\n' $__fish_doing_import_plugin_cache
+          end
+
+          function __fish_doing_complete_template
+            if not set -q __fish_doing_template_cache
+              or __fish_doing_cache_timer_expired template 3600
+              set -g -a __fish_doing_template_cache (doing template -c)
+            end
+            printf '%s\n' $__fish_doing_template_cache
+          end
+
+          function __fish_doing_complete_tag
+            if not set -q __fish_doing_tag_cache
+              or __fish_doing_cache_timer_expired tags 60
+              set -g -a __fish_doing_tag_cache (doing tags)
+            end
+            printf '%s\n' $__fish_doing_tag_cache
+          end
+
+          function __fish_doing_complete_show_tag
+            if not set -q __fish_doing_tag_cache
+              or __fish_doing_cache_timer_expired tags 60
+              set -g -a __fish_doing_tag_cache (doing tags)
+            end
+            printf '@%s\n' $__fish_doing_tag_cache
+          end
+
+          function __fish_doing_complete_args
+            for cmd in (doing commands_accepting -c $argv[1])
+              complete -x -c doing -l $argv[1] -n "__fish_doing_using_command $cmd" -a "(__fish_doing_complete_$argv[1])"
+            end
           end
 
           complete -c doing -f
@@ -64,6 +125,14 @@ module Doing
           complete -f -c doing -s t -l type -x -n '__fish_doing_using_command import' -a '(__fish_doing_import_plugins)'
 
           complete -xc doing -n '__fish_seen_subcommand_from help; and not __fish_seen_subcommand_from (doing help -c)' -a "(doing help -c)"
+
+          function __fish_doing_complete_args
+            for cmd in (doing commands_accepting -c $argv[1])
+              complete -x -c doing -l $argv[1] -n "__fish_doing_using_command $cmd" -a "(__fish_doing_complete_$argv[1])"
+            end
+          end
+
+          __fish_doing_complete_args tag
         EOFUNCTIONS
       end
 
@@ -161,7 +230,7 @@ module Doing
         end
 
         unless need_export.empty?
-          out << "complete -f -c doing -s o -l output -x -n '__fish_doing_using_command #{need_export.join(' ')}' -a '(__fish_doing_export_plugins)'"
+          out << "complete -f -c doing -s o -l output -x -n '__fish_doing_using_command #{need_export.join(' ')}' -a '(__fish_doing_export_plugin)'"
         end
 
         unless need_bool.empty?

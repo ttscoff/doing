@@ -48,7 +48,7 @@ module Doing
           note = i.note.map { |line| line.strip.link_urls(format: :markdown) } if i.note
         end
 
-        title = "#{title} @project(#{i.section})" unless variables[:is_single]
+        title = "#{title} @section(#{i.section})" unless variables[:is_single]
 
         interval = wwid.get_interval(i, record: true) if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
         interval ||= false

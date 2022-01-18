@@ -484,7 +484,7 @@ module Doing
       end
 
       # @content.update_item(original, item)
-      add_item(title, section, { note: note, back: opt[:date], timed: true })
+      add_item(title, section, { note: note, back: opt[:date], timed: false })
     end
 
     ##
@@ -1116,10 +1116,7 @@ module Doing
 
       return unless opt[:output]
 
-      items.map! do |i|
-        i.title = "#{i.title} @project(#{i.section})"
-        i
-      end
+      items.each { |i| i.title = "#{i.title} @section(#{i.section})" }
 
       export_items = Items.new
       export_items.concat(items)
