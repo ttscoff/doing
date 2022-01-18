@@ -99,7 +99,8 @@ module Doing
       'search' => {
         'matching' => 'pattern', # fuzzy, pattern, exact
         'distance' => 3,
-        'case' => 'smart' # sensitive, ignore, smart
+        'case' => 'smart', # sensitive, ignore, smart
+        'highlight' => false
       },
       'include_notes' => true,
       'interaction' => {

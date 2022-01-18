@@ -1650,6 +1650,7 @@ module Doing
 
       opt[:output] ||= 'template'
       opt[:wrap_width] ||= @config['templates']['default']['wrap_width'] || 0
+
       output(items, title, is_single, opt)
     end
 

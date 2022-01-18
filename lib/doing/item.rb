@@ -271,6 +271,34 @@ module Doing
       (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
     end
 
+    def highlight_search(search, distance: nil, negate: false, case_type: nil)
+      prefs = Doing.config.settings['search'] || {}
+      matching = prefs.fetch('matching', 'pattern').normalize_matching
+      distance ||= prefs.fetch('distance', 3).to_i
+      case_type ||= prefs.fetch('case', 'smart').normalize_case
+      new_note = Note.new
+
+      if search.is_rx? || matching == :fuzzy
+        rx = search.to_rx(distance: distance, case_type: case_type)
+        new_title = @title.gsub(rx) { |m| yellow(m) }
+        new_note.add(@note.to_s.gsub(rx) { |m| yellow(m) })
+      else
+        query = to_phrase_query(search.strip)
+
+        if query[:must].nil? && query[:must_not].nil?
+          query[:must] = query[:should]
+          query[:should] = []
+        end
+        query[:must].concat(query[:should]).each do |s|
+          rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
+          new_title = @title.gsub(rx) { |m| yellow(m) }
+          new_note.add(@note.to_s.gsub(rx) { |m| yellow(m) })
+        end
+      end
+
+      Item.new(@date, new_title, @section, new_note)
+    end
+
     ##
     ## Test if item matches search string
     ##

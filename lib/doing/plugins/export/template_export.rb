@@ -119,6 +119,8 @@ module Doing
 
         output.gsub!(/\\%/, '%')
 
+        output.highlight_search!(opt[:search]) if opt[:search] && !opt[:not] && opt[:highlight_search]
+
         out += "#{output}\n"
       end
 

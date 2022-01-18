@@ -1750,6 +1750,9 @@ command %i[grep search] do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
+  c.desc "Highlight search matches in output. Only affects command line output"
+  c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
+
   c.desc "Edit matching entries with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
@@ -1785,6 +1788,7 @@ command %i[grep search] do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
     options[:highlight] = true
     options[:search] = search
+    options[:highlight_search] = options[:hilite]
     options[:section] = section
     options[:tags_color] = tags_color
 
