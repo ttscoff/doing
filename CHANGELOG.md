@@ -1,10 +1,14 @@
 ### 2.1.20
 
-2022-01-18 09:13
+2022-01-18 09:26
 
 #### NEW
 
 - Autotag option for interactive `doing select` menu
+
+#### IMPROVED
+
+- Autotag improvements
 
 ### 2.1.19
 
