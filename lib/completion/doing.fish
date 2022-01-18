@@ -148,10 +148,11 @@ complete -c doing -l dump -s d -f  -n '__fish_doing_using_command config' -d DEP
 complete -c doing -l update -s u -f  -n '__fish_doing_using_command config' -d DEPRECATED
 complete -c doing -l archive -s a -f  -n '__fish_doing_using_command done did' -d Immediately\ archive\ the\ entry
 complete -c doing -l ask  -f  -n '__fish_doing_using_command done did' -d Prompt\ for\ note\ via\ multi-line\ input
-complete -c doing -l at  -f -r -n '__fish_doing_using_command done did' -d Set\ finish\ date\ to\ specific\ date/time
+complete -c doing -l finished  -f -r -n '__fish_doing_using_command done did' -d Set\ finish\ date\ to\ specific\ date/time
 complete -c doing -l started  -f -r -n '__fish_doing_using_command done did' -d Backdate\ start\ date\ by\ interval\ or\ set\ to\ time\ \[4pm\|20m\|2h\|\"yesterday\ noon\"\]
 complete -c doing -l date  -f  -n '__fish_doing_using_command done did' -d Include\ date
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command done did' -d Edit\ entry\ with\ vim
+complete -c doing -l from  -f -r -n '__fish_doing_using_command done did' -d Start\ and\ end\ times\ as\ a\ date/time\ range\ \`doing\ done\ --from\ \"1am\ to\ 8am\"\`
 complete -c doing -l note -s n -f -r -n '__fish_doing_using_command done did' -d Include\ a\ note
 complete -c doing -l remove -s r -f  -n '__fish_doing_using_command done did' -d Remove\ @done\ tag
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command done did' -d Section
