@@ -1,3 +1,13 @@
+### 2.1.19
+
+2022-01-18 08:40
+
+#### FIXED
+
+- Search highlighting error with some pattern searches
+- Reverse sort of items in menu from `--interactive` flags
+- Nil error when `--interactive` was called without search results
+
 ### 2.1.18
 
 Build automation test
@@ -33,7 +43,7 @@ Build automation test
 #### IMPROVED
 
 - Running `doing tag` without arguments takes command line input
-- If `doing now` or `doing later` are run without arguments, interactively request necessary information (you can still use --editor to edit in your preferred editor)
+- If `doing now` or `doing later` are run without arguments, interactively request necessary information (you can still use `--editor` to edit in your preferred editor)
 - Tab completion for tags when entering at prompt
 - Use readline when requesting input text, better editing features
 - `doing done --at` no longer overrides `--back`
@@ -43,7 +53,7 @@ Build automation test
 - `doing select` -> output formatted empty output
 - Sort items by date when using `doing select --editor` (was loading in selection order instead)
 - Ruby 2.7 error in template output (.empty? on FalseClass)
-- Don't add empty entry when cancelling --editor
+- Don't add empty entry when cancelling `--editor`
 - Batch editing bugs
 
 ### 2.1.15
@@ -68,21 +78,21 @@ Build automation test
 
 #### NEW
 
-- All commands that accept --note now accept --ask, which requests input via readline after creating the note. Multiple lines are allowed, hit return twice to end editing. Works alongside --note and --editor
+- All commands that accept `--note` now accept `--ask`, which requests input via readline after creating the note. Multiple lines are allowed, hit return twice to end editing. Works alongside `--note` and `--editor`
 
 #### IMPROVED
 
-- Implement --search and --from filtering for import plugins
+- Implement `--search` and `--from` filtering for import plugins
 - UTC format date strings in select menus for consistency (was relative date formatting)
-- Don't populate the fzf search with --search, it's already filtered. Separated --query from --search if you do want to populate the query string in addition to --search filtering
+- Don't populate the fzf search with `--search`, it's already filtered. Separated `--query` from `--search` if you do want to populate the query string in addition to `--search` filtering
 - When showing relative dates, don't include the year if the date is the previous year but a later month than the current month (less than a year old)
-- When using --editor while adding an entry, include any note specified on the command line or via --ask for further editing
+- When using `--editor` while adding an entry, include any note specified on the command line or via `--ask` for further editing
 
 ### 2.1.13
 
 #### NEW
 
-- --val flag for all display commands, allows tag value queries. Tag values are contained in parenthesis after the tag, e.g. @progress(50). Queries look like `--val "done < two weeks ago"`, "project *= oracle" or "progress >= 50". Wildcards allowed in value, comparators can be <, >, <=, >=, ==, *= (contains), ^= (begins with), $= (ends with). Numeric and date comparisons are detected automatically. Text comparisons are case insensitive. --val can be used multiple times in a command and you can use --bool to specify AND, OR, or NOT (default AND)
+- `--val` flag for all display commands, allows tag value queries. Tag values are contained in parenthesis after the tag, e.g. @progress(50). Queries look like `--val "done < two weeks ago"`, "project *= oracle" or "progress >= 50". Wildcards allowed in value, comparators can be <, >, <=, >=, ==, *= (contains), ^= (begins with), $= (ends with). Numeric and date comparisons are detected automatically. Text comparisons are case insensitive. `--val` can be used multiple times in a command and you can use `--bool` to specify AND, OR, or NOT (default AND)
 - `doing tag` now accepts a `--value` flag to define a value for a single tag, e.g. @tag(value)
 
 #### FIXED
@@ -96,7 +106,7 @@ Build automation test
 - Tag_dir command creates/updates .doingrc files in the current directory with default_tags values. Then all entries created within that directory (or subdirs) get tagged with that value.
 - Synonym triggers allow `*` and `?` wildcards
 - Add `--delete` flag for `doing last` to delete last entry
-- --delete and --editor flags for `doing search`, batch edit and delete
+- `--delete` and `--editor` flags for `doing search`, batch edit and delete
 - Example hook to add new entries containing a certain tag to Day One
 - New hooks: pre_entry_add, post_entry_added, post_entry_updated, post_entry_removed, pre_export
 
@@ -113,13 +123,13 @@ Build automation test
 
 #### NEW
 
-- --age (oldest|newest) option for view command
+- `--age` (oldest|newest) option for view command
 
 ### 2.1.9
 
 #### IMPROVED
 
-- Only attempt to install fzf if it doesn't exist on the system. In case of errors, this means a user can manually install fzf and still be able to access --interactive options
+- Only attempt to install fzf if it doesn't exist on the system. In case of errors, this means a user can manually install fzf and still be able to access `--interactive` options
 
 #### FIXED
 
@@ -199,10 +209,10 @@ Build automation test
 - `config list` will list detected .doingrc files and the main config file in order of precedence - refactoring
 - When modifying start dates or @done dates via an editor command, natural language strings can be used and will be parsed into doing-formatted dates automatically
 - When editor is invoked, entry titles include start date, which can be modified
-- --before, --after, and --from date filters for select command
-- --from flag for `doing today` and `doing yesterday`, filter by time range
-- --from flag for `doing search`, filter by date/time range
-- Commands that accept --before, --after, and --from can now filter on time ranges. If the date string given contains only a time (no day or date), it will be interpreted as a time range, meaning the date isn't filtered, but only entries within the time range are shown/processed
+- `--before`, `--after`, and `--from` date filters for select command
+- `--from` flag for `doing today` and `doing yesterday`, filter by time range
+- `--from` flag for `doing search`, filter by date/time range
+- Commands that accept `--before`, `--after`, and `--from` can now filter on time ranges. If the date string given contains only a time (no day or date), it will be interpreted as a time range, meaning the date isn't filtered, but only entries within the time range are shown/processed
 - Add %duration placeholder to template variables
 - Add `interval_format` setting to config (applies to root or any view/template) to set intervals/durations to human (2h 15m) or text (00:02:15)
 - Add `duration` key to config (root or view/template). If set to true, will display durations by default (no need for `--duration`)
@@ -291,10 +301,10 @@ Build automation test
 - Add 'timer_format' config with 'human' option for tag totals
 - If `doing view` and `doing show` are confused, offer option to run the other command
 - `doing completion` to generate shell completion scripts for zsh, bash, and fish
-- --search and --not for cancel command
-- --case flag for commands with --search. Can be (c)ase-sensitive, (i)nsensitive, or (s)mart (default smart, case insensitive unless search string contains uppercase letters)
+- `--search` and `--not` for cancel command
+- `--case` flag for commands with `--search`. Can be (c)ase-sensitive, (i)nsensitive, or (s)mart (default smart, case insensitive unless search string contains uppercase letters)
 - Add `--exact` flag to all commands with `--search` flag to force exact matching without requiring single quote prefix
-- Add `--not` flag to all commands with filters (--tag, --search, --before, etc.) to negate the filter and return entries NOT matched
+- Add `--not` flag to all commands with filters (`--tag`, `--search`, `--before`, etc.) to negate the filter and return entries NOT matched
 
 #### IMPROVED
 
@@ -318,13 +328,13 @@ Build automation test
 - `doing config --update` will add newly added config keys to your existing config file (handy with plugins that define their own config keys)
 - Add %idnote template placeholder for "indented note" (entire note indented one tab)
 - (loosely printf-esque) formatting options for `%note` template placeholder
-- --interactive mode to act on results of `doing grep`
+- `--interactive` mode to act on results of `doing grep`
 - Printf formatting for title and date
 - Doing import plugin
 - Plugins command to list plugins
-- --dump option for `doing config` to output a key.path config key as JSON, YAML, or raw output
-- --no-color global flag
-- Log levels, with --quiet and --verbose global flags
+- `--dump` option for `doing config` to output a key.path config key as JSON, YAML, or raw output
+- `--no-color` global flag
+- Log levels, with `--quiet` and `--verbose` global flags
 - Convert CLI messaging to Logger-based system
 - Use DOING_DEBUG, DOING_QUIET, or DOING_LOG_LEVEL environment variables to specify log levels before configuration is read
 - Hooks, register plugins to run based on events
@@ -337,26 +347,26 @@ Build automation test
 - Major plugin architecture refactoring
 - Fix regression where notes stored in doing file were outdented, breaking TaskPaper compatibility
 - When accepting a date filter, allow end date to be in the future
-- If an edited item has no changes, don't update/output notification - Don't start with query when using grep --interactive
+- If an edited item has no changes, don't update/output notification - Don't start with query when using grep `--interactive`
 - Select menu item formatting
 - Output wrapping for terminal display
-- Redirect warn to STDOUT when run with --stdout
+- Redirect warn to STDOUT when run with `--stdout`
 - Fish autocomplete
 - `--config_file` global flag deprected, now uses $DOING_CONFIG environment variable so that config overrides can be available before the initial configuration is run
-- When --stdout or not a TTY, no color or output formatting
+- When `--stdout` or not a TTY, no color or output formatting
 - Highlight tags when showing results. Because it looks nice.
-- --tag and --search for `doing note`
+- `--tag` and `--search` for `doing note`
 - View/section fuzzy guessing
 - Error reporting
 - If `doing config` finds local doingrc files, offers a menu for editing
 - More filtering options for `doing finish`
-- Doing done accepts --unfinished flag to finish last entry not marked @done (instead of last entry)
-- Doing done accepts --note flag to append a note when completing an entry
+- Doing done accepts `--unfinished` flag to finish last entry not marked @done (instead of last entry)
+- Doing done accepts `--note` flag to append a note when completing an entry
 
 #### FIXED
 
 - Multi-word unquoted arguments to add_section being truncated
-- Show --from with date span
+- Show `--from` with date span
 - Handling of arbitrary times in natural language dates
 - Backward scope of since command with arbitrary times
 - `doing rotate --keep` wasn't respecting keep value
@@ -370,33 +380,33 @@ Build automation test
 - "taskpaper" format available for all output options
 - "markdown" format available for all output commands (GFM-style task list, customizable template)
 - `--rename` option for tag command to replace tags
-- `--regex` option for tag command, for --remove and --rename
+- `--regex` option for tag command, for `--remove` and `--rename`
 
 ### 1.0.90
 
 - Minor fix for shell command in doing select
-- Fix for doing finish --auto when matched item is last in list
-- doing finish --auto now pulls from all sections, not just the section of the target entry
+- Fix for doing finish `--auto` when matched item is last in list
+- doing finish `--auto` now pulls from all sections, not just the section of the target entry
 
 ### 1.0.89
 
 - Pretty print JSON output
-- --no-menu option for select command to use --query as a filter and act on matching entries without displaying menu
+- `--no-menu` option for select command to use `--query` as a filter and act on matching entries without displaying menu
 
 ### 1.0.88
 
-- Add --before and --after time search to yesterday command
-- Add --before and --after date search to search/grep command
-- Add --tag_order to yesterday command
+- Add `--before` and `--after` time search to yesterday command
+- Add `--before` and `--after` date search to search/grep command
+- Add `--tag_order` to yesterday command
 
 ### 1.0.87
 
 - Add leading spaces to make %shortdate align properly, at least for the last week
-- Add --tag, --bool, and --search to view command
-- Add --before and --after date search to view command
-- Add --before and --after date search to show command
-- Add --before and --after time search to today command
-- Add --search filter to show command
+- Add `--tag`, `--bool`, and `--search` to view command
+- Add `--before` and `--after` date search to view command
+- Add `--before` and `--after` date search to show command
+- Add `--before` and `--after` time search to today command
+- Add `--search` filter to show command
 - More alignment/formatting fixes for %shortdate
 
 ### 1.0.86
@@ -405,8 +415,8 @@ Build automation test
 
 ### 1.0.85
 
-- Fix --auto for finish command
-- Add --before DATE_STRING to archive and rotate commands
+- Fix `--auto` for finish command
+- Add `--before` DATE_STRING to archive and rotate commands
 - Only create on rotate file per day, merge new entries into existing file
 
 ### 1.0.84
@@ -450,7 +460,7 @@ presented
 
 ### 1.0.74
 
-- Add --tag and --search flags to tag command to tag all entries matching search terms
+- Add `--tag` and `--search` flags to tag command to tag all entries matching search terms
 - Add since command, which is the same as `doing on tuesday to now` but `doing since tuesday` just feels more intuitive. 
 
 ### 1.0.73
@@ -506,7 +516,7 @@ presented
 
 ### 1.0.61
 
-- Add --search filter to `doing archive`
+- Add `--search` filter to `doing archive`
 
 ### 1.0.60
 
@@ -557,12 +567,12 @@ presented
 #### IMPROVED
 
 - Clean up command line help
-- --editor improvements for all commands that use it
+- `--editor` improvements for all commands that use it
 
 #### FIXED
 
-- Doing finish --took throwing error
-- Doing tag --remove was adding tags if they didn't exist
+- Doing finish `--took` throwing error
+- Doing tag `--remove` was adding tags if they didn't exist
 - Creating a meanwhile task with a note resulted in an error
 
 ### 1.0.54
@@ -582,13 +592,13 @@ presented
 
 #### IMPROVED
 
-- Add --no-color option to view command
-- Add --tag to show for compatibility
+- Add `--no-color` option to view command
+- Add `--tag` to show for compatibility
 
 #### FIXED
 
-- Error running finish without --tag flag
-- --archive flag on finish, done, and cancel causing error
+- Error running finish without `--tag` flag
+- `--archive` flag on finish, done, and cancel causing error
 
 ### 1.0.52
 
@@ -599,7 +609,7 @@ presented
 
 #### FIXED
 
-- --archive flag on finish, done, and cancel causing error
+- `--archive` flag on finish, done, and cancel causing error
 
 ### 1.0.49
 
@@ -647,7 +657,7 @@ presented
 ### 1.0.39
 
 - Tag transforms
-- Option to sort tags by name in --totals
+- Option to sort tags by name in `--totals`
 
 ### 1.0.33
 
