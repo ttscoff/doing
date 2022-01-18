@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.15
+v2.1.16
 
 === Global Options
 === --config_file arg
@@ -528,10 +528,10 @@ Use this command to add an entry after you've already finished it. It will be im
 You can modify the start and end times of the entry using the --back, --took, and --at flags, making it an easy
 way to add entries in post and maintain accurate (albeit manual) time tracking.
 ===== Options
-===== --at DATE_STRING
+===== --at|--finished DATE_STRING
 
 Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
-  If used, ignores --back. Used with --took, backdates start date
+  Used with --took, backdates start date
 
 [Default Value] None
 
@@ -539,6 +539,14 @@ Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm
 ===== -b|--back|--started DATE_STRING
 
 Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]
+
+[Default Value] None
+
+
+===== --from TIME_RANGE
+
+Start and end times as a date/time range `doing done --from "1am to 8am"`.
+        Overrides other date flags.
 
 [Default Value] None
 
@@ -1274,7 +1282,9 @@ Record what you're starting now, or backdate the start time using natural langua
 
 A parenthetical at the end of the entry will be converted to a note.
 
-Run with no argument to create a new entry using vim.
+Run without arguments to create a new entry interactively.
+
+Run with --editor to create a new entry using vim.
 ===== Options
 ===== -b|--back|--started DATE_STRING
 

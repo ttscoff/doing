@@ -19,17 +19,24 @@ class NoteEditorTest < Test::Unit::TestCase
   end
 
   def test_new_entry_via_editor
-    # doing now without argument should open editor
-    subject = 'Test new entry via editor'
-    editor_note = 'I would type this into my editor'
-    doing_env({ 'EDITOR' => mk_replacing_editor(subject, editor_note) }, 'now')
-    assert_match(/#{subject}/, doing('show'), 'should have added task')
-
-    # repeat with -e flag and no note
-    subject = 'Testing again via editor'
+    # with -e flag and no note
+    subject = 'Testing via editor'
     editor_note = ''
     doing_env({ 'EDITOR' => mk_replacing_editor(subject, editor_note) }, 'now', '--editor')
     assert_match(/#{subject}/, doing('show'), 'should have added task')
+  end
+
+  def test_new_entry_via_stdin
+    subject = 'Testing via STDIN'
+    editor_note = ''
+    doing_env({}, 'now', stdin: [subject, editor_note].join("\n").strip)
+    assert_match(/#{subject}/, doing('show'), 'should have added task')
+
+    subject = 'Testing via STDIN with note'
+    editor_note = 'A fun little note'
+    doing_env({}, 'now', stdin: [subject, editor_note].join("\n").strip)
+    assert_match(/#{subject}/, doing('show'), 'should have added task')
+    assert_match(/#{editor_note}/, doing('show'), 'should have added note to task')
   end
 
   def test_new_note_via_editor
@@ -84,14 +91,14 @@ class NoteEditorTest < Test::Unit::TestCase
     end
   end
 
-  def doing(*args)
-    doing_with_env({'DOING_EDITOR_TEST' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+  def doing(*args, stdin: nil)
+    doing_with_env({'DOING_EDITOR_TEST' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args, stdin: stdin)
   end
 
-  def doing_env(env, *args)
+  def doing_env(env, *args, stdin: nil)
     env['DOING_CONFIG'] = @config_file
     env['DOING_EDITOR_TEST'] = 'true'
-    doing_with_env(env, '--doing_file', @wwid_file, *args)
+    doing_with_env(env, '--doing_file', @wwid_file, *args, stdin: stdin)
   end
 
   def mktmpdir

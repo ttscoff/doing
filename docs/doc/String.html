@@ -937,6 +937,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#split_date_range-instance_method" title="#split_date_range (instance method)">#<strong>split_date_range</strong>  &#x21d2; Array&lt;DateTime&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Splits a range string and returns an array of DateTime objects as [start, end].</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#tag-instance_method" title="#tag (instance method)">#<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false, force: false)  &#x21d2; String </a>
     
 
@@ -2701,6 +2724,74 @@ not recognized)</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="split_date_range-instance_method">
+  
+    #<strong>split_date_range</strong>  &#x21d2; <tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span>&lt;DateTime&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Splits a range string and returns an array of
+DateTime objects as [start, end]. If only one date is
+given, end time is nil.</p>
+
+<p>&quot;mon 3pm to mon 5pm&quot;.split_date_range</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+        <p class="example_title"><div class='inline'><p>Process a natural language date range</p>
+</div></p>
+      
+      <pre class="example code"><code></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span>&lt;DateTime&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Start and end dates as
+array</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>InvalidTimeExpression</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="tag-instance_method">
   
     #<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false, force: false)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
@@ -3538,7 +3629,7 @@ Uses \S (non-whitespace) instead of . (any character)</p>
 </div>
 
       <div id="footer">
-  Generated on Mon Jan 17 08:01:48 2022 by
+  Generated on Tue Jan 18 02:48:58 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-3.0.1).
 </div>

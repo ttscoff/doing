@@ -176,7 +176,7 @@ module Doing
                   '  '
                 else
                   line = l.gsub(/%/, '\%').strip.wrap(width, pad: pad, indent: indent, offset: 0, prefix: prefix, color: last_color, after: after, reset: reset, pad_first: true)
-                  line.highlight_tags!(tags_color, last_color: last_color) unless tags_color.nil? || tags_color.empty?
+                  line.highlight_tags!(tags_color, last_color: last_color) unless !tags_color || tags_color.nil? || tags_color.empty?
                   "#{line}  "
                 end
               end.join("\n")

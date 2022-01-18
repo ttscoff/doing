@@ -13,12 +13,12 @@ module DoingHelpers
     ts.to_i / 60 * 60
   end
 
-  def doing_with_env(env, *args)
-    pread(env, DOING_EXEC, *args)
+  def doing_with_env(env, *args, stdin: nil)
+    pread(env, DOING_EXEC, *args, stdin: stdin)
   end
 
-  def pread(env, *cmd)
-    out, err, status = Open3.capture3(env, *cmd)
+  def pread(env, *cmd, stdin: nil)
+    out, err, status = Open3.capture3(env, *cmd, stdin_data: stdin)
     unless status.success?
       raise [
         "Error (#{status}): #{cmd.inspect} failed", "STDOUT:", out.inspect, "STDERR:", err.inspect

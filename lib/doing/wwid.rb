@@ -187,6 +187,8 @@ module Doing
       iso_rx = /\d{4}-\d\d-\d\d \d\d:\d\d/
       date_rx = /^(?:\s*- )?(?<date>.*?) \| (?=\S)/
 
+      raise EmptyInput, 'No content' if title.sub(/^.*?\| */, '').strip.empty?
+
       title.expand_date_tags(@config['date_tags'])
 
       if title =~ date_rx
@@ -807,6 +809,7 @@ module Doing
     end
 
     def edit_items(items)
+      items.sort_by! { |i| i.date }
       editable_items = []
 
       items.each do |i|
@@ -815,16 +818,16 @@ module Doing
         editable += "\n#{old_note}" unless old_note.nil?
         editable_items << editable
       end
-      divider = "\n-----------\n"
+      divider = "-----------"
       notice =<<~EONOTICE
       # - You may delete entries, but leave all divider lines (---) in place.
       # - Start and @done dates replaced with a time string (yesterday 3pm) will
       #   be parsed automatically. Do not delete the pipe (|) between start date
       #   and entry title.
       EONOTICE
-      input =  "#{editable_items.map(&:strip).join(divider)}\n\n#{notice}"
+      input =  "#{editable_items.map(&:strip).join("\n#{divider}\n")}\n\n#{notice}"
 
-      new_items = fork_editor(input).split(/#{divider}/)
+      new_items = fork_editor(input).split(/^#{divider}/).map(&:strip)
 
       new_items.each_with_index do |new_item, i|
         input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
@@ -833,7 +836,7 @@ module Doing
         if first_line.nil? || first_line =~ /^#{divider.strip}$/ || first_line.strip.empty?
           deleted = @content.delete_item(items[i], single: new_items.count == 1)
           Hooks.trigger :post_entry_removed, self, deleted
-          Doing.logger.count(:deleted)
+          Doing.logger.info('Deleted:', deleted.title)
         else
           date, title, note = format_input(new_item)
 
@@ -961,8 +964,14 @@ module Doing
             type = action =~ /^add/ ? 'add' : 'remove'
             raise InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
 
-            print "#{yellow("Tag to #{type}: ")}#{reset}"
-            tag = $stdin.gets
+            tags = type == 'add' ? all_tags(@content) : all_tags(items)
+
+            puts "#{yellow}Separate multiple tags with spaces, hit tab to complete known tags#{type == 'add' ? ', include values with tag(value)' : ''}"
+            puts "#{boldgreen}Available tags: #{boldwhite}#{tags.sort.map(&:add_at).join(', ')}" if type == 'remove'
+            tag = Prompt.read_line(prompt: "Tags to #{type}", completions: tags)
+
+            # print "#{yellow("Tag to #{type}: ")}#{reset}"
+            # tag = $stdin.gets
             next if tag =~ /^ *$/
 
             opt[:tag] = tag.strip.sub(/^@/, '')
@@ -984,8 +993,9 @@ module Doing
             opt[:output] = output_format.strip
             res = opt[:force] ? false : Prompt.yn('Save to file?', default_response: 'n')
             if res
-              print "#{yellow('File path/name: ')}#{reset}"
-              filename = $stdin.gets.strip
+              # print "#{yellow('File path/name: ')}#{reset}"
+              # filename = $stdin.gets.strip
+              filename = Prompt.read_line(prompt: 'File path/name')
               next if filename.empty?
 
               opt[:save_to] = filename
@@ -1093,10 +1103,10 @@ module Doing
         i
       end
 
-      @content = Items.new
-      @content.concat(items)
-      @content.add_section(Section.new('Export'), log: false)
-      options = { section: 'Export' }
+      export_items = Items.new
+      export_items.concat(items)
+      export_items.add_section(Section.new('Export'), log: false)
+      options = { section: 'All' }
 
       if opt[:output] =~ /doing/
         options[:output] = 'template'
@@ -1106,7 +1116,7 @@ module Doing
         options[:template] = opt[:template] || nil
       end
 
-      output = list_section(options) # hooked
+      output = list_section(options, items: export_items) # hooked
 
       if opt[:save_to]
         file = File.expand_path(opt[:save_to])
@@ -1182,6 +1192,19 @@ module Doing
       end
 
       raise NoResults, 'no items matched your search' if items.empty?
+
+      if opt[:tags].empty? && !opt[:autotag]
+        completions = opt[:remove] ? all_tags(items) : all_tags(@content)
+        if opt[:remove]
+          puts "#{yellow}Available tags: #{boldwhite}#{completions.map(&:add_at).join(', ')}"
+        else
+          puts "#{yellow}Use tab to complete known tags"
+        end
+        opt[:tags] = Doing::Prompt.read_line(prompt: "Enter tag(s) to #{opt[:remove] ? 'remove' : 'add'}",
+                                             completions: completions,
+                                             default_response: '').to_tags
+        raise UserCancelled, 'No tags provided' if opt[:tags].empty?
+      end
 
       items.each do |item|
         added = []
@@ -2126,6 +2149,13 @@ EOS
       false
     end
 
+    ##
+    ## Load configuration files and updated the @config
+    ## attribute with a Doing::Configuration object
+    ##
+    ## @param      filename  [String] (optional) path to
+    ##                       alternative config file
+    ##
     def configure(filename = nil)
       if filename
         Doing.config_with(filename, { ignore_local: true })
