@@ -1640,9 +1640,9 @@ module Doing
         opt[:menu] = !opt[:force]
         opt[:query] = '' # opt[:search]
         opt[:multiple] = true
-        selected = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **opt)
+        selected = Prompt.choose_from_items(items.reverse, include_section: opt[:section] =~ /^all$/i, **opt)
 
-        raise NoResults, 'no items selected' if selected.empty?
+        raise NoResults, 'no items selected' if selected.nil? || selected.empty?
 
         act_on(selected, opt)
         return

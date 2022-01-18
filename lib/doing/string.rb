@@ -133,7 +133,10 @@ module Doing
           query[:must] = query[:should]
           query[:should] = []
         end
-        query[:must].concat(query[:should]).each do |s|
+        qs = []
+        qs.concat(query[:must]) if query[:must]
+        qs.concat(query[:should]) if query[:should]
+        qs.each do |s|
           rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
           out.gsub!(rx) { |m| m.bgyellow.black }
         end
