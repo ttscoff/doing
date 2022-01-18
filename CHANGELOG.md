@@ -1,3 +1,18 @@
+### 2.1.17
+
+2022-01-18 04:13
+
+#### IMPROVED
+
+- Show up to 5 items when confirming delete operation so you actually know what you're deleting
+- Allow --ask when creating new entry via STDIN pipe
+- Tab completion for known tags when creating an entry interactively
+- Add purple as an alias for magenta in template colors
+
+#### FIXED
+
+- Clear STDIN before requesting input
+
 ### 2.1.16
 
 2022-01-18 02:45
