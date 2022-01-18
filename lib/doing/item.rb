@@ -9,6 +9,8 @@ module Doing
 
     # attr_reader :id
 
+    include Color
+
     ##
     ## Initialize an item with date, title, section, and
     ## optional note
@@ -269,6 +271,34 @@ module Doing
       (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
     end
 
+    def highlight_search(search, distance: nil, negate: false, case_type: nil)
+      prefs = Doing.config.settings['search'] || {}
+      matching = prefs.fetch('matching', 'pattern').normalize_matching
+      distance ||= prefs.fetch('distance', 3).to_i
+      case_type ||= prefs.fetch('case', 'smart').normalize_case
+      new_note = Note.new
+
+      if search.is_rx? || matching == :fuzzy
+        rx = search.to_rx(distance: distance, case_type: case_type)
+        new_title = @title.gsub(rx) { |m| yellow(m) }
+        new_note.add(@note.to_s.gsub(rx) { |m| yellow(m) })
+      else
+        query = to_phrase_query(search.strip)
+
+        if query[:must].nil? && query[:must_not].nil?
+          query[:must] = query[:should]
+          query[:should] = []
+        end
+        query[:must].concat(query[:should]).each do |s|
+          rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
+          new_title = @title.gsub(rx) { |m| yellow(m) }
+          new_note.add(@note.to_s.gsub(rx) { |m| yellow(m) })
+        end
+      end
+
+      Item.new(@date, new_title, @section, new_note)
+    end
+
     ##
     ## Test if item matches search string
     ##
@@ -370,6 +400,27 @@ module Doing
     # outputs item in Doing file format, including leading tab
     def to_s
       "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.empty? ? '' : "\n#{@note}"}"
+    end
+
+    ##
+    ## outputs a colored string with relative date and highlighted tags
+    ##
+    ## @return     Pretty representation of the object.
+    ##
+    def to_pretty(elements: %i[date title section])
+      output = []
+      elements.each do |e|
+        case e
+        when :date
+          output << format('%13s |', @date.relative_date).cyan
+        when :section
+          output << "#{magenta}(#{white(@section)}#{magenta})"
+        when :title
+          output << @title.white.highlight_tags('cyan')
+        end
+      end
+
+      output.join(' ')
     end
 
     # @private

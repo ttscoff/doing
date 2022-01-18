@@ -101,6 +101,46 @@ module Doing
       gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{last_color}")
     end
 
+    def to_phrase_query(query)
+      parser = PhraseParser::QueryParser.new
+      transformer = PhraseParser::QueryTransformer.new
+      parse_tree = parser.parse(query)
+      transformer.apply(parse_tree).to_elasticsearch
+    end
+
+    def ignore_case(search, case_type)
+      (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
+    end
+
+    def highlight_search!(search, distance: nil, negate: false, case_type: nil)
+      replace highlight_search(search, distance: distance, negate: negate, case_type: case_type)
+    end
+
+    def highlight_search(search, distance: nil, negate: false, case_type: nil)
+      out = dup
+      prefs = Doing.config.settings['search'] || {}
+      matching = prefs.fetch('matching', 'pattern').normalize_matching
+      distance ||= prefs.fetch('distance', 3).to_i
+      case_type ||= prefs.fetch('case', 'smart').normalize_case
+
+      if search.is_rx? || matching == :fuzzy
+        rx = search.to_rx(distance: distance, case_type: case_type)
+        out.gsub!(rx) { |m| m.bgyellow.black }
+      else
+        query = to_phrase_query(search.strip)
+
+        if query[:must].nil? && query[:must_not].nil?
+          query[:must] = query[:should]
+          query[:should] = []
+        end
+        query[:must].concat(query[:should]).each do |s|
+          rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
+          out.gsub!(rx) { |m| m.bgyellow.black }
+        end
+      end
+      out
+    end
+
     ##
     ## Test if line should be ignored
     ##

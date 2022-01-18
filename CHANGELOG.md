@@ -1,3 +1,23 @@
+### 2.1.17
+
+2022-01-18 07:26
+
+#### NEW
+
+- `--hilite` option for `doing search` to highlight matches in search results (terminal output only)
+- `--hilite` flag for `show` and `view` to highlight results when used with `--search`
+
+#### IMPROVED
+
+- Show preview of up to 5 items when confirming a delete operation so you actually know what you're deleting
+- Allow `--ask` when creating new entry via STDIN pipe
+- Tab completion for known tags when creating an entry interactively
+- Add purple as an alias for magenta in template colors
+
+#### FIXED
+
+- Clear STDIN before requesting input
+
 ### 2.1.16
 
 2022-01-18 02:45

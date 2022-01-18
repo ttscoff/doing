@@ -1236,14 +1236,20 @@ command %i[now next] do |c|
         date = d
       end
       note.add(options[:note]) if options[:note]
-      note.add(ask_note) unless ask_note.empty?
+      if ask_note.empty? && options[:ask]
+        ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
+        note.add(ask_note) unless ask_note.empty?
+      end
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     else
-      title = Doing::Prompt.read_line(prompt: 'Entry content')
+      tags = wwid.all_tags(wwid.content)
+      $stderr.puts Doing::Color.boldgreen("Add a new entry. Tab will autocomplete known tags. Ctrl-c to cancel.")
+      title = Doing::Prompt.read_line(prompt: 'Entry content', completions: tags)
       raise EmptyInput, 'You must provide content when creating a new entry' if title.strip.empty?
 
       note = Doing::Note.new
+      note.add(options[:note]) if options[:note]
       res = Doing::Prompt.yn('Add a note', default_response: false)
       ask_note = res ? Doing::Prompt.read_lines(prompt: 'Enter note') : []
       note.add(ask_note)
@@ -1744,6 +1750,9 @@ command %i[grep search] do |c|
   c.arg_name 'TYPE'
   c.flag [:case], must_match: /^[csi]/, default_value: settings.dig('search', 'case')
 
+  c.desc "Highlight search matches in output. Only affects command line output"
+  c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
+
   c.desc "Edit matching entries with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
@@ -1821,6 +1830,9 @@ command :last do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc "Highlight search matches in output. Only affects command line output"
+  c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
+
   c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
   c.arg_name 'QUERY'
   c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
@@ -1875,6 +1887,7 @@ command :last do |c|
                         search: options[:search],
                         fuzzy: options[:fuzzy],
                         case: options[:case],
+                        hilite: options[:hilite],
                         negate: options[:not],
                         tag: options[:tag],
                         tag_bool: options[:bool],
@@ -2019,6 +2032,9 @@ command :show do |c|
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
+
+  c.desc "Highlight search matches in output. Only affects command line output"
+  c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
@@ -2167,6 +2183,7 @@ command :show do |c|
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
     opt[:highlight] = true
+    opt[:hilite] = options[:hilite]
     opt[:order] = options[:sort].normalize_order
     opt[:tag] = nil
     opt[:tag_order] = options[:tag_order].normalize_order
@@ -2493,6 +2510,9 @@ command :view do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc "Highlight search matches in output. Only affects command line output"
+  c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
+
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
 
@@ -2653,6 +2673,7 @@ command :view do |c|
       opts[:count] = count
       opts[:format] = date_format
       opts[:highlight] = options[:color]
+      opts[:hilite] = options[:hilite]
       opts[:only_timed] = only_timed
       opts[:order] = order
       opts[:output] = options[:interactive] ? nil : options[:output]

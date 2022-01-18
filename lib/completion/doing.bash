@@ -101,9 +101,9 @@ _doing_finish() {
 _doing_grep() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--after --before --bool --case --delete --duration --editor --from --interactive --not --output --only_timed --section --times --tag_sort --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --before --bool --case --delete --duration --editor --from --hilite --interactive --not --output --only_timed --section --times --tag_sort --totals --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-d -e -i -o -s -t -x --after --before --bool --case --delete --duration --editor --from --interactive --not --output --only_timed --section --times --tag_sort --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-d -e -h -i -o -s -t -x --after --before --bool --case --delete --duration --editor --from --hilite --interactive --not --output --only_timed --section --times --tag_sort --totals --val --exact' -- $token ) )
   
   fi
 }
@@ -131,9 +131,9 @@ _doing_import() {
 _doing_last() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--bool --case --delete --duration --editor --not --section --search --tag --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--bool --case --delete --duration --editor --hilite --not --section --search --tag --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-d -e -s -x --bool --case --delete --duration --editor --not --section --search --tag --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-d -e -h -s -x --bool --case --delete --duration --editor --hilite --not --section --search --tag --val --exact' -- $token ) )
   
   fi
 }
@@ -276,9 +276,9 @@ local words=$(doing sections)
 IFS="$OLD_IFS"
 
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--age --after --bool --before --count --case --duration --from --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--age --after --bool --before --count --case --duration --from --hilite --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -b -c -i -m -o -s -t -x --age --after --bool --before --count --case --duration --from --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -b -c -h -i -m -o -s -t -x --age --after --bool --before --count --case --duration --from --hilite --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --totals --val --exact' -- $token ) )
   else
   local nocasematchWasOff=0
   shopt nocasematch >/dev/null || nocasematchWasOff=1
@@ -376,9 +376,9 @@ local words=$(doing views)
 IFS="$OLD_IFS"
 
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--after --age --bool --before --count --case --color --duration --from --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --age --bool --before --count --case --color --duration --from --hilite --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-b -c -i -o -s -t -x --after --age --bool --before --count --case --color --duration --from --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-b -c -h -i -o -s -t -x --after --age --bool --before --count --case --color --duration --from --hilite --interactive --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --totals --val --exact' -- $token ) )
   else
   local nocasematchWasOff=0
   shopt nocasematch >/dev/null || nocasematchWasOff=1

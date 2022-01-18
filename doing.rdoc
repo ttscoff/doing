@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.16
+v2.1.17
 
 === Global Options
 === --config_file arg
@@ -812,6 +812,11 @@ Edit matching entries with vim
 
 
 
+===== -h|--[no-]hilite
+Highlight search matches in output. Only affects command line output
+
+
+
 ===== -i|--interactive
 Display an interactive menu of results to perform further operations
 
@@ -1011,6 +1016,11 @@ Show elapsed time if entry is not tagged @done
 
 ===== -e|--editor
 Edit entry with vim
+
+
+
+===== -h|--[no-]hilite
+Highlight search matches in output. Only affects command line output
 
 
 
@@ -1908,6 +1918,11 @@ Show elapsed time on entries without @done tag
 
 
 
+===== -h|--[no-]hilite
+Highlight search matches in output. Only affects command line output
+
+
+
 ===== -i|--interactive
 Select from a menu of matching entries to perform additional operations
 
@@ -2465,6 +2480,11 @@ Include colors in output
 
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
+
+
+
+===== -h|--[no-]hilite
+Highlight search matches in output. Only affects command line output
 
 
 
