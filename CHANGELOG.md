@@ -1,6 +1,6 @@
 ### 2.1.20
 
-2022-01-19 10:08
+2022-01-19 10:26
 
 #### NEW
 
@@ -9,6 +9,7 @@
 #### IMPROVED
 
 - Autotag improvements
+- If doing is run without a command but with arguments, execute it as if you'd run `doing now`, passing the arguments to that. So you can just write "doing this thing" instead of "doing now this thing", as long as the first word of the arguments is not a recognized command.
 
 #### FIXED
 

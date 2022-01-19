@@ -38,7 +38,7 @@ module Doing
     #
     def deep_set(path, value)
       if path.count == 1
-        if value
+        unless value.nil? || value =~ /^ *$/
           self[path[0]] = value
         else
           delete(path[0])

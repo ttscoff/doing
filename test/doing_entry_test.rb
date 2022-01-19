@@ -81,7 +81,7 @@ class DoingEntryTest < Test::Unit::TestCase
     subject = 'Test later entry'
     result = doing('--stdout', 'later', subject)
     assert_matches([
-      [/New entry: added "#{subject}" to Later/, 'should have added entry to Later section']
+      [/New entry: added "(.*?)?: #{subject}" to Later/, 'should have added entry to Later section']
     ], result)
     assert_count_entries(1, doing('show', 'later'), 'There should be one later entry')
   end

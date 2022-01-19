@@ -356,7 +356,7 @@ module Doing
 
       @content.push(entry)
       # logger.count(:added, level: :debug)
-      logger.info('New entry:', %(added "#{entry.title}" to #{section}))
+      logger.info('New entry:', %(added "#{entry.date.relative_date}: #{entry.title}" to #{section}))
 
       Hooks.trigger :post_entry_added, self, entry.dup
     end
@@ -1141,6 +1141,8 @@ module Doing
     def verify_duration(date, finish_date, title: nil)
       max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
       max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
+      date = date.chronify(guess: :end, context: :today) if finish_date.is_a?(String)
+
       elapsed = finish_date - date
 
       if max_elapsed.positive? && (elapsed > max_elapsed)

@@ -31,13 +31,13 @@ class DoingResumeTest < Test::Unit::TestCase
     doing('done', subject)
     result = doing('--stdout', '--debug', 'again')
 
-    assert_match(/New entry: added "#{subject}" to #{@config['current_section']}/, result, 'Entry should be added again')
+    assert_match(/New entry: added "(.*?)?: #{subject}" to #{@config['current_section']}/, result, 'Entry should be added again')
   end
 
   def test_resume_tag
     3.times { |i| doing('done', '--back', "#{i+5}m", "Entry #{i + 1} with @tag#{i + 1}") }
     result = doing('--stdout', '--debug', 'again', '--tag', 'tag2')
-    assert_match(/New entry: added \"Entry 2 with @tag2\"/, result, 'Entry 2 should be repeated')
+    assert_match(/New entry: added \"(.*?)?: Entry 2 with @tag2\"/, result, 'Entry 2 should be repeated')
 
     result = doing('last').uncolor.strip
 

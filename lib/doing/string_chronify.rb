@@ -26,7 +26,7 @@ module Doing
     ##
     def chronify(**options)
       now = Time.now
-      raise InvalidTimeExpression, "Invalid time expression #{inspect}" if to_s.strip == ''
+      raise Errors::InvalidTimeExpression, "Invalid time expression #{inspect}" if to_s.strip == ''
 
       secs_ago = if match(/^(\d+)$/)
                    # plain number, assume minutes
@@ -43,14 +43,15 @@ module Doing
         Doing.logger.debug('Parser:', %(date/time string "#{self}" interpreted as #{res} (#{secs_ago} seconds ago)))
       else
         date_string = dup
-        day_rx = /^(mon|tue|wed|thur?|fri|sat|sun)(\w+(day)?)?$/
-        date_string = 'today' if date_string.match(day_rx) && now.strftime('%a') =~ /^#{Regexp.last_match(1)}/i
+        date_string = 'today' if date_string.match(REGEX_DAY) && now.strftime('%a') =~ /^#{Regexp.last_match(1)}/i
+        date_string = "#{options[:context].to_s} #{date_string}" if date_string =~ REGEX_TIME && options[:context]
 
         res = Chronic.parse(date_string, {
                               guess: options.fetch(:guess, :begin),
                               context: options.fetch(:future, false) ? :future : :past,
                               ambiguous_time_range: 8
                             })
+
         Doing.logger.debug('Parser:', %(date/time string "#{self}" interpreted as #{res}))
       end
 
@@ -194,7 +195,7 @@ module Doing
           finish = dates[-1].chronify(guess: inclusive ? :end : :begin, future: false)
         end
 
-        raise InvalidTimeExpression, 'Unrecognized date string' if start.nil? || finish.nil?
+        raise Errors::InvalidTimeExpression, 'Unrecognized date string' if start.nil? || finish.nil?
 
       else
         if date_string.strip =~ time_rx
@@ -204,7 +205,7 @@ module Doing
           start = date_string.strip.chronify(guess: :begin, future: false)
           finish = date_string.strip.chronify(guess: :end)
         end
-        raise InvalidTimeExpression, 'Unrecognized date string' unless start
+        raise Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
 
       end
 

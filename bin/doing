@@ -25,15 +25,6 @@ version Doing::VERSION
 hide_commands_without_desc true
 autocomplete_commands true
 
-REGEX_BOOL = /^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$/i
-REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
-REGEX_VALUE_QUERY = /^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$/
-REGEX_CLOCK = '(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)'
-REGEX_TIME = /^#{REGEX_CLOCK}$/i
-REGEX_RANGE_INDICATOR = ' +(?:to|through|thru|(?:un)?til|-+) +'
-REGEX_RANGE = /^\S+#{REGEX_RANGE_INDICATOR}+\S+/i
-REGEX_TIME_RANGE = /^#{REGEX_CLOCK}#{REGEX_RANGE_INDICATOR}#{REGEX_CLOCK}$/i
-
 InvalidExportType = Class.new(RuntimeError)
 MissingConfigFile = Class.new(RuntimeError)
 
@@ -479,6 +470,7 @@ command %i[done did] do |c|
     end
 
     if options[:date]
+      date = date.chronify(guess: :begin, context: :today) if date =~ REGEX_TIME
       finish_date = wwid.verify_duration(date, finish_date) unless options[:took] || options[:from]
 
       donedate = finish_date.strftime('%F %R')
@@ -590,7 +582,7 @@ command %i[done did] do |c|
       wwid.content.push(new_entry)
       Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
       wwid.write(wwid.doing_file)
-      Doing.logger.info('Entry Added:', new_entry.title)
+      Doing.logger.info('New entry:', %(added "#{new_entry.date.relative_date}: #{new_entry.title}" to #{section}))
     elsif $stdin.stat.size.positive?
       note = Doing::Note.new(options[:note])
       d, title, note = wwid.format_input($stdin.read.strip)
@@ -615,7 +607,7 @@ command %i[done did] do |c|
       Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
 
       wwid.write(wwid.doing_file)
-      Doing.logger.info('Entry Added:', new_entry.title)
+      Doing.logger.info('New entry:', %(added "#{new_entry.date.relative_date}: #{new_entry.title}" to #{section}))
     else
       raise EmptyInput, 'You must provide content when creating a new entry'
     end
@@ -3045,8 +3037,7 @@ command :config do |c|
       value = options[:remove] ? nil : args.pop
       keypath = args.join('.')
       real_path = config.resolve_key_path(keypath, create: true)
-
-      old_value = settings.dig(*real_path) || nil
+      old_value = settings.dig(*real_path)
       old_type = old_value&.class.to_s || nil
 
       if old_value.is_a?(Hash) && !options[:remove]
@@ -3072,7 +3063,6 @@ command :config do |c|
       else
         current_value = cfg.dig(*real_path)
         cfg.deep_set(real_path, value.set_type(old_type))
-
         $stderr.puts "#{' Key path:'.yellow} #{real_path.join('->').boldwhite}"
         $stderr.puts "#{'Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
         $stderr.puts "#{'  Current:'.yellow} #{ (current_value ? current_value.to_s : 'empty').boldwhite }"

@@ -685,6 +685,15 @@ module Doing
       end
     end
 
+    def to_bool
+      case self
+      when /^[yt1]/i
+        true
+      else
+        false
+      end
+    end
+
     ##
     ## Convert a string value to an appropriate type. If
     ## kind is not specified, '[one, two]' becomes an Array,
@@ -704,6 +713,8 @@ module Doing
           gsub(/^\[ *| *\]$/, '').split(/ *, */)
         when /^i/i
           to_i
+        when /^(fa|tr)/i
+          to_bool
         when /^f/i
           to_f
         when /^sy/i

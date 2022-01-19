@@ -52,6 +52,16 @@ require_relative 'doing/numeric_chronify'
 require_relative 'doing/string_chronify'
 # require 'doing/markdown_document_listener'
 
+REGEX_BOOL = /^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$/i
+REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
+REGEX_VALUE_QUERY = /^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$/
+REGEX_CLOCK = '(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)'
+REGEX_TIME = /^#{REGEX_CLOCK}$/i
+REGEX_DAY = /^(mon|tue|wed|thur?|fri|sat|sun)(\w+(day)?)?$/i
+REGEX_RANGE_INDICATOR = ' +(?:to|through|thru|(?:un)?til|-+) +'
+REGEX_RANGE = /^\S+#{REGEX_RANGE_INDICATOR}+\S+/i
+REGEX_TIME_RANGE = /^#{REGEX_CLOCK}#{REGEX_RANGE_INDICATOR}#{REGEX_CLOCK}$/i
+
 # Main doing module
 module Doing
   class << self
