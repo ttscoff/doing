@@ -634,42 +634,25 @@ module Doing
 
       opt[:time_filter] = [nil, nil]
       if opt[:from] && !opt[:date_filter]
-        date_string = opt[:from]
-        case date_string
-        when / (to|through|thru|(un)?til|-+) /
-          dates = date_string.split(/ (?:to|through|thru|(?:un)?til|-+) /)
-          if dates[0].strip =~ time_rx && dates[-1].strip =~ time_rx
-            time_start = dates[0].strip
-            time_end = dates[-1].strip
-          else
-            start = dates[0].chronify(guess: :begin)
-            finish = dates[-1].chronify(guess: :end)
-          end
-        when time_rx
-          time_start = date_string
-          time_end = nil
-        else
-          start = date_string.chronify(guess: :begin)
-          finish = false
+        if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
+          time_start, time_end = opt[:from]
+        elsif opt[:from].is_a?(Time)
+          start, finish = opt[:from]
         end
 
         if time_start
           opt[:time_filter] = [time_start, time_end]
-          Doing.logger.debug('Parser:', "--from string interpreted as time span, from #{time_start ? time_start : '12am'} to #{time_end ? time_end : '11:59pm'}")
         else
-          raise InvalidTimeExpression, 'Unrecognized date string' unless start
-
-          opt[:date_filter] = [start, finish]
-          Doing.logger.debug('Parser:', "--from string interpreted as #{start.strftime('%F %R')} -- #{finish ? finish.strftime('%F %R') : 'now'}")
+          opt[:date_filter] = opt[:from]
         end
       end
 
-      if opt[:before] =~ time_rx
+      if opt[:before].is_a?(String) && opt[:before] =~ time_rx
         opt[:time_filter][1] = opt[:before]
         opt[:before] = nil
       end
 
-      if opt[:after] =~ time_rx
+      if opt[:after].is_a?(String) && opt[:after] =~ time_rx
         opt[:time_filter][0] = opt[:after]
         opt[:after] = nil
       end
@@ -735,7 +718,7 @@ module Doing
           start_time = start_string.chronify(guess: :begin)
 
           end_string = if opt[:time_filter][1].nil?
-                         "#{item.date.next_day.strftime('%Y-%m-%d')} 12am"
+                         "#{item.date.to_datetime.next_day.strftime('%Y-%m-%d')} 12am"
                        else
                          "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][1]}"
                        end
@@ -754,22 +737,26 @@ module Doing
         end
 
         if keep && opt[:before]
-          time_string = opt[:before]
-          if time_string =~ time_rx
-            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{time_string}".chronify(guess: :begin)
+          before = opt[:before]
+          if before =~ time_rx
+            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{before}".chronify(guess: :begin)
+          elsif before.is_a?(String)
+            cutoff = before.chronify(guess: :begin)
           else
-            cutoff = time_string.chronify(guess: :begin)
+            cutoff = before
           end
           keep = cutoff && item.date <= cutoff
           keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:after]
-          time_string = opt[:after]
-          if time_string =~ time_rx
-            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{time_string}".chronify(guess: :end)
+          after = opt[:after]
+          if after =~ time_rx
+            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{after}".chronify(guess: :end)
+          elsif after.is_a?(String)
+            cutoff = after.chronify(guess: :end)
           else
-            cutoff = time_string.chronify(guess: :end)
+            cutoff = after
           end
           keep = cutoff && item.date >= cutoff
           keep = opt[:not] ? !keep : keep
@@ -1763,7 +1750,7 @@ module Doing
       opt[:sort_tags] ||= false
       section = guess_section(section)
       # :date_filter expects an array with start and end date
-      dates = [dates, dates] if dates.instance_of?(String)
+      dates = dates.split_date_range if dates.instance_of?(String)
 
       list_section({
                      section: section,

@@ -1,6 +1,6 @@
 ### 2.1.20
 
-2022-01-19 06:22
+2022-01-19 06:55
 
 #### NEW
 
@@ -14,6 +14,7 @@
 
 - `doing again` should only mark the original repeating entry @done, not search for the last unfinished entry
 - Error when using `doing finish --auto`
+- `doing on wed` when today is wednesday not returning results
 
 ### 2.1.19
 

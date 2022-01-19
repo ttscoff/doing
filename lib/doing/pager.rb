@@ -55,7 +55,7 @@ module Doing
           write_io.write(text)
           write_io.close
         rescue SystemCallError => e
-          raise Errors::DoingStandardError, "Pager error, #{e}"
+          # raise Errors::DoingStandardError, "Pager error, #{e}"
         end
 
         _, status = Process.waitpid2(pid)

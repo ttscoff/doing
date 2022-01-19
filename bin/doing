@@ -28,6 +28,11 @@ autocomplete_commands true
 REGEX_BOOL = /^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$/i
 REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
 REGEX_VALUE_QUERY = /^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$/
+REGEX_CLOCK = '(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)'
+REGEX_TIME = /^#{REGEX_CLOCK}$/i
+REGEX_RANGE_INDICATOR = ' +(?:to|through|thru|(?:un)?til|-+) +'
+REGEX_RANGE = /^\S+#{REGEX_RANGE_INDICATOR}+\S+/i
+REGEX_TIME_RANGE = /^#{REGEX_CLOCK}#{REGEX_RANGE_INDICATOR}#{REGEX_CLOCK}$/i
 
 InvalidExportType = Class.new(RuntimeError)
 MissingConfigFile = Class.new(RuntimeError)
@@ -77,25 +82,33 @@ class DateRangeString < Array; end
 class DateIntervalString < DateTime; end
 
 accept DateBeginString do |value|
-  res = value.chronify(guess: :begin)
+  if value =~ REGEX_TIME
+    res = value
+  else
+    res = value.chronify(guess: :begin, future: false)
+  end
   raise InvalidTimeExpression, 'Invalid start date' unless res
 
   res
 end
 
 accept DateEndString do |value|
-  res = value.chronify(guess: :end)
+  if value =~ REGEX_TIME
+    res = value
+  else
+    res = value.chronify(guess: :end, future: false)
+  end
   raise InvalidTimeExpression, 'Invalid end date' unless res
 
   res
 end
 
 accept DateRangeString do |value|
-  date, finish_date = options[:from].split_date_range
-  raise InvalidTimeExpression, 'Invalid range' unless date
+  start, finish = value.split_date_range
+  raise InvalidTimeExpression, 'Invalid range' unless start
 
-  finish_date ||= Time.now
-  [date, finish_date]
+  finish ||= Time.now
+  [start, finish]
 end
 
 accept DateIntervalString do |value|
@@ -396,7 +409,7 @@ command %i[done did] do |c|
         Overrides other date flags.
       )
   c.arg_name 'TIME_RANGE'
-  c.flag [:from]
+  c.flag [:from], must_match: REGEX_RANGE
 
   c.desc %(Set completion date to start date plus interval (XX[mhd] or HH:MM).
   If used without the --back option, the start date will be moved back to allow
@@ -430,7 +443,10 @@ command %i[done did] do |c|
     donedate = nil
 
     if options[:from]
-      date, finish_date = options[:from].split_date_range
+      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
+        time =~ REGEX_TIME ? "today #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}" : time
+      end.join(' to ').split_date_range
+      date, finish_date = options[:from]
       finish_date ||= Time.now
     else
       if options[:took]
@@ -447,6 +463,7 @@ command %i[done did] do |c|
 
       if options[:at]
         finish_date = options[:at]
+        finish_date = finish_date.chronify(guess: :begin) if finish_date.is_a? String
         raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
         if options[:took]
@@ -694,6 +711,7 @@ command :finish do |c|
 
       if options[:at]
         finish_date = options[:at]
+        finish_date = finish_date.chronify(guess: :begin) if finish_date.is_a? String
         raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
         date = options[:took] ? finish_date - took : finish_date
@@ -766,7 +784,7 @@ command :later do |c|
 
   c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back], type: DateBeginString
+  c.flag %i[b back started], type: DateBeginString
 
   c.desc 'Note'
   c.arg_name 'TEXT'
@@ -1459,11 +1477,11 @@ command :select do |c|
 
   c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
       Date range to show, or a single day to filter date on.
@@ -1474,7 +1492,7 @@ command :select do |c|
       by time of day.
     )
   c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.flag [:from], type: DateRangeString
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
@@ -1741,11 +1759,11 @@ command %i[grep search] do |c|
 
   c.desc 'Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
       Date range to show, or a single day to filter date on.
@@ -1756,7 +1774,7 @@ command %i[grep search] do |c|
       by time of day.
     )
   c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.flag [:from], type: DateRangeString
 
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
@@ -2054,11 +2072,11 @@ command :show do |c|
 
   c.desc 'Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
       Date range to show, or a single day to filter date on.
@@ -2070,7 +2088,7 @@ command :show do |c|
     )
 
   c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.flag [:from], type: DateRangeString
 
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -2365,8 +2383,8 @@ command :today do |c|
   c.desc %(
     Time range to show `doing today --from "12pm to 4pm"`
   )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.arg_name 'TIME_RANGE'
+  c.flag [:from], type: DateRangeString
 
   c.action do |_global_options, options, _args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
@@ -2379,7 +2397,7 @@ command :today do |c|
   end
 end
 
-# @on
+# @@on
 desc 'List entries for a date'
 long_desc %(Date argument can be natural language. "thursday" would be interpreted as "last thursday,"
 and "2d" would be interpreted as "two days ago." If you use "to" or "through" between two dates,
@@ -2418,7 +2436,10 @@ command :on do |c|
 
     raise MissingArgument, 'Missing date argument' if args.empty?
 
-    date_string = args.join(' ')
+    date_string = args.join(' ').strip
+    if date_string =~ /^tod(?:ay)?/i
+      date_string = 'today to tomorrow 12am'
+    end
     start, finish = date_string.split_date_range
 
     raise InvalidTimeExpression, 'Unrecognized date string' unless start
@@ -2571,11 +2592,11 @@ command :view do |c|
 
   c.desc 'View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
       Date range to show, or a single day to filter date on.
@@ -2586,7 +2607,7 @@ command :view do |c|
       by time of day.
     )
   c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.flag [:from], type: DateRangeString
 
   c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -2704,7 +2725,6 @@ command :view do |c|
 
       opts = options.dup
       opts[:age] = options[:age].normalize_age(:newest)
-      opts[:view_template] = title
       opts[:count] = count
       opts[:format] = date_format
       opts[:highlight] = options[:color]
@@ -2721,6 +2741,7 @@ command :view do |c|
       opts[:tags_color] = tags_color
       opts[:template] = template
       opts[:totals] = totals
+      opts[:view_template] = title
 
       Doing::Pager.page wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
@@ -2770,11 +2791,9 @@ command :yesterday do |c|
   c.arg_name 'TIME_STRING'
   c.flag [:after]
 
-  c.desc %(
-      Time range to show, e.g. `doing yesterday --from "1am to 8am"`
-    )
+  c.desc 'Time range to show, e.g. `doing yesterday --from "1am to 8am"`'
   c.arg_name 'TIME_RANGE'
-  c.flag [:from]
+  c.flag [:from], must_match: REGEX_TIME_RANGE
 
   c.desc 'Tag sort direction (asc|desc)'
   c.arg_name 'DIRECTION'
@@ -2786,9 +2805,9 @@ command :yesterday do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     if options[:from]
-      options[:from] = options[:from].split(/ (?:to|through|thru|(?:un)?til|-+) /).map do |time|
+      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
         "yesterday #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}"
-      end.join(' to ')
+      end.join(' to ').split_date_range
     end
 
     opt = {
@@ -3213,7 +3232,7 @@ command %i[archive move] do |c|
   c.desc 'Archive entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateEndString
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
@@ -3304,11 +3323,11 @@ command :import do |c|
   # TODO: Allow time range filtering
   c.desc 'Import entries older than date'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'Import entries newer than date'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
     Date range to import. Date range argument should be quoted. Date specifications can be natural language.
@@ -3316,7 +3335,7 @@ command :import do |c|
     Has no effect unless the import plugin has implemented date range filtering.
   )
   c.arg_name 'DATE_OR_RANGE'
-  c.flag %i[f from]
+  c.flag %i[f from], type: DateRangeString
 
   c.desc 'Allow entries that overlap existing times'
   c.switch [:overlap], negatable: true
@@ -3334,24 +3353,19 @@ command :import do |c|
     end
 
     if options[:from]
-      date_string = options[:from]
-      if date_string =~ / (to|through|thru|(un)?til|-+) /
-        dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-        start = dates[0].chronify(guess: :begin)
-        finish = dates[2].chronify(guess: :end)
-      else
-        start = date_string.chronify(guess: :begin)
-        finish = date_string.chronify(guess: :end)
-      end
-      raise InvalidTimeExpression, 'Unrecognized date string' unless start
-      dates = [start, finish]
+      options[:date_filter] = options[:from]
+
+      raise InvalidTimeExpression, 'Unrecognized date string' unless options[:date_filter][0]
+    elsif options[:before] || options[:after]
+      options[:date_filter] = [nil, nil]
+      options[:date_filter][1] = options[:before] || Time.now + (1 << 64)
+      options[:date_filter][0] = options[:after] || Time.now - (1 << 64)
     end
 
     options[:case] = options[:case].normalize_case
 
     if options[:type] =~ Doing::Plugins.plugin_regex(type: :import)
       options[:no_overlap] = !options[:overlap]
-      options[:date_filter] = dates
       wwid.import(args, options)
       wwid.write(wwid.doing_file)
     else
