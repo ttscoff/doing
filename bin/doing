@@ -3763,7 +3763,9 @@ pre do |global, _command, _options, _args|
 end
 
 on_error do |exception|
-  if exception.kind_of?(SystemExit)
+  if exception.kind_of?(GLI::UnknownCommand)
+    exit run(['now'].concat(ARGV))
+  elsif exception.kind_of?(SystemExit)
     false
   else
     # Doing.logger.error('Fatal:', exception)
