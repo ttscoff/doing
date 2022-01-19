@@ -171,7 +171,7 @@ module Doing
         finish = dates[-1].chronify(guess: :end)
       else
         start = date_string.chronify(guess: :begin)
-        finish = nil
+        finish = date_string.chronify(guess: :end)
       end
 
       raise InvalidTimeExpression, 'Unrecognized date string' unless start

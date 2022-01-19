@@ -1,6 +1,6 @@
 ### 2.1.20
 
-2022-01-18 09:26
+2022-01-18 12:22
 
 #### NEW
 
@@ -9,6 +9,10 @@
 #### IMPROVED
 
 - Autotag improvements
+
+#### FIXED
+
+- `doing again` should only mark the original repeating entry @done, not search for the last unfinished entry
 
 ### 2.1.19
 

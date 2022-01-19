@@ -71,6 +71,39 @@ if settings.dig('plugins', 'command_path')
 end
 
 class TagArray < Array; end
+class DateBeginString < DateTime; end
+class DateEndString < DateTime; end
+class DateRangeString < Array; end
+class DateIntervalString < DateTime; end
+
+accept DateBeginString do |value|
+  res = value.chronify(guess: :begin)
+  raise InvalidTimeExpression, 'Invalid start date' unless res
+
+  res
+end
+
+accept DateEndString do |value|
+  res = value.chronify(guess: :end)
+  raise InvalidTimeExpression, 'Invalid end date' unless res
+
+  res
+end
+
+accept DateRangeString do |value|
+  date, finish_date = options[:from].split_date_range
+  raise InvalidTimeExpression, 'Invalid range' unless date
+
+  finish_date ||= Time.now
+  [date, finish_date]
+end
+
+accept DateIntervalString do |value|
+  res = value.chronify_qty
+  raise InvalidTimeExpression, 'Invalid time quantity' unless res
+
+  res
+end
 
 accept TagArray do |value|
   value.gsub(/[, ]+/, ' ').split(' ').map { |tag| tag.sub(/^@/, '')}.map(&:strip)
@@ -145,7 +178,7 @@ command %i[again resume] do |c|
 
   c.desc 'Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back started]
+  c.flag %i[b back started], type: DateBeginString
 
   c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
@@ -203,7 +236,7 @@ command %i[again resume] do |c|
     end
 
     if options[:back]
-      date = options[:back].chronify(guess: :begin)
+      date = options[:back]
       raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
     else
       date = Time.now
@@ -352,11 +385,11 @@ command %i[done did] do |c|
   c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
   Used with --took, backdates start date)
   c.arg_name 'DATE_STRING'
-  c.flag %i[at finished]
+  c.flag %i[at finished], type: DateEndString
 
   c.desc 'Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back started]
+  c.flag %i[b back started], type: DateBeginString
 
   c.desc %(
         Start and end times as a date/time range `doing done --from "1am to 8am"`.
@@ -369,7 +402,7 @@ command %i[done did] do |c|
   If used without the --back option, the start date will be moved back to allow
   the completion date to be the current time.)
   c.arg_name 'INTERVAL'
-  c.flag %i[t took for]
+  c.flag %i[t took for], type: DateIntervalString
 
   c.desc 'Section'
   c.arg_name 'NAME'
@@ -401,19 +434,19 @@ command %i[done did] do |c|
       finish_date ||= Time.now
     else
       if options[:took]
-        took = options[:took].chronify_qty
+        took = options[:took]
         raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
       end
 
       if options[:back]
-        date = options[:back].chronify(guess: :begin)
+        date = options[:back]
         raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
       else
         date = options[:took] ? Time.now - took : Time.now
       end
 
       if options[:at]
-        finish_date = options[:at].chronify(guess: :begin)
+        finish_date = options[:at]
         raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
         if options[:took]
@@ -586,15 +619,15 @@ command :finish do |c|
 
   c.desc 'Backdate completed date to date string [4pm|20m|2h|yesterday noon]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back]
+  c.flag %i[b back started], type: DateBeginString
 
   c.desc 'Set the completed date to the start date plus XX[hmd]'
   c.arg_name 'INTERVAL'
-  c.flag %i[t took for]
+  c.flag %i[t took for], type: DateIntervalString
 
   c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.)
   c.arg_name 'DATE_STRING'
-  c.flag [:at]
+  c.flag %i[at finished], type: DateEndString
 
   c.desc 'Finish the last X entries containing TAG.
   Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).'
@@ -651,7 +684,7 @@ command :finish do |c|
     options[:fuzzy] = false
     unless options[:auto]
       if options[:took]
-        took = options[:took].chronify_qty
+        took = options[:took]
         raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
       end
 
@@ -660,20 +693,18 @@ command :finish do |c|
       raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 
       if options[:at]
-        finish_date = options[:at].chronify(guess: :begin)
+        finish_date = options[:at]
         raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
         date = options[:took] ? finish_date - took : finish_date
       elsif options[:back]
-        date = options[:back].chronify()
+        date = options[:back]
 
         raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
       else
         date = Time.now
       end
     end
-
-    options[:took] = options[:took].chronify_qty if options[:took]
 
     if options[:tag].nil?
       tags = []

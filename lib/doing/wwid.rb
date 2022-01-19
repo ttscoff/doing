@@ -454,7 +454,8 @@ module Doing
       opt ||= {}
       if item.should_finish?
         if item.should_time?
-          item.title.tag!('done', value: Time.now.strftime('%F %R'))
+          finish_date = verify_duration(item.date, Time.now, title: item.title)
+          item.title.tag!('done', value: finish_date.strftime('%F %R'))
         else
           item.title.tag!('done')
         end
@@ -1331,7 +1332,7 @@ module Doing
     ##
     ## @return     [Item] the next chronological item in the index
     ##
-    def next_item(item, options)
+    def next_item(item, options = {})
       options ||= {}
       items = filter_items(Items.new, opt: options)
 
