@@ -1,7 +1,7 @@
 ---
 plugins:
   plugin_path: test/plugins
-  command_path: "/Users/ttscoff/.config/doing/commands"
+  command_path: "/Users/ttscoff/Desktop/Code/doing/lib/examples/commands"
   trizzer:
     trizzle: test value from config
   say:

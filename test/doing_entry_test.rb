@@ -79,7 +79,7 @@ class DoingEntryTest < Test::Unit::TestCase
 
   def test_later_entry
     subject = 'Test later entry'
-    result = doing('--stdout', 'later', subject)
+    result = doing('--stdout', '--yes', 'later', subject)
     assert_matches([
       [/New entry: added "(.*?)?: #{subject}" to Later/, 'should have added entry to Later section']
     ], result)
