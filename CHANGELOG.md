@@ -1,6 +1,6 @@
 ### 2.1.20
 
-2022-01-18 12:22
+2022-01-19 06:22
 
 #### NEW
 
@@ -13,6 +13,7 @@
 #### FIXED
 
 - `doing again` should only mark the original repeating entry @done, not search for the last unfinished entry
+- Error when using `doing finish --auto`
 
 ### 2.1.19
 

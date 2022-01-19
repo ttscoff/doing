@@ -31,7 +31,7 @@ module Doing
       secs_ago = if match(/^(\d+)$/)
                    # plain number, assume minutes
                    Regexp.last_match(1).to_i * 60
-                 elsif (m = match(/^(?:(?<day>\d+)d)?(?:(?<hour>\d+)h)?(?:(?<min>\d+)m)?$/i))
+                 elsif (m = match(/^(?:(?<day>\d+)d)? *(?:(?<hour>\d+)h)? *(?:(?<min>\d+)m)?$/i))
                    # day/hour/minute format e.g. 1d2h30m
                    [[m['day'], 24 * 3600],
                     [m['hour'], 3600],
@@ -41,7 +41,12 @@ module Doing
       if secs_ago
         now - secs_ago
       else
-        Chronic.parse(self, {
+        date_string = dup
+        if date_string.match(/^(mon|tue|wed|thur?|fri|sat|sun)(\w+(day)?)?$/) && now.strftime('%a') =~ /^#{Regexp.last_match(1)}/i
+          date_string = 'today'
+        end
+
+        Chronic.parse(date_string, {
                         guess: options.fetch(:guess, :begin),
                         context: options.fetch(:future, false) ? :future : :past,
                         ambiguous_time_range: 8
@@ -167,11 +172,11 @@ module Doing
       case date_string
       when / (to|through|thru|(un)?til|-+) /
         dates = date_string.split(/ (?:to|through|thru|(?:un)?til|-+) /)
-        start = dates[0].chronify(guess: :begin)
-        finish = dates[-1].chronify(guess: :end)
+        start = dates[0].chronify(guess: :begin, future: false)
+        finish = dates[-1].chronify(guess: :end, future: false)
       else
-        start = date_string.chronify(guess: :begin)
-        finish = date_string.chronify(guess: :end)
+        start = date_string.chronify(guess: :begin, future: false)
+        finish = nil
       end
 
       raise InvalidTimeExpression, 'Unrecognized date string' unless start
