@@ -25,9 +25,6 @@ version Doing::VERSION
 hide_commands_without_desc true
 autocomplete_commands true
 
-InvalidExportType = Class.new(RuntimeError)
-MissingConfigFile = Class.new(RuntimeError)
-
 colors = Doing::Color
 wwid = Doing::WWID.new
 
@@ -65,12 +62,6 @@ wwid.config = settings
 if settings.dig('plugins', 'command_path')
   commands_from File.expand_path(settings.dig('plugins', 'command_path'))
 end
-
-class TagArray < Array; end
-class DateBeginString < DateTime; end
-class DateEndString < DateTime; end
-class DateRangeString < Array; end
-class DateIntervalString < DateTime; end
 
 accept DateBeginString do |value|
   if value =~ REGEX_TIME
@@ -764,92 +755,6 @@ command :finish do |c|
   end
 end
 
-# @@later
-desc 'Add an item to the Later section'
-arg_name 'ENTRY'
-command :later do |c|
-  c.example 'doing later "Something I\'ll think about tomorrow"', desc: 'Add an entry to the Later section'
-  c.example 'doing later -e', desc: 'Open $EDITOR to create an entry and optional note'
-
-  c.desc "Edit entry with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back started], type: DateBeginString
-
-  c.desc 'Note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  c.desc 'Prompt for note via multi-line input'
-  c.switch %i[ask], negatable: false, default_value: false
-
-  c.action do |_global_options, options, args|
-    if options[:back]
-      date = options[:back]
-      raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
-    else
-      date = Time.now
-    end
-
-    ask_note = options[:ask] && !options[:editor] && args.count.positive? ? Doing::Prompt.read_lines(prompt: 'Add a note') : ''
-
-    if options[:editor]
-      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
-      input = ''
-      input += date.strftime('%F %R | ')
-      input += args.empty? ? '' : args.join(' ')
-      input += "\n#{options[:note]}" if options[:note]
-      input += "\n#{ask_note}" unless ask_note.empty?
-
-      input = wwid.fork_editor(input).strip
-
-      d, title, note = wwid.format_input(input)
-      raise EmptyInput, 'No content' if title.empty?
-
-      note.add(options[:note]) if options[:note]
-      if ask_note.empty? && options[:ask]
-        ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
-        note.add(ask_note) unless ask_note.empty?
-      end
-
-      date = d.nil? ? date : d
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    elsif !args.empty?
-      d, title, note = wwid.format_input(args.join(' '))
-      date = d.nil? ? date : d
-      note.add(options[:note]) if options[:note]
-      note.add(ask_note) unless ask_note.empty?
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    elsif $stdin.stat.size.positive?
-      d, title, note = wwid.format_input($stdin.read)
-      unless d.nil?
-        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
-        date = d
-      end
-      note.add(options[:note]) if options[:note]
-      note.add(ask_note) unless ask_note.empty?
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    else
-      title = Doing::Prompt.read_line(prompt: 'Entry content')
-      raise EmptyInput, 'You must provide content when creating a new entry' if title.strip.empty?
-
-      note = Doing::Note.new
-      res = Doing::Prompt.yn('Add a note', default_response: false)
-      ask_note = res ? Doing::Prompt.read_lines(prompt: 'Enter note') : []
-      note.add(ask_note)
-
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    end
-  end
-end
-
 # @@mark @@flag
 desc 'Mark last entry as flagged'
 command %i[mark flag] do |c|
@@ -1264,7 +1169,7 @@ command %i[now next] do |c|
       input += "\n#{ask_note}" unless ask_note.empty?
       input = wwid.fork_editor(input).strip
 
-      date, title, note = wwid.format_input(input)
+      d, title, note = wwid.format_input(input)
       raise EmptyInput, 'No content' if title.strip.empty?
 
       if ask_note.empty? && options[:ask]
@@ -1272,6 +1177,7 @@ command %i[now next] do |c|
         note.add(ask_note) unless ask_note.empty?
       end
 
+      date = d.nil? ? date : d
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     elsif args.length.positive?

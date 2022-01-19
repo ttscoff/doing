@@ -305,6 +305,28 @@ module Doing
       view
     end
 
+    def add_with_editor(**options)
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Util.default_editor.nil?
+
+      input = options[:date].strftime('%F %R | ')
+      input += options[:title]
+      input += "\n#{options[:note]}" if options[:note]
+      input = fork_editor(input).strip
+
+      d, title, note = format_input(input)
+      raise EmptyInput, 'No content' if title.empty?
+
+      if options[:ask]
+        ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
+        note.add(ask_note) unless ask_note.empty?
+      end
+
+      date = d.nil? ? options[:date] : d
+      finish = options[:finish_last] || false
+      add_item(title.cap_first, options[:section], { note: note, back: date, timed: finish })
+      write(@doing_file)
+    end
+
     ##
     ## Adds an entry
     ##
