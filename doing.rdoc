@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.19
+v2.1.20
 
 === Global Options
 === --config_file arg
@@ -92,6 +92,13 @@ Repeat last entry as new entry
 
 This command is designed to allow multiple time intervals to be created for an entry by duplicating it with a new start (and end, eventually) time
 ===== Options
+===== -b|--back|--started DATE_STRING
+
+Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]
+
+[Default Value] None
+
+
 ===== --bool BOOLEAN
 
 Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
@@ -549,6 +556,7 @@ Start and end times as a date/time range `doing done --from "1am to 8am"`.
         Overrides other date flags.
 
 [Default Value] None
+[Must Match] (?i-mx:^\S+ +(?:to|through|thru|(?:un)?til|-+) ++\S+)
 
 
 ===== -n|--note TEXT
@@ -609,14 +617,14 @@ Mark last X entries as @done
 
 Marks the last X entries with a @done tag and current date. Does not alter already completed entries.
 ===== Options
-===== --at DATE_STRING
+===== --at|--finished DATE_STRING
 
 Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.
 
 [Default Value] None
 
 
-===== -b|--back DATE_STRING
+===== -b|--back|--started DATE_STRING
 
 Backdate completed date to date string [4pm|20m|2h|yesterday noon]
 
@@ -1039,7 +1047,7 @@ Add an item to the Later section
 
 
 ===== Options
-===== -b|--back DATE_STRING
+===== -b|--back|--started DATE_STRING
 
 Backdate start time to date string [4pm|20m|2h|yesterday noon]
 
@@ -1165,7 +1173,7 @@ This command makes it easy to start and stop these overarching entries. Just run
 big project` to start a @meanwhile entry, add other entries as you work on the project, then use `doing meanwhile` by
 itself to mark the entry as @done.
 ===== Options
-===== -b|--back DATE_STRING
+===== -b|--back|--started DATE_STRING
 
 Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
 
@@ -2282,7 +2290,7 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 [Default Value] None
 
 
-===== --from DATE_OR_RANGE
+===== --from TIME_RANGE
 
 Time range to show `doing today --from "12pm to 4pm"`
 
@@ -2615,6 +2623,7 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 Time range to show, e.g. `doing yesterday --from "1am to 8am"`
 
 [Default Value] None
+[Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon) +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)$)
 
 
 ===== -o|--output FORMAT

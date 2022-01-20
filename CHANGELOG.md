@@ -1,11 +1,12 @@
 ### 2.1.20
 
-2022-01-19 16:25
+2022-01-20 11:39
 
 #### NEW
 
 - Autotag option for interactive `doing select` menu
 - (Breaking change) Made the later command an optional plugin, see wiki for how to install (and create) custom commands
+- Config setting doing_file_sort (asc or desc) determines the sort order of entries in the actual Doing file. Has no effect on other operations, just allows you to store the file with newest entries at top (desc) or bottom (asc).
 
 #### IMPROVED
 
@@ -19,6 +20,7 @@
 - `doing on wed` when today is wednesday not returning results
 - Using `config set` with a false value deleted the key from config
 - `config set` with true or false value was inserting a quoted string
+- Entries were not being sorted (at all) within sections when writing the Doing file
 
 ### 2.1.19
 
