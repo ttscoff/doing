@@ -1,6 +1,6 @@
 ### 2.1.21
 
-2022-01-20 12:01
+2022-01-20 12:05
 
 #### NEW
 
@@ -21,6 +21,7 @@
 - Using `config set` with a false value deleted the key from config
 - `config set` with true or false value was inserting a quoted string
 - Entries were not being sorted (at all) within sections when writing the Doing file
+- Custom types not available to custom commands
 
 ### 2.1.20
 
