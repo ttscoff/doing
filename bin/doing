@@ -4,7 +4,6 @@
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'gli'
 require 'doing'
-require 'doing/types'
 require 'tempfile'
 require 'pp'
 
@@ -25,6 +24,8 @@ include Doing::Errors
 version Doing::VERSION
 hide_commands_without_desc true
 autocomplete_commands true
+
+include Doing::Types
 
 InvalidExportType = Class.new(RuntimeError)
 MissingConfigFile = Class.new(RuntimeError)
@@ -134,7 +135,7 @@ desc 'Use a pager when output is longer than screen'
 switch %i[p pager], default_value: settings['paginate']
 
 desc 'Answer yes/no menus with default option'
-switch [:default], default_value: false
+switch [:default], default_value: false, negatable: false
 
 desc 'Answer all yes/no menus with yes'
 switch [:yes], negatable: false
@@ -370,7 +371,7 @@ desc 'Add a completed item with @done(date). No argument finishes last entry'
 long_desc 'Use this command to add an entry after you\'ve already finished it. It will be immediately marked as @done.
 You can modify the start and end times of the entry using the --back, --took, and --at flags, making it an easy
 way to add entries in post and maintain accurate (albeit manual) time tracking.'
-arg_name 'ENTRY'
+arg_name 'ENTRY', optional: true
 command %i[done did] do |c|
   c.example 'doing done', desc: 'Tag the last entry @done'
   c.example 'doing done I already finished this', desc: 'Add a new entry and immediately mark it @done'
@@ -617,7 +618,7 @@ end
 # @@finish
 desc 'Mark last X entries as @done'
 long_desc 'Marks the last X entries with a @done tag and current date. Does not alter already completed entries.'
-arg_name 'COUNT'
+arg_name 'COUNT', optional: true
 command :finish do |c|
   c.example 'doing finish', desc: 'Mark the last entry @done'
   c.example 'doing finish --auto --section Later 10', desc: 'Add @done to any unfinished entries in the last 10 in Later, setting the finish time based on the start time of the task after it'
@@ -897,7 +898,7 @@ long_desc 'The @meanwhile tag allows you to have long-running entries that encom
 This command makes it easy to start and stop these overarching entries. Just run `doing meanwhile Starting work on this
 big project` to start a @meanwhile entry, add other entries as you work on the project, then use `doing meanwhile` by
 itself to mark the entry as @done.'
-arg_name 'ENTRY'
+arg_name 'ENTRY', optional: true
 command :meanwhile do |c|
   c.example 'doing meanwhile "Long task that will have others after it before it\'s done"', desc: 'Add a new long-running entry, completing any current @meanwhile entry'
   c.example 'doing meanwhile', desc: 'Finish any open @meanwhile entry'
@@ -987,7 +988,7 @@ long_desc %(
 
   Use -e to load the last entry in a text editor where you can append a note.
 )
-arg_name 'NOTE_TEXT'
+arg_name 'NOTE_TEXT', optional: true
 command :note do |c|
   c.example 'doing note', desc: 'Open the last entry in $EDITOR to append a note'
   c.example 'doing note "Just a quick annotation"', desc: 'Add a quick note to the last entry'
@@ -1055,7 +1056,6 @@ command :note do |c|
       options[:search] = search
     end
 
-
     last_entry = wwid.last_entry(options)
 
     unless last_entry
@@ -1065,37 +1065,37 @@ command :note do |c|
 
     last_note = last_entry.note || Doing::Note.new
     new_note = Doing::Note.new
-    ask_note = options[:ask] ? Doing::Prompt.read_lines(prompt: 'Add a note') : ''
 
-    if options[:editor] || (args.empty? && $stdin.stat.size.zero? && !options[:remove] && !options[:ask])
-      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
-      input = !args.empty? ? args.join(' ') : ''
-
-      if options[:remove]
-        prev_input = Doing::Note.new
-      else
-        prev_input = last_entry.note || Doing::Note.new
-      end
-
-
-      input = prev_input.add(input)
-      input.add(ask_note) unless ask_note.empty?
-
-      input = wwid.fork_editor(prev_input.strip_lines.join("\n"), message: nil).strip
-      note = input
-      options[:remove] = true
-      new_note.add(note)
-    elsif !args.empty?
-      new_note.add(args.join(' '))
-    elsif $stdin.stat.size.positive?
+    if $stdin.stat.size.positive?
       new_note.add($stdin.read.strip)
-    else
-      raise EmptyInput, 'You must provide content when adding a note' unless options[:remove] || !ask_note.empty?
-
     end
 
-    new_note.add(ask_note) unless ask_note.empty?
+    unless args.empty?
+      new_note.add(args.join(' '))
+    end
+
+    if options[:editor]
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+
+      if options[:remove]
+        input = Doing::Note.new
+      else
+        input = last_entry.note || Doing::Note.new
+      end
+
+      input.add(new_note)
+
+      new_note = Doing::Note.new(wwid.fork_editor(input.strip_lines.join("\n"), message: nil).strip)
+      options[:remove] = true
+    end
+
+    if (new_note.empty? && !options[:remove]) || options[:ask]
+      $stderr.puts last_note unless last_note.empty?
+      $stderr.puts new_note unless new_note.empty?
+      new_note.add(Doing::Prompt.read_lines(prompt: 'Add a note'))
+    end
+
+    raise EmptyInput, 'You must provide content when adding a note' unless options[:remove] || !new_note.empty?
 
     if last_note.equal?(new_note)
       Doing.logger.debug('Skipped:', 'No note change')
@@ -1233,7 +1233,7 @@ desc 'Reset the start time of an entry'
 long_desc 'Update the start time of the last entry or the last entry matching a tag/search filter.
 If no argument is provided, the start time will be reset to the current time.
 If a date string is provided as an argument, the start time will be set to the parsed result.'
-arg_name 'DATE_STRING'
+arg_name 'DATE_STRING', optional: true
 command %i[reset begin] do |c|
   c.example 'doing reset', desc: 'Reset the start time of the last entry to the current time'
   c.example 'doing reset --tag project1', desc: 'Reset the start time of the most recent entry tagged @project1 to the current time'
@@ -1246,6 +1246,9 @@ command %i[reset begin] do |c|
 
   c.desc 'Resume entry (remove @done)'
   c.switch %i[r resume], default_value: true
+
+  c.desc 'Change start date but do not remove @done (shortcut for --no-resume)'
+  c.switch [:n]
 
   c.desc 'Reset last entry matching tag. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
@@ -3654,7 +3657,7 @@ pre do |global, _command, _options, _args|
   Doing::Pager.paginate = global[:pager]
 
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
-  unless STDOUT.isatty
+  unless $stdout.isatty
     Doing::Color.coloring = global[:pager] ? global[:color] : false
   else
     Doing::Color.coloring = global[:color]
@@ -3704,7 +3707,12 @@ around do |global, command, options, arguments, code|
     Doing::Prompt.force_answer = false
     Doing.config.force_answer = false
   else
-    Doing::Prompt.default_answer = global[:default]
+    Doing::Prompt.default_answer = if $stdout.isatty
+                                     global[:default]
+                                   else
+                                     true
+                                   end
+
     Doing.config.force_answer = global[:default] ? true : false
   end
 

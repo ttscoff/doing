@@ -67,6 +67,14 @@ class DoingNoteTest < Test::Unit::TestCase
     assert_match(/.*?#{unique_keyword}.*?\n\t#{note}/, doing('show'), 'Tagged entry should contain note')
   end
 
+  def test_note_stdin
+    unique_title = "Test new entry with note from STDIN"
+    note = 'This is a test note from STDIN'
+    doing('now', unique_title)
+    doing('note', note, stdin: note)
+    assert_match(/.*?#{unique_title}.*?\n\t#{note}/, doing('show'), 'Tagged entry should contain note from STDIN')
+  end
+
   def test_note_tag
     unique_tag = 'balloonpants'
     unique_title = "Test new entry @#{unique_tag} sad monkey"
@@ -87,7 +95,7 @@ class DoingNoteTest < Test::Unit::TestCase
     tmpdir
   end
 
-  def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+  def doing(*args, stdin: nil)
+    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args, stdin: stdin)
   end
 end
