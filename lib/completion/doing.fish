@@ -23,28 +23,97 @@ function __fish_doing_using_command
   and return 0
 end
 
-function __fish_doing_complete_sections
-  doing sections -c
-end
+function __fish_doing_cache_timer_expired
+  set -l timer __fish_doing_cache_timer_$argv[1]
+  if not set -q $timer
+    set -g $timer (date '+%s')
+  end
 
-function __fish_doing_complete_views
-  doing views -c
+  if test (math (date '+%s') - $$timer) -gt $argv[2]
+    set -g $timer (date '+%s')
+    return 1
+  end
+
+  return 0
 end
 
 function __fish_doing_subcommands
-  doing help -c
+  if not set -q __fish_doing_subcommands_cache
+    or __fish_doing_cache_timer_expired subcommands 86400
+    set -g -a __fish_doing_subcommands_cache (doing help -c)
+  end
+  printf '%s
+' $__fish_doing_subcommands_cache
 end
 
-function __fish_doing_export_plugins
-  doing plugins --type export -c
+function __fish_doing_complete_sections
+  if not set -q __fish_doing_sections_cache
+    or __fish_doing_cache_timer_expired sections 3600
+    set -g -a __fish_doing_sections_cache (doing sections -c)
+  end
+  printf '%s
+' $__fish_doing_sections_cache
+  __fish_doing_complete_show_tag
 end
 
-function __fish_doing_import_plugins
-  doing plugins --type import -c
+function __fish_doing_complete_views
+  if not set -q __fish_doing_views_cache
+    or __fish_doing_cache_timer_expired views 3600
+    set -g -a __fish_doing_views_cache (doing views -c)
+  end
+  printf '%s
+' $__fish_doing_views_cache
 end
 
-function __fish_doing_complete_templates
-  doing template -c
+function __fish_doing_export_plugin
+  if not set -q __fish_doing_export_plugin_cache
+    or __fish_doing_cache_timer_expired export_plugins 3600
+    set -g -a __fish_doing_export_plugin_cache (doing plugins --type export -c)
+  end
+  printf '%s
+' $__fish_doing_export_plugin_cache
+end
+
+function __fish_doing_import_plugin
+  if not set -q __fish_doing_import_plugin_cache
+    or __fish_doing_cache_timer_expired import_plugins 3600
+    set -g -a __fish_doing_import_plugin_cache (doing plugins --type import -c)
+  end
+  printf '%s
+' $__fish_doing_import_plugin_cache
+end
+
+function __fish_doing_complete_template
+  if not set -q __fish_doing_template_cache
+    or __fish_doing_cache_timer_expired template 3600
+    set -g -a __fish_doing_template_cache (doing template -c)
+  end
+  printf '%s
+' $__fish_doing_template_cache
+end
+
+function __fish_doing_complete_tag
+  if not set -q __fish_doing_tag_cache
+    or __fish_doing_cache_timer_expired tags 60
+    set -g -a __fish_doing_tag_cache (doing tags)
+  end
+  printf '%s
+' $__fish_doing_tag_cache
+end
+
+function __fish_doing_complete_show_tag
+  if not set -q __fish_doing_tag_cache
+    or __fish_doing_cache_timer_expired tags 60
+    set -g -a __fish_doing_tag_cache (doing tags)
+  end
+  printf '@%s
+' $__fish_doing_tag_cache
+end
+
+function __fish_doing_complete_args
+  for cmd in (doing commands_accepting -c $argv[1])
+    complete -x -c doing -l $argv[1] -n "__fish_doing_using_command $cmd" -a "(__fish_doing_complete_$argv[1])"
+  end
 end
 
 complete -c doing -f
@@ -56,6 +125,14 @@ complete -f -c doing -n '__fish_doing_using_command template' -a '(__fish_doing_
 complete -f -c doing -s t -l type -x -n '__fish_doing_using_command import' -a '(__fish_doing_import_plugins)'
 
 complete -xc doing -n '__fish_seen_subcommand_from help; and not __fish_seen_subcommand_from (doing help -c)' -a "(doing help -c)"
+
+function __fish_doing_complete_args
+  for cmd in (doing commands_accepting -c $argv[1])
+    complete -x -c doing -l $argv[1] -n "__fish_doing_using_command $cmd" -a "(__fish_doing_complete_$argv[1])"
+  end
+end
+
+__fish_doing_complete_args tag
 
 complete -xc doing -n '__fish_doing_needs_command' -a 'add_section' -d Add\ a\ new\ section\ to\ the\ \"doing\"\ file
 complete -xc doing -n '__fish_doing_needs_command' -a 'again resume' -d Repeat\ last\ entry\ as\ new\ entry
@@ -100,6 +177,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'views' -d List\ available
 complete -xc doing -n '__fish_doing_needs_command' -a 'wiki' -d Output\ a\ tag\ wiki
 complete -xc doing -n '__fish_doing_needs_command' -a 'yesterday' -d List\ entries\ from\ yesterday
 complete -c doing -l ask  -f  -n '__fish_doing_using_command again resume' -d Prompt\ for\ note\ via\ multi-line\ input
+complete -c doing -l started  -f -r -n '__fish_doing_using_command again resume' -d Backdate\ start\ date\ by\ interval\ or\ set\ to\ time\ \[4pm\|20m\|2h\|\"yesterday\ noon\"\]
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command again resume' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l case  -f -r -n '__fish_doing_using_command again resume' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command again resume' -d Edit\ duplicated\ entry\ with\ vim\ before\ adding
@@ -159,9 +237,9 @@ complete -c doing -l section -s s -f -r -n '__fish_doing_using_command done did'
 complete -c doing -l for  -f -r -n '__fish_doing_using_command done did' -d Set\ completion\ date\ to\ start\ date\ plus\ interval
 complete -c doing -l unfinished -s u -f  -n '__fish_doing_using_command done did' -d Finish\ last\ entry\ not\ already\ marked\ @done
 complete -c doing -l archive -s a -f  -n '__fish_doing_using_command finish' -d Archive\ entries
-complete -c doing -l at  -f -r -n '__fish_doing_using_command finish' -d Set\ finish\ date\ to\ specific\ date/time
+complete -c doing -l finished  -f -r -n '__fish_doing_using_command finish' -d Set\ finish\ date\ to\ specific\ date/time
 complete -c doing -l auto  -f  -n '__fish_doing_using_command finish' -d Auto-generate\ finish\ dates\ from\ next\ entry\'s\ start\ time
-complete -c doing -l back -s b -f -r -n '__fish_doing_using_command finish' -d Backdate\ completed\ date\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
+complete -c doing -l started  -f -r -n '__fish_doing_using_command finish' -d Backdate\ completed\ date\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command finish' -d Boolean
 complete -c doing -l case  -f -r -n '__fish_doing_using_command finish' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l date  -f  -n '__fish_doing_using_command finish' -d Include\ date
@@ -222,7 +300,7 @@ complete -c doing -l tag  -f -r -n '__fish_doing_using_command last' -d Tag\ fil
 complete -c doing -l val  -f -r -n '__fish_doing_using_command last' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command last' -d Force\ exact\ search\ string\ matching
 complete -c doing -l ask  -f  -n '__fish_doing_using_command later' -d Prompt\ for\ note\ via\ multi-line\ input
-complete -c doing -l back -s b -f -r -n '__fish_doing_using_command later' -d Backdate\ start\ time\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
+complete -c doing -l started  -f -r -n '__fish_doing_using_command later' -d Backdate\ start\ time\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command later' -d Edit\ entry\ with\ vim
 complete -c doing -l note -s n -f -r -n '__fish_doing_using_command later' -d Note
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command mark flag' -d Boolean
@@ -241,7 +319,7 @@ complete -c doing -l val  -f -r -n '__fish_doing_using_command mark flag' -d Per
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command mark flag' -d Force\ exact\ search\ string\ matching
 complete -c doing -l archive -s a -f  -n '__fish_doing_using_command meanwhile' -d Archive\ previous\ @meanwhile\ entry
 complete -c doing -l ask  -f  -n '__fish_doing_using_command meanwhile' -d Prompt\ for\ note\ via\ multi-line\ input
-complete -c doing -l back -s b -f -r -n '__fish_doing_using_command meanwhile' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
+complete -c doing -l started  -f -r -n '__fish_doing_using_command meanwhile' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command meanwhile' -d Edit\ entry\ with\ vim
 complete -c doing -l note -s n -f -r -n '__fish_doing_using_command meanwhile' -d Note
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command meanwhile' -d Section
@@ -444,7 +522,7 @@ complete -c doing -l times -s t -f  -n '__fish_doing_using_command yesterday' -d
 complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command yesterday' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command yesterday' -d Sort\ tags\ by
 complete -c doing -l totals  -f  -n '__fish_doing_using_command yesterday' -d Show\ time\ totals\ at\ the\ end\ of\ output
-complete -f -c doing -s o -l output -x -n '__fish_doing_using_command grep search on select show since today view yesterday' -a '(__fish_doing_export_plugins)'
+complete -f -c doing -s o -l output -x -n '__fish_doing_using_command grep search on select show since today view yesterday' -a '(__fish_doing_export_plugin)'
 complete -f -c doing -s b -l bool -x -n '__fish_doing_using_command again resume archive move autotag cancel finish grep search last mark flag note reset begin rotate show tag tags view wiki' -a 'and or not pattern'
 complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel finish grep search import last mark flag note reset begin rotate select show show tag tags tags view' -a 'case-sensitive ignore smart'
 complete -f -c doing -l tag_sort -x -n '__fish_doing_using_command grep search on recent show since today view yesterday' -a 'name time'

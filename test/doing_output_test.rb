@@ -30,7 +30,7 @@ class DoingOutputTest < Test::Unit::TestCase
   end
 
   def test_invalid_output_format
-    doing('import', '--type', 'timing', @import_file)
+    # doing('import', '--type', 'timing', @import_file)
     assert_raises(RuntimeError) { doing('show', '-c', '10', '-o', 'falafel') }
   end
 

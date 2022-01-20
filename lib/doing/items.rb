@@ -131,7 +131,9 @@ module Doing
       out = []
       @sections.each do |section|
         out.push(section.original)
-        in_section(section.title).each { |item| out.push(item.to_s)}
+        items = in_section(section.title).sort_by { |i| i.date }
+        items.reverse! if Doing.config.settings['doing_file_sort'].normalize_order == 'desc'
+        items.each { |item| out.push(item.to_s)}
       end
 
       out.join("\n")

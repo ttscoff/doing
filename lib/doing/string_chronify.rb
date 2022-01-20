@@ -26,12 +26,12 @@ module Doing
     ##
     def chronify(**options)
       now = Time.now
-      raise InvalidTimeExpression, "Invalid time expression #{inspect}" if to_s.strip == ''
+      raise Errors::InvalidTimeExpression, "Invalid time expression #{inspect}" if to_s.strip == ''
 
       secs_ago = if match(/^(\d+)$/)
                    # plain number, assume minutes
                    Regexp.last_match(1).to_i * 60
-                 elsif (m = match(/^(?:(?<day>\d+)d)?(?:(?<hour>\d+)h)?(?:(?<min>\d+)m)?$/i))
+                 elsif (m = match(/^(?:(?<day>\d+)d)? *(?:(?<hour>\d+)h)? *(?:(?<min>\d+)m)?$/i))
                    # day/hour/minute format e.g. 1d2h30m
                    [[m['day'], 24 * 3600],
                     [m['hour'], 3600],
@@ -39,14 +39,23 @@ module Doing
                  end
 
       if secs_ago
-        now - secs_ago
+        res = now - secs_ago
+        Doing.logger.debug('Parser:', %(date/time string "#{self}" interpreted as #{res} (#{secs_ago} seconds ago)))
       else
-        Chronic.parse(self, {
-                        guess: options.fetch(:guess, :begin),
-                        context: options.fetch(:future, false) ? :future : :past,
-                        ambiguous_time_range: 8
-                      })
+        date_string = dup
+        date_string = 'today' if date_string.match(REGEX_DAY) && now.strftime('%a') =~ /^#{Regexp.last_match(1)}/i
+        date_string = "#{options[:context].to_s} #{date_string}" if date_string =~ REGEX_TIME && options[:context]
+
+        res = Chronic.parse(date_string, {
+                              guess: options.fetch(:guess, :begin),
+                              context: options.fetch(:future, false) ? :future : :past,
+                              ambiguous_time_range: 8
+                            })
+
+        Doing.logger.debug('Parser:', %(date/time string "#{self}" interpreted as #{res}))
       end
+
+      res
     end
 
     ##
@@ -152,6 +161,10 @@ module Doing
       end
     end
 
+    def is_range?
+      self =~ / (to|through|thru|(un)?til|-+) /
+    end
+
     ##
     ## Splits a range string and returns an array of
     ## DateTime objects as [start, end]. If only one date is
@@ -163,20 +176,45 @@ module Doing
     ## "mon 3pm to mon 5pm".split_date_range
     ##
     def split_date_range
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+      range_rx = / (to|through|thru|(?:un)?til|-+) /
+
       date_string = dup
-      case date_string
-      when / (to|through|thru|(un)?til|-+) /
-        dates = date_string.split(/ (?:to|through|thru|(?:un)?til|-+) /)
-        start = dates[0].chronify(guess: :begin)
-        finish = dates[-1].chronify(guess: :end)
+
+      if date_string.is_range?
+        # Do we want to differentiate between "to" and "through"?
+        # inclusive = date_string =~ / (through|thru|-+) / ? true : false
+        inclusive = true
+
+        dates = date_string.split(range_rx)
+        if dates[0].strip =~ time_rx && dates[-1].strip =~ time_rx
+          start = dates[0].strip
+          finish = dates[-1].strip
+        else
+          start = dates[0].chronify(guess: :begin, future: false)
+          finish = dates[-1].chronify(guess: inclusive ? :end : :begin, future: false)
+        end
+
+        raise Errors::InvalidTimeExpression, 'Unrecognized date string' if start.nil? || finish.nil?
+
       else
-        start = date_string.chronify(guess: :begin)
-        finish = nil
+        if date_string.strip =~ time_rx
+          start = date_string.strip
+          finish = nil
+        else
+          start = date_string.strip.chronify(guess: :begin, future: false)
+          finish = date_string.strip.chronify(guess: :end)
+        end
+        raise Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
+
       end
 
-      raise InvalidTimeExpression, 'Unrecognized date string' unless start
 
-      Doing.logger.debug('Parser:', "date range interpreted as #{start.strftime('%F %R')} -- #{finish ? finish.strftime('%F %R') : 'now'}")
+      if start.is_a? String
+        Doing.logger.debug('Parser:', "--from string interpreted as time span, from #{start || '12am'} to #{finish || '11:59pm'}")
+      else
+        Doing.logger.debug('Parser:', "date range interpreted as #{start.strftime('%F %R')} -- #{finish ? finish.strftime('%F %R') : 'now'}")
+      end
       [start, finish]
     end
   end

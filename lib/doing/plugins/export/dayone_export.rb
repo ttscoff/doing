@@ -75,7 +75,7 @@ module Doing
           note = i.note.map { |line| line.strip.link_urls(format: :markdown) } if i.note
         end
 
-        title = "#{title} @project(#{i.section})" unless variables[:is_single]
+        title = "#{title} @section(#{i.section})" unless variables[:is_single]
 
         tags.concat(i.tag_array).sort!.uniq!
         flagged = day_flagged = true if i.tags?(wwid.config['marker_tag'])

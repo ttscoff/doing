@@ -4,6 +4,7 @@
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'gli'
 require 'doing'
+require 'doing/types'
 require 'tempfile'
 require 'pp'
 
@@ -25,12 +26,13 @@ version Doing::VERSION
 hide_commands_without_desc true
 autocomplete_commands true
 
-REGEX_BOOL = /^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$/i
-REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i
-REGEX_VALUE_QUERY = /^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$/
-
 InvalidExportType = Class.new(RuntimeError)
 MissingConfigFile = Class.new(RuntimeError)
+TagArray = Class.new(Array)
+DateBeginString = Class.new(DateTime)
+DateEndString = Class.new(DateTime)
+DateRangeString = Class.new(Array)
+DateIntervalString = Class.new(DateTime)
 
 colors = Doing::Color
 wwid = Doing::WWID.new
@@ -70,7 +72,42 @@ if settings.dig('plugins', 'command_path')
   commands_from File.expand_path(settings.dig('plugins', 'command_path'))
 end
 
-class TagArray < Array; end
+accept DateBeginString do |value|
+  if value =~ REGEX_TIME
+    res = value
+  else
+    res = value.chronify(guess: :begin, future: false)
+  end
+  raise InvalidTimeExpression, 'Invalid start date' unless res
+
+  res
+end
+
+accept DateEndString do |value|
+  if value =~ REGEX_TIME
+    res = value
+  else
+    res = value.chronify(guess: :end, future: false)
+  end
+  raise InvalidTimeExpression, 'Invalid end date' unless res
+
+  res
+end
+
+accept DateRangeString do |value|
+  start, finish = value.split_date_range
+  raise InvalidTimeExpression, 'Invalid range' unless start
+
+  finish ||= Time.now
+  [start, finish]
+end
+
+accept DateIntervalString do |value|
+  res = value.chronify_qty
+  raise InvalidTimeExpression, 'Invalid time quantity' unless res
+
+  res
+end
 
 accept TagArray do |value|
   value.gsub(/[, ]+/, ' ').split(' ').map { |tag| tag.sub(/^@/, '')}.map(&:strip)
@@ -143,6 +180,10 @@ command %i[again resume] do |c|
   c.arg_name 'SECTION_NAME'
   c.flag [:in]
 
+  c.desc 'Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]'
+  c.arg_name 'DATE_STRING'
+  c.flag %i[b back started], type: DateBeginString
+
   c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
   c.flag [:tag], type: TagArray
@@ -198,6 +239,13 @@ command %i[again resume] do |c|
       options[:search] = search
     end
 
+    if options[:back]
+      date = options[:back]
+      raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
+    else
+      date = Time.now
+    end
+
     note = Doing::Note.new(options[:note])
     note.add(Doing::Prompt.read_lines(prompt: 'Add a note')) if options[:ask]
 
@@ -208,6 +256,7 @@ command %i[again resume] do |c|
     opts[:tag] = tags
     opts[:tag_bool] = options[:bool].normalize_bool
     opts[:interactive] = options[:interactive]
+    opts[:date] = date
 
     wwid.repeat_last(opts)
   end
@@ -340,24 +389,24 @@ command %i[done did] do |c|
   c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
   Used with --took, backdates start date)
   c.arg_name 'DATE_STRING'
-  c.flag %i[at finished]
+  c.flag %i[at finished], type: DateEndString
 
   c.desc 'Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back started]
+  c.flag %i[b back started], type: DateBeginString
 
   c.desc %(
         Start and end times as a date/time range `doing done --from "1am to 8am"`.
         Overrides other date flags.
       )
   c.arg_name 'TIME_RANGE'
-  c.flag [:from]
+  c.flag [:from], must_match: REGEX_RANGE
 
   c.desc %(Set completion date to start date plus interval (XX[mhd] or HH:MM).
   If used without the --back option, the start date will be moved back to allow
   the completion date to be the current time.)
   c.arg_name 'INTERVAL'
-  c.flag %i[t took for]
+  c.flag %i[t took for], type: DateIntervalString
 
   c.desc 'Section'
   c.arg_name 'NAME'
@@ -385,23 +434,27 @@ command %i[done did] do |c|
     donedate = nil
 
     if options[:from]
-      date, finish_date = options[:from].split_date_range
+      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
+        time =~ REGEX_TIME ? "today #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}" : time
+      end.join(' to ').split_date_range
+      date, finish_date = options[:from]
       finish_date ||= Time.now
     else
       if options[:took]
-        took = options[:took].chronify_qty
+        took = options[:took]
         raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
       end
 
       if options[:back]
-        date = options[:back].chronify(guess: :begin)
+        date = options[:back]
         raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
       else
         date = options[:took] ? Time.now - took : Time.now
       end
 
       if options[:at]
-        finish_date = options[:at].chronify(guess: :begin)
+        finish_date = options[:at]
+        finish_date = finish_date.chronify(guess: :begin) if finish_date.is_a? String
         raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
         if options[:took]
@@ -417,6 +470,7 @@ command %i[done did] do |c|
     end
 
     if options[:date]
+      date = date.chronify(guess: :begin, context: :today) if date =~ REGEX_TIME
       finish_date = wwid.verify_duration(date, finish_date) unless options[:took] || options[:from]
 
       donedate = finish_date.strftime('%F %R')
@@ -528,7 +582,7 @@ command %i[done did] do |c|
       wwid.content.push(new_entry)
       Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
       wwid.write(wwid.doing_file)
-      Doing.logger.info('Entry Added:', new_entry.title)
+      Doing.logger.info('New entry:', %(added "#{new_entry.date.relative_date}: #{new_entry.title}" to #{section}))
     elsif $stdin.stat.size.positive?
       note = Doing::Note.new(options[:note])
       d, title, note = wwid.format_input($stdin.read.strip)
@@ -553,7 +607,7 @@ command %i[done did] do |c|
       Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
 
       wwid.write(wwid.doing_file)
-      Doing.logger.info('Entry Added:', new_entry.title)
+      Doing.logger.info('New entry:', %(added "#{new_entry.date.relative_date}: #{new_entry.title}" to #{section}))
     else
       raise EmptyInput, 'You must provide content when creating a new entry'
     end
@@ -574,15 +628,15 @@ command :finish do |c|
 
   c.desc 'Backdate completed date to date string [4pm|20m|2h|yesterday noon]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back]
+  c.flag %i[b back started], type: DateBeginString
 
   c.desc 'Set the completed date to the start date plus XX[hmd]'
   c.arg_name 'INTERVAL'
-  c.flag %i[t took for]
+  c.flag %i[t took for], type: DateIntervalString
 
   c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.)
   c.arg_name 'DATE_STRING'
-  c.flag [:at]
+  c.flag %i[at finished], type: DateEndString
 
   c.desc 'Finish the last X entries containing TAG.
   Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).'
@@ -639,7 +693,7 @@ command :finish do |c|
     options[:fuzzy] = false
     unless options[:auto]
       if options[:took]
-        took = options[:took].chronify_qty
+        took = options[:took]
         raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
       end
 
@@ -648,20 +702,19 @@ command :finish do |c|
       raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 
       if options[:at]
-        finish_date = options[:at].chronify(guess: :begin)
+        finish_date = options[:at]
+        finish_date = finish_date.chronify(guess: :begin) if finish_date.is_a? String
         raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
 
         date = options[:took] ? finish_date - took : finish_date
       elsif options[:back]
-        date = options[:back].chronify()
+        date = options[:back]
 
         raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
       else
         date = Time.now
       end
     end
-
-    options[:took] = options[:took].chronify_qty if options[:took]
 
     if options[:tag].nil?
       tags = []
@@ -708,92 +761,6 @@ command :finish do |c|
     }
 
     wwid.tag_last(opts)
-  end
-end
-
-# @@later
-desc 'Add an item to the Later section'
-arg_name 'ENTRY'
-command :later do |c|
-  c.example 'doing later "Something I\'ll think about tomorrow"', desc: 'Add an entry to the Later section'
-  c.example 'doing later -e', desc: 'Open $EDITOR to create an entry and optional note'
-
-  c.desc "Edit entry with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc 'Backdate start time to date string [4pm|20m|2h|yesterday noon]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back]
-
-  c.desc 'Note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  c.desc 'Prompt for note via multi-line input'
-  c.switch %i[ask], negatable: false, default_value: false
-
-  c.action do |_global_options, options, args|
-    if options[:back]
-      date = options[:back].chronify(guess: :begin)
-      raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
-    else
-      date = Time.now
-    end
-
-    ask_note = options[:ask] && !options[:editor] && args.count.positive? ? Doing::Prompt.read_lines(prompt: 'Add a note') : ''
-
-    if options[:editor]
-      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
-      input = ''
-      input += date.strftime('%F %R | ')
-      input += args.empty? ? '' : args.join(' ')
-      input += "\n#{options[:note]}" if options[:note]
-      input += "\n#{ask_note}" unless ask_note.empty?
-
-      input = wwid.fork_editor(input).strip
-
-      d, title, note = wwid.format_input(input)
-      raise EmptyInput, 'No content' if title.empty?
-
-      note.add(options[:note]) if options[:note]
-      if ask_note.empty? && options[:ask]
-        ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
-        note.add(ask_note) unless ask_note.empty?
-      end
-
-      date = d.nil? ? date : d
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    elsif !args.empty?
-      d, title, note = wwid.format_input(args.join(' '))
-      date = d.nil? ? date : d
-      note.add(options[:note]) if options[:note]
-      note.add(ask_note) unless ask_note.empty?
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    elsif $stdin.stat.size.positive?
-      d, title, note = wwid.format_input($stdin.read)
-      unless d.nil?
-        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
-        date = d
-      end
-      note.add(options[:note]) if options[:note]
-      note.add(ask_note) unless ask_note.empty?
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    else
-      title = Doing::Prompt.read_line(prompt: 'Entry content')
-      raise EmptyInput, 'You must provide content when creating a new entry' if title.strip.empty?
-
-      note = Doing::Note.new
-      res = Doing::Prompt.yn('Add a note', default_response: false)
-      ask_note = res ? Doing::Prompt.read_lines(prompt: 'Enter note') : []
-      note.add(ask_note)
-
-      wwid.add_item(title.cap_first, 'Later', { note: note, back: date })
-      wwid.write(wwid.doing_file)
-    end
   end
 end
 
@@ -949,7 +916,7 @@ command :meanwhile do |c|
 
   c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back]
+  c.flag %i[b back started], type: DateBeginString
 
   c.desc 'Note'
   c.arg_name 'TEXT'
@@ -960,7 +927,7 @@ command :meanwhile do |c|
 
   c.action do |_global_options, options, args|
     if options[:back]
-      date = options[:back].chronify(guess: :begin)
+      date = options[:back]
 
       raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
     else
@@ -1169,7 +1136,7 @@ command %i[now next] do |c|
 
   c.desc 'Backdate start time [4pm|20m|2h|"yesterday noon"]'
   c.arg_name 'DATE_STRING'
-  c.flag %i[b back started]
+  c.flag %i[b back started], type: DateBeginString
 
   c.desc 'Timed entry, marks last entry in section as @done'
   c.switch %i[f finish_last], negatable: false, default_value: false
@@ -1187,7 +1154,7 @@ command %i[now next] do |c|
 
   c.action do |_global_options, options, args|
     if options[:back]
-      date = options[:back].chronify(guess: :begin)
+      date = options[:back]
 
       raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if date.nil?
     else
@@ -1211,7 +1178,7 @@ command %i[now next] do |c|
       input += "\n#{ask_note}" unless ask_note.empty?
       input = wwid.fork_editor(input).strip
 
-      date, title, note = wwid.format_input(input)
+      d, title, note = wwid.format_input(input)
       raise EmptyInput, 'No content' if title.strip.empty?
 
       if ask_note.empty? && options[:ask]
@@ -1219,6 +1186,7 @@ command %i[now next] do |c|
         note.add(ask_note) unless ask_note.empty?
       end
 
+      date = d.nil? ? date : d
       wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
       wwid.write(wwid.doing_file)
     elsif args.length.positive?
@@ -1416,11 +1384,11 @@ command :select do |c|
 
   c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
       Date range to show, or a single day to filter date on.
@@ -1431,7 +1399,7 @@ command :select do |c|
       by time of day.
     )
   c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.flag [:from], type: DateRangeString
 
   c.desc 'Force exact search string matching (case sensitive)'
   c.switch %i[x exact], default_value: config.exact_match?, negatable: config.exact_match?
@@ -1698,11 +1666,11 @@ command %i[grep search] do |c|
 
   c.desc 'Search entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'Search entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
       Date range to show, or a single day to filter date on.
@@ -1713,7 +1681,7 @@ command %i[grep search] do |c|
       by time of day.
     )
   c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.flag [:from], type: DateRangeString
 
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
@@ -2011,11 +1979,11 @@ command :show do |c|
 
   c.desc 'Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
       Date range to show, or a single day to filter date on.
@@ -2027,7 +1995,7 @@ command :show do |c|
     )
 
   c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.flag [:from], type: DateRangeString
 
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -2322,8 +2290,8 @@ command :today do |c|
   c.desc %(
     Time range to show `doing today --from "12pm to 4pm"`
   )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.arg_name 'TIME_RANGE'
+  c.flag [:from], type: DateRangeString
 
   c.action do |_global_options, options, _args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
@@ -2336,7 +2304,7 @@ command :today do |c|
   end
 end
 
-# @on
+# @@on
 desc 'List entries for a date'
 long_desc %(Date argument can be natural language. "thursday" would be interpreted as "last thursday,"
 and "2d" would be interpreted as "two days ago." If you use "to" or "through" between two dates,
@@ -2375,16 +2343,11 @@ command :on do |c|
 
     raise MissingArgument, 'Missing date argument' if args.empty?
 
-    date_string = args.join(' ')
-
-    if date_string =~ / (to|through|thru) /
-      dates = date_string.split(/ (to|through|thru) /)
-      start = dates[0].chronify(guess: :begin)
-      finish = dates[2].chronify(guess: :end)
-    else
-      start = date_string.chronify(guess: :begin)
-      finish = false
+    date_string = args.join(' ').strip
+    if date_string =~ /^tod(?:ay)?/i
+      date_string = 'today to tomorrow 12am'
     end
+    start, finish = date_string.split_date_range
 
     raise InvalidTimeExpression, 'Unrecognized date string' unless start
 
@@ -2536,11 +2499,11 @@ command :view do |c|
 
   c.desc 'View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
       Date range to show, or a single day to filter date on.
@@ -2551,7 +2514,7 @@ command :view do |c|
       by time of day.
     )
   c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from]
+  c.flag [:from], type: DateRangeString
 
   c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -2669,7 +2632,6 @@ command :view do |c|
 
       opts = options.dup
       opts[:age] = options[:age].normalize_age(:newest)
-      opts[:view_template] = title
       opts[:count] = count
       opts[:format] = date_format
       opts[:highlight] = options[:color]
@@ -2686,6 +2648,7 @@ command :view do |c|
       opts[:tags_color] = tags_color
       opts[:template] = template
       opts[:totals] = totals
+      opts[:view_template] = title
 
       Doing::Pager.page wwid.list_section(opts)
     elsif title.instance_of?(FalseClass)
@@ -2735,11 +2698,9 @@ command :yesterday do |c|
   c.arg_name 'TIME_STRING'
   c.flag [:after]
 
-  c.desc %(
-      Time range to show, e.g. `doing yesterday --from "1am to 8am"`
-    )
+  c.desc 'Time range to show, e.g. `doing yesterday --from "1am to 8am"`'
   c.arg_name 'TIME_RANGE'
-  c.flag [:from]
+  c.flag [:from], must_match: REGEX_TIME_RANGE
 
   c.desc 'Tag sort direction (asc|desc)'
   c.arg_name 'DIRECTION'
@@ -2751,9 +2712,9 @@ command :yesterday do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     if options[:from]
-      options[:from] = options[:from].split(/ (?:to|through|thru|(?:un)?til|-+) /).map do |time|
+      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
         "yesterday #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}"
-      end.join(' to ')
+      end.join(' to ').split_date_range
     end
 
     opt = {
@@ -2991,8 +2952,7 @@ command :config do |c|
       value = options[:remove] ? nil : args.pop
       keypath = args.join('.')
       real_path = config.resolve_key_path(keypath, create: true)
-
-      old_value = settings.dig(*real_path) || nil
+      old_value = settings.dig(*real_path)
       old_type = old_value&.class.to_s || nil
 
       if old_value.is_a?(Hash) && !options[:remove]
@@ -3018,7 +2978,6 @@ command :config do |c|
       else
         current_value = cfg.dig(*real_path)
         cfg.deep_set(real_path, value.set_type(old_type))
-
         $stderr.puts "#{' Key path:'.yellow} #{real_path.join('->').boldwhite}"
         $stderr.puts "#{'Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
         $stderr.puts "#{'  Current:'.yellow} #{ (current_value ? current_value.to_s : 'empty').boldwhite }"
@@ -3178,7 +3137,7 @@ command %i[archive move] do |c|
   c.desc 'Archive entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateEndString
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
@@ -3269,11 +3228,11 @@ command :import do |c|
   # TODO: Allow time range filtering
   c.desc 'Import entries older than date'
   c.arg_name 'DATE_STRING'
-  c.flag [:before]
+  c.flag [:before], type: DateBeginString
 
   c.desc 'Import entries newer than date'
   c.arg_name 'DATE_STRING'
-  c.flag [:after]
+  c.flag [:after], type: DateEndString
 
   c.desc %(
     Date range to import. Date range argument should be quoted. Date specifications can be natural language.
@@ -3281,7 +3240,7 @@ command :import do |c|
     Has no effect unless the import plugin has implemented date range filtering.
   )
   c.arg_name 'DATE_OR_RANGE'
-  c.flag %i[f from]
+  c.flag %i[f from], type: DateRangeString
 
   c.desc 'Allow entries that overlap existing times'
   c.switch [:overlap], negatable: true
@@ -3299,24 +3258,19 @@ command :import do |c|
     end
 
     if options[:from]
-      date_string = options[:from]
-      if date_string =~ / (to|through|thru|(un)?til|-+) /
-        dates = date_string.split(/ (to|through|thru|(un)?til|-+) /)
-        start = dates[0].chronify(guess: :begin)
-        finish = dates[2].chronify(guess: :end)
-      else
-        start = date_string.chronify(guess: :begin)
-        finish = date_string.chronify(guess: :end)
-      end
-      raise InvalidTimeExpression, 'Unrecognized date string' unless start
-      dates = [start, finish]
+      options[:date_filter] = options[:from]
+
+      raise InvalidTimeExpression, 'Unrecognized date string' unless options[:date_filter][0]
+    elsif options[:before] || options[:after]
+      options[:date_filter] = [nil, nil]
+      options[:date_filter][1] = options[:before] || Time.now + (1 << 64)
+      options[:date_filter][0] = options[:after] || Time.now - (1 << 64)
     end
 
     options[:case] = options[:case].normalize_case
 
     if options[:type] =~ Doing::Plugins.plugin_regex(type: :import)
       options[:no_overlap] = !options[:overlap]
-      options[:date_filter] = dates
       wwid.import(args, options)
       wwid.write(wwid.doing_file)
     else
@@ -3667,9 +3621,9 @@ command :commands_accepting do |c|
       end
 
       if o[:column]
-        puts cmds
+        puts cmds.sort
       else
-        puts "Commands accepting --#{option}: #{cmds.join(', ')}"
+        puts "Commands accepting --#{option}: #{cmds.sort.join(', ')}"
       end
     end
   end
@@ -3714,7 +3668,9 @@ pre do |global, _command, _options, _args|
 end
 
 on_error do |exception|
-  if exception.kind_of?(SystemExit)
+  if exception.kind_of?(GLI::UnknownCommand)
+    exit run(['now'].concat(ARGV))
+  elsif exception.kind_of?(SystemExit)
     false
   else
     # Doing.logger.error('Fatal:', exception)

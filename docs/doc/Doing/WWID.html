@@ -6,7 +6,7 @@
 <title>
   Class: Doing::WWID
   
-    &mdash; Documentation by YARD 0.9.26
+    &mdash; Documentation by YARD 0.9.27
   
 </title>
 
@@ -405,6 +405,28 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#add_with_editor-instance_method" title="#add_with_editor (instance method)">#<strong>add_with_editor</strong>(**options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#all_tags-instance_method" title="#all_tags (instance method)">#<strong>all_tags</strong>(items, opt: {}, counts: false)  &#x21d2; Object </a>
     
 
@@ -427,7 +449,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#archive-instance_method" title="#archive (instance method)">#<strong>archive</strong>(section = @config[&#39;current_section&#39;], options)  &#x21d2; Object </a>
+      <a href="#archive-instance_method" title="#archive (instance method)">#<strong>archive</strong>(section = , options)  &#x21d2; Object </a>
     
 
     
@@ -1138,7 +1160,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#next_item-instance_method" title="#next_item (instance method)">#<strong>next_item</strong>(item, options)  &#x21d2; Item </a>
+      <a href="#next_item-instance_method" title="#next_item (instance method)">#<strong>next_item</strong>(item, options = {})  &#x21d2; Item </a>
     
 
     
@@ -2048,6 +2070,40 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="add_with_editor-instance_method">
+  
+    #<strong>add_with_editor</strong>(**options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>MissingEditor</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="all_tags-instance_method">
   
     #<strong>all_tags</strong>(items, opt: {}, counts: false)  &#x21d2; <tt>Object</tt> 
@@ -2062,7 +2118,7 @@
       <div class="method_details ">
   <h3 class="signature " id="archive-instance_method">
   
-    #<strong>archive</strong>(section = @config[&#39;current_section&#39;], options)  &#x21d2; <tt>Object</tt> 
+    #<strong>archive</strong>(section = , options)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -2088,7 +2144,7 @@
         <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>@config[&#39;current_section&#39;]</tt>)</em>
+        <em class="default">(defaults to: <tt></tt>)</em>
       
       
         &mdash;
@@ -3700,7 +3756,7 @@ All</p>
       <div class="method_details ">
   <h3 class="signature " id="next_item-instance_method">
   
-    #<strong>next_item</strong>(item, options)  &#x21d2; <tt><span class='object_link'><a href="Item.html" title="Doing::Item (class)">Item</a></span></tt> 
+    #<strong>next_item</strong>(item, options = {})  &#x21d2; <tt><span class='object_link'><a href="Item.html" title="Doing::Item (class)">Item</a></span></tt> 
   
 
   
@@ -3739,6 +3795,8 @@ All</p>
       
         <span class='type'>(<tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
       
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
       
       
         &mdash;
@@ -4696,9 +4754,9 @@ json, or text)</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Jan 18 08:53:02 2022 by
+  Generated on Thu Jan 20 11:48:56 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.26 (ruby-3.0.1).
+  0.9.27 (ruby-3.0.1).
 </div>
 
     </div>

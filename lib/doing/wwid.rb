@@ -305,6 +305,28 @@ module Doing
       view
     end
 
+    def add_with_editor(**options)
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Util.default_editor.nil?
+
+      input = options[:date].strftime('%F %R | ')
+      input += options[:title]
+      input += "\n#{options[:note]}" if options[:note]
+      input = fork_editor(input).strip
+
+      d, title, note = format_input(input)
+      raise EmptyInput, 'No content' if title.empty?
+
+      if options[:ask]
+        ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
+        note.add(ask_note) unless ask_note.empty?
+      end
+
+      date = d.nil? ? options[:date] : d
+      finish = options[:finish_last] || false
+      add_item(title.cap_first, options[:section], { note: note, back: date, timed: finish })
+      write(@doing_file)
+    end
+
     ##
     ## Adds an entry
     ##
@@ -356,7 +378,7 @@ module Doing
 
       @content.push(entry)
       # logger.count(:added, level: :debug)
-      logger.info('New entry:', %(added "#{entry.title}" to #{section}))
+      logger.info('New entry:', %(added "#{entry.date.relative_date}: #{entry.title}" to #{section}))
 
       Hooks.trigger :post_entry_added, self, entry.dup
     end
@@ -454,7 +476,8 @@ module Doing
       opt ||= {}
       if item.should_finish?
         if item.should_time?
-          item.title.tag!('done', value: Time.now.strftime('%F %R'))
+          finish_date = verify_duration(item.date, Time.now, title: item.title)
+          item.title.tag!('done', value: finish_date.strftime('%F %R'))
         else
           item.title.tag!('done')
         end
@@ -484,7 +507,7 @@ module Doing
       end
 
       # @content.update_item(original, item)
-      add_item(title, section, { note: note, back: opt[:date], timed: true })
+      add_item(title, section, { note: note, back: opt[:date], timed: false })
     end
 
     ##
@@ -633,42 +656,25 @@ module Doing
 
       opt[:time_filter] = [nil, nil]
       if opt[:from] && !opt[:date_filter]
-        date_string = opt[:from]
-        case date_string
-        when / (to|through|thru|(un)?til|-+) /
-          dates = date_string.split(/ (?:to|through|thru|(?:un)?til|-+) /)
-          if dates[0].strip =~ time_rx && dates[-1].strip =~ time_rx
-            time_start = dates[0].strip
-            time_end = dates[-1].strip
-          else
-            start = dates[0].chronify(guess: :begin)
-            finish = dates[-1].chronify(guess: :end)
-          end
-        when time_rx
-          time_start = date_string
-          time_end = nil
-        else
-          start = date_string.chronify(guess: :begin)
-          finish = false
+        if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
+          time_start, time_end = opt[:from]
+        elsif opt[:from].is_a?(Time)
+          start, finish = opt[:from]
         end
 
         if time_start
           opt[:time_filter] = [time_start, time_end]
-          Doing.logger.debug('Parser:', "--from string interpreted as time span, from #{time_start ? time_start : '12am'} to #{time_end ? time_end : '11:59pm'}")
         else
-          raise InvalidTimeExpression, 'Unrecognized date string' unless start
-
-          opt[:date_filter] = [start, finish]
-          Doing.logger.debug('Parser:', "--from string interpreted as #{start.strftime('%F %R')} -- #{finish ? finish.strftime('%F %R') : 'now'}")
+          opt[:date_filter] = opt[:from]
         end
       end
 
-      if opt[:before] =~ time_rx
+      if opt[:before].is_a?(String) && opt[:before] =~ time_rx
         opt[:time_filter][1] = opt[:before]
         opt[:before] = nil
       end
 
-      if opt[:after] =~ time_rx
+      if opt[:after].is_a?(String) && opt[:after] =~ time_rx
         opt[:time_filter][0] = opt[:after]
         opt[:after] = nil
       end
@@ -734,7 +740,7 @@ module Doing
           start_time = start_string.chronify(guess: :begin)
 
           end_string = if opt[:time_filter][1].nil?
-                         "#{item.date.next_day.strftime('%Y-%m-%d')} 12am"
+                         "#{item.date.to_datetime.next_day.strftime('%Y-%m-%d')} 12am"
                        else
                          "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][1]}"
                        end
@@ -753,22 +759,26 @@ module Doing
         end
 
         if keep && opt[:before]
-          time_string = opt[:before]
-          if time_string =~ time_rx
-            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{time_string}".chronify(guess: :begin)
+          before = opt[:before]
+          if before =~ time_rx
+            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{before}".chronify(guess: :begin)
+          elsif before.is_a?(String)
+            cutoff = before.chronify(guess: :begin)
           else
-            cutoff = time_string.chronify(guess: :begin)
+            cutoff = before
           end
           keep = cutoff && item.date <= cutoff
           keep = opt[:not] ? !keep : keep
         end
 
         if keep && opt[:after]
-          time_string = opt[:after]
-          if time_string =~ time_rx
-            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{time_string}".chronify(guess: :end)
+          after = opt[:after]
+          if after =~ time_rx
+            cutoff = "#{item.date.strftime('%Y-%m-%d')} #{after}".chronify(guess: :end)
+          elsif after.is_a?(String)
+            cutoff = after.chronify(guess: :end)
           else
-            cutoff = time_string.chronify(guess: :end)
+            cutoff = after
           end
           keep = cutoff && item.date >= cutoff
           keep = opt[:not] ? !keep : keep
@@ -934,6 +944,7 @@ module Doing
         actions = [
           'add tag',
           'remove tag',
+          'autotag',
           'cancel',
           'delete',
           'finish',
@@ -960,6 +971,8 @@ module Doing
             opt[:resume] = true
           when /reset/
             opt[:reset] = true
+          when /autotag/
+            opt[:autotag] = true
           when /(add|remove) tag/
             type = action =~ /^add/ ? 'add' : 'remove'
             raise InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
@@ -1071,6 +1084,21 @@ module Doing
         end
       end
 
+      if opt[:autotag]
+        items.map! do |i|
+          new_title = autotag(i.title)
+          if new_title == i.title
+            logger.count(:skipped, level: :debug, message: '%count unchaged %items')
+            # logger.debug('Autotag:', 'No changes')
+          else
+            logger.count(:added_tags)
+            logger.write(items.count == 1 ? :info : :debug, 'Tagged:', new_title)
+            i.title = new_title
+            Hooks.trigger :post_entry_updated, self, i
+          end
+        end
+      end
+
       if opt[:tag]
         tag = opt[:tag]
         items.map! do |i|
@@ -1098,10 +1126,7 @@ module Doing
 
       return unless opt[:output]
 
-      items.map! do |i|
-        i.title = "#{i.title} @project(#{i.section})"
-        i
-      end
+      items.each { |i| i.title = "#{i.title} @section(#{i.section})" }
 
       export_items = Items.new
       export_items.concat(items)
@@ -1138,6 +1163,8 @@ module Doing
     def verify_duration(date, finish_date, title: nil)
       max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
       max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
+      date = date.chronify(guess: :end, context: :today) if finish_date.is_a?(String)
+
       elapsed = finish_date - date
 
       if max_elapsed.positive? && (elapsed > max_elapsed)
@@ -1316,7 +1343,7 @@ module Doing
     ##
     ## @return     [Item] the next chronological item in the index
     ##
-    def next_item(item, options)
+    def next_item(item, options = {})
       options ||= {}
       items = filter_items(Items.new, opt: options)
 
@@ -1747,7 +1774,7 @@ module Doing
       opt[:sort_tags] ||= false
       section = guess_section(section)
       # :date_filter expects an array with start and end date
-      dates = [dates, dates] if dates.instance_of?(String)
+      dates = dates.split_date_range if dates.instance_of?(String)
 
       list_section({
                      section: section,

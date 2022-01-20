@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    doing (2.1.19)
+    doing (2.1.21)
       chronic (~> 0.10, >= 0.10.2)
       deep_merge (~> 1.2, >= 1.2.1)
-      gli (~> 2.19, >= 2.19.2)
+      gli (~> 2.20, >= 2.20.1)
       haml (~> 5.0.0, >= 5.0.0)
       parslet (~> 2.0, >= 2.0.0)
       plist (~> 3.6, >= 3.6.0)
@@ -19,12 +19,11 @@ PATH
 GEM
   remote: http://rubygems.org/
   specs:
-    activesupport (6.1.4.1)
+    activesupport (7.0.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-      zeitwerk (~> 2.3)
     aruba (1.0.4)
       childprocess (>= 2.0, < 5.0)
       contracts (~> 0.16.0)
@@ -68,8 +67,8 @@ GEM
       cucumber-cucumber-expressions (~> 10.3, >= 10.3.0)
       cucumber-messages (~> 13.0, >= 13.0.1)
     deep_merge (1.2.2)
-    diff-lcs (1.4.4)
-    ffi (1.15.4)
+    diff-lcs (1.5.0)
+    ffi (1.15.5)
     github-markup (4.0.0)
     gli (2.20.1)
     haml (5.0.4)
@@ -80,7 +79,7 @@ GEM
     kramdown (2.3.1)
       rexml
     middleware (0.1.0)
-    minitest (5.14.4)
+    minitest (5.15.0)
     multi_test (0.1.2)
     parallel (1.21.0)
     parallel_tests (3.7.3)
@@ -100,7 +99,7 @@ GEM
     redcarpet (3.5.1)
     rexml (3.2.5)
     rouge (3.27.0)
-    rspec-expectations (3.10.1)
+    rspec-expectations (3.10.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.3)
@@ -115,7 +114,7 @@ GEM
     temple (0.8.2)
     test-unit (3.4.9)
       power_assert
-    thor (1.1.0)
+    thor (1.2.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
     tty-color (0.6.0)
@@ -145,9 +144,10 @@ GEM
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)
     unicode_utils (1.4.0)
+    webrick (1.7.0)
     wisper (2.0.1)
-    yard (0.9.26)
-    zeitwerk (2.5.1)
+    yard (0.9.27)
+      webrick (~> 1.7.0)
 
 PLATFORMS
   ruby
