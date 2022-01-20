@@ -25,6 +25,14 @@ version Doing::VERSION
 hide_commands_without_desc true
 autocomplete_commands true
 
+InvalidExportType = Class.new(RuntimeError)
+MissingConfigFile = Class.new(RuntimeError)
+TagArray = Class.new(Array)
+DateBeginString = Class.new(DateTime)
+DateEndString = Class.new(DateTime)
+DateRangeString = Class.new(Array)
+DateIntervalString = Class.new(DateTime)
+
 colors = Doing::Color
 wwid = Doing::WWID.new
 

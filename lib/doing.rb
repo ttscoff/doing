@@ -62,14 +62,6 @@ REGEX_RANGE_INDICATOR = ' +(?:to|through|thru|(?:un)?til|-+) +'
 REGEX_RANGE = /^\S+#{REGEX_RANGE_INDICATOR}+\S+/i
 REGEX_TIME_RANGE = /^#{REGEX_CLOCK}#{REGEX_RANGE_INDICATOR}#{REGEX_CLOCK}$/i
 
-InvalidExportType = Class.new(RuntimeError)
-MissingConfigFile = Class.new(RuntimeError)
-TagArray = Class.new(Array)
-DateBeginString = Class.new(DateTime)
-DateEndString = Class.new(DateTime)
-DateRangeString = Class.new(Array)
-DateIntervalString = Class.new(DateTime)
-
 # Main doing module
 module Doing
   class << self

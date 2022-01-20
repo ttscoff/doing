@@ -1,10 +1,11 @@
 ### 2.1.20
 
-2022-01-19 14:28
+2022-01-19 16:25
 
 #### NEW
 
 - Autotag option for interactive `doing select` menu
+- (Breaking change) Made the later command an optional plugin, see wiki for how to install (and create) custom commands
 
 #### IMPROVED
 

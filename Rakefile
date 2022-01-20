@@ -37,7 +37,6 @@ end
 # end
 
 namespace :test do
-
   FileList['test/*_test.rb'].each do |rakefile|
     test_name = File.basename(rakefile, '.rb').sub(/^.*?_(.*?)_.*?$/, '\1')
 
@@ -49,6 +48,13 @@ namespace :test do
     # Define default task for :test
     task default: test_name
   end
+end
+
+desc 'Run all tests, threaded'
+task :test, :pattern, :threads, :max_tests do |_, args|
+  args.with_defaults(pattern: '*', threads: 24, max_tests: 0)
+  require_relative 'lib/helpers/threaded_tests'
+  ThreadedTests.new.run(pattern: args[:pattern], max_threads: args[:threads].to_i, max_tests: args[:max_tests])
 end
 
 desc 'Run tests in Docker'
@@ -85,8 +91,8 @@ task :dockertest, :version, :login do |_, args|
   # puts commit&.empty? ? "Error commiting Docker tag #{img}" : "Committed Docker tag #{img}"
 end
 
-desc 'Run all tests'
-task test: 'test:default'
+# desc 'Run all tests'
+# task test: 'test:default'
 
 desc 'Run one test verbosely'
 task :test_one, :test do |_, args|
@@ -151,4 +157,4 @@ task :bump, :type do |_, args|
   File.open(version_file, 'w+') { |f| f.puts content }
 end
 
-task default: %i[clobber yard package]
+task default: %i[test clobber package]

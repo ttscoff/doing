@@ -30,6 +30,7 @@ module Doing
         'command_path' => File.join(Util.user_home, '.config', 'doing', 'commands')
       },
       'doing_file' => '~/.local/share/doing/what_was_i_doing.md',
+      'doing_file_sort' => 'desc',
       'backup_dir' => '~/.local/share/doing/doing_backup',
       'history_size' => 15,
       'current_section' => 'Currently',
