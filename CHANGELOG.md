@@ -1,26 +1,22 @@
+### 2.1.22
+
+2022-01-20 16:52
+
+#### IMPROVED
+
+- General improvements to `doing note`, including better handling of piping notes from STDIN, using a Readline input unless `--editor` is specified, changed order of importance for different inputs
+- `doing reset -n` switch is a shortcut for `--no-resume` to avoid removing @done when modifying a start date
+
+#### FIXED
+
+- Don't invoke Readline inputs when the current device is not a TTY
+
 ### 2.1.21
 
 2022-01-20 12:05
 
-#### NEW
-
-- Autotag option for interactive `doing select` menu
-- (Breaking change) Made the later command an optional plugin, see wiki for how to install (and create) custom commands
-- Config setting doing_file_sort (asc or desc) determines the sort order of entries in the actual Doing file. Has no effect on other operations, just allows you to store the file with newest entries at top (desc) or bottom (asc).
-
-#### IMPROVED
-
-- Autotag improvements
-- If doing is run without a command but with arguments, execute it as if you'd run `doing now`, passing the arguments to that. So you can just write "doing this thing" instead of "doing now this thing", as long as the first word of the arguments is not a recognized command.
-
 #### FIXED
 
-- `doing again` should only mark the original repeating entry @done, not search for the last unfinished entry
-- Error when using `doing finish --auto`
-- `doing on wed` when today is wednesday not returning results
-- Using `config set` with a false value deleted the key from config
-- `config set` with true or false value was inserting a quoted string
-- Entries were not being sorted (at all) within sections when writing the Doing file
 - Custom types not available to custom commands
 
 ### 2.1.20
