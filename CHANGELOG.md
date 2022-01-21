@@ -1,6 +1,6 @@
 ### 2.1.22
 
-2022-01-21 11:33
+2022-01-21 14:38
 
 #### IMPROVED
 
@@ -10,12 +10,10 @@
 
 #### FIXED
 
-- Git hooks
 - Don't invoke Readline inputs when the current device is not a TTY
 - View keys being overridden by template keys
 - Tag string routines
 - Error handling additional configs when a config file is specified on command line
-- Git hooks
 
 ### 2.1.21
 

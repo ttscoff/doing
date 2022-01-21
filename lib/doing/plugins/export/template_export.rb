@@ -49,6 +49,8 @@ module Doing
           note = []
         end
 
+        placeholders['tags'] = item.tags
+
         placeholders['date'] = item.date.strftime(opt[:format])
 
         interval = wwid.get_interval(item, record: true, formatted: false) if opt[:times]

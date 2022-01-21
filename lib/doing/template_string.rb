@@ -146,6 +146,13 @@ module Doing
           end
           indent ||= placeholder =~ /^title/ ? '' : "\t"
           prefix = m['prefix']
+
+          if placeholder =~ /^tags/
+            prefix ||= ''
+            value = value.map { |t| "#{prefix}#{t.sub(/^#{prefix}?/, '')}" }.join(' ')
+            prefix = ''
+          end
+
           if placeholder =~ /^title/
             color = last_color + color
 
