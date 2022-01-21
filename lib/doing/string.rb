@@ -20,7 +20,9 @@ module Doing
     ## can be separated by up to *distance* characters in
     ## haystack, spaces indicate unlimited distance.
     ##
-    ## @example    `"this word".to_rx(2) => /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/`
+    ## @example
+    ##   "this word".to_rx(2)
+    ##   # => /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/
     ##
     ## @param      distance   [Integer] Allowed distance
     ##                        between characters

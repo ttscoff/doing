@@ -1,4 +1,4 @@
-lib/doing/hash.rb 4c08dd246aa0ced651a1568832cea1a91a984eb6
+lib/doing/hash.rb 48b7ed855f33b2f10b4be41b09cee1efcb855b4b
 lib/doing/item.rb ffccadf4b6e9e48373a954ad4b690e9c31dfd2cb
 lib/doing/note.rb bbadd9e34e6dc43a2af1110a5107f46c39d2547f
 lib/doing/time.rb 60183c3c31532ffea1440c766de0f90042e0fd10
@@ -12,7 +12,7 @@ lib/doing/types.rb eed3ee1071ffa4a2f9caf50beb7523a24146cd1d
 lib/doing/colors.rb b7239a69e10c5df9378a5843441af5b93c1872f8
 lib/doing/errors.rb af07e482a5389924edc2337749c81cda501098f0
 lib/doing/prompt.rb d241935b209e69a14c55a9c3a035f1751c576b4c
-lib/doing/string.rb ae82fc6e60a490bfb30b5913390d1d375451fe69
+lib/doing/string.rb da9696c7f5ff758c32d48a0a3d64cd2261186d42
 lib/doing/symbol.rb 309799458a1bc715c2707307c9a62ab26086275e
 lib/doing/section.rb 206e119cf818f1e76798753e611180fe77bc299a
 lib/doing/version.rb 21027627e64f35ac455dee6dd8565e6af062ddbb
@@ -24,7 +24,7 @@ lib/doing/configuration.rb 26c86add1bf9ab00bec24ba0c01774b5617fe2d9
 lib/doing/phrase_parser.rb 8f1789d7cf8326d8cc231b4a21505a93f8de20d2
 lib/doing/array_chronify.rb b39b40268b1751b18acf6bae4e53885818e45f62
 lib/doing/plugin_manager.rb cb16a82c3182ef7008359670ab96ff6b39270ccc
-lib/doing/string_chronify.rb 79d3926e586b2ddeef508d778f76c777bc4ee811
+lib/doing/string_chronify.rb 888afa2175f3bb6cac0d68e3cb0f27cf162bb1bf
 lib/doing/template_string.rb 736f6e7645160f75061db1856a62101238fe8c56
 lib/doing/numeric_chronify.rb bedeff62a95f8a8ff116e1bf0cc1d9eb2707a900
 lib/doing/boolean_term_parser.rb 075977892ac5c6e3435cb8877d8b8b68eb1962e3
