@@ -1,15 +1,17 @@
 ---
 plugins:
   plugin_path: test/plugins
+  command_path: "/Users/ttscoff/.config/doing/commands"
   trizzer:
     trizzle: test value from config
   say:
     say_voice: Fiona
-default_tags: [defaulttag]
+default_tags:
+- defaulttag
 autotag:
   transform:
-  - (deploy|merge)\s+@(\w+)-\d+:$1-$2 @dev @dev-$2
-  - "flubber:fraggle rock/r"
+  - "(deploy|merge)\\s+@(\\w+)-\\d+:$1-$2 @dev @dev-$2"
+  - flubber:fraggle rock/r
   whitelist:
   - autotag
   - overtired
@@ -20,16 +22,17 @@ autotag:
     - guntzel
 doing_file: "~/what_was_i_doing.md"
 current_section: Lately
-editor_app:
 templates:
   default:
     date_format: "%Y-%m-%d %H:%M"
     template: "%date | %title%note"
     wrap_width: 0
+    order: asc
   today:
     date_format: "%Y-%m-%d %H:%M"
     template: "%date | %title %interval%note"
     wrap_width: 0
+    order: asc
   last:
     date_format: "%-I:%M%P on %a"
     template: "%title (at %date)%odnote"
@@ -38,6 +41,8 @@ templates:
     date_format: "%_I:%M%P"
     template: "%shortdate: %title (%section)"
     wrap_width: 88
+    count: 10
+    order: asc
 views:
   test:
     template: "%date | DOING TEST: %title%note"
@@ -78,8 +83,6 @@ views:
     order: asc
 marker_tag: flagged
 marker_color: red
-:include_notes: true
-config_editor_app:
 export_templates:
   css:
   haml:
@@ -95,4 +98,31 @@ export_templates:
   doing:
   say:
   trizzer:
+  dayone:
+  dayone-days:
+  dayone-entries:
 tag_sort: name
+include_notes: true
+editors:
+  default: vim
+  doing_file:
+  config:
+doing_file_sort: desc
+backup_dir: "~/.local/share/doing/doing_backup"
+history_size: 15
+paginate: false
+never_time: []
+never_finish: []
+date_tags:
+- defer(?:red)?
+- done
+- waiting
+timer_format: text
+interval_format: text
+search:
+  matching: pattern
+  distance: 3
+  case: smart
+  highlight: false
+interaction:
+  confirm_longer_than: 5h

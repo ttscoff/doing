@@ -98,6 +98,9 @@ export_templates:
   say:
   trizzer:
   wiki:
+  dayone:
+  dayone-days:
+  dayone-entries:
 tag_sort: name
 never_time:
 - "@nevertime"
@@ -111,3 +114,16 @@ editors:
   config:
 paginate: false
 backup_dir: test/doing_test_backup
+history_size: 15
+date_tags:
+- defer(?:red)?
+- done
+- waiting
+interval_format: text
+search:
+  matching: pattern
+  distance: 3
+  case: smart
+  highlight: false
+interaction:
+  confirm_longer_than: 5h

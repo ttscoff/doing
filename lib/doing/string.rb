@@ -458,7 +458,16 @@ module Doing
     ## @return     [String] @string
     ##
     def add_at
-      strip.sub(/^([+-]*)@/, '\1')
+      strip.sub(/^([+-]*)@?/, '\1@')
+    end
+
+    ##
+    ## Removes @ prefix if needed, maintains +/- prefix
+    ##
+    ## @return     [String] string without @ prefix
+    ##
+    def remove_at
+      strip.sub(/^([+-]*)@?/, '\1')
     end
 
     ##

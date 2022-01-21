@@ -633,8 +633,8 @@ module Doing
     end
 
     def split_tags(tags)
-      tags = tags.split(/ *, */) if tags.is_a? String
-      tags.map { |t| t.strip.add_at }
+      tags = tags.to_tags if tags.is_a? String
+      tags.map(&:remove_at)
     end
   end
 end

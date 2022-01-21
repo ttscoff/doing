@@ -2554,17 +2554,17 @@ command :view do |c|
     view = wwid.get_view(title)
 
     if view
-      page_title = view.key?('title') ? view['title'] : title.cap_first
+      page_title = view['title'] || title.cap_first
       only_timed = if (view.key?('only_timed') && view['only_timed']) || options[:only_timed]
                      true
                    else
                      false
                    end
 
-      template = view.key?('template') ? view['template'] : nil
-      date_format = view.key?('date_format') ? view['date_format'] : nil
+      template = view['template'] || nil
+      date_format = view['date_format'] || nil
 
-      tags_color = view.key?('tags_color') ? view['tags_color'] : nil
+      tags_color = view['tags_color'] || nil
       tag_filter = false
       if options[:tag]
         tag_filter = { 'tags' => [], 'bool' => 'OR' }
@@ -2594,19 +2594,19 @@ command :view do |c|
       section = if options[:section]
                   section
                 else
-                  view.key?('section') ? view['section'] : settings['current_section']
+                  view['section'] || settings['current_section']
                 end
-      order = view.key?('order') ? view['order'].normalize_order : 'asc'
+      order = view['order']&.normalize_order || 'asc'
 
       totals = if options[:totals]
                  true
                else
-                 view.key?('totals') ? view['totals'] : false
+                 view['totals'] || false
                end
       tag_order = if options[:tag_order]
                     options[:tag_order].normalize_order
                   else
-                    view.key?('tag_order') ? view['tag_order'].normalize_order : 'asc'
+                    view['tag_order']&.normalize_order || 'asc'
                   end
 
       options[:times] = true if totals

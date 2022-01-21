@@ -356,7 +356,7 @@ module Doing
         next if data[:count].zero?
 
         count = data[:count]
-        tags = data[:tag] ? data[:tag].uniq.map { |t| "@#{t}".cyan }.join(', ') : 'tags'
+        tags = data[:tag] ? data[:tag].uniq.map { |t| t.add_at.cyan }.join(', ') : 'tags'
         topic, m = format_counter(key, data)
         message = m.dup
         message.sub!(/%count/, count.to_s)

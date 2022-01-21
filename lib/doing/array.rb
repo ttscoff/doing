@@ -11,17 +11,18 @@ module Doing
     ## @return     [Array] array of strings
     ##
     def tags_to_array
-      map { |t| t.sub(/^@/, '') }
+      map(&:remove_at)
     end
 
     # Convert strings to @tags
     #
-    # @example `['one', '@two', 'three'].to_tags`
-    # @example `=> ['@one', '@two', '@three']`
     # @return     [Array] Array of @tags
     #
+    # @example
+    # ['one', '@two', 'three'].to_tags
+    # # => ['@one', '@two', '@three']
     def to_tags
-      map { |t| t.sub(/^@?/, '@') }
+      map(&:add_at)
     end
 
     def to_tags!

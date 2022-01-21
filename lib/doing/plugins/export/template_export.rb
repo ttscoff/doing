@@ -56,8 +56,10 @@ module Doing
           interval = case opt[:interval_format].to_sym
                      when :human
                        interval.time_string(format: :hm)
-                     else
+                     when :text
                        interval.time_string(format: :clock)
+                     else
+                       interval.time_string(format: opt[:interval_format].to_sym)
                      end
         end
 
@@ -69,8 +71,10 @@ module Doing
           duration = case opt[:interval_format].to_sym
                      when :human
                        duration.time_string(format: :hm)
-                     else
+                     when :text
                        duration.time_string(format: :clock)
+                     else
+                       duration.time_string(format: opt[:interval_format].to_sym)
                      end
         end
         duration ||= ''

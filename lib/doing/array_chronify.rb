@@ -6,9 +6,10 @@ module Doing
     ##
     ## Format [d, h, m] as string
     ##
-    ## @param      time    [Array] Array of [days, hours,
-    ##                     minutes]
-    ## @param      format  [Symbol] The format, :dhm, :hm, :m, :clock, :natural
+    ## @accept     [Array] Array of [days, hours, minutes]
+    ##
+    ## @param      format  [Symbol] The format, :dhm, :hm,
+    ##                     :m, :clock, :natural
     ## @return     [String] formatted string
     ##
     def time_string(format: :dhm)
