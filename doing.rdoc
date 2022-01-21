@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.21
+v2.1.22
 
 === Global Options
 === --config_file arg
@@ -32,7 +32,7 @@ Verbose output
 
 
 
-=== --[no-]default
+=== --default
 Answer yes/no menus with default option
 
 
@@ -528,7 +528,7 @@ Update default config file, adding any missing keys
 
 
 [Default Command] edit
-==== Command: <tt>done|did  ENTRY</tt>
+==== Command: <tt>done|did  [ENTRY]</tt>
 Add a completed item with @done(date). No argument finishes last entry
 
 Use this command to add an entry after you've already finished it. It will be immediately marked as @done.
@@ -612,7 +612,7 @@ Finish last entry not already marked @done
 
 
 
-==== Command: <tt>finish  COUNT</tt>
+==== Command: <tt>finish  [COUNT]</tt>
 Mark last X entries as @done
 
 Marks the last X entries with a @done tag and current date. Does not alter already completed entries.
@@ -1165,7 +1165,7 @@ Force exact search string matching (case sensitive)
 
 
 
-==== Command: <tt>meanwhile  ENTRY</tt>
+==== Command: <tt>meanwhile  [ENTRY]</tt>
 Finish any running @meanwhile tasks and optionally create a new one
 
 The @meanwhile tag allows you to have long-running entries that encompass smaller entries.
@@ -1209,7 +1209,7 @@ Edit entry with vim
 
 
 
-==== Command: <tt>note  NOTE_TEXT</tt>
+==== Command: <tt>note  [NOTE_TEXT]</tt>
 Add a note to the last entry
 
 If -r is provided with no other arguments, the last note is removed.
@@ -1473,7 +1473,7 @@ Show intervals with totals at the end of output
 
 
 
-==== Command: <tt>reset|begin  DATE_STRING</tt>
+==== Command: <tt>reset|begin  [DATE_STRING]</tt>
 Reset the start time of an entry
 
 Update the start time of the last entry or the last entry matching a tag/search filter.
@@ -1527,6 +1527,11 @@ Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be 
 
 ===== -i|--interactive
 Select from a menu of matching entries
+
+
+
+===== -n
+Change start date but do not remove @done (shortcut for --no-resume)
 
 
 
