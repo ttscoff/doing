@@ -1,3 +1,16 @@
+### 2.1.23
+
+2022-01-21 17:04
+
+#### NEW
+
+- All display commands (except view) now accept `--config_template TEMPLATE_KEY` to override that commands default template.
+
+#### IMPROVED
+
+- `doing tags` takes a MAX_COUNT argument to limit results when searching
+- `doing tags --line` flag to output tags in a single line
+
 ### 2.1.22
 
 2022-01-21 14:53
