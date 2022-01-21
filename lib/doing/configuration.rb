@@ -160,7 +160,7 @@ module Doing
     def choose_config(create: false)
       return @config_file if @force_answer
 
-      if @additional_configs.count.positive? || create
+      if @additional_configs&.count&.positive? || create
         choices = [@config_file].concat(@additional_configs)
         choices.push('Create a new .doingrc in the current directory') if create && !File.exist?('.doingrc')
         res = Doing::Prompt.choose_from(choices.uniq.sort.reverse,

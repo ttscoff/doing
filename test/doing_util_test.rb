@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'time'
 require 'fileutils'
 require 'tempfile'
 require 'yaml'
@@ -8,6 +9,7 @@ require 'test_helper'
 
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'doing'
+require 'doing/errors'
 # require 'gli'
 
 # Tests for archive commands
@@ -23,8 +25,6 @@ class DoingUtilTest < Test::Unit::TestCase
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @config = Util.safe_load_file(@config_file)
     @backup_dir = File.join(@basedir, 'doing_backup')
-    import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
-    doing('import', '--type', 'timing', import_file)
     @wwid = WWID.new
     config = Doing.config_with(@config_file, { ignore_local: true })
     @wwid.config = config.settings
@@ -35,8 +35,20 @@ class DoingUtilTest < Test::Unit::TestCase
     FileUtils.rm_rf(@tmpdirs)
   end
 
+  def test_tag_strings
+    tag_array = '@test1 +test2 test3 test4(value)'.to_tags
+    assert_equal(["+@test2", "@test1", "@test3", "@test4(value)"], tag_array, 'String should be converted to array of @tags')
+    assert_equal("+@test2, @test1, @test3, @test4(value)", tag_array.log_tags, 'Array should be output as comma-separated string')
+    assert_equal(["+test2", "test1", "test3", "test4(value)"], tag_array.tags_to_array, 'Array should have @ symbols removed')
+    assert_equal(tag_array, tag_array.to_tags, 'Array should not be changed')
+    assert_equal('@testtag', 'testtag'.add_at, '@ symbol should be added')
+    assert_equal('@testtag', '@testtag'.add_at, '@ symbol should not be duped')
+    assert_equal('testtag', '@testtag'.remove_at, '@ symbol should be removed')
+  end
+
+
   def test_format_time
-    item = @wwid.content.in_section(@wwid.config['current_section'])[0]
+    item = Doing::Item.new(Time.now - 3600, "Test item @done(#{(Time.now - 1200).strftime('%F %R')})", @wwid.current_section)
     distance = (item.end_date - item.date).to_i
     interval = @wwid.get_interval(item, formatted: false, record: false)
     assert_equal(distance, interval, 'Interval should match')
@@ -73,6 +85,14 @@ class DoingUtilTest < Test::Unit::TestCase
     assert_no_match(/<a href/, res, 'Quoted URL should not be linked')
     res = 'Markdown [test](https://brettterpstra.com) url'.link_urls
     assert_no_match(/<a href/, res, 'Markdown URL should not be linked')
+  end
+
+  def test_file_write
+    file = File.join(mktmpdir, 'file_write_test.txt')
+    content = 'FILE WRITE TEST'
+    Util.write_to_file(file, content)
+    assert(File.exist?(file), 'Temp file should exist')
+    assert_match(/#{content}/, IO.read(file), 'File should contain test content')
   end
 
   def test_exec_available

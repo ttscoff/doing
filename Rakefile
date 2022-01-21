@@ -52,9 +52,11 @@ end
 
 desc 'Run all tests, threaded'
 task :test, :pattern, :threads, :max_tests do |_, args|
-  args.with_defaults(pattern: '*', threads: 24, max_tests: 0)
+  args.with_defaults(pattern: '*', threads: 8, max_tests: 0)
+  pattern = args[:pattern] =~ /(n[iu]ll?|0|\.)/i ? '*' : args[:pattern]
+
   require_relative 'lib/helpers/threaded_tests'
-  ThreadedTests.new.run(pattern: args[:pattern], max_threads: args[:threads].to_i, max_tests: args[:max_tests])
+  ThreadedTests.new.run(pattern: pattern, max_threads: args[:threads].to_i, max_tests: args[:max_tests])
 end
 
 desc 'Run tests in Docker'

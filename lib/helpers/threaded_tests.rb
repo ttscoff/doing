@@ -58,10 +58,10 @@ end
 class ThreadedTests
   include Doing::Color
 
-  def run(pattern: '*', max_threads: 24, max_tests: 0)
+  def run(pattern: '*', max_threads: 8, max_tests: 0)
     start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-    max_threads = 24 if max_threads == 0
+    max_threads = 1000 if max_threads == 0
 
     c = Doing::Color
     c.coloring = true
@@ -91,11 +91,12 @@ class ThreadedTests
     progress = TTY::ProgressBar::Multi.new(banner,
                                            width: 12,
                                            hide_cursor: true)
-    children = []
+    @children = []
     tests.each do |t|
       test_name = File.basename(t, '.rb').sub(/doing_(.*?)_test/, '\1')
-      new_sp = progress.register("[#{':bar'.cyan}] #{test_name.bold.white}:status", total: 2, width: 1, head: '.', hide_cursor: true)
-      children.push([test_name, new_sp, nil])
+      new_sp = progress.register("[#{':bar'.cyan}] #{test_name.bold.white}:status",
+                                 total: 2, width: 1, head: '.', hide_cursor: true, clear: true)
+      @children.push([test_name, new_sp, nil])
     end
 
     @elapsed = 0.0
@@ -103,57 +104,20 @@ class ThreadedTests
     @assrt_total = 0
     @error_out = []
     # progress.start
+    @threads = []
 
     begin
-      while children.count.positive?
-        threads = []
-        slices = children.slice!(0, max_threads)
+      while @children.count.positive?
+
+        slices = @children.slice!(0, max_threads)
         slices.each { |c| c[1].start }
         slices.each do |s|
-          bar = s[1]
-          bar.advance(status: ": #{'running'.green}")
-
-          threads << Thread.new do
-            out, _err, status = Open3.capture3(ENV, 'rake', "test:#{s[0]}", stdin_data: nil)
-            unless status.success?
-              m = out.match(/(?<fail>\d+) failures, (?<err>\d+) errors/)
-              status = ": #{m['fail'].bold.red} #{'failures'.red}, #{m['err'].bold.red} #{'errors'.red}"
-              bar.update(head: '✖'.boldred)
-              bar.advance(head: '✖'.boldred, status: status)
-
-              # errs = out.scan(/(?:Failure|Error): [\w_]+\((?:.*?)\):(?:.*?)(?=\n=======)/m)
-              @error_out.push(out.highlight_errors)
-              bar.finish
-
-              Thread.exit
-            end
-
-            time = out.match(/^Finished in (?<time>\d+\.\d+) seconds\./)
-            count = out.match(/^(?<tests>\d+) tests, (?<assrt>\d+) assertions, (?<fails>\d+) failures, (?<errs>\d+) errors/)
-            status = [
-              ': ',
-              count['tests'].green,
-              '/',
-              count['assrt'].cyan,
-              # ' (',
-              # count['fails'].to_i == 0 ? '-'.dark.white.reset : count['fails'].bold.red,
-              # '/',
-              # count['errs'].to_i == 0 ? '-'.dark.white.reset : count['errs'].bold.red,
-              # ') ',
-              ' ',
-              time['time'].to_f.round(3).to_s.yellow,
-              's'
-            ].join('')
-            bar.update(head: '✔'.boldgreen)
-            bar.advance(head: '✔'.boldgreen, status: status)
-            @test_total += count['tests'].to_i
-            @assrt_total += count['assrt'].to_i
-            @elapsed += time['time'].to_f
-
-            bar.finish
+          @threads << Thread.new do
+            run_test(s)
           end
         end
-        threads.each { |t| t.join }
+
+        @threads.each { |t| t.join }
       end
 
       finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -174,6 +138,65 @@ class ThreadedTests
       puts @error_out.join("\n----\n".boldwhite) if @error_out.count.positive?
     rescue
       progress.stop
+    end
+  end
+
+  def run_test(s)
+    bar = s[1]
+    bar.advance(status: ": #{'running'.green}")
+
+    out, _err, status = Open3.capture3(ENV, 'rake', "test:#{s[0]}", stdin_data: nil)
+    unless status.success?
+      m = out.match(/(?<fail>\d+) failures, (?<err>\d+) errors/)
+      status = ": #{m['fail'].bold.red} #{'failures'.red}, #{m['err'].bold.red} #{'errors'.red}"
+      bar.update(head: '✖'.boldred)
+      bar.advance(head: '✖'.boldred, status: status)
+
+      # errs = out.scan(/(?:Failure|Error): [\w_]+\((?:.*?)\):(?:.*?)(?=\n=======)/m)
+      @error_out.push(out.highlight_errors)
+      bar.finish
+
+      next_test
+      Thread.exit
+    end
+
+    time = out.match(/^Finished in (?<time>\d+\.\d+) seconds\./)
+    count = out.match(/^(?<tests>\d+) tests, (?<assrt>\d+) assertions, (?<fails>\d+) failures, (?<errs>\d+) errors/)
+    status = [
+      ': ',
+      count['tests'].green,
+      '/',
+      count['assrt'].cyan,
+      # ' (',
+      # count['fails'].to_i == 0 ? '-'.dark.white.reset : count['fails'].bold.red,
+      # '/',
+      # count['errs'].to_i == 0 ? '-'.dark.white.reset : count['errs'].bold.red,
+      # ') ',
+      ' ',
+      time['time'].to_f.round(3).to_s.yellow,
+      's'
+    ].join('')
+    bar.update(head: '✔'.boldgreen)
+    bar.advance(head: '✔'.boldgreen, status: status)
+    @test_total += count['tests'].to_i
+    @assrt_total += count['assrt'].to_i
+    @elapsed += time['time'].to_f
+
+    bar.finish
+
+    next_test
+  end
+
+  def next_test
+    if @children.count.positive?
+      t = Thread.new do
+        s = @children.shift
+        # s[1].start
+        # s[1].advance(status: ": #{'running'.green}")
+        run_test(s)
+      end
+
+      t.join
     end
   end
 end

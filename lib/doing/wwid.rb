@@ -657,14 +657,8 @@ module Doing
       opt[:time_filter] = [nil, nil]
       if opt[:from] && !opt[:date_filter]
         if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
-          time_start, time_end = opt[:from]
-        elsif opt[:from].is_a?(Time)
-          start, finish = opt[:from]
-        end
-
-        if time_start
-          opt[:time_filter] = [time_start, time_end]
-        else
+          opt[:time_filter] = opt[:from]
+        elsif opt[:from][0].is_a?(Time)
           opt[:date_filter] = opt[:from]
         end
       end
@@ -1622,6 +1616,7 @@ module Doing
                        'duration' => @config['duration'],
                        'interval_format' => @config['interval_format']
                      }, { extend_existing_arrays: true, sort_merged_arrays: true })
+
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
       opt[:count] ||= 0
@@ -2307,7 +2302,6 @@ EOS
 
       section_items = @content.in_section(section)
       max = section_items.count - count.to_i
-      moved_items = []
 
       counter = 0
 

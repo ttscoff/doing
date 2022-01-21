@@ -42,7 +42,7 @@ module Doing
         end
       end
 
-      def read_lines(prompt: 'Enter text', completions: [])
+      def read_lines(prompt: 'Enter text', completions: [], default_response: '')
         $stdin.reopen('/dev/tty')
         return default_response if @default_answer
 
@@ -72,8 +72,10 @@ module Doing
         res.join("\n").strip
       end
 
-      def request_lines(prompt: 'Enter text')
+      def request_lines(prompt: 'Enter text', default_response: '')
         $stdin.reopen('/dev/tty')
+        return default_response if @default_answer
+
         ask_note = []
         reader = TTY::Reader.new(interrupt: -> { raise Errors::UserCancelled }, track_history: false)
         puts "#{boldgreen(prompt.sub(/:?$/, ':'))} #{yellow('Hit return for a new line, ')}#{boldwhite('enter a blank line (')}#{boldyellow('return twice')}#{boldwhite(') to end editing')}"

@@ -54,7 +54,7 @@ module Doing
           read_io.close
           write_io.write(text)
           write_io.close
-        rescue SystemCallError => e
+        rescue SystemCallError # => e
           # raise Errors::DoingStandardError, "Pager error, #{e}"
         end
 

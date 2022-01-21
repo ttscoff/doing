@@ -24,6 +24,7 @@ require 'tty-reader'
 require 'tty-screen'
 
 require_relative 'doing/hash'
+require_relative 'doing/types'
 require_relative 'doing/colors'
 require_relative 'doing/template_string'
 require_relative 'doing/string'
