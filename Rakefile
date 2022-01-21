@@ -53,6 +53,7 @@ end
 desc 'Run all tests, threaded'
 task :test, :pattern, :threads, :max_tests do |_, args|
   args.with_defaults(pattern: '*', threads: 24, max_tests: 0)
+  args[:pattern] = '*' if args[:pattern] =~ /(n[i]ll?|0)/i
   require_relative 'lib/helpers/threaded_tests'
   ThreadedTests.new.run(pattern: args[:pattern], max_threads: args[:threads].to_i, max_tests: args[:max_tests])
 end
