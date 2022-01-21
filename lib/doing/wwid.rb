@@ -1749,7 +1749,7 @@ module Doing
         totals: opt[:totals],
         wrap_width: cfg['wrap_width'],
         tags_color: cfg['tags_color'],
-        config_template: 'today'
+        config_template: opt[:config_template]
       }
       list_section(options)
     end
@@ -1781,7 +1781,7 @@ module Doing
                      totals: opt[:totals],
                      duration: opt[:duration],
                      sort_tags: opt[:sort_tags],
-                     config_template: 'default'
+                     config_template: opt[:config_template]
                    })
     end
 
@@ -1835,7 +1835,7 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates']['recent'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
+      cfg = @config['templates'][opt[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
@@ -1856,7 +1856,6 @@ module Doing
       opt[:template] = cfg['template']
       opt[:order] = 'asc'
       opt[:times] = times
-      opt[:config_template] = 'recent'
 
       list_section(opt)
     end

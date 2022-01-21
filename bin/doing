@@ -65,6 +65,13 @@ if settings.dig('plugins', 'command_path')
   commands_from File.expand_path(settings.dig('plugins', 'command_path'))
 end
 
+accept TemplateName do |value|
+  res = settings['templates'].keys.select { |k| k =~ value.to_rx(distance: 2) }
+  raise InvalidArgument, "Unknown template: #{value}" if res.empty?
+
+  res.group_by(&:length).min.last[0]
+end
+
 accept DateBeginString do |value|
   if value =~ REGEX_TIME
     res = value
@@ -1682,6 +1689,10 @@ command %i[grep search] do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'default'
+
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
@@ -1736,7 +1747,7 @@ command %i[grep search] do |c|
     options[:fuzzy] = false
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    template = settings['templates']['default'].deep_merge(settings)
+    template = settings['templates'][options[:config_template]].deep_merge(settings)
     tags_color = template.key?('tags_color') ? template['tags_color'] : nil
 
     section = wwid.guess_section(options[:section]) if options[:section]
@@ -1793,6 +1804,10 @@ command :last do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'last'
+
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
 
@@ -1846,6 +1861,7 @@ command :last do |c|
     else
       last = wwid.last(times: true, section: options[:section],
                      options: {
+                        config_template: options[:config_template],
                         duration: options[:duration],
                         search: options[:search],
                         fuzzy: options[:fuzzy],
@@ -1879,6 +1895,10 @@ command :recent do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'recent'
 
   c.desc 'Show elapsed time on entries without @done tag'
   c.switch [:duration]
@@ -1923,7 +1943,8 @@ command :recent do |c|
         times: options[:times],
         totals: options[:totals],
         interactive: options[:interactive],
-        duration: options[:duration]
+        duration: options[:duration],
+        config_template: options[:config_template]
       }
 
       Doing::Pager::page wwid.recent(count, section.cap_first, opts)
@@ -2037,6 +2058,10 @@ command :show do |c|
 
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
+
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'default'
 
   c.desc 'Select section or tag to display from a menu'
   c.switch %i[m menu], negatable: false, default_value: false
@@ -2158,6 +2183,7 @@ end
 
 # @@tags
 desc 'List all tags in the current Doing file'
+arg_name 'MAX_COUNT', optional: true, type: Integer
 command :tags do |c|
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'
@@ -2165,6 +2191,9 @@ command :tags do |c|
 
   c.desc 'Show count of occurrences'
   c.switch %i[c counts]
+
+  c.desc 'Output in a single line with @ symbols. Ignored if --counts is specified.'
+  c.switch %i[l line]
 
   c.desc 'Sort by name or count'
   c.arg_name 'SORT_ORDER'
@@ -2209,6 +2238,7 @@ command :tags do |c|
 
   c.action do |_global, options, args|
     section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    options[:count] = args.count.positive? ? args[0].to_i : 0
 
     items = wwid.filter_items([], opt: options)
 
@@ -2236,7 +2266,11 @@ command :tags do |c|
     if options[:counts]
       tags.each { |t, c| puts "#{t} (#{c})" }
     else
-      tags.each { |t, c| puts "#{t}" }
+      if options[:line]
+        puts tags.map { |t, c| t }.to_tags.join(' ')
+      else
+        tags.each { |t, c| puts "#{t}" }
+      end
     end
   end
 end
@@ -2274,6 +2308,10 @@ command :today do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'today'
+
   c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
   c.arg_name 'TIME_STRING'
   c.flag [:before]
@@ -2293,7 +2331,7 @@ command :today do |c|
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-    filter_options = %i[after before duration from section sort_tags totals].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
+    filter_options = %i[after before duration from section sort_tags totals config_template].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
 
     Doing::Pager.page wwid.today(options[:times], options[:output], filter_options).chomp
   end
@@ -2333,6 +2371,10 @@ command :on do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'default'
+
   c.action do |_global_options, options, args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
@@ -2354,7 +2396,7 @@ command :on do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
-                        { duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+                        { config_template: options[:config_template], duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
 
@@ -2390,6 +2432,10 @@ command :since do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'default'
+
   c.action do |_global_options, options, args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
@@ -2411,7 +2457,7 @@ command :since do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
-                        { duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+                        { config_template: options[:config_template], duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
 
@@ -2671,6 +2717,10 @@ command :yesterday do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'today'
+
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
@@ -2712,16 +2762,10 @@ command :yesterday do |c|
       end.join(' to ').split_date_range
     end
 
-    opt = {
-      after: options[:after],
-      before: options[:before],
-      duration: options[:duration],
-      from: options[:from],
-      sort_tags: options[:sort_tags],
-      tag_order: options[:tag_order].normalize_order,
-      totals: options[:totals],
-      order: settings.dig('templates', 'today', 'order')
-    }
+    opt = options.dup
+    opt[:tag_order] = options[:tag_order].normalize_order
+    opt[:order] = settings.dig('templates', options[:config_template], 'order')
+
     Doing::Pager.page wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
   end
 end

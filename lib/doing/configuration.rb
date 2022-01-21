@@ -190,7 +190,7 @@ module Doing
     ##                      matched, first match wins)
     ## @return     [Array] ordered array of resolved keys
     ##
-    def resolve_key_path(keypath, create: false)
+    def resolve_key_path(keypath, create: false, distance: 2)
       cfg = @settings
       real_path = []
       unless keypath =~ /^[.*]?$/
@@ -198,16 +198,24 @@ module Doing
         while paths.length.positive? && !cfg.nil?
           path = paths.shift
           new_cfg = nil
-          cfg.each do |key, val|
-            next unless key =~ path.to_rx(distance: 4)
 
-            real_path << key
-            new_cfg = val
-            break
+          if cfg.is_a?(Hash)
+            matches = cfg.select { |key, val| key =~ path.to_rx(distance: distance) }
+            if matches.count.positive?
+              shortest = matches.keys.group_by(&:length).min.last[0]
+              real_path << shortest
+              new_cfg = matches[shortest]
+            end
+          else
+            new_cfg = cfg
           end
 
           if new_cfg.nil?
-            return nil unless create
+            if distance < 5 && !create
+              return resolve_key_path(keypath, create: false, distance: distance + 1)
+            else
+              return nil unless create
+            end
 
             resolved = real_path.count.positive? ? "Resolved #{real_path.join('->')}, but " : ''
             Doing.logger.log_now(:warn, "#{resolved}#{path} is unknown")

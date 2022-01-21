@@ -19,8 +19,8 @@ module Doing
     # @return     [Array] Array of @tags
     #
     # @example
-    # ['one', '@two', 'three'].to_tags
-    # # => ['@one', '@two', '@three']
+    #   ['one', '@two', 'three'].to_tags
+    #   # => ['@one', '@two', '@three']
     def to_tags
       map(&:add_at)
     end

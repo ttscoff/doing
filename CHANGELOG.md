@@ -1,20 +1,6 @@
 ### 2.1.22
 
-2022-01-21 14:39
-
-#### IMPROVED
-
-- General improvements to `doing note`, including better handling of piping notes from STDIN, using a Readline input unless `--editor` is specified, changed order of importance for different inputs
-- `doing reset -n` switch is a shortcut for `--no-resume` to avoid removing @done when modifying a start date
-- More duration formats available for config (clock, dhm, hm, m, natural)
-
-#### FIXED
-
-- Fix already initialized warning
-- Don't invoke Readline inputs when the current device is not a TTY
-- View keys being overridden by template keys
-- Tag string routines
-- Error handling additional configs when a config file is specified on command line
+2022-01-21 14:53
 
 ### 2.1.21
 
