@@ -1,6 +1,6 @@
 ### 2.1.22
 
-2022-01-21 14:38
+2022-01-21 14:39
 
 #### IMPROVED
 
@@ -10,6 +10,7 @@
 
 #### FIXED
 
+- Fix already initialized warning
 - Don't invoke Readline inputs when the current device is not a TTY
 - View keys being overridden by template keys
 - Tag string routines
