@@ -78,8 +78,8 @@ class DoingTimingImportTest < Test::Unit::TestCase
     doing('done', '--back', '2021-07-22 11:20', '--took', '30m', 'Testing overlapping entry')
     doing('done', '--back', '2021-07-22 15:20', '--took', '30m', 'Testing overlapping entry')
     result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--no-overlap', @timing_import_file)
-    assert_match(/Skipped: 1 overlapping item/, result, "Should have skipped #{target} duplicate entries")
-    assert_match(/Imported: #{target - 1} items/, result, "Should have imported #{target - 1} entries")
+    assert_match(/Skipped: 2 overlapping item/, result, "Should have skipped #{target} duplicate entries")
+    assert_match(/Imported: #{target - 2} items/, result, "Should have imported #{target - 2} entries")
   end
 
   private

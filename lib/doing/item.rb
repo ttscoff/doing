@@ -125,11 +125,11 @@ module Doing
       return true if same_time?(item_b)
 
       start_a = date
-      interval = interval
-      end_a = interval ? start_a + interval.to_i : start_a
+      a_interval = interval
+      end_a = a_interval ? start_a + a_interval.to_i : start_a
       start_b = item_b.date
-      interval = item_b.interval
-      end_b = interval ? start_b + interval.to_i : start_b
+      b_interval = item_b.interval
+      end_b = b_interval ? start_b + b_interval.to_i : start_b
       (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
     end
 

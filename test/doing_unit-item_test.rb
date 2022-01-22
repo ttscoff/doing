@@ -20,6 +20,8 @@ class DoingItemTest < Test::Unit::TestCase
   def teardown
   end
 
+  # TODO: tests for duration, interval, end_date, overlapping_time?, tags?, tag_values?
+
   def test_tag_item
     item = Item.new(Time.now - 3600, "Test item @done(#{(Time.now - 1200).strftime('%F %R')})", @wwid.current_section)
     item.tag(%w[testtag1 testtag2])

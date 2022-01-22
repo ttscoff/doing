@@ -1,6 +1,6 @@
 ### 2.1.23
 
-2022-01-22 12:43
+2022-01-22 13:38
 
 #### NEW
 
@@ -9,6 +9,7 @@
 
 #### IMPROVED
 
+- When registering hooks, you can pass an array to register a block for multiple events, assuming the events provide the same block arguments (like post_entry_added and post_entry_updated)
 - `doing tags` takes a MAX_COUNT argument to limit results when searching
 - `doing tags --line` flag to output tags in a single line
 - Mostly for my own use, `doing changes` (which views the changelog) now accepts `--lookup VERSION` and `--search SEARCH_PATTERN`
