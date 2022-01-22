@@ -23,6 +23,7 @@ require 'tty-markdown'
 require 'tty-reader'
 require 'tty-screen'
 
+require_relative 'doing/help_monkey_patch'
 require_relative 'doing/changelog'
 require_relative 'doing/hash'
 require_relative 'doing/types'
