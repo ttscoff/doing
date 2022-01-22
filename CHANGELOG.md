@@ -1,15 +1,20 @@
 ### 2.1.23
 
-2022-01-21 17:04
+2022-01-21 18:26
 
 #### NEW
 
+- Display commands accept `--template`, which takes a template string containing %placeholders and overrides the commands default template output. Affects grep, last, on, recent, show, since, today, yesterday
 - All display commands (except view) now accept `--config_template TEMPLATE_KEY` to override that commands default template.
 
 #### IMPROVED
 
 - `doing tags` takes a MAX_COUNT argument to limit results when searching
 - `doing tags --line` flag to output tags in a single line
+
+#### FIXED
+
+- Running `--tag "@doing"` wouldn't work where `--tag "doing"` would. Now properly ignoring @ symbols
 
 ### 2.1.22
 
