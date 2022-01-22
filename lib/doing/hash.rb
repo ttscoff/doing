@@ -48,8 +48,9 @@ module Doing
 
     # Set a nested hash value using an array
     #
-    # @example `{}.deep_set(['one', 'two'], 'value')`
-    # @example `=> { 'one' => { 'two' => 'value' } }
+    # @example
+    #   {}.deep_set(['one', 'two'], 'value')
+    #   # => { 'one' => { 'two' => 'value' } }
     #
     # @param      path   [Array] key path
     # @param      value  The value

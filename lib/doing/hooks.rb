@@ -23,7 +23,11 @@ module Doing
 
     # register hook(s) to be called later, public API
     def self.register(event, priority: DEFAULT_PRIORITY, &block)
-      register_one(event, priority_value(priority), &block)
+      if event.is_a?(Array)
+        event.each { |ev| register_one(ev, priority_value(priority), &block) }
+      else
+        register_one(event, priority_value(priority), &block)
+      end
     end
 
     # Ensure the priority is a Fixnum

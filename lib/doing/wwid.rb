@@ -1265,7 +1265,7 @@ module Doing
 
             tag = tag.strip
 
-            if tag =~ /^done$/
+            if tag =~ /^done$/ && opt[:date] && item.should_time?
               max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
               max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
               elapsed = done_date - item.date
@@ -1719,7 +1719,7 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates']['today'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
+      cfg = @config['templates'][opt[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
@@ -1727,6 +1727,8 @@ module Doing
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
       }, { extend_existing_arrays: true, sort_merged_arrays: true })
+
+      template = opt[:template] || cfg['template']
 
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
@@ -1743,13 +1745,13 @@ module Doing
         output: output,
         section: opt[:section],
         sort_tags: opt[:sort_tags],
-        template: cfg['template'],
+        template: template,
         times: times,
         today: true,
         totals: opt[:totals],
         wrap_width: cfg['wrap_width'],
         tags_color: cfg['tags_color'],
-        config_template: 'today'
+        config_template: opt[:config_template]
       }
       list_section(options)
     end
@@ -1781,7 +1783,8 @@ module Doing
                      totals: opt[:totals],
                      duration: opt[:duration],
                      sort_tags: opt[:sort_tags],
-                     config_template: 'default'
+                     template: opt[:template],
+                     config_template: opt[:config_template]
                    })
     end
 
@@ -1816,7 +1819,8 @@ module Doing
         times: times,
         totals: opt[:totals],
         yesterday: true,
-        config_template: 'today'
+        config_template: opt[:config_template] || 'today',
+        template: opt[:template]
       }
 
       list_section(options)
@@ -1835,7 +1839,7 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates']['recent'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
+      cfg = @config['templates'][opt[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
@@ -1853,10 +1857,9 @@ module Doing
       opt[:wrap_width] = cfg['wrap_width']
       opt[:count] = count
       opt[:format] = cfg['date_format']
-      opt[:template] = cfg['template']
+      opt[:template] = opt[:template] || cfg['template']
       opt[:order] = 'asc'
       opt[:times] = times
-      opt[:config_template] = 'recent'
 
       list_section(opt)
     end
@@ -1869,7 +1872,7 @@ module Doing
     ##
     def last(times: true, section: nil, options: {})
       section = section.nil? || section =~ /all/i ? 'All' : guess_section(section)
-      cfg = @config['templates']['last'].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
+      cfg = @config['templates'][options[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
         'order' => @config['order'] || 'asc',
@@ -1881,19 +1884,19 @@ module Doing
       options[:interval_format] ||= cfg['interval_format'] || 'text'
 
       opts = {
-        section: section,
-        wrap_width: cfg['wrap_width'],
-        count: 1,
-        format: cfg['date_format'],
-        template: cfg['template'],
-        times: times,
-        duration: options[:duration],
-        interval_format: options[:interval_format],
         case: options[:case],
-        not: options[:negate],
         config_template: 'last',
+        count: 1,
         delete: options[:delete],
-        val: options[:val]
+        duration: options[:duration],
+        format: cfg['date_format'],
+        interval_format: options[:interval_format],
+        not: options[:negate],
+        section: section,
+        template: options[:template] || cfg['template'],
+        times: times,
+        val: options[:val],
+        wrap_width: cfg['wrap_width']
       }
 
       if options[:tag]

@@ -173,7 +173,7 @@ module Doing
     ## @return     [Array<DateTime>] Start and end dates as
     ##             array
     ## @example    Process a natural language date range
-    ## "mon 3pm to mon 5pm".split_date_range
+    ##   "mon 3pm to mon 5pm".split_date_range
     ##
     def split_date_range
       time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/

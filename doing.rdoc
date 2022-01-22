@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.22
+v2.1.23
 
 === Global Options
 === --config_file arg
@@ -403,10 +403,37 @@ Force exact search string matching (case sensitive)
 
 
 
-==== Command: <tt>changelog|changes </tt>
+==== Command: <tt>changes|changelog </tt>
 List recent changes in Doing
 
-Display a formatted list of changes in recent versions, latest at the top
+Display a formatted list of changes in recent versions.
+
+            Without flags, displays only the most recent version.
+            Use --lookup or --all for history.
+===== Options
+===== -l|--lookup VERSION
+
+Look up a specific version. Specify versions as "MAJ.MIN.PATCH", MIN
+           and PATCH are optional. Use > or < to see all changes since or prior
+           to a version.
+
+[Default Value] None
+[Must Match] (?-mix:^(?:(?:(?:[<>=]|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[\d.*?]+ *)+|(?:[\d.]+ *-+ *[\d.]+))$)
+
+
+===== -s|--search arg
+
+Show changelogs matching search terms (uses pattern-based searching).
+           Add slashes to search with regular expressions, e.g. `--search "/output.*flag/"`
+
+[Default Value] None
+
+
+===== -a|--all
+Display all versions
+
+
+
 ==== Command: <tt>choose </tt>
 Select a section to display from a menu
 
@@ -763,6 +790,13 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 [Must Match] (?-mix:^[csi])
 
 
+===== --config_template TEMPLATE_KEY
+
+Output using a template from configuration
+
+[Default Value] default
+
+
 ===== --from DATE_OR_RANGE
 
 Date range to show, or a single day to filter date on.
@@ -795,6 +829,13 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== --template TEMPLATE_STRING
+
+Override output format with a template string containing %placeholders
+
+[Default Value] None
 
 
 ===== --val QUERY
@@ -983,6 +1024,13 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 [Must Match] (?-mix:^[csi])
 
 
+===== --config_template TEMPLATE_KEY
+
+Output using a template from configuration
+
+[Default Value] last
+
+
 ===== -s|--section NAME
 
 Specify a section
@@ -1000,6 +1048,13 @@ Search filter, surround with slashes for regex (/query/), start with single quot
 ===== --tag TAG
 
 Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?)
+
+[Default Value] None
+
+
+===== --template TEMPLATE_STRING
+
+Override output format with a template string containing %placeholders
 
 [Default Value] None
 
@@ -1347,6 +1402,13 @@ Date argument can be natural language. "thursday" would be interpreted as "last 
 and "2d" would be interpreted as "two days ago." If you use "to" or "through" between two dates,
 it will create a range.
 ===== Options
+===== --config_template TEMPLATE_KEY
+
+Output using a template from configuration
+
+[Default Value] default
+
+
 ===== -o|--output FORMAT
 
 Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
@@ -1367,6 +1429,13 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== --template TEMPLATE_STRING
+
+Override output format with a template string containing %placeholders
+
+[Default Value] None
 
 
 ===== --[no-]duration
@@ -1438,6 +1507,13 @@ List recent entries
 
 
 ===== Options
+===== --config_template TEMPLATE_KEY
+
+Output using a template from configuration
+
+[Default Value] recent
+
+
 ===== -s|--section NAME
 
 Section
@@ -1451,6 +1527,13 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== --template TEMPLATE_STRING
+
+Override output format with a template string containing %placeholders
+
+[Default Value] None
 
 
 ===== --[no-]duration
@@ -1861,6 +1944,13 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 [Must Match] (?-mix:^[csi])
 
 
+===== --config_template TEMPLATE_KEY
+
+Output using a template from configuration
+
+[Default Value] default
+
+
 ===== --from DATE_OR_RANGE
 
 Date range to show, or a single day to filter date on.
@@ -1916,6 +2006,13 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time))
+
+
+===== --template TEMPLATE_STRING
+
+Override output format with a template string containing %placeholders
+
+[Default Value] None
 
 
 ===== --val QUERY
@@ -1977,6 +2074,13 @@ List entries since a date
 Date argument can be natural language and are always interpreted as being in the past. "thursday" would be interpreted as "last thursday,"
 and "2d" would be interpreted as "two days ago."
 ===== Options
+===== --config_template TEMPLATE_KEY
+
+Output using a template from configuration
+
+[Default Value] default
+
+
 ===== -o|--output FORMAT
 
 Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
@@ -1997,6 +2101,13 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== --template TEMPLATE_STRING
+
+Override output format with a template string containing %placeholders
+
+[Default Value] None
 
 
 ===== --[no-]duration
@@ -2156,7 +2267,7 @@ Remove all default_tags from the local .doingrc
 
 
 
-==== Command: <tt>tags </tt>
+==== Command: <tt>tags  [MAX_COUNT]</tt>
 List all tags in the current Doing file
 
 
@@ -2233,6 +2344,11 @@ Select items to scan from a menu of matching entries
 
 
 
+===== -l|--[no-]line
+Output in a single line with @ symbols. Ignored if --counts is specified.
+
+
+
 ===== --not
 Get tags from items that *don't* match search/tag filters
 
@@ -2295,6 +2411,13 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 [Default Value] None
 
 
+===== --config_template TEMPLATE_KEY
+
+Output using a template from configuration
+
+[Default Value] today
+
+
 ===== --from TIME_RANGE
 
 Time range to show `doing today --from "12pm to 4pm"`
@@ -2322,6 +2445,13 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== --template TEMPLATE_STRING
+
+Override output format with a template string containing %placeholders
+
+[Default Value] None
 
 
 ===== --[no-]duration
@@ -2623,6 +2753,13 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 [Default Value] None
 
 
+===== --config_template TEMPLATE_KEY
+
+Output using a template from configuration
+
+[Default Value] today
+
+
 ===== --from TIME_RANGE
 
 Time range to show, e.g. `doing yesterday --from "1am to 8am"`
@@ -2659,6 +2796,13 @@ Sort tags by (name|time)
 
 [Default Value] name
 [Must Match] (?i-mx:^(?:name|time)$)
+
+
+===== --template TEMPLATE_STRING
+
+Override output format with a template string containing %placeholders
+
+[Default Value] None
 
 
 ===== --[no-]duration

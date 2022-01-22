@@ -3,6 +3,7 @@
 
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'gli'
+require 'doing/help_monkey_patch'
 require 'doing'
 require 'tempfile'
 require 'pp'
@@ -21,6 +22,7 @@ end
 
 include GLI::App
 include Doing::Errors
+
 version Doing::VERSION
 hide_commands_without_desc true
 autocomplete_commands true
@@ -63,6 +65,13 @@ wwid.config = settings
 
 if settings.dig('plugins', 'command_path')
   commands_from File.expand_path(settings.dig('plugins', 'command_path'))
+end
+
+accept TemplateName do |value|
+  res = settings['templates'].keys.select { |k| k =~ value.to_rx(distance: 2) }
+  raise InvalidArgument, "Unknown template: #{value}" if res.empty?
+
+  res.group_by(&:length).min.last[0]
 end
 
 accept DateBeginString do |value|
@@ -1682,6 +1691,14 @@ command %i[grep search] do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'default'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
@@ -1736,7 +1753,7 @@ command %i[grep search] do |c|
     options[:fuzzy] = false
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    template = settings['templates']['default'].deep_merge(settings)
+    template = settings['templates'][options[:config_template]].deep_merge(settings)
     tags_color = template.key?('tags_color') ? template['tags_color'] : nil
 
     section = wwid.guess_section(options[:section]) if options[:section]
@@ -1793,6 +1810,14 @@ command :last do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'last'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
 
@@ -1846,6 +1871,8 @@ command :last do |c|
     else
       last = wwid.last(times: true, section: options[:section],
                      options: {
+                        config_template: options[:config_template],
+                        template: options[:template],
                         duration: options[:duration],
                         search: options[:search],
                         fuzzy: options[:fuzzy],
@@ -1879,6 +1906,14 @@ command :recent do |c|
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
+
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'recent'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
 
   c.desc 'Show elapsed time on entries without @done tag'
   c.switch [:duration]
@@ -1923,7 +1958,9 @@ command :recent do |c|
         times: options[:times],
         totals: options[:totals],
         interactive: options[:interactive],
-        duration: options[:duration]
+        duration: options[:duration],
+        config_template: options[:config_template],
+        template: options[:template]
       }
 
       Doing::Pager::page wwid.recent(count, section.cap_first, opts)
@@ -2038,6 +2075,14 @@ command :show do |c|
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'default'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.desc 'Select section or tag to display from a menu'
   c.switch %i[m menu], negatable: false, default_value: false
 
@@ -2094,7 +2139,7 @@ command :show do |c|
 
     options[:times] = true if options[:totals]
 
-    template = settings['templates']['default'].deep_merge({
+    template = settings['templates'][options[:config_template]].deep_merge({
         'wrap_width' => settings['wrap_width'] || 0,
         'date_format' => settings['default_date_format'],
         'order' => settings['order'] || 'asc',
@@ -2158,6 +2203,7 @@ end
 
 # @@tags
 desc 'List all tags in the current Doing file'
+arg_name 'MAX_COUNT', optional: true, type: Integer
 command :tags do |c|
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'
@@ -2165,6 +2211,9 @@ command :tags do |c|
 
   c.desc 'Show count of occurrences'
   c.switch %i[c counts]
+
+  c.desc 'Output in a single line with @ symbols. Ignored if --counts is specified.'
+  c.switch %i[l line]
 
   c.desc 'Sort by name or count'
   c.arg_name 'SORT_ORDER'
@@ -2209,6 +2258,7 @@ command :tags do |c|
 
   c.action do |_global, options, args|
     section = wwid.guess_section(options[:section]) || options[:section].cap_first
+    options[:count] = args.count.positive? ? args[0].to_i : 0
 
     items = wwid.filter_items([], opt: options)
 
@@ -2236,7 +2286,11 @@ command :tags do |c|
     if options[:counts]
       tags.each { |t, c| puts "#{t} (#{c})" }
     else
-      tags.each { |t, c| puts "#{t}" }
+      if options[:line]
+        puts tags.map { |t, c| t }.to_tags.join(' ')
+      else
+        tags.each { |t, c| puts "#{t}" }
+      end
     end
   end
 end
@@ -2274,6 +2328,14 @@ command :today do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'today'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
   c.arg_name 'TIME_STRING'
   c.flag [:before]
@@ -2293,7 +2355,7 @@ command :today do |c|
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-    filter_options = %i[after before duration from section sort_tags totals].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
+    filter_options = %i[after before duration from section sort_tags totals template config_template].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
 
     Doing::Pager.page wwid.today(options[:times], options[:output], filter_options).chomp
   end
@@ -2333,6 +2395,14 @@ command :on do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'default'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.action do |_global_options, options, args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
@@ -2354,7 +2424,7 @@ command :on do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
-                        { duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+                        { template: options[:template], config_template: options[:config_template], duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
 
@@ -2390,6 +2460,14 @@ command :since do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'default'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.action do |_global_options, options, args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
@@ -2411,7 +2489,7 @@ command :since do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
-                        { duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+                        { template: options[:template], config_template: options[:config_template], duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
 
@@ -2671,6 +2749,14 @@ command :yesterday do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  c.desc "Output using a template from configuration"
+  c.arg_name 'TEMPLATE_KEY'
+  c.flag [:config_template], type: TemplateName, default_value: 'today'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
@@ -2712,16 +2798,10 @@ command :yesterday do |c|
       end.join(' to ').split_date_range
     end
 
-    opt = {
-      after: options[:after],
-      before: options[:before],
-      duration: options[:duration],
-      from: options[:from],
-      sort_tags: options[:sort_tags],
-      tag_order: options[:tag_order].normalize_order,
-      totals: options[:totals],
-      order: settings.dig('templates', 'today', 'order')
-    }
+    opt = options.dup
+    opt[:tag_order] = options[:tag_order].normalize_order
+    opt[:order] = settings.dig('templates', options[:config_template], 'order')
+
     Doing::Pager.page wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
   end
 end
@@ -3582,17 +3662,44 @@ end
 
 # @@changelog @@changes
 desc 'List recent changes in Doing'
-long_desc 'Display a formatted list of changes in recent versions, latest at the top'
-command %i[changelog changes] do |c|
+long_desc %(Display a formatted list of changes in recent versions.
+
+            Without flags, displays only the most recent version.
+            Use --lookup or --all for history.)
+command %i[changes changelog] do |c|
+  c.desc 'Display all versions'
+  c.switch %i[a all], default_value: false, negatable: false
+
+  c.desc %(Look up a specific version. Specify versions as "MAJ.MIN.PATCH", MIN
+           and PATCH are optional. Use > or < to see all changes since or prior
+           to a version.)
+  c.arg_name 'VERSION'
+  c.flag %i[l lookup], must_match: /^(?:(?:(?:[<>=]|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[\d.*?]+ *)+|(?:[\d.]+ *-+ *[\d.]+))$/
+
+  c.desc %(Show changelogs matching search terms (uses pattern-based searching).
+           Add slashes to search with regular expressions, e.g. `--search "/output.*flag/"`)
+  c.flag %i[s search]
+
+  c.example 'doing changes', desc: 'View changes in the current version'
+  c.example 'doing changes --all', desc: 'See the entire changelog'
+  c.example 'doing changes --lookup 2.0.21', desc: 'See changes from version 2.0.21'
+  c.example 'doing changes --lookup "> 2.1"', desc: 'See all changes since 2.1.0'
+  c.example 'doing changes --search "tags +bool"', desc: 'See all changes containing "tags" and "bool"'
+  c.example 'doing changes -l "> 2.1" -s "pattern"', desc: 'Lookup and search can be combined'
+
+
   c.action do |_global_options, options, args|
-    changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', 'CHANGELOG.md'))
-    if File.exist?(changelog)
-      parsed = TTY::Markdown.parse(IO.read(changelog), width: 80, symbols: {override: {bullet: "•"}})
-      Doing::Pager.paginate = true
-      Doing::Pager.page parsed
-    else
-      raise "Error locating changelog"
-    end
+    cl = Doing::Changes.new(lookup: options[:lookup], search: options[:search])
+
+    content = if options[:all] || options[:search] || options[:lookup]
+                cl.to_s
+              else
+                cl.latest
+              end
+
+    parsed = TTY::Markdown.parse(content, width: 80, symbols: {override: {bullet: "•"}})
+    Doing::Pager.paginate = true
+    Doing::Pager.page parsed
   end
 end
 

@@ -20,7 +20,9 @@ module Doing
     ## can be separated by up to *distance* characters in
     ## haystack, spaces indicate unlimited distance.
     ##
-    ## @example    `"this word".to_rx(2) => /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/`
+    ## @example
+    ##   "this word".to_rx(3)
+    ##   # => /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/
     ##
     ## @param      distance   [Integer] Allowed distance
     ##                        between characters
@@ -51,6 +53,20 @@ module Doing
                   end.join('.*?')
                 end
       Regexp.new(pattern, !case_sensitive)
+    end
+
+    def to_phrase_query
+      parser = PhraseParser::QueryParser.new
+      transformer = PhraseParser::QueryTransformer.new
+      parse_tree = parser.parse(self)
+      transformer.apply(parse_tree).to_elasticsearch
+    end
+
+    def to_query
+      parser = BooleanTermParser::QueryParser.new
+      transformer = BooleanTermParser::QueryTransformer.new
+      parse_tree = parser.parse(self)
+      transformer.apply(parse_tree).to_elasticsearch
     end
 
     ##
@@ -101,13 +117,6 @@ module Doing
       gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{last_color}")
     end
 
-    def to_phrase_query(query)
-      parser = PhraseParser::QueryParser.new
-      transformer = PhraseParser::QueryTransformer.new
-      parse_tree = parser.parse(query)
-      transformer.apply(parse_tree).to_elasticsearch
-    end
-
     def ignore_case(search, case_type)
       (case_type == :smart && search !~ /[A-Z]/) || case_type == :ignore
     end
@@ -127,7 +136,7 @@ module Doing
         rx = search.to_rx(distance: distance, case_type: case_type)
         out.gsub!(rx) { |m| m.bgyellow.black }
       else
-        query = to_phrase_query(search.strip)
+        query = search.strip.to_phrase_query
 
         if query[:must].nil? && query[:must_not].nil?
           query[:must] = query[:should]
@@ -449,7 +458,7 @@ module Doing
     ## @return     [String] Regular expression string
     ##
     def wildcard_to_rx
-      gsub(/\?/, '\S').gsub(/\*/, '\S*?')
+      gsub(/\?/, '\S').gsub(/\*/, '\S*?').gsub(/\]\]/, '--')
     end
 
     ##

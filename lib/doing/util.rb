@@ -27,7 +27,8 @@ module Doing
     ##
     ## Return the first valid executable from a list of commands
     ##
-    ## @example `Doing::Util.first_available_exec('bat', 'less -Xr', 'more -r', 'cat')`
+    ## @example
+    ##   Doing::Util.first_available_exec('bat', 'less -Xr', 'more -r', 'cat')
     ##
     def first_available_exec(*commands)
       commands.compact.map(&:strip).reject(&:empty?).uniq

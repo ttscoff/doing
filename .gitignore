@@ -1,14 +1,10 @@
-pkg
 html
-*.taskpaper
-*.sublime*
 .rake_tasks~
 .sass-cache
 helpfile.txt
 .doingrc
 .irb-history
 buildnotes.md
-vendor
 .tool-versions
 wwid.md
 COMMANDS.bak

@@ -14,7 +14,9 @@ module Doing
 
     InvalidExportType = Class.new(RuntimeError)
     MissingConfigFile = Class.new(RuntimeError)
+
     TagArray = Class.new(Array)
+    TemplateName = Class.new(String)
     DateBeginString = Class.new(DateTime)
     DateEndString = Class.new(DateTime)
     DateRangeString = Class.new(Array)

@@ -95,7 +95,7 @@ class ThreadedTests
     tests.each do |t|
       test_name = File.basename(t, '.rb').sub(/doing_(.*?)_test/, '\1')
       new_sp = progress.register("[#{':bar'.cyan}] #{test_name.bold.white}:status",
-                                 total: 2, width: 1, head: '.', hide_cursor: true, clear: true)
+                                 total: 4, width: 1, head: ' ', unknown: ' ', hide_cursor: true, clear: true)
       @children.push([test_name, new_sp, nil])
     end
 
@@ -105,6 +105,7 @@ class ThreadedTests
     @error_out = []
     # progress.start
     @threads = []
+    @running_tests = []
 
     begin
       while @children.count.positive?
@@ -142,8 +143,20 @@ class ThreadedTests
   end
 
   def run_test(s)
+
     bar = s[1]
     bar.advance(status: ": #{'running'.green}")
+
+    if @running_tests.count.positive?
+      prev_bar = @running_tests[-1][1]
+      unless prev_bar.complete?
+        prev_bar.update(head: ' ', unfinished: ' ')
+        prev_bar.advance(status: ": #{'running'.green}")
+      end
+    end
+
+    @running_tests.push(s)
+
 
     out, _err, status = Open3.capture3(ENV, 'rake', "test:#{s[0]}", stdin_data: nil)
     unless status.success?

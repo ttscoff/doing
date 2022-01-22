@@ -125,11 +125,11 @@ module Doing
       return true if same_time?(item_b)
 
       start_a = date
-      interval = interval
-      end_a = interval ? start_a + interval.to_i : start_a
+      a_interval = interval
+      end_a = a_interval ? start_a + a_interval.to_i : start_a
       start_b = item_b.date
-      interval = item_b.interval
-      end_b = interval ? start_b + interval.to_i : start_b
+      b_interval = item_b.interval
+      end_b = b_interval ? start_b + b_interval.to_i : start_b
       (start_a >= start_b && start_a <= end_b) || (end_a >= start_b && end_a <= end_b) || (start_a < start_b && end_a > end_b)
     end
 
@@ -216,8 +216,8 @@ module Doing
     ##
     def tags?(tags, bool = :and, negate: false)
       if bool == :pattern
-        tags = tags.join(' ') if tags.is_a?(Array)
-        matches = tag_pattern?(tags.gsub(/ *, */, ' '))
+        tags = tags.to_tags.tags_to_array.join(' ')
+        matches = tag_pattern?(tags)
 
         return negate ? !matches : matches
       end
@@ -283,7 +283,7 @@ module Doing
         new_title = @title.gsub(rx) { |m| yellow(m) }
         new_note.add(@note.to_s.gsub(rx) { |m| yellow(m) })
       else
-        query = to_phrase_query(search.strip)
+        query = search.strip.to_phrase_query
 
         if query[:must].nil? && query[:must_not].nil?
           query[:must] = query[:should]
@@ -319,7 +319,7 @@ module Doing
       if search.is_rx? || matching == :fuzzy
         matches = @title + @note.to_s =~ search.to_rx(distance: distance, case_type: case_type)
       else
-        query = to_phrase_query(search.strip)
+        query = search.strip.to_phrase_query
 
         if query[:must].nil? && query[:must_not].nil?
           query[:must] = query[:should]
@@ -612,29 +612,14 @@ module Doing
       end
     end
 
-    def to_query(query)
-      parser = BooleanTermParser::QueryParser.new
-      transformer = BooleanTermParser::QueryTransformer.new
-      parse_tree = parser.parse(query)
-      transformer.apply(parse_tree).to_elasticsearch
-    end
-
-    def to_phrase_query(query)
-      parser = PhraseParser::QueryParser.new
-      transformer = PhraseParser::QueryTransformer.new
-      parse_tree = parser.parse(query)
-      transformer.apply(parse_tree).to_elasticsearch
-    end
-
     def tag_pattern?(tags)
-      query = to_query(tags)
+      query = tags.to_query
 
       no_tags?(query[:must_not]) && all_tags?(query[:must]) && any_tags?(query[:should])
     end
 
     def split_tags(tags)
-      tags = tags.to_tags if tags.is_a? String
-      tags.map(&:remove_at)
+      tags.to_tags.tags_to_array
     end
   end
 end
