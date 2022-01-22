@@ -15,7 +15,7 @@ lib/doing/prompt.rb d241935b209e69a14c55a9c3a035f1751c576b4c
 lib/doing/string.rb 443e238f1c4e205a61734b4be3d22f41388e9713
 lib/doing/symbol.rb 309799458a1bc715c2707307c9a62ab26086275e
 lib/doing/section.rb 206e119cf818f1e76798753e611180fe77bc299a
-lib/doing/version.rb 21027627e64f35ac455dee6dd8565e6af062ddbb
+lib/doing/version.rb 7a231babfa24987f2616244664899d7e39d293ea
 lib/doing/changelog.rb f7d1bd424e63400ab0613ef3358e614fdf53e2b5
 lib/doing/cli_status.rb dbedd454c4cbbd0fed9ef30120f6ec85d18b9356
 lib/doing/completion.rb c658e7dc7898fb022a21b2bd77bedb958ca3b067

@@ -123,8 +123,9 @@ complete -f -c doing -n '__fish_doing_using_command show' -a '(__fish_doing_comp
 complete -f -c doing -n '__fish_doing_using_command view' -a '(__fish_doing_complete_views)'
 complete -f -c doing -n '__fish_doing_using_command template' -a '(__fish_doing_complete_templates)'
 complete -f -c doing -s t -l type -x -n '__fish_doing_using_command import' -a '(__fish_doing_import_plugins)'
+complete -f -c doing -n '__fish_doing_using_command help' -a '(__fish_doing_subcommands)'
 
-complete -xc doing -n '__fish_seen_subcommand_from help; and not __fish_seen_subcommand_from (doing help -c)' -a "(doing help -c)"
+# complete -xc doing -n '__fish_seen_subcommand_from help; and not __fish_seen_subcommand_from (doing help -c)' -a "(doing help -c)"
 
 function __fish_doing_complete_args
   for cmd in (doing commands_accepting -c $argv[1])
