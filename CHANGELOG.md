@@ -1,6 +1,6 @@
 ### 2.1.23
 
-2022-01-22 14:57
+2022-01-22 15:52
 
 #### NEW
 
@@ -9,6 +9,7 @@
 
 #### IMPROVED
 
+- With complete examples in the help output for most commands, `doing help` almost always requires scrolling up. It now automatically paginates using your system $PAGER (or best detected option). # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is up to date with 'origin/develop'. # # Changes to be committed: #	modified:   lib/doing.rb #	new file:   lib/doing/help_monkey_patch.rb # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/lib/doing.rb b/lib/doing.rb index d29e6ab..87a47b8 100644 --- a/lib/doing.rb +++ b/lib/doing.rb @@ -23,6 +23,7 @@ require 'tty-markdown'  require 'tty-reader'  require 'tty-screen'   +require_relative 'doing/help_monkey_patch'  require_relative 'doing/changelog'  require_relative 'doing/hash'  require_relative 'doing/types' diff --git a/lib/doing/help_monkey_patch.rb b/lib/doing/help_monkey_patch.rb new file mode 100644 index 0000000..5a20288 --- /dev/null +++ b/lib/doing/help_monkey_patch.rb @@ -0,0 +1,31 @@ +# frozen_string_literal: true + +module GLI +  module Commands +    # Help Command Monkeypatch for paginated output +    class Help < Command +      def show_help(global_options,options,arguments,out,error) +        Doing::Pager.paginate = true + +        command_finder = HelpModules::CommandFinder.new(@app,arguments,error) +        if options[:c] +          help_output = HelpModules::HelpCompletionFormat.new(@app,command_finder,arguments).format +          out.puts help_output unless help_output.nil? +        elsif arguments.empty? || options[:c] +          Doing::Pager.page HelpModules::GlobalHelpFormat.new(@app,@sorter,@text_wrapping_class).format +        else +          name = arguments.shift +          command = command_finder.find_command(name) +          unless command.nil? +            Doing::Pager.page HelpModules::CommandHelpFormat.new( +              command, +              @app, +              @sorter, +              @synopsis_formatter_class, +              @text_wrapping_class).format +          end +        end +      end +    end +  end +end
 - `doing tags` takes a MAX_COUNT argument to limit results when searching
 - `doing tags --line` flag to output tags in a single line
 - Mostly for my own use, `doing changes` (which views the changelog) now accepts `--lookup VERSION` and `--search SEARCH_PATTERN`
