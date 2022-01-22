@@ -1,0 +1,115 @@
+# frozen_string_literal: true
+
+module Doing
+  # A single version's entries
+  class Change
+    attr_reader :version, :content
+
+    attr_accessor :entries
+
+    def initialize(version, content)
+      @version = Version.new(version)
+      @content = content
+      parse_entries
+    end
+
+    def parse_entries
+      @entries = []
+      types = @content.scan(/(?<=\n|\A)#### (NEW|IMPROVED|FIXED)(.*?)(?=\n####|\Z)/m)
+      types.each do |type|
+        type[1].scan(/\s*- +(.*?)$/).each do |entry|
+          @entries << Entry.new(entry[0].strip, type[0])
+        end
+      end
+    end
+
+    def search_entries(search_string)
+      case_type = :ignore
+
+      matches = []
+
+      if search_string.is_rx?
+        matches = @entries.select { |e| e.string =~ search_string.to_rx(distance: 2, case_type: case_type) }
+      else
+        query = search_string.gsub(/(-)?--/, '\1]]').to_phrase_query
+
+        if query[:must].nil? && query[:must_not].nil?
+          query[:must] = query[:should]
+          query[:should] = []
+        end
+
+        @entries.each do |entry|
+          m = no_searches?(entry.string, query[:must_not])
+          m &&= all_searches?(entry.string, query[:must])
+          m &&= any_searches?(entry.string, query[:should])
+          matches << entry if m
+        end
+      end
+
+      @entries = matches.count.positive? ? matches : nil
+    end
+
+    def to_h
+      { version: @version, content: @content }
+    end
+
+    def to_s
+      out = ["### #{@version}"]
+      items = {
+        new: [],
+        improved: [],
+        fixed: [],
+        other: []
+      }
+      @entries.each do |e|
+        type = e.type.downcase.to_sym
+        if items.key?(type)
+          items[type] << e
+        else
+          items[:other] << e
+        end
+      end
+
+      items.each do |type, members|
+        if members.count.positive?
+          out << "#### #{type.to_s.capitalize}"
+          out << members.map(&:to_s).join("\n")
+        end
+      end
+
+      out.join("\n\n")
+    end
+
+    private
+
+    def all_searches?(text, searches)
+      return true if searches.nil? || searches.empty?
+
+      searches.each do |s|
+        rx = Regexp.new(s.wildcard_to_rx, true)
+        return false unless text =~ rx
+      end
+      true
+    end
+
+    def no_searches?(text, searches)
+      return true if searches.nil? || searches.empty?
+
+      searches.each do |s|
+        rx = Regexp.new(s.wildcard_to_rx, true)
+        return false if text =~ rx
+      end
+      true
+    end
+
+    def any_searches?(text, searches)
+      return true if searches.nil? || searches.empty?
+
+      searches.each do |s|
+        rx = Regexp.new(s.wildcard_to_rx, true)
+        return true if text =~ rx
+      end
+      false
+    end
+  end
+end

@@ -283,7 +283,7 @@ module Doing
         new_title = @title.gsub(rx) { |m| yellow(m) }
         new_note.add(@note.to_s.gsub(rx) { |m| yellow(m) })
       else
-        query = to_phrase_query(search.strip)
+        query = search.strip.to_phrase_query
 
         if query[:must].nil? && query[:must_not].nil?
           query[:must] = query[:should]
@@ -319,7 +319,7 @@ module Doing
       if search.is_rx? || matching == :fuzzy
         matches = @title + @note.to_s =~ search.to_rx(distance: distance, case_type: case_type)
       else
-        query = to_phrase_query(search.strip)
+        query = search.strip.to_phrase_query
 
         if query[:must].nil? && query[:must_not].nil?
           query[:must] = query[:should]
@@ -610,20 +610,6 @@ module Doing
       else
         false
       end
-    end
-
-    def to_query(query)
-      parser = BooleanTermParser::QueryParser.new
-      transformer = BooleanTermParser::QueryTransformer.new
-      parse_tree = parser.parse(query)
-      transformer.apply(parse_tree).to_elasticsearch
-    end
-
-    def to_phrase_query(query)
-      parser = PhraseParser::QueryParser.new
-      transformer = PhraseParser::QueryTransformer.new
-      parse_tree = parser.parse(query)
-      transformer.apply(parse_tree).to_elasticsearch
     end
 
     def tag_pattern?(tags)
