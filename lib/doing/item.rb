@@ -216,8 +216,8 @@ module Doing
     ##
     def tags?(tags, bool = :and, negate: false)
       if bool == :pattern
-        tags = tags.join(' ') if tags.is_a?(Array)
-        matches = tag_pattern?(tags.gsub(/ *, */, ' '))
+        tags = tags.to_tags.tags_to_array.join(' ')
+        matches = tag_pattern?(tags)
 
         return negate ? !matches : matches
       end
@@ -633,8 +633,7 @@ module Doing
     end
 
     def split_tags(tags)
-      tags = tags.to_tags if tags.is_a? String
-      tags.map(&:remove_at)
+      tags.to_tags.tags_to_array
     end
   end
 end

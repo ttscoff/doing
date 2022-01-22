@@ -1693,6 +1693,10 @@ command %i[grep search] do |c|
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'default'
 
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
@@ -1808,6 +1812,10 @@ command :last do |c|
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'last'
 
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: settings.dig('search', 'highlight')
 
@@ -1862,6 +1870,7 @@ command :last do |c|
       last = wwid.last(times: true, section: options[:section],
                      options: {
                         config_template: options[:config_template],
+                        template: options[:template],
                         duration: options[:duration],
                         search: options[:search],
                         fuzzy: options[:fuzzy],
@@ -1899,6 +1908,10 @@ command :recent do |c|
   c.desc "Output using a template from configuration"
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'recent'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
 
   c.desc 'Show elapsed time on entries without @done tag'
   c.switch [:duration]
@@ -1944,7 +1957,8 @@ command :recent do |c|
         totals: options[:totals],
         interactive: options[:interactive],
         duration: options[:duration],
-        config_template: options[:config_template]
+        config_template: options[:config_template],
+        template: options[:template]
       }
 
       Doing::Pager::page wwid.recent(count, section.cap_first, opts)
@@ -2063,6 +2077,10 @@ command :show do |c|
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'default'
 
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.desc 'Select section or tag to display from a menu'
   c.switch %i[m menu], negatable: false, default_value: false
 
@@ -2119,7 +2137,7 @@ command :show do |c|
 
     options[:times] = true if options[:totals]
 
-    template = settings['templates']['default'].deep_merge({
+    template = settings['templates'][options[:config_template]].deep_merge({
         'wrap_width' => settings['wrap_width'] || 0,
         'date_format' => settings['default_date_format'],
         'order' => settings['order'] || 'asc',
@@ -2312,6 +2330,10 @@ command :today do |c|
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'today'
 
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
   c.arg_name 'TIME_STRING'
   c.flag [:before]
@@ -2331,7 +2353,7 @@ command :today do |c|
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
-    filter_options = %i[after before duration from section sort_tags totals config_template].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
+    filter_options = %i[after before duration from section sort_tags totals template config_template].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
 
     Doing::Pager.page wwid.today(options[:times], options[:output], filter_options).chomp
   end
@@ -2375,6 +2397,10 @@ command :on do |c|
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'default'
 
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.action do |_global_options, options, args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
@@ -2396,7 +2422,7 @@ command :on do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
-                        { config_template: options[:config_template], duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+                        { template: options[:template], config_template: options[:config_template], duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
 
@@ -2436,6 +2462,10 @@ command :since do |c|
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'default'
 
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
+
   c.action do |_global_options, options, args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
@@ -2457,7 +2487,7 @@ command :since do |c|
     options[:sort_tags] = options[:tag_sort] =~ /^n/i
 
     Doing::Pager.page wwid.list_date([start, finish], options[:section], options[:times], options[:output],
-                        { config_template: options[:config_template], duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
+                        { template: options[:template], config_template: options[:config_template], duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
   end
 end
 
@@ -2720,6 +2750,10 @@ command :yesterday do |c|
   c.desc "Output using a template from configuration"
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'today'
+
+  c.desc 'Override output format with a template string containing %placeholders'
+  c.arg_name 'TEMPLATE_STRING'
+  c.flag [:template]
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
