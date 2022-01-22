@@ -1,16 +1,20 @@
 ### 2.1.23
 
-2022-01-21 18:26
+2022-01-22 12:27
 
 #### NEW
 
-- Display commands accept `--template`, which takes a template string containing %placeholders and overrides the commands default template output. Affects grep, last, on, recent, show, since, today, yesterday
 - All display commands (except view) now accept `--config_template TEMPLATE_KEY` to override that commands default template.
+- Display commands accept `--template`, which takes a template string containing %placeholders and overrides the commands default template output. Affects grep, last, on, recent, show, since, today, yesterday
 
 #### IMPROVED
 
+- Mostly for my own use, `doing changes` (which views the changelog) now accepts `--lookup VERSION` and `--search SEARCH_PATTERN`
+- `doing changes --lookup` accepts `"< 2.1 > 2.0"`, `"2.1.10-2.2"`, a specific version, or a version number with wildcards # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # Date:      Sat Jan 22 12:16:21 2022 -0600 # # On branch develop # Your branch is ahead of 'origin/develop' by 4 commits. # # Changes to be committed: #	modified:   bin/doing #	modified:   lib/doing.rb #	new file:   lib/doing/changelog.rb #	new file:   lib/doing/changelog/change.rb #	new file:   lib/doing/changelog/changes.rb #	new file:   lib/doing/changelog/entry.rb #	new file:   lib/doing/changelog/version.rb #	modified:   lib/doing/item.rb #	modified:   lib/doing/string.rb # # Changes not staged for commit: #	modified:   CHANGELOG.md #
 - `doing tags` takes a MAX_COUNT argument to limit results when searching
 - `doing tags --line` flag to output tags in a single line
+- Mostly for my own use, `doing changes` (which views the changelog) now accepts `--lookup VERSION` and `--search SEARCH_PATTERN`
+- `doing changes --lookup` accepts `"< 2.1 > 2.0"`, `"2.1.10-2.2"`, a specific version, or a version number with wildcards
 
 #### FIXED
 

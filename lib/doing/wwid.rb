@@ -1265,7 +1265,7 @@ module Doing
 
             tag = tag.strip
 
-            if tag =~ /^done$/
+            if tag =~ /^done$/ && opt[:date] && item.should_time?
               max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
               max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
               elapsed = done_date - item.date

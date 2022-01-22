@@ -613,7 +613,7 @@ module Doing
     end
 
     def tag_pattern?(tags)
-      query = to_query(tags)
+      query = tags.to_query
 
       no_tags?(query[:must_not]) && all_tags?(query[:must]) && any_tags?(query[:should])
     end
