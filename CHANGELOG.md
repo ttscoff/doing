@@ -1,3 +1,11 @@
+### 2.1.24
+
+2022-01-22 16:25
+
+#### IMPROVED
+
+- Minor update to Fish completion script
+
 ### 2.1.23
 
 2022-01-22 15:52
