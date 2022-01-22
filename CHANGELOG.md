@@ -6,6 +6,10 @@
 
 - Minor update to Fish completion script
 
+#### FIXED
+
+- Fix changelog issue
+
 ### 2.1.23
 
 2022-01-22 15:52
