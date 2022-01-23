@@ -1,6 +1,6 @@
 ### 2.1.25
 
-2022-01-23 08:28
+2022-01-23 09:20
 
 #### NEW
 
@@ -12,6 +12,7 @@
 
 #### FIXED
 
+- Regex warning on Ruby 2.7
 - :post_entry_added hook was receiving new items couldn't be modified
 
 ### 2.1.24

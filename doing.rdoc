@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.24
+v2.1.25
 
 === Global Options
 === --config_file arg
@@ -165,7 +165,7 @@ Prompt for note via multi-line input
 
 
 ===== -e|--editor
-Edit duplicated entry with vim before adding
+Edit duplicated entry with /opt/homebrew/bin/vim before adding
 
 
 
@@ -625,7 +625,7 @@ Include date
 
 
 ===== -e|--editor
-Edit entry with vim (with no arguments, edits the last entry)
+Edit entry with /opt/homebrew/bin/vim (with no arguments, edits the last entry)
 
 
 
@@ -857,7 +857,7 @@ Show elapsed time on entries without @done tag
 
 
 ===== -e|--editor
-Edit matching entries with vim
+Edit matching entries with /opt/homebrew/bin/vim
 
 
 
@@ -1078,7 +1078,7 @@ Show elapsed time if entry is not tagged @done
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with /opt/homebrew/bin/vim
 
 
 
@@ -1122,7 +1122,7 @@ Prompt for note via multi-line input
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with /opt/homebrew/bin/vim
 
 
 
@@ -1260,7 +1260,7 @@ Prompt for note via multi-line input
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with /opt/homebrew/bin/vim
 
 
 
@@ -1324,7 +1324,7 @@ Prompt for note via multi-line input
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with /opt/homebrew/bin/vim
 
 
 
@@ -1357,11 +1357,19 @@ A parenthetical at the end of the entry will be converted to a note.
 
 Run without arguments to create a new entry interactively.
 
-Run with --editor to create a new entry using vim.
+Run with --editor to create a new entry using /opt/homebrew/bin/vim.
 ===== Options
 ===== -b|--back|--started DATE_STRING
 
 Backdate start time [4pm|20m|2h|"yesterday noon"]
+
+[Default Value] None
+
+
+===== --from TIME_RANGE
+
+Set a start and optionally end time as a date range ("from 1pm to 2:30pm").
+        If an end time is provided, a dated @done tag will be added
 
 [Default Value] None
 
@@ -1386,7 +1394,7 @@ Prompt for note via multi-line input
 
 
 ===== -e|--editor
-Edit entry with vim
+Edit entry with /opt/homebrew/bin/vim
 
 
 
@@ -1457,7 +1465,7 @@ Show time totals at the end of output
 Open the "doing" file in an editor
 
 `doing open` defaults to using the editors->doing_file setting
-in /Users/ttscoff/.config/doing/config.yml (TaskPaper).
+in /Users/ttscoff/.config/doing/config.yml (/opt/homebrew/bin/vim).
 ===== Options
 ===== -a|--app APP_NAME
 

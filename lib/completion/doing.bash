@@ -191,9 +191,9 @@ _doing_note() {
 _doing_now() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--ask --started --editor --finish_last --note --section' -- $token ) )
+    COMPREPLY=( $( compgen -W '--ask --started --editor --finish_last --from --note --section' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-e -f -n -s --ask --started --editor --finish_last --note --section' -- $token ) )
+    COMPREPLY=( $( compgen -W '-e -f -n -s --ask --started --editor --finish_last --from --note --section' -- $token ) )
   
   fi
 }
