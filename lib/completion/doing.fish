@@ -141,8 +141,8 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'archive move' -d Move\ en
 complete -xc doing -n '__fish_doing_needs_command' -a 'autotag' -d Autotag\ last\ entry\ or\ filtered\ entries
 complete -xc doing -n '__fish_doing_needs_command' -a 'cancel' -d End\ last\ X\ entries\ with\ no\ time\ tracked
 complete -xc doing -n '__fish_doing_needs_command' -a 'changes changelog' -d List\ recent\ changes\ in\ Doing
-complete -xc doing -n '__fish_doing_needs_command' -a 'choose' -d Select\ a\ section\ to\ display\ from\ a\ menu
 complete -xc doing -n '__fish_doing_needs_command' -a 'colors' -d List\ available\ color\ variables\ for\ configuration\ templates\ and\ views
+complete -xc doing -n '__fish_doing_needs_command' -a 'commands' -d Enable\ and\ disable\ Doing\ commands
 complete -xc doing -n '__fish_doing_needs_command' -a 'completion' -d Generate\ shell\ completion\ scripts
 complete -xc doing -n '__fish_doing_needs_command' -a 'config' -d Edit\ the\ configuration\ file\ or\ output\ a\ value\ from\ it
 complete -xc doing -n '__fish_doing_needs_command' -a 'done did' -d Add\ a\ completed\ item\ with\ @done\(date\)

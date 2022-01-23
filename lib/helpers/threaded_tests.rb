@@ -18,7 +18,7 @@ class ThreadedTests
     start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     @results = File.expand_path('results.log')
 
-    max_threads = 1000 if max_threads == 0
+    max_threads = 1000 if max_threads.to_i == 0
 
     c = Doing::Color
     c.coloring = true
@@ -27,8 +27,8 @@ class ThreadedTests
 
     tests = Dir.glob(pattern)
 
-    if max_tests > 0
-      tests = tests.slice(0, max_tests - 1)
+    if max_tests.to_i > 0
+      tests = tests.slice(0, max_tests.to_i - 1)
     end
 
     puts "#{tests.count} test files".boldcyan
@@ -89,24 +89,30 @@ class ThreadedTests
       finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
       progress.finish
+    rescue
+      progress.stop
+    ensure
+      msg = @running_tests.map { |t| t[1].format.uncolor.sub(/^\[:bar\] (.*?):status/, "#{c.bold}#{c.white}\\1#{c.reset}#{t[2]}") }.join("\n")
+
+      Doing::Prompt.clear_screen(msg)
 
       output = []
-      if @error_out.count.positive?
-        output << c.boldred("#{@error_out.count} Issues")
-      else
-        output << c.green('Success')
-      end
+      output << if @error_out.count.positive?
+                  c.boldred("#{@error_out.count} Issues")
+                else
+                  c.green('Success')
+                end
       output << c.green("#{@test_total} tests")
       output << c.cyan("#{@assrt_total} assertions")
       output << c.yellow("#{(finish_time - start_time).round(3)}s")
       puts output.join(', ')
 
-      puts @error_out.join("\n----\n".boldwhite) if @error_out.count.positive?
-    rescue
-      progress.stop
+      if @error_out.count.positive?
+        res = Doing::Prompt.yn('Display error report?', default_response: false)
+        Doing::Pager.paginate = true
+        Doing::Pager.page(@error_out.join("\n----\n".boldwhite)) if res
+      end
     end
-  ensure
-    FileUtils.rm(@results)
   end
 
   def run_test(s)
@@ -129,10 +135,12 @@ class ThreadedTests
     end
 
     @running_tests.push(s)
-    out, _err, status = Open3.capture3(ENV, "rake test:#{s[0]} | tee #{@results}", stdin_data: nil)
-    unless status.success?
-      m = out.match(/(?<fail>\d+) failures, (?<err>\d+) errors/)
-      s[2] = ": #{m['fail'].bold.red} #{'failures'.red}, #{m['err'].bold.red} #{'errors'.red}"
+    out, _err, status = Open3.capture3(ENV, 'rake', "test:#{s[0]}", stdin_data: nil)
+    time = out.match(/^Finished in (?<time>\d+\.\d+) seconds\./)
+    count = out.match(/^(?<tests>\d+) tests, (?<assrt>\d+) assertions, (?<fails>\d+) failures, (?<errs>\d+) errors/)
+
+    unless status.success? && !count['fails'].to_i.positive? && !count['errs'].to_i.positive?
+      s[2] = ": #{count['fails'].bold.red} #{'failures'.red}, #{count['errs'].bold.red} #{'errors'.red}"
       bar.update(head: '✖'.boldred)
       bar.advance(head: '✖'.boldred, status: s[2])
 
@@ -144,8 +152,6 @@ class ThreadedTests
       Thread.exit
     end
 
-    time = out.match(/^Finished in (?<time>\d+\.\d+) seconds\./)
-    count = out.match(/^(?<tests>\d+) tests, (?<assrt>\d+) assertions, (?<fails>\d+) failures, (?<errs>\d+) errors/)
     s[2] = [
       ': ',
       count['tests'].green,

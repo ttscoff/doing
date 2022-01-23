@@ -16,8 +16,8 @@ function _doing() {
                   'cancel:End last X entries with no time tracked'
                   'changes:List recent changes in Doing'
                   'changelog:List recent changes in Doing'
-                  'choose:Select a section to display from a menu'
                   'colors:List available color variables for configuration templates and views'
+                  'commands:Enable and disable Doing commands'
                   'completion:Generate shell completion scripts'
                   'config:Edit the configuration file or output a value from it'
                   'done:Add a completed item with @done(date)'
@@ -93,10 +93,10 @@ function _doing() {
             changelog) 
                 args=( {-a,--all}"[Display all versions]" {-l,--lookup=}"[Look up a specific version]" {-s,--search=}"[Show changelogs matching search terms]" )
             ;;
-            choose) 
+            colors) 
                 args=(  )
             ;;
-            colors) 
+            commands) 
                 args=(  )
             ;;
             completion) 

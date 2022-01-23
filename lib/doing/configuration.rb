@@ -29,6 +29,7 @@ module Doing
         'plugin_path' => File.join(Util.user_home, '.config', 'doing', 'plugins'),
         'command_path' => File.join(Util.user_home, '.config', 'doing', 'commands')
       },
+      'disabled_commands' => [],
       'doing_file' => '~/.local/share/doing/what_was_i_doing.md',
       'doing_file_sort' => 'desc',
       'backup_dir' => '~/.local/share/doing/doing_backup',
