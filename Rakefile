@@ -77,9 +77,10 @@ task :dockertest, :version, :login do |_, args|
     file = 'Dockerfile'
   end
 
-  exec "docker run -it #{img} /bin/bash -l" if args[:login]
 
   puts `docker build . --file #{file} -t #{img}`
+
+  exec "docker run -it #{img} /bin/bash -l" if args[:login]
 
   spinner = TTY::Spinner.new('[:spinner] Running tests ...', hide_cursor: true)
 

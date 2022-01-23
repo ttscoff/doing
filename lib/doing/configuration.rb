@@ -45,8 +45,7 @@ module Doing
       'templates' => {
         'default' => {
           'date_format' => '%Y-%m-%d %H:%M',
-          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset
-            %yellow%interval%boldred%duration%dark%white%80_14┃ note',
+          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %boldmagenta[%boldwhite%-10section%boldmagenta]%reset %yellow%interval%boldred%duration%white%80_14┃ note',
           'wrap_width' => 0,
           'order' => 'asc'
         },
@@ -63,8 +62,7 @@ module Doing
         },
         'recent' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset
-            %yellow%interval%boldred%duration%dark%white%80_14┃ note',
+          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %boldmagenta[%boldwhite%-10section%boldmagenta]%reset  %yellow%interval%boldred%duration%white%80_14┃ note',
           'wrap_width' => 88,
           'count' => 10,
           'order' => 'asc'

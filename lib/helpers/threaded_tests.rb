@@ -2,11 +2,13 @@
 
 require 'tty-spinner'
 require 'tty-progressbar'
-require './lib/doing'
 require 'open3'
 require 'shellwords'
 require 'fileutils'
-require_relative 'threaded_tests_string'
+
+$LOAD_PATH.unshift File.join(__dir__, '..')
+require 'doing'
+require 'helpers/threaded_tests_string'
 
 class ThreadedTests
   include Doing::Color
