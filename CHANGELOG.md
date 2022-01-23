@@ -1,10 +1,11 @@
 ### 2.1.26
 
-2022-01-23 10:56
+2022-01-23 11:46
 
 #### NEW
 
-- Use plugins.hidden_commands in configuration to disable any command (array of command names). Note that some commands use aliases and the first name should be used.
+- Use disabled_commands in configuration to disable any command (array of command names). Note that some commands use aliases and the first name should be used.
+- `doing commands [add|remove]` allows interactive enabling and disabling of default and custom commands
 
 #### IMPROVED
 
