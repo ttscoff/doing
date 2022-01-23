@@ -5,6 +5,7 @@ require 'tty-progressbar'
 require './lib/doing'
 require 'open3'
 require 'shellwords'
+require 'fileutils'
 require_relative 'threaded_tests_string'
 
 class ThreadedTests
@@ -13,6 +14,7 @@ class ThreadedTests
 
   def run(pattern: '*', max_threads: 8, max_tests: 0)
     start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    @results = File.expand_path('results.log')
 
     max_threads = 1000 if max_threads == 0
 
@@ -101,10 +103,11 @@ class ThreadedTests
     rescue
       progress.stop
     end
+  ensure
+    FileUtils.rm(@results)
   end
 
   def run_test(s)
-
     bar = s[1]
     s[2] = ": #{'running'.green}"
     bar.advance(status: s[2])
@@ -124,8 +127,7 @@ class ThreadedTests
     end
 
     @running_tests.push(s)
-
-    out, _err, status = Open3.capture3(ENV, 'rake', "test:#{s[0]}", stdin_data: nil)
+    out, _err, status = Open3.capture3(ENV, "rake test:#{s[0]} | tee #{@results}", stdin_data: nil)
     unless status.success?
       m = out.match(/(?<fail>\d+) failures, (?<err>\d+) errors/)
       s[2] = ": #{m['fail'].bold.red} #{'failures'.red}, #{m['err'].bold.red} #{'errors'.red}"

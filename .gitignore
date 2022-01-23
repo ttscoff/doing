@@ -12,3 +12,4 @@ COMMANDS.bak
 !*.secret
 lib/helpers/fzf/bin/fzf
 test/doing_test_backup/
+results.log
