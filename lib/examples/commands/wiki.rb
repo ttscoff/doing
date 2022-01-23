@@ -36,8 +36,7 @@ command :wiki do |c|
   c.switch [:only_timed], default_value: false, negatable: false
 
   c.action do |global, options, args|
-    wwid = global[:wwid]
-    tags = wwid.tag_groups([], opt: options)
+    tags = @wwid.tag_groups([], opt: options)
 
     wiki = Doing::Plugins.plugins.dig(:export, 'wiki', :class)
 
@@ -46,7 +45,7 @@ command :wiki do |c|
 
       raise RuntimeError, 'Missing plugin "wiki"' unless wiki
 
-      out = wiki.render(wwid, items, variables: export_options)
+      out = wiki.render(@wwid, items, variables: export_options)
 
       if out
         FileUtils.mkdir_p('doing_wiki')
@@ -56,13 +55,13 @@ command :wiki do |c|
       end
     end
 
-    template = if wwid.config['export_templates']['wiki_index'] && File.exist?(File.expand_path(wwid.config['export_templates']['wiki_index']))
-                 IO.read(File.expand_path(wwid.config['export_templates']['wiki_index']))
+    template = if @settings['export_templates']['wiki_index'] && File.exist?(File.expand_path(@settings['export_templates']['wiki_index']))
+                 IO.read(File.expand_path(@settings['export_templates']['wiki_index']))
                else
                  wiki.template('wiki_index')
                end
-    style = if wwid.config['export_templates']['wiki_css'] && File.exist?(File.expand_path(wwid.config['export_templates']['wiki_css']))
-              IO.read(File.expand_path(wwid.config['export_templates']['wiki_css']))
+    style = if @settings['export_templates']['wiki_css'] && File.exist?(File.expand_path(@settings['export_templates']['wiki_css']))
+              IO.read(File.expand_path(@settings['export_templates']['wiki_css']))
             else
               wiki.template('wiki_css')
             end

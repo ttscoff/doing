@@ -1,19 +1,18 @@
-### 2.1.25
+### 2.1.26
 
-2022-01-23 09:20
+2022-01-23 10:55
 
 #### NEW
 
-- `doing now --from 'TIME [to TIME]'` flag, sets start date and optionally adds dated @done tag.
+- Use plugins.hidden_commands in configuration to disable any command (array of command names). Note that some commands use aliases and the first name should be used.
 
 #### IMPROVED
 
-- :post_entry_updated hook now receives both the updated item (mutable) and a copy of the original item
+- Moved all commands into separate files for management
 
-#### FIXED
+### 2.1.25
 
-- Regex warning on Ruby 2.7
-- :post_entry_added hook was receiving new items couldn't be modified
+2022-01-23 09:25
 
 ### 2.1.24
 
