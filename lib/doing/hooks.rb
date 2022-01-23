@@ -10,8 +10,8 @@ module Doing
       post_local_config: [],  # wwid
       post_read: [],          # wwid
       pre_entry_add: [],      # wwid, new_entry
-      post_entry_added: [],   # wwid, new_entry.dup
-      post_entry_updated: [], # wwid, entry
+      post_entry_added: [],   # wwid, new_entry
+      post_entry_updated: [], # wwid, entry, old_entry
       post_entry_removed: [], # wwid, entry.dup
       pre_export: [],         # wwid, format, entries
       pre_write: [],          # wwid, file
@@ -57,7 +57,7 @@ module Doing
 
     def self.trigger(event, *args)
       hooks = @registry[event]
-      return if hooks.nil? || hooks.empty?
+      return unless hooks.good?
 
       # sort and call hooks according to priority and load order
       hooks.sort_by { |h| @hook_priority[h] }.each do |hook|

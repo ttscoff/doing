@@ -45,8 +45,7 @@ module Doing
       'templates' => {
         'default' => {
           'date_format' => '%Y-%m-%d %H:%M',
-          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset
-            %yellow%interval%boldred%duration%dark%white%80_14┃ note',
+          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %boldmagenta[%boldwhite%-10section%boldmagenta]%reset %yellow%interval%boldred%duration%white%80_14┃ note',
           'wrap_width' => 0,
           'order' => 'asc'
         },
@@ -63,8 +62,7 @@ module Doing
         },
         'recent' => {
           'date_format' => '%_I:%M%P',
-          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset
-            %yellow%interval%boldred%duration%dark%white%80_14┃ note',
+          'template' => '%reset%cyan%shortdate %boldwhite%80║ title %boldmagenta[%boldwhite%-10section%boldmagenta]%reset  %yellow%interval%boldred%duration%white%80_14┃ note',
           'wrap_width' => 88,
           'count' => 10,
           'order' => 'asc'
@@ -314,7 +312,7 @@ module Doing
 
       @ignore_local = opt[:ignore_local] if opt[:ignore_local]
 
-      config = read_config.dup
+      config = read_config.clone
 
       plugin_config = Util.deep_merge_hashes(DEFAULTS['plugins'], config['plugins'] || {})
 
@@ -322,7 +320,7 @@ module Doing
 
       Plugins.plugins.each do |_type, plugins|
         plugins.each do |title, plugin|
-          plugin_config[title] = plugin[:config] if plugin[:config] && !plugin[:config].empty?
+          plugin_config[title] = plugin[:config] if plugin[:config].good?
           config['export_templates'][title] ||= nil if plugin[:templates] && !plugin[:templates].empty?
         end
       end

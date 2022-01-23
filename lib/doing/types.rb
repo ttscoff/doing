@@ -20,6 +20,7 @@ module Doing
     DateBeginString = Class.new(DateTime)
     DateEndString = Class.new(DateTime)
     DateRangeString = Class.new(Array)
+    DateRangeOptionalString = Class.new(Array)
     DateIntervalString = Class.new(DateTime)
   end
 end

@@ -93,7 +93,7 @@ module Doing
         wwid.content.add_section(item.section) unless wwid.content.section?(item.section)
         Hooks.trigger :pre_entry_add, self, item
         wwid.content.push(item)
-        Hooks.trigger :post_entry_added, self, item.dup
+        Hooks.trigger :post_entry_added, self, item
       end
 
       Doing.logger.info('Imported:', "#{imported.count} items")

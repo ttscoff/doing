@@ -2,64 +2,21 @@
 
 require 'tty-spinner'
 require 'tty-progressbar'
-require './lib/doing'
 require 'open3'
 require 'shellwords'
+require 'fileutils'
 
-class ::String
-  include Doing::Color
-
-  def highlight_errors
-    cols = `tput cols`.strip.to_i
-
-    string = dup
-
-    errs = string.scan(/(?<==\n)(?:Failure|Error):.*?(?=\n=+)/m)
-
-    errs.map! do |error|
-      err = error.dup
-
-      err.gsub!(%r{^(/.*?/)([^/:]+):(\d+):in (.*?)$}) do
-        m = Regexp.last_match
-        "#{m[1].white}#{m[2].bold.white}:#{m[3].yellow}:in #{m[4].cyan}"
-      end
-      err.gsub!(/(Failure|Error): (.*?)\((.*?)\):\n  (.*?)(?=\n)/m) do
-        m = Regexp.last_match
-        [
-          m[1].bold.boldbgred.white,
-          m[3].bold.boldbgcyan.white,
-          m[2].bold.boldbgyellow.black,
-          " #{m[4]} ".bold.boldbgwhite.black.reset
-        ].join(':'.boldblack.boldbgblack.reset)
-      end
-      err.gsub!(/(<.*?>) (was expected to) (.*?)\n( *<.*?>)./m) do
-        m = Regexp.last_match
-        "#{m[1].bold.green} #{m[2].white} #{m[3].boldwhite.boldbgred.reset}\n#{m[4].bold.white}"
-      end
-      err.gsub!(/(Finished in) ([\d.]+) (seconds)/) do
-        m = Regexp.last_match
-        "#{m[1].green} #{m[2].bold.white} #{m[3].green}"
-      end
-      err.gsub!(/(\d+) (failures)/) do
-        m = Regexp.last_match
-        "#{m[1].bold.red} #{m[2].red}"
-      end
-      err.gsub!(/100% passed/) do |m|
-        m.bold.green
-      end
-
-      err
-    end
-
-    errs.join("\n#{('=' * cols).blue}\n")
-  end
-end
+$LOAD_PATH.unshift File.join(__dir__, '..')
+require 'doing'
+require 'helpers/threaded_tests_string'
 
 class ThreadedTests
   include Doing::Color
+  include ThreadedTestString
 
   def run(pattern: '*', max_threads: 8, max_tests: 0)
     start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    @results = File.expand_path('results.log')
 
     max_threads = 1000 if max_threads == 0
 
@@ -90,13 +47,21 @@ class ThreadedTests
     ].join('')
     progress = TTY::ProgressBar::Multi.new(banner,
                                            width: 12,
+                                           clear: true,
                                            hide_cursor: true)
     @children = []
     tests.each do |t|
       test_name = File.basename(t, '.rb').sub(/doing_(.*?)_test/, '\1')
       new_sp = progress.register("[#{':bar'.cyan}] #{test_name.bold.white}:status",
-                                 total: 4, width: 1, head: ' ', unknown: ' ', hide_cursor: true, clear: true)
-      @children.push([test_name, new_sp, nil])
+                                 total: tests.count + 8,
+                                 width: 1,
+                                 head: ' ',
+                                 unknown: ' ',
+                                 hide_cursor: true,
+                                 clear: true)
+      status = ': waiting'.dark.yellow.reset
+      @children.push([test_name, new_sp, status])
+      # new_sp.advance(status: ': waiting'.dark.yellow.reset)
     end
 
     @elapsed = 0.0
@@ -140,30 +105,36 @@ class ThreadedTests
     rescue
       progress.stop
     end
+  ensure
+    FileUtils.rm(@results)
   end
 
   def run_test(s)
-
     bar = s[1]
-    bar.advance(status: ": #{'running'.green}")
+    s[2] = ": #{'running'.green}"
+    bar.advance(status: s[2])
 
     if @running_tests.count.positive?
-      prev_bar = @running_tests[-1][1]
-      unless prev_bar.complete?
-        prev_bar.update(head: ' ', unfinished: ' ')
-        prev_bar.advance(status: ": #{'running'.green}")
+      @running_tests.each do |b|
+        prev_bar = b[1]
+        if prev_bar.complete?
+          prev_bar.reset
+          prev_bar.advance(status: b[2])
+          prev_bar.finish
+        else
+          prev_bar.update(head: ' ', unfinished: ' ')
+          prev_bar.advance(status: b[2])
+        end
       end
     end
 
     @running_tests.push(s)
-
-
-    out, _err, status = Open3.capture3(ENV, 'rake', "test:#{s[0]}", stdin_data: nil)
+    out, _err, status = Open3.capture3(ENV, "rake test:#{s[0]} | tee #{@results}", stdin_data: nil)
     unless status.success?
       m = out.match(/(?<fail>\d+) failures, (?<err>\d+) errors/)
-      status = ": #{m['fail'].bold.red} #{'failures'.red}, #{m['err'].bold.red} #{'errors'.red}"
+      s[2] = ": #{m['fail'].bold.red} #{'failures'.red}, #{m['err'].bold.red} #{'errors'.red}"
       bar.update(head: '✖'.boldred)
-      bar.advance(head: '✖'.boldred, status: status)
+      bar.advance(head: '✖'.boldred, status: s[2])
 
       # errs = out.scan(/(?:Failure|Error): [\w_]+\((?:.*?)\):(?:.*?)(?=\n=======)/m)
       @error_out.push(out.highlight_errors)
@@ -175,7 +146,7 @@ class ThreadedTests
 
     time = out.match(/^Finished in (?<time>\d+\.\d+) seconds\./)
     count = out.match(/^(?<tests>\d+) tests, (?<assrt>\d+) assertions, (?<fails>\d+) failures, (?<errs>\d+) errors/)
-    status = [
+    s[2] = [
       ': ',
       count['tests'].green,
       '/',
@@ -190,7 +161,7 @@ class ThreadedTests
       's'
     ].join('')
     bar.update(head: '✔'.boldgreen)
-    bar.advance(head: '✔'.boldgreen, status: status)
+    bar.advance(head: '✔'.boldgreen, status: s[2])
     @test_total += count['tests'].to_i
     @assrt_total += count['assrt'].to_i
     @elapsed += time['time'].to_f

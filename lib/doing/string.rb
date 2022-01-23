@@ -108,7 +108,7 @@ module Doing
         escapes = scan(/(\e\[[\d;]+m)[^\e]+@/)
         color = color.split(' ') unless color.is_a?(Array)
         tag_color = color.each_with_object([]) { |c, arr| arr << Doing::Color.send(c) }.join('')
-        last_color = if !escapes.empty?
+        last_color = if escapes.good?
                        (escapes.count > 1 ? escapes[-2..-1] : [escapes[-1]]).map { |v| v[0] }.join('')
                      else
                        Doing::Color.default

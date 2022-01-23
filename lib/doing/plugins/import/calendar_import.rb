@@ -89,7 +89,7 @@ module Doing
 
       wwid.content.concat(new_items)
 
-      new_items.map { |item| Hooks.trigger :post_entry_added, self, item.dup }
+      new_items.map { |item| Hooks.trigger :post_entry_added, self, item }
 
       Doing.logger.info(%(Imported #{new_items.count} items to #{section}))
     end

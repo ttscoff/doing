@@ -1,3 +1,20 @@
+### 2.1.25
+
+2022-01-23 09:20
+
+#### NEW
+
+- `doing now --from 'TIME [to TIME]'` flag, sets start date and optionally adds dated @done tag.
+
+#### IMPROVED
+
+- :post_entry_updated hook now receives both the updated item (mutable) and a copy of the original item
+
+#### FIXED
+
+- Regex warning on Ruby 2.7
+- :post_entry_added hook was receiving new items couldn't be modified
+
 ### 2.1.24
 
 2022-01-22 17:27

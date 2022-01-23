@@ -123,7 +123,7 @@ module Doing
     ## @return     [String] Rendered output
     ##
     def self.render(wwid, items, variables: {})
-      return if items.nil? || items.empty?
+      return unless items.good?
 
       # the :options key includes the flags passed to the
       # command that called the plugin use `puts
@@ -164,7 +164,7 @@ module Doing
 
       if wwid.config['export_templates'].key?('say')
         cfg_tpl = wwid.config['export_templates']['say']
-        tpl = cfg_tpl unless cfg_tpl.nil? || cfg_tpl.empty?
+        tpl = cfg_tpl if cfg_tpl.good?
       end
       output = tpl.dup
       output.gsub!(/%date/, date)
