@@ -43,7 +43,7 @@ class DoingConfigTest < Test::Unit::TestCase
     user_config = YAML.load(IO.read(@config_file))
     path = ['plugins', 'say', 'say_voice']
     setting = user_config.dig(*path)
-    res = doing('config', '--dump', "#{path.join('.')}")
+    res = doing('config', 'get', "#{path.join('.')}")
     assert_match(/#{setting}/, res, 'Correct config setting should be returned to STDOUT')
   end
 

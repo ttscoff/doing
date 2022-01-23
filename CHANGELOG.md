@@ -1,6 +1,6 @@
 ### 2.1.26
 
-2022-01-23 13:32
+2022-01-23 16:14
 
 #### NEW
 
@@ -464,9 +464,13 @@ Build automation test
 
 ### 1.0.93
 
+#### FIXED
+
 - Gemfile error
 
 ### 1.0.91
+
+#### NEW
 
 - "taskpaper" format available for all output options
 - "markdown" format available for all output commands (GFM-style task list, customizable template)
@@ -475,22 +479,33 @@ Build automation test
 
 ### 1.0.90
 
-- Minor fix for shell command in doing select
-- Fix for doing finish `--auto` when matched item is last in list
+#### IMPROVED
+
 - doing finish `--auto` now pulls from all sections, not just the section of the target entry
 
+#### FIXED
+
+- Minor fix for shell command in doing select
+- Fix for doing finish `--auto` when matched item is last in list
+
 ### 1.0.89
+
+#### NEW
 
 - Pretty print JSON output
 - `--no-menu` option for select command to use `--query` as a filter and act on matching entries without displaying menu
 
 ### 1.0.88
 
+#### IMPROVED
+
 - Add `--before` and `--after` time search to yesterday command
 - Add `--before` and `--after` date search to search/grep command
 - Add `--tag_order` to yesterday command
 
 ### 1.0.87
+
+#### IMPROVED
 
 - Add leading spaces to make %shortdate align properly, at least for the last week
 - Add `--tag`, `--bool`, and `--search` to view command
@@ -502,43 +517,72 @@ Build automation test
 
 ### 1.0.86
 
+#### IMPROVED
+
 - Add `count` config option for templates->recent
 
 ### 1.0.85
 
-- Fix `--auto` for finish command
+#### IMPROVED
+
 - Add `--before` DATE_STRING to archive and rotate commands
 - Only create on rotate file per day, merge new entries into existing file
 
+#### FIXED
+
+- Fix `--auto` for finish command
+
 ### 1.0.84
 
+#### NEW
+
 - `rotate` command for archiving entries to new file
+
+#### FIXED
+
 - Fixed current_section config key not being honored in some commands
 
 ### 1.0.83
+
+#### FIXED
 
 - Fixes for `doing view` options, additional config keys for views
 
 ### 1.0.82
 
+#### FIXED
+
 - Bugfixes
 
 ### 1.0.81
+
+#### IMPROVED
 
 - fzf menu improvements
 - allow multiple selections `doing select` action menu
 
 ### 1.0.80
 
+#### IMPROVED
+
 - Convert all menus to fzf screens
 
 ### 1.0.79
 
-- Gem missing fzf
+#### IMPROVED
+
 - Wildcard tag removal using `doing select -t "tag*" -r`
 - fzf menu display polish
 
+#### FIXED
+
+#### FIXED
+
+- Gem missing fzf
+
 ### 1.0.78
+
+#### IMPROVED
 
 - If no action is specified with select command, an interactive menu is
 presented
@@ -547,65 +591,97 @@ presented
 
 ### 1.0.76
 
+#### IMPROVED
+
 - Refine editing multiple selections (doing select)
 
 ### 1.0.74
+
+#### NEW
 
 - Add `--tag` and `--search` flags to tag command to tag all entries matching search terms
 - Add since command, which is the same as `doing on tuesday to now` but `doing since tuesday` just feels more intuitive. 
 
 ### 1.0.73
 
+#### FIXED
+
 - Fix for timeline output
 
 ### 1.0.72
+
+#### NEW
 
 - Add `doing select` to show menu of all tasks, searchable with fuzzy matching and the ability to perform certain tasks on multiple selections.
 
 ### 1.0.71
 
+#### FIXED
+
 - Fix for template command not working at all
 
 ### 1.0.70
+
+#### FIXED
 
 - Fix for `doing done --took 30m` setting the wrong @done timestamp when completing previous item
 
 ### 1.0.69
 
+#### IMPROVED
+
 - Add `--unfinished` option to finish and cancel commands
 
 ### 1.0.68
+
+#### FIXED
 
 - Fix error in `doing show --sort` argument parsing
 
 ### 1.0.67
 
+#### FIXED
+
 - Gem packaging error
 
 ### 1.0.66
 
-- Fix for some long flags being interpreted as arrays instead of strings
+#### IMPROVED
+
 - More flexible boolean specification, can be: all, and, any, or, not, or none
+
+#### FIXED
+
+- Fix for some long flags being interpreted as arrays instead of strings
 - Fix for archive command not removing original entries from archived section
 
 ### 1.0.65
+
+#### IMPROVED
 
 - Prevent duplicates/overlapping entries when importing
 
 ### 1.0.64
 
+#### NEW
+
 - Initial import feature for Timing.app reports
 
 ### 1.0.63
 
-- README updates
+#### IMPROVED
+
 - If `doing done --took=X` results in completion date greater than current time, use current time as completion date and backdate the entry's timestamp to fit
 
 ### 1.0.62
 
-- Fix: `doing done` with `--took=` and without `--back=` should set end time to start date plus `--took` value
+#### FIXED
+
+- `doing done` with `--took=` and without `--back=` should set end time to start date plus `--took` value
 
 ### 1.0.61
+
+#### IMPROVED
 
 - Add `--search` filter to `doing archive`
 
@@ -703,13 +779,19 @@ presented
 
 ### 1.0.49
 
+#### FIXED
+
 - Fix for missing date on @done tags
 
 ### 1.0.48
 
+#### FIXED
+
 - Fix confirmation dialog for `doing tag -a -c 0` (autotag all)
 
 ### 1.0.47
+
+#### IMPROVED
 
 - Remove check for file existence before attempting to run run_after script
 - Don't autotag entries restarted with `again/resume`
@@ -717,61 +799,89 @@ presented
 
 ### 1.0.46
 
+#### IMPROVED
+
 - Code cleanup
 
 ### 1.0.45
+
+#### IMPROVED
 
 - Only execute run_after script if changes are written
 
 ### 1.0.44
 
+#### IMPROVED
+
 - Remove unnecessary console logging
 
 ### 1.0.43
+
+#### NEW
 
 - Add `again` command to repeat last entry without @done tag
 - Add `run_after` configuration option to execute external script after any change
 
 ### 1.0.42
 
+#### FIXED
+
 - Fix note indentation in doing file
 
 ### 1.0.41
+
+#### FIXED
 
 - Fix for repeated backreferences in tag transform
 
 ### 1.0.40
 
+#### IMPROVED
+
 - Add `--tag_sort` to all subcommands with `--totals` option
 
 ### 1.0.39
+
+#### NEW
 
 - Tag transforms
 - Option to sort tags by name in `--totals`
 
 ### 1.0.33
 
+#### FIXED
+
 - Gem dependency updates
 
 ### 1.0.30
+
+#### FIXED
 
 - Fix for array comparison error
 
 ### 1.0.29
 
+#### FIXED
+
 - Bugfixes
 
 ### 1.0.28
+
+#### IMPROVED
 
 - Global option `-x` to skip autotags and default_tags from global/local .doingrc
 - Remove extra spaces when creating entry
 
 ### 1.0.27
 
+#### IMPROVED
+
 - More graceful writing of default config (~/.doingrc) on first run
 - Repaired testing setup. Needs moar tests.
 
 ### 1.0.26
+
+#### IMPROVED
 
 - Add `--at` flag for `doing done`, e.g. `doing done --at=1:35pm --took=15m A new task I already finished`
 - Allow decimal quantities when using natural language for hours or days, e.g. `--took=2.5h`
@@ -779,11 +889,17 @@ presented
 
 ### 1.0.25
 
+#### IMPROVED
+
+#### IMPROVED
+
 - Smarter method of getting user $HOME
 - Improved avoiding duplicate tags when autotagging
 - Improved autotag reporting
 
 ### 1.0.24
+
+#### IMPROVED
 
 - `doing note` operates on whatever is most recent, not just the last note in Currently
 - `doing tag` with no count specified operates on most recent entry in any section, not just Currently
@@ -793,6 +909,8 @@ presented
 
 ### 1.0.23
 
+#### IMPROVED
+
 - Apply default_tags after autotagging to avoid tags triggering tags
 - Set `doing recent` to default to All sections instead of Currently
 - Fix error in time reporting
@@ -800,24 +918,41 @@ presented
 
 ### 1.0.22
 
-- Fix handling of "local" config files, allowing per-project configurations
+#### IMPROVED
+
 - Allow cascading of local config files
 - Allow `doing today` and `yesterday` to specify a section
 
+#### FIXED
+
+- Fix handling of "local" config files, allowing per-project configurations
+
 ### 1.0.21
+
+#### NEW
 
 - Add legitimate regex search capabilities
 - Synonyms for grep (search) and now (next)
+
+#### FIXED
+
 - CSS fix
 
 ### 1.0.20
 
-- Rewrite HTML export templates with responsive layout and typography
-- Ability to customize the HTML output using HAML and CSS
+#### NEW
+
 - New command `doing templates` to export default templates for HAML and CSS
 - New config options under `html_template` for `haml` and `css`
 
+#### IMPROVED
+
+- Rewrite HTML export templates with responsive layout and typography
+- Ability to customize the HTML output using HAML and CSS
+
 ### 1.0.19
+
+#### IMPROVED
 
 - For `doing note -e` include the entry title so you know what you're adding a note to
 - For any other command that allows `-e` include a comment noting that anything after the first line creates a note
@@ -826,25 +961,36 @@ presented
 
 ### 1.0.18
 
-- Fix `undefined method [] for nil class` error in `doing view`
+#### IMPROVED
+
 - Loosened up the template color resetting a bit more
 
+#### FIXED
+
+- Fix `undefined method [] for nil class` error in `doing view`
+
 ### 1.0.17
+
+#### NEW
 
 - Add `--stdout` global option to send reporting to STDOUT instead of STDERR (for use with LaunchBar et al)
 
 ### 1.0.16
 
+#### FIXED
+
 - Fixes overzealous color resetting
 
 ### 1.0.15
+
+#### FIXED
 
 - CLI/text totals block was outputting when HTML output was selected
 - Have all template colors reset bold and background automatically when called
 
 ### 1.0.14
 
-Catching up on the changelog. Kind of. A lot has happened, mostly fixes.
+#### IMPROVED
 
 - Fish completion
 - views and sections subcommands have -c option to output single column
@@ -854,149 +1000,175 @@ Catching up on the changelog. Kind of. A lot has happened, mostly fixes.
 
 ### 1.0.13
 
+#### FIXED
+
 - Fix gsub error in doing meanwhile
 
 ### 1.0.8pre
 
-* JSON output option to view commands
-* Added autotagging to tag command
-* date filtering, improved date language
-* added doing on command
-* let view templates define output format (csv, json, html, template)
-    * add `%chompnote` template variable (item note with newlines and extra whitespace stripped)
+#### NEW
+
+- added doing on command
+- Added autotagging to tag command
+- JSON output option to view commands
+- date filtering, improved date language
+- let view templates define output format (csv, json, html, template)
+
+#### IMPROVED
+
+- add `%chompnote` template variable (item note with newlines and extra whitespace stripped)
 
 ### 1.0.7pre
 
-* fix for `-v` option
-* Slightly fuzzier searching in the grep command
-* cleaner exits, `only_timed` key for view configs
-* making the note command append new notes better, and load existing notes in the editor if `-e` is called
-* handle multiple tag input in `show` tag filter
-* Global tag operations, better reporting
+#### IMPROVED
+
+- Slightly fuzzier searching in the grep command
+- cleaner exits, `only_timed` key for view configs
+- making the note command append new notes better, and load existing notes in the editor if `-e` is called
+- handle multiple tag input in `show` tag filter
+- Global tag operations, better reporting
+
+#### FIXED
+
+- fix for `-v` option
 
 ### 1.0.4pre
 
-* Improved HTML output
-* `--only_timed` option for view/show commands that only outputs items with elapsed timers (interval between start and done dates)
-* add seconds for timed items in CSV output, run `--only_timed` before chopping off `--count #`
-* fix for 1.8.7 `Dir.home` issue
-* version bump
-* don't show tag totals with zero times
-* zsh completion for doing
-* HTML styling
-* `--only_timed` option
-* added zsh completion file to `README.md`
-* add zsh completion file
+#### IMPROVED
+
+- Improved HTML output
+- `--only_timed` option for view/show commands that only outputs items with elapsed timers (interval between start and done dates)
+- add seconds for timed items in CSV output, run `--only_timed` before chopping off `--count #`
+- fix for 1.8.7 `Dir.home` issue
+- version bump
+- don't show tag totals with zero times
+- zsh completion for doing
+- HTML styling
+- `--only_timed` option
+- added zsh completion file to `README.md`
+- add zsh completion file
 
 ### 1.0.3pre
 
-* `done` command: making `--took` modify start time if `--back` isn't specified
-* Cleaned up time totals, improved HTML output
-* fixes for `--back` and `--took` parsing
-* Adding more complete terminal reporting to archive command
+#### IMPROVED
+
+- `done` command: making `--took` modify start time if `--back` isn't specified
+- Cleaned up time totals, improved HTML output
+- fixes for `--back` and `--took` parsing
+- Adding more complete terminal reporting to archive command
 
 ### 1.0.0pre
 
-* Skipped ahead in the version numbering. Because I don't care.
-* Added a `note` command and `--note` flags for entry creation commands
+#### IMPROVED
 
-* * * 
+- Skipped ahead in the version numbering. Because I don't care.
+- Added a `note` command and `--note` flags for entry creation commands
 
 ### 0.2.6pre
 
-* `--totals`, `--[no-]times`, `--output [csv,html]` options for `yesterday` command.
-* Add tests for Darwin to hide OS X-only features on other systems
-* `-f` flag to `now` command for finishing last task when starting a new one (Looks back for the last unfinished task in the list)
-* `--took` option for `done` and `finish` for specifying intervals from the start date for the completion date
-* Basic command line reporting
-* `--auto` flag for `finish` and `done` that will automatically set the completion time to 1 minute before the next start time in the list. You can use it retroactively to add times to sequential todos.
-* `doing grep` for searching by text or regex
+#### IMPROVED
+
+- `--totals`, `--[no-]times`, `--output [csv,html]` options for `yesterday` command.
+- Add tests for Darwin to hide OS X-only features on other systems
+- `-f` flag to `now` command for finishing last task when starting a new one (Looks back for the last unfinished task in the list)
+- `--took` option for `done` and `finish` for specifying intervals from the start date for the completion date
+- Basic command line reporting
+- `--auto` flag for `finish` and `done` that will automatically set the completion time to 1 minute before the next start time in the list. You can use it retroactively to add times to sequential todos.
+- `doing grep` for searching by text or regex
 
 ### 0.2.5
 
-* Default to showing times #26, show totals even if no tags exist #27, fix indentation #29
-* Add section label to archived tasks automatically, excepting `Currently` section
-* Today outputs and backdate for finish
-* HTML styling and fix for 1.8.7 HAML errors
-* Look, HTML output! (`--output html`)
-* Also, `--output csv`
-* let doing `archive` function on all sections
-* option to exclude date from _@done_,  
-* output newlines in sections and views
-* Flagging (`doing mark`)
-* fix for view/section guess error
-* Adding tag filtering to archive command (`doing archive \@done`)
-* `doing yesterday`
-* `doing done -r` to remove last doing tag (optionally from `-s Section`)
-* Add `-f` flag to specify alternate doing file
-* `meanwhile` command
+#### IMPROVED
+
+- Default to showing times #26, show totals even if no tags exist #27, fix indentation #29
+- Add section label to archived tasks automatically, excepting `Currently` section
+- Today outputs and backdate for finish
+- HTML styling and fix for 1.8.7 HAML errors
+- Look, HTML output! (`--output html`)
+- Also, `--output csv`
+- let doing `archive` function on all sections
+- option to exclude date from _@done_,  
+- output newlines in sections and views
+- Flagging (`doing mark`)
+- fix for view/section guess error
+- Adding tag filtering to archive command (`doing archive \@done`)
+- `doing yesterday`
+- `doing done -r` to remove last doing tag (optionally from `-s Section`)
+- Add `-f` flag to specify alternate doing file
+- `meanwhile` command
 
 ### 0.2.1
+
+#### IMPROVED
 
 - CSV output for show command (`--csv`)
 - HTML output for show command (`--output html`)
 - fuzzy searching for all commands that specify a view. 
-  - In the terminal, you'll see "Assume you meant XXX" to show what match it found, but this is output to STDERR (and won't show up if you're redirecting the output or using it in GeekTool, etc.)
+- In the terminal, you'll see "Assume you meant XXX" to show what match it found, but this is output to STDERR (and won't show up if you're redirecting the output or using it in GeekTool, etc.)
 - `tags_color` in view config to highlight tags at the end of the lines. Can be set to any of the `%colors`.
 - Basic time tracking. 
-  - `-t` on `show` and `view` will turn on time calculations
-  - Intervals between timestamps and dated _@done_ tags are calculated for each line, if the tag exists. 
-  - You must include a `%interval` token in the appropriate template for it to show
-  - _@start(date)_ tags can optionally be used to override the timestamp in the calculation
-  - Any other tags in the line have that line's total added to them
-  - Totals for tags can be displayed at the end of output with `--totals`
+- `-t` on `show` and `view` will turn on time calculations
+- Intervals between timestamps and dated _@done_ tags are calculated for each line, if the tag exists. 
+- You must include a `%interval` token in the appropriate template for it to show
+- _@start(date)_ tags can optionally be used to override the timestamp in the calculation
+- Any other tags in the line have that line's total added to them
+- Totals for tags can be displayed at the end of output with `--totals`
 
 
 ### 0.2.0
 
+#### IMPROVED
+
 - `doing done` without argument tags last entry done
-  - `-a` archives them
+- `-a` archives them
 - `doing finish` or `doing finish X` marks last X entries done
-  - `-a` archives them
+- `-a` archives them
 - `doing tag tag1 [tag2]` tags last entry or `-c X` entries
-  - `doing tag -r tag1 [tag2]` removes said tag(s)
+- `doing tag -r tag1 [tag2]` removes said tag(s)
 - custom views additions
-  - custom views can include `tags` and `tags_bool`
-    - `tags` is a space-separated list of tags to filter the results by
-    - `tags_bool` defines `AND` (all tags must exist), `OR` (any tag exists), or `NONE` (none of the tags exist)
-  - `order` key (`asc` or `desc`) defines output sort order by date
-  - section key can be set to `All` to combine sections
+- custom views can include `tags` and `tags_bool`
+- `tags` is a space-separated list of tags to filter the results by
+- `tags_bool` defines `AND` (all tags must exist), `OR` (any tag exists), or `NONE` (none of the tags exist)
+- `order` key (`asc` or `desc`) defines output sort order by date
+- section key can be set to `All` to combine sections
 - `doing show` updates
-  - accepts `all` as a section
-  - arguments following section name are tags to filter by
-    - `-b` sets boolean (`AND`, `OR`, `NONE`) or (`ALL`, `ANY`, `NONE`) (default `OR`/`ANY`)
-  - use `-c X` to limit results
-  - use `-s` to set sort order (`asc` or `desc`)
-  - use `-a` to set age (`newest` or `oldest`)
+- accepts `all` as a section
+- arguments following section name are tags to filter by
+- `-b` sets boolean (`AND`, `OR`, `NONE`) or (`ALL`, `ANY`, `NONE`) (default `OR`/`ANY`)
+- use `-c X` to limit results
+- use `-s` to set sort order (`asc` or `desc`)
+- use `-a` to set age (`newest` or `oldest`)
 - fuzzy section guessing when specified section isn't found
 - fuzzy view guessing for `doing view` command
 
-* * *
-
 ### 0.1.9
+
+#### IMPROVED
 
 - colors in templated output
 - `open` command
-  - opens in the default app for file type
-  - `-a APPNAME` (`doing open -a TaskPaper`)
-  - `-b bundle_id` (`doing open -b com.sublimetext.3`)
+- opens in the default app for file type
+- `-a APPNAME` (`doing open -a TaskPaper`)
+- `-b bundle_id` (`doing open -b com.sublimetext.3`)
 - `-e` switch for `now`, `later` and `done` commands
-  - save a tmp file and open it in an editor
-  - allows multi-line entries, anything after first line is considered a note
-  - assumed when no input is provided (`doing now`)
+- save a tmp file and open it in an editor
+- allows multi-line entries, anything after first line is considered a note
+- assumed when no input is provided (`doing now`)
 - `doing views` shows all available custom views
 - `doing view` without a view name will let you choose a view from a menu
 - `doing archive` fixed so that `-k X` works to keep `X` number of entries in the section
 
 ### 0.1.7
 
+#### IMPROVED
+
 - colors in templated output
 - `open` command
-  - opens in the default app for file type
-  - `-a APPNAME` (`doing open -a TaskPaper`)
-  - `-b bundle_id` (`doing open -b com.sublimetext.3`)
+- opens in the default app for file type
+- `-a APPNAME` (`doing open -a TaskPaper`)
+- `-b bundle_id` (`doing open -b com.sublimetext.3`)
 - `-e` switch for `now`, `later`, and `done` commands
-  - save a tmp file and open it in an editor
-  - allows multi-line entries, anything after first line is considered a note
-  - assumed when no input is provided (`doing now`)
+- save a tmp file and open it in an editor
+- allows multi-line entries, anything after first line is considered a note
+- assumed when no input is provided (`doing now`)
 

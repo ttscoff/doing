@@ -171,8 +171,8 @@ flag %i[f doing_file]
 
 def add_commands(commands)
   commands = [commands] unless commands.is_a?(Array)
-  hidden = @settings.dig('plugins', 'hidden_commands')
-  hidden = hidden.set_type('array') unless hidden.is_a?(Array)
+  hidden = @settings['disabled_commands']
+  hidden = hidden.set_type('array') if hidden.good? && !hidden.is_a?(Array)
   commands.delete_if { |c| hidden.include?(c) }
   commands.each { |cmd| require_relative "commands/#{cmd}" }
 end

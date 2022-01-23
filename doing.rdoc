@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.25
+v2.1.26
 
 === Global Options
 === --config_file arg
@@ -434,14 +434,24 @@ Display all versions
 
 
 
-==== Command: <tt>choose </tt>
-Select a section to display from a menu
-
-
 ==== Command: <tt>colors </tt>
 List available color variables for configuration templates and views
 
 
+==== Command: <tt>commands </tt>
+Enable and disable Doing commands
+
+
+===== Commands
+====== Command: <tt>add|enable  COMMAND [COMMAND...]</tt>
+Enable Doing commands
+
+Run without arguments to select commands from a list.
+====== Command: <tt>remove|disable </tt>
+Disable Doing commands
+
+
+[Default Command] add
 ==== Command: <tt>completion </tt>
 Generate shell completion scripts
 

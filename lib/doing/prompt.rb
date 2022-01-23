@@ -8,6 +8,14 @@ module Doing
 
       include Color
 
+      ##
+      ## Clear the terminal screen
+      ##
+      def clear_screen(msg = nil)
+        puts "\e[H\e[2J" if STDOUT.tty?
+        puts msg if msg.good?
+      end
+
       def force_answer
         @force_answer ||= nil
       end
