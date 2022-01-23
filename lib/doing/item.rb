@@ -399,7 +399,7 @@ module Doing
 
     # outputs item in Doing file format, including leading tab
     def to_s
-      "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.empty? ? '' : "\n#{@note}"}"
+      "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.good? ? "\n#{@note}" : ''}"
     end
 
     ##
@@ -427,6 +427,10 @@ module Doing
     def inspect
       # %(<Doing::Item @date=#{@date} @title="#{@title}" @section:"#{@section}" @note:#{@note.to_s}>)
       %(<Doing::Item @date=#{@date}>)
+    end
+
+    def clone
+      Marshal.load(Marshal.dump(self))
     end
 
     private
@@ -457,7 +461,7 @@ module Doing
     end
 
     def all_searches?(searches, case_type: :smart)
-      return true if searches.nil? || searches.empty?
+      return true unless searches.good?
 
       text = @title + @note.to_s
       searches.each do |s|
@@ -468,7 +472,7 @@ module Doing
     end
 
     def no_searches?(searches, case_type: :smart)
-      return true if searches.nil? || searches.empty?
+      return true unless searches.good?
 
       text = @title + @note.to_s
       searches.each do |s|
@@ -479,7 +483,7 @@ module Doing
     end
 
     def any_searches?(searches, case_type: :smart)
-      return true if searches.nil? || searches.empty?
+      return true unless searches.good?
 
       text = @title + @note.to_s
       searches.each do |s|
@@ -490,7 +494,7 @@ module Doing
     end
 
     def all_tags?(tags)
-      return true if tags.nil? || tags.empty?
+      return true unless tags.good?
 
       tags.each do |tag|
         return false unless @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
@@ -499,7 +503,7 @@ module Doing
     end
 
     def no_tags?(tags)
-      return true if tags.nil? || tags.empty?
+      return true unless tags.good?
 
       tags.each do |tag|
         return false if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
@@ -508,7 +512,7 @@ module Doing
     end
 
     def any_tags?(tags)
-      return true if tags.nil? || tags.empty?
+      return true unless tags.good?
 
       tags.each do |tag|
         return true if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
@@ -537,7 +541,7 @@ module Doing
     end
 
     def any_values?(queries)
-      return true if queries.nil? || queries.empty?
+      return true unless queries.good?
 
       queries.each do |q|
         parts = split_value_query(q)
@@ -547,7 +551,7 @@ module Doing
     end
 
     def all_values?(queries)
-      return true if queries.nil? || queries.empty?
+      return true unless queries.good?
 
       queries.each do |q|
         parts = split_value_query(q)
@@ -557,7 +561,7 @@ module Doing
     end
 
     def no_values?(queries)
-      return true if queries.nil? || queries.empty?
+      return true unless queries.good?
 
       queries.each do |q|
         parts = split_value_query(q)

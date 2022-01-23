@@ -69,7 +69,7 @@ end
 
 accept TemplateName do |value|
   res = settings['templates'].keys.select { |k| k =~ value.to_rx(distance: 2) }
-  raise InvalidArgument, "Unknown template: #{value}" if res.empty?
+  raise InvalidArgument, "Unknown template: #{value}" unless res.good?
 
   res.group_by(&:length).min.last[0]
 end
@@ -101,6 +101,13 @@ accept DateRangeString do |value|
   raise InvalidTimeExpression, 'Invalid range' unless start
 
   finish ||= Time.now
+  [start, finish]
+end
+
+accept DateRangeOptionalString do |value|
+  start, finish = value.split_date_range
+  raise InvalidTimeExpression, 'Invalid range' unless start
+
   [start, finish]
 end
 
@@ -253,7 +260,7 @@ command %i[again resume] do |c|
 
     options[:note] = note
 
-    opts = options.dup
+    opts = options.clone
 
     opts[:tag] = tags
     opts[:tag_bool] = options[:bool].normalize_bool
@@ -504,7 +511,7 @@ command %i[done did] do |c|
           raise NoResults, 'No results'
         end
 
-        old_entry = last_entry.dup
+        old_entry = last_entry.clone
         last_entry.note.add(note)
         input = ["#{last_entry.date.strftime('%F %R | ')}#{last_entry.title}", last_entry.note.strip_lines.join("\n")].join("\n")
       else
@@ -513,13 +520,13 @@ command %i[done did] do |c|
       end
 
       input = wwid.fork_editor(input).strip
-      raise EmptyInput, 'No content' unless input && !input.empty?
+      raise EmptyInput, 'No content' unless input.good?
 
       d, title, note = wwid.format_input(input)
 
       if options[:ask]
         ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
-        note.add(ask_note) unless ask_note.empty?
+        note.add(ask_note) if ask_note.good?
       end
 
       date = d.nil? ? date : d
@@ -535,15 +542,16 @@ command %i[done did] do |c|
       if (is_new)
         Doing::Hooks.trigger :pre_entry_add, wwid, new_entry
         wwid.content.push(new_entry)
-        Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
+        Doing::Hooks.trigger :post_entry_added, wwid, new_entry
       else
+        old = old_entry.clone
         wwid.content.update_item(old_entry, new_entry)
-        Doing::Hooks.trigger :post_entry_updated, wwid, new_entry unless options[:archive]
+        Doing::Hooks.trigger :post_entry_updated, wwid, new_entry, old unless options[:archive]
       end
 
       if options[:archive]
         wwid.move_item(new_entry, 'Archive', label: true)
-        Doing::Hooks.trigger :post_entry_updated, wwid, new_entry
+        Doing::Hooks.trigger :post_entry_updated, wwid, new_entry, old_entry
       end
 
       wwid.write(wwid.doing_file)
@@ -582,7 +590,7 @@ command %i[done did] do |c|
 
       Doing::Hooks.trigger :pre_entry_add, wwid, new_entry
       wwid.content.push(new_entry)
-      Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
+      Doing::Hooks.trigger :post_entry_added, wwid, new_entry
       wwid.write(wwid.doing_file)
       Doing.logger.info('New entry:', %(added "#{new_entry.date.relative_date}: #{new_entry.title}" to #{section}))
     elsif $stdin.stat.size.positive?
@@ -606,7 +614,7 @@ command %i[done did] do |c|
 
       Doing::Hooks.trigger :pre_entry_add, wwid, new_entry
       wwid.content.push(new_entry)
-      Doing::Hooks.trigger :post_entry_added, wwid, new_entry.dup
+      Doing::Hooks.trigger :post_entry_added, wwid, new_entry
 
       wwid.write(wwid.doing_file)
       Doing.logger.info('New entry:', %(added "#{new_entry.date.relative_date}: #{new_entry.title}" to #{section}))
@@ -950,7 +958,7 @@ command :meanwhile do |c|
       input += date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
       input += "\n#{options[:note]}" if options[:note]
-      input += "\n#{ask_note}" unless ask_note.empty?
+      input += "\n#{ask_note}" unless ask_note.good?
 
       input = wwid.fork_editor(input).strip
     elsif !args.empty?
@@ -959,7 +967,7 @@ command :meanwhile do |c|
       input = $stdin.read.strip
     end
 
-    if input && !input.empty?
+    if input.good?
       d, input, note = wwid.format_input(input)
       unless d.nil?
         Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
@@ -972,7 +980,7 @@ command :meanwhile do |c|
 
     unless options[:editor]
       note.add(options[:note]) if options[:note]
-      note.add(ask_note) unless ask_note.empty?
+      note.add(ask_note) if ask_note.good?
     end
 
     wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:archive], note: note })
@@ -1058,6 +1066,7 @@ command :note do |c|
     end
 
     last_entry = wwid.last_entry(options)
+    old_entry = last_entry.clone
 
     unless last_entry
       Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
@@ -1091,19 +1100,19 @@ command :note do |c|
     end
 
     if (new_note.empty? && !options[:remove]) || options[:ask]
-      $stderr.puts last_note unless last_note.empty?
-      $stderr.puts new_note unless new_note.empty?
+      $stderr.puts last_note if last_note.good?
+      $stderr.puts new_note if new_note.good?
       new_note.add(Doing::Prompt.read_lines(prompt: 'Add a note'))
     end
 
-    raise EmptyInput, 'You must provide content when adding a note' unless options[:remove] || !new_note.empty?
+    raise EmptyInput, 'You must provide content when adding a note' unless options[:remove] || new_note.good?
 
     if last_note.equal?(new_note)
       Doing.logger.debug('Skipped:', 'No note change')
     else
       last_note.add(new_note, replace: options[:remove])
       Doing.logger.info('Entry updated:', last_entry.title)
-      Doing::Hooks.trigger :post_entry_updated, wwid, last_entry
+      Doing::Hooks.trigger :post_entry_updated, wwid, last_entry, old_entry
     end
     # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
     wwid.write(wwid.doing_file)
@@ -1139,6 +1148,13 @@ command %i[now next] do |c|
   c.arg_name 'DATE_STRING'
   c.flag %i[b back started], type: DateBeginString
 
+  c.desc %(
+        Set a start and optionally end time as a date range ("from 1pm to 2:30pm").
+        If an end time is provided, a dated @done tag will be added
+      )
+  c.arg_name 'TIME_RANGE'
+  c.flag [:from], type: DateRangeString
+
   c.desc 'Timed entry, marks last entry in section as @done'
   c.switch %i[f finish_last], negatable: false, default_value: false
 
@@ -1154,13 +1170,17 @@ command %i[now next] do |c|
   # # c.flag [:a, :app]
 
   c.action do |_global_options, options, args|
+    raise InvalidArgument, "--back and --from cannot be used together" if options[:back] && options[:from]
+
     if options[:back]
       date = options[:back]
-
-      raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if date.nil?
+    elsif options[:from]
+      date, finish_date = options[:from]
+      options[:done] = finish_date
     else
       date = Time.now
     end
+    raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if date.nil?
 
     if options[:section]
       section = wwid.guess_section(options[:section]) || options[:section].cap_first
@@ -1175,16 +1195,17 @@ command %i[now next] do |c|
 
       input = date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
+      input += " @done(#{options[:done].strftime('%F %R')})" if options[:done]
       input += "\n#{options[:note]}" if options[:note]
-      input += "\n#{ask_note}" unless ask_note.empty?
+      input += "\n#{ask_note}" if ask_note.good?
       input = wwid.fork_editor(input).strip
 
       d, title, note = wwid.format_input(input)
-      raise EmptyInput, 'No content' if title.strip.empty?
+      raise EmptyInput, 'No content' unless title.good?
 
       if ask_note.empty? && options[:ask]
         ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
-        note.add(ask_note) unless ask_note.empty?
+        note.add(ask_note) if ask_note.good?
       end
 
       date = d.nil? ? date : d
@@ -1194,8 +1215,15 @@ command %i[now next] do |c|
       d, title, note = wwid.format_input(args.join(' '))
       date = d.nil? ? date : d
       note.add(options[:note]) if options[:note]
-      note.add(ask_note) unless ask_note.empty?
-      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      note.add(ask_note) if ask_note.good?
+      entry = wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      if options[:done] && entry.should_finish?
+        if entry.should_time?
+          entry.tag('done', value: options[:done])
+        else
+          entry.tag('done')
+        end
+      end
       wwid.write(wwid.doing_file)
     elsif $stdin.stat.size.positive?
       input = $stdin.read.strip
@@ -1207,15 +1235,22 @@ command %i[now next] do |c|
       note.add(options[:note]) if options[:note]
       if ask_note.empty? && options[:ask]
         ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
-        note.add(ask_note) unless ask_note.empty?
+        note.add(ask_note) if ask_note.good?
       end
-      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      entry = wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      if options[:done] && entry.should_finish?
+        if entry.should_time?
+          entry.tag('done', value: options[:done])
+        else
+          entry.tag('done')
+        end
+      end
       wwid.write(wwid.doing_file)
     else
       tags = wwid.all_tags(wwid.content)
       $stderr.puts Doing::Color.boldgreen("Add a new entry. Tab will autocomplete known tags. Ctrl-c to cancel.")
       title = Doing::Prompt.read_line(prompt: 'Entry content', completions: tags)
-      raise EmptyInput, 'You must provide content when creating a new entry' if title.strip.empty?
+      raise EmptyInput, 'You must provide content when creating a new entry' unless title.good?
 
       note = Doing::Note.new
       note.add(options[:note]) if options[:note]
@@ -1223,7 +1258,14 @@ command %i[now next] do |c|
       ask_note = res ? Doing::Prompt.read_lines(prompt: 'Enter note') : []
       note.add(ask_note)
 
-      wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      entry = wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      if options[:done] && entry.should_finish?
+        if entry.should_time?
+          entry.tag('done', value: options[:done])
+        else
+          entry.tag('done')
+        end
+      end
       wwid.write(wwid.doing_file)
     end
   end
@@ -1326,8 +1368,10 @@ command %i[reset begin] do |c|
       return
     end
 
+    old_item = last_entry.clone
+
     wwid.reset_item(last_entry, date: reset_date, resume: options[:resume])
-    Doing::Hooks.trigger :post_entry_updated, wwid, last_entry
+    Doing::Hooks.trigger :post_entry_updated, wwid, last_entry, old_item
     # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
 
     wwid.write(wwid.doing_file)
@@ -2156,7 +2200,7 @@ command :show do |c|
 
     options[:section] = section
 
-    unless tags.empty?
+    if tags.good?
       tag_filter = {
         'tags' => tags,
         'bool' => options[:bool].normalize_bool
@@ -2175,7 +2219,7 @@ command :show do |c|
       # options[:bool] = :and unless tags.empty?
 
       tags = tag.split(/ +/).map { |t| t.strip.sub(/^@?/, '') } if tag =~ /^@/
-      unless tags.empty?
+      if tags.good?
         tag_filter = {
           'tags' => tags,
           'bool' => options[:bool].normalize_bool
@@ -2186,7 +2230,7 @@ command :show do |c|
 
     options[:age] ||= :newest
 
-    opt = options.dup
+    opt = options.clone
     opt[:age] = options[:age].normalize_age(:newest) if options[:age]
     opt[:sort_tags] = options[:tag_sort] =~ /^n/i
     opt[:count] = options[:count].to_i
@@ -2645,7 +2689,7 @@ command :view do |c|
                              else
                                options[:tag].gsub(/[, ]+/, ' ').split(' ').map(&:strip)
                              end
-      elsif view.key?('tags') && !(view['tags'].nil? || view['tags'].empty?)
+      elsif view.key?('tags') && view['tags'].good?
         tag_filter = { 'tags' => [], 'bool' => 'OR' }
         bool = view.key?('tags_bool') && !view['tags_bool'].nil? ? view['tags_bool'].normalize_bool : :pattern
         tag_filter['bool'] = bool
@@ -2703,7 +2747,7 @@ command :view do |c|
 
       options[:age] ||= :newest
 
-      opts = options.dup
+      opts = options.clone
       opts[:age] = options[:age].normalize_age(:newest)
       opts[:count] = count
       opts[:format] = date_format
@@ -2798,7 +2842,7 @@ command :yesterday do |c|
       end.join(' to ').split_date_range
     end
 
-    opt = options.dup
+    opt = options.clone
     opt[:tag_order] = options[:tag_order].normalize_order
     opt[:order] = settings.dig('templates', options[:config_template], 'order')
 
@@ -3090,7 +3134,7 @@ command :open do |c|
   end
 
   c.action do |_global_options, options, _args|
-    params = options.dup
+    params = options.clone
     params.delete_if do |k, v|
       k.instance_of?(String) || v.nil? || v == false
     end
@@ -3242,7 +3286,7 @@ command %i[archive move] do |c|
       search.sub!(/^'?/, "'") if options[:exact]
     end
 
-    opts = options.dup
+    opts = options.clone
     opts[:search] = search
     opts[:bool] = options[:bool].normalize_bool
     opts[:destination] = options[:to]

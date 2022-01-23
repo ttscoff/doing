@@ -338,6 +338,7 @@ module Doing
     ## @option opt :note [Array] item note (will be converted if value is String)
     ## @option opt :back [Date] backdate
     ## @option opt :timed [Boolean] new item is timed entry, marks previous entry as @done
+    ## @option opt :done [Date] If set, adds a @done tag to new entry
     ##
     def add_item(title, section = nil, opt)
       opt ||= {}
@@ -360,9 +361,18 @@ module Doing
 
       title.compress!
       entry = Item.new(opt[:back], title.strip, section)
+
+      if opt[:done] && entry.should_finish?
+        if entry.should_time?
+          entry.tag('done', value: opt[:done])
+        else
+          entry.tag('done')
+        end
+      end
+
       entry.note = note
 
-      items = @content.dup
+      items = @content.clone
       if opt[:timed]
         items.reverse!
         items.each_with_index do |i, x|
@@ -380,7 +390,8 @@ module Doing
       # logger.count(:added, level: :debug)
       logger.info('New entry:', %(added "#{entry.date.relative_date}: #{entry.title}" to #{section}))
 
-      Hooks.trigger :post_entry_added, self, entry.dup
+      Hooks.trigger :post_entry_added, self, entry
+      entry
     end
 
     ##
@@ -474,6 +485,7 @@ module Doing
     #
     def repeat_item(item, opt)
       opt ||= {}
+      old_item = item.clone
       if item.should_finish?
         if item.should_time?
           finish_date = verify_duration(item.date, Time.now, title: item.title)
@@ -481,7 +493,7 @@ module Doing
         else
           item.title.tag!('done')
         end
-        Hooks.trigger :post_entry_updated, self, item
+        Hooks.trigger :post_entry_updated, self, item, old_item
       end
 
       # Remove @done tag
@@ -651,7 +663,7 @@ module Doing
 
       if items.nil? || items.empty?
         section = opt[:section] ? guess_section(opt[:section]) : 'All'
-        items = section =~ /^all$/i ? @content.dup : @content.in_section(section)
+        items = section =~ /^all$/i ? @content.clone : @content.in_section(section)
       end
 
       opt[:time_filter] = [nil, nil]
@@ -847,7 +859,7 @@ module Doing
           note.map!(&:strip)
           note.delete_if(&:ignore?)
           item = items[i]
-          old_item = item.dup
+          old_item = item.clone
           item.date = date || items[i].date
           item.title = title
           item.note = note
@@ -855,7 +867,7 @@ module Doing
             Doing.logger.count(:skipped, level: :debug)
           else
             Doing.logger.count(:updated)
-            Hooks.trigger :post_entry_updated, self, item
+            Hooks.trigger :post_entry_updated, self, item, old_item
           end
         end
       end
@@ -1045,9 +1057,10 @@ module Doing
                 else
                   opt[:resume]
                 end
+          old_item = item.clone
           new_entry = reset_item(item, date: date, resume: res)
           @content.update_item(item, new_entry)
-          Hooks.trigger :post_entry_updated, self, new_entry
+          Hooks.trigger :post_entry_updated, self, new_entry, old_item
         end
         write(@doing_file)
 
@@ -1062,8 +1075,9 @@ module Doing
       if opt[:flag]
         tag = @config['marker_tag'] || 'flagged'
         items.map! do |i|
+          old_item = i.clone
           i.tag(tag, date: false, remove: opt[:remove], single: single)
-          Hooks.trigger :post_entry_updated, self, i
+          Hooks.trigger :post_entry_updated, self, i, old_item
         end
       end
 
@@ -1071,9 +1085,10 @@ module Doing
         tag = 'done'
         items.map! do |i|
           if i.should_finish?
+            old_item = i.clone
             should_date = !opt[:cancel] && i.should_time?
             i.tag(tag, date: should_date, remove: opt[:remove], single: single)
-            Hooks.trigger :post_entry_updated, self, i
+            Hooks.trigger :post_entry_updated, self, i, old_item
           end
         end
       end
@@ -1087,8 +1102,9 @@ module Doing
           else
             logger.count(:added_tags)
             logger.write(items.count == 1 ? :info : :debug, 'Tagged:', new_title)
+            old_item = i.clone
             i.title = new_title
-            Hooks.trigger :post_entry_updated, self, i
+            Hooks.trigger :post_entry_updated, self, i, old_item
           end
         end
       end
@@ -1096,17 +1112,19 @@ module Doing
       if opt[:tag]
         tag = opt[:tag]
         items.map! do |i|
+          old_item = i.clone
           i.tag(tag, date: false, remove: opt[:remove], single: single)
           i.expand_date_tags(@config['date_tags'])
-          Hooks.trigger :post_entry_updated, self, i
+          Hooks.trigger :post_entry_updated, self, i, old_item
         end
       end
 
       if opt[:archive] || opt[:move]
         section = opt[:archive] ? 'Archive' : guess_section(opt[:move])
         items.map! do |i|
+          old_item = i.clone
           i.move_to(section, label: true)
-          Hooks.trigger :post_entry_updated, self, i
+          Hooks.trigger :post_entry_updated, self, i, old_item
         end
       end
 
@@ -1228,6 +1246,7 @@ module Doing
       end
 
       items.each do |item|
+        old_item = item.clone
         added = []
         removed = []
 
@@ -1322,7 +1341,7 @@ module Doing
         end
 
         item.expand_date_tags(@config['date_tags'])
-        Hooks.trigger :post_entry_updated, self, item
+        Hooks.trigger :post_entry_updated, self, item, old_item
       end
 
       write(@doing_file)
@@ -1361,6 +1380,7 @@ module Doing
         return
       end
 
+      old_item = item.clone
       content = ["#{item.date.strftime('%F %R')} | #{item.title.dup}"]
       content << item.note.strip_lines.join("\n") unless item.note.empty?
       new_item = fork_editor(content.join("\n"))
@@ -1376,7 +1396,7 @@ module Doing
         item.title = title
         item.note.add(note, replace: true)
         logger.info('Edited:', item.title)
-        Hooks.trigger :post_entry_updated, self, item.dup
+        Hooks.trigger :post_entry_updated, self, item, old_item
 
         write(@doing_file)
       end
@@ -1413,6 +1433,7 @@ module Doing
       found_items = 0
 
       @content.each_with_index do |item, i|
+        old_item = i.clone
         next unless item.section == opt[:section] || opt[:section] =~ /all/i
 
         next unless item.title =~ /@#{tag}/
@@ -1431,7 +1452,7 @@ module Doing
           logger.count(:completed)
           logger.info('Completed:', item.title)
         end
-        Hooks.trigger :post_entry_updated, self, item
+        Hooks.trigger :post_entry_updated, self, item, old_item
       end
 
 
@@ -1492,7 +1513,7 @@ module Doing
 
         unless ((!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s)) || (opt[:before] && item.date >= cutoff))
           new_item = @content.delete(item)
-          Hooks.trigger :post_entry_removed, self, item.dup
+          Hooks.trigger :post_entry_removed, self, item.clone
           raise DoingRuntimeError, "Error deleting item: #{item}" if new_item.nil?
 
           new_content.add_section(new_item.section, log: false)
@@ -2202,7 +2223,7 @@ EOS
 
       filename ||= @config['doing_file']
       init_doing_file(filename)
-      current_content = @content.dup
+      current_content = @content.clone
       backup_file = Util::Backup.last_backup(filename, count: 1)
       raise DoingRuntimeError, 'No undo history to diff' if backup_file.nil?
 
@@ -2321,8 +2342,9 @@ EOS
           item
         else
           counter += 1
+          old_item = item.clone
           item.move_to(destination, label: label, log: false)
-          Hooks.trigger :post_entry_updated, self, item.dup
+          Hooks.trigger :post_entry_updated, self, item, old_item
           item
         end
       end

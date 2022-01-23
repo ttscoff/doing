@@ -19,7 +19,7 @@ module Doing
     ## @param      cli   [String] The name or path of the cli
     ##
     def exec_available(cli)
-      return false if cli.nil?
+      return false unless cli.good?
 
       !TTY::Which.which(cli).nil?
     end
@@ -32,7 +32,7 @@ module Doing
     ##
     def first_available_exec(*commands)
       commands.compact.map(&:strip).reject(&:empty?).uniq
-      .find { |cmd| exec_available(cmd.split.first) }
+              .find { |cmd| exec_available(cmd.split.first) }
     end
 
     def merge_default_proc(target, overwrite)
@@ -56,7 +56,7 @@ module Doing
     # @param      [Hash] other_hash   The other hash
     #
     def deep_merge_hashes(master_hash, other_hash)
-      deep_merge_hashes!(master_hash.dup, other_hash)
+      deep_merge_hashes!(master_hash.clone, other_hash)
     end
 
     # Merges a master hash with another hash, recursively.
@@ -157,32 +157,32 @@ module Doing
     def find_default_editor(editor_for = 'default')
       # return nil unless $stdout.isatty || ENV['DOING_EDITOR_TEST']
 
-      if ENV['DOING_EDITOR_TEST']
-        return ENV['EDITOR']
-      end
+      return ENV['EDITOR'] if ENV['DOING_EDITOR_TEST']
 
       editor_config = Doing.config.settings['editors']
 
       if editor_config.is_a?(String)
-        Doing.logger.warn('Deprecated:', "Please update your configuration, 'editors' should be a mapping. Delete the key and run `doing config --update`.")
+        msg = "Please update your configuration, 'editors' should be a mapping."
+        msg << ' Delete the key and run `doing config --update`.'
+        Doing.logger.warn('Deprecated:', msg)
         return editor_config
       end
 
       if editor_config[editor_for]
         editor = editor_config[editor_for]
         # Doing.logger.debug('Editor:', "Using #{editor} from config 'editors->#{editor_for}'")
-        return editor unless editor.nil? || editor.empty?
+        return editor unless editor.good?
       end
 
       if editor_for != 'editor' && editor_config['default']
         editor = editor_config['default']
         # Doing.logger.debug('Editor:', "Using #{editor} from config: 'editors->default'")
-        return editor unless editor.nil? || editor.empty?
+        return editor unless editor.good?
       end
 
       editor ||= ENV['DOING_EDITOR'] || ENV['GIT_EDITOR'] || ENV['EDITOR']
 
-      unless editor.nil? || editor.empty?
+      unless editor.good?
         # Doing.logger.debug('Editor:', "Found editor in environment variables: #{editor}")
         return editor
       end

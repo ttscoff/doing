@@ -314,7 +314,7 @@ module Doing
 
       @ignore_local = opt[:ignore_local] if opt[:ignore_local]
 
-      config = read_config.dup
+      config = read_config.clone
 
       plugin_config = Util.deep_merge_hashes(DEFAULTS['plugins'], config['plugins'] || {})
 
@@ -322,7 +322,7 @@ module Doing
 
       Plugins.plugins.each do |_type, plugins|
         plugins.each do |title, plugin|
-          plugin_config[title] = plugin[:config] if plugin[:config] && !plugin[:config].empty?
+          plugin_config[title] = plugin[:config] if plugin[:config].good?
           config['export_templates'][title] ||= nil if plugin[:templates] && !plugin[:templates].empty?
         end
       end

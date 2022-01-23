@@ -34,6 +34,10 @@ module Doing
       replace deep_thaw
     end
 
+    def clone
+      Marshal.load(Marshal.dump(self))
+    end
+
     # Turn all keys into string
     #
     # Return a copy of the hash where all its keys are strings
