@@ -25,7 +25,7 @@
 
 #### FIXED
 
-- Changelog formatting issue # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is ahead of 'origin/develop' by 3 commits. # # Changes to be committed: #	modified:   CHANGELOG.md # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/CHANGELOG.md b/CHANGELOG.md index 962cc74..81bde33 100644 --- a/CHANGELOG.md +++ b/CHANGELOG.md @@ -6,6 +6,10 @@    - Minor update to Fish completion script   +#### FIXED + +- Fix changelog issue +  ### 2.1.23    2022-01-22 15:52
+- Changelog formatting issue
 
 ### 2.1.23
 
@@ -675,7 +675,7 @@ presented
 - `--tag` and `--bool` filtering for again/resume, cancel
 - `--in` flag for `again`/`resume` to specify to which section the new
 - Finish command accepts `--tag=` flag, finishing last entry
-- `doing cancel` to end X tasks without completion date (alias for
+- `doing cancel` to end X tasks without completion date
 
 #### IMPROVED
 
@@ -692,7 +692,6 @@ presented
 #### NEW
 
 - Finish command accepts `--tag=` flag, finishing last entry
-- `doing cancel` to end X tasks without completion date (alias for
 
 #### FIXED
 

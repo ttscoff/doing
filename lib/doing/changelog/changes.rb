@@ -24,7 +24,7 @@ module Doing
     private
 
     def parse_changes(lookup, search)
-      change_rx = /(?<=\n|\A)### (\d+\.\d+\.\d+(?:\w*))(.*)(?=\n### |\Z)/m
+      change_rx = /(?<=\n|\A)### (\d+\.\d+\.\d+(?:\w*))(.*?)(?=\n### |\Z)/m
       @changes = @content.scan(change_rx).each_with_object([]) do |m, a|
         next if m[0].nil? || m[1].nil?
 

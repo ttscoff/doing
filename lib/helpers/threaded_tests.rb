@@ -18,7 +18,7 @@ class ThreadedTests
     start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     @results = File.expand_path('results.log')
 
-    max_threads = 1000 if max_threads == 0
+    max_threads = 1000 if max_threads.to_i == 0
 
     c = Doing::Color
     c.coloring = true
@@ -27,8 +27,8 @@ class ThreadedTests
 
     tests = Dir.glob(pattern)
 
-    if max_tests > 0
-      tests = tests.slice(0, max_tests - 1)
+    if max_tests.to_i > 0
+      tests = tests.slice(0, max_tests.to_i - 1)
     end
 
     puts "#{tests.count} test files".boldcyan
@@ -90,6 +90,10 @@ class ThreadedTests
 
       progress.finish
 
+      puts "\e[H\e[2J" # Clear screen
+
+      puts @running_tests.map { |t| t[1].format.uncolor.sub(/^\[:bar\] (.*?):status/, "#{c.bold}#{c.white}\\1#{c.reset}#{t[2]}") }.join("\n")
+
       output = []
       if @error_out.count.positive?
         output << c.boldred("#{@error_out.count} Issues")
@@ -101,7 +105,10 @@ class ThreadedTests
       output << c.yellow("#{(finish_time - start_time).round(3)}s")
       puts output.join(', ')
 
-      puts @error_out.join("\n----\n".boldwhite) if @error_out.count.positive?
+      if !@error_out.count.positive?
+        res = Doing::Prompt.yn('Display error report?', default_response: false)
+        puts @error_out.join("\n----\n".boldwhite) if res
+      end
     rescue
       progress.stop
     end
