@@ -57,10 +57,9 @@ command %i[grep search] do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = 'time'
-  default = @settings['tag_sort'] || 'name'
+  default = @settings['tag_sort'].normalize_tag_sort || :name
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
 
   c.desc 'Only show items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -76,7 +75,9 @@ command %i[grep search] do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: @settings.dig('search', 'highlight')
@@ -95,7 +96,10 @@ command %i[grep search] do |c|
   c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
   c.desc 'Combine multiple tags or value queries using AND, OR, or NOT'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'AND'
+  c.arg_name 'BOOLEAN'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :pattern,
+                  type: BooleanSymbol
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
@@ -106,14 +110,11 @@ command %i[grep search] do |c|
 
     section = @wwid.guess_section(options[:section]) if options[:section]
 
-    options[:case] = options[:case].normalize_case
-    options[:bool] = options[:bool].normalize_bool
-
     search = args.join(' ')
     search.sub!(/^'?/, "'") if options[:exact]
 
     options[:times] = true if options[:totals]
-    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    options[:sort_tags] = options[:tag_sort]
     options[:highlight] = true
     options[:search] = search
     options[:section] = section

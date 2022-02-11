@@ -22,7 +22,9 @@ command :rotate do |c|
 
   c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :pattern,
+                  type: BooleanSymbol
 
   c.desc 'Search filter'
   c.arg_name 'QUERY'
@@ -43,22 +45,19 @@ command :rotate do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.desc 'Rotate entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.action do |_global_options, options, args|
+  c.action do |_global_options, options, _args|
     options[:fuzzy] = false
-    if options[:section] && options[:section] !~ /^all$/i
-      options[:section] = @wwid.guess_section(options[:section])
-    end
 
-    options[:bool] = options[:bool].normalize_bool
-
-    options[:case] = options[:case].normalize_case
+    options[:section] = @wwid.guess_section(options[:section]) if options[:section] && options[:section] !~ /^all$/i
 
     search = nil
 

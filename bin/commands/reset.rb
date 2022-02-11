@@ -24,11 +24,13 @@ command %i[reset begin] do |c|
   c.arg_name 'TAG'
   c.flag [:tag]
 
-  c.desc 'Reset last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.desc 'Reset last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"),
+          start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
+          May be used multiple times, combined with --bool'
   c.arg_name 'QUERY'
   c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
@@ -43,31 +45,31 @@ command %i[reset begin] do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :pattern,
+                  type: BooleanSymbol
 
   c.desc 'Select from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.action do |global_options, options, args|
-    if args.count > 0
+    if args.count.positive?
       reset_date = args.join(' ').chronify(guess: :begin)
       raise InvalidArgument, 'Invalid date string' unless reset_date
+
     else
       reset_date = Time.now
     end
 
     options[:fuzzy] = false
-    if options[:section]
-      options[:section] = @wwid.guess_section(options[:section]) || options[:section].cap_first
-    end
 
-    options[:bool] = options[:bool].normalize_bool
-
-    options[:case] = options[:case].normalize_case
+    options[:section] = @wwid.guess_section(options[:section]) || options[:section].cap_first if options[:section]
 
     if options[:search]
       search = options[:search]
@@ -75,25 +77,22 @@ command %i[reset begin] do |c|
       options[:search] = search
     end
 
-
     items = @wwid.filter_items([], opt: options)
 
-    if options[:interactive]
-      last_entry = Doing::Prompt.choose_from_items(items, include_section: options[:section].nil?,
-        menu: true,
-        header: '',
-        prompt: 'Select an entry to start/reset > ',
-        multiple: false,
-        sort: false,
-        show_if_single: true)
-    else
-      last_entry = items.reverse.last
-    end
+    last_entry = if options[:interactive]
+                   Doing::Prompt.choose_from_items(items, include_section: options[:section].nil?,
+                                                          menu: true,
+                                                          header: '',
+                                                          prompt: 'Select an entry to start/reset > ',
+                                                          multiple: false,
+                                                          sort: false,
+                                                          show_if_single: true)
+                 else
+                   items.reverse.last
+                 end
 
-    unless last_entry
-      Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
-      return
-    end
+
+    raise NoResults, 'No entry matching parameters was found.' unless last_entry
 
     old_item = last_entry.clone
 

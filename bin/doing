@@ -63,8 +63,30 @@ Doing.logger.benchmark(:configure, :finish)
 @settings = @config.settings
 @wwid.config = @settings
 
-if @settings.dig('plugins', 'command_path')
-  commands_from File.expand_path(@settings.dig('plugins', 'command_path'))
+commands_from File.expand_path(@settings.dig('plugins', 'command_path')) if @settings.dig('plugins', 'command_path')
+
+accept BooleanSymbol do |value|
+  value.normalize_bool
+end
+
+accept CaseSymbol do |value|
+  value.normalize_case
+end
+
+accept AgeSymbol do |value|
+  value.normalize_age
+end
+
+accept OrderSymbol do |value|
+  value.normalize_order
+end
+
+accept MatchingSymbol do |value|
+  value.normalize_matching
+end
+
+accept TagSortSymbol do |value|
+  value.normalize_tag_sort
 end
 
 accept TemplateName do |value|
@@ -191,7 +213,6 @@ add_commands(%w[undo redo])
 add_commands(%w[commands_accepting install_fzf])
 ## Optional commands
 add_commands(%w[again cancel flag meanwhile reset tags today yesterday since add_section tag_dir colors completion plugins sections template views changes])
-
 
 pre do |global, _command, _options, _args|
   # global[:pager] ||= @settings['paginate']

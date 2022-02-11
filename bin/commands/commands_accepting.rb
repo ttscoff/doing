@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@commands_accepting
 arg_name 'OPTION'
 command :commands_accepting do |c|
@@ -8,10 +10,8 @@ command :commands_accepting do |c|
     a.each do |option|
       cmds = []
       commands.each do |cmd, v|
-        v.flags.merge(v.switches).each do |n, flag|
-          if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
-            cmds.push(cmd)
-          end
+        v.flags.merge(v.switches).each do |_, flag|
+          cmds.push(cmd) if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
         end
       end
 

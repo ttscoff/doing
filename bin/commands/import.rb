@@ -26,7 +26,9 @@ command :import do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.desc 'Only import items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -87,8 +89,6 @@ command :import do |c|
       options[:date_filter][1] = options[:before] || Time.now + (1 << 64)
       options[:date_filter][0] = options[:after] || Time.now - (1 << 64)
     end
-
-    options[:case] = options[:case].normalize_case
 
     if options[:type] =~ Doing::Plugins.plugin_regex(type: :import)
       options[:no_overlap] = !options[:overlap]

@@ -27,9 +27,11 @@ command :commands do |c|
                     Doing::Prompt.choose_from(available,
                                               prompt: 'Select commands to enable',
                                               multiple: true,
-                                              sorted: true).strip.split("\n")
+                                              sorted: true)
                   end
-      to_enable.each do |cmd|
+      raise UserCancelled unless to_enable
+
+      to_enable.strip.split("\n").each do |cmd|
         default_command = File.join(File.dirname(__FILE__), "#{cmd}.rb")
         custom_command = File.join(File.expand_path(custom_dir), "#{cmd}.rb")
         unless File.exist?(default_command) || File.exist?(custom_command)

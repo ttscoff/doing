@@ -129,7 +129,7 @@ module Doing
                    self.template('dayone')
                  end
 
-      totals = opt[:totals] ? wwid.tag_times(format: :markdown, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+      totals = opt[:totals] ? wwid.tag_times(format: :markdown, sort_by: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
 
       case digest
       when :day

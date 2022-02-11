@@ -18,7 +18,7 @@ command :tags do |c|
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
-  c.flag %i[o order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
+  c.flag %i[o order], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
 
   c.desc 'Get tags for entries matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
   c.arg_name 'TAG'
@@ -44,11 +44,15 @@ command :tags do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :pattern,
+                  type: BooleanSymbol
 
   c.desc 'Select items to scan from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
@@ -78,7 +82,7 @@ command :tags do |c|
       tags = tags.sort_by { |tag, count| count }
     end
 
-    tags.reverse! if options[:order].normalize_order == 'desc'
+    tags.reverse! if options[:order] == :desc
 
     if options[:counts]
       tags.each { |t, c| puts "#{t} (#{c})" }

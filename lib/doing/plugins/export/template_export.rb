@@ -133,7 +133,7 @@ module Doing
       # Doing.logger.debug('Template Export:', "#{items.count} items output to template #{opt[:template]}")
       if opt[:totals]
         out += wwid.tag_times(format: wwid.config['timer_format'].to_sym,
-                              sort_by_name: opt[:sort_tags],
+                              sort_by: opt[:sort_tags],
                               sort_order: opt[:tag_order])
       end
       out

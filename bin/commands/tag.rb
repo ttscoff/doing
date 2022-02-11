@@ -79,11 +79,15 @@ command :tag do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :pattern,
+                  type: BooleanSymbol
 
   c.desc 'Select item(s) to tag from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
@@ -130,9 +134,6 @@ command :tag do |c|
       count = options[:count].to_i
     end
 
-    options[:case] ||= :smart
-    options[:case] = options[:case].normalize_case
-
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
@@ -143,7 +144,7 @@ command :tag do |c|
     options[:section] = section
     options[:tag] = search_tags
     options[:tags] = tags
-    options[:tag_bool] = options[:bool].normalize_bool
+    options[:tag_bool] = options[:bool]
 
     if count.zero? && !options[:force]
       matches = @wwid.filter_items([], opt: options).count

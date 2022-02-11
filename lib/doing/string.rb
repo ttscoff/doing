@@ -322,6 +322,27 @@ module Doing
     end
 
     ##
+    ## Convert tag sort string to a qualified type
+    ##
+    ## @return     [Symbol] :name or :time
+    ##
+    def normalize_tag_sort(default = :name)
+      case self
+      when /^n/i
+        :name
+      when /^t/i
+        :time
+      else
+        default
+      end
+    end
+
+    ## @see #normalize_tag_sort
+    def normalize_tag_sort!(default = :name)
+      replace normalize_tag_sort(default)
+    end
+
+    ##
     ## Convert an age string to a qualified type
     ##
     ## @return     [Symbol] :oldest or :newest
@@ -345,18 +366,18 @@ module Doing
     ##
     ## Convert a sort order string to a qualified type
     ##
-    ## @return     [String] 'asc' or 'desc'
+    ## @return     [Symbol] :asc or :desc
     ##
-    def normalize_order!(default = 'asc')
+    def normalize_order!(default = :asc)
       replace normalize_order(default)
     end
 
-    def normalize_order(default = 'asc')
+    def normalize_order(default = :asc)
       case self
       when /^a/i
-        'asc'
+        :asc
       when /^d/i
-        'desc'
+        :desc
       else
         default
       end
@@ -367,7 +388,8 @@ module Doing
     ##
     ## @return     Symbol :smart, :sensitive, :ignore
     ##
-    def normalize_case(default = :smart)
+    def normalize_case(default = nil)
+      default ||= Doing.config.settings.dig('search', 'case')
       case self
       when /^(c|sens)/i
         :sensitive

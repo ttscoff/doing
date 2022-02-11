@@ -5,6 +5,10 @@ module Doing
   ## Symbol helpers
   ##
   class ::Symbol
+    def normalize_tag_sort(default = :name)
+      to_s.normalize_tag_sort
+    end
+
     def normalize_bool(default = :and)
       to_s.normalize_bool(default)
     end
@@ -13,7 +17,7 @@ module Doing
       to_s.normalize_age(default)
     end
 
-    def normalize_order(default = 'asc')
+    def normalize_order(default = :asc)
       to_s.normalize_order(default)
     end
 

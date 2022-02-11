@@ -91,7 +91,7 @@ module Doing
         JSON.pretty_generate({
           'section' => variables[:page_title],
           'items' => items_out,
-          'timers' => wwid.tag_times(format: :json, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order])
+          'timers' => wwid.tag_times(format: :json, sort_by: opt[:sort_tags], sort_order: opt[:tag_order])
         })
       elsif opt[:output] == 'timeline'
         template = <<~EOTEMPLATE

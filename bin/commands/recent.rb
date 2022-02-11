@@ -30,10 +30,9 @@ command :recent do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = 'time'
-  default = @settings['tag_sort'] || 'name'
+  default = @settings['tag_sort'].normalize_tag_sort || :name
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
 
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
@@ -55,7 +54,7 @@ command :recent do |c|
       end
 
       options[:times] = true if options[:totals]
-      options[:sort_tags] = options[:tag_sort] =~ /^n/i
+      options[:sort_tags] = options[:tag_sort]
 
       template = @settings['templates']['recent'].deep_merge(@settings['templates']['default'])
       tags_color = template.key?('tags_color') ? template['tags_color'] : nil

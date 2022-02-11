@@ -14,9 +14,13 @@ sbtrkt  fuzzy-match   Items that match s*b*t*r*k*t
 
 !fire   inverse-exact-match   Items that do not include fire'
 command :select do |c|
-  c.example 'doing select', desc: 'Select from all entries. A menu of available actions will be presented after confirming the selection.'
-  c.example 'doing select --editor', desc: 'Select entries from a menu and batch edit them in your default editor'
-  c.example 'doing select --after "yesterday 12pm" --tag project1', desc: 'Display a menu of entries created after noon yesterday, add @project1 to selected entries'
+  c.example 'doing select',
+            desc: 'Select from all entries. A menu of actions will be presented after confirming the selection.'
+  c.example 'doing select --editor',
+            desc: 'Select entries from a menu and batch edit them in your default editor'
+  c.example 'doing select --after "yesterday 12pm" --tag project1',
+            desc: 'Display a menu of entries created after noon yesterday, add @project1 to selected entries'
+
   c.desc 'Select from a specific section'
   c.arg_name 'SECTION'
   c.flag %i[s section]
@@ -38,23 +42,28 @@ command :select do |c|
   c.arg_name 'SECTION'
   c.flag %i[m move]
 
-  c.desc 'Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "\'search"'
+  c.desc 'Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote,
+          e.g. `--query "\'search"'
   c.arg_name 'QUERY'
   c.flag %i[q query]
 
-  c.desc 'Select from entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
+  c.desc 'Select from entries matching search filter, surround with slashes for regex (e.g. "/query.*/"),
+          start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
+          May be used multiple times, combined with --bool'
   c.arg_name 'QUERY'
   c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
-  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
+  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included,
+          but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:before], type: DateBeginString
 
-  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
+  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included,
+          but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:after], type: DateEndString
 
@@ -77,9 +86,12 @@ command :select do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
-  c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches'
+  c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically.
+          Test with `--output doing` to preview matches'
   c.switch %i[menu], negatable: true, default_value: true
 
   c.desc 'Cancel selected items (add @done without timestamp)'
@@ -115,8 +127,6 @@ command :select do |c|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     raise InvalidArgument, '--no-menu requires --query' if !options[:menu] && !options[:query]
-
-    options[:case] = options[:case].normalize_case
 
     @wwid.interactive(options) # hooked
   end

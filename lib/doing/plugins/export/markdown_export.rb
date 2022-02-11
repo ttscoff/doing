@@ -72,7 +72,7 @@ module Doing
                    self.template(nil)
                  end
 
-      totals = opt[:totals] ? wwid.tag_times(format: :markdown, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+      totals = opt[:totals] ? wwid.tag_times(format: :markdown, sort_by: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
 
       mdx = MarkdownRenderer.new(variables[:page_title], all_items, totals)
       Doing.logger.debug('Markdown Export:', "#{all_items.count} items output to Markdown")

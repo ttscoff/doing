@@ -132,7 +132,7 @@ module Doing
       @sections.each do |section|
         out.push(section.original)
         items = in_section(section.title).sort_by { |i| i.date }
-        items.reverse! if Doing.config.settings['doing_file_sort'].normalize_order == 'desc'
+        items.reverse! if Doing.config.settings['doing_file_sort'].normalize_order == :desc
         items.each { |item| out.push(item.to_s)}
       end
 

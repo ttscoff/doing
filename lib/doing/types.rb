@@ -2,6 +2,8 @@
 
 module Doing
   module Types
+    REGEX_CASE = /^[cis].*?$/i.freeze
+    REGEX_TAG_SORT = /^(?:n(?:ame)?|t(?:ime)?)$/i.freeze
     REGEX_BOOL = /^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$/i.freeze
     REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i.freeze
     REGEX_VALUE_QUERY = /^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$/.freeze
@@ -22,5 +24,11 @@ module Doing
     DateRangeString = Class.new(Array)
     DateRangeOptionalString = Class.new(Array)
     DateIntervalString = Class.new(DateTime)
+    BooleanSymbol = Class.new(Symbol)
+    CaseSymbol = Class.new(Symbol)
+    AgeSymbol = Class.new(String)
+    OrderSymbol = Class.new(Symbol)
+    TagSortSymbol = Class.new(Symbol)
+    MatchingSymbol = Class.new(Symbol)
   end
 end

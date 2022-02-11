@@ -21,7 +21,7 @@ command :view do |c|
 
   c.desc 'Age (oldest|newest)'
   c.arg_name 'AGE'
-  c.flag %i[age], default_value: 'newest'
+  c.flag %i[age], default_value: :newest, type: AgeSymbol
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
@@ -43,9 +43,11 @@ command :view do |c|
   c.arg_name 'QUERY'
   c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
-  c.desc 'Tag boolean (AND,OR,NOT). Use PATTERN to parse + and - as booleans'
+  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
-  c.flag %i[b bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :pattern,
+                  type: BooleanSymbol
 
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -65,21 +67,25 @@ command :view do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.desc 'Sort tags by (name|time)'
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i
+  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, type: TagSortSymbol
 
   c.desc 'Tag sort direction (asc|desc)'
   c.arg_name 'DIRECTION'
-  c.flag [:tag_order], must_match: REGEX_SORT_ORDER
+  c.flag [:tag_order], must_match: REGEX_SORT_ORDER, type: OrderSymbol
 
-  c.desc 'View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
+  c.desc 'View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included,
+          but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:before], type: DateBeginString
 
-  c.desc 'View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
+  c.desc 'View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included,
+          but entries will be filtered by time of day'
   c.arg_name 'DATE_STRING'
   c.flag [:after], type: DateEndString
 
@@ -113,8 +119,8 @@ command :view do |c|
                 @wwid.guess_view(args[0])
               rescue WrongCommand => exception
                 cmd = commands[:show]
-                options[:sort] = 'asc'
-                options[:tag_order] = 'asc'
+                options[:sort] = :asc
+                options[:tag_order] = :asc
                 action = cmd.send(:get_action, nil)
                 return action.call(global_options, options, args)
               end
@@ -143,7 +149,7 @@ command :view do |c|
       tag_filter = false
       if options[:tag]
         tag_filter = { 'tags' => [], 'bool' => 'OR' }
-        bool = options[:bool].normalize_bool
+        bool = options[:bool]
         tag_filter['bool'] = bool
         tag_filter['tags'] = if bool == :pattern
                                options[:tag]
@@ -164,40 +170,44 @@ command :view do |c|
       # If the -o/--output flag was specified, override any default in the view template
       options[:output] ||= view.key?('output_format') ? view['output_format'] : 'template'
 
-      count = options[:count] ? options[:count] : view.key?('count') ? view['count'] : 10
+      count = if options[:count]
+                options[:count]
+              elsif view.key?('count')
+                view['count']
+              else
+                10
+              end
 
       section = if options[:section]
                   section
                 else
                   view['section'] || @settings['current_section']
                 end
-      order = view['order']&.normalize_order || 'asc'
+      order = if view.key?('order')
+                view['order'].normalize_order
+              else
+                :asc
+              end
 
       totals = if options[:totals]
                  true
                else
                  view['totals'] || false
                end
-      tag_order = if options[:tag_order]
-                    options[:tag_order].normalize_order
-                  else
-                    view['tag_order']&.normalize_order || 'asc'
-                  end
+      tag_order = options[:tag_order] || view['tag_order']&.normalize_order || :asc
 
       options[:times] = true if totals
       output_format = options[:output]&.downcase || 'template'
 
       options[:sort_tags] = if options[:tag_sort]
-                              options[:tag_sort] =~ /^n/i ? true : false
+                              options[:tag_sort]
                             elsif view.key?('tag_sort')
-                              view['tag_sort'] =~ /^n/i ? true : false
+                              view['tag_sort'].normalize_tag_sort
                             else
                               false
                             end
 
       %w[before after from duration].each { |k| options[k.to_sym] = view[k] if view.key?(k) && !options[k.to_sym] }
-
-      options[:case] = options[:case].normalize_case
 
       search = nil
 
@@ -209,7 +219,7 @@ command :view do |c|
       options[:age] ||= :newest
 
       opts = options.clone
-      opts[:age] = options[:age].normalize_age(:newest)
+      opts[:age] = options[:age]
       opts[:count] = count
       opts[:format] = date_format
       opts[:highlight] = options[:color]

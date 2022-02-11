@@ -1632,7 +1632,7 @@ module Doing
       cfg.deep_merge({
                        'wrap_width' => @config['wrap_width'] || 0,
                        'date_format' => @config['default_date_format'],
-                       'order' => @config['order'] || 'asc',
+                       'order' => @config['order'] || :asc,
                        'tags_color' => @config['tags_color'],
                        'duration' => @config['duration'],
                        'interval_format' => @config['interval_format']
@@ -1644,8 +1644,8 @@ module Doing
       opt[:age] ||= :newest
       opt[:age] = opt[:age].normalize_age
       opt[:format] ||= cfg['date_format']
-      opt[:order] ||= cfg['order'] || 'asc'
-      opt[:tag_order] ||= 'asc'
+      opt[:order] ||= cfg['order'] || :asc
+      opt[:tag_order] ||= :asc
       opt[:tags_color] = cfg['tags_color'] || false if opt[:tags_color].nil?
       opt[:template] ||= cfg['template']
 
@@ -1671,7 +1671,7 @@ module Doing
 
       items = filter_items(items, opt: opt)
 
-      items.reverse! unless opt[:order] =~ /^d/i
+      items.reverse! unless opt[:order].normalize_order == :desc
 
       if opt[:delete]
         delete_items(items, force: opt[:force])
@@ -1743,7 +1743,7 @@ module Doing
       cfg = @config['templates'][opt[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || 'asc',
+        'order' => @config['order'] || :asc,
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
@@ -1762,7 +1762,7 @@ module Doing
         from: opt[:from],
         format: cfg['date_format'],
         interval_format: opt[:interval_format],
-        order: cfg['order'] || 'asc',
+        order: cfg['order'] || :asc,
         output: output,
         section: opt[:section],
         sort_tags: opt[:sort_tags],
@@ -1797,7 +1797,7 @@ module Doing
       list_section({
                      section: section,
                      count: 0,
-                     order: 'asc',
+                     order: :asc,
                      date_filter: dates,
                      times: times,
                      output: output,
@@ -1863,7 +1863,7 @@ module Doing
       cfg = @config['templates'][opt[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || 'asc',
+        'order' => @config['order'] || :asc,
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
@@ -1879,7 +1879,7 @@ module Doing
       opt[:count] = count
       opt[:format] = cfg['date_format']
       opt[:template] = opt[:template] || cfg['template']
-      opt[:order] = 'asc'
+      opt[:order] = :asc
       opt[:times] = times
 
       list_section(opt)
@@ -1896,7 +1896,7 @@ module Doing
       cfg = @config['templates'][options[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || 'asc',
+        'order' => @config['order'] || :asc,
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
@@ -2043,10 +2043,10 @@ module Doing
     ##
     ## @param      format        [String] return format (html,
     ##                           json, or text)
-    ## @param      sort_by_name  [Boolean] Sort by name if true, otherwise by time
-    ## @param      sort_order    [String] The sort order (asc or desc)
+    ## @param      sort_by       [Symbol] Sort by :name or :time
+    ## @param      sort_order    [Symbol] The sort order (:asc or :desc)
     ##
-    def tag_times(format: :text, sort_by_name: false, sort_order: 'asc')
+    def tag_times(format: :text, sort_by: :time, sort_order: :asc)
       return '' if @timers.empty?
 
       max = @timers.keys.sort_by { |k| k.length }.reverse[0].length + 1
@@ -2054,13 +2054,13 @@ module Doing
       total = @timers.delete('All')
 
       tags_data = @timers.delete_if { |_k, v| v == 0 }
-      sorted_tags_data = if sort_by_name
+      sorted_tags_data = if sort_by.normalize_tag_sort == :name
                            tags_data.sort_by { |k, _v| k }
                          else
                            tags_data.sort_by { |_k, v| v }
                          end
 
-      sorted_tags_data.reverse! if sort_order =~ /^asc/i
+      sorted_tags_data.reverse! if sort_order.normalize_order == :asc
       case format
       when :html
 

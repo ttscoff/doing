@@ -6,15 +6,20 @@ module Doing
   ##
   class ::Array
     ##
-    ## Convert an @tags to plain strings
+    ## Convert an array of @tags to plain strings
     ##
     ## @return     [Array] array of strings
     ##
     def tags_to_array
-      map(&:remove_at)
+      map(&:remove_at).map(&:strip)
     end
 
-    # Convert strings to @tags
+    # Convert an array of @tags to plain strings in place
+    def tags_to_array!
+      replace tags_to_array
+    end
+
+    # Convert array of strings to array of @tags
     #
     # @return     [Array] Array of @tags
     #
@@ -25,6 +30,7 @@ module Doing
       map(&:add_at)
     end
 
+    # Convert array of strings to array of @tags in place
     def to_tags!
       replace to_tags
     end
@@ -56,11 +62,9 @@ module Doing
     ##
     ## @param      value  The value to set
     ##
-    def nested_hash(value)
-      raise StandardError, 'Value can not be nil' if value.nil?
-
+    def nested_hash(value = nil)
       hsh = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
-      hsh.dig(*self[0..-2])[self.fetch(-1)] = value
+      hsh.dig(*self[0..-2])[fetch(-1)] = value
       hsh
     end
   end

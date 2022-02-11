@@ -50,11 +50,15 @@ command %i[mark flag] do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :pattern,
+                  type: BooleanSymbol
 
   c.desc 'Select item(s) to flag from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
@@ -67,15 +71,9 @@ command %i[mark flag] do |c|
 
     section = 'All'
 
-    if options[:section]
-      section = @wwid.guess_section(options[:section]) || options[:section].cap_first
-    end
+    section = @wwid.guess_section(options[:section]) || options[:section].cap_first if options[:section]
 
-    if options[:tag].nil?
-      search_tags = []
-    else
-      search_tags = options[:tag]
-    end
+    search_tags = options[:tag].nil? ? [] : options[:tag]
 
     if options[:interactive]
       count = 0
@@ -84,8 +82,6 @@ command %i[mark flag] do |c|
       count = options[:count].to_i
     end
 
-    options[:case] = options[:case].normalize_case
-
     if options[:search]
       search = options[:search]
       search.sub!(/^'?/, "'") if options[:exact]
@@ -93,16 +89,15 @@ command %i[mark flag] do |c|
     end
 
     if count.zero? && !options[:force]
-      if options[:search]
-        section_q = ' matching your search terms'
-      elsif options[:tag]
-        section_q = ' matching your tag search'
-      elsif section == 'All'
-        section_q = ''
-      else
-        section_q = " in section #{section}"
-      end
-
+      section_q = if options[:search]
+                    ' matching your search terms'
+                  elsif options[:tag]
+                    ' matching your tag search'
+                  elsif section == 'All'
+                    ''
+                  else
+                    " in section #{section}"
+                  end
 
       question = if options[:remove]
                    "Are you sure you want to unflag all entries#{section_q}"
@@ -119,7 +114,7 @@ command %i[mark flag] do |c|
     options[:section] = section
     options[:tag] = search_tags
     options[:tags] = [mark]
-    options[:tag_bool] = options[:bool].normalize_bool
+    options[:tag_bool] = options[:bool]
 
     @wwid.tag_last(options)
   end

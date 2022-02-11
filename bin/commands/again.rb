@@ -1,11 +1,18 @@
+# frozen_string_literal: true
+
 # @@again @@resume
 desc 'Repeat last entry as new entry'
-long_desc 'This command is designed to allow multiple time intervals to be created for an entry by duplicating it with a new start (and end, eventually) time'
+long_desc 'This command is designed to allow multiple time intervals to be created
+           for an entry by duplicating it with a new start (and end, eventually) time'
 command %i[again resume] do |c|
-  c.example 'doing resume', desc: 'Duplicate the most recent entry with a new start time, removing any @done tag'
-  c.example 'doing again', desc: 'again is an alias for resume'
-  c.example 'doing resume --editor', desc: 'Repeat the last entry, opening the new entry in the default editor'
-  c.example 'doing resume --tag project1 --in Projects', desc: 'Repeat the last entry tagged @project1, creating the new entry in the Projects section'
+  c.example 'doing resume',
+            desc: 'Duplicate the most recent entry with a new start time, removing any @done tag'
+  c.example 'doing again',
+            desc: 'again is an alias for resume'
+  c.example 'doing resume --editor',
+            desc: 'Repeat the last entry, opening the new entry in the default editor'
+  c.example 'doing resume --tag project1 --in Projects',
+            desc: 'Repeat the last entry tagged @project1, creating the new entry in the Projects section'
   c.example 'doing resume --interactive', desc: 'Select the entry to repeat from a menu'
 
   c.desc 'Get last entry from a specific section'
@@ -29,7 +36,8 @@ command %i[again resume] do |c|
   c.arg_name 'QUERY'
   c.flag [:search]
 
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
+          May be used multiple times, combined with --bool'
   c.arg_name 'QUERY'
   c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
@@ -44,11 +52,15 @@ command %i[again resume] do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :pattern,
+                  type: BooleanSymbol
 
   c.desc "Edit duplicated entry with #{Doing::Util.default_editor} before adding"
   c.switch %i[e editor], negatable: false, default_value: false
@@ -65,35 +77,26 @@ command %i[again resume] do |c|
 
   c.action do |_global_options, options, _args|
     options[:fuzzy] = false
-    tags = options[:tag].nil? ? [] : options[:tag]
-
-    options[:case] = options[:case].normalize_case
 
     if options[:search]
-      search = options[:search]
-      search.sub!(/^'?/, "'") if options[:exact]
-      options[:search] = search
+      options[:search] = options[:exact] ? options[:search].sub(/^'?/, "'") : options[:search]
     end
 
     if options[:back]
-      date = options[:back]
+      options[:date] = options[:back]
       raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
+
     else
-      date = Time.now
+      options[:date] = Time.now
     end
 
     note = Doing::Note.new(options[:note])
     note.add(Doing::Prompt.read_lines(prompt: 'Add a note')) if options[:ask]
 
     options[:note] = note
+    options[:tag] ||= []
+    options[:tag_bool] = options[:bool]
 
-    opts = options.clone
-
-    opts[:tag] = tags
-    opts[:tag_bool] = options[:bool].normalize_bool
-    opts[:interactive] = options[:interactive]
-    opts[:date] = date
-
-    @wwid.repeat_last(opts)
+   @wwid.repeat_last(options)
   end
 end

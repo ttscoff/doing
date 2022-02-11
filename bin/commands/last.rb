@@ -27,7 +27,9 @@ command :last do |c|
 
   c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :pattern,
+                  type: BooleanSymbol
 
   c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
   c.arg_name 'QUERY'
@@ -62,20 +64,15 @@ command :last do |c|
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
+  c.flag [:case], must_match: REGEX_CASE,
+                  default_value: @settings.dig('search', 'case').normalize_case,
+                  type: CaseSymbol
 
   c.action do |global_options, options, _args|
     options[:fuzzy] = false
     raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
 
-    if options[:tag].nil?
-      options[:tag] = []
-    else
-      options[:tag] = options[:tag]
-      options[:bool] = options[:bool].normalize_bool
-    end
-
-    options[:case] = options[:case].normalize_case
+    options[:tag] ||= []
 
     options[:search] = options[:search].sub(/^'?/, "'") if options[:search] && options[:exact]
 
