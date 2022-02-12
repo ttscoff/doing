@@ -1,3 +1,11 @@
+### 2.1.27
+
+2022-02-12 06:07
+
+#### IMPROVED
+
+- Code refactoring and cleanup
+
 ### 2.1.26
 
 2022-01-23 16:14

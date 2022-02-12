@@ -5,7 +5,7 @@ module Doing
   class Change
     attr_reader :version, :content
 
-    attr_accessor :entries
+    attr_accessor :entries, :change_date
 
     def initialize(version, content)
       @version = Version.new(version)
@@ -14,6 +14,9 @@ module Doing
     end
 
     def parse_entries
+      date = @content.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      @change_date = Time.parse(date[0]) if date
+
       @entries = []
       types = @content.scan(/(?<=\n|\A)#### (NEW|IMPROVED|FIXED)(.*?)(?=\n####|\Z)/m)
       types.each do |type|
@@ -53,14 +56,9 @@ module Doing
       { version: @version, content: @content }
     end
 
-    def to_s
-      out = ["### #{@version}"]
-      items = {
-        new: [],
-        improved: [],
-        fixed: [],
-        other: []
-      }
+    def split_items
+      items = { new: [], improved: [], fixed: [], other: [] }
+
       @entries.each do |e|
         type = e.type.downcase.to_sym
         if items.key?(type)
@@ -70,7 +68,14 @@ module Doing
         end
       end
 
-      items.each do |type, members|
+      items
+    end
+
+    def to_s
+      out = ["### __#{@version}__"]
+      out << "Released _#{@change_date.strftime('%F')}_" unless @change_date.nil?
+
+      split_items.each do |type, members|
         if members.count.positive?
           out << "#### #{type.to_s.capitalize}"
           out << members.map(&:to_s).join("\n")
