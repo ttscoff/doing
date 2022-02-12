@@ -72,8 +72,8 @@ module Doing
     end
 
     def to_s
-      out = ["### __#{@version}__"]
-      out << "Released _#{@change_date.strftime('%F')}_" unless @change_date.nil?
+      date = @change_date.nil? ? '' : " _(#{@change_date.strftime('%F')})_"
+      out = ["### __#{@version}__#{date}"]
 
       split_items.each do |type, members|
         if members.count.positive?

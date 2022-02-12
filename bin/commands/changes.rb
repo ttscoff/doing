@@ -35,7 +35,21 @@ command %i[changes changelog] do |c|
                 cl.latest
               end
 
-    parsed = TTY::Markdown.parse(content, width: 80, symbols: {override: {bullet: "•"}})
+    theme = {
+      em: [:white, :dark],
+      header: [:cyan, :bold],
+      hr: :yellow,
+      link: [:bright_cyan, :underline],
+      list: :yellow,
+      strong: [:yellow, :bold],
+      table: :yellow,
+      quote: :yellow,
+      image: :bright_black,
+      note: :yellow,
+      comment: :bright_black
+    }
+
+    parsed = TTY::Markdown.parse(content, width: 80, theme: theme, symbols: {override: {bullet: "•"}})
     Doing::Pager.paginate = true
     Doing::Pager.page parsed
   end
