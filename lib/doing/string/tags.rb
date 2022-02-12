@@ -41,7 +41,7 @@ module Doing
     ## @return     [String] the tagged string
     ##
     def add_tags(tags, remove: false)
-      title = self.dup
+      title = dup
       tags = tags.to_tags
       tags.each { |tag| title.tag!(tag, remove: remove) }
       title

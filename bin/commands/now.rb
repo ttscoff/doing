@@ -64,7 +64,7 @@ command %i[now next] do |c|
     if options[:section]
       section = @wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      options[:section] = @settings['current_section']
+      section = @settings['current_section']
     end
 
     ask_note = options[:ask] && !options[:editor] && args.count.positive? ? Doing::Prompt.read_lines(prompt: 'Add a note') : ''

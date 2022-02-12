@@ -23,9 +23,18 @@ class ThreadedTests
     c = Doing::Color
     c.coloring = true
 
-    pattern = "test/doing_*#{pattern}*_test.rb"
+    shuffle = false
+
+    unless pattern =~ /shuffle/i
+      pattern = "test/doing_*#{pattern}*_test.rb"
+    else
+      pattern = "test/doing_*_test.rb"
+      shuffle = true
+    end
 
     tests = Dir.glob(pattern)
+
+    tests.shuffle! if shuffle
 
     if max_tests.to_i > 0
       tests = tests.slice(0, max_tests.to_i - 1)

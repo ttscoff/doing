@@ -260,10 +260,10 @@ around do |global, command, options, arguments, code|
   end
 
   if global[:yes]
-    Doing::Prompt.force_answer = true
+    Doing::Prompt.force_answer = :yes
     Doing.config.force_answer = true
   elsif global[:no]
-    Doing::Prompt.force_answer = false
+    Doing::Prompt.force_answer = :no
     Doing.config.force_answer = false
   else
     Doing::Prompt.default_answer = if $stdout.isatty

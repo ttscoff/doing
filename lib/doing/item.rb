@@ -177,7 +177,7 @@ module Doing
       tags.each do |tag|
         bool = remove ? :and : :not
         if tags?(tag, bool)
-          @title.tag!(tag, **options).strip!
+          @title = @title.tag(tag, **options).strip
           remove ? removed.push(tag) : added.push(tag)
         end
       end

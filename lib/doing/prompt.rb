@@ -107,9 +107,7 @@ module Doing
       ## @return     (Bool) yes or no
       ##
       def yn(question, default_response: false)
-        unless @force_answer.nil?
-          return @force_answer
-        end
+        return @force_answer == :yes ? true : false unless @force_answer.nil?
 
         $stdin.reopen('/dev/tty')
 

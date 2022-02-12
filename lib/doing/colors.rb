@@ -176,10 +176,6 @@ module Doing
       end
     end
 
-    def validate_color(color)
-      color.validate_color
-    end
-
     # Regular expression that is used to scan for ANSI-sequences while
     # uncoloring strings.
     COLORED_REGEXP = /\e\[(?:(?:[349]|10)[0-7]|[0-9])?m/
