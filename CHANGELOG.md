@@ -1,10 +1,12 @@
 ### 2.1.27
 
-2022-02-12 06:07
+2022-02-12 07:42
 
 #### IMPROVED
 
+- Allow various naming conventions for %color strings in templates. Now `boldwhite`, `brightwhite`, `bg_bold_cyan`, and `bold_bg_cyan` all work (for example)
 - Code refactoring and cleanup
+- Include release dates in `doing changes` output when available
 
 ### 2.1.26
 

@@ -4,6 +4,7 @@ module Doing
   ## Tag and search highlighting
   class ::String
     include Doing::Color
+
     ## @param (see #highlight_tags)
     def highlight_tags!(color = 'yellow', last_color: nil)
       replace highlight_tags(color)
