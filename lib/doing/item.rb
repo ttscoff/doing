@@ -278,7 +278,7 @@ module Doing
       case_type ||= prefs.fetch('case', 'smart').normalize_case
       new_note = Note.new
 
-      if search.is_rx? || matching == :fuzzy
+      if search.rx? || matching == :fuzzy
         rx = search.to_rx(distance: distance, case_type: case_type)
         new_title = @title.gsub(rx) { |m| yellow(m) }
         new_note.add(@note.to_s.gsub(rx) { |m| yellow(m) })
@@ -316,7 +316,7 @@ module Doing
       distance ||= prefs.fetch('distance', 3).to_i
       case_type ||= prefs.fetch('case', 'smart').normalize_case
 
-      if search.is_rx? || matching == :fuzzy
+      if search.rx? || matching == :fuzzy
         matches = @title + @note.to_s =~ search.to_rx(distance: distance, case_type: case_type)
       else
         query = search.strip.to_phrase_query
@@ -335,7 +335,7 @@ module Doing
       #   matches = text =~ search.to_rx(distance: distance, case_type: case_type)
       # end
 
-      # if search.is_rx? || !fuzzy
+      # if search.rx? || !fuzzy
       #   matches = text =~ search.to_rx(distance: distance, case_type: case_type)
       # else
       #   distance = 0.25 if distance > 1
@@ -393,7 +393,7 @@ module Doing
 
       Doing.logger.count(@section == 'Archive' ? :archived : :moved) if log
       Doing.logger.debug("#{@section == 'Archive' ? 'Archived' : 'Moved'}:",
-                         "#{@title.truncate(60)} from #{from} to #{@section}")
+                         "#{@title.trunc(60)} from #{from} to #{@section}")
       self
     end
 

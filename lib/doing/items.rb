@@ -102,7 +102,7 @@ module Doing
 
       self[s_idx] = new_item
       Doing.logger.count(:updated)
-      Doing.logger.info('Entry updated:', self[s_idx].title.truncate(60))
+      Doing.logger.info('Entry updated:', self[s_idx].title.trunc(60))
       new_item
     end
 

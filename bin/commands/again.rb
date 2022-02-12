@@ -97,6 +97,7 @@ command %i[again resume] do |c|
     options[:tag] ||= []
     options[:tag_bool] = options[:bool]
 
-   @wwid.repeat_last(options)
+    puts options[:case]
+   # @wwid.repeat_last(options)
   end
 end

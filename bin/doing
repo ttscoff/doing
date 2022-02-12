@@ -70,7 +70,7 @@ accept BooleanSymbol do |value|
 end
 
 accept CaseSymbol do |value|
-  value.normalize_case
+  value.normalize_case(@config.fetch('search', 'case', :smart))
 end
 
 accept AgeSymbol do |value|

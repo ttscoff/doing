@@ -28,7 +28,7 @@ module Doing
 
       matches = []
 
-      if search_string.is_rx?
+      if search_string.rx?
         matches = @entries.select { |e| e.string =~ search_string.to_rx(distance: 2, case_type: case_type) }
       else
         query = search_string.gsub(/(-)?--/, '\1]]').to_phrase_query
