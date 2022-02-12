@@ -41,7 +41,7 @@ module Doing
     ## @param      color  [String] the color to highlight
     ##                    with
     ##
-    ## @return     [String] string with @tags highlighted
+    ## @return     [Array] Array of highlighted @tags
     ##
     def highlight_tags(color = 'cyan')
       tag_color = Doing::Color.send(color)

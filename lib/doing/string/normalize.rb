@@ -86,8 +86,8 @@ module Doing
     end
 
     ## @see #normalize_case
-    def normalize_case!
-      replace normalize_case
+    def normalize_case!(default = :smart)
+      replace normalize_case(default)
     end
 
     ##

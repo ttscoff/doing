@@ -21,8 +21,8 @@ module Doing
       to_s.normalize_order(default)
     end
 
-    def normalize_case
-      self
+    def normalize_case(default = :smart)
+      to_s.normalize_case(default)
     end
 
     def normalize_matching(default = :pattern)
