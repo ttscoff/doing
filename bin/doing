@@ -38,11 +38,11 @@ env_log_level = nil
 if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DOING_VERBOSE'] || ENV['DOING_PLUGIN_DEBUG']
   env_log_level = true
   # Quiet always wins
-  if ENV['DOING_QUIET'] && ENV['DOING_QUIET'].truthy?
+  if ENV['DOING_QUIET']&.truthy?
     Doing.logger.log_level = :error
-  elsif (ENV['DOING_PLUGIN_DEBUG'] && ENV['DOING_PLUGIN_DEBUG'].truthy?)
+  elsif ENV['DOING_PLUGIN_DEBUG']&.truthy?
     Doing.logger.log_level = :debug
-  elsif (ENV['DOING_DEBUG'] && ENV['DOING_DEBUG'].truthy?)
+  elsif ENV['DOING_DEBUG']&.truthy?
     Doing.logger.log_level = :debug
   elsif ENV['DOING_LOG_LEVEL']
     Doing.logger.log_level = ENV['DOING_LOG_LEVEL']
@@ -51,11 +51,8 @@ end
 
 Doing.logger.benchmark(:total, :start)
 
-if ENV['DOING_CONFIG']
-  Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
-end
-
 Doing.logger.benchmark(:configure, :start)
+Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true }) if ENV['DOING_CONFIG']
 @config = Doing.config
 Doing.logger.benchmark(:configure, :finish)
 
@@ -66,7 +63,7 @@ Doing.logger.benchmark(:configure, :finish)
 commands_from File.expand_path(@settings.dig('plugins', 'command_path')) if @settings.dig('plugins', 'command_path')
 
 accept BooleanSymbol do |value|
-  value.normalize_bool
+  value.normalize_bool(:pattern)
 end
 
 accept CaseSymbol do |value|
@@ -74,19 +71,19 @@ accept CaseSymbol do |value|
 end
 
 accept AgeSymbol do |value|
-  value.normalize_age
+  value.normalize_age(:newest)
 end
 
 accept OrderSymbol do |value|
-  value.normalize_order
+  value.normalize_order(:asc)
 end
 
 accept MatchingSymbol do |value|
-  value.normalize_matching
+  value.normalize_matching(:pattern)
 end
 
 accept TagSortSymbol do |value|
-  value.normalize_tag_sort
+  value.normalize_tag_sort(@config.fetch('tag_sort', :name))
 end
 
 accept TemplateName do |value|

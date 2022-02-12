@@ -34,7 +34,7 @@ command %i[archive move] do |c|
   c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
   c.arg_name 'BOOLEAN'
   c.flag [:bool], must_match: REGEX_BOOL,
-                  default_value: 'PATTERN'.normalize_bool,
+                  default_value: :pattern,
                   type: BooleanSymbol
 
   c.desc 'Search filter'
