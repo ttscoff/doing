@@ -56,7 +56,10 @@ command :finish do |c|
                   default_value: :pattern,
                   type: BooleanSymbol
 
-  c.desc 'Remove done tag'
+  c.desc 'Overwrite existing @done tag with new date'
+  c.switch %i[update], negatable: false, default_value: false
+
+  c.desc 'Remove @done tag'
   c.switch %i[r remove], negatable: false, default_value: false
 
   c.desc 'Finish last entry (or entries) not already marked @done'
@@ -145,6 +148,7 @@ command :finish do |c|
       tags: ['done'],
       took: options[:took],
       unfinished: options[:unfinished],
+      update: options[:update],
       val: options[:val]
     }
 

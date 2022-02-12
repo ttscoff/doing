@@ -1211,6 +1211,7 @@ module Doing
       opt[:sequential] ||= false
       opt[:date] ||= false
       opt[:remove] ||= false
+      opt[:update] ||= false
       opt[:autotag] ||= false
       opt[:back] ||= false
       opt[:unfinished] ||= false
@@ -1323,7 +1324,7 @@ module Doing
             else
               old_title = item.title.dup
               should_date = opt[:date] && item.should_time?
-              item.title.tag!('done', remove: true) if tag =~ /done/ && !should_date
+              item.title.tag!('done', remove: true) if tag =~ /done/ && (!should_date || opt[:update])
               item.title.tag!(tag, value: should_date ? done_date.strftime('%F %R') : nil)
               added << tag if old_title != item.title
             end
