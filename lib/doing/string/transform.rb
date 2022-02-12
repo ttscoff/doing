@@ -5,7 +5,6 @@ module Doing
   ## String helpers
   ##
   class ::String
-    include Doing::Color
     # Compress multiple spaces to single space
     def compress
       gsub(/ +/, ' ').strip
