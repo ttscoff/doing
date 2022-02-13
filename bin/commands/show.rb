@@ -18,20 +18,6 @@ command :show do |c|
   c.example 'doing show Ideas @doing --from "mon to fri"', desc: 'Show entries tagged @doing from the Ideas section added between monday and friday of the current week.'
   c.example 'doing show --interactive Later @doing', desc: 'Create a menu from entries from the Later section tagged @doing to perform batch actions'
 
-  c.desc 'Tag filter, combine multiple tags with a comma. Use `--tag pick` for a menu of available tags. Wildcards allowed (*, ?). Added for compatibility with other commands'
-  c.arg_name 'TAG'
-  c.flag [:tag], type: TagArray
-
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
-  c.arg_name 'QUERY'
-  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  c.desc 'Tag boolean (AND,OR,NOT). Use PATTERN to parse + and - as booleans'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL,
-                  default_value: :pattern,
-                  type: BooleanSymbol
-
   c.desc 'Max count to show'
   c.arg_name 'MAX'
   c.flag %i[c count], default_value: 0, must_match: /^\d+$/, type: Integer
@@ -56,31 +42,11 @@ command :show do |c|
       If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
       by time of day.
     )
-
   c.arg_name 'DATE_OR_RANGE'
   c.flag [:from], type: DateRangeString
 
-  c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: @settings.dig('search', 'highlight')
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
-  c.desc 'Show items that *don\'t* match search/tag/date filters'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: REGEX_CASE,
-                  default_value: @settings.dig('search', 'case').normalize_case,
-                  type: CaseSymbol
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
@@ -124,6 +90,10 @@ command :show do |c|
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
   c.flag %i[o output]
+
+  add_options(:search, c)
+  add_options(:tag_filter, c)
+
   c.action do |global_options, options, args|
     options[:fuzzy] = false
     if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)

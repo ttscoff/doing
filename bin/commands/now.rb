@@ -20,9 +20,6 @@ command %i[now next] do |c|
   c.arg_name 'NAME'
   c.flag %i[s section]
 
-  c.desc "Edit entry with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
-
   c.desc 'Backdate start time [4pm|20m|2h|"yesterday noon"]'
   c.arg_name 'DATE_STRING'
   c.flag %i[b back started], type: DateBeginString
@@ -37,19 +34,16 @@ command %i[now next] do |c|
   c.desc 'Timed entry, marks last entry in section as @done'
   c.switch %i[f finish_last], negatable: false, default_value: false
 
-  c.desc 'Include a note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  c.desc 'Prompt for note via multi-line input'
-  c.switch %i[ask], negatable: false, default_value: false
+  add_options(:add_entry, c)
 
   # c.desc "Edit entry with specified app"
   # c.arg_name 'editor_app'
   # # c.flag [:a, :app]
 
   c.action do |_global_options, options, args|
-    raise InvalidArgument, "--back and --from cannot be used together" if options[:back] && options[:from]
+    @wwid.auto_tag = !options[:noauto]
+
+    raise InvalidArgument, '--back and --from cannot be used together' if options[:back] && options[:from]
 
     if options[:back]
       date = options[:back]
@@ -61,13 +55,17 @@ command %i[now next] do |c|
     end
     raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if date.nil?
 
-    if options[:section]
-      section = @wwid.guess_section(options[:section]) || options[:section].cap_first
-    else
-      section = @settings['current_section']
-    end
+    section = if options[:section]
+                @wwid.guess_section(options[:section]) || options[:section].cap_first
+              else
+                @settings['current_section']
+              end
 
-    ask_note = options[:ask] && !options[:editor] && args.count.positive? ? Doing::Prompt.read_lines(prompt: 'Add a note') : ''
+    ask_note = if options[:ask] && !options[:editor] && args.count.positive?
+                 Doing::Prompt.read_lines(prompt: 'Add a note')
+               else
+                 ''
+               end
 
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?

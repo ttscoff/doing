@@ -47,11 +47,6 @@ command :select do |c|
   c.arg_name 'QUERY'
   c.flag %i[q query]
 
-  c.desc 'Select from entries matching search filter, surround with slashes for regex (e.g. "/query.*/"),
-          start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
   c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
           May be used multiple times, combined with --bool'
   c.arg_name 'QUERY'
@@ -78,17 +73,8 @@ command :select do |c|
   c.arg_name 'DATE_OR_RANGE'
   c.flag [:from], type: DateRangeString
 
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
   c.desc 'Select items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: REGEX_CASE,
-                  default_value: @settings.dig('search', 'case').normalize_case,
-                  type: CaseSymbol
 
   c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically.
           Test with `--output doing` to preview matches'
@@ -120,11 +106,17 @@ command :select do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
-  c.desc "Copy selection as a new entry with current time and no @done tag. Only works with single selections. Can be combined with --editor."
+  c.desc 'Copy selection as a new entry with current time and no @done tag.
+          Only works with single selections. Can be combined with --editor.'
   c.switch %i[again resume], negatable: false, default_value: false
 
-  c.action do |_global_options, options, args|
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+  add_options(:search, c)
+
+  c.action do |_global_options, options, _args|
+    if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+      raise DoingRuntimeError, %(Invalid output type "#{options[:output]}")
+
+    end
 
     raise InvalidArgument, '--no-menu requires --query' if !options[:menu] && !options[:query]
 

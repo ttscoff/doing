@@ -20,43 +20,11 @@ command %i[reset begin] do |c|
   c.desc 'Change start date but do not remove @done (shortcut for --no-resume)'
   c.switch [:n]
 
-  c.desc 'Reset last entry matching tag. Wildcards allowed (*, ?)'
-  c.arg_name 'TAG'
-  c.flag [:tag]
-
-  c.desc 'Reset last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"),
-          start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
-          May be used multiple times, combined with --bool'
-  c.arg_name 'QUERY'
-  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
-  c.desc 'Reset items that *don\'t* match search/tag filters'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: REGEX_CASE,
-                  default_value: @settings.dig('search', 'case').normalize_case,
-                  type: CaseSymbol
-
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL,
-                  default_value: :pattern,
-                  type: BooleanSymbol
-
   c.desc 'Select from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
+
+  add_options(:search, c)
+  add_options(:tag_filter, c)
 
   c.action do |global_options, options, args|
     if args.count.positive?

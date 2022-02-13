@@ -85,6 +85,16 @@ module Doing
       out.join("\n\n")
     end
 
+    def changes_only
+      out = []
+
+      split_items.each do |_, members|
+        out << members.map(&:to_s).join("\n")
+      end
+
+      out.join("")
+    end
+
     private
 
     def all_searches?(text, searches)

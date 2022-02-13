@@ -11,24 +11,8 @@ command :import do |c|
   c.arg_name 'TYPE'
   c.flag :type, default_value: 'doing'
 
-  c.desc 'Only import items matching search. Surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
   c.desc 'Import items that *don\'t* match search/tag/date filters'
   c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: REGEX_CASE,
-                  default_value: @settings.dig('search', 'case').normalize_case,
-                  type: CaseSymbol
 
   c.desc 'Only import items with recorded time intervals'
   c.switch [:only_timed], default_value: false, negatable: false
@@ -67,6 +51,8 @@ command :import do |c|
 
   c.desc 'Allow entries that overlap existing times'
   c.switch [:overlap], negatable: true
+
+  add_options(:search, c)
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false

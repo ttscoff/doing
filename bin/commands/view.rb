@@ -35,41 +35,8 @@ command :view do |c|
   c.desc 'Include colors in output'
   c.switch [:color], default_value: true, negatable: true
 
-  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?)'
-  c.arg_name 'TAG'
-  c.flag [:tag]
-
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
-  c.arg_name 'QUERY'
-  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL,
-                  default_value: :pattern,
-                  type: BooleanSymbol
-
-  c.desc 'Search filter, surround with slashes for regex (/query/), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: @settings.dig('search', 'highlight')
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
-  c.desc 'Show items that *don\'t* match search string'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: REGEX_CASE,
-                  default_value: @settings.dig('search', 'case').normalize_case,
-                  type: CaseSymbol
 
   c.desc 'Sort tags by (name|time)'
   c.arg_name 'KEY'
@@ -106,9 +73,15 @@ command :view do |c|
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
 
+  add_options(:search, c)
+  add_options(:tag_filter, c)
+
   c.action do |global_options, options, args|
     options[:fuzzy] = false
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+      raise DoingRuntimeError, %(Invalid output type "#{options[:output]}")
+
+    end
 
     raise InvalidArgument, '--tag and --search can not be used together' if options[:tag] && options[:search]
 
@@ -117,7 +90,7 @@ command :view do |c|
             else
               begin
                 @wwid.guess_view(args[0])
-              rescue WrongCommand => exception
+              rescue WrongCommand
                 cmd = commands[:show]
                 options[:sort] = :asc
                 options[:tag_order] = :asc
@@ -126,11 +99,11 @@ command :view do |c|
               end
             end
 
-    if options[:section]
-      section = @wwid.guess_section(options[:section]) || options[:section].cap_first
-    else
-      section = @settings['current_section']
-    end
+    section = if options[:section]
+                @wwid.guess_section(options[:section]) || options[:section].cap_first
+              else
+                @settings['current_section']
+              end
 
     view = @wwid.get_view(title)
 

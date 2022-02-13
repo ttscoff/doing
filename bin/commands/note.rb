@@ -24,45 +24,14 @@ command :note do |c|
   c.desc "Replace/Remove last entry's note (default append)"
   c.switch %i[r remove], negatable: false, default_value: false
 
-  c.desc 'Add/remove note from last entry matching tag. Wildcards allowed (*, ?)'
-  c.arg_name 'TAG'
-  c.flag [:tag], type: TagArray
-
-  c.desc 'Add/remove note from last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
-          May be used multiple times, combined with --bool'
-  c.arg_name 'QUERY'
-  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
-  c.desc 'Add note to item that *doesn\'t* match search/tag filters'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: REGEX_CASE,
-                  default_value: @settings.dig('search', 'case').normalize_case,
-                  type: CaseSymbol
-
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL,
-                  default_value: :pattern,
-                  type: BooleanSymbol
-
   c.desc 'Select item for new note from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.desc 'Prompt for note via multi-line input'
   c.switch %i[ask], negatable: false, default_value: false
+
+  add_options(:search, c)
+  add_options(:tag_filter, c)
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false

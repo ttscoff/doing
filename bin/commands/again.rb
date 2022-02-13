@@ -27,53 +27,14 @@ command %i[again resume] do |c|
   c.arg_name 'DATE_STRING'
   c.flag %i[b back started], type: DateBeginString
 
-  c.desc 'Repeat last entry matching tags. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
-  c.arg_name 'TAG'
-  c.flag [:tag], type: TagArray
 
-  c.desc 'Repeat last entry matching search. Surround with
-  slashes for regex (e.g. "/query/"), start with a single quote for exact match ("\'query").'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
-          May be used multiple times, combined with --bool'
-  c.arg_name 'QUERY'
-  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
-  c.desc 'Resume items that *don\'t* match search/tag filters'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: REGEX_CASE,
-                  default_value: @settings.dig('search', 'case').normalize_case,
-                  type: CaseSymbol
-
-  c.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL,
-                  default_value: :pattern,
-                  type: BooleanSymbol
-
-  c.desc "Edit duplicated entry with #{Doing::Util.default_editor} before adding"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc 'Add a note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  c.desc 'Prompt for note via multi-line input'
-  c.switch %i[ask], negatable: false, default_value: false
 
   c.desc 'Select item to resume from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
+
+  add_options(:add_entry, c)
+  add_options(:search, c)
+  add_options(:tag_filter, c)
 
   c.action do |_global_options, options, _args|
     options[:fuzzy] = false

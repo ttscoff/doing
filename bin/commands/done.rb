@@ -45,24 +45,14 @@ command %i[done did] do |c|
   c.arg_name 'NAME'
   c.flag %i[s section]
 
-  c.desc "Edit entry with #{Doing::Util.default_editor} (with no arguments, edits the last entry)"
-  c.switch %i[e editor], negatable: false, default_value: false
-
-  c.desc 'Include a note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  c.desc 'Prompt for note via multi-line input'
-  c.switch %i[ask], negatable: false, default_value: false
-
   c.desc 'Finish last entry not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false
 
-  # c.desc "Edit entry with specified app"
-  # c.arg_name 'editor_app'
-  # # c.flag [:a, :app]
+  add_options(:add_entry, c)
 
   c.action do |_global_options, options, args|
+    @wwid.auto_tag = !options[:noauto]
+
     took = 0
     donedate = nil
 
