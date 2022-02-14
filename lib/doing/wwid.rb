@@ -659,7 +659,7 @@ module Doing
     ## @option opt [Array] :val (nil) Array of tag value queries
     ##
     def filter_items(items = Items.new, opt: {})
-      Doing.logger.benchmark(:filter_items, :start)
+      logger.benchmark(:filter_items, :start)
       time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
 
       if items.nil? || items.empty?
@@ -811,7 +811,7 @@ module Doing
         output.concat(filtered_items.reverse.slice(0, count))
       end
 
-      Doing.logger.benchmark(:filter_items, :finish)
+      logger.benchmark(:filter_items, :finish)
 
       output
     end
@@ -1623,6 +1623,7 @@ module Doing
     ## @param      opt   [Hash] Additional Options
     ##
     def list_section(opt, items: Items.new)
+      logger.benchmark(:list_section, :start)
       opt[:config_template] ||= 'default'
 
       tpl_cfg = @config.dig('templates', opt[:config_template])
@@ -1698,6 +1699,7 @@ module Doing
       opt[:output] ||= 'template'
       opt[:wrap_width] ||= @config['templates']['default']['wrap_width'] || 0
 
+      logger.benchmark(:list_section, :finish)
       output(items, title, is_single, opt)
     end
 
@@ -2214,9 +2216,9 @@ EOS
         Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
       end
 
-      Doing.logger.benchmark(:configure, :start)
+      logger.benchmark(:configure, :start)
       config = Doing.config
-      Doing.logger.benchmark(:configure, :finish)
+      logger.benchmark(:configure, :finish)
 
       config.settings['backup_dir'] = ENV['DOING_BACKUP_DIR'] if ENV['DOING_BACKUP_DIR']
       @config = config.settings
@@ -2270,6 +2272,7 @@ EOS
     ##             template trigger
     ##
     def output(items, title, is_single, opt)
+      logger.benchmark(:output, :start)
       opt ||= {}
       out = nil
 
@@ -2287,7 +2290,7 @@ EOS
       end
 
       logger.debug('Output:', "#{items.count} #{items.count == 1 ? 'item' : 'items'} shown")
-
+      logger.benchmark(:output, :finish)
       out
     end
 

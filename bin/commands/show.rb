@@ -154,6 +154,7 @@ command :show do |c|
     items = @wwid.filter_items([], opt: options)
 
     if options[:menu]
+      Doing.logger.benchmark(:menu, :start)
       tag = @wwid.choose_tag(section, items: items, include_all: true)
       raise UserCancelled unless tag
 
@@ -165,6 +166,7 @@ command :show do |c|
         }
         options[:tag_filter] = tag_filter
       end
+      Doing.logger.benchmark(:menu, :finish)
     end
 
     options[:age] ||= :newest

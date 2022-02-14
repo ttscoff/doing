@@ -17,6 +17,7 @@ module Doing
     end
 
     def self.render(wwid, items, variables: {})
+      # Doing.logger.benchmark(:template_render, :start)
       return if items.nil?
 
       opt = variables[:options]
@@ -136,6 +137,7 @@ module Doing
                               sort_by: opt[:sort_tags],
                               sort_order: opt[:tag_order])
       end
+      # Doing.logger.benchmark(:template_render, :finish)
       out
     end
 
