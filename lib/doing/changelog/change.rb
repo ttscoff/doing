@@ -92,7 +92,7 @@ module Doing
         out << members.map(&:to_s).join("\n")
       end
 
-      out.join("")
+      out.join("\n")
     end
 
     private

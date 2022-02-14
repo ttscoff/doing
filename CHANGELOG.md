@@ -1,3 +1,11 @@
+### 2.1.28
+
+2022-02-14 11:39
+
+#### FIXED
+
+- Lines merging in `doing changes --changes` output
+
 ### 2.1.27
 
 2022-02-14 06:04

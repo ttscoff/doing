@@ -230,6 +230,7 @@ complete -c doing -l all -s a -f  -n '__fish_doing_using_command changes changel
 complete -c doing -l lookup -s l -f -r -n '__fish_doing_using_command changes changelog' -d Look\ up\ a\ specific\ version
 complete -c doing -l markdown  -f  -n '__fish_doing_using_command changes changelog' -d Output\ raw\ Markdown
 complete -c doing -l search -s s -f -r -n '__fish_doing_using_command changes changelog' -d Show\ changelogs\ matching\ search\ terms
+complete -c doing -l sort  -f -r -n '__fish_doing_using_command changes changelog' -d Sort\ order
 complete -c doing -l file -s f -f -r -n '__fish_doing_using_command completion' -d File\ to\ write\ output\ to
 complete -c doing -l type -s t -f -r -n '__fish_doing_using_command completion' -d Shell\ to\ generate\ for
 complete -c doing -l dump -s d -f  -n '__fish_doing_using_command config' -d DEPRECATED
@@ -558,7 +559,7 @@ complete -c doing -l template  -f -r -n '__fish_doing_using_command yesterday' -
 complete -c doing -l totals  -f  -n '__fish_doing_using_command yesterday' -d Show\ time\ totals\ at\ the\ end\ of\ output
 complete -f -c doing -s o -l output -x -n '__fish_doing_using_command grep search on select show since today view yesterday' -a '(__fish_doing_export_plugin)'
 complete -f -c doing -s b -l bool -x -n '__fish_doing_using_command again resume archive move autotag cancel finish grep search last mark flag note reset begin rotate show tag tags view wiki' -a 'and or not pattern'
-complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel finish grep search import last mark flag note reset begin rotate select show show tag tags tags view' -a 'case-sensitive ignore smart'
+complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel changes changelog finish grep search import last mark flag note reset begin rotate select show show tag tags tags view' -a 'case-sensitive ignore smart'
 complete -f -c doing -l tag_sort -x -n '__fish_doing_using_command grep search on recent show since today view yesterday' -a 'name time'
 complete -f -c doing -l tag_order -x -n '__fish_doing_using_command show view yesterday' -a 'asc desc'
 complete -f -c doing -s a -l age -x -n '__fish_doing_using_command show view' -a 'oldest newest'

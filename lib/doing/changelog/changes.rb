@@ -6,13 +6,15 @@ module Doing
     attr_reader :changes
     attr_writer :changes_only
 
-    def initialize(lookup: nil, search: nil, changes_only: false)
-      @changes_only = changes_only
+    def initialize(lookup: nil, search: nil, changes: false, sort: :desc)
+      @changes_only = changes
       changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'CHANGELOG.md'))
       raise 'Error locating changelog' unless File.exist?(changelog)
 
       @content = IO.read(changelog)
       parse_changes(lookup, search)
+
+      @changes.reverse! if sort == :asc
     end
 
     def latest
