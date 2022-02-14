@@ -35,6 +35,10 @@ command %i[changes changelog] do |c|
            Add slashes to search with regular expressions, e.g. `--search "/output.*flag/"`)
   c.flag %i[s search]
 
+  c.desc 'Sort order (asc/desc)'
+  c.arg_name 'ORDER'
+  c.flag %i[sort], must_match: REGEX_SORT_ORDER, default_value: :desc, type: OrderSymbol
+
   c.desc 'Only output changes, no version numbers, headers, or dates'
   c.switch %i[C changes], default_value: false, negatable: false
 
@@ -49,7 +53,7 @@ command %i[changes changelog] do |c|
   c.example 'doing changes -l "> 2.1" -s "pattern"', desc: 'Lookup and search can be combined'
 
   c.action do |_global_options, options, _args|
-    cl = Doing::Changes.new(lookup: options[:lookup], search: options[:search], changes_only: options[:changes])
+    cl = Doing::Changes.new(lookup: options[:lookup], search: options[:search], changes: options[:changes], sort: options[:sort])
 
     content = if options[:all] || options[:search] || options[:lookup]
                 cl.to_s
