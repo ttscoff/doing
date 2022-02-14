@@ -1,6 +1,6 @@
 ### 2.1.27
 
-2022-02-13 06:32
+2022-02-14 05:24
 
 #### NEW
 
@@ -8,6 +8,7 @@
 
 #### IMPROVED
 
+- `doing archive` now accepts `--after` and `--from` date filters
 - Code refactoring and cleanup
 - Include release dates in `doing changes` output when available
 - Allow various naming conventions for %color strings in templates. Now `boldwhite`, `brightwhite`, `bg_bold_cyan`, and `bold_bg_cyan` all work (for example)

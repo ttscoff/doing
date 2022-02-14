@@ -659,6 +659,7 @@ module Doing
     ## @option opt [Array] :val (nil) Array of tag value queries
     ##
     def filter_items(items = Items.new, opt: {})
+      Doing.logger.benchmark(:filter_items, :start)
       time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
 
       if items.nil? || items.empty?
@@ -809,6 +810,8 @@ module Doing
       else
         output.concat(filtered_items.reverse.slice(0, count))
       end
+
+      Doing.logger.benchmark(:filter_items, :finish)
 
       output
     end

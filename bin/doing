@@ -156,6 +156,20 @@ end
 ## @param      cmd   The GLI command to which the options will be added
 ##
 def add_options(type, cmd)
+  cmd_name = cmd.name.to_s
+  action = case cmd_name
+           when /again/
+             'Repeat'
+           when /grep/
+             'Search'
+           when /mark/
+             'Flag'
+           when /(last|tags|view)/
+             'Show'
+           else
+             cmd_name.capitalize
+           end
+
   case type
   when :add_entry
     cmd.desc 'Exclude auto tags and default tags'
@@ -198,31 +212,46 @@ def add_options(type, cmd)
     cmd.arg_name 'QUERY'
     cmd.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
-    cmd.desc 'Select items that *don\'t* match search/tag filters'
+    cmd.desc "#{action} items that *don't* match search/tag filters"
     cmd.switch [:not], default_value: false, negatable: false
 
     cmd.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
     cmd.arg_name 'BOOLEAN'
     cmd.flag [:bool], must_match: REGEX_BOOL,
-                    default_value: :pattern,
-                    type: BooleanSymbol
+                      default_value: :pattern,
+                      type: BooleanSymbol
   when :date_filter
-    cmd.desc 'Select entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
+    if action =~ /Archive/
+      cmd.desc 'Archive entries older than date (natural language).'
+    else
+      cmd.desc "#{action} entries older than date (natural language). If this is only a time (8am, 1:30pm, 15:00), all
+              dates will be included, but entries will be filtered by time of day"
+    end
     cmd.arg_name 'DATE_STRING'
     cmd.flag [:before], type: DateBeginString
 
-    cmd.desc 'Select entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
+    if action =~ /Archive/
+      cmd.desc 'Archive entries newer than date (natural language).'
+    else
+      cmd.desc "#{action} entries newer than date (natural language). If this is only a time (8am, 1:30pm, 15:00), all
+              dates will be included, but entries will be filtered by time of day"
+    end
     cmd.arg_name 'DATE_STRING'
     cmd.flag [:after], type: DateEndString
 
-    cmd.desc %(
-        Date range to select, or a single day to filter date on.
-        Date range argument should be quoted. Date specifications can be natural language.
-        To specify a range, use "to" or "through": `doing search --from "monday 8am to friday 5pm"`.
+    if action =~ /Archive/
+      cmd.desc %(
+          Date range (natural language) to archive: `doing archive --from "1/1/21 to 12/31/21"`.
+        )
+    else
+      cmd.desc %(
+        Date range (natural language) to #{action.downcase}, or a single day to filter on.
+        To specify a range, use "to": `doing #{cmd_name} --from "monday 8am to friday 5pm"`.
 
         If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
         by time of day.
       )
+    end
     cmd.arg_name 'DATE_OR_RANGE'
     cmd.flag [:from], type: DateRangeString
   end
