@@ -14,9 +14,13 @@ sbtrkt  fuzzy-match   Items that match s*b*t*r*k*t
 
 !fire   inverse-exact-match   Items that do not include fire'
 command :select do |c|
-  c.example 'doing select', desc: 'Select from all entries. A menu of available actions will be presented after confirming the selection.'
-  c.example 'doing select --editor', desc: 'Select entries from a menu and batch edit them in your default editor'
-  c.example 'doing select --after "yesterday 12pm" --tag project1', desc: 'Display a menu of entries created after noon yesterday, add @project1 to selected entries'
+  c.example 'doing select',
+            desc: 'Select from all entries. A menu of actions will be presented after confirming the selection.'
+  c.example 'doing select --editor',
+            desc: 'Select entries from a menu and batch edit them in your default editor'
+  c.example 'doing select --after "yesterday 12pm" --tag project1',
+            desc: 'Display a menu of entries created after noon yesterday, add @project1 to selected entries'
+
   c.desc 'Select from a specific section'
   c.arg_name 'SECTION'
   c.flag %i[s section]
@@ -38,48 +42,21 @@ command :select do |c|
   c.arg_name 'SECTION'
   c.flag %i[m move]
 
-  c.desc 'Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote, e.g. `--query "\'search"'
+  c.desc 'Initial search query for filtering. Matching is fuzzy. For exact matching, start query with a single quote,
+          e.g. `--query "\'search"'
   c.arg_name 'QUERY'
   c.flag %i[q query]
 
-  c.desc 'Select from entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
+  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
+          May be used multiple times, combined with --bool'
   c.arg_name 'QUERY'
   c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
-  c.arg_name 'DATE_STRING'
-  c.flag [:before], type: DateBeginString
-
-  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
-  c.arg_name 'DATE_STRING'
-  c.flag [:after], type: DateEndString
-
-  c.desc %(
-      Date range to show, or a single day to filter date on.
-      Date range argument should be quoted. Date specifications can be natural language.
-      To specify a range, use "to" or "through": `doing select --from "monday 8am to friday 5pm"`.
-
-      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
-      by time of day.
-    )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from], type: DateRangeString
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
 
   c.desc 'Select items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
-
-  c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically. Test with `--output doing` to preview matches'
+  c.desc 'Use --no-menu to skip the interactive menu. Use with --query to filter items and act on results automatically.
+          Test with `--output doing` to preview matches'
   c.switch %i[menu], negatable: true, default_value: true
 
   c.desc 'Cancel selected items (add @done without timestamp)'
@@ -108,15 +85,20 @@ command :select do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
-  c.desc "Copy selection as a new entry with current time and no @done tag. Only works with single selections. Can be combined with --editor."
+  c.desc 'Copy selection as a new entry with current time and no @done tag.
+          Only works with single selections. Can be combined with --editor.'
   c.switch %i[again resume], negatable: false, default_value: false
 
-  c.action do |_global_options, options, args|
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+  add_options(:search, c)
+  add_options(:date_filter, c)
+
+  c.action do |_global_options, options, _args|
+    if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+      raise DoingRuntimeError, %(Invalid output type "#{options[:output]}")
+
+    end
 
     raise InvalidArgument, '--no-menu requires --query' if !options[:menu] && !options[:query]
-
-    options[:case] = options[:case].normalize_case
 
     @wwid.interactive(options) # hooked
   end

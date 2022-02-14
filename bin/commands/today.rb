@@ -22,10 +22,9 @@ command :today do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = 'time'
-  default = @settings['tag_sort'] || 'name'
+  default = @settings['tag_sort'].normalize_tag_sort || :name
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
 
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
@@ -57,7 +56,7 @@ command :today do |c|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     options[:times] = true if options[:totals]
-    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    options[:sort_tags] = options[:tag_sort]
     filter_options = %i[after before duration from section sort_tags totals template config_template].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
 
     Doing::Pager.page @wwid.today(options[:times], options[:output], filter_options).chomp

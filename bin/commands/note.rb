@@ -24,50 +24,19 @@ command :note do |c|
   c.desc "Replace/Remove last entry's note (default append)"
   c.switch %i[r remove], negatable: false, default_value: false
 
-  c.desc 'Add/remove note from last entry matching tag. Wildcards allowed (*, ?)'
-  c.arg_name 'TAG'
-  c.flag [:tag], type: TagArray
-
-  c.desc 'Add/remove note from last entry matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
-  c.arg_name 'QUERY'
-  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
-  c.desc 'Add note to item that *doesn\'t* match search/tag filters'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
-
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
-
   c.desc 'Select item for new note from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
   c.desc 'Prompt for note via multi-line input'
   c.switch %i[ask], negatable: false, default_value: false
 
+  add_options(:search, c)
+  add_options(:tag_filter, c)
+
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
-    if options[:section]
-      options[:section] = @wwid.guess_section(options[:section]) || options[:section].cap_first
-    end
-
-    options[:tag_bool] = options[:bool].normalize_bool
-
-    options[:case] = options[:case].normalize_case
+    options[:section] = @wwid.guess_section(options[:section]) || options[:section].cap_first if options[:section]
+    options[:tag_bool] = options[:bool]
 
     if options[:search]
       search = options[:search]
@@ -78,30 +47,22 @@ command :note do |c|
     last_entry = @wwid.last_entry(options)
     old_entry = last_entry.clone
 
-    unless last_entry
-      Doing.logger.warn('Not found:', 'No entry matching parameters was found.')
-      return
-    end
+    raise NoResults, 'No entry matching parameters was found.' unless last_entry
 
     last_note = last_entry.note || Doing::Note.new
     new_note = Doing::Note.new
 
-    if $stdin.stat.size.positive?
-      new_note.add($stdin.read.strip)
-    end
-
-    unless args.empty?
-      new_note.add(args.join(' '))
-    end
+    new_note.add($stdin.read.strip) if $stdin.stat.size.positive?
+    new_note.add(args.join(' ')) unless args.empty?
 
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
 
-      if options[:remove]
-        input = Doing::Note.new
-      else
-        input = last_entry.note || Doing::Note.new
-      end
+      input = if options[:remove]
+                Doing::Note.new
+              else
+                last_entry.note || Doing::Note.new
+              end
 
       input.add(new_note)
 

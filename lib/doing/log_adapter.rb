@@ -277,17 +277,50 @@ module Doing
 
     def log_benchmarks
       if ENV['DOING_BENCHMARK']
+
         output = []
-        @benchmarks.each do |k, timers|
+        beginning = @benchmarks[:total][:start]
+        ending = @benchmarks[:total][:finish]
+        total = ending - beginning
+        factor = TTY::Screen.columns / total
+
+        cols = Array.new(TTY::Screen.columns)
+
+        colors = %w[bgred bggreen bgyellow bgblue bgmagenta bgcyan bgwhite boldbgred boldbggreen boldbgyellow boldbgblue boldbgwhite]
+        idx = 0
+        # @benchmarks.delete(:total)
+
+        @benchmarks.sort_by { |_, timers| [timers[:start], timers[:finish]] }.each do |k, timers|
           if timers[:finish] && timers[:start]
-            output << "#{k}: #{timers[:finish] - timers[:start]}"
+            color = colors[idx % colors.count]
+            fg = if idx < 7
+                   Color.boldblack
+                 else
+                   Color.boldwhite
+                 end
+            color = Color.send(color) + fg
+
+            start = ((timers[:start] - beginning) * factor).floor
+            finish = ((timers[:finish] - beginning) * factor).ceil
+
+            cols.fill("#{color}-", start..finish)
+            cols[start] = "#{color}|"
+            cols[finish] = "#{color}|"
+            output << "#{color}#{k}#{Color.default}: #{timers[:finish] - timers[:start]}"
           else
             output << "#{k}: error"
           end
+
+          idx += 1
         end
+
         output.each do |msg|
           $stdout.puts color_message(:debug, 'Benchmark:', msg)
         end
+
+        $stdout.puts color_message(:debug, 'Benchmark:', "Total: #{total}")
+
+        $stdout.puts cols[0..TTY::Screen.columns-1].join + Color.reset
       end
     end
 

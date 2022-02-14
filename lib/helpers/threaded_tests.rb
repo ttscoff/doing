@@ -23,9 +23,18 @@ class ThreadedTests
     c = Doing::Color
     c.coloring = true
 
-    pattern = "test/doing_*#{pattern}*_test.rb"
+    shuffle = false
+
+    unless pattern =~ /shuffle/i
+      pattern = "test/doing_*#{pattern}*_test.rb"
+    else
+      pattern = "test/doing_*_test.rb"
+      shuffle = true
+    end
 
     tests = Dir.glob(pattern)
+
+    tests.shuffle! if shuffle
 
     if max_tests.to_i > 0
       tests = tests.slice(0, max_tests.to_i - 1)
@@ -140,7 +149,11 @@ class ThreadedTests
     count = out.match(/^(?<tests>\d+) tests, (?<assrt>\d+) assertions, (?<fails>\d+) failures, (?<errs>\d+) errors/)
 
     unless status.success? && !count['fails'].to_i.positive? && !count['errs'].to_i.positive?
-      s[2] = ": #{count['fails'].bold.red} #{'failures'.red}, #{count['errs'].bold.red} #{'errors'.red}"
+      s[2] = if count
+               ": #{count['fails'].bold.red} #{'failures'.red}, #{count['errs'].bold.red} #{'errors'.red}"
+             else
+               ": #{'Unknown Error'.bold.red}"
+             end
       bar.update(head: '✖'.boldred)
       bar.advance(head: '✖'.boldred, status: s[2])
 

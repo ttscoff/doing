@@ -170,29 +170,33 @@ module Doing
 
       if editor_config[editor_for]
         editor = editor_config[editor_for]
-        # Doing.logger.debug('Editor:', "Using #{editor} from config 'editors->#{editor_for}'")
-        return editor unless editor.good?
+        Doing.logger.debug('Editor:', "Using #{editor} from config 'editors.#{editor_for}' for #{editor_for}")
+        return editor if editor.good?
       end
 
       if editor_for != 'editor' && editor_config['default']
         editor = editor_config['default']
-        # Doing.logger.debug('Editor:', "Using #{editor} from config: 'editors->default'")
-        return editor unless editor.good?
+        Doing.logger.debug('Editor:', "Using #{editor} from config: 'editors.default' for #{editor_for}")
+        return editor if editor.good?
       end
 
       editor ||= ENV['DOING_EDITOR'] || ENV['GIT_EDITOR'] || ENV['EDITOR']
 
-      unless editor.good?
-        # Doing.logger.debug('Editor:', "Found editor in environment variables: #{editor}")
+      if editor.good?
+        Doing.logger.debug('Editor:', "Found editor in environment variables: #{editor} for #{editor_for}")
         return editor
       end
 
-      Doing.logger.debug('ENV:', 'No EDITOR environment variable, testing available editors')
+      Doing.logger.debug('Editor:', 'No EDITOR environment variable, testing available editors')
       editors = %w[vim vi code subl mate mvim nano emacs]
       editors.each do |ed|
-        return TTY::Which.which(ed) if TTY::Which.which(ed)
+        try = TTY::Which.which(ed)
+        if try
+          Doing.logger.debug('Editor:', "Using editor #{try} for #{editor_for}")
+          return try
+        end
 
-        Doing.logger.debug('ENV:', "#{ed} not available")
+        Doing.logger.debug('Editor:', "#{ed} not available")
       end
 
       nil

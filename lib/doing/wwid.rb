@@ -659,6 +659,7 @@ module Doing
     ## @option opt [Array] :val (nil) Array of tag value queries
     ##
     def filter_items(items = Items.new, opt: {})
+      logger.benchmark(:filter_items, :start)
       time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
 
       if items.nil? || items.empty?
@@ -809,6 +810,8 @@ module Doing
       else
         output.concat(filtered_items.reverse.slice(0, count))
       end
+
+      logger.benchmark(:filter_items, :finish)
 
       output
     end
@@ -1211,6 +1214,7 @@ module Doing
       opt[:sequential] ||= false
       opt[:date] ||= false
       opt[:remove] ||= false
+      opt[:update] ||= false
       opt[:autotag] ||= false
       opt[:back] ||= false
       opt[:unfinished] ||= false
@@ -1323,7 +1327,7 @@ module Doing
             else
               old_title = item.title.dup
               should_date = opt[:date] && item.should_time?
-              item.title.tag!('done', remove: true) if tag =~ /done/ && !should_date
+              item.title.tag!('done', remove: true) if tag =~ /done/ && (!should_date || opt[:update])
               item.title.tag!(tag, value: should_date ? done_date.strftime('%F %R') : nil)
               added << tag if old_title != item.title
             end
@@ -1619,6 +1623,7 @@ module Doing
     ## @param      opt   [Hash] Additional Options
     ##
     def list_section(opt, items: Items.new)
+      logger.benchmark(:list_section, :start)
       opt[:config_template] ||= 'default'
 
       tpl_cfg = @config.dig('templates', opt[:config_template])
@@ -1632,7 +1637,7 @@ module Doing
       cfg.deep_merge({
                        'wrap_width' => @config['wrap_width'] || 0,
                        'date_format' => @config['default_date_format'],
-                       'order' => @config['order'] || 'asc',
+                       'order' => @config['order'] || :asc,
                        'tags_color' => @config['tags_color'],
                        'duration' => @config['duration'],
                        'interval_format' => @config['interval_format']
@@ -1644,8 +1649,8 @@ module Doing
       opt[:age] ||= :newest
       opt[:age] = opt[:age].normalize_age
       opt[:format] ||= cfg['date_format']
-      opt[:order] ||= cfg['order'] || 'asc'
-      opt[:tag_order] ||= 'asc'
+      opt[:order] ||= cfg['order'] || :asc
+      opt[:tag_order] ||= :asc
       opt[:tags_color] = cfg['tags_color'] || false if opt[:tags_color].nil?
       opt[:template] ||= cfg['template']
 
@@ -1671,7 +1676,7 @@ module Doing
 
       items = filter_items(items, opt: opt)
 
-      items.reverse! unless opt[:order] =~ /^d/i
+      items.reverse! unless opt[:order].normalize_order == :desc
 
       if opt[:delete]
         delete_items(items, force: opt[:force])
@@ -1694,6 +1699,7 @@ module Doing
       opt[:output] ||= 'template'
       opt[:wrap_width] ||= @config['templates']['default']['wrap_width'] || 0
 
+      logger.benchmark(:list_section, :finish)
       output(items, title, is_single, opt)
     end
 
@@ -1721,7 +1727,7 @@ module Doing
       destination = guess_section(destination)
 
       if @content.section?(destination) && (@content.section?(section) || archive_all)
-        do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label], before: options[:before] })
+        do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label], before: options[:before], after: options[:after], from: options[:from] })
         write(doing_file)
       else
         raise InvalidArgument, 'Either source or destination does not exist'
@@ -1743,7 +1749,7 @@ module Doing
       cfg = @config['templates'][opt[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || 'asc',
+        'order' => @config['order'] || :asc,
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
@@ -1762,7 +1768,7 @@ module Doing
         from: opt[:from],
         format: cfg['date_format'],
         interval_format: opt[:interval_format],
-        order: cfg['order'] || 'asc',
+        order: cfg['order'] || :asc,
         output: output,
         section: opt[:section],
         sort_tags: opt[:sort_tags],
@@ -1797,7 +1803,7 @@ module Doing
       list_section({
                      section: section,
                      count: 0,
-                     order: 'asc',
+                     order: :asc,
                      date_filter: dates,
                      times: times,
                      output: output,
@@ -1863,7 +1869,7 @@ module Doing
       cfg = @config['templates'][opt[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || 'asc',
+        'order' => @config['order'] || :asc,
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
@@ -1879,7 +1885,7 @@ module Doing
       opt[:count] = count
       opt[:format] = cfg['date_format']
       opt[:template] = opt[:template] || cfg['template']
-      opt[:order] = 'asc'
+      opt[:order] = :asc
       opt[:times] = times
 
       list_section(opt)
@@ -1896,7 +1902,7 @@ module Doing
       cfg = @config['templates'][options[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => @config['wrap_width'] || 0,
         'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || 'asc',
+        'order' => @config['order'] || :asc,
         'tags_color' => @config['tags_color'],
         'duration' => @config['duration'],
         'interval_format' => @config['interval_format']
@@ -2043,10 +2049,10 @@ module Doing
     ##
     ## @param      format        [String] return format (html,
     ##                           json, or text)
-    ## @param      sort_by_name  [Boolean] Sort by name if true, otherwise by time
-    ## @param      sort_order    [String] The sort order (asc or desc)
+    ## @param      sort_by       [Symbol] Sort by :name or :time
+    ## @param      sort_order    [Symbol] The sort order (:asc or :desc)
     ##
-    def tag_times(format: :text, sort_by_name: false, sort_order: 'asc')
+    def tag_times(format: :text, sort_by: :time, sort_order: :asc)
       return '' if @timers.empty?
 
       max = @timers.keys.sort_by { |k| k.length }.reverse[0].length + 1
@@ -2054,13 +2060,13 @@ module Doing
       total = @timers.delete('All')
 
       tags_data = @timers.delete_if { |_k, v| v == 0 }
-      sorted_tags_data = if sort_by_name
+      sorted_tags_data = if sort_by.normalize_tag_sort == :name
                            tags_data.sort_by { |k, _v| k }
                          else
                            tags_data.sort_by { |_k, v| v }
                          end
 
-      sorted_tags_data.reverse! if sort_order =~ /^asc/i
+      sorted_tags_data.reverse! if sort_order.normalize_order == :asc
       case format
       when :html
 
@@ -2210,9 +2216,9 @@ EOS
         Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
       end
 
-      Doing.logger.benchmark(:configure, :start)
+      logger.benchmark(:configure, :start)
       config = Doing.config
-      Doing.logger.benchmark(:configure, :finish)
+      logger.benchmark(:configure, :finish)
 
       config.settings['backup_dir'] = ENV['DOING_BACKUP_DIR'] if ENV['DOING_BACKUP_DIR']
       @config = config.settings
@@ -2266,6 +2272,7 @@ EOS
     ##             template trigger
     ##
     def output(items, title, is_single, opt)
+      logger.benchmark(:output, :start)
       opt ||= {}
       out = nil
 
@@ -2283,7 +2290,7 @@ EOS
       end
 
       logger.debug('Output:', "#{items.count} #{items.count == 1 ? 'item' : 'items'} shown")
-
+      logger.benchmark(:output, :finish)
       out
     end
 
@@ -2327,26 +2334,37 @@ EOS
       section_items = @content.in_section(section)
       max = section_items.count - count.to_i
 
+      opt[:after] = opt[:from][0] if opt[:from]
+      opt[:before] = opt[:from][1] if opt[:from]
+
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+
+      if opt[:before].is_a?(String) && opt[:before] =~ time_rx
+        opt[:before] = opt[:before].chronify(guess: :end, future: false)
+      end
+
+      if opt[:after].is_a?(String) && opt[:after] =~ time_rx
+        opt[:after] = opt[:after].chronify(guess: :begin, future: false)
+      end
+
       counter = 0
 
       @content.map do |item|
         break if counter >= max
-        if opt[:before]
-          time_string = opt[:before]
-          cutoff = time_string.chronify(guess: :begin)
-        end
 
-        if (item.section.downcase != section.downcase && section != /^all$/i) || item.section.downcase == destination.downcase
-          item
-        elsif ((!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s)) || (opt[:before] && item.date >= cutoff))
-          item
-        else
-          counter += 1
-          old_item = item.clone
-          item.move_to(destination, label: label, log: false)
-          Hooks.trigger :post_entry_updated, self, item, old_item
-          item
-        end
+        next if item.section.downcase == destination.downcase
+
+        next if item.section.downcase != section.downcase && section != /^all$/i
+
+        next if (opt[:before] && item.date > opt[:before]) || (opt[:after] && item.date < opt[:after])
+
+        next if (!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s))
+
+        counter += 1
+        old_item = item.clone
+        item.move_to(destination, label: label, log: false)
+        Hooks.trigger :post_entry_updated, self, item, old_item
+        item
       end
 
       if counter.positive?

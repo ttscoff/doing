@@ -16,49 +16,18 @@ command :rotate do |c|
   c.arg_name 'SECTION_NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Tag filter, combine multiple tags with a comma. Wildcards allowed (*, ?). Added for compatibility with other commands'
-  c.arg_name 'TAG'
-  c.flag [:tag]
-
-  c.desc 'Tag boolean (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
-
-  c.desc 'Search filter'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
-  c.arg_name 'QUERY'
-  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
-  c.desc 'Rotate items that *don\'t* match search string or tag filter'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
-
   c.desc 'Rotate entries older than date
     (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
   c.arg_name 'DATE_STRING'
   c.flag [:before]
 
-  c.action do |_global_options, options, args|
+  add_options(:search, c)
+  add_options(:tag_filter, c)
+
+  c.action do |_global_options, options, _args|
     options[:fuzzy] = false
-    if options[:section] && options[:section] !~ /^all$/i
-      options[:section] = @wwid.guess_section(options[:section])
-    end
 
-    options[:bool] = options[:bool].normalize_bool
-
-    options[:case] = options[:case].normalize_case
+    options[:section] = @wwid.guess_section(options[:section]) if options[:section] && options[:section] !~ /^all$/i
 
     search = nil
 

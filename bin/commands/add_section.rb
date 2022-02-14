@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@add_section
 desc 'Add a new section to the "doing" file'
 arg_name 'SECTION_NAME'

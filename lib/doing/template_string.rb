@@ -5,28 +5,6 @@ module Doing
   ## Template string formatting
   ##
   class TemplateString < String
-    class ::String
-      ##
-      ## Extract the longest valid color from a string.
-      ##
-      ## Allows %colors to bleed into other text and still
-      ## be recognized, e.g. %greensomething still finds
-      ## %green.
-      ##
-      ## @return     [String] a valid color name
-      ## @api private
-      def validate_color
-        valid_color = nil
-        compiled = ''
-        split('').each do |char|
-          compiled += char
-          valid_color = compiled if Color.attributes.include?(compiled.to_sym)
-        end
-
-        valid_color
-      end
-    end
-
     attr_reader :original
 
     include Color

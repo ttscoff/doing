@@ -179,6 +179,10 @@ module Doing
       end
     end
 
+    def fetch(*path, default)
+      @settings.dig(*path) || default
+    end
+
     ##
     ## Resolve a fuzzy-matched key path
     ##

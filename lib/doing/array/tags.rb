@@ -6,15 +6,15 @@ module Doing
   ##
   class ::Array
     ##
-    ## Convert an @tags to plain strings
+    ## Convert an array of @tags to plain strings
     ##
     ## @return     [Array] array of strings
     ##
     def tags_to_array
-      map(&:remove_at)
+      map(&:remove_at).map(&:strip)
     end
 
-    # Convert strings to @tags
+    # Convert array of strings to array of @tags
     #
     # @return     [Array] Array of @tags
     #
@@ -25,21 +25,16 @@ module Doing
       map(&:add_at)
     end
 
-    def to_tags!
-      replace to_tags
-    end
-
     ##
     ## Hightlight @tags in string for console output
     ##
     ## @param      color  [String] the color to highlight
     ##                    with
     ##
-    ## @return     [String] string with @tags highlighted
+    ## @return     [Array] Array of highlighted @tags
     ##
     def highlight_tags(color = 'cyan')
-      tag_color = Doing::Color.send(color)
-      to_tags.map { |t| "#{tag_color}#{t}" }
+      to_tags.map { |t| Doing::Color.send(color.to_sym, t) }
     end
 
     ##
@@ -47,21 +42,8 @@ module Doing
     ##
     ## @return     [String] Highlighted tag array joined with comma
     ##
-    def log_tags
-      highlight_tags.join(', ')
-    end
-
-    ##
-    ## Convert array to nested hash, setting last key to value
-    ##
-    ## @param      value  The value to set
-    ##
-    def nested_hash(value)
-      raise StandardError, 'Value can not be nil' if value.nil?
-
-      hsh = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
-      hsh.dig(*self[0..-2])[self.fetch(-1)] = value
-      hsh
+    def log_tags(color = 'cyan')
+      highlight_tags(color).join(', ')
     end
   end
 end

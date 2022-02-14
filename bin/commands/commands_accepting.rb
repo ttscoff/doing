@@ -1,25 +1,76 @@
+# frozen_string_literal: true
+
 # @@commands_accepting
 arg_name 'OPTION'
 command :commands_accepting do |c|
   c.desc 'Output in single column for completion'
   c.switch %i[c column]
 
-  c.action do |g, o, a|
-    a.each do |option|
-      cmds = []
-      commands.each do |cmd, v|
-        v.flags.merge(v.switches).each do |n, flag|
-          if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
-            cmds.push(cmd)
-          end
-        end
-      end
+  c.desc 'Join multiple arguments using boolean (AND|OR|NOT)'
+  c.flag [:bool], must_match: REGEX_BOOL,
+                  default_value: :and,
+                  type: BooleanSymbol
 
-      if o[:column]
-        puts cmds.sort
-      else
-        puts "Commands accepting --#{option}: #{cmds.sort.join(', ')}"
-      end
+  c.action do |g, o, a|
+    cmds = []
+    commands.each { |cmd, v| cmds.push(cmd) if has_flags?(v, a, o[:bool]) }
+
+    if o[:column]
+      puts cmds.sort
+    else
+      description = "Commands "
+      description += "not " if o[:bool] == :not
+      description += "accepting "
+      description += a.map { |arg| "--#{arg}" }.join(o[:bool] == :and ? ' and ' : ' or ')
+      puts "#{description}: #{cmds.sort.join(', ')}"
     end
   end
+
+  def has_flags?(options, args, bool)
+    case bool
+    when :and
+      all_flags?(options, args)
+    when :not
+      no_flags?(options, args)
+    else
+      any_flags?(options, args)
+    end
+  end
+
+  def all_flags?(options, args)
+    args.each do |arg|
+      has_flag = false
+      options.flags.merge(options.switches).each do |_, flag|
+        if flag.name == arg.to_sym || flag.aliases&.include?(arg.to_sym)
+          has_flag = true
+          break
+        end
+      end
+      return false unless has_flag
+    end
+
+    true
+  end
+
+  def any_flags?(options, args)
+    args.each do |option|
+      options.flags.merge(options.switches).each do |_, flag|
+        return true if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
+      end
+    end
+
+    false
+  end
+
+  def no_flags?(options, args)
+    args.each do |option|
+      options.flags.merge(options.switches).each do |_, flag|
+        return false if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
+      end
+    end
+
+    true
+  end
 end
+
+

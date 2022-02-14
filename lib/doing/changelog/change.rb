@@ -5,7 +5,7 @@ module Doing
   class Change
     attr_reader :version, :content
 
-    attr_accessor :entries
+    attr_accessor :entries, :change_date
 
     def initialize(version, content)
       @version = Version.new(version)
@@ -14,6 +14,9 @@ module Doing
     end
 
     def parse_entries
+      date = @content.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      @change_date = Time.parse(date[0]) if date
+
       @entries = []
       types = @content.scan(/(?<=\n|\A)#### (NEW|IMPROVED|FIXED)(.*?)(?=\n####|\Z)/m)
       types.each do |type|
@@ -28,7 +31,7 @@ module Doing
 
       matches = []
 
-      if search_string.is_rx?
+      if search_string.rx?
         matches = @entries.select { |e| e.string =~ search_string.to_rx(distance: 2, case_type: case_type) }
       else
         query = search_string.gsub(/(-)?--/, '\1]]').to_phrase_query
@@ -53,14 +56,9 @@ module Doing
       { version: @version, content: @content }
     end
 
-    def to_s
-      out = ["### #{@version}"]
-      items = {
-        new: [],
-        improved: [],
-        fixed: [],
-        other: []
-      }
+    def split_items
+      items = { new: [], improved: [], fixed: [], other: [] }
+
       @entries.each do |e|
         type = e.type.downcase.to_sym
         if items.key?(type)
@@ -70,7 +68,14 @@ module Doing
         end
       end
 
-      items.each do |type, members|
+      items
+    end
+
+    def to_s
+      date = @change_date.nil? ? '' : " _(#{@change_date.strftime('%F')})_"
+      out = ["### __#{@version}__#{date}"]
+
+      split_items.each do |type, members|
         if members.count.positive?
           out << "#### #{type.to_s.capitalize}"
           out << members.map(&:to_s).join("\n")
@@ -78,6 +83,16 @@ module Doing
       end
 
       out.join("\n\n")
+    end
+
+    def changes_only
+      out = []
+
+      split_items.each do |_, members|
+        out << members.map(&:to_s).join("\n")
+      end
+
+      out.join("")
     end
 
     private

@@ -97,8 +97,8 @@ class DoingShowTest < Test::Unit::TestCase
     assert_match(/writing/, first_tag[1], 'First tag should be writing')
 
     # test show --val queries
-    result = doing('--stdout', 'show', '--val', 'done < 9/14/21 12:30', '--val', 'done > 9/14/21 10am')
-    assert_count_entries(8, result, 'There should be 8 entries matching query')
+    result = doing('--stdout', 'show', '--val', 'done < 2021-09-13', '--val', 'done > 2021-09-12')
+    assert_count_entries(5, result, 'There should be 5 entries matching query')
   end
 
   private

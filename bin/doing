@@ -38,11 +38,11 @@ env_log_level = nil
 if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DOING_VERBOSE'] || ENV['DOING_PLUGIN_DEBUG']
   env_log_level = true
   # Quiet always wins
-  if ENV['DOING_QUIET'] && ENV['DOING_QUIET'].truthy?
+  if ENV['DOING_QUIET']&.truthy?
     Doing.logger.log_level = :error
-  elsif (ENV['DOING_PLUGIN_DEBUG'] && ENV['DOING_PLUGIN_DEBUG'].truthy?)
+  elsif ENV['DOING_PLUGIN_DEBUG']&.truthy?
     Doing.logger.log_level = :debug
-  elsif (ENV['DOING_DEBUG'] && ENV['DOING_DEBUG'].truthy?)
+  elsif ENV['DOING_DEBUG']&.truthy?
     Doing.logger.log_level = :debug
   elsif ENV['DOING_LOG_LEVEL']
     Doing.logger.log_level = ENV['DOING_LOG_LEVEL']
@@ -51,11 +51,8 @@ end
 
 Doing.logger.benchmark(:total, :start)
 
-if ENV['DOING_CONFIG']
-  Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
-end
-
 Doing.logger.benchmark(:configure, :start)
+Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true }) if ENV['DOING_CONFIG']
 @config = Doing.config
 Doing.logger.benchmark(:configure, :finish)
 
@@ -63,8 +60,30 @@ Doing.logger.benchmark(:configure, :finish)
 @settings = @config.settings
 @wwid.config = @settings
 
-if @settings.dig('plugins', 'command_path')
-  commands_from File.expand_path(@settings.dig('plugins', 'command_path'))
+commands_from File.expand_path(@settings.dig('plugins', 'command_path')) if @settings.dig('plugins', 'command_path')
+
+accept BooleanSymbol do |value|
+  value.normalize_bool(:pattern)
+end
+
+accept CaseSymbol do |value|
+  value.normalize_case(@config.fetch('search', 'case', :smart))
+end
+
+accept AgeSymbol do |value|
+  value.normalize_age(:newest)
+end
+
+accept OrderSymbol do |value|
+  value.normalize_order(:asc)
+end
+
+accept MatchingSymbol do |value|
+  value.normalize_matching(:pattern)
+end
+
+accept TagSortSymbol do |value|
+  value.normalize_tag_sort(@config.fetch('tag_sort', :name))
 end
 
 accept TemplateName do |value|
@@ -119,7 +138,123 @@ accept DateIntervalString do |value|
 end
 
 accept TagArray do |value|
-  value.gsub(/[, ]+/, ' ').split(' ').map { |tag| tag.sub(/^@/, '')}.map(&:strip)
+  value.gsub(/[, ]+/, ' ').split(' ').map { |tag| tag.sub(/^@/, '') }.map(&:strip)
+end
+
+##
+## Add presets of flags and switches to a command.
+##
+## :add_entry => --noauto, --note, --ask, --editor, --back
+##
+## :search => --search, --case, --exact
+##
+## :tag_filter => --tag, --bool, --not, --val
+##
+## :date_filter => --before, --after, --from
+##
+## @param      type  [Symbol] The type
+## @param      cmd   The GLI command to which the options will be added
+##
+def add_options(type, cmd)
+  cmd_name = cmd.name.to_s
+  action = case cmd_name
+           when /again/
+             'Repeat'
+           when /grep/
+             'Search'
+           when /mark/
+             'Flag'
+           when /(last|tags|view)/
+             'Show'
+           else
+             cmd_name.capitalize
+           end
+
+  case type
+  when :add_entry
+    cmd.desc 'Exclude auto tags and default tags'
+    cmd.switch %i[X noauto], default_value: false, negatable: false
+
+    cmd.desc 'Include a note'
+    cmd.arg_name 'TEXT'
+    cmd.flag %i[n note]
+
+    cmd.desc 'Prompt for note via multi-line input'
+    cmd.switch %i[ask], negatable: false, default_value: false
+
+    cmd.desc "Edit entry with #{Doing::Util.default_editor}"
+    cmd.switch %i[e editor], negatable: false, default_value: false
+
+    cmd.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
+    cmd.arg_name 'DATE_STRING'
+    cmd.flag %i[b back started], type: DateBeginString
+  when :search
+    cmd.desc 'Filter entries using a search query, surround with slashes for regex (e.g. "/query.*/"),
+            start with single quote for exact match ("\'query")'
+    cmd.arg_name 'QUERY'
+    cmd.flag [:search]
+
+    cmd.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
+    cmd.arg_name 'TYPE'
+    cmd.flag [:case], must_match: REGEX_CASE,
+                      default_value: @settings.dig('search', 'case').normalize_case,
+                      type: CaseSymbol
+
+    cmd.desc 'Force exact search string matching (case sensitive)'
+    cmd.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
+  when :tag_filter
+    cmd.desc 'Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
+    cmd.arg_name 'TAG'
+    cmd.flag [:tag], type: TagArray
+
+    cmd.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
+            May be used multiple times, combined with --bool'
+    cmd.arg_name 'QUERY'
+    cmd.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
+
+    cmd.desc "#{action} items that *don't* match search/tag filters"
+    cmd.switch [:not], default_value: false, negatable: false
+
+    cmd.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
+    cmd.arg_name 'BOOLEAN'
+    cmd.flag [:bool], must_match: REGEX_BOOL,
+                      default_value: :pattern,
+                      type: BooleanSymbol
+  when :date_filter
+    if action =~ /Archive/
+      cmd.desc 'Archive entries older than date (natural language).'
+    else
+      cmd.desc "#{action} entries older than date (natural language). If this is only a time (8am, 1:30pm, 15:00), all
+              dates will be included, but entries will be filtered by time of day"
+    end
+    cmd.arg_name 'DATE_STRING'
+    cmd.flag [:before], type: DateBeginString
+
+    if action =~ /Archive/
+      cmd.desc 'Archive entries newer than date (natural language).'
+    else
+      cmd.desc "#{action} entries newer than date (natural language). If this is only a time (8am, 1:30pm, 15:00), all
+              dates will be included, but entries will be filtered by time of day"
+    end
+    cmd.arg_name 'DATE_STRING'
+    cmd.flag [:after], type: DateEndString
+
+    if action =~ /Archive/
+      cmd.desc %(
+          Date range (natural language) to archive: `doing archive --from "1/1/21 to 12/31/21"`.
+        )
+    else
+      cmd.desc %(
+        Date range (natural language) to #{action.downcase}, or a single day to filter on.
+        To specify a range, use "to": `doing #{cmd_name} --from "monday 8am to friday 5pm"`.
+
+        If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+        by time of day.
+      )
+    end
+    cmd.arg_name 'DATE_OR_RANGE'
+    cmd.flag [:from], type: DateRangeString
+  end
 end
 
 program_desc 'A CLI for a What Was I Doing system'
@@ -192,7 +327,6 @@ add_commands(%w[commands_accepting install_fzf])
 ## Optional commands
 add_commands(%w[again cancel flag meanwhile reset tags today yesterday since add_section tag_dir colors completion plugins sections template views changes])
 
-
 pre do |global, _command, _options, _args|
   # global[:pager] ||= @settings['paginate']
   Doing::Pager.paginate = global[:pager]
@@ -232,6 +366,7 @@ post do |global, _command, _options, _args|
 end
 
 around do |global, command, options, arguments, code|
+  Doing.logger.benchmark("command_#{command.name.to_s}".to_sym, :start)
   # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{@settings['paginate']}, Pager: #{Doing::Pager.paginate}")
   if env_log_level.nil?
     Doing.logger.adjust_verbosity(global)
@@ -242,10 +377,10 @@ around do |global, command, options, arguments, code|
   end
 
   if global[:yes]
-    Doing::Prompt.force_answer = true
+    Doing::Prompt.force_answer = :yes
     Doing.config.force_answer = true
   elsif global[:no]
-    Doing::Prompt.force_answer = false
+    Doing::Prompt.force_answer = :no
     Doing.config.force_answer = false
   else
     Doing::Prompt.default_answer = if $stdout.isatty
@@ -281,6 +416,8 @@ around do |global, command, options, arguments, code|
   global[:wwid] = @wwid
 
   code.call
+
+  Doing.logger.benchmark("command_#{command.name.to_s}".to_sym, :finish)
 end
 
 exit run(ARGV)

@@ -33,9 +33,9 @@ command :yesterday do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = @settings['tag_sort'] || 'name'
+  default = @settings['tag_sort'].normalize_tag_sort || :name
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
 
   c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
   c.arg_name 'TIME_STRING'
@@ -51,12 +51,12 @@ command :yesterday do |c|
 
   c.desc 'Tag sort direction (asc|desc)'
   c.arg_name 'DIRECTION'
-  c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: 'asc'
+  c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
 
   c.action do |_global_options, options, _args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    options[:sort_tags] = options[:tag_sort]
 
     if options[:from]
       options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
@@ -65,7 +65,6 @@ command :yesterday do |c|
     end
 
     opt = options.clone
-    opt[:tag_order] = options[:tag_order].normalize_order
     opt[:order] = @settings.dig('templates', options[:config_template], 'order')
 
     Doing::Pager.page @wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp

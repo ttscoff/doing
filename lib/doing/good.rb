@@ -48,6 +48,10 @@ module Doing
     def good?
       false
     end
+
+    def normalize_tag_sort
+      :time
+    end
   end
 
   class ::TrueClass
@@ -59,6 +63,10 @@ module Doing
     ##
     def good?
       true
+    end
+
+    def normalize_tag_sort
+      :name
     end
   end
 end

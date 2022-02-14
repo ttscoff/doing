@@ -218,7 +218,7 @@ command :config do |c|
 
       config_file = @config.choose_config(create: true)
 
-      cfg = YAML.safe_load_file(config_file) || {}
+      cfg = Doing::Util.safe_load_file(config_file) || {}
 
       $stderr.puts "Updating #{config_file}".yellow
 

@@ -74,7 +74,7 @@ module Doing
                 self.template('wiki_css')
               end
 
-      totals = opt[:totals] ? wwid.tag_times(format: :html, sort_by_name: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+      totals = opt[:totals] ? wwid.tag_times(format: :html, sort_by: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
       engine = Haml::Engine.new(template)
       Doing.logger.debug('Wiki Export:', "#{items_out.count} items output to #{variables[:page_title]} wiki page")
       @out = engine.render(Object.new,

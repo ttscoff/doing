@@ -4,8 +4,10 @@ module Doing
   # A collection of Changes
   class Changes
     attr_reader :changes
+    attr_writer :changes_only
 
-    def initialize(lookup: nil, search: nil)
+    def initialize(lookup: nil, search: nil, changes_only: false)
+      @changes_only = changes_only
       changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'CHANGELOG.md'))
       raise 'Error locating changelog' unless File.exist?(changelog)
 
@@ -14,11 +16,19 @@ module Doing
     end
 
     def latest
-      @changes[0].to_s.force_encoding('utf-8')
+      if @changes_only
+        @changes[0].changes_only.force_encoding('utf-8')
+      else
+        @changes[0].to_s.force_encoding('utf-8')
+      end
     end
 
     def to_s
-      @changes.map(&:to_s).join("\n\n").force_encoding('utf-8')
+      if @changes_only
+        @changes.map(&:changes_only).join().force_encoding('utf-8')
+      else
+        @changes.map(&:to_s).join("\n\n").force_encoding('utf-8')
+      end
     end
 
     private

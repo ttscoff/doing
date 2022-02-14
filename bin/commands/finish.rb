@@ -22,37 +22,10 @@ command :finish do |c|
   c.arg_name 'DATE_STRING'
   c.flag %i[at finished], type: DateEndString
 
-  c.desc 'Finish the last X entries containing TAG.
-  Separate multiple tags with comma (--tag=tag1,tag2), combine with --bool. Wildcards allowed (*, ?).'
-  c.arg_name 'TAG'
-  c.flag [:tag], type: TagArray
+  c.desc 'Overwrite existing @done tag with new date'
+  c.switch %i[update], negatable: false, default_value: false
 
-  c.desc 'Finish the last X entries matching search filter, surround with slashes for regex (e.g. "/query.*/"), start with single quote for exact match ("\'query")'
-  c.arg_name 'QUERY'
-  c.flag [:search]
-
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
-  c.arg_name 'QUERY'
-  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
-  # c.switch [:fuzzy], default_value: false, negatable: false
-
-  c.desc 'Force exact search string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-
-  c.desc 'Finish items that *don\'t* match search/tag filters'
-  c.switch [:not], default_value: false, negatable: false
-
-  c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-  c.arg_name 'TYPE'
-  c.flag [:case], must_match: /^[csi]/, default_value: @settings.dig('search', 'case')
-
-  c.desc 'Boolean (AND|OR|NOT) with which to combine multiple tag filters. Use PATTERN to parse + and - as booleans'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL, default_value: 'PATTERN'
-
-  c.desc 'Remove done tag'
+  c.desc 'Remove @done tag'
   c.switch %i[r remove], negatable: false, default_value: false
 
   c.desc 'Finish last entry (or entries) not already marked @done'
@@ -72,6 +45,9 @@ command :finish do |c|
 
   c.desc 'Select item(s) to finish from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
+
+  add_options(:search, c)
+  add_options(:tag_filter, c)
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
@@ -141,6 +117,7 @@ command :finish do |c|
       tags: ['done'],
       took: options[:took],
       unfinished: options[:unfinished],
+      update: options[:update],
       val: options[:val]
     }
 

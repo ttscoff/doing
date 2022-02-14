@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 # @@redo
-long_desc 'Shortcut for `doing undo -r`, reverses the last undo command. You cannot undo a redo'
+desc 'Redo an undo command'
+long_desc 'Shortcut for `doing undo -r`, reverses the last undo command. Specify a count to redo multiple undos'
 arg_name 'COUNT'
 command :redo do |c|
   c.desc 'Specify alternate doing file'
@@ -12,7 +15,8 @@ command :redo do |c|
   c.action do |_global, options, args|
     file = options[:file] || @wwid.doing_file
     count = args.empty? ? 1 : args[0].to_i
-    raise InvalidArgument, "Invalid count specified for redo" unless count&.positive?
+    raise InvalidArgument, 'Invalid count specified for redo' unless count&.positive?
+
     if options[:interactive]
       Doing::Util::Backup.select_redo(file)
     else

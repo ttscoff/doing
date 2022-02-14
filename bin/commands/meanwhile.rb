@@ -15,24 +15,14 @@ command :meanwhile do |c|
   c.arg_name 'NAME'
   c.flag %i[s section]
 
-  c.desc "Edit entry with #{Doing::Util.default_editor}"
-  c.switch %i[e editor], negatable: false, default_value: false
-
   c.desc 'Archive previous @meanwhile entry'
   c.switch %i[a archive], negatable: false, default_value: false
 
-  c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back started], type: DateBeginString
-
-  c.desc 'Note'
-  c.arg_name 'TEXT'
-  c.flag %i[n note]
-
-  c.desc 'Prompt for note via multi-line input'
-  c.switch %i[ask], negatable: false, default_value: false
+  add_options(:add_entry, c)
 
   c.action do |_global_options, options, args|
+    @wwid.auto_tag = !options[:noauto]
+
     if options[:back]
       date = options[:back]
 

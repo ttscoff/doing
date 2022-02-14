@@ -23,10 +23,9 @@ command :on do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = 'time'
-  default = @settings['tag_sort'] || 'name'
+  default = @settings['tag_sort'].normalize_tag_sort || :name
   c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: /^(?:name|time)$/i, default_value: default
+  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
 
   c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
   c.arg_name 'FORMAT'
@@ -58,7 +57,7 @@ command :on do |c|
     Doing.logger.debug('Interpreter:', message)
 
     options[:times] = true if options[:totals]
-    options[:sort_tags] = options[:tag_sort] =~ /^n/i
+    options[:sort_tags] = options[:tag_sort]
 
     Doing::Pager.page @wwid.list_date([start, finish], options[:section], options[:times], options[:output],
                         { template: options[:template], config_template: options[:config_template], duration: options[:duration], totals: options[:totals], sort_tags: options[:sort_tags] }).chomp
