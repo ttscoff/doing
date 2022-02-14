@@ -87,11 +87,6 @@
   
   
   
-  <dl>
-      <dt>Includes:</dt>
-      <dd><span class='object_link'><a href="Doing/Color.html" title="Doing::Color (module)">Doing::Color</a></span></dd>
-  </dl>
-  
   
 
   
@@ -99,8 +94,8 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/doing/string.rb<span class="defines">,<br />
-  lib/doing/good.rb,<br /> lib/doing/string_chronify.rb,<br /> lib/doing/template_string.rb</span>
+    <dd>lib/doing/colors.rb<span class="defines">,<br />
+  lib/doing/good.rb,<br /> lib/doing/normalize.rb</span>
 </dd>
   </dl>
   
@@ -108,7 +103,7 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Chronify methods for strings</p>
+    <p>String to symbol conversion</p>
 
 
   </div>
@@ -123,12 +118,6 @@
 
 
 
-  <h2>Constant Summary</h2>
-  
-  <h3 class="inherited">Constants included
-     from <span class='object_link'><a href="Doing/Color.html" title="Doing::Color (module)">Doing::Color</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="Doing/Color.html#ATTRIBUTES-constant" title="Doing::Color::ATTRIBUTES (constant)">Doing::Color::ATTRIBUTES</a></span>, <span class='object_link'><a href="Doing/Color.html#ATTRIBUTE_NAMES-constant" title="Doing::Color::ATTRIBUTE_NAMES (constant)">Doing::Color::ATTRIBUTE_NAMES</a></span>, <span class='object_link'><a href="Doing/Color.html#COLORED_REGEXP-constant" title="Doing::Color::COLORED_REGEXP (constant)">Doing::Color::COLORED_REGEXP</a></span></p>
-
 
 
 
@@ -140,279 +129,6 @@
     </h2>
 
     <ul class="summary">
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#add_at-instance_method" title="#add_at (instance method)">#<strong>add_at</strong>  &#x21d2; String </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Add @ prefix to string if needed, maintains +/- prefix.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#add_tags-instance_method" title="#add_tags (instance method)">#<strong>add_tags</strong>(tags, remove: false)  &#x21d2; String </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>The tagged string.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#add_tags!-instance_method" title="#add_tags! (instance method)">#<strong>add_tags!</strong>(tags, remove: false)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#cap_first-instance_method" title="#cap_first (instance method)">#<strong>cap_first</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Capitalize on the first character on string.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#chronify-instance_method" title="#chronify (instance method)">#<strong>chronify</strong>(**options)  &#x21d2; DateTime </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Converts input string into a Time object when input takes on the following formats:             - interval format e.g.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#chronify_qty-instance_method" title="#chronify_qty (instance method)">#<strong>chronify_qty</strong>  &#x21d2; Integer </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Converts simple strings into seconds that can be added to a Time object.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#clean_unlinked_urls-instance_method" title="#clean_unlinked_urls (instance method)">#<strong>clean_unlinked_urls</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Clean up unlinked <urls>.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#compress-instance_method" title="#compress (instance method)">#<strong>compress</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Compress multiple spaces to single space.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#compress!-instance_method" title="#compress! (instance method)">#<strong>compress!</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#dedup_tags-instance_method" title="#dedup_tags (instance method)">#<strong>dedup_tags</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Remove duplicate tags, leaving only first occurrence.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#dedup_tags!-instance_method" title="#dedup_tags! (instance method)">#<strong>dedup_tags!</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#expand_date_tags-instance_method" title="#expand_date_tags (instance method)">#<strong>expand_date_tags</strong>(additional_tags = nil)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Convert (chronify) natural language dates within configured date tags (tags whose value is expected to be a date).</p>
-</div></span>
-  
-</li>
-
       
         <li class="public ">
   <span class="summary_signature">
@@ -433,253 +149,6 @@
   
     <span class="summary_desc"><div class='inline'><p>Tests if object is nil or empty.</p>
 </div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#highlight_search-instance_method" title="#highlight_search (instance method)">#<strong>highlight_search</strong>(search, distance: nil, negate: false, case_type: nil)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#highlight_search!-instance_method" title="#highlight_search! (instance method)">#<strong>highlight_search!</strong>(search, distance: nil, negate: false, case_type: nil)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#highlight_tags-instance_method" title="#highlight_tags (instance method)">#<strong>highlight_tags</strong>(color = &#39;yellow&#39;, last_color: nil)  &#x21d2; String </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Colorize @tags with ANSI escapes.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#highlight_tags!-instance_method" title="#highlight_tags! (instance method)">#<strong>highlight_tags!</strong>(color = &#39;yellow&#39;, last_color: nil)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#ignore%3F-instance_method" title="#ignore? (instance method)">#<strong>ignore?</strong>  &#x21d2; Boolean </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Test if line should be ignored.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#ignore_case-instance_method" title="#ignore_case (instance method)">#<strong>ignore_case</strong>(search, case_type)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#is_range%3F-instance_method" title="#is_range? (instance method)">#<strong>is_range?</strong>  &#x21d2; Boolean </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#is_rx%3F-instance_method" title="#is_rx? (instance method)">#<strong>is_rx?</strong>  &#x21d2; Boolean </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Determines if receiver is surrounded by slashes or starts with single quote.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#last_color-instance_method" title="#last_color (instance method)">#<strong>last_color</strong>  &#x21d2; String </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Returns the last escape sequence from a string.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#link_urls-instance_method" title="#link_urls (instance method)">#<strong>link_urls</strong>(**opt)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Turn raw urls into HTML links.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#link_urls!-instance_method" title="#link_urls! (instance method)">#<strong>link_urls!</strong>(**opt)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -800,7 +269,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_case!-instance_method" title="#normalize_case! (instance method)">#<strong>normalize_case!</strong>  &#x21d2; Object </a>
+      <a href="#normalize_case!-instance_method" title="#normalize_case! (instance method)">#<strong>normalize_case!</strong>(default = :smart)  &#x21d2; Object </a>
     
 
     
@@ -815,6 +284,29 @@
 
   
     <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_color-instance_method" title="#normalize_color (instance method)">#<strong>normalize_color</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Normalize a color name, removing underscores, replacing &quot;bright&quot; with &quot;bold&quot;, and converting bgbold to boldbg.</p>
+</div></span>
   
 </li>
 
@@ -867,7 +359,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_order-instance_method" title="#normalize_order (instance method)">#<strong>normalize_order</strong>(default = &#39;asc&#39;)  &#x21d2; Object </a>
+      <a href="#normalize_order-instance_method" title="#normalize_order (instance method)">#<strong>normalize_order</strong>(default = :asc)  &#x21d2; Object </a>
     
 
     
@@ -889,7 +381,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_order!-instance_method" title="#normalize_order! (instance method)">#<strong>normalize_order!</strong>(default = &#39;asc&#39;)  &#x21d2; String </a>
+      <a href="#normalize_order!-instance_method" title="#normalize_order! (instance method)">#<strong>normalize_order!</strong>(default = :asc)  &#x21d2; Symbol </a>
     
 
     
@@ -905,6 +397,51 @@
   
     <span class="summary_desc"><div class='inline'><p>Convert a sort order string to a qualified type.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_tag_sort-instance_method" title="#normalize_tag_sort (instance method)">#<strong>normalize_tag_sort</strong>(default = :name)  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert tag sort string to a qualified type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_tag_sort!-instance_method" title="#normalize_tag_sort! (instance method)">#<strong>normalize_tag_sort!</strong>(default = :name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -957,528 +494,6 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#remove_at-instance_method" title="#remove_at (instance method)">#<strong>remove_at</strong>  &#x21d2; String </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Removes @ prefix if needed, maintains +/- prefix.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#remove_self_links-instance_method" title="#remove_self_links (instance method)">#<strong>remove_self_links</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Remove <self-linked> formatting.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#replace_qualified_urls-instance_method" title="#replace_qualified_urls (instance method)">#<strong>replace_qualified_urls</strong>(**options)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Replace qualified urls.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#set_type-instance_method" title="#set_type (instance method)">#<strong>set_type</strong>(kind = nil)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Convert a string value to an appropriate type.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#simple_wrap-instance_method" title="#simple_wrap (instance method)">#<strong>simple_wrap</strong>(width)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#split_date_range-instance_method" title="#split_date_range (instance method)">#<strong>split_date_range</strong>  &#x21d2; Array&lt;DateTime&gt; </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Splits a range string and returns an array of DateTime objects as [start, end].</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#tag-instance_method" title="#tag (instance method)">#<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false, force: false)  &#x21d2; String </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Add, rename, or remove a tag.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#tag!-instance_method" title="#tag! (instance method)">#<strong>tag!</strong>(tag, **options)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Add, rename, or remove a tag in place.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#time_string-instance_method" title="#time_string (instance method)">#<strong>time_string</strong>(format: :dhm)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Convert DD:HH:MM to a natural language string.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#to_bool-instance_method" title="#to_bool (instance method)">#<strong>to_bool</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#to_p-instance_method" title="#to_p (instance method)">#<strong>to_p</strong>(number)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Pluralize a string based on quantity.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#to_phrase_query-instance_method" title="#to_phrase_query (instance method)">#<strong>to_phrase_query</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#to_query-instance_method" title="#to_query (instance method)">#<strong>to_query</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#to_rx-instance_method" title="#to_rx (instance method)">#<strong>to_rx</strong>(distance: nil, case_type: nil)  &#x21d2; Regexp </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Convert string to fuzzy regex.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#to_seconds-instance_method" title="#to_seconds (instance method)">#<strong>to_seconds</strong>  &#x21d2; Integer </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Convert DD:HH:MM to seconds.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#to_tags-instance_method" title="#to_tags (instance method)">#<strong>to_tags</strong>  &#x21d2; Array </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Convert a list of tags to an array.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#truncate-instance_method" title="#truncate (instance method)">#<strong>truncate</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Truncate to nearest word.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#truncate!-instance_method" title="#truncate! (instance method)">#<strong>truncate!</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#truncmiddle-instance_method" title="#truncmiddle (instance method)">#<strong>truncmiddle</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Truncate string in the middle.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#truncmiddle!-instance_method" title="#truncmiddle! (instance method)">#<strong>truncmiddle!</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#truthy%3F-instance_method" title="#truthy? (instance method)">#<strong>truthy?</strong>  &#x21d2; Boolean </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Test string for truthiness (0, &quot;f&quot;, &quot;false&quot;, &quot;n&quot;, &quot;no&quot; all return false, case insensitive, otherwise true).</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#uncolor-instance_method" title="#uncolor (instance method)">#<strong>uncolor</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Remove color escape codes.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#uncolor!-instance_method" title="#uncolor! (instance method)">#<strong>uncolor!</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
       <a href="#validate_color-instance_method" title="#validate_color (instance method)">#<strong>validate_color</strong>  &#x21d2; String </a>
     
 
@@ -1490,56 +505,10 @@
   
   
   
-  <span class="private note title">private</span>
-
-  
-    <span class="summary_desc"><div class='inline'><p>Extract the longest valid color from a string.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#wildcard_to_rx-instance_method" title="#wildcard_to_rx (instance method)">#<strong>wildcard_to_rx</strong>  &#x21d2; String </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Convert ? and * wildcards to regular expressions.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#wrap-instance_method" title="#wrap (instance method)">#<strong>wrap</strong>(len, pad: 0, indent: &#39;  &#39;, offset: 0, prefix: &#39;&#39;, color: &#39;&#39;, after: &#39;&#39;, reset: &#39;&#39;, pad_first: false)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Wrap string at word breaks, respecting tags.</p>
+    <span class="summary_desc"><div class='inline'><p>Extract the longest valid %color name from a string.</p>
 </div></span>
   
 </li>
@@ -1548,17 +517,6 @@
     </ul>
   
 
-
-  
-  
-  
-  
-  
-  
-  
-  
-  <h3 class="inherited">Methods included from <span class='object_link'><a href="Doing/Color.html" title="Doing::Color (module)">Doing::Color</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="Doing/Color.html#attributes-class_method" title="Doing::Color.attributes (method)">attributes</a></span>, <span class='object_link'><a href="Doing/Color.html#coloring%3F-class_method" title="Doing::Color.coloring? (method)">coloring?</a></span>, <span class='object_link'><a href="Doing/Color.html#support%3F-instance_method" title="Doing::Color#support? (method)">#support?</a></span></p>
 
 
   <div id="instance_method_details" class="method_details_list">
@@ -1566,514 +524,7 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="add_at-instance_method">
-  
-    #<strong>add_at</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Add @ prefix to string if needed, maintains +/- prefix</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>@string</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="add_tags-instance_method">
-  
-    #<strong>add_tags</strong>(tags, remove: false)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Returns the tagged string.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>tags</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span> or <span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>List of tags to add. @ symbol optional</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>remove</span>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>false</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>remove tags instead of adding</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>the tagged string</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="add_tags!-instance_method">
-  
-    #<strong>add_tags!</strong>(tags, remove: false)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-
-  </div>
-</div>
-<div class="tags">
-  
-
-  <p class="tag_title">See Also:</p>
-  <ul class="see">
-    
-      <li><span class='object_link'><a href="#add_tags-instance_method" title="String#add_tags (method)">#add_tags</a></span></li>
-    
-  </ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="cap_first-instance_method">
-  
-    #<strong>cap_first</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Capitalize on the first character on string</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        
-        <div class='inline'><p>Capitalized string</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="chronify-instance_method">
-  
-    #<strong>chronify</strong>(**options)  &#x21d2; <tt>DateTime</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Converts input string into a Time object when input
-takes on the following formats:
-            - interval format e.g. &#39;1d2h30m&#39;, &#39;45m&#39;
-              etc.
-            - a semantic phrase e.g. &#39;yesterday
-              5:30pm&#39;
-            - a strftime e.g. &#39;2016-03-15 15:32:04
-              PDT&#39;</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>options</span>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>Additional options</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-  
-    
-    
-    <p class="tag_title">Options Hash (<tt>**options</tt>):</p>
-    <ul class="option">
-      
-        <li>
-          <span class="name">:future</span>
-          <span class="type">(<tt>Boolean</tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>assume future date
-(default: false)</p>
-</div>
-          
-        </li>
-      
-        <li>
-          <span class="name">:guess</span>
-          <span class="type">(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>:begin or :end to
-assume beginning or end of
-arbitrary time range</p>
-</div>
-          
-        </li>
-      
-    </ul>
-  
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>DateTime</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>result</p>
-</div>
-      
-    </li>
-  
-</ul>
-<p class="tag_title">Raises:</p>
-<ul class="raise">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Errors::InvalidTimeExpression</tt>)</span>
-      
-      
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="chronify_qty-instance_method">
-  
-    #<strong>chronify_qty</strong>  &#x21d2; <tt>Integer</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Converts simple strings into seconds that can be
-added to a Time object</p>
-
-<p>Input string can be HH:MM or XX[dhm]<a href="1d2h30m,%2045m,%201.5d,%201h20m,%20etc.">[XXhm][XXm]</a></p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>seconds</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="clean_unlinked_urls-instance_method">
-  
-    #<strong>clean_unlinked_urls</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Clean up unlinked <urls></p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="compress-instance_method">
-  
-    #<strong>compress</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Compress multiple spaces to single space</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="compress!-instance_method">
-  
-    #<strong>compress!</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="dedup_tags-instance_method">
-  
-    #<strong>dedup_tags</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Remove duplicate tags, leaving only first occurrence</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        
-        <div class='inline'><p>Deduplicated string</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="dedup_tags!-instance_method">
-  
-    #<strong>dedup_tags!</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-
-  </div>
-</div>
-<div class="tags">
-  
-
-  <p class="tag_title">See Also:</p>
-  <ul class="see">
-    
-      <li><span class='object_link'><a href="#dedup_tags-instance_method" title="String#dedup_tags (method)">#dedup_tags</a></span></li>
-    
-  </ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="expand_date_tags-instance_method">
-  
-    #<strong>expand_date_tags</strong>(additional_tags = nil)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Convert (chronify) natural language dates
-within configured date tags (tags whose value is
-expected to be a date). Modifies string in place.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>additional_tags</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>An array of
-additional tags to
-consider date_tags</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="good?-instance_method">
+  <h3 class="signature first" id="good?-instance_method">
   
     #<strong>good?</strong>  &#x21d2; <tt>Boolean</tt> 
   
@@ -2108,394 +559,6 @@ has content</p>
     </li>
   
 </ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="highlight_search-instance_method">
-  
-    #<strong>highlight_search</strong>(search, distance: nil, negate: false, case_type: nil)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="highlight_search!-instance_method">
-  
-    #<strong>highlight_search!</strong>(search, distance: nil, negate: false, case_type: nil)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="highlight_tags-instance_method">
-  
-    #<strong>highlight_tags</strong>(color = &#39;yellow&#39;, last_color: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Colorize @tags with ANSI escapes</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>color</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>&#39;yellow&#39;</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>color (see #Color)</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>string with @tags highlighted</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="highlight_tags!-instance_method">
-  
-    #<strong>highlight_tags!</strong>(color = &#39;yellow&#39;, last_color: nil)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>color</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>&#39;yellow&#39;</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>color (see #Color)</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="ignore?-instance_method">
-  
-    #<strong>ignore?</strong>  &#x21d2; <tt>Boolean</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Test if line should be ignored</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>line is empty or comment</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="ignore_case-instance_method">
-  
-    #<strong>ignore_case</strong>(search, case_type)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="is_range?-instance_method">
-  
-    #<strong>is_range?</strong>  &#x21d2; <tt>Boolean</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="is_rx?-instance_method">
-  
-    #<strong>is_rx?</strong>  &#x21d2; <tt>Boolean</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Determines if receiver is surrounded by slashes or starts with single quote</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>True if regex, False otherwise.</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="last_color-instance_method">
-  
-    #<strong>last_color</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Returns the last escape sequence from a string.</p>
-
-<p>Actually returns all escape codes, with the assumption
-that the result of inserting them will generate the
-same color as was set at the end of the string.
-Because you can send modifiers like dark and bold
-separate from color codes, only using the last code
-may not render the same style.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>All escape codes in string</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="link_urls-instance_method">
-  
-    #<strong>link_urls</strong>(**opt)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Turn raw urls into HTML links</p>
-
-<p>:html (default)</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>opt</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>Additional Options</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-  
-    
-    
-    <p class="tag_title">Options Hash (<tt>**opt</tt>):</p>
-    <ul class="option">
-      
-        <li>
-          <span class="name">:format</span>
-          <span class="type">(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>can be :markdown or</p>
-</div>
-          
-        </li>
-      
-    </ul>
-  
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="link_urls!-instance_method">
-  
-    #<strong>link_urls!</strong>(**opt)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-
-  </div>
-</div>
-<div class="tags">
-  
-
-  <p class="tag_title">See Also:</p>
-  <ul class="see">
-    
-      <li><span class='object_link'><a href="#link_urls-instance_method" title="String#link_urls (method)">#link_urls</a></span></li>
-    
-  </ul>
 
 </div>
 </div>
@@ -2676,7 +739,7 @@ may not render the same style.</p>
       <div class="method_details ">
   <h3 class="signature " id="normalize_case!-instance_method">
   
-    #<strong>normalize_case!</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>normalize_case!</strong>(default = :smart)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
   
 
   
@@ -2697,6 +760,47 @@ may not render the same style.</p>
       <li><span class='object_link'><a href="#normalize_case-instance_method" title="String#normalize_case (method)">#normalize_case</a></span></li>
     
   </ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_color-instance_method">
+  
+    #<strong>normalize_color</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Normalize a color name, removing underscores,
+replacing &quot;bright&quot; with &quot;bold&quot;, and converting
+bgbold to boldbg</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Normalized color name</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -2794,7 +898,7 @@ doesn&#39;t match a known symbol</p>
       <div class="method_details ">
   <h3 class="signature " id="normalize_order-instance_method">
   
-    #<strong>normalize_order</strong>(default = &#39;asc&#39;)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>normalize_order</strong>(default = :asc)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
   
 
   
@@ -2806,7 +910,7 @@ doesn&#39;t match a known symbol</p>
       <div class="method_details ">
   <h3 class="signature " id="normalize_order!-instance_method">
   
-    #<strong>normalize_order!</strong>(default = &#39;asc&#39;)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
+    #<strong>normalize_order!</strong>(default = :asc)  &#x21d2; <tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt> 
   
 
   
@@ -2827,17 +931,84 @@ doesn&#39;t match a known symbol</p>
     <li>
       
       
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>&#39;asc&#39; or &#39;desc&#39;</p>
+        <div class='inline'><p>:asc or :desc</p>
 </div>
       
     </li>
   
 </ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_tag_sort-instance_method">
+  
+    #<strong>normalize_tag_sort</strong>(default = :name)  &#x21d2; <tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert tag sort string to a qualified type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:name or :time</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_tag_sort!-instance_method">
+  
+    #<strong>normalize_tag_sort!</strong>(default = :name)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#normalize_tag_sort-instance_method" title="String#normalize_tag_sort (method)">#normalize_tag_sort</a></span></li>
+    
+  </ul>
 
 </div>
 </div>
@@ -2911,926 +1082,6 @@ to avoid match groups</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="remove_at-instance_method">
-  
-    #<strong>remove_at</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Removes @ prefix if needed, maintains +/- prefix</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>string without @ prefix</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="remove_self_links-instance_method">
-  
-    #<strong>remove_self_links</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Remove <self-linked> formatting</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="replace_qualified_urls-instance_method">
-  
-    #<strong>replace_qualified_urls</strong>(**options)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Replace qualified urls</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="set_type-instance_method">
-  
-    #<strong>set_type</strong>(kind = nil)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Convert a string value to an appropriate type. If
-kind is not specified, &#39;[one, two]&#39; becomes an Array,
-&#39;1&#39; becomes Integer, &#39;1.5&#39; becomes Float, &#39;true&#39; or
-&#39;yes&#39; becomes TrueClass, &#39;false&#39; or &#39;no&#39; becomes
-FalseClass.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>kind</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>specify string, array,
-integer, float, symbol, or boolean
-(falls back to string if value is
-not recognized)</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        
-        <div class='inline'><p>Converted object type</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="simple_wrap-instance_method">
-  
-    #<strong>simple_wrap</strong>(width)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="split_date_range-instance_method">
-  
-    #<strong>split_date_range</strong>  &#x21d2; <tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span>&lt;DateTime&gt;</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Splits a range string and returns an array of
-DateTime objects as [start, end]. If only one date is
-given, end time is nil.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-  <div class="examples">
-    <p class="tag_title">Examples:</p>
-    
-      
-        <p class="example_title"><div class='inline'><p>Process a natural language date range</p>
-</div></p>
-      
-      <pre class="example code"><code><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>mon 3pm to mon 5pm</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_split_date_range'>split_date_range</span></code></pre>
-    
-  </div>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span>&lt;DateTime&gt;</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>Start and end dates as
-array</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="tag-instance_method">
-  
-    #<strong>tag</strong>(tag, value: nil, remove: false, rename_to: nil, regex: false, single: false, force: false)  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Add, rename, or remove a tag</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>tag</span>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>The tag</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>value</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>Value for tag (@tag(value))</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>remove</span>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>false</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>Remove the tag instead of adding</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>rename_to</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>Replace tag with this tag</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>regex</span>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>false</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>Tag is regular expression</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>single</span>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>false</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>Operating on a single item (for logging)</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>force</span>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>false</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>With rename_to, add tag if it doesn&#39;t exist</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>The string with modified tags</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="tag!-instance_method">
-  
-    #<strong>tag!</strong>(tag, **options)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Add, rename, or remove a tag in place</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-  <p class="tag_title">See Also:</p>
-  <ul class="see">
-    
-      <li><span class='object_link'><a href="#tag-instance_method" title="String#tag (method)">#tag</a></span></li>
-    
-  </ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="time_string-instance_method">
-  
-    #<strong>time_string</strong>(format: :dhm)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Convert DD:HH:MM to a natural language string</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>format</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>:dhm</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>The format to output (:dhm, :hm, :m, :clock, :natural)</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="to_bool-instance_method">
-  
-    #<strong>to_bool</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="to_p-instance_method">
-  
-    #<strong>to_p</strong>(number)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Pluralize a string based on quantity</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>number</span>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>the quantity of the
-object the string represents</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="to_phrase_query-instance_method">
-  
-    #<strong>to_phrase_query</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="to_query-instance_method">
-  
-    #<strong>to_query</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="to_rx-instance_method">
-  
-    #<strong>to_rx</strong>(distance: nil, case_type: nil)  &#x21d2; <tt>Regexp</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Convert string to fuzzy regex. Characters in words
-can be separated by up to <em>distance</em> characters in
-haystack, spaces indicate unlimited distance.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-  <div class="examples">
-    <p class="tag_title">Examples:</p>
-    
-      
-      <pre class="example code"><code><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>this word</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_to_rx'>to_rx</span><span class='lparen'>(</span><span class='int'>3</span><span class='rparen'>)</span>
-<span class='comment'># =&gt; /t.{0,3}h.{0,3}i.{0,3}s.{0,3}.*?w.{0,3}o.{0,3}r.{0,3}d/</span></code></pre>
-    
-  </div>
-<p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>distance</span>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>Allowed distance
-between characters</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>case_type</span>
-      
-      
-        <span class='type'></span>
-      
-      
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>The case type</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Regexp</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>Regex pattern</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="to_seconds-instance_method">
-  
-    #<strong>to_seconds</strong>  &#x21d2; <tt>Integer</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Convert DD:HH:MM to seconds</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>rounded number of seconds</p>
-</div>
-      
-    </li>
-  
-</ul>
-<p class="tag_title">Raises:</p>
-<ul class="raise">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Errors::DoingRuntimeError</tt>)</span>
-      
-      
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="to_tags-instance_method">
-  
-    #<strong>to_tags</strong>  &#x21d2; <tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Convert a list of tags to an array. Tags can be with
-or without @ symbols, separated by any character, and
-can include parenthetical values (with spaces)</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>array of tags including @ symbols</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="truncate-instance_method">
-  
-    #<strong>truncate</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Truncate to nearest word</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>len</span>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>The length</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="truncate!-instance_method">
-  
-    #<strong>truncate!</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="truncmiddle-instance_method">
-  
-    #<strong>truncmiddle</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Truncate string in the middle</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>len</span>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>The length</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>ellipsis</span>
-      
-      
-        <span class='type'></span>
-      
-      
-        <em class="default">(defaults to: <tt>&#39;...&#39;</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>The ellipsis</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="truncmiddle!-instance_method">
-  
-    #<strong>truncmiddle!</strong>(len, ellipsis: &#39;...&#39;)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="truthy?-instance_method">
-  
-    #<strong>truthy?</strong>  &#x21d2; <tt>Boolean</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Test string for truthiness (0, &quot;f&quot;, &quot;false&quot;, &quot;n&quot;, &quot;no&quot; all return false, case insensitive, otherwise true)</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>String is truthy</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="uncolor-instance_method">
-  
-    #<strong>uncolor</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Remove color escape codes</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        
-        <div class='inline'><p>clean string</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="uncolor!-instance_method">
-  
-    #<strong>uncolor!</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
   <h3 class="signature " id="validate_color-instance_method">
   
     #<strong>validate_color</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
@@ -3841,11 +1092,7 @@ can include parenthetical values (with spaces)</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p class="note private">
-  <strong>This method is part of a private API.</strong>
-  You should avoid using this method if possible, as it may be removed or be changed in the future.
-</p>
-<p>Extract the longest valid color from a string.</p>
+    <p>Extract the longest valid %color name from a string.</p>
 
 <p>Allows %colors to bleed into other text and still
 be recognized, e.g. %greensomething still finds
@@ -3877,127 +1124,12 @@ be recognized, e.g. %greensomething still finds
 </div>
 </div>
     
-      <div class="method_details ">
-  <h3 class="signature " id="wildcard_to_rx-instance_method">
-  
-    #<strong>wildcard_to_rx</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Convert ? and * wildcards to regular expressions.
-Uses \S (non-whitespace) instead of . (any character)</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>Regular expression string</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="wrap-instance_method">
-  
-    #<strong>wrap</strong>(len, pad: 0, indent: &#39;  &#39;, offset: 0, prefix: &#39;&#39;, color: &#39;&#39;, after: &#39;&#39;, reset: &#39;&#39;, pad_first: false)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Wrap string at word breaks, respecting tags</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>len</span>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>The length</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>offset</span>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>0</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>(Optional) The width to pad each subsequent line</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>prefix</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="String (class)">String</a></span></tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>&#39;&#39;</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>(Optional) A prefix to add to each line</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Sun Jan 23 16:30:43 2022 by
+  Generated on Mon Feb 14 10:46:50 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>
