@@ -61,9 +61,9 @@ _doing_cancel() {
 _doing_changes() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--changes --all --lookup --markdown --search' -- $token ) )
+    COMPREPLY=( $( compgen -W '--changes --all --lookup --markdown --search --sort' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-C -a -l -s --changes --all --lookup --markdown --search' -- $token ) )
+    COMPREPLY=( $( compgen -W '-C -a -l -s --changes --all --lookup --markdown --search --sort' -- $token ) )
   
   fi
 }

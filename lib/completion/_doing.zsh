@@ -89,10 +89,10 @@ function _doing() {
                 args=( {-a,--archive}"[Archive entries]" "(--bool=)--bool=}[Boolean used to combine multiple tags]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-i,--interactive}"[Select item(s) to cancel from a menu of matching entries]" "(--not)--not}[Cancel items that *dont* match search/tag filterst* match search/tag filters]" {-s,--section=}"[Section]" "(--search=)--search=}[Filter entries using a search query]" "(--tag=)--tag=}[Filter entries by tag]" {-u,--unfinished}"[Cancel last entry]" "(--val=)--val=}[Perform a tag value query]" {-x,--exact}"[Force exact search string matching]" )
             ;;
             changes) 
-                args=( {-C,--changes}"[Only output changes]" {-a,--all}"[Display all versions]" {-l,--lookup=}"[Look up a specific version]" "(--markdown)--markdown}[Output raw Markdown]" {-s,--search=}"[Show changelogs matching search terms]" )
+                args=( {-C,--changes}"[Only output changes]" {-a,--all}"[Display all versions]" {-l,--lookup=}"[Look up a specific version]" "(--markdown)--markdown}[Output raw Markdown]" {-s,--search=}"[Show changelogs matching search terms]" "(--sort=)--sort=}[Sort order]" )
             ;;
             changelog) 
-                args=( {-C,--changes}"[Only output changes]" {-a,--all}"[Display all versions]" {-l,--lookup=}"[Look up a specific version]" "(--markdown)--markdown}[Output raw Markdown]" {-s,--search=}"[Show changelogs matching search terms]" )
+                args=( {-C,--changes}"[Only output changes]" {-a,--all}"[Display all versions]" {-l,--lookup=}"[Look up a specific version]" "(--markdown)--markdown}[Output raw Markdown]" {-s,--search=}"[Show changelogs matching search terms]" "(--sort=)--sort=}[Sort order]" )
             ;;
             colors) 
                 args=(  )

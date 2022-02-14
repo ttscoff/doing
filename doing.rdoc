@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.27
+v2.1.28
 
 === Global Options
 === --config_file arg
@@ -452,6 +452,14 @@ Show changelogs matching search terms (uses pattern-based searching).
            Add slashes to search with regular expressions, e.g. `--search "/output.*flag/"`
 
 [Default Value] None
+
+
+===== --sort ORDER
+
+Sort order (asc/desc)
+
+[Default Value] desc
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
 ===== -C|--changes
