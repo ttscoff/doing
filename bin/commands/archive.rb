@@ -26,13 +26,9 @@ command %i[archive move] do |c|
   c.desc 'Label moved items with @from(SECTION_NAME)'
   c.switch [:label], default_value: true, negatable: true
 
-  c.desc 'Archive entries older than date
-    (Flexible date format, e.g. 1/27/2021, 2020-07-19, or Monday 3pm)'
-  c.arg_name 'DATE_STRING'
-  c.flag [:before], type: DateEndString
-
   add_options(:search, c)
   add_options(:tag_filter, c)
+  add_options(:date_filter, c)
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false

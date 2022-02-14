@@ -61,15 +61,26 @@ class DoingArchiveTest < Test::Unit::TestCase
     result = doing('--stdout', 'archive', '--search', '/cont.*?ion/')
     assert_match(/Archived: 1 item/, result, 'Regex search should have matched 1 items')
 
-    assert_count_entries(entries - 3, doing('show'), "Current section should have 3 fewer items items")
+    assert_count_entries(entries - 3, doing('show'), 'Current section should have 3 fewer items items')
 
     assert_count_entries(3, doing('show', 'archive'), 'Archive should have 3 items')
     assert_valid_file(@wwid_file)
   end
 
+  def test_archive_date
+    result = doing('--stdout', 'archive', '--from', '2021-07-19 12am to 2021-07-20 12AM')
+    assert_match(/Archived: 2 items/, result, 'Should have archived 2 items')
+
+    result = doing('--stdout', 'archive', '--before', '2021-07-19')
+    assert_match(/Archived: 3 items/, result, 'Should have archived 3 items')
+
+    result = doing('--stdout', 'archive', '--after', '2021-07-20')
+    assert_match(/Archived: 3 items/, result, 'Should have archived 3 items')
+  end
+
   def test_archive_keep
     result = doing('--stdout', 'archive', '--keep', '5')
-    assert_match(/Archived: 3 items/, result, "Should have archived 3 items")
+    assert_match(/Archived: 3 items/, result, 'Should have archived 3 items')
   end
 
   def test_archive_destination

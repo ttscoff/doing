@@ -1722,7 +1722,7 @@ module Doing
       destination = guess_section(destination)
 
       if @content.section?(destination) && (@content.section?(section) || archive_all)
-        do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label], before: options[:before] })
+        do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label], before: options[:before], after: options[:after], from: options[:from] })
         write(doing_file)
       else
         raise InvalidArgument, 'Either source or destination does not exist'
@@ -2328,26 +2328,37 @@ EOS
       section_items = @content.in_section(section)
       max = section_items.count - count.to_i
 
+      opt[:after] = opt[:from][0] if opt[:from]
+      opt[:before] = opt[:from][1] if opt[:from]
+
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+
+      if opt[:before].is_a?(String) && opt[:before] =~ time_rx
+        opt[:before] = opt[:before].chronify(guess: :end, future: false)
+      end
+
+      if opt[:after].is_a?(String) && opt[:after] =~ time_rx
+        opt[:after] = opt[:after].chronify(guess: :begin, future: false)
+      end
+
       counter = 0
 
       @content.map do |item|
         break if counter >= max
-        if opt[:before]
-          time_string = opt[:before]
-          cutoff = time_string.chronify(guess: :begin)
-        end
 
-        if (item.section.downcase != section.downcase && section != /^all$/i) || item.section.downcase == destination.downcase
-          item
-        elsif ((!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s)) || (opt[:before] && item.date >= cutoff))
-          item
-        else
-          counter += 1
-          old_item = item.clone
-          item.move_to(destination, label: label, log: false)
-          Hooks.trigger :post_entry_updated, self, item, old_item
-          item
-        end
+        next if item.section.downcase == destination.downcase
+
+        next if item.section.downcase != section.downcase && section != /^all$/i
+
+        next if (opt[:before] && item.date > opt[:before]) || (opt[:after] && item.date < opt[:after])
+
+        next if (!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s))
+
+        counter += 1
+        old_item = item.clone
+        item.move_to(destination, label: label, log: false)
+        Hooks.trigger :post_entry_updated, self, item, old_item
+        item
       end
 
       if counter.positive?

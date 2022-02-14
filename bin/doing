@@ -141,6 +141,20 @@ accept TagArray do |value|
   value.gsub(/[, ]+/, ' ').split(' ').map { |tag| tag.sub(/^@/, '') }.map(&:strip)
 end
 
+##
+## Add presets of flags and switches to a command.
+##
+## :add_entry => --noauto, --note, --ask, --editor, --back
+##
+## :search => --search, --case, --exact
+##
+## :tag_filter => --tag, --bool, --not, --val
+##
+## :date_filter => --before, --after, --from
+##
+## @param      type  [Symbol] The type
+## @param      cmd   The GLI command to which the options will be added
+##
 def add_options(type, cmd)
   case type
   when :add_entry
@@ -156,6 +170,10 @@ def add_options(type, cmd)
 
     cmd.desc "Edit entry with #{Doing::Util.default_editor}"
     cmd.switch %i[e editor], negatable: false, default_value: false
+
+    cmd.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
+    cmd.arg_name 'DATE_STRING'
+    cmd.flag %i[b back started], type: DateBeginString
   when :search
     cmd.desc 'Filter entries using a search query, surround with slashes for regex (e.g. "/query.*/"),
             start with single quote for exact match ("\'query")'
@@ -188,6 +206,25 @@ def add_options(type, cmd)
     cmd.flag [:bool], must_match: REGEX_BOOL,
                     default_value: :pattern,
                     type: BooleanSymbol
+  when :date_filter
+    cmd.desc 'Select entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
+    cmd.arg_name 'DATE_STRING'
+    cmd.flag [:before], type: DateBeginString
+
+    cmd.desc 'Select entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
+    cmd.arg_name 'DATE_STRING'
+    cmd.flag [:after], type: DateEndString
+
+    cmd.desc %(
+        Date range to select, or a single day to filter date on.
+        Date range argument should be quoted. Date specifications can be natural language.
+        To specify a range, use "to" or "through": `doing search --from "monday 8am to friday 5pm"`.
+
+        If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+        by time of day.
+      )
+    cmd.arg_name 'DATE_OR_RANGE'
+    cmd.flag [:from], type: DateRangeString
   end
 end
 

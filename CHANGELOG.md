@@ -1,6 +1,6 @@
 ### 2.1.27
 
-2022-02-12 14:45
+2022-02-13 06:32
 
 #### NEW
 
@@ -11,6 +11,9 @@
 - Code refactoring and cleanup
 - Include release dates in `doing changes` output when available
 - Allow various naming conventions for %color strings in templates. Now `boldwhite`, `brightwhite`, `bg_bold_cyan`, and `bold_bg_cyan` all work (for example)
+- Common flags (e.g. --search, --tag) found on multiple commands consolidated and help descriptions matched
+- `commands_accepting` now accepts multiple arguments and a `--bool` flag
+- `changes` command can now output changes only (no version numbers) and defaults to raw Markdown if not a TTY or the `--md` flag is used
 
 ### 2.1.26
 

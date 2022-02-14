@@ -20,10 +20,6 @@ command %i[now next] do |c|
   c.arg_name 'NAME'
   c.flag %i[s section]
 
-  c.desc 'Backdate start time [4pm|20m|2h|"yesterday noon"]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back started], type: DateBeginString
-
   c.desc %(
         Set a start and optionally end time as a date range ("from 1pm to 2:30pm").
         If an end time is provided, a dated @done tag will be added

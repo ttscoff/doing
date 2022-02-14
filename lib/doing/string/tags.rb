@@ -29,7 +29,12 @@ module Doing
     ## @return     [Array] array of tags including @ symbols
     ##
     def to_tags
-      gsub(/ *, */, ' ').scan(/(@?(?:\S+(?:\(.+\)))|@?(?:\S+))/).map(&:first).sort.uniq.map(&:add_at)
+      arr = gsub(/ *, */, ' ').scan(/(@?(?:\S+(?:\(.+\)))|@?(?:\S+))/).map(&:first).sort.uniq.map(&:add_at)
+      if block_given?
+        yield arr
+      else
+        arr
+      end
     end
 
     ##

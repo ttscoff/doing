@@ -52,27 +52,6 @@ command :select do |c|
   c.arg_name 'QUERY'
   c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
 
-  c.desc 'Select from entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included,
-          but entries will be filtered by time of day'
-  c.arg_name 'DATE_STRING'
-  c.flag [:before], type: DateBeginString
-
-  c.desc 'Select from entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included,
-          but entries will be filtered by time of day'
-  c.arg_name 'DATE_STRING'
-  c.flag [:after], type: DateEndString
-
-  c.desc %(
-      Date range to show, or a single day to filter date on.
-      Date range argument should be quoted. Date specifications can be natural language.
-      To specify a range, use "to" or "through": `doing select --from "monday 8am to friday 5pm"`.
-
-      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
-      by time of day.
-    )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from], type: DateRangeString
-
   c.desc 'Select items that *don\'t* match search/tag filters'
   c.switch [:not], default_value: false, negatable: false
 
@@ -111,6 +90,7 @@ command :select do |c|
   c.switch %i[again resume], negatable: false, default_value: false
 
   add_options(:search, c)
+  add_options(:date_filter, c)
 
   c.action do |_global_options, options, _args|
     if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)

@@ -24,10 +24,6 @@ command %i[done did] do |c|
   c.arg_name 'DATE_STRING'
   c.flag %i[at finished], type: DateEndString
 
-  c.desc 'Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back started], type: DateBeginString
-
   c.desc %(
         Start and end times as a date/time range `doing done --from "1am to 8am"`.
         Overrides other date flags.

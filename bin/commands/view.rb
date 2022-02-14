@@ -46,27 +46,6 @@ command :view do |c|
   c.arg_name 'DIRECTION'
   c.flag [:tag_order], must_match: REGEX_SORT_ORDER, type: OrderSymbol
 
-  c.desc 'View entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included,
-          but entries will be filtered by time of day'
-  c.arg_name 'DATE_STRING'
-  c.flag [:before], type: DateBeginString
-
-  c.desc 'View entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included,
-          but entries will be filtered by time of day'
-  c.arg_name 'DATE_STRING'
-  c.flag [:after], type: DateEndString
-
-  c.desc %(
-      Date range to show, or a single day to filter date on.
-      Date range argument should be quoted. Date specifications can be natural language.
-      To specify a range, use "to" or "through": `doing view --from "monday 8am to friday 5pm" view_name`.
-
-      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
-      by time of day.
-    )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from], type: DateRangeString
-
   c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
 
@@ -75,6 +54,7 @@ command :view do |c|
 
   add_options(:search, c)
   add_options(:tag_filter, c)
+  add_options(:date_filter, c)
 
   c.action do |global_options, options, args|
     options[:fuzzy] = false

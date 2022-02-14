@@ -18,10 +18,6 @@ command :meanwhile do |c|
   c.desc 'Archive previous @meanwhile entry'
   c.switch %i[a archive], negatable: false, default_value: false
 
-  c.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back started], type: DateBeginString
-
   add_options(:add_entry, c)
 
   c.action do |_global_options, options, args|

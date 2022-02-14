@@ -26,25 +26,6 @@ command :show do |c|
   c.arg_name 'AGE'
   c.flag %i[a age], default_value: :newest, type: AgeSymbol
 
-  c.desc 'Show entries older than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
-  c.arg_name 'DATE_STRING'
-  c.flag [:before], type: DateBeginString
-
-  c.desc 'Show entries newer than date. If this is only a time (8am, 1:30pm, 15:00), all dates will be included, but entries will be filtered by time of day'
-  c.arg_name 'DATE_STRING'
-  c.flag [:after], type: DateEndString
-
-  c.desc %(
-      Date range to show, or a single day to filter date on.
-      Date range argument should be quoted. Date specifications can be natural language.
-      To specify a range, use "to" or "through": `doing show --from "monday 8am to friday 5pm"`.
-
-      If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
-      by time of day.
-    )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag [:from], type: DateRangeString
-
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: @settings.dig('search', 'highlight')
 
@@ -93,6 +74,7 @@ command :show do |c|
 
   add_options(:search, c)
   add_options(:tag_filter, c)
+  add_options(:date_filter, c)
 
   c.action do |global_options, options, args|
     options[:fuzzy] = false

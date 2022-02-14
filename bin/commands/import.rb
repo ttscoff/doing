@@ -32,27 +32,11 @@ command :import do |c|
   c.arg_name 'PREFIX'
   c.flag :prefix
 
-  # TODO: Allow time range filtering
-  c.desc 'Import entries older than date'
-  c.arg_name 'DATE_STRING'
-  c.flag [:before], type: DateBeginString
-
-  c.desc 'Import entries newer than date'
-  c.arg_name 'DATE_STRING'
-  c.flag [:after], type: DateEndString
-
-  c.desc %(
-    Date range to import. Date range argument should be quoted. Date specifications can be natural language.
-    To specify a range, use "to" or "through": `--from "monday to friday"` or `--from 10/1 to 10/31`.
-    Has no effect unless the import plugin has implemented date range filtering.
-  )
-  c.arg_name 'DATE_OR_RANGE'
-  c.flag %i[f from], type: DateRangeString
-
   c.desc 'Allow entries that overlap existing times'
   c.switch [:overlap], negatable: true
 
   add_options(:search, c)
+  add_options(:date_filter, c)
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false

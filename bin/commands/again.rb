@@ -23,12 +23,6 @@ command %i[again resume] do |c|
   c.arg_name 'SECTION_NAME'
   c.flag [:in]
 
-  c.desc 'Backdate start date by interval or set to time [4pm|20m|2h|"yesterday noon"]'
-  c.arg_name 'DATE_STRING'
-  c.flag %i[b back started], type: DateBeginString
-
-
-
   c.desc 'Select item to resume from a menu of matching entries'
   c.switch %i[i interactive], negatable: false, default_value: false
 
