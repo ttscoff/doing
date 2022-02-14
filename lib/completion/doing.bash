@@ -61,9 +61,9 @@ _doing_cancel() {
 _doing_changes() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--changes --all --lookup --markdown --search --sort' -- $token ) )
+    COMPREPLY=( $( compgen -W '--changes --all --interactive --lookup --markdown --render --search --sort' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-C -a -l -s --changes --all --lookup --markdown --search --sort' -- $token ) )
+    COMPREPLY=( $( compgen -W '-C -a -i -l -s --changes --all --interactive --lookup --markdown --render --search --sort' -- $token ) )
   
   fi
 }
@@ -144,16 +144,6 @@ _doing_last() {
     COMPREPLY=( $( compgen -W '--bool --case --config_template --delete --duration --editor --hilite --not --section --search --tag --template --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
     COMPREPLY=( $( compgen -W '-d -e -h -s -x --bool --case --config_template --delete --duration --editor --hilite --not --section --search --tag --template --val --exact' -- $token ) )
-  
-  fi
-}
-
-_doing_later() {
-  
-  if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--ask --started --editor --note' -- $token ) )
-  elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-e -n --ask --started --editor --note' -- $token ) )
   
   fi
 }
@@ -466,7 +456,6 @@ _doing()
     elif [[ $last =~ (help) ]]; then _doing_help
     elif [[ $last =~ (import) ]]; then _doing_import
     elif [[ $last =~ (last) ]]; then _doing_last
-    elif [[ $last =~ (later) ]]; then _doing_later
     elif [[ $last =~ (mark|flag) ]]; then _doing_mark
     elif [[ $last =~ (meanwhile) ]]; then _doing_meanwhile
     elif [[ $last =~ (note) ]]; then _doing_note

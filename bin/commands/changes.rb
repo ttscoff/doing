@@ -45,6 +45,12 @@ command %i[changes changelog] do |c|
   c.desc 'Output raw Markdown'
   c.switch %i[m md markdown], default_value: false, negatable: false
 
+  c.desc 'Force rendered output'
+  c.switch %i[render], default_value: false, negatable: false
+
+  c.desc 'Open changelog in interactive viewer'
+  c.switch %i[i interactive], default_value: false, negatable: false
+
   c.example 'doing changes', desc: 'View changes in the current version'
   c.example 'doing changes --all', desc: 'See the entire changelog'
   c.example 'doing changes --lookup 2.0.21', desc: 'See changes from version 2.0.21'
@@ -55,19 +61,23 @@ command %i[changes changelog] do |c|
   c.action do |_global_options, options, _args|
     cl = Doing::Changes.new(lookup: options[:lookup], search: options[:search], changes: options[:changes], sort: options[:sort])
 
-    content = if options[:all] || options[:search] || options[:lookup]
-                cl.to_s
-              else
-                cl.latest
-              end
+    if options[:interactive]
+      cl.interactive
+    else
+      content = if options[:all] || options[:search] || options[:lookup]
+                  cl.to_s
+                else
+                  cl.latest
+                end
 
-    parsed = if options[:markdown] || !$stdout.isatty
-               content
-             else
-               TTY::Markdown.parse(content, width: 80, theme: MARKDOWN_THEME, symbols: { override: { bullet: '•' } })
-             end
+      parsed = if (options[:markdown] || !$stdout.isatty) && !options[:render]
+                 content
+               else
+                 TTY::Markdown.parse(content, width: 80, theme: MARKDOWN_THEME, symbols: { override: { bullet: '•' } })
+               end
 
-    Doing::Pager.paginate = true
-    Doing::Pager.page parsed
+      Doing::Pager.paginate = true
+      Doing::Pager.page parsed
+    end
   end
 end

@@ -28,7 +28,6 @@ function _doing() {
                   'help:Shows a list of commands or help for one command'
                   'import:Import entries from an external source'
                   'last:Show the last entry'
-                  'later:Add an item to the Later section'
                   'mark:Mark last entry as flagged'
                   'flag:Mark last entry as flagged'
                   'meanwhile:Finish any running @meanwhile tasks and optionally create a new one'
@@ -89,10 +88,10 @@ function _doing() {
                 args=( {-a,--archive}"[Archive entries]" "(--bool=)--bool=}[Boolean used to combine multiple tags]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-i,--interactive}"[Select item(s) to cancel from a menu of matching entries]" "(--not)--not}[Cancel items that *dont* match search/tag filterst* match search/tag filters]" {-s,--section=}"[Section]" "(--search=)--search=}[Filter entries using a search query]" "(--tag=)--tag=}[Filter entries by tag]" {-u,--unfinished}"[Cancel last entry]" "(--val=)--val=}[Perform a tag value query]" {-x,--exact}"[Force exact search string matching]" )
             ;;
             changes) 
-                args=( {-C,--changes}"[Only output changes]" {-a,--all}"[Display all versions]" {-l,--lookup=}"[Look up a specific version]" "(--markdown)--markdown}[Output raw Markdown]" {-s,--search=}"[Show changelogs matching search terms]" "(--sort=)--sort=}[Sort order]" )
+                args=( {-C,--changes}"[Only output changes]" {-a,--all}"[Display all versions]" {-i,--interactive}"[Open changelog in interactive viewer]" {-l,--lookup=}"[Look up a specific version]" "(--markdown)--markdown}[Output raw Markdown]" "(--render)--render}[Force rendered output]" {-s,--search=}"[Show changelogs matching search terms]" "(--sort=)--sort=}[Sort order]" )
             ;;
             changelog) 
-                args=( {-C,--changes}"[Only output changes]" {-a,--all}"[Display all versions]" {-l,--lookup=}"[Look up a specific version]" "(--markdown)--markdown}[Output raw Markdown]" {-s,--search=}"[Show changelogs matching search terms]" "(--sort=)--sort=}[Sort order]" )
+                args=( {-C,--changes}"[Only output changes]" {-a,--all}"[Display all versions]" {-i,--interactive}"[Open changelog in interactive viewer]" {-l,--lookup=}"[Look up a specific version]" "(--markdown)--markdown}[Output raw Markdown]" "(--render)--render}[Force rendered output]" {-s,--search=}"[Show changelogs matching search terms]" "(--sort=)--sort=}[Sort order]" )
             ;;
             colors) 
                 args=(  )
@@ -129,9 +128,6 @@ function _doing() {
             ;;
             last) 
                 args=( "(--bool=)--bool=}[Boolean used to combine multiple tags]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" "(--config_template=)--config_template=}[Output using a template from configuration]" {-d,--delete}"[Delete the last entry]" "(--duration)--duration}[Show elapsed time if entry is not tagged @done]" {-e,--editor}"[Edit entry with vim]" {-h,--hilite}"[Highlight search matches in output]" "(--not)--not}[Show items that *dont* match search/tag filterst* match search/tag filters]" {-s,--section=}"[Specify a section]" "(--search=)--search=}[Filter entries using a search query]" "(--tag=)--tag=}[Filter entries by tag]" "(--template=)--template=}[Override output format with a template string containing %placeholders]" "(--val=)--val=}[Perform a tag value query]" {-x,--exact}"[Force exact search string matching]" )
-            ;;
-            later) 
-                args=( "(--ask)--ask}[Prompt for note via multi-line input]" "(--started=)--started=}[Backdate start time to date string [4pm|20m|2h|yesterday noon]]" {-e,--editor}"[Edit entry with vim]" {-n,--note=}"[Note]" )
             ;;
             mark) 
                 args=( "(--bool=)--bool=}[Boolean used to combine multiple tags]" {-c,--count=}"[How many recent entries to tag]" "(--case=)--case=}[Case sensitivity for search string matching [(c)ase-sensitive]" {-d,--date}"[Include current date/time with tag]" "(--force)--force}[Dont ask permission to flag all entries when count is 0t ask permission to flag all entries when count is 0]" {-i,--interactive}"[Select item(s) to flag from a menu of matching entries]" "(--not)--not}[Flag items that *dont* match search/tag filterst* match search/tag filters]" {-r,--remove}"[Remove flag]" {-s,--section=}"[Section]" "(--search=)--search=}[Filter entries using a search query]" "(--tag=)--tag=}[Filter entries by tag]" {-u,--unfinished}"[Flag last entry]" "(--val=)--val=}[Perform a tag value query]" {-x,--exact}"[Force exact search string matching]" )

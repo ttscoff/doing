@@ -25,6 +25,21 @@ module Doing
       end
     end
 
+    def versions
+      @changes.select { |change| change.entries&.count > 0 }.map { |change| change.version }
+    end
+
+    def interactive
+      Doing::Prompt.choose_from(versions,
+                                prompt: 'Select a version to see its changelog',
+                                sorted: false,
+                                fzf_args: [
+                                  %(--preview='doing changes --render -l {1}'),
+                                  '--disabled',
+                                  '--preview-window="right,70%"'
+                                ])
+    end
+
     def to_s
       if @changes_only
         @changes.map(&:changes_only).join().force_encoding('utf-8')

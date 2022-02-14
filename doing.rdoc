@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.28
+v2.1.29
 
 === Global Options
 === --config_file arg
@@ -472,8 +472,18 @@ Display all versions
 
 
 
+===== -i|--interactive
+Open changelog in interactive viewer
+
+
+
 ===== -m|--md|--markdown
 Output raw Markdown
+
+
+
+===== --render
+Force rendered output
 
 
 
@@ -1166,35 +1176,6 @@ Show items that *don't* match search/tag filters
 
 ===== -x|--exact
 Force exact search string matching (case sensitive)
-
-
-
-==== Command: <tt>later  ENTRY</tt>
-Add an item to the Later section
-
-
-===== Options
-===== -b|--back|--started DATE_STRING
-
-Backdate start time to date string [4pm|20m|2h|yesterday noon]
-
-[Default Value] None
-
-
-===== -n|--note TEXT
-
-Note
-
-[Default Value] None
-
-
-===== --ask
-Prompt for note via multi-line input
-
-
-
-===== -e|--editor
-Edit entry with vim
 
 
 

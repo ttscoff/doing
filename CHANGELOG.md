@@ -1,3 +1,11 @@
+### 2.1.29
+
+2022-02-14 12:42
+
+#### IMPROVED
+
+- `doing changes --interactive` will load up a changelog viewer using fzf. Because it makes me happy, that's why.
+
 ### 2.1.28
 
 2022-02-14 11:39
