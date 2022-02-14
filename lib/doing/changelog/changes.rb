@@ -26,7 +26,7 @@ module Doing
     end
 
     def versions
-      @changes.map { |change| change.version }
+      @changes.select { |change| change.entries&.count > 0 }.map { |change| change.version }
     end
 
     def interactive
