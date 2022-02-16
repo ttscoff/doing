@@ -1,3 +1,16 @@
+### 2.1.30
+
+2022-02-16 07:18
+
+#### IMPROVED
+
+- `doing changes` does a better job of parsing a lookup string like '>= 2.1.10 < 2.1.15'
+
+#### FIXED
+
+- System agnostic platform detection, so commands that check for Darwin won't error out on other systems
+- `doing completions` debugging code
+
 ### 2.1.29
 
 2022-02-14 12:42
