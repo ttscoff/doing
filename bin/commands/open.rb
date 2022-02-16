@@ -29,7 +29,7 @@ command :open do |c|
 
       editor = TTY::Which.which(options[:editor])
       system %(#{editor} "#{File.expand_path(@wwid.doing_file)}")
-    elsif `uname` =~ /Darwin/
+    elsif Sys::Platform.mac?
       if options[:app]
         system %(open -a "#{options[:app]}" "#{File.expand_path(@wwid.doing_file)}")
       elsif options[:bundle_id]

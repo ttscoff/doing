@@ -22,6 +22,7 @@ require 'tty-which'
 require 'tty-markdown'
 require 'tty-reader'
 require 'tty-screen'
+require 'sys-uname'
 
 require_relative 'doing/changelog'
 require_relative 'doing/hash'
