@@ -29,16 +29,12 @@ module Doing
       max = last_date.strftime('%F')
       min = items[0].date.strftime('%F')
       items.each_with_index do |i, index|
-        if String.method_defined? :force_encoding
-          title = i.title.force_encoding('utf-8')
-          note = i.note.map { |line| line.force_encoding('utf-8').strip } if i.note
-        else
-          title = i.title
-          note = i.note.map { |line| line.strip } if i.note
-        end
+        title = i.title.utf8
+        note = i.note
 
         end_date = i.end_date || ''
         interval = wwid.get_interval(i, formatted: false) || 0
+        duration = i.duration || 0
         note ||= ''
 
         tags = []
@@ -49,14 +45,15 @@ module Doing
           attributes[tag[0]] = tag[1] if tag[1]
         end
 
-        if opt[:output] == 'json'
-
+        case opt[:output]
+        when 'json'
           i = {
             date: i.date,
             end_date: end_date,
             title: title.strip, #+ " #{note}"
-            note: note.instance_of?(Array) ? note.to_s : note,
+            note: note.to_s(prefix: ''),
             time: interval.time_string(format: :clock),
+            duration: duration.time_string(format: :clock),
             tags: tags
           }
 
@@ -64,7 +61,7 @@ module Doing
 
           items_out << i
 
-        elsif opt[:output] == 'timeline'
+        when 'timeline'
           new_item = {
             'id' => index + 1,
             'content' => title.strip, #+ " #{note}"
@@ -74,8 +71,7 @@ module Doing
             'style' => 'color:#4c566b;background-color:#d8dee9;'
           }
 
-
-          if interval && interval.to_i > 0
+          if interval.to_i&.positive?
             new_item['end'] = end_date.strftime('%F %T')
             if interval.to_i > 3600
               new_item['type'] = 'range'
@@ -86,14 +82,17 @@ module Doing
           items_out.push(new_item)
         end
       end
-      if opt[:output] == 'json'
+      case opt[:output]
+      when 'json'
         Doing.logger.debug('JSON Export:', "#{items_out.count} items output to JSON")
         JSON.pretty_generate({
-          'section' => variables[:page_title],
-          'items' => items_out,
-          'timers' => wwid.tag_times(format: :json, sort_by: opt[:sort_tags], sort_order: opt[:tag_order])
-        })
-      elsif opt[:output] == 'timeline'
+                               'section' => variables[:page_title],
+                               'items' => items_out,
+                               'timers' => wwid.tag_times(format: :json,
+                                                          sort_by: opt[:sort_tags],
+                                                          sort_order: opt[:tag_order])
+                             })
+      when 'timeline'
         template = <<~EOTEMPLATE
                     <!doctype html>
                     <html>

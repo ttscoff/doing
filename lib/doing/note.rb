@@ -64,8 +64,8 @@ module Doing
 
     ##
     ## Note as multi-line string
-    def to_s
-      compress.strip_lines.map { |l| "\t\t#{l}" }.join("\n")
+    def to_s(prefix: "\t\t")
+      compress.strip_lines.map { |l| "#{prefix}#{l}" }.join("\n")
     end
 
     # @private

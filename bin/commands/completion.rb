@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
+SHELLS = %w[zsh bash fish all].freeze
+SHELL_RX = /^(?:[bzf](?:[ai]?sh)?|all)$/i.freeze
+
 # @@completion
 desc 'Generate shell completion scripts for doing'
 long_desc 'Generates the necessary scripts to add command line completion to various shells,
 so typing \'doing\' and hitting tab will offer completions of subcommands and their options.'
 command :completion do |c|
-  SHELLS = %w[zsh bash fish all].freeze
-  SHELL_RX = /^(?:[bzf](?:[ai]?sh)?|all)$/i.freeze
-
   c.example 'doing completion install zsh',
             desc: 'Install the default zsh completion script and link it to the zsh autolaod directory.'
   c.example 'doing completion generate zsh', desc: 'Generate zsh (default) script to default file, offer to symlink'

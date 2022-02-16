@@ -1,10 +1,9 @@
 ### 2.1.31
 
-2022-02-16 11:35
+2022-02-16 11:36
 
 #### NEW
 
-- `doing completion` now uses subcommands, `generate` and `install`. The install command will write default scripts to ~/.local/share/doing/completion and link them into the appropriate autoload directory for the shell. The generate command will create new scripts that include any custom commands and plugins.
 - `doing completion install SHELL` will copy the default completion scripts to your ~/.local/share/doing folder and offer to symlink them to autoload directories. These scripts are generated with each release but will not include any custom commands or plugins in the completions.
 - `doing completion` now uses subcommands, `generate` and `install`. The install command will write default scripts to ~/.local/share/doing/completion and link them into the appropriate autoload directory for the shell. The generate command will create new scripts that include any custom commands and plugins.
 
