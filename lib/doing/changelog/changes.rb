@@ -36,6 +36,7 @@ module Doing
                                 fzf_args: [
                                   %(--preview='doing changes --render -l {1}'),
                                   '--disabled',
+                                  '--height=50',
                                   '--preview-window="right,70%"'
                                 ])
     end
@@ -65,18 +66,19 @@ module Doing
     def lookup(lookup_version)
       range = []
 
-      if lookup_version =~ /([\d.]+) *-+ *([\d.]+)/
+      if lookup_version =~ /([\d.]+) *(?:-|to)+ *([\d.]+)/
         m = Regexp.last_match
         lookup("> #{m[1]}")
         lookup("< #{m[2]}")
-      elsif lookup_version.scan(/[<>]/).count > 1
-        params = lookup_version.scan(/[<>] [\d.]+/)
+      elsif lookup_version.scan(/(?:<=?|prior|before|older|>=?|since|after|newer) *[0-9*?.]+/).count > 1
+        params = lookup_version.scan(/(?:<=?|prior|before|older|>=?|since|after|newer) *[0-9*?.]+/)
         params.each { |query| lookup(query) }
       else
+        inclusive = lookup_version =~ /=/ ? true : false
         comp = case lookup_version
                when /(<|prior|before|older)/
                  :older
-               when />|since|after|newer/
+               when /(>|since|after|newer)/
                  :newer
                else
                  :equal
@@ -84,7 +86,7 @@ module Doing
         version = Version.new(lookup_version)
 
         @changes.select! do |change|
-          change.version.compare(version, comp)
+          change.version.compare(version, comp, inclusive: inclusive)
         end
       end
     end

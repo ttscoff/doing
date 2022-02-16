@@ -139,7 +139,7 @@ command :config do |c|
     dump.example 'doing config get', desc: 'Output the entire configuration'
     dump.example 'doing config get timer_format --output raw', desc: 'Output the value of timer_format as a plain string'
     dump.example 'doing config get doing_file', desc: 'Output the value of the doing_file setting, respecting local configurations'
-    dump.example 'doing config get -o json plug.plugpath', desc: 'Key path is fuzzy matched: output the value of plugins->plugin_path as JSON'
+    dump.example 'doing config get -o json plug.plugpath', desc: 'Key path is fuzzy matched: output the value of plugins.plugin_path as JSON'
 
     dump.desc 'Format for output (json|yaml|raw)'
     dump.arg_name 'FORMAT'
@@ -188,7 +188,7 @@ command :config do |c|
   c.arg 'KEY VALUE'
   c.command :set do |set|
     set.example 'doing config set timer_format human', desc: 'Set the value of timer_format to "human"'
-    set.example 'doing config set plug.plugpath ~/my_plugins', desc: 'Key path is fuzzy matched: set the value of plugins->plugin_path'
+    set.example 'doing config set plug.plugpath ~/my_plugins', desc: 'Key path is fuzzy matched: set the value of plugins.plugin_path'
 
     set.desc 'Delete specified key'
     set.switch %i[r remove], default_value: false, negatable: false
@@ -206,7 +206,7 @@ command :config do |c|
       old_type = old_value&.class.to_s || nil
 
       if old_value.is_a?(Hash) && !options[:remove]
-        Doing.logger.log_now(:warn, 'Config:', "Config key must point to a single value, #{real_path.join('->').boldwhite} is a mapping")
+        Doing.logger.log_now(:warn, 'Config:', "Config key must point to a single value, #{real_path.join('.').boldwhite} is a mapping")
         didyou = 'Did you mean:'
         old_value.keys.each do |k|
           Doing.logger.log_now(:warn, "#{didyou}", "#{keypath}.#{k}?")
@@ -224,11 +224,11 @@ command :config do |c|
 
       if options[:remove]
         cfg.deep_set(real_path, nil)
-        $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('->').boldwhite}"
+        $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('.').boldwhite}"
       else
         current_value = cfg.dig(*real_path)
         cfg.deep_set(real_path, value.set_type(old_type))
-        $stderr.puts "#{' Key path:'.yellow} #{real_path.join('->').boldwhite}"
+        $stderr.puts "#{' Key path:'.yellow} #{real_path.join('.').boldwhite}"
         $stderr.puts "#{'Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
         $stderr.puts "#{'  Current:'.yellow} #{ (current_value ? current_value.to_s : 'empty').boldwhite }"
         $stderr.puts "#{'      New:'.yellow} #{value.set_type(old_type).to_s.boldwhite}"

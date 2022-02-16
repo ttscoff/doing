@@ -14,7 +14,7 @@ MARKDOWN_THEME = {
   comment: :bright_black
 }.deep_freeze
 
-CHANGE_RX = /^(?:(?:(?:[<>=]|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[\d.*?]+ *)+|(?:[\d.]+ *-+ *[\d.]+))$/
+CHANGE_RX = /^(?:(?:(?:[<>=]+|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[0-9.*?]+ *)+|(?:[\d.]+ *(?:-|to)+ *[0-9.]+))$/
 
 desc 'List recent changes in Doing'
 long_desc %(Display a formatted list of changes in recent versions.
@@ -27,7 +27,7 @@ command %i[changes changelog] do |c|
 
   c.desc %(Look up a specific version. Specify versions as "MAJ.MIN.PATCH", MIN
            and PATCH are optional. Use > or < to see all changes since or prior
-           to a version.)
+           to a version. Wildcards (*?) accepted unless using < or >.)
   c.arg_name 'VERSION'
   c.flag %i[l lookup], must_match: CHANGE_RX
 
