@@ -68,6 +68,11 @@ module Doing
 
       def parse_command(command)
         res = command.match(/^(?<cmd>[^, \t]+)(?<alias>(?:, [^, \t]+)*)?\s+- (?<desc>.*?)$/)
+        if res.nil?
+          Doing.logger.error('Completion:', "Error parsing #{command}")
+          return nil
+
+        end
         commands = [res['cmd']]
         commands.concat(res['alias'].split(/, /).delete_if(&:empty?)) if res['alias']
 
