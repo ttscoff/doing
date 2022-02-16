@@ -24,4 +24,17 @@ command :completion do |c|
   c.action do |_global_options, options, _args|
     Doing::Completion.generate_completion(type: options[:type], file: options[:file])
   end
+
+  c.desc 'Install default completion scripts'
+  c.long_desc 'Argument specifies which shell to install for: zsh, bash, fish, or all'
+  c.arg_name 'SHELL'
+  c.command :install do |install|
+    install.example 'doing completion install zsh', desc: 'Install and link zsh completion script'
+
+    install.action do |_global_options, options, args|
+      raise InvalidArgument, "Unknown shell #{args[0]}" unless args[0].strip =~ /^(?:[bzf](?:[ai]?sh)?|all)$/i
+
+      Doing::Completion.link_default(args[0].strip)
+    end
+  end
 end
