@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.29
+v2.1.30
 
 === Global Options
 === --config_file arg
@@ -440,10 +440,10 @@ Display a formatted list of changes in recent versions.
 
 Look up a specific version. Specify versions as "MAJ.MIN.PATCH", MIN
            and PATCH are optional. Use > or < to see all changes since or prior
-           to a version.
+           to a version. Wildcards (*?) accepted unless using < or >.
 
 [Default Value] None
-[Must Match] (?-mix:^(?:(?:(?:[<>=]|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[\d.*?]+ *)+|(?:[\d.]+ *-+ *[\d.]+))$)
+[Must Match] (?-mix:^(?:(?:(?:[<>=]+|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[0-9.*?]+ *)+|(?:[\d.]+ *(?:-|to)+ *[0-9.]+))$)
 
 
 ===== -s|--search arg
@@ -1530,7 +1530,7 @@ Show time totals at the end of output
 ==== Command: <tt>open </tt>
 Open the "doing" file in an editor
 
-`doing open` defaults to using the editors->doing_file setting
+`doing open` defaults to using the editors.doing_file setting
 in /Users/ttscoff/.config/doing/config.yml (TaskPaper).
 ===== Options
 ===== -a|--app APP_NAME

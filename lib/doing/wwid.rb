@@ -77,7 +77,7 @@ module Doing
       lines.each do |line|
         next if line =~ /^\s*$/
 
-        if line =~ /^(\S[\S ]+):\s*(@\S+\s*)*$/
+        if line =~ /^(\S[\S ]+):( .*)?$/
           section = Regexp.last_match(1)
           @content.add_section(Section.new(section, original: line), log: false)
         elsif line =~ /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/

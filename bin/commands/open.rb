@@ -1,6 +1,6 @@
 # @@open
 desc 'Open the "doing" file in an editor'
-long_desc "`doing open` defaults to using the editors->doing_file setting
+long_desc "`doing open` defaults to using the editors.doing_file setting
 in #{@config.config_file} (#{Doing::Util.find_default_editor('doing_file')})."
 command :open do |c|
   c.example 'doing open', desc: 'Open the doing file in the default editor'
@@ -8,7 +8,7 @@ command :open do |c|
   c.arg_name 'COMMAND'
   c.flag %i[e editor]
 
-  if `uname` =~ /Darwin/
+  if Sys::Platform.mac?
     c.desc 'Open with app name'
     c.arg_name 'APP_NAME'
     c.flag %i[a app]
@@ -29,7 +29,7 @@ command :open do |c|
 
       editor = TTY::Which.which(options[:editor])
       system %(#{editor} "#{File.expand_path(@wwid.doing_file)}")
-    elsif `uname` =~ /Darwin/
+    elsif Sys::Platform.mac?
       if options[:app]
         system %(open -a "#{options[:app]}" "#{File.expand_path(@wwid.doing_file)}")
       elsif options[:bundle_id]

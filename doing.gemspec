@@ -44,5 +44,6 @@ spec = Gem::Specification.new do |s|
   s.add_runtime_dependency('tty-screen', '~> 0.8', '>= 0.8.1')
   s.add_runtime_dependency('parslet', '~> 2.0', '>= 2.0.0')
   s.add_runtime_dependency('plist', '~> 3.6', '>= 3.6.0')
+  s.add_runtime_dependency('sys-uname', '~> 1.2', '>= 1.2.2')
   # s.add_runtime_dependency('amatch', '~> 0.4', '>= 0.4.0')
 end

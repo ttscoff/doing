@@ -13,7 +13,7 @@ module Doing
       @original = if original.nil?
                     "#{title}:"
                   else
-                    original =~ /:(\s+@\S+(\(.*?\))?)*$/ ? original : "#{original}:"
+                    original =~ /:(\s+@[^ (]+(\([^)]*\))?)*?$/ ? original : "#{original}:"
                   end
     end
 

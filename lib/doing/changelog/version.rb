@@ -37,7 +37,7 @@ module Doing
     end
 
 
-    def compare(other, comp)
+    def compare(other, comp, inclusive: false)
       case comp
       when :older
         if @maj <= other.maj
@@ -46,7 +46,11 @@ module Doing
           elsif @maj == other.maj && (other.min.nil? || @min < other.min)
             true
           elsif @maj == other.maj && @min == other.min
-            other.patch.nil? ? false : @patch < other.patch
+            if other.patch.nil?
+              false
+            else
+              inclusive ? @patch <= other.patch : @patch < other.patch
+            end
           else
             false
           end
@@ -60,7 +64,11 @@ module Doing
           elsif @maj == other.maj && (other.min.nil? || @min > other.min)
             true
           elsif @maj == other.maj && @min == other.min
-            other.patch.nil? || @patch >= other.patch
+            if other.patch.nil?
+              false
+            else
+              inclusive ? @patch >= other.patch : @patch > other.patch
+            end
           else
             false
           end

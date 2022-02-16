@@ -220,9 +220,9 @@ module Doing
               return nil unless create
             end
 
-            resolved = real_path.count.positive? ? "Resolved #{real_path.join('->')}, but " : ''
+            resolved = real_path.count.positive? ? "Resolved #{real_path.join('.')}, but " : ''
             Doing.logger.log_now(:warn, "#{resolved}#{path} is unknown")
-            new_path = [*real_path, path, *paths].join('->')
+            new_path = [*real_path, path, *paths].join('.')
             Doing.logger.log_now(:warn, "Continuing will create the path #{new_path}")
             res = Prompt.yn('Key path not found, create it?', default_response: true)
             raise InvalidArgument, 'Invalid key path' unless res
@@ -374,7 +374,7 @@ module Doing
         deprecated = true
         config['editors']['default'] ||= config['editor']
         config.delete('editor')
-        Doing.logger.debug('Deprecated:', "config key 'editor' is now 'editors->default', please update your config.")
+        Doing.logger.debug('Deprecated:', "config key 'editor' is now 'editors.default', please update your config.")
       end
 
       if config.key?('config_editor_app') && !config['editors']['config']
@@ -382,7 +382,7 @@ module Doing
         config['editors']['config'] = config['config_editor_app']
         config.delete('config_editor_app')
         Doing.logger.debug('Deprecated:',
-                           "config key 'config_editor_app' is now 'editors->config', please update your config.")
+                           "config key 'config_editor_app' is now 'editors.config', please update your config.")
       end
 
       if config.key?('editor_app') && !config['editors']['doing_file']
@@ -390,7 +390,7 @@ module Doing
         config['editors']['doing_file'] = config['editor_app']
         config.delete('editor_app')
         Doing.logger.debug('Deprecated:',
-                           "config key 'editor_app' is now 'editors->doing_file', please update your config.")
+                           "config key 'editor_app' is now 'editors.doing_file', please update your config.")
       end
 
       Doing.logger.warn('Deprecated:', 'outdated keys found, please run `doing config --update`.') if deprecated

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    doing (2.1.29)
+    doing (2.1.30)
       chronic (~> 0.10, >= 0.10.2)
       deep_merge (~> 1.2, >= 1.2.1)
       gli (~> 2.20, >= 2.20.1)
@@ -9,6 +9,7 @@ PATH
       parslet (~> 2.0, >= 2.0.0)
       plist (~> 3.6, >= 3.6.0)
       safe_yaml (~> 1.0)
+      sys-uname (~> 1.2, >= 1.2.2)
       tty-link (~> 0.1, >= 0.1.1)
       tty-markdown (~> 0.7, >= 0.7.0)
       tty-progressbar (~> 0.18, >= 0.18.2)
