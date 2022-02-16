@@ -18,9 +18,10 @@ module Doing
       # @param      type  [String] shell to generate for (zsh|bash|fish)
       # @param      file  [String] Path to save to, or 'stdout'
       #
-      def generate_completion(type: 'zsh', file: 'stdout', link: true)
+      def generate_completion(type: 'zsh', file: :default, link: true)
         return generate_all if type =~ /^all$/i
 
+        file = file == :default ? default_file(type) : file
         file = validate_target(file)
         result = generate_type(type)
 
@@ -40,18 +41,16 @@ module Doing
 
         return %i[zsh bash fish].each { |t| link_default(t) } if type == :all
 
-        target_dir = File.expand_path('~/.local/share/doing/completion')
-        FileUtils.mkdir_p(target_dir)
+        FileUtils.mkdir_p(default_dir)
         files = { zsh: '_doing.zsh', bash: 'doing.bash', fish: 'doing.fish' }
         src = File.expand_path(File.join(File.dirname(__FILE__), '..', 'completion', files[type]))
-        FileUtils.cp(src, target_dir)
-        link_completion_type(type, File.join(target_dir, files[type]))
+        FileUtils.cp(src, default_dir)
+        Doing.logger.warn('File written:', "#{type} completions saved to #{File.join(default_dir, files[type])}")
+        link_completion_type(type, File.join(default_dir, files[type]))
       end
 
-      private
-
       def normalize_type(type)
-        case type
+        case type.to_s
         when /^f/i
           :fish
         when /^b/i
@@ -64,6 +63,8 @@ module Doing
           :invalid
         end
       end
+
+      private
 
       def generate_type(type)
         generator = case type.to_s
@@ -86,6 +87,17 @@ module Doing
         end
 
         file
+      end
+
+      def default_dir
+        File.expand_path('~/.local/share/doing/completion')
+      end
+
+      def default_file(type)
+        type = normalize_type(type)
+
+        files = { zsh: '_doing.zsh', bash: 'doing.bash', fish: 'doing.fish' }
+        File.join(default_dir, files[type])
       end
 
       def validate_file(file)
@@ -139,10 +151,12 @@ module Doing
       def link_completion(file, targets, filename)
         return if targets.map { |t| File.expand_path(t) }.include?(File.dirname(file))
 
+        found = false
         linked = false
 
         targets.each do |target|
           next unless File.directory?(File.expand_path(target))
+          found = true
 
           target_file = File.join(File.expand_path(target), filename)
           next unless Doing::Prompt.yn("Create link to #{target_file}", default_response: 'n')
@@ -155,8 +169,10 @@ module Doing
 
         return if linked
 
-        $stdout.puts 'No known auto-load directory found for specified shell'.red
-        $stdout.puts "Looked for #{targets.join(', ')}, found no existing directory".yellow
+        unless found
+          $stdout.puts 'No known auto-load directory found for specified shell'.red
+          $stdout.puts "Looked for #{targets.join(', ')}, found no existing directory".yellow
+        end
         $stdout.puts 'If you don\'t want to autoload completions'.yellow
         $stdout.puts 'you can source the script directly in your shell\'s startup file:'.yellow
         $stdout.puts %(source "#{file}").boldwhite
