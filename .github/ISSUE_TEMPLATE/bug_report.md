@@ -13,10 +13,13 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 
+
 Steps to reproduce the behavior:
 
 1. Execute command '...'
 2. See error
+
+Please execute the problematic command with the prefix `GLI_DEBUG=true DOING_DEBUG=true` and include the output with your bug report. E.g. `GLI_DEBUG=true DOING_DEBUG=true doing completion --type zsh`.
 
 **Expected behavior**
 
