@@ -355,6 +355,24 @@ module Doing
     end
 
     ##
+    ## Test if item has a @done tag
+    ##
+    ## @return     [Boolean] true item has @done tag
+    ##
+    def finished?
+      tags?('done')
+    end
+
+    ##
+    ## Test if item does not contain @done tag
+    ##
+    ## @return     [Boolean] true if item is missing @done tag
+    ##
+    def unfinished?
+      tags?('done', negate: true)
+    end
+
+    ##
     ## Test if item is included in never_finish config and
     ## thus should not receive a @done tag
     ##

@@ -1,6 +1,6 @@
 ### 2.1.31
 
-2022-02-16 11:36
+2022-02-16 15:38
 
 #### NEW
 
@@ -10,6 +10,10 @@
 #### IMPROVED
 
 - When generating completion scripts using `doing completion --file FILE_PATH`, if the file specified is not in an auto-load directory for the shell type, offer to symlink the output to an appropriate directory
+
+#### FIXED
+
+- Don't output empty notes as empty brackets in JSON output (also fixes the LaunchBar view of recent entries)
 
 ### 2.1.29
 
