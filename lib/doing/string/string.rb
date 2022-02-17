@@ -5,7 +5,7 @@ class ::String
 
   def utf8
     if String.method_defined? :force_encoding
-      replace force_encoding('utf-8')
+      dup.force_encoding('utf-8')
     else
       self
     end

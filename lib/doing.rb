@@ -71,7 +71,7 @@ module Doing
     end
 
     def settings
-      @settings ||= @config.settings
+      @config.settings
     end
 
     def config_with(file, options = {})
