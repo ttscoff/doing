@@ -77,7 +77,7 @@ module Doing
       lines.each do |line|
         next if line =~ /^\s*$/
 
-        if line =~ /^(\S[\S ]+):( .*)?$/
+        if line =~ /^(\S[\S ]+):\s*(@\S+\s*)*$/
           section = Regexp.last_match(1)
           @content.add_section(Section.new(section, original: line), log: false)
         elsif line =~ /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/
@@ -486,7 +486,7 @@ module Doing
     def repeat_item(item, opt)
       opt ||= {}
       old_item = item.clone
-      if item.unfinished? && item.should_finish?
+      if item.should_finish?
         if item.should_time?
           finish_date = verify_duration(item.date, Time.now, title: item.title)
           item.title.tag!('done', value: finish_date.strftime('%F %R'))

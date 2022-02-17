@@ -1,18 +1,22 @@
 ### 2.1.31
 
-2022-02-16 15:38
+2022-02-17 04:54
 
 #### NEW
 
+- Don't try to finish items already marked @done in `doing again` # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is ahead of 'origin/develop' by 3 commits. # # Changes to be committed: #	modified:   CHANGELOG.md #	modified:   bin/commands/again.rb #	modified:   bin/doing #	new file:   lib/doing/add_options.rb #	modified:   lib/doing/item.rb #	modified:   lib/doing/wwid.rb # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/CHANGELOG.md b/CHANGELOG.md index 0c69f8f..edc4af5 100644 --- a/CHANGELOG.md +++ b/CHANGELOG.md @@ -1,6 +1,6 @@  ### 2.1.31   -2022-02-16 11:36 +2022-02-16 15:38    #### NEW   @@ -11,6 +11,10 @@    - When generating completion scripts using `doing completion --file FILE_PATH`, if the file specified is not in an auto-load directory for the shell type, offer to symlink the output to an appropriate directory   +#### FIXED + +- Don't output empty notes as empty brackets in JSON output (also fixes the LaunchBar view of recent entries) +  ### 2.1.29    2022-02-14 12:42 diff --git a/bin/commands/again.rb b/bin/commands/again.rb index 29d0500..66015d9 100644 --- a/bin/commands/again.rb +++ b/bin/commands/again.rb @@ -39,7 +39,7 @@ command %i[again resume] do |c|        if options[:back]        options[:date] = options[:back]
 - `doing completion install SHELL` will copy the default completion scripts to your ~/.local/share/doing folder and offer to symlink them to autoload directories. These scripts are generated with each release but will not include any custom commands or plugins in the completions.
 - `doing completion` now uses subcommands, `generate` and `install`. The install command will write default scripts to ~/.local/share/doing/completion and link them into the appropriate autoload directory for the shell. The generate command will create new scripts that include any custom commands and plugins.
 
 #### IMPROVED
 
+- Update examples in `doing help completion` and its subcommands
 - When generating completion scripts using `doing completion --file FILE_PATH`, if the file specified is not in an auto-load directory for the shell type, offer to symlink the output to an appropriate directory
 
 #### FIXED
 
+- Error in `--back` flag for `doing again`
+- Don't try to finish items already marked @done in `doing again` # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is ahead of 'origin/develop' by 3 commits. # # Changes to be committed: #	modified:   CHANGELOG.md #	modified:   bin/commands/again.rb #	modified:   bin/doing #	new file:   lib/doing/add_options.rb #	modified:   lib/doing/item.rb #	modified:   lib/doing/wwid.rb # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/CHANGELOG.md b/CHANGELOG.md index 0c69f8f..edc4af5 100644 --- a/CHANGELOG.md +++ b/CHANGELOG.md @@ -1,6 +1,6 @@  ### 2.1.31   -2022-02-16 11:36 +2022-02-16 15:38    #### NEW   @@ -11,6 +11,10 @@    - When generating completion scripts using `doing completion --file FILE_PATH`, if the file specified is not in an auto-load directory for the shell type, offer to symlink the output to an appropriate directory   +#### FIXED + +- Don't output empty notes as empty brackets in JSON output (also fixes the LaunchBar view of recent entries) +  ### 2.1.29    2022-02-14 12:42 diff --git a/bin/commands/again.rb b/bin/commands/again.rb index 29d0500..66015d9 100644 --- a/bin/commands/again.rb +++ b/bin/commands/again.rb @@ -39,7 +39,7 @@ command %i[again resume] do |c|        if options[:back]        options[:date] = options[:back]
 - Don't output empty notes as empty brackets in JSON output (also fixes the LaunchBar view of recent entries)
 
 ### 2.1.29

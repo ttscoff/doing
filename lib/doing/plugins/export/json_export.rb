@@ -30,7 +30,7 @@ module Doing
       min = items[0].date.strftime('%F')
       items.each_with_index do |i, index|
         title = i.title.utf8
-        note = i.note
+        note = i.note.utf8
 
         end_date = i.end_date || ''
         interval = wwid.get_interval(i, formatted: false) || 0

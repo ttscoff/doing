@@ -70,6 +70,10 @@ module Doing
       @config ||= Configuration.new
     end
 
+    def settings
+      @settings ||= @config.settings
+    end
+
     def config_with(file, options = {})
       @config = Configuration.new(file, options: options)
     end

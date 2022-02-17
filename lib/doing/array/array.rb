@@ -10,8 +10,9 @@ class ::Array
   ## @return     [Array] Encoded lines
   ##
   def utf8
+    c = self.class
     if String.method_defined? :force_encoding
-      map(&:utf8)
+      replace c.new(map(&:utf8))
     else
       self
     end
