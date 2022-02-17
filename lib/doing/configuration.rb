@@ -156,7 +156,13 @@ module Doing
     ##
     ## @return     [String] file path
     ##
-    def choose_config(create: false)
+    def choose_config(create: false, local: false)
+      if local && create
+        res = File.expand_path('.doingrc')
+        FileUtils.touch(res)
+        return res
+      end
+
       return @config_file if @force_answer
 
       if @additional_configs&.count&.positive? || create
