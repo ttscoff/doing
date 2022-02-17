@@ -78,7 +78,7 @@ module Doing
               new_item['style'] = 'color:white;background-color:#a2bf8a;'
             end
           end
-          new_item['style'] = 'color:white;background-color:#f7921e;' if i.tags?(wwid.config['marker_tag'])
+          new_item['style'] = 'color:white;background-color:#f7921e;' if i.tags?(Doing.setting('marker_tag'))
           items_out.push(new_item)
         end
       end

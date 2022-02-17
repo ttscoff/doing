@@ -56,11 +56,11 @@ def add_options(type, cmd)
     cmd.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
     cmd.arg_name 'TYPE'
     cmd.flag [:case], must_match: REGEX_CASE,
-                      default_value: @settings.dig('search', 'case').normalize_case,
+                      default_value: Doing.settings.dig('search', 'case').normalize_case,
                       type: CaseSymbol
 
     cmd.desc 'Force exact search string matching (case sensitive)'
-    cmd.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
+    cmd.switch %i[x exact], default_value: Doing.config.exact_match?, negatable: Doing.config.exact_match?
   when :tag_filter
     cmd.desc 'Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
     cmd.arg_name 'TAG'

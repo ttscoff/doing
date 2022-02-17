@@ -24,8 +24,8 @@ module Doing
 
       out = ''
       items.each do |item|
-        if opt[:highlight] && item.title =~ /@#{wwid.config['marker_tag']}\b/i
-          flag = Doing::Color.send(wwid.config['marker_color'])
+        if opt[:highlight] && item.title =~ /@#{Doing.setting('marker_tag')}\b/i
+          flag = Doing::Color.send(Doing.setting('marker_color'))
           reset = Doing::Color.reset + Doing::Color.default
         else
           flag = ''
@@ -34,7 +34,7 @@ module Doing
 
         placeholders = {}
 
-        if !item.note.empty? && wwid.config['include_notes']
+        if !item.note.empty? && Doing.setting('include_notes')
           note = item.note.map(&:strip).delete_if(&:empty?)
           note.map! { |line| "#{line.sub(/^\t*/, '')}  " }
 
@@ -133,7 +133,7 @@ module Doing
 
       # Doing.logger.debug('Template Export:', "#{items.count} items output to template #{opt[:template]}")
       if opt[:totals]
-        out += wwid.tag_times(format: wwid.config['timer_format'].to_sym,
+        out += wwid.tag_times(format: Doing.setting('timer_format').to_sym,
                               sort_by: opt[:sort_tags],
                               sort_order: opt[:tag_order])
       end

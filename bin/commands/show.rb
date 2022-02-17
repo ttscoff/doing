@@ -27,7 +27,7 @@ command :show do |c|
   c.flag %i[a age], default_value: :newest, type: AgeSymbol
 
   c.desc "Highlight search matches in output. Only affects command line output"
-  c.switch %i[h hilite], default_value: @settings.dig('search', 'highlight')
+  c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
@@ -43,7 +43,7 @@ command :show do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = @settings['tag_sort'].normalize_tag_sort || :name
+  default = Doing.setting('tag_sort').normalize_tag_sort || :name
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
 
@@ -118,7 +118,7 @@ command :show do |c|
         end
       end
     else
-      section = options[:menu] ? @wwid.choose_section(include_all: true) : @settings['current_section']
+      section = options[:menu] ? @wwid.choose_section(include_all: true) : Doing.setting('current_section')
       section ||= 'All'
     end
 
@@ -126,11 +126,11 @@ command :show do |c|
 
     options[:times] = true if options[:totals]
 
-    template = @settings['templates'][options[:config_template]].deep_merge({
-                                                    'wrap_width' => @settings['wrap_width'] || 0,
-                                                    'date_format' => @settings['default_date_format'],
-                                                    'order' => @settings['order']&.normalize_order || :asc,
-                                                    'tags_color' => @settings['tags_color']
+    template = Doing.setting(['templates', options[:config_template]]).deep_merge({
+                                                    'wrap_width' => Doing.setting('wrap_width') || 0,
+                                                    'date_format' => Doing.setting('default_date_format'),
+                                                    'order' => Doing.setting('order')&.normalize_order || :asc,
+                                                    'tags_color' => Doing.setting('tags_color')
                                                   })
 
     if options[:search]

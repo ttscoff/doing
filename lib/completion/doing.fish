@@ -143,7 +143,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'cancel' -d End\ last\ X\ 
 complete -xc doing -n '__fish_doing_needs_command' -a 'changes changelog' -d List\ recent\ changes\ in\ Doing
 complete -xc doing -n '__fish_doing_needs_command' -a 'colors' -d List\ available\ color\ variables\ for\ configuration\ templates\ and\ views
 complete -xc doing -n '__fish_doing_needs_command' -a 'commands' -d Enable\ and\ disable\ Doing\ commands
-complete -xc doing -n '__fish_doing_needs_command' -a 'completion' -d Generate\ shell\ completion\ scripts
+complete -xc doing -n '__fish_doing_needs_command' -a 'completion' -d Generate\ shell\ completion\ scripts\ for\ doing
 complete -xc doing -n '__fish_doing_needs_command' -a 'config' -d Edit\ the\ configuration\ file\ or\ output\ a\ value\ from\ it
 complete -xc doing -n '__fish_doing_needs_command' -a 'done did' -d Add\ a\ completed\ item\ with\ @done\(date\)
 complete -xc doing -n '__fish_doing_needs_command' -a 'finish' -d Mark\ last\ X\ entries\ as\ @done
@@ -232,8 +232,7 @@ complete -c doing -l markdown  -f  -n '__fish_doing_using_command changes change
 complete -c doing -l render  -f  -n '__fish_doing_using_command changes changelog' -d Force\ rendered\ output
 complete -c doing -l search -s s -f -r -n '__fish_doing_using_command changes changelog' -d Show\ changelogs\ matching\ search\ terms
 complete -c doing -l sort  -f -r -n '__fish_doing_using_command changes changelog' -d Sort\ order
-complete -c doing -l file -s f -f -r -n '__fish_doing_using_command completion' -d File\ to\ write\ output\ to
-complete -c doing -l type -s t -f -r -n '__fish_doing_using_command completion' -d Shell\ to\ generate\ for
+complete -c doing -l type -s t -f -r -n '__fish_doing_using_command completion' -d Deprecated
 complete -c doing -l dump -s d -f  -n '__fish_doing_using_command config' -d DEPRECATED
 complete -c doing -l update -s u -f  -n '__fish_doing_using_command config' -d DEPRECATED
 complete -c doing -l noauto -s X -f  -n '__fish_doing_using_command done did' -d Exclude\ auto\ tags\ and\ default\ tags

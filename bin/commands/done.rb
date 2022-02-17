@@ -98,7 +98,7 @@ command %i[done did] do |c|
     if options[:section]
       section = @wwid.guess_section(options[:section]) || options[:section].cap_first
     else
-      section = @settings['current_section']
+      section = Doing.setting('current_section')
     end
 
 

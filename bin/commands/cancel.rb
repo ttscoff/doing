@@ -30,7 +30,7 @@ command :cancel do |c|
     options[:section] = if options[:section]
                           @wwid.guess_section(options[:section]) || options[:section].cap_first
                         else
-                          @settings['current_section']
+                          Doing.setting('current_section')
                         end
 
     raise InvalidArgument, 'Only one argument allowed' if args.length > 1

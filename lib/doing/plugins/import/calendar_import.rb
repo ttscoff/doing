@@ -23,7 +23,7 @@ module Doing
       limit_start = options[:start].to_i
       limit_end = options[:end].to_i
 
-      section = options[:section] || wwid.config['current_section']
+      section = options[:section] || Doing.setting('current_section')
       options[:no_overlap] ||= false
       options[:autotag] ||= wwid.auto_tag
 

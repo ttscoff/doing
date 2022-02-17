@@ -30,7 +30,7 @@ command :recent do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = @settings['tag_sort'].normalize_tag_sort || :name
+  default = Doing.setting('tag_sort').normalize_tag_sort || :name
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
 
@@ -41,8 +41,8 @@ command :recent do |c|
     section = @wwid.guess_section(options[:section]) || options[:section].cap_first
 
     unless global_options[:version]
-      if @settings['templates']['recent'].key?('count')
-        config_count = @settings['templates']['recent']['count'].to_i
+      if Doing.setting('templates.recent.count')
+        config_count = Doing.setting('templates.recent.count').to_i
       else
         config_count = 10
       end
@@ -56,7 +56,7 @@ command :recent do |c|
       options[:times] = true if options[:totals]
       options[:sort_tags] = options[:tag_sort]
 
-      template = @settings['templates']['recent'].deep_merge(@settings['templates']['default'])
+      template = Doing.setting('templates.recent').deep_merge(Doing.setting('templates.default'))
       tags_color = template.key?('tags_color') ? template['tags_color'] : nil
 
       opts = {

@@ -15,8 +15,8 @@ command :commands do |c|
   c.arg_name 'COMMAND [COMMAND...]'
   c.command %i[add enable] do |add|
     add.action do |_global, _options, args|
-      cfg = @settings
-      custom_dir = @settings.dig('plugins', 'command_path')
+      cfg = Doing.settings
+      custom_dir = cfg.dig('plugins', 'command_path')
 
       available = cfg['disabled_commands']
       raise UserCancelled, 'No commands available to enable' unless args.good? || available.good?
@@ -45,8 +45,8 @@ command :commands do |c|
 
       cfg.deep_set(['disabled_commands'], available)
 
-      Doing::Util.write_to_file(@config.config_file, YAML.dump(cfg), backup: true)
-      Doing.logger.warn('Config:', "#{@config.config_file} updated")
+      Doing::Util.write_to_file(Doing.config.config_file, YAML.dump(cfg), backup: true)
+      Doing.logger.warn('Config:', "#{Doing.config.config_file} updated")
     end
   end
 
@@ -55,8 +55,8 @@ command :commands do |c|
   c.command %i[remove disable] do |remove|
     remove.action do |_global, _options, args|
       available = Dir.glob(File.join(File.dirname(__FILE__), '*.rb')).map { |cmd| File.basename(cmd, '.rb') }
-      cfg = @settings
-      custom_dir = @settings.dig('plugins', 'command_path')
+      cfg = Doing.settings
+      custom_dir = cfg.dig('plugins', 'command_path')
       custom_commands = Dir.glob(File.join(File.expand_path(custom_dir), '*.rb'))
       available.concat(custom_commands.map { |cmd| File.basename(cmd, '.rb') })
       disabled = cfg['disabled_commands']
@@ -82,8 +82,8 @@ command :commands do |c|
 
       cfg.deep_set(['disabled_commands'], disabled.concat(to_disable))
 
-      Doing::Util.write_to_file(@config.config_file, YAML.dump(cfg), backup: true)
-      Doing.logger.warn('Config:', "#{@config.config_file} updated")
+      Doing::Util.write_to_file(Doing.config.config_file, YAML.dump(cfg), backup: true)
+      Doing.logger.warn('Config:', "#{Doing.config.config_file} updated")
     end
   end
 end

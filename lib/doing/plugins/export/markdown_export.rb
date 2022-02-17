@@ -66,8 +66,8 @@ module Doing
         }
       end
 
-      template = if wwid.config['export_templates']['markdown'] && File.exist?(File.expand_path(wwid.config['export_templates']['markdown']))
-                   IO.read(File.expand_path(wwid.config['export_templates']['markdown']))
+      template = if Doing.setting('export_templates.markdown') && File.exist?(File.expand_path(Doing.setting('export_templates.markdown')))
+                   IO.read(File.expand_path(Doing.setting('export_templates.markdown')))
                  else
                    self.template(nil)
                  end

@@ -45,7 +45,9 @@ module Doing
 
     def self.render(wwid, items, variables: {})
 
-      return if items.nil?
+      return unless items.good?
+
+      config = Doing.settings
 
       opt = variables[:options]
       trigger = opt[:output]
@@ -78,7 +80,7 @@ module Doing
         title = "#{title} @section(#{i.section})" unless variables[:is_single]
 
         tags.concat(i.tag_array).sort!.uniq!
-        flagged = day_flagged = true if i.tags?(wwid.config['marker_tag'])
+        flagged = day_flagged = true if i.tags?(config['marker_tag'])
 
         interval = wwid.get_interval(i, record: true) if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
         interval ||= false
@@ -123,8 +125,8 @@ module Doing
       end
 
 
-      template = if wwid.config['export_templates']['dayone'] && File.exist?(File.expand_path(wwid.config['export_templates']['dayone']))
-                   IO.read(File.expand_path(wwid.config['export_templates']['dayone']))
+      template = if config['export_templates']['dayone'] && File.exist?(File.expand_path(config['export_templates']['dayone']))
+                   IO.read(File.expand_path(config['export_templates']['dayone']))
                  else
                    self.template('dayone')
                  end
@@ -144,8 +146,8 @@ module Doing
                     starred: hsh[:starred])
         end
       when :entries
-        entry_template = if wwid.config['export_templates']['dayone_entry'] && File.exist?(File.expand_path(wwid.config['export_templates']['dayone_entry']))
-                           IO.read(File.expand_path(wwid.config['export_templates']['dayone_entry']))
+        entry_template = if config['export_templates']['dayone_entry'] && File.exist?(File.expand_path(config['export_templates']['dayone_entry']))
+                           IO.read(File.expand_path(config['export_templates']['dayone_entry']))
                          else
                            self.template('dayone-entry')
                          end

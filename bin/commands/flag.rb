@@ -34,7 +34,7 @@ command %i[mark flag] do |c|
 
   c.action do |_global_options, options, _args|
     options[:fuzzy] = false
-    mark = @settings['marker_tag'] || 'flagged'
+    mark = Doing.setting('marker_tag', 'flagged')
 
     raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
 

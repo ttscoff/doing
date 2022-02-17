@@ -36,7 +36,7 @@ command :view do |c|
   c.switch [:color], default_value: true, negatable: true
 
   c.desc "Highlight search matches in output. Only affects command line output"
-  c.switch %i[h hilite], default_value: @settings.dig('search', 'highlight')
+  c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
   c.desc 'Sort tags by (name|time)'
   c.arg_name 'KEY'
@@ -82,7 +82,7 @@ command :view do |c|
     section = if options[:section]
                 @wwid.guess_section(options[:section]) || options[:section].cap_first
               else
-                @settings['current_section']
+                Doing.setting('current_section')
               end
 
     view = @wwid.get_view(title)
@@ -134,7 +134,7 @@ command :view do |c|
       section = if options[:section]
                   section
                 else
-                  view['section'] || @settings['current_section']
+                  view['section'] || Doing.setting('current_section')
                 end
       order = if view.key?('order')
                 view['order'].normalize_order

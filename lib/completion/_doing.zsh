@@ -18,7 +18,7 @@ function _doing() {
                   'changelog:List recent changes in Doing'
                   'colors:List available color variables for configuration templates and views'
                   'commands:Enable and disable Doing commands'
-                  'completion:Generate shell completion scripts'
+                  'completion:Generate shell completion scripts for doing'
                   'config:Edit the configuration file or output a value from it'
                   'done:Add a completed item with @done(date)'
                   'did:Add a completed item with @done(date)'
@@ -100,7 +100,7 @@ function _doing() {
                 args=(  )
             ;;
             completion) 
-                args=( {-f,--file=}"[File to write output to]" {-t,--type=}"[Shell to generate for]" )
+                args=( {-t,--type=}"[Deprecated]" )
             ;;
             config) 
                 args=( {-d,--dump}"[DEPRECATED]" {-u,--update}"[DEPRECATED]" )

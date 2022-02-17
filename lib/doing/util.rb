@@ -159,7 +159,7 @@ module Doing
 
       return ENV['EDITOR'] if ENV['DOING_EDITOR_TEST']
 
-      editor_config = Doing.config.settings['editors']
+      editor_config = Doing.setting('editors')
 
       if editor_config.is_a?(String)
         msg = "Please update your configuration, 'editors' should be a mapping."

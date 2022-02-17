@@ -1,7 +1,7 @@
 # @@open
 desc 'Open the "doing" file in an editor'
 long_desc "`doing open` defaults to using the editors.doing_file setting
-in #{@config.config_file} (#{Doing::Util.find_default_editor('doing_file')})."
+in #{Doing.config.config_file} (#{Doing::Util.find_default_editor('doing_file')})."
 command :open do |c|
   c.example 'doing open', desc: 'Open the doing file in the default editor'
   c.desc 'Open with editor command (e.g. vim, mate)'

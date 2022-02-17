@@ -54,7 +54,7 @@ module Doing
     ##   automatically be added for the user to override
     ##   The config key will be available at:
     ##
-    ##       wwid.config['export_templates'][PLUGIN_NAME]
+    ##       Doing.config.settings['export_templates'][PLUGIN_NAME]
     ##
     ## config:    (optional) A Hash which will be
     ## added to the main configuration in the plugins section.
@@ -65,7 +65,7 @@ module Doing
     ##
     ##   The configuration keys will be available at:
     ##
-    ##      wwid.config['plugins'][PLUGIN_NAME][KEY]
+    ##      Doing.config.settings['plugins'][PLUGIN_NAME][KEY]
     ##
     ## Method to return plugin settings (required)
     ##
@@ -125,6 +125,8 @@ module Doing
     def self.render(wwid, items, variables: {})
       return unless items.good?
 
+      config = Doing.config.settings
+
       # the :options key includes the flags passed to the
       # command that called the plugin use `puts
       # variables.inspect` to see properties and methods
@@ -162,8 +164,8 @@ module Doing
       title = i.title.gsub(/@/, 'hashtag ')
       tpl = template('say')
 
-      if wwid.config['export_templates'].key?('say')
-        cfg_tpl = wwid.config['export_templates']['say']
+      if config['export_templates'].key?('say')
+        cfg_tpl = config['export_templates']['say']
         tpl = cfg_tpl if cfg_tpl.good?
       end
       output = tpl.dup
@@ -188,7 +190,7 @@ module Doing
       Doing.logger.info('Spoke the last entry. Did you hear it?')
 
       # This export runs a command for fun, most plugins won't
-      voice = wwid.config['plugins']['say']['say_voice'] || 'Alex'
+      voice = config['plugins']['say']['say_voice'] || 'Alex'
       `say -v "#{voice}" "#{output}"`
 
       # Return the result (don't output to terminal with puts or print)

@@ -131,9 +131,9 @@ module Doing
       out = []
       @sections.each do |section|
         out.push(section.original)
-        items = in_section(section.title).sort_by { |i| i.date }
-        items.reverse! if Doing.config.settings['doing_file_sort'].normalize_order == :desc
-        items.each { |item| out.push(item.to_s)}
+        items = in_section(section.title).sort_by(&:date)
+        items.reverse! if Doing.setting('doing_file_sort').normalize_order == :desc
+        items.each { |item| out.push(item.to_s) }
       end
 
       out.join("\n")
@@ -141,8 +141,8 @@ module Doing
 
     # @private
     def inspect
-      "#<Doing::Items #{count} items, #{@sections.count} sections: #{@sections.map { |s| "<Section:#{s.title} #{in_section(s.title).count} items>" }.join(', ')}>"
+      sections = @sections.map { |s| "<Section:#{s.title} #{in_section(s.title).count} items>" }.join(', ')
+      "#<Doing::Items #{count} items, #{@sections.count} sections: #{sections}>"
     end
-
   end
 end

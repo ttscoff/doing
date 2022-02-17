@@ -48,7 +48,7 @@ module Doing
     ## @param      path  [String] Override path to a doing file, optional
     ##
     def init_doing_file(path = nil)
-      @doing_file =  File.expand_path(@config['doing_file'])
+      @doing_file =  File.expand_path(Doing.setting('doing_file'))
 
       if path.nil?
         create(@doing_file) unless File.exist?(@doing_file)
@@ -117,7 +117,7 @@ module Doing
       FileUtils.mkdir_p(File.dirname(filename)) unless File.directory?(File.dirname(filename))
 
       File.open(filename, 'w+') do |f|
-        f.puts "#{@config['current_section']}:"
+        f.puts "#{Doing.setting('current_section')}:"
       end
     end
 
@@ -189,7 +189,7 @@ module Doing
 
       raise EmptyInput, 'No content' if title.sub(/^.*?\| */, '').strip.empty?
 
-      title.expand_date_tags(@config['date_tags'])
+      title.expand_date_tags(Doing.setting('date_tags'))
 
       if title =~ date_rx
         m = title.match(date_rx)
@@ -236,7 +236,7 @@ module Doing
     ##
     def guess_section(frag, guessed: false, suggest: false)
       return 'All' if frag =~ /^all$/i
-      frag ||= @config['current_section']
+      frag ||= Doing.setting('current_section')
 
       return frag.cap_first if @content.section?(frag)
 
@@ -342,7 +342,7 @@ module Doing
     ##
     def add_item(title, section = nil, opt)
       opt ||= {}
-      section ||= @config['current_section']
+      section ||= Doing.setting('current_section')
       @content.add_section(section, log: false)
       opt[:back] ||= opt[:date] ? opt[:date] : Time.now
       opt[:date] ||= Time.now
@@ -356,7 +356,7 @@ module Doing
 
       if @auto_tag
         title = autotag(title)
-        title.add_tags!(@config['default_tags']) unless @config['default_tags'].empty?
+        title.add_tags!(Doing.setting('default_tags')) if Doing.setting('default_tags').good?
       end
 
       title.compress!
@@ -553,7 +553,7 @@ module Doing
     def last_entry(opt)
       opt ||= {}
       opt[:tag_bool] ||= :and
-      opt[:section] ||= @config['current_section']
+      opt[:section] ||= Doing.setting('current_section')
 
       items = filter_items(Items.new, opt: opt)
 
@@ -1076,7 +1076,7 @@ module Doing
       end
 
       if opt[:flag]
-        tag = @config['marker_tag'] || 'flagged'
+        tag = Doing.setting('marker_tag', 'flagged')
         items.map! do |i|
           old_item = i.clone
           i.tag(tag, date: false, remove: opt[:remove], single: single)
@@ -1117,7 +1117,7 @@ module Doing
         items.map! do |i|
           old_item = i.clone
           i.tag(tag, date: false, remove: opt[:remove], single: single)
-          i.expand_date_tags(@config['date_tags'])
+          i.expand_date_tags(Doing.setting('date_tags'))
           Hooks.trigger :post_entry_updated, self, i, old_item
         end
       end
@@ -1176,7 +1176,7 @@ module Doing
     end
 
     def verify_duration(date, finish_date, title: nil)
-      max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
+      max_elapsed = Doing.setting('interaction.confirm_longer_than', 0)
       max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
       date = date.chronify(guess: :end, context: :today) if finish_date.is_a?(String)
 
@@ -1289,7 +1289,7 @@ module Doing
             tag = tag.strip
 
             if tag =~ /^done$/ && opt[:date] && item.should_time?
-              max_elapsed = @config.dig('interaction', 'confirm_longer_than') || 0
+              max_elapsed = Doing.setting('interaction.confirm_longer_than', 0)
               max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
               elapsed = done_date - item.date
 
@@ -1344,7 +1344,7 @@ module Doing
           logger.warn('Skipped:', 'Archiving is skipped when operating on all entries')
         end
 
-        item.expand_date_tags(@config['date_tags'])
+        item.expand_date_tags(Doing.setting('date_tags'))
         Hooks.trigger :post_entry_updated, self, item, old_item
       end
 
@@ -1424,7 +1424,7 @@ module Doing
     def stop_start(target_tag, opt)
       opt ||= {}
       tag = target_tag.dup
-      opt[:section] ||= @config['current_section']
+      opt[:section] ||= Doing.setting('current_section')
       opt[:archive] ||= false
       opt[:back] ||= Time.now
       opt[:new_item] ||= false
@@ -1485,7 +1485,7 @@ module Doing
         $stdout.puts output
       else
         Util.write_to_file(file, output, backup: backup)
-        run_after if @config.key?('run_after')
+        run_after if Doing.setting('run_after')
       end
     end
 
@@ -1593,7 +1593,7 @@ module Doing
     ## @return     [Array] View names
     ##
     def views
-      @config.has_key?('views') ? @config['views'].keys : []
+      Doing.setting('views') ? Doing.setting('views').keys : []
     end
 
     ##
@@ -1612,7 +1612,7 @@ module Doing
     ## @param      title  [String] The title of the view to retrieve
     ##
     def get_view(title)
-      return @config['views'][title] if @config['views'].has_key?(title)
+      return Doing.setting(['views', title], nil)
 
       false
     end
@@ -1626,21 +1626,21 @@ module Doing
       logger.benchmark(:list_section, :start)
       opt[:config_template] ||= 'default'
 
-      tpl_cfg = @config.dig('templates', opt[:config_template])
+      tpl_cfg = Doing.setting(['templates', opt[:config_template]])
 
       cfg = if opt[:view_template]
-              @config.dig('views', opt[:view_template]).deep_merge(tpl_cfg, { extend_existing_arrays: true, sort_merged_arrays: true })
+              Doing.setting(['views', opt[:view_template]]).deep_merge(tpl_cfg, { extend_existing_arrays: true, sort_merged_arrays: true })
             else
               tpl_cfg
             end
 
       cfg.deep_merge({
-                       'wrap_width' => @config['wrap_width'] || 0,
-                       'date_format' => @config['default_date_format'],
-                       'order' => @config['order'] || :asc,
-                       'tags_color' => @config['tags_color'],
-                       'duration' => @config['duration'],
-                       'interval_format' => @config['interval_format']
+                       'wrap_width' => Doing.setting('wrap_width') || 0,
+                       'date_format' => Doing.setting('default_date_format'),
+                       'order' => Doing.setting('order') || :asc,
+                       'tags_color' => Doing.setting('tags_color'),
+                       'duration' => Doing.setting('duration'),
+                       'interval_format' => Doing.setting('interval_format')
                      }, { extend_existing_arrays: true, sort_merged_arrays: true })
 
       opt[:duration] ||= cfg['duration'] || false
@@ -1697,7 +1697,7 @@ module Doing
       end
 
       opt[:output] ||= 'template'
-      opt[:wrap_width] ||= @config['templates']['default']['wrap_width'] || 0
+      opt[:wrap_width] ||= Doing.setting('templates.default.wrap_width', 0)
 
       logger.benchmark(:list_section, :finish)
       output(items, title, is_single, opt)
@@ -1710,7 +1710,7 @@ module Doing
     ## @param      section      [String] The source section
     ## @param      options      [Hash] Options
     ##
-    def archive(section = @config['current_section'], options)
+    def archive(section = Doing.setting('current_section'), options)
       options ||= {}
       count       = options[:keep] || 0
       destination = options[:destination] || 'Archive'
@@ -1746,13 +1746,13 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates'][opt[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
-        'wrap_width' => @config['wrap_width'] || 0,
-        'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || :asc,
-        'tags_color' => @config['tags_color'],
-        'duration' => @config['duration'],
-        'interval_format' => @config['interval_format']
+      cfg = Doing.setting('templates').deep_merge(Doing.setting('templates.default'), { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
+        'wrap_width' => Doing.setting('wrap_width') || 0,
+        'date_format' => Doing.setting('default_date_format'),
+        'order' => Doing.setting('order') || :asc,
+        'tags_color' => Doing.setting('tags_color'),
+        'duration' => Doing.setting('duration'),
+        'interval_format' => Doing.setting('interval_format')
       }, { extend_existing_arrays: true, sort_merged_arrays: true })
 
       template = opt[:template] || cfg['template']
@@ -1866,18 +1866,18 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = @config['templates'][opt[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
-        'wrap_width' => @config['wrap_width'] || 0,
-        'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || :asc,
-        'tags_color' => @config['tags_color'],
-        'duration' => @config['duration'],
-        'interval_format' => @config['interval_format']
+      cfg = Doing.setting('templates.recent').deep_merge(Doing.setting('templates.default'), { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
+        'wrap_width' => Doing.setting('wrap_width') || 0,
+        'date_format' => Doing.setting('default_date_format'),
+        'order' => Doing.setting('order') || :asc,
+        'tags_color' => Doing.setting('tags_color'),
+        'duration' => Doing.setting('duration'),
+        'interval_format' => Doing.setting('interval_format')
       }, { extend_existing_arrays: true, sort_merged_arrays: true })
       opt[:duration] ||= cfg['duration'] || false
       opt[:interval_format] ||= cfg['interval_format'] || 'text'
 
-      section ||= @config['current_section']
+      section ||= Doing.setting('current_section')
       section = guess_section(section)
 
       opt[:section] = section
@@ -1899,13 +1899,13 @@ module Doing
     ##
     def last(times: true, section: nil, options: {})
       section = section.nil? || section =~ /all/i ? 'All' : guess_section(section)
-      cfg = @config['templates'][options[:config_template]].deep_merge(@config['templates']['default'], { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
-        'wrap_width' => @config['wrap_width'] || 0,
-        'date_format' => @config['default_date_format'],
-        'order' => @config['order'] || :asc,
-        'tags_color' => @config['tags_color'],
-        'duration' => @config['duration'],
-        'interval_format' => @config['interval_format']
+      cfg = Doing.setting(['templates', options[:config_template]]).deep_merge(Doing.setting('templates.default'), { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
+        'wrap_width' => Doing.setting('wrap_width', 0),
+        'date_format' => Doing.setting('default_date_format'),
+        'order' => Doing.setting('order', :asc),
+        'tags_color' => Doing.setting('tags_color'),
+        'duration' => Doing.setting('duration'),
+        'interval_format' => Doing.setting('interval_format')
       }, { extend_existing_arrays: true, sort_merged_arrays: true })
       options[:duration] ||= cfg['duration'] || false
       options[:interval_format] ||= cfg['interval_format'] || 'text'
@@ -1960,7 +1960,7 @@ module Doing
         replaced: []
       }
 
-      @config['autotag']['whitelist'].each do |tag|
+      Doing.setting('autotag.whitelist').each do |tag|
         next if text =~ /@#{tag}\b/i
 
         text.sub!(/(?<= |\A)(#{tag.strip})(?= |\Z)/i) do |m|
@@ -1970,7 +1970,7 @@ module Doing
         end
       end
 
-      @config['autotag']['synonyms'].each do |tag, v|
+      Doing.setting('autotag.synonyms').each do |tag, v|
         v.each do |word|
           word = word.wildcard_to_rx
           next unless text =~ /\b#{word}\b/i
@@ -1982,8 +1982,8 @@ module Doing
         end
       end
 
-      if @config['autotag'].key? 'transform'
-        @config['autotag']['transform'].each do |tag|
+      if Doing.setting('autotag.transform')
+        Doing.setting('autotag.transform').each do |tag|
           next unless tag =~ /\S+:\S+/
 
           if tag =~ /::/
@@ -2055,11 +2055,11 @@ module Doing
     def tag_times(format: :text, sort_by: :time, sort_order: :asc)
       return '' if @timers.empty?
 
-      max = @timers.keys.sort_by { |k| k.length }.reverse[0].length + 1
+      max = @timers.keys.sort_by(&:length).reverse[0].length + 1
 
       total = @timers.delete('All')
 
-      tags_data = @timers.delete_if { |_k, v| v == 0 }
+      tags_data = @timers.delete_if { |_k, v| v.zero? }
       sorted_tags_data = if sort_by.normalize_tag_sort == :name
                            tags_data.sort_by { |k, _v| k }
                          else
@@ -2070,7 +2070,7 @@ module Doing
       case format
       when :html
 
-        output = <<EOS
+        output = <<EOHEAD
           <table>
           <caption id="tagtotals">Tag Totals</caption>
           <colgroup>
@@ -2084,13 +2084,13 @@ module Doing
           </tr>
           </thead>
           <tbody>
-EOS
+EOHEAD
         sorted_tags_data.reverse.each do |k, v|
-          if v > 0
+          if v.positive?
             output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{v.time_string(format: :clock)}</td></tr>\n"
           end
         end
-        tail = <<EOS
+        tail = <<EOTAIL
         <tr>
           <td style="text-align:left;" colspan="2"></td>
         </tr>
@@ -2102,21 +2102,21 @@ EOS
         </tr>
         </tfoot>
         </table>
-EOS
+EOTAIL
         output + tail
       when :markdown
-        pad = sorted_tags_data.map {|k, v| k }.group_by(&:size).max.last[0].length
+        pad = sorted_tags_data.map { |k, _| k }.group_by(&:size).max.last[0].length
         pad = 7 if pad < 7
-        output = <<~EOS
-  | #{' ' * (pad - 7) }project | time     |
+        output = <<~EOHEADER
+  | #{' ' * (pad - 7)}project | time     |
   | #{'-' * (pad - 1)}: | :------- |
-        EOS
+        EOHEADER
         sorted_tags_data.reverse.each do |k, v|
-          if v > 0
+          if v.positive?
             output += "| #{' ' * (pad - k.length)}#{k} | #{v.time_string(format: :clock)} |\n"
           end
         end
-        tail = "[Tag Totals]"
+        tail = '[Tag Totals]'
         output + tail
       when :json
         output = []
@@ -2203,38 +2203,37 @@ EOS
     end
 
     ##
-    ## Load configuration files and updated the @config
+    ## Load configuration files and updated the @settings
     ## attribute with a Doing::Configuration object
     ##
     ## @param      filename  [String] (optional) path to
     ##                       alternative config file
     ##
     def configure(filename = nil)
+      logger.benchmark(:configure, :start)
+
       if filename
         Doing.config_with(filename, { ignore_local: true })
       elsif ENV['DOING_CONFIG']
         Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
       end
 
-      logger.benchmark(:configure, :start)
-      config = Doing.config
       logger.benchmark(:configure, :finish)
 
-      config.settings['backup_dir'] = ENV['DOING_BACKUP_DIR'] if ENV['DOING_BACKUP_DIR']
-      @config = config.settings
+      Doing.set('backup_dir', ENV['DOING_BACKUP_DIR']) if ENV['DOING_BACKUP_DIR']
     end
 
     def get_diff(filename = nil)
-      configure if @config.nil?
+      configure if Doing.settings.nil?
 
-      filename ||= @config['doing_file']
+      filename ||= Doing.setting('doing_file')
       init_doing_file(filename)
       current_content = @content.clone
       backup_file = Util::Backup.last_backup(filename, count: 1)
       raise DoingRuntimeError, 'No undo history to diff' if backup_file.nil?
 
       backup = WWID.new
-      backup.config = @config
+      backup.config = Doing.settings
       backup.init_doing_file(backup_file)
       current_content.diff(backup.content)
     end
@@ -2378,12 +2377,12 @@ EOS
     end
 
     def run_after
-      return unless @config.key?('run_after')
+      return unless Doing.setting('run_after')
 
-      _, stderr, status = Open3.capture3(@config['run_after'])
+      _, stderr, status = Open3.capture3(Doing.setting('run_after'))
       return unless status.exitstatus.positive?
 
-      logger.log_now(:error, 'Script error:', "Error running #{@config['run_after']}")
+      logger.log_now(:error, 'Script error:', "Error running #{Doing.setting('run_after')}")
       logger.log_now(:error, 'STDERR output:', stderr)
     end
   end
