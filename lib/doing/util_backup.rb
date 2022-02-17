@@ -30,7 +30,7 @@ module Doing
       ## @param      limit  Maximum number of backups to retain
       ##
       def clear_redo(filename)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
         backups = Dir.glob("undone*___#{File.basename(filename)}", base: backup_dir).sort.reverse
         backups.each do |file|
           FileUtils.rm(File.join(backup_dir, file))
@@ -44,7 +44,7 @@ module Doing
       ## @return     [String] filename
       ##
       def last_backup(filename = nil, count: 1)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
 
         backup = get_backups(filename).slice(count - 1)
         backup.nil? ? nil : File.join(backup_dir, backup)
@@ -59,7 +59,7 @@ module Doing
       ##
       def restore_last_backup(filename = nil, count: 1)
         Doing.logger.benchmark(:restore_backup, :start)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
 
         backup_file = last_backup(filename, count: count)
         raise DoingRuntimeError, 'End of undo history' if backup_file.nil?
@@ -77,7 +77,7 @@ module Doing
       ## @param      filename  The filename
       ##
       def redo_backup(filename = nil, count: 1)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
         # redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
         undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort.reverse
         total = undones.count
@@ -101,7 +101,7 @@ module Doing
       end
 
       def clear_undone(filename = nil)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
         # redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
         Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).each do |f|
           FileUtils.rm(File.join(backup_dir, f))
@@ -115,7 +115,7 @@ module Doing
       ## @param      filename  The filename to restore
       ##
       def select_redo(filename = nil)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
 
         undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort
 
@@ -155,7 +155,7 @@ module Doing
       ## @param      filename  The filename to restore
       ##
       def select_backup(filename = nil)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
 
         options = get_backups(filename).each_with_object([]) do |file, arr|
           d, _base = date_of_backup(file)
@@ -219,7 +219,7 @@ module Doing
       ##
       def write_backup(filename = nil)
         Doing.logger.benchmark(:_write_backup, :start)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
 
         unless File.exist?(filename)
           Doing.logger.debug('Backup:', "original file doesn't exist (#{filename})")
@@ -234,7 +234,7 @@ module Doing
 
         FileUtils.cp(filename, backup_file)
 
-        prune_backups(filename, Doing.config.settings['history_size'].to_i)
+        prune_backups(filename, Doing.setting('history_size').to_i)
         clear_undone(filename)
         Doing.logger.benchmark(:_write_backup, :finish)
       end
@@ -246,13 +246,13 @@ module Doing
       end
 
       def get_backups(filename = nil, include_forward: false)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
         backups = Dir.glob("*___#{File.basename(filename)}", base: backup_dir).sort.reverse
         backups.delete_if { |f| f =~ /^undone/ } unless include_forward
       end
 
       def save_undone(filename = nil)
-        filename ||= Doing.config.settings['doing_file']
+        filename ||= Doing.setting('doing_file')
         undone_file = File.join(backup_dir, "undone#{timestamp_filename}___#{File.basename(filename)}")
         FileUtils.cp(filename, undone_file)
       end
@@ -279,7 +279,7 @@ module Doing
       end
 
       def create_backup_dir
-        dir = File.expand_path(Doing.config.settings['backup_dir']) || File.join(user_home, '.doing_backup')
+        dir = File.expand_path(Doing.setting('backup_dir')) || File.join(user_home, '.doing_backup')
         if File.exist?(dir) && !File.directory?(dir)
           raise DoingRuntimeError, "Backup error: #{dir} is not a directory"
 

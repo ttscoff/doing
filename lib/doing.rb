@@ -66,10 +66,67 @@ module Doing
       @logger ||= LogAdapter.new((ENV['DOING_LOG_LEVEL'] || :info).to_sym)
     end
 
+    ##
+    ## Holds a Configuration object with methods and a @settings hash
+    ##
+    ## @return     [Configuration] Configuration object
+    ##
     def config
       @config ||= Configuration.new
     end
 
+    ##
+    ## Shortcut for Doing.config.settings
+    ##
+    ## @return     [Hash] Settings hash
+    ##
+    def settings
+      config.settings
+    end
+
+    ##
+    ## Fetch a config setting using a dot-separated keypath
+    ## or array of keys
+    ##
+    ## @param      keypath  [String|Array] Either a
+    ##                      dot-separated key path
+    ##                      (search.case) or array of keys
+    ##                      (['search', 'case'])
+    ## @param      default  A default value to return if the
+    ##                      provided path returns nil result
+    ##
+    def setting(keypath, default = nil)
+      cfg = config.settings
+      case keypath
+      when Array
+        cfg.dig(*keypath) || default
+      when String
+        unless keypath =~ /^[.*]?$/
+          real_path = config.resolve_key_path(keypath, create: false)
+          return default unless real_path&.count&.positive?
+
+          cfg = cfg.dig(*real_path)
+        end
+
+        cfg.nil? ? default : cfg
+      end
+    end
+
+    def set(keypath, value)
+      real_path = config.resolve_key_path(keypath, create: false)
+      return nil unless real_path&.count&.positive?
+
+      config.settings.deep_set(real_path, value)
+    end
+
+    ##
+    ## Update configuration from specified file
+    ##
+    ## @param      file     [String] Path to new config file
+    ## @param      options  [Hash] options
+    ##
+    ## @option options :ignore_local Ignore local configuration files
+    ##
     def config_with(file, options = {})
       @config = Configuration.new(file, options: options)
     end

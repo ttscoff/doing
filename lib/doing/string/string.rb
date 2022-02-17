@@ -2,6 +2,14 @@
 
 class ::String
   include Doing::Color
+
+  def utf8
+    if String.method_defined? :force_encoding
+      dup.force_encoding('utf-8')
+    else
+      self
+    end
+  end
 end
 
 require_relative 'highlight'

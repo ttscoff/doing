@@ -5,7 +5,6 @@ module Doing
   ## This class describes an item note.
   ##
   class Note < Array
-
     ##
     ## Initializes a new note
     ##
@@ -28,9 +27,10 @@ module Doing
     ##
     def add(note, replace: false)
       clear if replace
-      if note.is_a?(String)
+      case note
+      when String
         append_string(note)
-      elsif note.is_a?(Array)
+      when Array
         append(note)
       end
     end
@@ -55,7 +55,7 @@ module Doing
     ## @return     [Array] Stripped note
     ##
     def strip_lines
-      map(&:strip)
+      Note.new(map(&:strip))
     end
 
     def strip_lines!
@@ -64,8 +64,24 @@ module Doing
 
     ##
     ## Note as multi-line string
-    def to_s
-      compress.strip_lines.map { |l| "\t\t#{l}" }.join("\n")
+    ##
+    ## @param      prefix  [String] prefix for each line (default two tabs, TaskPaper format)
+    ##
+    def to_s(prefix: "\t\t")
+      compress.strip_lines.map { |l| "#{prefix}#{l}" }.join("\n")
+    end
+
+    ##
+    ## Returns note as a single line, newlines separated by
+    ## space
+    ##
+    ## @return     [String] Line representation of the Note.
+    ##
+    ## @param      separator  The separator with which to
+    ##                        join multiple lines
+    ##
+    def to_line(separator: ' ')
+      compress.strip_lines.join(separator)
     end
 
     # @private
@@ -94,7 +110,7 @@ module Doing
     ## @param      lines  [Array] Array of strings
     ##
     def append(lines)
-      concat(lines)
+      concat(lines.utf8)
       replace compress
     end
 
@@ -105,7 +121,7 @@ module Doing
     ##                    newlines will be split
     ##
     def append_string(input)
-      concat(input.split(/\n/).map(&:strip))
+      concat(input.utf8.split(/\n/).map(&:strip))
       replace compress
     end
   end

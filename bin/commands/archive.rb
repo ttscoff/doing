@@ -5,9 +5,9 @@ desc 'Move entries between sections'
 long_desc %(Argument can be a section name to move all entries from a section,
 or start with an "@" to move entries matching a tag.
 
-Default with no argument moves items from the "#{@settings['current_section']}" section to Archive.)
+Default with no argument moves items from the "#{Doing.setting('current_section')}" section to Archive.)
 arg_name 'SECTION_OR_TAG'
-default_value @settings['current_section']
+default_value Doing.setting('current_section')
 command %i[archive move] do |c|
   c.example 'doing archive Currently', desc: 'Move all entries in the Currently section to Archive section'
   c.example 'doing archive @done', desc: 'Move all entries tagged @done to Archive'
@@ -33,7 +33,7 @@ command %i[archive move] do |c|
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
     section, tags = if args.empty?
-                      [@settings['current_section'], []]
+                      [Doing.setting('current_section'), []]
                     elsif args[0] =~ /^all/i
                       ['all', []]
                     elsif args[0] =~ /^@\S+/

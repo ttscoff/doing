@@ -54,7 +54,7 @@ command %i[now next] do |c|
     section = if options[:section]
                 @wwid.guess_section(options[:section]) || options[:section].cap_first
               else
-                @settings['current_section']
+                Doing.setting('current_section')
               end
 
     ask_note = if options[:ask] && !options[:editor] && args.count.positive?

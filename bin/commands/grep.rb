@@ -38,7 +38,7 @@ command %i[grep search] do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = @settings['tag_sort'].normalize_tag_sort || :name
+  default = Doing.setting('tag_sort').normalize_tag_sort || :name
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
 
@@ -49,7 +49,7 @@ command %i[grep search] do |c|
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact string matching (case sensitive)'
-  c.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
+  c.switch %i[x exact], default_value: Doing.config.exact_match?, negatable: Doing.config.exact_match?
 
   c.desc 'Show items that *don\'t* match search string'
   c.switch [:not], default_value: false, negatable: false
@@ -57,11 +57,11 @@ command %i[grep search] do |c|
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: REGEX_CASE,
-                  default_value: @settings.dig('search', 'case').normalize_case,
+                  default_value: Doing.settings.dig('search', 'case').normalize_case,
                   type: CaseSymbol
 
   c.desc "Highlight search matches in output. Only affects command line output"
-  c.switch %i[h hilite], default_value: @settings.dig('search', 'highlight')
+  c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
   c.desc "Edit matching entries with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
@@ -88,7 +88,7 @@ command %i[grep search] do |c|
     options[:fuzzy] = false
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
-    template = @settings['templates'][options[:config_template]].deep_merge(@settings)
+    template = Doing.setting(['templates', options[:config_template]]).deep_merge(Doing.settings)
     tags_color = template.key?('tags_color') ? template['tags_color'] : nil
 
     section = @wwid.guess_section(options[:section]) if options[:section]

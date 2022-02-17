@@ -58,14 +58,14 @@ module Doing
         }
       end
 
-      template = if wwid.config['export_templates']['haml'] && File.exist?(File.expand_path(wwid.config['export_templates']['haml']))
-                   IO.read(File.expand_path(wwid.config['export_templates']['haml']))
+      template = if Doing.setting('export_templates.haml') && File.exist?(File.expand_path(Doing.setting('export_templates.haml')))
+                   IO.read(File.expand_path(Doing.setting('export_templates.haml')))
                  else
                    self.template('html')
                  end
 
-      style = if wwid.config['export_templates']['css'] && File.exist?(File.expand_path(wwid.config['export_templates']['css']))
-                IO.read(File.expand_path(wwid.config['export_templates']['css']))
+      style = if Doing.setting('export_templates.css') && File.exist?(File.expand_path(Doing.setting('export_templates.css')))
+                IO.read(File.expand_path(Doing.setting('export_templates.css')))
               else
                 self.template('css')
               end

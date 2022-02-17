@@ -33,7 +33,7 @@ command :yesterday do |c|
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Sort tags by (name|time)'
-  default = @settings['tag_sort'].normalize_tag_sort || :name
+  default = Doing.setting('tag_sort').normalize_tag_sort || :name
   c.arg_name 'KEY'
   c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
 
@@ -65,7 +65,7 @@ command :yesterday do |c|
     end
 
     opt = options.clone
-    opt[:order] = @settings.dig('templates', options[:config_template], 'order')
+    opt[:order] = Doing.setting(['templates', options[:config_template], 'order'])
 
     Doing::Pager.page @wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
   end

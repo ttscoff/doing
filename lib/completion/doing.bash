@@ -71,9 +71,9 @@ _doing_changes() {
 _doing_completion() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--file --type' -- $token ) )
+    COMPREPLY=( $( compgen -W '--type' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-f -t --file --type' -- $token ) )
+    COMPREPLY=( $( compgen -W '-t --type' -- $token ) )
   
   fi
 }

@@ -272,7 +272,7 @@ module Doing
     end
 
     def highlight_search(search, distance: nil, negate: false, case_type: nil)
-      prefs = Doing.config.settings['search'] || {}
+      prefs = Doing.setting('search', {})
       matching = prefs.fetch('matching', 'pattern').normalize_matching
       distance ||= prefs.fetch('distance', 3).to_i
       case_type ||= prefs.fetch('case', 'smart').normalize_case
@@ -311,7 +311,7 @@ module Doing
     ## @return     [Boolean] matches search criteria
     ##
     def search(search, distance: nil, negate: false, case_type: nil)
-      prefs = Doing.config.settings['search'] || {}
+      prefs = Doing.setting('search', {})
       matching = prefs.fetch('matching', 'pattern').normalize_matching
       distance ||= prefs.fetch('distance', 3).to_i
       case_type ||= prefs.fetch('case', 'smart').normalize_case
@@ -352,6 +352,24 @@ module Doing
       # end
 
       negate ? !matches : matches
+    end
+
+    ##
+    ## Test if item has a @done tag
+    ##
+    ## @return     [Boolean] true item has @done tag
+    ##
+    def finished?
+      tags?('done')
+    end
+
+    ##
+    ## Test if item does not contain @done tag
+    ##
+    ## @return     [Boolean] true if item is missing @done tag
+    ##
+    def unfinished?
+      tags?('done', negate: true)
     end
 
     ##
@@ -436,7 +454,7 @@ module Doing
     private
 
     def should?(key)
-      config = Doing.config.settings
+      config = Doing.settings
       return true unless config[key].is_a?(Array)
 
       config[key].each do |tag|

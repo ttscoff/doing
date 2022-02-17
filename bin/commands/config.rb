@@ -30,8 +30,8 @@ command :config do |c|
   Values defined in the top item in the list will override values in configutations below it.'
   c.command :list do |list|
     list.action do |global, options, args|
-      puts @config.additional_configs.join("\n")
-      puts @config.config_file
+      puts Doing.config.additional_configs.join("\n")
+      puts Doing.config.config_file
     end
   end
 
@@ -74,7 +74,7 @@ command :config do |c|
         return
       end
 
-      config_file = @config.choose_config
+      config_file = Doing.config.choose_config
 
       if Sys::Platform.mac?
         if options[:default]
@@ -118,7 +118,7 @@ command :config do |c|
   c.desc 'Update default config file, adding any missing keys'
   c.command %i[update refresh] do |update|
     update.action do |_global, options, args|
-      @config.configure({rewrite: true, ignore_local: true})
+      Doing.config.configure({rewrite: true, ignore_local: true})
       Doing.logger.warn('Config:', 'config refreshed')
     end
   end
@@ -127,7 +127,7 @@ command :config do |c|
   c.desc 'Undo the last change to a config file'
   c.command :undo do |undo|
     undo.action do |_global, options, args|
-      config_file = @config.choose_config
+      config_file = Doing.config.choose_config
       Doing::Util::Backup.restore_last_backup(config_file, count: 1)
     end
   end
@@ -148,8 +148,8 @@ command :config do |c|
     dump.action do |_global, options, args|
 
       keypath = args.join('.')
-      cfg = @config.value_for_key(keypath)
-      real_path = @config.resolve_key_path(keypath)
+      cfg = Doing.config.value_for_key(keypath)
+      real_path = Doing.config.resolve_key_path(keypath)
 
       if cfg
         val = cfg.map {|k, v| v }[0]
@@ -201,7 +201,7 @@ command :config do |c|
 
       value = options[:remove] ? nil : args.pop
       keypath = args.join('.')
-      real_path = @config.resolve_key_path(keypath, create: true)
+      real_path = Doing.config.resolve_key_path(keypath, create: true)
       old_value = @settings.dig(*real_path)
       old_type = old_value&.class.to_s || nil
 
@@ -216,7 +216,7 @@ command :config do |c|
 
       end
 
-      config_file = @config.choose_config(create: true)
+      config_file = Doing.config.choose_config(create: true)
 
       cfg = Doing::Util.safe_load_file(config_file) || {}
 

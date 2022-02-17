@@ -30,7 +30,7 @@ command :last do |c|
   c.flag [:template]
 
   c.desc "Highlight search matches in output. Only affects command line output"
-  c.switch %i[h hilite], default_value: @settings.dig('search', 'highlight')
+  c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
   c.desc 'Show elapsed time if entry is not tagged @done'
   c.switch [:duration]

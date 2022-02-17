@@ -39,7 +39,7 @@ command %i[again resume] do |c|
 
     if options[:back]
       options[:date] = options[:back]
-      raise InvalidTimeExpression, 'Unable to parse date string for --back' if date.nil?
+      raise InvalidTimeExpression, 'Unable to parse date string for --back' if options[:date].nil?
 
     else
       options[:date] = Time.now

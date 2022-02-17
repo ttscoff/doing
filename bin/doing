@@ -4,6 +4,7 @@
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'gli'
 require 'doing/help_monkey_patch'
+require 'doing/add_options'
 require 'doing'
 require 'tempfile'
 require 'pp'
@@ -26,6 +27,7 @@ include Doing::Errors
 version Doing::VERSION
 hide_commands_without_desc true
 autocomplete_commands true
+wrap_help_text :one_line unless $stdout.isatty
 
 include Doing::Types
 
@@ -35,7 +37,9 @@ include Doing::Types
 Doing.logger.log_level = :info
 env_log_level = nil
 
-if ENV['DOING_LOG_LEVEL'] || ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] || ENV['DOING_VERBOSE'] || ENV['DOING_PLUGIN_DEBUG']
+if ENV['DOING_LOG_LEVEL'] ||
+   ENV['DOING_DEBUG'] || ENV['DOING_QUIET'] ||
+   ENV['DOING_VERBOSE'] || ENV['DOING_PLUGIN_DEBUG']
   env_log_level = true
   # Quiet always wins
   if ENV['DOING_QUIET']&.truthy?
@@ -53,21 +57,20 @@ Doing.logger.benchmark(:total, :start)
 
 Doing.logger.benchmark(:configure, :start)
 Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true }) if ENV['DOING_CONFIG']
-@config = Doing.config
 Doing.logger.benchmark(:configure, :finish)
 
-@config.settings['backup_dir'] = ENV['DOING_BACKUP_DIR'] if ENV['DOING_BACKUP_DIR']
-@settings = @config.settings
-@wwid.config = @settings
+Doing.set('backup_dir', ENV['DOING_BACKUP_DIR']) if ENV['DOING_BACKUP_DIR']
 
-commands_from File.expand_path(@settings.dig('plugins', 'command_path')) if @settings.dig('plugins', 'command_path')
+# Set up class vars for backwards compatibility
+@settings = Doing.settings
+@wwid.config = Doing.settings
 
 accept BooleanSymbol do |value|
   value.normalize_bool(:pattern)
 end
 
 accept CaseSymbol do |value|
-  value.normalize_case(@config.fetch('search', 'case', :smart))
+  value.normalize_case(Doing.config.fetch('search', 'case', :smart))
 end
 
 accept AgeSymbol do |value|
@@ -83,11 +86,11 @@ accept MatchingSymbol do |value|
 end
 
 accept TagSortSymbol do |value|
-  value.normalize_tag_sort(@config.fetch('tag_sort', :name))
+  value.normalize_tag_sort(Doing.config.fetch('tag_sort', :name))
 end
 
 accept TemplateName do |value|
-  res = @settings['templates'].keys.select { |k| k =~ value.to_rx(distance: 2) }
+  res = Doing.setting('templates').keys.select { |k| k =~ value.to_rx(distance: 2) }
   raise InvalidArgument, "Unknown template: #{value}" unless res.good?
 
   res.group_by(&:length).min.last[0]
@@ -141,121 +144,7 @@ accept TagArray do |value|
   value.gsub(/[, ]+/, ' ').split(' ').map { |tag| tag.sub(/^@/, '') }.map(&:strip)
 end
 
-##
-## Add presets of flags and switches to a command.
-##
-## :add_entry => --noauto, --note, --ask, --editor, --back
-##
-## :search => --search, --case, --exact
-##
-## :tag_filter => --tag, --bool, --not, --val
-##
-## :date_filter => --before, --after, --from
-##
-## @param      type  [Symbol] The type
-## @param      cmd   The GLI command to which the options will be added
-##
-def add_options(type, cmd)
-  cmd_name = cmd.name.to_s
-  action = case cmd_name
-           when /again/
-             'Repeat'
-           when /grep/
-             'Search'
-           when /mark/
-             'Flag'
-           when /(last|tags|view)/
-             'Show'
-           else
-             cmd_name.capitalize
-           end
-
-  case type
-  when :add_entry
-    cmd.desc 'Exclude auto tags and default tags'
-    cmd.switch %i[X noauto], default_value: false, negatable: false
-
-    cmd.desc 'Include a note'
-    cmd.arg_name 'TEXT'
-    cmd.flag %i[n note]
-
-    cmd.desc 'Prompt for note via multi-line input'
-    cmd.switch %i[ask], negatable: false, default_value: false
-
-    cmd.desc "Edit entry with #{Doing::Util.default_editor}"
-    cmd.switch %i[e editor], negatable: false, default_value: false
-
-    cmd.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
-    cmd.arg_name 'DATE_STRING'
-    cmd.flag %i[b back started], type: DateBeginString
-  when :search
-    cmd.desc 'Filter entries using a search query, surround with slashes for regex (e.g. "/query.*/"),
-            start with single quote for exact match ("\'query")'
-    cmd.arg_name 'QUERY'
-    cmd.flag [:search]
-
-    cmd.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
-    cmd.arg_name 'TYPE'
-    cmd.flag [:case], must_match: REGEX_CASE,
-                      default_value: @settings.dig('search', 'case').normalize_case,
-                      type: CaseSymbol
-
-    cmd.desc 'Force exact search string matching (case sensitive)'
-    cmd.switch %i[x exact], default_value: @config.exact_match?, negatable: @config.exact_match?
-  when :tag_filter
-    cmd.desc 'Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
-    cmd.arg_name 'TAG'
-    cmd.flag [:tag], type: TagArray
-
-    cmd.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
-            May be used multiple times, combined with --bool'
-    cmd.arg_name 'QUERY'
-    cmd.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-    cmd.desc "#{action} items that *don't* match search/tag filters"
-    cmd.switch [:not], default_value: false, negatable: false
-
-    cmd.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
-    cmd.arg_name 'BOOLEAN'
-    cmd.flag [:bool], must_match: REGEX_BOOL,
-                      default_value: :pattern,
-                      type: BooleanSymbol
-  when :date_filter
-    if action =~ /Archive/
-      cmd.desc 'Archive entries older than date (natural language).'
-    else
-      cmd.desc "#{action} entries older than date (natural language). If this is only a time (8am, 1:30pm, 15:00), all
-              dates will be included, but entries will be filtered by time of day"
-    end
-    cmd.arg_name 'DATE_STRING'
-    cmd.flag [:before], type: DateBeginString
-
-    if action =~ /Archive/
-      cmd.desc 'Archive entries newer than date (natural language).'
-    else
-      cmd.desc "#{action} entries newer than date (natural language). If this is only a time (8am, 1:30pm, 15:00), all
-              dates will be included, but entries will be filtered by time of day"
-    end
-    cmd.arg_name 'DATE_STRING'
-    cmd.flag [:after], type: DateEndString
-
-    if action =~ /Archive/
-      cmd.desc %(
-          Date range (natural language) to archive: `doing archive --from "1/1/21 to 12/31/21"`.
-        )
-    else
-      cmd.desc %(
-        Date range (natural language) to #{action.downcase}, or a single day to filter on.
-        To specify a range, use "to": `doing #{cmd_name} --from "monday 8am to friday 5pm"`.
-
-        If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
-        by time of day.
-      )
-    end
-    cmd.arg_name 'DATE_OR_RANGE'
-    cmd.flag [:from], type: DateRangeString
-  end
-end
+commands_from File.expand_path(Doing.setting('plugins.command_path')) if Doing.setting('plugins.command_path')
 
 program_desc 'A CLI for a What Was I Doing system'
 program_long_desc %(Doing uses a TaskPaper-like formatting to keep a plain text
@@ -275,7 +164,7 @@ desc 'Send results report to STDOUT instead of STDERR'
 switch [:stdout], default_value: false, negatable: false
 
 desc 'Use a pager when output is longer than screen'
-switch %i[p pager], default_value: @settings['paginate']
+switch %i[p pager], default_value: Doing.setting('paginate')
 
 desc 'Answer yes/no menus with default option'
 switch [:default], default_value: false, negatable: false
@@ -299,14 +188,14 @@ desc 'Verbose output'
 switch %i[debug], default_value: false, negatable: false
 
 desc 'Use a specific configuration file. Deprecated, set $DOING_CONFIG instead'
-flag [:config_file], default_value: @config.config_file
+flag [:config_file], default_value: Doing.config.config_file
 
 desc 'Specify a different doing_file'
 flag %i[f doing_file]
 
 def add_commands(commands)
   commands = [commands] unless commands.is_a?(Array)
-  hidden = @settings['disabled_commands']
+  hidden = Doing.setting('disabled_commands')
   hidden = hidden.set_type('array') if hidden.good? && !hidden.is_a?(Array)
   commands.delete_if { |c| hidden.include?(c) }
   commands.each { |cmd| require_relative "commands/#{cmd}" }
@@ -328,7 +217,7 @@ add_commands(%w[commands_accepting install_fzf])
 add_commands(%w[again cancel flag meanwhile reset tags today yesterday since add_section tag_dir colors completion plugins sections template views changes])
 
 pre do |global, _command, _options, _args|
-  # global[:pager] ||= @settings['paginate']
+  # global[:pager] ||= Doing.setting('paginate')
   Doing::Pager.paginate = global[:pager]
 
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
@@ -367,7 +256,7 @@ end
 
 around do |global, command, options, arguments, code|
   Doing.logger.benchmark("command_#{command.name.to_s}".to_sym, :start)
-  # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{@settings['paginate']}, Pager: #{Doing::Pager.paginate}")
+  # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{Doing.setting('paginate')}, Pager: #{Doing::Pager.paginate}")
   if env_log_level.nil?
     Doing.logger.adjust_verbosity(global)
   end
@@ -392,15 +281,15 @@ around do |global, command, options, arguments, code|
     Doing.config.force_answer = global[:default] ? true : false
   end
 
-  if global[:config_file] && global[:config_file] != @config.config_file
+  if global[:config_file] && global[:config_file] != Doing.config.config_file
     Doing.logger.warn(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', @colors.flamingo, @colors.default, @colors.boldred))
     Doing.logger.warn(format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  @colors.red, @colors.boldwhite, @colors.default))
 
     cf = File.expand_path(global[:config_file])
     raise MissingConfigFile, "Config file not found (#{global[:config_file]})" unless File.exist?(cf)
 
-    @config.config_file = cf
-    @settings = @config.configure({ ignore_local: true })
+    Doing.config.config_file = cf
+    Doing.config_with(cf, { ignore_local: true })
   end
   Doing.logger.benchmark(:init, :start)
   if global[:doing_file]
@@ -411,7 +300,7 @@ around do |global, command, options, arguments, code|
   Doing.logger.benchmark(:init, :finish)
   @wwid.auto_tag = !global[:noauto]
 
-  @settings[:include_notes] = false unless global[:notes]
+  Doing.set('include_notes', false) unless global[:notes]
 
   global[:wwid] = @wwid
 

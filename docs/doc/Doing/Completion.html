@@ -94,6 +94,32 @@
   
 
 </div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="OPTIONS_RX-constant" class="">OPTIONS_RX =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(?:-(?&lt;short&gt;\w), )?(?:--(?:\[no-\])?(?&lt;long&gt;\w+)(?:=(?&lt;arg&gt;\w+))?)\s+- (?&lt;desc&gt;.*?)$</span><span class='regexp_end'>/</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="SECTIONS_RX-constant" class="">SECTIONS_RX =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(?m-i)^([A-Z ]+)\n([\s\S]*?)(?=\n+[A-Z]+|\Z)</span><span class='regexp_end'>/</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="COMMAND_RX-constant" class="">COMMAND_RX =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^(?&lt;cmd&gt;[^, \t]+)(?&lt;alias&gt;(?:, [^, \t]+)*)?\s+- (?&lt;desc&gt;.*?)$</span><span class='regexp_end'>/</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
 
 
 
@@ -111,7 +137,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#generate_completion-class_method" title="generate_completion (class method)">.<strong>generate_completion</strong>(type: &#39;zsh&#39;, file: &#39;stdout&#39;)  &#x21d2; Object </a>
+      <a href="#generate_completion-class_method" title="generate_completion (class method)">.<strong>generate_completion</strong>(type: &#39;zsh&#39;, file: :default, link: true)  &#x21d2; Object </a>
     
 
     
@@ -131,6 +157,182 @@
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_help_sections-class_method" title="get_help_sections (class method)">.<strong>get_help_sections</strong>(command = &#39;&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#install_builtin-class_method" title="install_builtin (class method)">.<strong>install_builtin</strong>(type)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#link_default-class_method" title="link_default (class method)">.<strong>link_default</strong>(type)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_type-class_method" title="normalize_type (class method)">.<strong>normalize_type</strong>(type)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#parse_command-class_method" title="parse_command (class method)">.<strong>parse_command</strong>(command)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#parse_commands-class_method" title="parse_commands (class method)">.<strong>parse_commands</strong>(commands)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#parse_option-class_method" title="parse_option (class method)">.<strong>parse_option</strong>(option)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#parse_options-class_method" title="parse_options (class method)">.<strong>parse_options</strong>(options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
     </ul>
   
 
@@ -143,7 +345,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="generate_completion-class_method">
   
-    .<strong>generate_completion</strong>(type: &#39;zsh&#39;, file: &#39;stdout&#39;)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+    .<strong>generate_completion</strong>(type: &#39;zsh&#39;, file: :default, link: true)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
   
 
   
@@ -186,7 +388,7 @@ stdout</p>
         <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>&#39;stdout&#39;</tt>)</em>
+        <em class="default">(defaults to: <tt>:default</tt>)</em>
       
       
         &mdash;
@@ -201,12 +403,130 @@ stdout</p>
 </div>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="get_help_sections-class_method">
+  
+    .<strong>get_help_sections</strong>(command = &#39;&#39;)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="install_builtin-class_method">
+  
+    .<strong>install_builtin</strong>(type)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="link_default-class_method">
+  
+    .<strong>link_default</strong>(type)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>InvalidArgument</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_type-class_method">
+  
+    .<strong>normalize_type</strong>(type)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="parse_command-class_method">
+  
+    .<strong>parse_command</strong>(command)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="parse_commands-class_method">
+  
+    .<strong>parse_commands</strong>(commands)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="parse_option-class_method">
+  
+    .<strong>parse_option</strong>(option)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="parse_options-class_method">
+  
+    .<strong>parse_options</strong>(options)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Wed Feb 16 07:23:35 2022 by
+  Generated on Thu Feb 17 13:05:18 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>

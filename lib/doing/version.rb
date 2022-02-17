@@ -1,3 +1,3 @@
 module Doing
-  VERSION = '2.1.30'
+  VERSION = '2.1.32pre'
 end

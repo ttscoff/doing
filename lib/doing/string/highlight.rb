@@ -35,10 +35,9 @@ module Doing
 
     def highlight_search(search, distance: nil, negate: false, case_type: nil)
       out = dup
-      prefs = Doing.config.settings['search'] || {}
-      matching = prefs.fetch('matching', 'pattern').normalize_matching
-      distance ||= prefs.fetch('distance', 3).to_i
-      case_type ||= prefs.fetch('case', 'smart').normalize_case
+      matching = Doing.setting('search.matching', 'pattern').normalize_matching
+      distance ||= Doing.setting('search.distance', 3).to_i
+      case_type ||= Doing.setting('search.case', 'smart').normalize_case
 
       if search.rx? || matching == :fuzzy
         rx = search.to_rx(distance: distance, case_type: case_type)
