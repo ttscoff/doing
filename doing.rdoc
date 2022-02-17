@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.30
+v2.1.31pre
 
 === Global Options
 === --config_file arg
@@ -506,26 +506,42 @@ Disable Doing commands
 
 [Default Command] add
 ==== Command: <tt>completion </tt>
-Generate shell completion scripts
+Generate shell completion scripts for doing
 
 Generates the necessary scripts to add command line completion to various shells,
 so typing 'doing' and hitting tab will offer completions of subcommands and their options.
 ===== Options
-===== -f|--file PATH
+===== -t|--type arg
 
-File to write output to
+Deprecated, specify shell as argument to subcommand
 
-[Default Value] STDOUT
-
-
-===== -t|--type SHELL
-
-Shell to generate for (bash, zsh, fish)
-
-[Default Value] zsh
+[Default Value] None
 [Must Match] (?i-mx:^(?:[bzf](?:[ai]?sh)?|all)$)
 
 
+===== Commands
+====== Command: <tt>generate  [zsh|bash|fish|all]</tt>
+Generate completion scripts, including custom plugins and command options
+
+Argument specifies which shell to install for: zsh, bash, fish, all
+======= Options
+======= -f|--file PATH
+
+Alternative file to write output to
+
+[Default Value] None
+Argument specifies which shell to install for: zsh, bash, fish, all
+
+======= --stdout
+Output result to STDOUT only
+
+
+
+====== Command: <tt>install  [zsh|bash|fish]</tt>
+Install default completion scripts
+
+Argument specifies which shell to install for: zsh, bash, fish, or all
+[Default Command] generate
 ==== Command: <tt>config </tt>
 Edit the configuration file or output a value from it
 

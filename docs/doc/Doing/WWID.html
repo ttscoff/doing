@@ -449,7 +449,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#archive-instance_method" title="#archive (instance method)">#<strong>archive</strong>(section = , options)  &#x21d2; Object </a>
+      <a href="#archive-instance_method" title="#archive (instance method)">#<strong>archive</strong>(section = Doing.setting(&#39;current_section&#39;), options)  &#x21d2; Object </a>
     
 
     
@@ -601,7 +601,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Load configuration files and updated the @config attribute with a Doing::Configuration object.</p>
+    <span class="summary_desc"><div class='inline'><p>Load configuration files and updated the @settings attribute with a Doing::Configuration object.</p>
 </div></span>
   
 </li>
@@ -2130,7 +2130,7 @@
       <div class="method_details ">
   <h3 class="signature " id="archive-instance_method">
   
-    #<strong>archive</strong>(section = , options)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>archive</strong>(section = Doing.setting(&#39;current_section&#39;), options)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
   
 
   
@@ -2156,7 +2156,7 @@
         <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
       
       
-        <em class="default">(defaults to: <tt></tt>)</em>
+        <em class="default">(defaults to: <tt>Doing.setting(&#39;current_section&#39;)</tt>)</em>
       
       
         &mdash;
@@ -2396,7 +2396,7 @@ untagged keyword</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Load configuration files and updated the @config
+    <p>Load configuration files and updated the @settings
 attribute with a Doing::Configuration object</p>
 
 
@@ -4766,7 +4766,7 @@ json, or text)</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Feb 16 07:23:35 2022 by
+  Generated on Thu Feb 17 13:05:18 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>
