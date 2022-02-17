@@ -13,7 +13,7 @@ lib/doing/colors.rb 8c2d1c8c7e99022d33f1548c5456a0f02d570c4f
 lib/doing/errors.rb af07e482a5389924edc2337749c81cda501098f0
 lib/doing/prompt.rb 330b8e6e1e85f73b54f602a0aeac58b6b422fabb
 lib/doing/section.rb 48f200cf363a555b51d90d6477939cf3cf83f241
-lib/doing/version.rb 67c5685c51ce2e0273e04d6a09a9d122de0d1602
+lib/doing/version.rb 8389dcaf8bf64a9a7f22c14a67a4e158f682e383
 lib/doing/changelog.rb f7d1bd424e63400ab0613ef3358e614fdf53e2b5
 lib/doing/normalize.rb b9925102db5f19cae0e524ffd1be979ab5bc1199
 lib/doing/cli_status.rb dbedd454c4cbbd0fed9ef30120f6ec85d18b9356
