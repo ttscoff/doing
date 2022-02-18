@@ -1,6 +1,6 @@
-### 2.1.32pre
+### 2.1.32
 
-2022-02-18 08:05
+2022-02-18 08:23
 
 #### NEW
 
@@ -15,7 +15,7 @@
 
 - Remove blank lines when running `doing changes --changes --md` (output changes only in Markdown format)
 
-### 2.1.31pre
+### 2.1.31
 
 2022-02-17 12:59
 
