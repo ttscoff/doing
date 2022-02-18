@@ -1,3 +1,11 @@
+### 2.1.33
+
+2022-02-18 12:09
+
+#### FIXED
+
+- Major fixes for completion scripts, especially zsh
+
 ### 2.1.32
 
 2022-02-18 08:34

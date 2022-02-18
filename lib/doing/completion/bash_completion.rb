@@ -126,7 +126,7 @@ module Doing
         data = Completion.get_help_sections
         @global_options = Completion.parse_options(data[:global_options])
         @commands = Completion.parse_commands(data[:commands])
-        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Bash completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :box, hide_cursor: true, status: 'Reading subcommands')
+        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Bash completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'Reading subcommands')
         width = TTY::Screen.columns - 45
         @bar.resize(width)
       end

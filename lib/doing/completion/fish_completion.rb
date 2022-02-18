@@ -183,7 +183,7 @@ module Doing
               need_export.concat(cmd[:commands]) if option[:long] == 'output'
               need_bool.concat(cmd[:commands]) if option[:long] == 'bool'
               need_case.concat(cmd[:commands]) if option[:long] == 'case'
-              need_case.concat(cmd[:commands]) if option[:long] == 'sort'
+              need_sort.concat(cmd[:commands]) if option[:long] == 'sort'
               need_tag_sort.concat(cmd[:commands]) if option[:long] == 'tag_sort'
               need_tag_order.concat(cmd[:commands]) if option[:long] == 'tag_order'
               need_age.concat(cmd[:commands]) if option[:long] == 'age'
@@ -232,7 +232,7 @@ module Doing
         data = Completion.get_help_sections
         @global_options = Completion.parse_options(data[:global_options])
         @commands = Completion.parse_commands(data[:commands])
-        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Fish completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :block, hide_cursor: true, status: 'processing subcommands')
+        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Fish completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'processing subcommands')
         width = TTY::Screen.columns - 45
         @bar.resize(width)
       end
