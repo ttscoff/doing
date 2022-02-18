@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.31pre
+v2.1.32
 
 === Global Options
 === --config_file arg
@@ -620,6 +620,11 @@ Set a key's value in the config file
 
 
 ======= Options
+======= --local
+Force update to .doingrc in the current directory
+
+
+
 ======= -r|--remove
 Delete specified key
 
