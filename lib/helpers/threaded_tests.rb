@@ -82,6 +82,7 @@ class ThreadedTests
     @running_tests = []
 
     begin
+      finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       while @children.count.positive?
 
         slices = @children.slice!(0, max_threads)
@@ -89,6 +90,7 @@ class ThreadedTests
         slices.each do |s|
           @threads << Thread.new do
             run_test(s)
+            finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           end
         end
 
