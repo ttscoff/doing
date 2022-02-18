@@ -1,6 +1,6 @@
 ### 2.1.32pre
 
-2022-02-17 16:03
+2022-02-18 08:05
 
 #### NEW
 
@@ -10,6 +10,10 @@
 
 - `doing tag_dir` will not allow duplicate tags or tags that are already applied by a config higher up the hierarchy
 - `doing tag_dir` will force updates to .doingrc in the current directory rather than offering a menu
+
+#### FIXED
+
+- Remove blank lines when running `doing changes --changes --md` (output changes only in Markdown format)
 
 ### 2.1.31pre
 
