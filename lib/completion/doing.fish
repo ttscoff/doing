@@ -555,7 +555,8 @@ complete -c doing -l template  -f -r -n '__fish_doing_using_command yesterday' -
 complete -c doing -l totals  -f  -n '__fish_doing_using_command yesterday' -d Show\ time\ totals\ at\ the\ end\ of\ output
 complete -f -c doing -s o -l output -x -n '__fish_doing_using_command grep search on select show since today view yesterday' -a '(__fish_doing_export_plugin)'
 complete -f -c doing -s b -l bool -x -n '__fish_doing_using_command again resume archive move autotag cancel finish grep search last mark flag note reset begin rotate show tag tags view wiki' -a 'and or not pattern'
-complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel changes changelog finish grep search import last mark flag note reset begin rotate select show show tag tags tags view' -a 'case-sensitive ignore smart'
+complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel finish grep search import last mark flag note reset begin rotate select show tag tags view' -a 'case-sensitive ignore smart'
+complete -f -c doing -l sort -x -n '__fish_doing_using_command changes changelog show tags' -a 'asc desc'
 complete -f -c doing -l tag_sort -x -n '__fish_doing_using_command grep search on recent show since today view yesterday' -a 'name time'
 complete -f -c doing -l tag_order -x -n '__fish_doing_using_command show view yesterday' -a 'asc desc'
 complete -f -c doing -s a -l age -x -n '__fish_doing_using_command show view' -a 'oldest newest'
