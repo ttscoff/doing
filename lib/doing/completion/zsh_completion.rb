@@ -2,6 +2,12 @@
 
 module Doing
   module Completion
+    class ::String
+      def sanitize
+        gsub(/'/, '\\\'').gsub(/\[/, '(').gsub(/\]/, ')')
+      end
+    end
+
     # Generate completions for zsh
     class ZshCompletions
       attr_accessor :commands, :global_options
@@ -65,12 +71,12 @@ module Doing
             Completion.parse_options(data[:command_options]).each do |option|
               next if option.nil?
 
-              arg = option[:arg] ? '=' : ''
+              arg = option[:arg] ? ":#{option[:arg]}:" : ''
 
               option_arr << if option[:short]
-                              %({-#{option[:short]},--#{option[:long]}#{arg}}"[#{option[:description].gsub(/'/, '\\\'')}]")
+                              %({'(--#{option[:long]})-#{option[:short]}','(-#{option[:short]})--#{option[:long]}'}"[#{option[:description].sanitize}]#{arg}")
                             else
-                              %("(--#{option[:long]}#{arg})--#{option[:long]}#{arg}}[#{option[:description].gsub(/'/, '\\\'')}]")
+                              %("--#{option[:long]}[#{option[:description].sanitize}]#{arg}")
                             end
             end
           end
@@ -87,7 +93,7 @@ module Doing
         data = Completion.get_help_sections
         @global_options = Completion.parse_options(data[:global_options])
         @commands = Completion.parse_commands(data[:commands])
-        @bar = TTY::ProgressBar.new(" \033[0;0;33mGenerating Zsh completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :block, hide_cursor: true, status: 'processing subcommands')
+        @bar = TTY::ProgressBar.new(" \033[0;0;33mGenerating Zsh completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'processing subcommands')
         width = TTY::Screen.columns - 45
         @bar.resize(width)
       end
