@@ -57,13 +57,14 @@ require_relative 'doing/chronify/chronify'
 # Main doing module
 module Doing
   class << self
+    attr_accessor :auto_tag
     #
     # Fetch the logger
     #
-    # @return     the LogAdapter instance.
+    # @return     the Logger instance.
     #
     def logger
-      @logger ||= LogAdapter.new((ENV['DOING_LOG_LEVEL'] || :info).to_sym)
+      @logger ||= Logger.new((ENV['DOING_LOG_LEVEL'] || :info).to_sym)
     end
 
     ##

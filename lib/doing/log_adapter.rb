@@ -4,7 +4,7 @@ module Doing
   ##
   ## Log adapter
   ##
-  class LogAdapter
+  class Logger
     # Sets the log device
     attr_writer :logdev
 

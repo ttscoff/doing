@@ -37,7 +37,7 @@ command %i[now next] do |c|
   # # c.flag [:a, :app]
 
   c.action do |_global_options, options, args|
-    @wwid.auto_tag = !options[:noauto]
+    Doing.auto_tag = !options[:noauto]
 
     raise InvalidArgument, '--back and --from cannot be used together' if options[:back] && options[:from]
 

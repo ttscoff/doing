@@ -43,7 +43,7 @@ command :config do |c|
 
     edit.desc 'Editor to use'
     edit.arg_name 'EDITOR'
-    edit.flag %i[e editor], default_value: nil
+    edit.flag %i[e editor]
 
     if Sys::Platform.mac?
       edit.desc 'Application to use'
@@ -54,8 +54,8 @@ command :config do |c|
       edit.arg_name 'BUNDLE_ID'
       edit.flag %i[b bundle_id]
 
-      edit.desc "Use the config_editor_app defined in ~/.config/doing/config.yml (#{@settings.key?('config_editor_app') ? @settings['config_editor_app'] : 'config_editor_app not set'})"
-      edit.switch %i[x default]
+      edit.desc "Use the config editor defined in ~/.config/doing/config.yml (#{Doing.setting('editors.config', 'editors.config not set')})"
+      edit.switch %i[x default], negatable: false
     end
 
     edit.action do |global, options, args|
@@ -205,7 +205,7 @@ command :config do |c|
       value = options[:remove] ? nil : args.pop
       keypath = args.join('.')
       real_path = Doing.config.resolve_key_path(keypath, create: true)
-      old_value = @settings.dig(*real_path)
+      old_value = Doing.config.settings.dig(*real_path)
       old_type = old_value&.class.to_s || nil
 
       if old_value.is_a?(Hash) && !options[:remove]
@@ -223,7 +223,7 @@ command :config do |c|
 
       cfg = Doing::Util.safe_load_file(config_file) || {}
 
-      $stderr.puts "Updating #{config_file}".yellow
+      $stderr.puts ">      Config: Updating #{config_file}".yellow
 
       if options[:remove]
         cfg.deep_set(real_path, nil)
@@ -231,10 +231,10 @@ command :config do |c|
       else
         current_value = cfg.dig(*real_path)
         cfg.deep_set(real_path, value.set_type(old_type))
-        $stderr.puts "#{' Key path:'.yellow} #{real_path.join('.').boldwhite}"
-        $stderr.puts "#{'Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
-        $stderr.puts "#{'  Current:'.yellow} #{ (current_value ? current_value.to_s : 'empty').boldwhite }"
-        $stderr.puts "#{'      New:'.yellow} #{value.set_type(old_type).to_s.boldwhite}"
+        $stderr.puts "#{'     Key path:'.yellow} #{real_path.join('.').boldwhite}"
+        $stderr.puts "#{'    Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
+        $stderr.puts "#{'      Current:'.yellow} #{ (current_value ? current_value.to_s : 'empty').boldwhite }"
+        $stderr.puts "#{'          New:'.yellow} #{value.set_type(old_type).to_s.boldwhite}"
       end
 
       res = Doing::Prompt.yn('Update selected config', default_response: true)

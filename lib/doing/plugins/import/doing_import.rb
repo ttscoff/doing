@@ -29,7 +29,7 @@ module Doing
       exit_now! 'File not found' unless File.exist?(File.expand_path(path))
 
       options[:no_overlap] ||= false
-      options[:autotag] ||= wwid.auto_tag
+      options[:autotag] ||= Doing.auto_tag
 
       tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '') } : []
       prefix = options[:prefix] || ''

@@ -14,7 +14,7 @@ module Doing
   class WWID
     attr_reader   :additional_configs, :current_section, :doing_file, :content
 
-    attr_accessor :config, :config_file, :auto_tag, :default_option
+    attr_accessor :config, :config_file, :default_option
 
     include Color
     # include Util
@@ -26,7 +26,12 @@ module Doing
       @timers = {}
       @recorded_items = []
       @content = Items.new
-      @auto_tag = true
+      Doing.auto_tag = true
+    end
+
+    # For backwards compatibility where @wwid.config was accessed instead of Doing.config.settings
+    def config
+      Doing.config.settings
     end
 
     ##
@@ -354,7 +359,7 @@ module Doing
       title = [title.strip.cap_first]
       title = title.join(' ')
 
-      if @auto_tag
+      if Doing.auto_tag
         title = autotag(title)
         title.add_tags!(Doing.setting('default_tags')) if Doing.setting('default_tags').good?
       end
@@ -499,7 +504,7 @@ module Doing
       # Remove @done tag
       title = item.title.sub(/\s*@done(\(.*?\))?/, '').chomp
       section = opt[:in].nil? ? item.section : guess_section(opt[:in])
-      @auto_tag = false
+      Doing.auto_tag = false
 
       note = opt[:note] || Note.new
 
@@ -1255,7 +1260,7 @@ module Doing
         removed = []
 
         if opt[:autotag]
-          new_title = autotag(item.title) if @auto_tag
+          new_title = autotag(item.title) if Doing.auto_tag
           if new_title == item.title
             logger.count(:skipped, level: :debug, message: '%count unchaged %items')
             # logger.debug('Autotag:', 'No changes')
@@ -1947,7 +1952,7 @@ module Doing
     ##
     def autotag(string)
       return unless string
-      return string unless @auto_tag
+      return string unless Doing.auto_tag
 
       original = string.dup
       text = string.dup

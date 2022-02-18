@@ -47,7 +47,7 @@ command %i[done did] do |c|
   add_options(:add_entry, c)
 
   c.action do |_global_options, options, args|
-    @wwid.auto_tag = !options[:noauto]
+    Doing.auto_tag = !options[:noauto]
 
     took = 0
     donedate = nil

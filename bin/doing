@@ -63,7 +63,6 @@ Doing.set('backup_dir', ENV['DOING_BACKUP_DIR']) if ENV['DOING_BACKUP_DIR']
 
 # Set up class vars for backwards compatibility
 @settings = Doing.settings
-@wwid.config = Doing.settings
 
 accept BooleanSymbol do |value|
   value.normalize_bool(:pattern)
@@ -143,8 +142,6 @@ end
 accept TagArray do |value|
   value.gsub(/[, ]+/, ' ').split(' ').map { |tag| tag.sub(/^@/, '') }.map(&:strip)
 end
-
-commands_from File.expand_path(Doing.setting('plugins.command_path')) if Doing.setting('plugins.command_path')
 
 program_desc 'A CLI for a What Was I Doing system'
 program_long_desc %(Doing uses a TaskPaper-like formatting to keep a plain text
@@ -298,7 +295,7 @@ around do |global, command, options, arguments, code|
     @wwid.init_doing_file
   end
   Doing.logger.benchmark(:init, :finish)
-  @wwid.auto_tag = !global[:noauto]
+  Doing.auto_tag = !global[:noauto]
 
   Doing.set('include_notes', false) unless global[:notes]
 
@@ -308,6 +305,8 @@ around do |global, command, options, arguments, code|
 
   Doing.logger.benchmark("command_#{command.name.to_s}".to_sym, :finish)
 end
+
+commands_from File.expand_path(Doing.setting('plugins.command_path')) if Doing.setting('plugins.command_path')
 
 @command = ARGV[0]
 
