@@ -5,5 +5,7 @@ WORKDIR /doing
 # COPY ./ /doing/
 RUN gem install bundler:2.2.17
 RUN apt-get update -y
-RUN apt-get install -y less
+RUN apt-get install -y less vim
+COPY ./inputrc /root/.inputrc
+COPY ./bash_profile /root/.bash_profile
 CMD ["scripts/runtests.sh"]

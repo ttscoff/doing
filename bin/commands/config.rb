@@ -191,7 +191,10 @@ command :config do |c|
     set.example 'doing config set plug.plugpath ~/my_plugins', desc: 'Key path is fuzzy matched: set the value of plugins.plugin_path'
 
     set.desc 'Delete specified key'
-    set.switch %i[r remove], default_value: false, negatable: false
+    set.switch %i[r remove], negatable: false
+
+    set.desc 'Force update to .doingrc in the current directory'
+    set.switch %[local], negatable: false
 
     set.action do |_global, options, args|
       if args.count < 2 && !options[:remove]
@@ -216,7 +219,7 @@ command :config do |c|
 
       end
 
-      config_file = Doing.config.choose_config(create: true)
+      config_file = Doing.config.choose_config(create: true, local: options[:local])
 
       cfg = Doing::Util.safe_load_file(config_file) || {}
 

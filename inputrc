@@ -1,0 +1,57 @@
+"\e[3~": delete-char
+"\ex": 'cd !$ \015ls\015'
+"\ez": 'cd -\015'
+"\e\C-m": '\C-a "$(\C-e|fzf)"\C-a'
+"\e/": '"$(!!|fzf)"\C-a \C-m\C-m'
+# these allow you to use alt+left/right arrow keys
+# to jump the cursor over words
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+# "\e[D": backward-word
+# "\e[C": forward-word
+"\ea": menu-complete
+# TAB: menu-complete
+# "\e[Z": "\e-1\C-i"
+
+"\e\C-l": history-and-alias-expand-line
+
+# these allow you to start typing a command and
+# use the up/down arrow to auto complete from
+# commands in your history
+"\e[B": history-search-forward
+"\e[A": history-search-backward
+"\ew": history-search-backward
+"\es": history-search-forward
+# this lets you hit tab to auto-complete a file or
+# directory name ignoring case
+set completion-ignore-case On
+set mark-symlinked-directories On
+set completion-prefix-display-length 2
+set bell-style none
+# set bell-style visible
+set meta-flag on
+set convert-meta off
+set input-meta on
+set output-meta on
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+set completion-map-case on
+set visible-stats on
+
+# Do history expansion when space entered?
+$if bash
+	Space: magic-space
+$endif
+
+# Show extra file information when completing, like `ls -F` does
+set visible-stats on
+
+# Be more intelligent when autocompleting by also looking at the text after
+# the cursor. For example, when the current line is "cd ~/src/mozil", and
+# the cursor is on the "z", pressing Tab will not autocomplete it to "cd
+# ~/src/mozillail", but to "cd ~/src/mozilla". (This is supported by the
+# Readline used by Bash 4.)
+set skip-completed-text on
+
+# Use Alt/Meta + Delete to delete the preceding word
+"\e[3;3~": kill-word

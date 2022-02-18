@@ -236,7 +236,7 @@ end
 
 on_error do |exception|
   if exception.kind_of?(GLI::UnknownCommand)
-    exit run(['now'].concat(ARGV))
+    exit run(['now'].concat(ARGV.unshift(@command)))
   elsif exception.kind_of?(SystemExit)
     false
   else
@@ -255,7 +255,7 @@ post do |global, _command, _options, _args|
 end
 
 around do |global, command, options, arguments, code|
-  Doing.logger.benchmark("command_#{command.name.to_s}".to_sym, :start)
+  Doing.logger.benchmark("command_#{command.name}".to_sym, :start)
   # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{Doing.setting('paginate')}, Pager: #{Doing::Pager.paginate}")
   if env_log_level.nil?
     Doing.logger.adjust_verbosity(global)
@@ -308,5 +308,7 @@ around do |global, command, options, arguments, code|
 
   Doing.logger.benchmark("command_#{command.name.to_s}".to_sym, :finish)
 end
+
+@command = ARGV[0]
 
 exit run(ARGV)
