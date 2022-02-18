@@ -1,3 +1,16 @@
+### 2.1.32pre
+
+2022-02-17 16:03
+
+#### NEW
+
+- `doing config set --local` flag to force updates to local .doingrc, creating if it doesn't exist, and bypassing menu selection
+
+#### IMPROVED
+
+- `doing tag_dir` will not allow duplicate tags or tags that are already applied by a config higher up the hierarchy
+- `doing tag_dir` will force updates to .doingrc in the current directory rather than offering a menu
+
 ### 2.1.31pre
 
 2022-02-17 12:59

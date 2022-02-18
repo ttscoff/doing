@@ -43,7 +43,7 @@ module Doing
 
     def to_s
       if @changes_only
-        @changes.map(&:changes_only).join().force_encoding('utf-8')
+        @changes.map(&:changes_only).delete_if(&:empty?).join().gsub(/\n+/, "\n").force_encoding('utf-8')
       else
         @changes.map(&:to_s).join("\n\n").force_encoding('utf-8')
       end
