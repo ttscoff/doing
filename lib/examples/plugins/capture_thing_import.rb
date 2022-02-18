@@ -33,7 +33,7 @@ module Doing
       raise InvalidArgument, 'Path is not a directory' unless File.directory?(path)
 
       options[:no_overlap] ||= false
-      options[:autotag] ||= wwid.auto_tag
+      options[:autotag] ||= Doing.auto_tag
 
       tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '') } : []
       options[:tag] = nil

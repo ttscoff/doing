@@ -25,7 +25,7 @@ module Doing
 
       section = options[:section] || Doing.setting('current_section')
       options[:no_overlap] ||= false
-      options[:autotag] ||= wwid.auto_tag
+      options[:autotag] ||= Doing.auto_tag
 
       wwid.content.add_section(section) unless wwid.content.section?(section)
 
