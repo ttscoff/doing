@@ -1,6 +1,6 @@
 ### 2.1.32
 
-2022-02-18 08:23
+2022-02-18 08:34
 
 #### NEW
 
@@ -13,6 +13,7 @@
 
 #### FIXED
 
+- When running without subcommand, e.g. `doing this thing`, the first word was being lost
 - Remove blank lines when running `doing changes --changes --md` (output changes only in Markdown format)
 
 ### 2.1.31
