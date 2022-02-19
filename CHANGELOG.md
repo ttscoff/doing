@@ -1,3 +1,11 @@
+### 2.1.34
+
+2022-02-19 11:15
+
+#### FIXED
+
+- Don't return a duration for entries configured as never_time or never_finish # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # Date:      Sat Feb 19 11:15:15 2022 -0600 # # On branch develop # Your branch is ahead of 'origin/develop' by 1 commit. # # Changes to be committed: #	modified:   lib/doing/item.rb #
+
 ### 2.1.33
 
 2022-02-18 12:09

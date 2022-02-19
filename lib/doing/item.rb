@@ -35,6 +35,8 @@ module Doing
 
     ## If the entry doesn't have a @done date, return the elapsed time
     def duration
+      return nil unless should_time? && should_finish?
+
       return nil if @title =~ /(?<=^| )@done\b/
 
       return Time.now - @date
@@ -469,6 +471,8 @@ module Doing
     end
 
     def calc_interval
+      return nil unless should_time? && should_finish?
+
       done = end_date
       return nil if done.nil?
 
