@@ -23,7 +23,7 @@ def add_options(type, cmd)
              'Search'
            when /mark/
              'Flag'
-           when /(last|tags|view)/
+           when /(last|tags|view|on)/
              'Show'
            else
              cmd_name.capitalize
@@ -61,6 +61,27 @@ def add_options(type, cmd)
 
     cmd.desc 'Force exact search string matching (case sensitive)'
     cmd.switch %i[x exact], default_value: Doing.config.exact_match?, negatable: Doing.config.exact_match?
+  when :time_display
+    cmd.desc 'Show time intervals on @done tasks'
+    cmd.switch %i[t times], default_value: true, negatable: true
+
+    cmd.desc 'Show elapsed time on entries without @done tag'
+    cmd.switch [:duration]
+
+    cmd.desc 'Show time totals at the end of output'
+    cmd.switch [:totals], default_value: false, negatable: false
+
+    cmd.desc 'Sort tags by (name|time)'
+    default = Doing.setting('tag_sort').normalize_tag_sort || :name
+    cmd.arg_name 'KEY'
+    cmd.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
+
+    cmd.desc 'Tag sort direction (asc|desc)'
+    cmd.arg_name 'DIRECTION'
+    cmd.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
+
+    cmd.desc 'Only show items with recorded time intervals'
+    cmd.switch [:only_timed], default_value: false, negatable: false
   when :tag_filter
     cmd.desc 'Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
     cmd.arg_name 'TAG'
@@ -79,6 +100,20 @@ def add_options(type, cmd)
     cmd.flag [:bool], must_match: REGEX_BOOL,
                       default_value: :pattern,
                       type: BooleanSymbol
+  when :time_filter
+    cmd.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
+    cmd.arg_name 'TIME_STRING'
+    cmd.flag [:before], type: DateEndString
+
+    cmd.desc 'View entries after specified time (e.g. 8am, 12:30pm, 15:00)'
+    cmd.arg_name 'TIME_STRING'
+    cmd.flag [:after], type: DateBeginString
+
+    cmd.desc %(
+      Time range to show `doing #{cmd.name} --from "12pm to 4pm"`
+    )
+    cmd.arg_name 'TIME_RANGE'
+    cmd.flag [:from], type: DateRangeString, must_match: REGEX_TIME_RANGE
   when :date_filter
     if action =~ /Archive/
       cmd.desc 'Archive entries older than date (natural language).'

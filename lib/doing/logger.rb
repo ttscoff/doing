@@ -332,9 +332,15 @@ module Doing
         if tags_added.empty?
           count(:skipped, level: :debug, message: 'no tags added to %count %items')
         elsif single && item
+          elapsed = if item && tags_added.include?('done')
+                      item.interval ? " (#{item.interval&.time_string(format: :dhm)})" : ''
+                    else
+                      ''
+                    end
+
           added = tags_added.log_tags
           info('Tagged:',
-               %(added #{tags_added.count == 1 ? 'tag' : 'tags'} #{added} to #{item.title}))
+               %(added #{tags_added.count == 1 ? 'tag' : 'tags'} #{added}#{elapsed} to #{item.title}))
         else
           count(:added_tags, level: :info, tag: tags_added, message: '%tags added to %count %items')
         end

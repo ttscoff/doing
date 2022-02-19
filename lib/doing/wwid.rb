@@ -1805,19 +1805,14 @@ module Doing
       # :date_filter expects an array with start and end date
       dates = dates.split_date_range if dates.instance_of?(String)
 
-      list_section({
-                     section: section,
-                     count: 0,
-                     order: :asc,
-                     date_filter: dates,
-                     times: times,
-                     output: output,
-                     totals: opt[:totals],
-                     duration: opt[:duration],
-                     sort_tags: opt[:sort_tags],
-                     template: opt[:template],
-                     config_template: opt[:config_template]
-                   })
+      opt[:section] = section
+      opt[:count] = 0
+      opt[:order] = :asc
+      opt[:date_filter] = dates
+      opt[:times] = times
+      opt[:output] = output
+
+      list_section(opt)
     end
 
     ##
