@@ -1,11 +1,10 @@
 ### 2.1.34
 
-2022-02-19 11:16
+2022-02-19 17:35
 
 #### FIXED
 
 - Don't return a duration or interval for entries configured as never_time or never_finish
-- Don't return a duration for entries configured as never_time or never_finish
 
 ### 2.1.33
 
