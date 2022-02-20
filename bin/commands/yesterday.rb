@@ -31,12 +31,6 @@ command :yesterday do |c|
 
     options[:sort_tags] = options[:tag_sort]
 
-    if options[:from]
-      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
-        "yesterday #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}"
-      end.join(' to ').split_date_range
-    end
-
     opt = options.clone
     opt[:order] = Doing.setting(['templates', options[:config_template], 'order'])
 

@@ -1,6 +1,11 @@
 ### 2.1.34
 
-2022-02-19 17:35
+2022-02-20 06:27
+
+#### IMPROVED
+
+- --tag_order for commands missing with --totals output that were missing it
+- Tag and search filters for on, since, today and yesterday
 
 #### FIXED
 

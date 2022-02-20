@@ -1827,30 +1827,20 @@ module Doing
       opt ||= {}
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
+      opt[:config_template] ||= 'today'
+      opt[:yesterday] = true
+
       section = guess_section(section)
       y = (Time.now - (60 * 60 * 24)).strftime('%Y-%m-%d')
       opt[:after] = "#{y} #{opt[:after]}" if opt[:after]
       opt[:before] = "#{y} #{opt[:before]}" if opt[:before]
 
-      options = {
-        after: opt[:after],
-        before: opt[:before],
-        count: 0,
-        duration: opt[:duration],
-        from: opt[:from],
-        order: opt[:order],
-        output: output,
-        section: section,
-        sort_tags: opt[:sort_tags],
-        tag_order: opt[:tag_order],
-        times: times,
-        totals: opt[:totals],
-        yesterday: true,
-        config_template: opt[:config_template] || 'today',
-        template: opt[:template]
-      }
+      opt[:output] = output
+      opt[:section] = section
+      opt[:times] = times
+      opt[:count] = 0
 
-      list_section(options)
+      list_section(opt)
     end
 
     ##
