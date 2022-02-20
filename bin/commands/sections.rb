@@ -80,7 +80,7 @@ command :add_section do |c|
     cmd = commands[:sections].commands[:add]
 
     action = cmd.send(:get_action, nil)
-    exit action.call(g, o, a)
+    action.call(g, o, a)
   end
 end
 
