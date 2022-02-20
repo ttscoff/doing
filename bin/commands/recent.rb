@@ -12,9 +12,6 @@ command :recent do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true, negatable: true
-
   c.desc "Output using a template from configuration"
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'recent'
@@ -23,19 +20,10 @@ command :recent do |c|
   c.arg_name 'TEMPLATE_STRING'
   c.flag [:template]
 
-  c.desc 'Show elapsed time on entries without @done tag'
-  c.switch [:duration]
-
-  c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: false
-
-  c.desc 'Sort tags by (name|time)'
-  default = Doing.setting('tag_sort').normalize_tag_sort || :name
-  c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
-
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
+
+  add_options(:time_display, c)
 
   c.action do |global_options, options, args|
     section = @wwid.guess_section(options[:section]) || options[:section].cap_first

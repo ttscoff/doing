@@ -50,7 +50,7 @@ class DoingFinishTest < Test::Unit::TestCase
     doing('now', '--back=15m', 'Unfinished entry')
     doing('done', 'Finished entry')
     result = doing('--stdout', 'finish', '--unfinished')
-    assert_match(/Tagged: added tag @done to Un/, result, 'Earlier unfinished task should be marked @done')
+    assert_match(/Tagged: added tag @done (\(.*?\))? to Un/, result, 'Earlier unfinished task should be marked @done')
   end
 
   def test_finish_took

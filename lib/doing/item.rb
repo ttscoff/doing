@@ -35,6 +35,8 @@ module Doing
 
     ## If the entry doesn't have a @done date, return the elapsed time
     def duration
+      return nil unless should_time? && should_finish?
+
       return nil if @title =~ /(?<=^| )@done\b/
 
       return Time.now - @date
@@ -88,16 +90,19 @@ module Doing
     ##
     ## Test for equality between items
     ##
-    ## @param      other [Item] The other item
+    ## @param      other          [Item] The other item
+    ## @param      match_section  [Boolean] If true, require item sections to match
     ##
     ## @return     [Boolean] is equal?
     ##
-    def equal?(other)
+    def equal?(other, match_section: false)
       return false if @title.strip != other.title.strip
 
       return false if @date != other.date
 
       return false unless @note.equal?(other.note)
+
+      return false if match_section && @section != other.section
 
       true
     end
@@ -469,6 +474,8 @@ module Doing
     end
 
     def calc_interval
+      return nil unless should_time? && should_finish?
+
       done = end_date
       return nil if done.nil?
 

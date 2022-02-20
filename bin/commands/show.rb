@@ -33,27 +33,6 @@ command :show do |c|
   c.arg_name 'ORDER'
   c.flag %i[s sort], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
 
-  c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true, negatable: true
-
-  c.desc 'Show elapsed time on entries without @done tag'
-  c.switch [:duration]
-
-  c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: false
-
-  c.desc 'Sort tags by (name|time)'
-  default = Doing.setting('tag_sort').normalize_tag_sort || :name
-  c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
-
-  c.desc 'Tag sort direction (asc|desc)'
-  c.arg_name 'DIRECTION'
-  c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
-
-  c.desc 'Only show items with recorded time intervals'
-  c.switch [:only_timed], default_value: false, negatable: false
-
   c.desc "Output using a template from configuration"
   c.arg_name 'TEMPLATE_KEY'
   c.flag [:config_template], type: TemplateName, default_value: 'default'
@@ -72,6 +51,7 @@ command :show do |c|
   c.arg_name 'FORMAT'
   c.flag %i[o output]
 
+  add_options(:time_display, c)
   add_options(:search, c)
   add_options(:tag_filter, c)
   add_options(:date_filter, c)

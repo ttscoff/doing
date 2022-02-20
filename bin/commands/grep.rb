@@ -28,31 +28,12 @@ command %i[grep search] do |c|
   c.arg_name 'TEMPLATE_STRING'
   c.flag [:template]
 
-  c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true, negatable: true
-
-  c.desc 'Show elapsed time on entries without @done tag'
-  c.switch [:duration]
-
-  c.desc 'Show intervals with totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: false
-
-  c.desc 'Sort tags by (name|time)'
-  default = Doing.setting('tag_sort').normalize_tag_sort || :name
-  c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
-
-  c.desc 'Only show items with recorded time intervals'
-  c.switch [:only_timed], default_value: false, negatable: false
-
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact string matching (case sensitive)'
   c.switch %i[x exact], default_value: Doing.config.exact_match?, negatable: Doing.config.exact_match?
 
-  c.desc 'Show items that *don\'t* match search string'
-  c.switch [:not], default_value: false, negatable: false
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
@@ -72,17 +53,9 @@ command %i[grep search] do |c|
   c.desc 'Display an interactive menu of results to perform further operations'
   c.switch %i[i interactive], default_value: false, negatable: false
 
-  c.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool'
-  c.arg_name 'QUERY'
-  c.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
-
-  c.desc 'Combine multiple tags or value queries using AND, OR, or NOT'
-  c.arg_name 'BOOLEAN'
-  c.flag [:bool], must_match: REGEX_BOOL,
-                  default_value: :pattern,
-                  type: BooleanSymbol
-
+  add_options(:tag_filter, c)
   add_options(:date_filter, c)
+  add_options(:time_display, c)
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false

@@ -211,7 +211,7 @@ add_commands(%w[undo redo])
 ## Hidden commands
 add_commands(%w[commands_accepting install_fzf])
 ## Optional commands
-add_commands(%w[again cancel flag meanwhile reset tags today yesterday since add_section tag_dir colors completion plugins sections template views changes])
+add_commands(%w[again cancel flag meanwhile reset tags today yesterday since tag_dir colors completion plugins sections template views changes])
 
 pre do |global, _command, _options, _args|
   # global[:pager] ||= Doing.setting('paginate')
@@ -232,7 +232,7 @@ pre do |global, _command, _options, _args|
 end
 
 on_error do |exception|
-  if exception.kind_of?(GLI::UnknownCommand)
+  if exception.kind_of?(GLI::UnknownCommand) && ARGV.count > 1
     exit run(['now'].concat(ARGV.unshift(@command)))
   elsif exception.kind_of?(SystemExit)
     false

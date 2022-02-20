@@ -672,12 +672,14 @@ module Doing
         items = section =~ /^all$/i ? @content.clone : @content.in_section(section)
       end
 
-      opt[:time_filter] = [nil, nil]
-      if opt[:from] && !opt[:date_filter]
-        if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
-          opt[:time_filter] = opt[:from]
-        elsif opt[:from][0].is_a?(Time)
-          opt[:date_filter] = opt[:from]
+      if !opt[:time_filter]
+        opt[:time_filter] = [nil, nil]
+        if opt[:from] && !opt[:date_filter]
+          if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
+            opt[:time_filter] = opt[:from]
+          elsif opt[:from][0].is_a?(Time)
+            opt[:date_filter] = opt[:from]
+          end
         end
       end
 
@@ -1658,6 +1660,7 @@ module Doing
       opt[:tag_order] ||= :asc
       opt[:tags_color] = cfg['tags_color'] || false if opt[:tags_color].nil?
       opt[:template] ||= cfg['template']
+      opt[:sort_tags] ||= opt[:tag_sort]
 
       # opt[:highlight] ||= true
       title = ''
@@ -1773,6 +1776,7 @@ module Doing
         from: opt[:from],
         format: cfg['date_format'],
         interval_format: opt[:interval_format],
+        only_timed: opt[:only_timed],
         order: cfg['order'] || :asc,
         output: output,
         section: opt[:section],
@@ -1805,19 +1809,19 @@ module Doing
       # :date_filter expects an array with start and end date
       dates = dates.split_date_range if dates.instance_of?(String)
 
-      list_section({
-                     section: section,
-                     count: 0,
-                     order: :asc,
-                     date_filter: dates,
-                     times: times,
-                     output: output,
-                     totals: opt[:totals],
-                     duration: opt[:duration],
-                     sort_tags: opt[:sort_tags],
-                     template: opt[:template],
-                     config_template: opt[:config_template]
-                   })
+      opt[:section] = section
+      opt[:count] = 0
+      opt[:order] = :asc
+      opt[:date_filter] = dates
+      opt[:times] = times
+      opt[:output] = output
+
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+      if opt[:from] && opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
+        opt[:time_filter] = opt[:from]
+      end
+
+      list_section(opt)
     end
 
     ##
@@ -1832,30 +1836,20 @@ module Doing
       opt ||= {}
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
+      opt[:config_template] ||= 'today'
+      opt[:yesterday] = true
+
       section = guess_section(section)
       y = (Time.now - (60 * 60 * 24)).strftime('%Y-%m-%d')
       opt[:after] = "#{y} #{opt[:after]}" if opt[:after]
       opt[:before] = "#{y} #{opt[:before]}" if opt[:before]
 
-      options = {
-        after: opt[:after],
-        before: opt[:before],
-        count: 0,
-        duration: opt[:duration],
-        from: opt[:from],
-        order: opt[:order],
-        output: output,
-        section: section,
-        sort_tags: opt[:sort_tags],
-        tag_order: opt[:tag_order],
-        times: times,
-        totals: opt[:totals],
-        yesterday: true,
-        config_template: opt[:config_template] || 'today',
-        template: opt[:template]
-      }
+      opt[:output] = output
+      opt[:section] = section
+      opt[:times] = times
+      opt[:count] = 0
 
-      list_section(options)
+      list_section(opt)
     end
 
     ##
@@ -2255,6 +2249,7 @@ EOTAIL
       output = @other_content_top ? "#{@other_content_top.join("\n")}\n" : ''
       was_color = Color.coloring?
       Color.coloring = false
+      @content.dedup!(match_section: true)
       output += @content.to_s
       output += @other_content_bottom.join("\n") unless @other_content_bottom.nil?
       # Just strip all ANSI colors from the content before writing to doing file

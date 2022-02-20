@@ -23,46 +23,13 @@ command :yesterday do |c|
   c.arg_name 'TEMPLATE_STRING'
   c.flag [:template]
 
-  c.desc 'Show time intervals on @done tasks'
-  c.switch %i[t times], default_value: true, negatable: true
-
-  c.desc 'Show elapsed time on entries without @done tag'
-  c.switch [:duration]
-
-  c.desc 'Show time totals at the end of output'
-  c.switch [:totals], default_value: false, negatable: false
-
-  c.desc 'Sort tags by (name|time)'
-  default = Doing.setting('tag_sort').normalize_tag_sort || :name
-  c.arg_name 'KEY'
-  c.flag [:tag_sort], must_match: REGEX_TAG_SORT, default_value: default, type: TagSortSymbol
-
-  c.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
-  c.arg_name 'TIME_STRING'
-  c.flag [:before]
-
-  c.desc 'View entries after specified time (e.g. 8am, 12:30pm, 15:00)'
-  c.arg_name 'TIME_STRING'
-  c.flag [:after]
-
-  c.desc 'Time range to show, e.g. `doing yesterday --from "1am to 8am"`'
-  c.arg_name 'TIME_RANGE'
-  c.flag [:from], must_match: REGEX_TIME_RANGE
-
-  c.desc 'Tag sort direction (asc|desc)'
-  c.arg_name 'DIRECTION'
-  c.flag [:tag_order], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
+  add_options(:time_filter, c)
+  add_options(:time_display, c)
 
   c.action do |_global_options, options, _args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     options[:sort_tags] = options[:tag_sort]
-
-    if options[:from]
-      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
-        "yesterday #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}"
-      end.join(' to ').split_date_range
-    end
 
     opt = options.clone
     opt[:order] = Doing.setting(['templates', options[:config_template], 'order'])
