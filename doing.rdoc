@@ -83,10 +83,6 @@ Answer all yes/no menus with yes
 
 
 === Commands
-==== Command: <tt>add_section  SECTION_NAME</tt>
-Add a new section to the "doing" file
-
-
 ==== Command: <tt>again|resume </tt>
 Repeat last entry as new entry
 
@@ -1555,7 +1551,7 @@ Output using a template from configuration
 Time range to show `doing on --from "12pm to 4pm"`
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon) +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)$)
+[Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)(?: +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon))?$)
 
 
 ===== -o|--output FORMAT
@@ -1942,15 +1938,35 @@ Force exact search string matching (case sensitive)
 
 
 ==== Command: <tt>sections </tt>
+List, add, or remove sections in the Doing file
+
+
+===== Commands
+====== Command: <tt>add  SECTION_NAME</tt>
+Add a section
+
+
+====== Command: <tt>list </tt>
 List sections
 
 
-===== Options
-===== -c|--column
+======= Options
+======= -c|--column
 List in single column
 
 
 
+====== Command: <tt>remove  SECTION_NAME</tt>
+Remove a section
+
+
+======= Options
+======= -a|--[no-]archive
+Archive entries in section before deleting. --no-archive permanently deletes section contents
+
+
+
+[Default Command] list
 ==== Command: <tt>select </tt>
 Display an interactive menu to perform operations
 
@@ -2727,7 +2743,7 @@ Output using a template from configuration
 Time range to show `doing today --from "12pm to 4pm"`
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon) +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)$)
+[Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)(?: +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon))?$)
 
 
 ===== -o|--output FORMAT
@@ -3086,7 +3102,7 @@ Output using a template from configuration
 Time range to show `doing yesterday --from "12pm to 4pm"`
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon) +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)$)
+[Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)(?: +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon))?$)
 
 
 ===== -o|--output FORMAT

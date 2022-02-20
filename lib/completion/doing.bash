@@ -111,9 +111,9 @@ _doing_finish() {
 _doing_grep() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--after --before --bool --case --config_template --delete --duration --editor --from --hilite --interactive --not --output --only_timed --section --times --tag_sort --template --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --before --bool --case --config_template --delete --duration --editor --from --hilite --interactive --not --output --only_timed --section --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-d -e -h -i -o -s -t -x --after --before --bool --case --config_template --delete --duration --editor --from --hilite --interactive --not --output --only_timed --section --times --tag_sort --template --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-d -e -h -i -o -s -t -x --after --before --bool --case --config_template --delete --duration --editor --from --hilite --interactive --not --output --only_timed --section --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
   
   fi
 }
@@ -191,9 +191,9 @@ _doing_now() {
 _doing_on() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--config_template --duration --output --section --times --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --before --bool --case --config_template --duration --from --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-o -s -t --config_template --duration --output --section --times --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '-o -s -t -x --after --before --bool --case --config_template --duration --from --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
   
   fi
 }
@@ -221,9 +221,9 @@ _doing_plugins() {
 _doing_recent() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--config_template --duration --interactive --section --times --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '--config_template --duration --interactive --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-i -s -t --config_template --duration --interactive --section --times --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '-i -s -t --config_template --duration --interactive --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
   
   fi
 }
@@ -254,16 +254,6 @@ _doing_rotate() {
     COMPREPLY=( $( compgen -W '--before --bool --case --keep --not --section --search --tag --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
     COMPREPLY=( $( compgen -W '-k -s -x --before --bool --case --keep --not --section --search --tag --val --exact' -- $token ) )
-  
-  fi
-}
-
-_doing_sections() {
-  
-  if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--column' -- $token ) )
-  elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-c --column' -- $token ) )
   
   fi
 }
@@ -311,9 +301,9 @@ IFS="$OLD_IFS"
 _doing_since() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--config_template --duration --output --section --times --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '--bool --case --config_template --duration --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-o -s -t --config_template --duration --output --section --times --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '-o -s -t -x --bool --case --config_template --duration --not --output --only_timed --section --search --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
   
   fi
 }
@@ -361,9 +351,9 @@ _doing_template() {
 _doing_today() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--after --before --config_template --duration --from --output --section --times --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --before --config_template --duration --from --output --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-o -s -t --after --before --config_template --duration --from --output --section --times --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '-o -s -t --after --before --config_template --duration --from --output --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
   
   fi
 }
@@ -431,9 +421,9 @@ _doing_wiki() {
 _doing_yesterday() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--after --before --config_template --duration --from --output --section --times --tag_order --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '--after --before --config_template --duration --from --output --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-o -s -t --after --before --config_template --duration --from --output --section --times --tag_order --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '-o -s -t --after --before --config_template --duration --from --output --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
   
   fi
 }
@@ -467,7 +457,6 @@ _doing()
     elif [[ $last =~ (redo) ]]; then _doing_redo
     elif [[ $last =~ (reset|begin) ]]; then _doing_reset
     elif [[ $last =~ (rotate) ]]; then _doing_rotate
-    elif [[ $last =~ (sections) ]]; then _doing_sections
     elif [[ $last =~ (select) ]]; then _doing_select
     elif [[ $last =~ (show) ]]; then _doing_show
     elif [[ $last =~ (since) ]]; then _doing_since

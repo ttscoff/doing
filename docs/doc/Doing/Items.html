@@ -205,6 +205,51 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#dedup-instance_method" title="#dedup (instance method)">#<strong>dedup</strong>(match_section: true)  &#x21d2; Items </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Remove duplicated entries.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#dedup!-instance_method" title="#dedup! (instance method)">#<strong>dedup!</strong>(match_section: true)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#delete_item-instance_method" title="#delete_item (instance method)">#<strong>delete_item</strong>(item, single: false)  &#x21d2; Object </a>
     
 
@@ -221,6 +266,28 @@
   
     <span class="summary_desc"><div class='inline'><p>Delete an item from the index.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#delete_section-instance_method" title="#delete_section (instance method)">#<strong>delete_section</strong>(section, log: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -267,6 +334,28 @@
   
     <span class="summary_desc"><div class='inline'><p>Get a new Items object containing only items in a specified section.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#include%3F-instance_method" title="#include? (instance method)">#<strong>include?</strong>(item, match_section: true)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -557,6 +646,57 @@ creation of the section.</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="dedup-instance_method">
+  
+    #<strong>dedup</strong>(match_section: true)  &#x21d2; <tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Remove duplicated entries. Duplicate entries must have matching start date, title, note, and section</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Items array with duplicate entries removed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="dedup!-instance_method">
+  
+    #<strong>dedup!</strong>(match_section: true)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="delete_item-instance_method">
   
     #<strong>delete_item</strong>(item, single: false)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
@@ -593,6 +733,40 @@ creation of the section.</p>
   
 </ul>
 
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="delete_section-instance_method">
+  
+    #<strong>delete_section</strong>(section, log: false)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>DoingRuntimeError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -689,6 +863,40 @@ specified section</p>
         &mdash;
         <div class='inline'><p>Array of items</p>
 </div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="include?-instance_method">
+  
+    #<strong>include?</strong>(item, match_section: true)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
       
     </li>
   
@@ -890,7 +1098,7 @@ specified section</p>
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 18 16:55:44 2022 by
+  Generated on Sun Feb 20 09:36:52 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>

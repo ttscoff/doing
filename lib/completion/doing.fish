@@ -135,7 +135,6 @@ end
 
 __fish_doing_complete_args tag
 
-complete -xc doing -n '__fish_doing_needs_command' -a 'add_section' -d Add\ a\ new\ section\ to\ the\ \"doing\"\ file
 complete -xc doing -n '__fish_doing_needs_command' -a 'again resume' -d Repeat\ last\ entry\ as\ new\ entry
 complete -xc doing -n '__fish_doing_needs_command' -a 'archive move' -d Move\ entries\ between\ sections
 complete -xc doing -n '__fish_doing_needs_command' -a 'autotag' -d Autotag\ last\ entry\ or\ filtered\ entries
@@ -162,7 +161,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'recent' -d List\ recent\ 
 complete -xc doing -n '__fish_doing_needs_command' -a 'redo' -d Redo\ an\ undo\ command
 complete -xc doing -n '__fish_doing_needs_command' -a 'reset begin' -d Reset\ the\ start\ time\ of\ an\ entry
 complete -xc doing -n '__fish_doing_needs_command' -a 'rotate' -d Move\ entries\ to\ archive\ file
-complete -xc doing -n '__fish_doing_needs_command' -a 'sections' -d List\ sections
+complete -xc doing -n '__fish_doing_needs_command' -a 'sections' -d List
 complete -xc doing -n '__fish_doing_needs_command' -a 'select' -d Display\ an\ interactive\ menu\ to\ perform\ operations
 complete -xc doing -n '__fish_doing_needs_command' -a 'show' -d List\ all\ entries
 complete -xc doing -n '__fish_doing_needs_command' -a 'since' -d List\ entries\ since\ a\ date
@@ -268,7 +267,7 @@ complete -c doing -l val  -f -r -n '__fish_doing_using_command finish' -d Perfor
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command finish' -d Force\ exact\ search\ string\ matching
 complete -c doing -l after  -f -r -n '__fish_doing_using_command grep search' -d Search\ entries\ newer\ than\ date
 complete -c doing -l before  -f -r -n '__fish_doing_using_command grep search' -d Search\ entries\ older\ than\ date
-complete -c doing -l bool  -f -r -n '__fish_doing_using_command grep search' -d Combine\ multiple\ tags\ or\ value\ queries\ using\ AND
+complete -c doing -l bool  -f -r -n '__fish_doing_using_command grep search' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l case  -f -r -n '__fish_doing_using_command grep search' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command grep search' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l delete -s d -f  -n '__fish_doing_using_command grep search' -d Delete\ matching\ entries
@@ -277,14 +276,16 @@ complete -c doing -l editor -s e -f  -n '__fish_doing_using_command grep search'
 complete -c doing -l from  -f -r -n '__fish_doing_using_command grep search' -d Date\ range
 complete -c doing -l hilite -s h -f  -n '__fish_doing_using_command grep search' -d Highlight\ search\ matches\ in\ output
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command grep search' -d Display\ an\ interactive\ menu\ of\ results\ to\ perform\ further\ operations
-complete -c doing -l not  -f  -n '__fish_doing_using_command grep search' -d Show\ items\ that\ \*don\'t\*\ match\ search\ string
+complete -c doing -l not  -f  -n '__fish_doing_using_command grep search' -d Search\ items\ that\ \*don\'t\*\ match\ search/tag\ filters
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command grep search' -d Output\ to\ export\ format
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command grep search' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command grep search' -d Section
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command grep search' -d Show\ time\ intervals\ on\ @done\ tasks
+complete -c doing -l tag  -f -r -n '__fish_doing_using_command grep search' -d Filter\ entries\ by\ tag
+complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command grep search' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command grep search' -d Sort\ tags\ by
 complete -c doing -l template  -f -r -n '__fish_doing_using_command grep search' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
-complete -c doing -l totals  -f  -n '__fish_doing_using_command grep search' -d Show\ intervals\ with\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals  -f  -n '__fish_doing_using_command grep search' -d Show\ time\ totals\ at\ the\ end\ of\ output
 complete -c doing -l val  -f -r -n '__fish_doing_using_command grep search' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command grep search' -d Force\ exact\ string\ matching
 complete -c doing -F -n '__fish_doing_using_command import'
@@ -357,14 +358,26 @@ complete -c doing -l finish_last -s f -f  -n '__fish_doing_using_command now nex
 complete -c doing -l from  -f -r -n '__fish_doing_using_command now next' -d Set\ a\ start\ and\ optionally\ end\ time\ as\ a\ date\ range
 complete -c doing -l note -s n -f -r -n '__fish_doing_using_command now next' -d Include\ a\ note
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command now next' -d Section
+complete -c doing -l after  -f -r -n '__fish_doing_using_command on' -d View\ entries\ after\ specified\ time
+complete -c doing -l before  -f -r -n '__fish_doing_using_command on' -d View\ entries\ before\ specified\ time
+complete -c doing -l bool  -f -r -n '__fish_doing_using_command on' -d Boolean\ used\ to\ combine\ multiple\ tags
+complete -c doing -l case  -f -r -n '__fish_doing_using_command on' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command on' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command on' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
+complete -c doing -l from  -f -r -n '__fish_doing_using_command on' -d Time\ range\ to\ show\ \`doing\ on\ --from\ \"12pm\ to\ 4pm\"\`
+complete -c doing -l not  -f  -n '__fish_doing_using_command on' -d Show\ items\ that\ \*don\'t\*\ match\ search/tag\ filters
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command on' -d Output\ to\ export\ format
+complete -c doing -l only_timed  -f  -n '__fish_doing_using_command on' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command on' -d Section
+complete -c doing -l search  -f -r -n '__fish_doing_using_command on' -d Filter\ entries\ using\ a\ search\ query
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command on' -d Show\ time\ intervals\ on\ @done\ tasks
+complete -c doing -l tag  -f -r -n '__fish_doing_using_command on' -d Filter\ entries\ by\ tag
+complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command on' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command on' -d Sort\ tags\ by
 complete -c doing -l template  -f -r -n '__fish_doing_using_command on' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l totals  -f  -n '__fish_doing_using_command on' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l val  -f -r -n '__fish_doing_using_command on' -d Perform\ a\ tag\ value\ query
+complete -c doing -l exact -s x -f  -n '__fish_doing_using_command on' -d Force\ exact\ search\ string\ matching
 complete -c doing -l app -s a -f -r -n '__fish_doing_using_command open' -d Open\ with\ app\ name
 complete -c doing -l bundle_id -s b -f -r -n '__fish_doing_using_command open' -d Open\ with\ app\ bundle\ id
 complete -c doing -l editor -s e -f -r -n '__fish_doing_using_command open' -d Open\ with\ editor\ command
@@ -373,11 +386,13 @@ complete -c doing -l type -s t -f -r -n '__fish_doing_using_command plugins' -d 
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command recent' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command recent' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command recent' -d Select\ from\ a\ menu\ of\ matching\ entries\ to\ perform\ additional\ operations
+complete -c doing -l only_timed  -f  -n '__fish_doing_using_command recent' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command recent' -d Section
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command recent' -d Show\ time\ intervals\ on\ @done\ tasks
+complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command recent' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command recent' -d Sort\ tags\ by
 complete -c doing -l template  -f -r -n '__fish_doing_using_command recent' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
-complete -c doing -l totals  -f  -n '__fish_doing_using_command recent' -d Show\ intervals\ with\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals  -f  -n '__fish_doing_using_command recent' -d Show\ time\ totals\ at\ the\ end\ of\ output
 complete -c doing -l file -s f -f -r -n '__fish_doing_using_command redo' -d Specify\ alternate\ doing\ file
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command redo' -d Select\ from\ an\ interactive\ menu
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command reset begin' -d Boolean\ used\ to\ combine\ multiple\ tags
@@ -400,7 +415,6 @@ complete -c doing -l search  -f -r -n '__fish_doing_using_command rotate' -d Fil
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command rotate' -d Filter\ entries\ by\ tag
 complete -c doing -l val  -f -r -n '__fish_doing_using_command rotate' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command rotate' -d Force\ exact\ search\ string\ matching
-complete -c doing -l column -s c -f  -n '__fish_doing_using_command sections' -d List\ in\ single\ column
 complete -c doing -l archive -s a -f  -n '__fish_doing_using_command select' -d Archive\ selected\ items
 complete -c doing -l after  -f -r -n '__fish_doing_using_command select' -d Select\ entries\ newer\ than\ date
 complete -c doing -l resume  -f  -n '__fish_doing_using_command select' -d Copy\ selection\ as\ a\ new\ entry\ with\ current\ time\ and\ no\ @done\ tag
@@ -447,17 +461,26 @@ complete -c doing -l tag  -f -r -n '__fish_doing_using_command show' -d Filter\ 
 complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command show' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command show' -d Sort\ tags\ by
 complete -c doing -l template  -f -r -n '__fish_doing_using_command show' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
-complete -c doing -l totals  -f  -n '__fish_doing_using_command show' -d Show\ intervals\ with\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals  -f  -n '__fish_doing_using_command show' -d Show\ time\ totals\ at\ the\ end\ of\ output
 complete -c doing -l val  -f -r -n '__fish_doing_using_command show' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command show' -d Force\ exact\ search\ string\ matching
+complete -c doing -l bool  -f -r -n '__fish_doing_using_command since' -d Boolean\ used\ to\ combine\ multiple\ tags
+complete -c doing -l case  -f -r -n '__fish_doing_using_command since' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command since' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command since' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
+complete -c doing -l not  -f  -n '__fish_doing_using_command since' -d Since\ items\ that\ \*don\'t\*\ match\ search/tag\ filters
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command since' -d Output\ to\ export\ format
+complete -c doing -l only_timed  -f  -n '__fish_doing_using_command since' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command since' -d Section
+complete -c doing -l search  -f -r -n '__fish_doing_using_command since' -d Filter\ entries\ using\ a\ search\ query
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command since' -d Show\ time\ intervals\ on\ @done\ tasks
+complete -c doing -l tag  -f -r -n '__fish_doing_using_command since' -d Filter\ entries\ by\ tag
+complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command since' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command since' -d Sort\ tags\ by
 complete -c doing -l template  -f -r -n '__fish_doing_using_command since' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l totals  -f  -n '__fish_doing_using_command since' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l val  -f -r -n '__fish_doing_using_command since' -d Perform\ a\ tag\ value\ query
+complete -c doing -l exact -s x -f  -n '__fish_doing_using_command since' -d Force\ exact\ search\ string\ matching
 complete -c doing -l autotag -s a -f  -n '__fish_doing_using_command tag' -d Autotag\ entries\ based\ on\ autotag\ configuration\ in\ \~/
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command tag' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l count -s c -f -r -n '__fish_doing_using_command tag' -d How\ many\ recent\ entries\ to\ tag
@@ -500,8 +523,10 @@ complete -c doing -l config_template  -f -r -n '__fish_doing_using_command today
 complete -c doing -l duration  -f  -n '__fish_doing_using_command today' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
 complete -c doing -l from  -f -r -n '__fish_doing_using_command today' -d Time\ range\ to\ show\ \`doing\ today\ --from\ \"12pm\ to\ 4pm\"\`
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command today' -d Output\ to\ export\ format
+complete -c doing -l only_timed  -f  -n '__fish_doing_using_command today' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command today' -d Specify\ a\ section
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command today' -d Show\ time\ intervals\ on\ @done\ tasks
+complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command today' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command today' -d Sort\ tags\ by
 complete -c doing -l template  -f -r -n '__fish_doing_using_command today' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l totals  -f  -n '__fish_doing_using_command today' -d Show\ time\ totals\ at\ the\ end\ of\ output
@@ -545,8 +570,9 @@ complete -c doing -l after  -f -r -n '__fish_doing_using_command yesterday' -d V
 complete -c doing -l before  -f -r -n '__fish_doing_using_command yesterday' -d View\ entries\ before\ specified\ time
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command yesterday' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command yesterday' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
-complete -c doing -l from  -f -r -n '__fish_doing_using_command yesterday' -d Time\ range\ to\ show
+complete -c doing -l from  -f -r -n '__fish_doing_using_command yesterday' -d Time\ range\ to\ show\ \`doing\ yesterday\ --from\ \"12pm\ to\ 4pm\"\`
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command yesterday' -d Output\ to\ export\ format
+complete -c doing -l only_timed  -f  -n '__fish_doing_using_command yesterday' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command yesterday' -d Specify\ a\ section
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command yesterday' -d Show\ time\ intervals\ on\ @done\ tasks
 complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command yesterday' -d Tag\ sort\ direction
@@ -554,10 +580,10 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command yesterday' -
 complete -c doing -l template  -f -r -n '__fish_doing_using_command yesterday' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l totals  -f  -n '__fish_doing_using_command yesterday' -d Show\ time\ totals\ at\ the\ end\ of\ output
 complete -f -c doing -s o -l output -x -n '__fish_doing_using_command grep search on select show since today view yesterday' -a '(__fish_doing_export_plugin)'
-complete -f -c doing -s b -l bool -x -n '__fish_doing_using_command again resume archive move autotag cancel finish grep search last mark flag note reset begin rotate show tag tags view wiki' -a 'and or not pattern'
-complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel finish grep search import last mark flag note reset begin rotate select show tag tags view' -a 'case-sensitive ignore smart'
+complete -f -c doing -s b -l bool -x -n '__fish_doing_using_command again resume archive move autotag cancel finish grep search last mark flag note on reset begin rotate show since tag tags view wiki' -a 'and or not pattern'
+complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel finish grep search import last mark flag note on reset begin rotate select show since tag tags view' -a 'case-sensitive ignore smart'
 complete -f -c doing -l sort -x -n '__fish_doing_using_command changes changelog show tags' -a 'asc desc'
 complete -f -c doing -l tag_sort -x -n '__fish_doing_using_command grep search on recent show since today view yesterday' -a 'name time'
-complete -f -c doing -l tag_order -x -n '__fish_doing_using_command show view yesterday' -a 'asc desc'
+complete -f -c doing -l tag_order -x -n '__fish_doing_using_command grep search on recent show since today view yesterday' -a 'asc desc'
 complete -f -c doing -s a -l age -x -n '__fish_doing_using_command show view' -a 'oldest newest'
 complete -f -c doing -s s -l section -x -n '__fish_doing_using_command again resume autotag cancel done did finish grep search import last mark flag meanwhile note now next on recent reset begin rotate select since tag tags today view wiki yesterday' -a '(__fish_doing_complete_sections)'
