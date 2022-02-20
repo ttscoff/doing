@@ -1,3 +1,23 @@
+### 2.1.34
+
+2022-02-20 09:10
+
+#### IMPROVED
+
+- --tag_order for commands missing with --totals output that were missing it
+- Tag and search filters for on, since, today and yesterday
+- --only_timed filter for yesterday
+- --only_timed for today
+- Remove exact duplicates from content before saving
+- `doing sections` now has subcommands -- `sections list`, `sections add SECTION` (replaces `add_section`) and `sections remove SECTION` allows removal of a section and archiving of its contents
+
+#### FIXED
+
+- Don't return a duration or interval for entries configured as never_time or never_finish
+- --from time filter for yesterday
+- Regex error in `doing archive`
+- `--times` error in `doing today`
+
 ### 2.1.33
 
 2022-02-20 08:59
@@ -14,6 +34,7 @@
 
 #### FIXED
 
+- `doing yesterday --from` not filtering time range
 - Don't return a duration or interval for entries configured as never_time or never_finish
 - `--from` time filter for yesterday
 - Regex error in `doing archive`

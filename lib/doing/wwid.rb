@@ -672,15 +672,15 @@ module Doing
         items = section =~ /^all$/i ? @content.clone : @content.in_section(section)
       end
 
-      opt[:time_filter] = [nil, nil]
-      if opt[:from] && !opt[:date_filter]
-        if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
-          opt[:time_filter] = opt[:from]
-        elsif opt[:from][0].is_a?(Time)
-          opt[:date_filter] = opt[:from]
+      if !opt[:time_filter]
+        opt[:time_filter] = [nil, nil]
+        if opt[:from] && !opt[:date_filter]
+          if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
+            opt[:time_filter] = opt[:from]
+          elsif opt[:from][0].is_a?(Time)
+            opt[:date_filter] = opt[:from]
+          end
         end
-      elsif opt[:from] && opt[:date_filter]
-        opt[:time_filter] = opt[:from]
       end
 
       if opt[:before].is_a?(String) && opt[:before] =~ time_rx
@@ -1815,6 +1815,11 @@ module Doing
       opt[:date_filter] = dates
       opt[:times] = times
       opt[:output] = output
+
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+      if opt[:from] && opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
+        opt[:time_filter] = opt[:from]
+      end
 
       list_section(opt)
     end

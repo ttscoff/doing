@@ -200,7 +200,7 @@ module Doing
       else
         if date_string.strip =~ time_rx
           start = date_string.strip
-          finish = nil
+          finish = '11:59pm'
         else
           start = date_string.strip.chronify(guess: :begin, future: false)
           finish = date_string.strip.chronify(guess: :end)
