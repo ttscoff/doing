@@ -90,16 +90,19 @@ module Doing
     ##
     ## Test for equality between items
     ##
-    ## @param      other [Item] The other item
+    ## @param      other          [Item] The other item
+    ## @param      match_section  [Boolean] If true, require item sections to match
     ##
     ## @return     [Boolean] is equal?
     ##
-    def equal?(other)
+    def equal?(other, match_section: false)
       return false if @title.strip != other.title.strip
 
       return false if @date != other.date
 
       return false unless @note.equal?(other.note)
+
+      return false if match_section && @section != other.section
 
       true
     end

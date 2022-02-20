@@ -126,6 +126,36 @@ module Doing
       diff
     end
 
+    ##
+    ## Remove duplicated entries. Duplicate entries must have matching start date, title, note, and section
+    ##
+    ## @return     [Items] Items array with duplicate entries removed
+    ##
+    def dedup(match_section: true)
+      unique = Items.new
+      each do |item|
+        unique.push(item) unless unique.include?(item, match_section: match_section)
+      end
+
+      unique
+    end
+
+    def dedup!(match_section: true)
+      replace dedup(match_section: match_section)
+    end
+
+    def include?(item, match_section: true)
+      includes = false
+      each do |other_item|
+        if other_item.equal?(item, match_section: match_section)
+          includes = true
+          break
+        end
+      end
+
+      includes
+    end
+
     # Output sections and items in Doing file format
     def to_s
       out = []

@@ -1,17 +1,18 @@
 ### 2.1.34
 
-2022-02-20 06:34
+2022-02-20 06:38
 
 #### IMPROVED
 
-- --only_timed filter for yesterday
+- --only_timed for today
 - --tag_order for commands missing with --totals output that were missing it
 - Tag and search filters for on, since, today and yesterday
+- --only_timed filter for yesterday
 
 #### FIXED
 
-- --from time filter for yesterday
 - Don't return a duration or interval for entries configured as never_time or never_finish
+- --from time filter for yesterday
 
 ### 2.1.33
 

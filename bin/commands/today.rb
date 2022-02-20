@@ -32,7 +32,7 @@ command :today do |c|
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort]
-    filter_options = %i[after before duration from section sort_tags totals template config_template only_timed].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
+    filter_options = %i[after before times duration from section sort_tags totals tag_order template config_template only_timed].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
 
     Doing::Pager.page @wwid.today(options[:times], options[:output], filter_options).chomp
   end

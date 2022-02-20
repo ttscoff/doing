@@ -232,7 +232,7 @@ pre do |global, _command, _options, _args|
 end
 
 on_error do |exception|
-  if exception.kind_of?(GLI::UnknownCommand)
+  if exception.kind_of?(GLI::UnknownCommand) && ARGV.count > 1
     exit run(['now'].concat(ARGV.unshift(@command)))
   elsif exception.kind_of?(SystemExit)
     false

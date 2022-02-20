@@ -144,7 +144,7 @@ module Doing
       tags = title.scan(/(?<=\A| )(@(\S+?)(\([^)]+\))?)(?= |\Z)/).uniq
       tags.each do |tag|
         found = false
-        title.gsub!(/( |^)#{tag[1]}(\([^)]+\))?(?= |$)/) do |m|
+        title.gsub!(/( |^)#{Regexp.escape(tag[1])}(\([^)]+\))?(?= |$)/) do |m|
           if found
             ''
           else

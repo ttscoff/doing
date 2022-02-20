@@ -1658,6 +1658,7 @@ module Doing
       opt[:tag_order] ||= :asc
       opt[:tags_color] = cfg['tags_color'] || false if opt[:tags_color].nil?
       opt[:template] ||= cfg['template']
+      opt[:sort_tags] ||= opt[:tag_sort]
 
       # opt[:highlight] ||= true
       title = ''
@@ -2241,6 +2242,7 @@ EOTAIL
       output = @other_content_top ? "#{@other_content_top.join("\n")}\n" : ''
       was_color = Color.coloring?
       Color.coloring = false
+      @content.dedup!(match_section: true)
       output += @content.to_s
       output += @other_content_bottom.join("\n") unless @other_content_bottom.nil?
       # Just strip all ANSI colors from the content before writing to doing file

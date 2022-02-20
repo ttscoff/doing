@@ -40,3 +40,20 @@ command :rotate do |c|
     @wwid.rotate(options)
   end
 end
+
+# # @@doctor
+
+# desc 'Doing file maintenance.'
+# long_desc %(Duplicate entries compressed to a single entry. This will modify the doing file.)
+# command :doctor do |c|
+#   c.example 'doing doctor', desc: 'Clean up the Doing file, sorting and removing duplicates'
+
+#   c.desc 'Only remove duplicates in the same section'
+#   c.switch %i[s same_section], negatable: false, default_value: false
+
+#   c.action do |_global_options, options, _args|
+#     @wwid.content.dedup!(match_section: options[:same_section])
+#     @wwid.write(@wwid.doing_file)
+#   end
+# end
+
