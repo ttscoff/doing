@@ -679,6 +679,8 @@ module Doing
         elsif opt[:from][0].is_a?(Time)
           opt[:date_filter] = opt[:from]
         end
+      elsif opt[:from] && opt[:date_filter]
+        opt[:time_filter] = opt[:from]
       end
 
       if opt[:before].is_a?(String) && opt[:before] =~ time_rx
