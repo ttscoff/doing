@@ -1773,6 +1773,7 @@ module Doing
         from: opt[:from],
         format: cfg['date_format'],
         interval_format: opt[:interval_format],
+        only_timed: opt[:only_timed],
         order: cfg['order'] || :asc,
         output: output,
         section: opt[:section],
