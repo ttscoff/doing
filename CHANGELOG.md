@@ -1,16 +1,19 @@
 ### 2.1.34
 
-2022-02-20 06:38
+2022-02-20 07:54
 
 #### IMPROVED
 
-- --only_timed for today
+- Remove exact duplicates from content before saving
 - --tag_order for commands missing with --totals output that were missing it
 - Tag and search filters for on, since, today and yesterday
 - --only_timed filter for yesterday
+- --only_timed for today
 
 #### FIXED
 
+- Regex error in `doing archive`
+- `--times` error in `doing today`
 - Don't return a duration or interval for entries configured as never_time or never_finish
 - --from time filter for yesterday
 

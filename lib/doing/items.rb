@@ -58,6 +58,24 @@ module Doing
       Doing.logger.info('New section:', %("#{section}" added)) if log
     end
 
+    def delete_section(section, log: false)
+      return unless section?(section)
+
+      raise DoingRuntimeError, 'Section not empty' if in_section(section).count > 0
+
+      deleted = false
+
+      @sections.each do |sect|
+        if sect.title == section && in_section(sect).count.zero?
+          @sections.delete(sect)
+          Doing.logger.info('Removed section:', %("#{section}" removed)) if log
+          return
+        end
+      end
+
+      Doing.logger.error('Not found:', %("#{section}" not found))
+    end
+
     # Get a new Items object containing only items in a
     # specified section
     #

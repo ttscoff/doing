@@ -211,7 +211,7 @@ add_commands(%w[undo redo])
 ## Hidden commands
 add_commands(%w[commands_accepting install_fzf])
 ## Optional commands
-add_commands(%w[again cancel flag meanwhile reset tags today yesterday since add_section tag_dir colors completion plugins sections template views changes])
+add_commands(%w[again cancel flag meanwhile reset tags today yesterday since tag_dir colors completion plugins sections template views changes])
 
 pre do |global, _command, _options, _args|
   # global[:pager] ||= Doing.setting('paginate')
