@@ -1,21 +1,23 @@
 ### 2.1.34
 
-2022-02-20 07:54
+2022-02-20 08:49
 
 #### IMPROVED
 
-- Remove exact duplicates from content before saving
+- `doing sections` now has subcommands -- `sections list`, `sections add SECTION` (replaces `add_section`) and `sections remove SECTION` allows removal of a section and archiving of its contents # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is ahead of 'origin/develop' by 4 commits. # # Changes to be committed: #	modified:   CHANGELOG.md #	deleted:    bin/commands/add_section.rb #	modified:   bin/commands/sections.rb #	modified:   bin/doing #	modified:   lib/doing/items.rb #	new file:   test/doing_sections_test.rb # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/CHANGELOG.md b/CHANGELOG.md index 5c3eeb0..0027ba5 100644 --- a/CHANGELOG.md +++ b/CHANGELOG.md @@ -1,16 +1,19 @@  ### 2.1.34   -2022-02-20 06:38 +2022-02-20 07:54    #### IMPROVED   -- --only_timed for today +- Remove exact duplicates from content before saving  - --tag_order for commands missing with --totals output that were missing it  - Tag and search filters for on, since, today and yesterday  - --only_timed filter for yesterday +- --only_timed for today    #### FIXED   +- Regex error in `doing archive` +- `--times` error in `doing today`  - Don't return a duration or interval for entries configured as never_time or never_finish  - --from time filter for yesterday   diff --git a/bin/commands/add_section.rb b/bin/commands/add_section.rb deleted file mode 100644 index 7428217..0000000 --- a/bin/commands/add_section.rb +++ /dev/null @@ -1,15 +0,0 @@ -# frozen_string_literal: true - -# @@add_section -desc 'Add a new section to the "doing" file' -arg_name 'SECTION_NAME' -command :add_section do |c|
 - --tag_order for commands missing with --totals output that were missing it
 - Tag and search filters for on, since, today and yesterday
 - --only_timed filter for yesterday
 - --only_timed for today
+- Remove exact duplicates from content before saving
 
 #### FIXED
 
-- Regex error in `doing archive`
-- `--times` error in `doing today`
+- `doing sections` now has subcommands -- `sections list`, `sections add SECTION` (replaces `add_section`) and `sections remove SECTION` allows removal of a section and archiving of its contents # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is ahead of 'origin/develop' by 4 commits. # # Changes to be committed: #	modified:   CHANGELOG.md #	deleted:    bin/commands/add_section.rb #	modified:   bin/commands/sections.rb #	modified:   bin/doing #	modified:   lib/doing/items.rb #	new file:   test/doing_sections_test.rb # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/CHANGELOG.md b/CHANGELOG.md index 5c3eeb0..0027ba5 100644 --- a/CHANGELOG.md +++ b/CHANGELOG.md @@ -1,16 +1,19 @@  ### 2.1.34   -2022-02-20 06:38 +2022-02-20 07:54    #### IMPROVED   -- --only_timed for today +- Remove exact duplicates from content before saving  - --tag_order for commands missing with --totals output that were missing it  - Tag and search filters for on, since, today and yesterday  - --only_timed filter for yesterday +- --only_timed for today    #### FIXED   +- Regex error in `doing archive` +- `--times` error in `doing today`  - Don't return a duration or interval for entries configured as never_time or never_finish  - --from time filter for yesterday   diff --git a/bin/commands/add_section.rb b/bin/commands/add_section.rb deleted file mode 100644 index 7428217..0000000 --- a/bin/commands/add_section.rb +++ /dev/null @@ -1,15 +0,0 @@ -# frozen_string_literal: true - -# @@add_section -desc 'Add a new section to the "doing" file' -arg_name 'SECTION_NAME' -command :add_section do |c|
 - Don't return a duration or interval for entries configured as never_time or never_finish
 - --from time filter for yesterday
+- Regex error in `doing archive`
+- `--times` error in `doing today`
 
 ### 2.1.33
 
