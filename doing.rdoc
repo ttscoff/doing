@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.33
+v2.1.34
 
 === Global Options
 === --config_file arg
@@ -592,8 +592,8 @@ Editor to use
 [Default Value] None
 
 
-======= -x|--[no-]default
-Use the config_editor_app defined in ~/.config/doing/config.yml (config_editor_app not set)
+======= -x|--default
+Use the config editor defined in ~/.config/doing/config.yml (Sublime Text)
 
 
 
@@ -873,7 +873,7 @@ Search entries older than date (natural language). If this is only a time (8am, 
 
 ===== --bool BOOLEAN
 
-Combine multiple tags or value queries using AND, OR, or NOT
+Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -919,6 +919,21 @@ Section
 [Default Value] All
 
 
+===== --tag TAG
+
+Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)
+
+[Default Value] None
+
+
+===== --tag_order DIRECTION
+
+Tag sort direction (asc|desc)
+
+[Default Value] asc
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
+
+
 ===== --tag_sort KEY
 
 Sort tags by (name|time)
@@ -936,7 +951,8 @@ Override output format with a template string containing %placeholders
 
 ===== --val QUERY
 
-Perform a tag value query ("@done > two hours ago" or "@progress < 50"). May be used multiple times, combined with --bool
+Perform a tag value query ("@done > two hours ago" or "@progress < 50").
+            May be used multiple times, combined with --bool
 
 [Default Value] None
 [Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
@@ -968,7 +984,7 @@ Display an interactive menu of results to perform further operations
 
 
 ===== --not
-Show items that *don't* match search string
+Search items that *don't* match search/tag filters
 
 
 
@@ -983,7 +999,7 @@ Show time intervals on @done tasks
 
 
 ===== --totals
-Show intervals with totals at the end of output
+Show time totals at the end of output
 
 
 
@@ -1497,11 +1513,49 @@ Date argument can be natural language. "thursday" would be interpreted as "last 
 and "2d" would be interpreted as "two days ago." If you use "to" or "through" between two dates,
 it will create a range.
 ===== Options
+===== --after TIME_STRING
+
+View entries after specified time (e.g. 8am, 12:30pm, 15:00)
+
+[Default Value] None
+
+
+===== --before TIME_STRING
+
+View entries before specified time (e.g. 8am, 12:30pm, 15:00)
+
+[Default Value] None
+
+
+===== --bool BOOLEAN
+
+Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+
+[Default Value] pattern
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
+
+[Default Value] smart
+[Must Match] (?i-mx:^[cis].*?$)
+
+
 ===== --config_template TEMPLATE_KEY
 
 Output using a template from configuration
 
 [Default Value] default
+
+
+===== --from TIME_RANGE
+
+Time range to show `doing on --from "12pm to 4pm"`
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon) +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)$)
 
 
 ===== -o|--output FORMAT
@@ -1516,6 +1570,29 @@ Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|m
 Section
 
 [Default Value] All
+
+
+===== --search QUERY
+
+Filter entries using a search query, surround with slashes for regex (e.g. "/query.*/"),
+            start with single quote for exact match ("'query")
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)
+
+[Default Value] None
+
+
+===== --tag_order DIRECTION
+
+Tag sort direction (asc|desc)
+
+[Default Value] asc
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
 ===== --tag_sort KEY
@@ -1533,8 +1610,27 @@ Override output format with a template string containing %placeholders
 [Default Value] None
 
 
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50").
+            May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
+
+
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
+
+
+
+===== --not
+Show items that *don't* match search/tag filters
+
+
+
+===== --only_timed
+Only show items with recorded time intervals
 
 
 
@@ -1545,6 +1641,11 @@ Show time intervals on @done tasks
 
 ===== --totals
 Show time totals at the end of output
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -1616,6 +1717,14 @@ Section
 [Default Value] All
 
 
+===== --tag_order DIRECTION
+
+Tag sort direction (asc|desc)
+
+[Default Value] asc
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
+
+
 ===== --tag_sort KEY
 
 Sort tags by (name|time)
@@ -1641,13 +1750,18 @@ Select from a menu of matching entries to perform additional operations
 
 
 
+===== --only_timed
+Only show items with recorded time intervals
+
+
+
 ===== -t|--[no-]times
 Show time intervals on @done tasks
 
 
 
 ===== --totals
-Show intervals with totals at the end of output
+Show time totals at the end of output
 
 
 
@@ -2184,7 +2298,7 @@ Show time intervals on @done tasks
 
 
 ===== --totals
-Show intervals with totals at the end of output
+Show time totals at the end of output
 
 
 
@@ -2199,6 +2313,22 @@ List entries since a date
 Date argument can be natural language and are always interpreted as being in the past. "thursday" would be interpreted as "last thursday,"
 and "2d" would be interpreted as "two days ago."
 ===== Options
+===== --bool BOOLEAN
+
+Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+
+[Default Value] pattern
+[Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
+
+
+===== --case TYPE
+
+Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
+
+[Default Value] smart
+[Must Match] (?i-mx:^[cis].*?$)
+
+
 ===== --config_template TEMPLATE_KEY
 
 Output using a template from configuration
@@ -2220,6 +2350,29 @@ Section
 [Default Value] All
 
 
+===== --search QUERY
+
+Filter entries using a search query, surround with slashes for regex (e.g. "/query.*/"),
+            start with single quote for exact match ("'query")
+
+[Default Value] None
+
+
+===== --tag TAG
+
+Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)
+
+[Default Value] None
+
+
+===== --tag_order DIRECTION
+
+Tag sort direction (asc|desc)
+
+[Default Value] asc
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
+
+
 ===== --tag_sort KEY
 
 Sort tags by (name|time)
@@ -2235,8 +2388,27 @@ Override output format with a template string containing %placeholders
 [Default Value] None
 
 
+===== --val QUERY
+
+Perform a tag value query ("@done > two hours ago" or "@progress < 50").
+            May be used multiple times, combined with --bool
+
+[Default Value] None
+[Must Match] (?-mix:^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$)
+
+
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
+
+
+
+===== --not
+Since items that *don't* match search/tag filters
+
+
+
+===== --only_timed
+Only show items with recorded time intervals
 
 
 
@@ -2247,6 +2419,11 @@ Show time intervals on @done tasks
 
 ===== --totals
 Show time totals at the end of output
+
+
+
+===== -x|--exact
+Force exact search string matching (case sensitive)
 
 
 
@@ -2550,6 +2727,7 @@ Output using a template from configuration
 Time range to show `doing today --from "12pm to 4pm"`
 
 [Default Value] None
+[Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon) +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)$)
 
 
 ===== -o|--output FORMAT
@@ -2564,6 +2742,14 @@ Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|m
 Specify a section
 
 [Default Value] All
+
+
+===== --tag_order DIRECTION
+
+Tag sort direction (asc|desc)
+
+[Default Value] asc
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
 ===== --tag_sort KEY
@@ -2583,6 +2769,11 @@ Override output format with a template string containing %placeholders
 
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
+
+
+
+===== --only_timed
+Only show items with recorded time intervals
 
 
 
@@ -2892,7 +3083,7 @@ Output using a template from configuration
 
 ===== --from TIME_RANGE
 
-Time range to show, e.g. `doing yesterday --from "1am to 8am"`
+Time range to show `doing yesterday --from "12pm to 4pm"`
 
 [Default Value] None
 [Must Match] (?i-mx:^(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon) +(?:to|through|thru|(?:un)?til|-+) +(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)$)
@@ -2937,6 +3128,11 @@ Override output format with a template string containing %placeholders
 
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
+
+
+
+===== --only_timed
+Only show items with recorded time intervals
 
 
 
