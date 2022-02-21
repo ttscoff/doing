@@ -8,7 +8,7 @@ command :open do |c|
   c.arg_name 'COMMAND'
   c.flag %i[e editor]
 
-  if Sys::Platform.mac?
+  if `uname` =~ /Darwin/
     c.desc 'Open with app name'
     c.arg_name 'APP_NAME'
     c.flag %i[a app]
@@ -29,7 +29,7 @@ command :open do |c|
 
       editor = TTY::Which.which(options[:editor])
       system %(#{editor} "#{File.expand_path(@wwid.doing_file)}")
-    elsif Sys::Platform.mac?
+    elsif `uname` =~ /Darwin/
       if options[:app]
         system %(open -a "#{options[:app]}" "#{File.expand_path(@wwid.doing_file)}")
       elsif options[:bundle_id]

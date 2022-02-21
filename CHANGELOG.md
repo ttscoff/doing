@@ -1,3 +1,12 @@
+### 2.1.35
+
+2022-02-21 14:53
+
+#### FIXED
+
+- Revert switch to sys-uname, hopefully solve crash
+- Revert switch to sys-uname, hopefully solve crash
+
 ### 2.1.34
 
 2022-02-20 09:32
