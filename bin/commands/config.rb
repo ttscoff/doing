@@ -45,7 +45,7 @@ command :config do |c|
     edit.arg_name 'EDITOR'
     edit.flag %i[e editor]
 
-    if Sys::Platform.mac?
+    if `uname` =~ /Darwin/
       edit.desc 'Application to use'
       edit.arg_name 'APP_NAME'
       edit.flag %i[a app]
@@ -76,7 +76,7 @@ command :config do |c|
 
       config_file = Doing.config.choose_config
 
-      if Sys::Platform.mac?
+      if `uname` =~ /Darwin/
         if options[:default]
           editor = Doing::Util.find_default_editor('config')
           if editor
