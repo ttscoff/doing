@@ -5,7 +5,6 @@
 #### FIXED
 
 - Revert switch to sys-uname, hopefully solve crash
-- Revert switch to sys-uname, hopefully solve crash
 
 ### 2.1.34
 
