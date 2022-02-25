@@ -89,7 +89,7 @@ command %i[done did] do |c|
     end
 
     if options[:date]
-      date = date.chronify(guess: :begin, context: :today) if date =~ REGEX_TIME
+      date = date.chronify(guess: :begin, context: :today) if date.is_a? String
       finish_date = @wwid.verify_duration(date, finish_date) unless options[:took] || options[:from]
 
       donedate = finish_date.strftime('%F %R')
