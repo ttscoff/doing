@@ -1,3 +1,11 @@
+### 2.1.36
+
+2022-02-25 08:44
+
+#### FIXED
+
+- Warning when using `doing done --took`
+
 ### 2.1.35
 
 2022-02-21 14:53
