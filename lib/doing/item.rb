@@ -522,7 +522,11 @@ module Doing
       return true unless tags.good?
 
       tags.each do |tag|
-        return false unless @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
+        if tag =~ /done/ && !should_finish?
+          next
+        else
+          return false unless @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
+        end
       end
       true
     end
@@ -531,7 +535,11 @@ module Doing
       return true unless tags.good?
 
       tags.each do |tag|
-        return false if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
+        if tag =~ /done/ && !should_finish?
+          return false
+        else
+          return false if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
+        end
       end
       true
     end
@@ -540,7 +548,11 @@ module Doing
       return true unless tags.good?
 
       tags.each do |tag|
-        return true if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
+        if tag =~ /done/ && !should_finish?
+          return true
+        else
+          return true if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
+        end
       end
       false
     end
@@ -596,7 +608,27 @@ module Doing
     end
 
     def tag_value_matches?(tag, comp, value, negate)
-      if all_tags?([tag])
+      if tag =~ /^(elapsed|dur(ation)?|int(erval)?|t(ime)?)$/
+
+        return false if interval.nil?
+
+        val = value.chronify_qty
+        is_match = case comp
+                   when /^<$/
+                     interval < val
+                   when /^<=$/
+                     interval <= val
+                   when /^>$/
+                     interval > val
+                   when /^>=$/
+                     interval >= val
+                   when /^!=/
+                     interval != val
+                   when /^=/
+                     interval == val
+                   end
+        comp =~ /!/ || negate ? !is_match : is_match
+      elsif all_tags?([tag])
         tag_val = tag_value(tag)
 
         if (value.chronify.nil? && value =~ /[a-z]/i && comp =~ /^!?==?$/) || comp =~ /[$*^]=/
