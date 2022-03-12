@@ -1,3 +1,12 @@
+### 2.1.37
+
+2022-03-12 11:37
+
+#### FIXED
+
+- Recognize STDIN input on non-Mac systems. I don't know if this will translate to Windows or not. Resolves #136, thanks @sjsrey for the pointer
+- Recongnition of 'today' as a date input, e.g. `doing on today`, converts to 'current date 12am to 11:59pm'
+
 ### 2.1.36
 
 2022-02-25 08:44
