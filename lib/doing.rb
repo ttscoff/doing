@@ -15,6 +15,7 @@ require 'haml'
 require 'json'
 require 'logger'
 require 'safe_yaml/load'
+require 'fcntl'
 
 require 'chronic'
 require 'tty-link'

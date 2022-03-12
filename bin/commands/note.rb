@@ -33,7 +33,7 @@ command :note do |c|
   add_options(:search, c)
   add_options(:tag_filter, c)
 
-  c.action do |_global_options, options, args|
+  c.action do |global_options, options, args|
     options[:fuzzy] = false
     options[:section] = @wwid.guess_section(options[:section]) || options[:section].cap_first if options[:section]
     options[:tag_bool] = options[:bool]
@@ -52,7 +52,7 @@ command :note do |c|
     last_note = last_entry.note || Doing::Note.new
     new_note = Doing::Note.new
 
-    new_note.add($stdin.read.strip) if $stdin.stat.size.positive?
+    new_note.add(global_options[:stdin]) if global_options[:stdin]
     new_note.add(args.join(' ')) unless args.empty?
 
     if options[:editor]

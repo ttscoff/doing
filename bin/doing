@@ -258,6 +258,13 @@ around do |global, command, options, arguments, code|
     Doing.logger.adjust_verbosity(global)
   end
 
+  global[:stdin] = if $stdin.stat.size.positive? || $stdin.fcntl(Fcntl::F_GETFL, 0) == 0
+                     $stdin.read.strip
+                   else
+                     nil
+                   end
+  global[:stdin] = nil unless global[:stdin].good?
+
   if global[:stdout]
     Doing.logger.logdev = $stdout
   end
