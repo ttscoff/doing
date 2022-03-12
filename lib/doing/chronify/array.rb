@@ -18,8 +18,16 @@ module Doing
       d, h, m = self
       case format
       when :clock
+        if d.zero? && h > 24
+          d = (h / 24).floor
+          h = h % 24
+        end
         format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
       when :dhm
+        if d.zero? && h > 24
+          d = (h / 24).floor
+          h = h % 24
+        end
         output = []
         output.push(format('%<d>dd', d: d)) if d.positive?
         output.push(format('%<h>dh', h: h)) if h.positive?

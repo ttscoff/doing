@@ -1688,9 +1688,13 @@ module Doing
 
       if opt[:delete]
         delete_items(items, force: opt[:force])
+
+        write(@doing_file)
         return
       elsif opt[:editor]
         edit_items(items)
+
+        write(@doing_file)
         return
       elsif opt[:interactive]
         opt[:menu] = !opt[:force]

@@ -1,3 +1,20 @@
+### 2.1.38
+
+2022-03-12 15:40
+
+#### NEW
+
+- `--val 'duration > 2h'` allows querying elapsed time of entries
+
+#### IMPROVED
+
+- Exclude never_finish entries when searching for @done items
+
+#### FIXED
+
+- `--editor` not saving results in some commands (including `doing search -e`)
+- Clock or dhm interval output not converting hours to days in some cases
+
 ### 2.1.37
 
 2022-03-12 11:37
