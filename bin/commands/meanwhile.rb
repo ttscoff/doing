@@ -20,7 +20,7 @@ command :meanwhile do |c|
 
   add_options(:add_entry, c)
 
-  c.action do |_global_options, options, args|
+  c.action do |global_options, options, args|
     Doing.auto_tag = !options[:noauto]
 
     if options[:back]
@@ -50,8 +50,8 @@ command :meanwhile do |c|
       input = @wwid.fork_editor(input).strip
     elsif !args.empty?
       input = args.join(' ')
-    elsif $stdin.stat.size.positive?
-      input = $stdin.read.strip
+    elsif global_options[:stdin]
+      input = global_options[:stdin]
     end
 
     if input.good?

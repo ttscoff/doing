@@ -43,8 +43,8 @@ module Doing
         Doing.logger.debug('Parser:', %(date/time string "#{self}" interpreted as #{res} (#{secs_ago} seconds ago)))
       else
         date_string = dup
-        date_string = 'today' if date_string.match(REGEX_DAY) && now.strftime('%a') =~ /^#{Regexp.last_match(1)}/i
-        date_string = "#{options[:context].to_s} #{date_string}" if date_string =~ REGEX_TIME && options[:context]
+        date_string = 'today' if date_string.match(Types::REGEX_DAY) && now.strftime('%a') =~ /^#{Regexp.last_match(1)}/i
+        date_string = "#{options[:context].to_s} #{date_string}" if date_string =~ Types::REGEX_TIME && options[:context]
 
         res = Chronic.parse(date_string, {
                               guess: options.fetch(:guess, :begin),
@@ -176,7 +176,7 @@ module Doing
     ##   "mon 3pm to mon 5pm".split_date_range
     ##
     def split_date_range
-      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+      time_rx = /^(\d{1,2}(:\d{1,2})?( *(am|pm))?|midnight|noon)$/
       range_rx = / (to|through|thru|(?:un)?til|-+) /
 
       date_string = dup
@@ -187,12 +187,13 @@ module Doing
         inclusive = true
 
         dates = date_string.split(range_rx)
+
         if dates[0].strip =~ time_rx && dates[-1].strip =~ time_rx
           start = dates[0].strip
           finish = dates[-1].strip
         else
           start = dates[0].chronify(guess: :begin, future: false)
-          finish = dates[-1].chronify(guess: inclusive ? :end : :begin, future: false)
+          finish = dates[-1].chronify(guess: inclusive ? :end : :begin, future: true)
         end
 
         raise Errors::InvalidTimeExpression, 'Unrecognized date string' if start.nil? || finish.nil?

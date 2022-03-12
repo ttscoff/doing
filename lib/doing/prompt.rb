@@ -62,7 +62,9 @@ module Doing
         prompt_text << boldgreen(prompt.sub(/:?$/, ':'))
         prompt_text << yellow(' Enter a blank line (')
         prompt_text << boldwhite('return twice')
-        prompt_text << yellow(') to end editing')
+        prompt_text << yellow(') to end editing and save, ')
+        prompt_text << boldwhite('CTRL-C')
+        prompt_text << yellow(' to cancel')
         puts prompt_text.join('')
 
         res = []

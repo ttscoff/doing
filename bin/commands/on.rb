@@ -37,8 +37,9 @@ command :on do |c|
 
     date_string = args.join(' ').strip
     if date_string =~ /^tod(?:ay)?/i
-      date_string = 'today to tomorrow 12am'
+      date_string = 'today 12am to today 11:59pm'
     end
+
     start, finish = date_string.split_date_range
 
     raise InvalidTimeExpression, 'Unrecognized date string' unless start

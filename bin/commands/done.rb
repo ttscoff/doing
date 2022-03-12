@@ -46,7 +46,7 @@ command %i[done did] do |c|
 
   add_options(:add_entry, c)
 
-  c.action do |_global_options, options, args|
+  c.action do |global_options, options, args|
     Doing.auto_tag = !options[:noauto]
 
     took = 0
@@ -165,7 +165,7 @@ command %i[done did] do |c|
       end
 
       @wwid.write(@wwid.doing_file)
-    elsif args.empty? && $stdin.stat.size.zero?
+    elsif args.empty? && global_options[:stdin].nil?
       if options[:remove]
         @wwid.tag_last({ tags: ['done'], count: 1, section: section, remove: true })
       else
@@ -203,9 +203,9 @@ command %i[done did] do |c|
       Doing::Hooks.trigger :post_entry_added, @wwid, new_entry
       @wwid.write(@wwid.doing_file)
       Doing.logger.info('New entry:', %(added "#{new_entry.date.relative_date}: #{new_entry.title}" to #{section}))
-    elsif $stdin.stat.size.positive?
+    elsif !global_options[:stdin].nil?
       note = Doing::Note.new(options[:note])
-      d, title, note = @wwid.format_input($stdin.read.strip)
+      d, title, note = @wwid.format_input(global_options[:stdin])
       unless d.nil?
         Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
         date = d

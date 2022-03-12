@@ -36,7 +36,7 @@ command %i[now next] do |c|
   # c.arg_name 'editor_app'
   # # c.flag [:a, :app]
 
-  c.action do |_global_options, options, args|
+  c.action do |global_options, options, args|
     Doing.auto_tag = !options[:noauto]
 
     raise InvalidArgument, '--back and --from cannot be used together' if options[:back] && options[:from]
@@ -98,8 +98,8 @@ command %i[now next] do |c|
         end
       end
       @wwid.write(@wwid.doing_file)
-    elsif $stdin.stat.size.positive?
-      input = $stdin.read.strip
+    elsif global_options[:stdin]
+      input = global_options[:stdin]
       d, title, note = @wwid.format_input(input)
       unless d.nil?
         Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
