@@ -117,14 +117,20 @@ module Doing
         else
           Doing.logger.debug('Skipped:', "not tagged #{"@#{tag}".cyan}")
         end
-      elsif title =~ /@#{tag}(?=[ (]|$)/
+      elsif title =~ /@#{tag}(?=[ (]|$)/ && !value.good?
         Doing.logger.debug('Skipped:', "already tagged #{"@#{tag}".cyan}")
         return title
       else
         add = tag
         add += "(#{value})" unless value.nil?
+
         title.chomp!
-        title += " @#{add}"
+
+        if value && title =~ /@#{tag}(?=[ (]|$)/
+          title.sub!(/@#{tag}(\(.*?\))?/, "@#{add}")
+        else
+          title += " @#{add}"
+        end
 
         title.dedup_tags!
         title.chomp!

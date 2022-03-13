@@ -29,6 +29,9 @@ command :show do |c|
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
+  c.desc "Edit matching entries with #{Doing::Util.default_editor}"
+  c.switch %i[e editor], negatable: false, default_value: false
+
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
   c.flag %i[s sort], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol

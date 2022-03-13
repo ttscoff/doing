@@ -1297,7 +1297,7 @@ module Doing
             if tag =~ /^(\S+)\((.*?)\)$/
               m = Regexp.last_match
               tag = m[1]
-              opt[:value] = opt[:value] ? opt[:value] : m[2]
+              opt[:value] ||= m[2]
             end
 
             if tag =~ /^done$/ && opt[:date] && item.should_time?

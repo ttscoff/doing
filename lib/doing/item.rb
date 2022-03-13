@@ -180,8 +180,14 @@ module Doing
 
       remove = options.fetch(:remove, false)
       tags.each do |tag|
+        if tag =~ /^(\S+)\((.*?)\)$/
+          m = Regexp.last_match
+          tag = m[1]
+          options[:value] ||= m[2]
+        end
+
         bool = remove ? :and : :not
-        if tags?(tag, bool)
+        if tags?(tag, bool) || options[:value]
           @title = @title.tag(tag, **options).strip
           remove ? removed.push(tag) : added.push(tag)
         end

@@ -1,6 +1,6 @@
 ### 2.1.39
 
-2022-03-13 00:28
+2022-03-13 03:08
 
 #### NEW
 
@@ -8,6 +8,8 @@
 
 #### IMPROVED
 
+- Check for tag matching property name before assuming property in `--val` comparisons
+- Allow `doing tag 'name(value)'` to update an existing value (already works with `--value` flag)
 - Allow time filtering for `--val` where if only a time is supplied for a date query, ignore the date and filter entries by time of day
 
 ### 2.1.38
