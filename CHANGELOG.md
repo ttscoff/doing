@@ -1,6 +1,6 @@
 ### 2.1.39
 
-2022-03-13 03:58
+2022-03-13 04:32
 
 #### NEW
 
@@ -16,6 +16,7 @@
 
 #### FIXED
 
+- `doing on today` breaking on Ruby 2.6
 - Sort entries by both date and title to prevent shuffling between revisions
 
 ### 2.1.38
