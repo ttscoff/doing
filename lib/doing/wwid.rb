@@ -23,6 +23,7 @@ module Doing
     ## Initializes the object.
     ##
     def initialize
+      @current_section = Doing.setting('current_section')
       @timers = {}
       @recorded_items = []
       @content = Items.new

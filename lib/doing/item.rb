@@ -465,7 +465,7 @@ module Doing
     # @private
     def inspect
       # %(<Doing::Item @date=#{@date} @title="#{@title}" @section:"#{@section}" @note:#{@note.to_s}>)
-      %(<Doing::Item @date=#{@date}>)
+      %(<Doing::Item @date=#{@date.strftime('%F %T')} @section=#{@section} @title=#{@title.trunc(30)}>)
     end
 
     def clone
