@@ -27,7 +27,7 @@ command :yesterday do |c|
   add_options(:time_display, c)
 
   c.action do |_global_options, options, _args|
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    raise InvalidPlugin.new('output', options[:output]) if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     options[:sort_tags] = options[:tag_sort]
 

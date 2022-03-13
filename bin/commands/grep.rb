@@ -59,7 +59,8 @@ command %i[grep search] do |c|
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+
+    raise InvalidPlugin.new('output', options[:output]) if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     template = Doing.setting(['templates', options[:config_template]]).deep_merge(Doing.settings)
     tags_color = template.key?('tags_color') ? template['tags_color'] : nil

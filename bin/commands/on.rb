@@ -31,7 +31,7 @@ command :on do |c|
   add_options(:time_filter, c)
 
   c.action do |_global_options, options, args|
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    raise InvalidPlugin.new('output', options[:output]) if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     raise MissingArgument, 'Missing date argument' if args.empty?
 

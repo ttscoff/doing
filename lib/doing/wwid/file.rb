@@ -66,6 +66,7 @@ module Doing
       end
 
       Hooks.trigger :post_read, self
+      @initial_content = @content.clone
     end
 
     ##
@@ -96,6 +97,8 @@ module Doing
         Util.write_to_file(file, output, backup: backup)
         run_after if Doing.setting('run_after')
       end
+
+      # puts @content.diff(@initial_content)
     end
 
     ##

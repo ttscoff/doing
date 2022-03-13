@@ -14,7 +14,6 @@ module Doing
       def initialize(msg = 'No input', topic = 'Exited:')
         Doing.logger.output_results
         Doing.logger.log_now(:warn, topic, msg)
-        Process.exit 1
       end
     end
 
@@ -35,10 +34,11 @@ module Doing
     end
 
     class DoingRuntimeError < ::RuntimeError
-      def initialize(msg = 'Runtime Error', topic: 'Error:')
+      def initialize(msg = 'Runtime Error', exit_code = nil, topic: 'Error:')
         Doing.logger.output_results
         Doing.logger.log_now(:error, topic, msg)
-        Process.exit 1
+
+        Process.exit exit_code if exit_code
       end
     end
 
@@ -52,14 +52,32 @@ module Doing
     end
 
     class DoingNoTraceError < ::StandardError
-      def initialize(msg = nil, level = nil, topic = nil)
+      def initialize(msg = nil, level: nil, topic: 'Error:', exit_code: 1)
         level ||= :error
         Doing.logger.output_results
         if msg
           Doing.logger.log_now(level, topic, msg)
         end
 
-        Process.exit 1
+        Process.exit exit_code
+      end
+    end
+
+    class HistoryLimitError < DoingNoTraceError
+      def initialize(msg, exit_code = 24)
+        super(msg, level: :error, topic: 'History:', exit_code: exit_code)
+      end
+    end
+
+    class MissingBackupFile < DoingNoTraceError
+      def initialize(msg, exit_code = 26)
+        super(msg, level: :error, topic: 'History:', exit_code: exit_code)
+      end
+    end
+
+    class InvalidPlugin < DoingRuntimeError
+      def initialize(kind = 'output', msg = nil)
+        super(%(Invalid #{kind} type (#{msg})), 128, topic: 'Invalid:')
       end
     end
 
@@ -82,7 +100,6 @@ module Doing
         msg = "(#{@type}: #{@plugin}) #{msg}"
 
         Doing.logger.log_now(:error, 'Plugin:', msg)
-        Process.exit 1
       end
     end
 

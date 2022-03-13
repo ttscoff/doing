@@ -23,7 +23,7 @@ module Doing
   ## Main "What Was I Doing" methods
   ##
   class WWID
-    attr_reader   :additional_configs, :current_section, :doing_file, :content
+    attr_reader   :additional_configs, :current_section, :doing_file, :content, :initial_content
 
     attr_accessor :config, :config_file, :default_option
 

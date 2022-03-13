@@ -32,7 +32,7 @@ module Doing
         if alt
           meant_view = Prompt.yn("#{boldwhite("Did you mean")} `#{yellow("doing view #{alt}")}#{boldwhite}`?", default_response: 'n')
 
-          raise WrongCommand.new("run again with #{"doing view #{alt}".boldwhite}", topic: 'Try again:') if meant_view
+          raise Errors::WrongCommand.new("run again with #{"doing view #{alt}".boldwhite}", topic: 'Try again:') if meant_view
 
         end
 
@@ -44,7 +44,7 @@ module Doing
           return frag.cap_first
         end
 
-        raise InvalidSection.new("unknown section #{frag.bold.white}", topic: 'Missing:')
+        raise Errors::InvalidSection.new("unknown section #{frag.bold.white}", topic: 'Missing:')
       end
       section ? section.cap_first : guessed
     end
@@ -69,13 +69,13 @@ module Doing
       unless view || guessed
         alt = guess_section(frag, guessed: true, suggest: true)
 
-        raise InvalidView.new(%(unknown view #{frag.bold.white}), topic: 'Missing:') unless alt
+        raise Errors::InvalidView.new(%(unknown view #{frag.bold.white}), topic: 'Missing:') unless alt
 
         meant_view = Prompt.yn("Did you mean `doing show #{alt}`?", default_response: 'n')
 
-        raise WrongCommand.new("run again with #{"doing show #{alt}".yellow}", topic: 'Try again:') if meant_view
+        raise Errors::WrongCommand.new("run again with #{"doing show #{alt}".yellow}", topic: 'Try again:') if meant_view
 
-        raise InvalidView.new(%(unknown view #{alt.bold.white}), topic: 'Missing:')
+        raise Errors::InvalidView.new(%(unknown view #{alt.bold.white}), topic: 'Missing:')
       end
       view
     end
