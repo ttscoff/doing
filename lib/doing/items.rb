@@ -131,9 +131,13 @@ module Doing
     end
 
     ##
-    ## Return Items containing items that don't exist in receiver
+    ## Return Items containing items that don't exist in
+    ## receiver
     ##
     ## @param      items  [Items] Receiver
+    ##
+    ## @return     [Array<Item>] Array of items not found in
+    ##             compared Items array
     ##
     def diff(items)
       diff = Items.new
