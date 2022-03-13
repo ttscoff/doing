@@ -276,9 +276,9 @@ local words=$(doing sections)
 IFS="$OLD_IFS"
 
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--age --after --before --bool --count --case --config_template --duration --from --hilite --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--age --after --before --bool --count --case --config_template --duration --editor --from --hilite --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -c -h -i -m -o -s -t -x --age --after --before --bool --count --case --config_template --duration --from --hilite --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -c -e -h -i -m -o -s -t -x --age --after --before --bool --count --case --config_template --duration --editor --from --hilite --interactive --menu --not --output --only_timed --sort --search --times --tag --tag_order --tag_sort --template --totals --val --exact' -- $token ) )
   else
   local nocasematchWasOff=0
   shopt nocasematch >/dev/null || nocasematchWasOff=1

@@ -447,6 +447,7 @@ complete -c doing -l count -s c -f -r -n '__fish_doing_using_command show' -d Ma
 complete -c doing -l case  -f -r -n '__fish_doing_using_command show' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command show' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command show' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
+complete -c doing -l editor -s e -f  -n '__fish_doing_using_command show' -d Edit\ matching\ entries\ with\ vim
 complete -c doing -l from  -f -r -n '__fish_doing_using_command show' -d Date\ range
 complete -c doing -l hilite -s h -f  -n '__fish_doing_using_command show' -d Highlight\ search\ matches\ in\ output
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command show' -d Select\ from\ a\ menu\ of\ matching\ entries\ to\ perform\ additional\ operations

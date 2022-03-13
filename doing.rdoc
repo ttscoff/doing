@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.38
+v2.1.39
 
 === Global Options
 === --config_file arg
@@ -2280,6 +2280,11 @@ Perform a tag value query ("@done > two hours ago" or "@progress < 50").
 
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
+
+
+
+===== -e|--editor
+Edit matching entries with vim
 
 
 
