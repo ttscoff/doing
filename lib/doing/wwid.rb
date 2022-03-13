@@ -665,7 +665,7 @@ module Doing
     ##
     def filter_items(items = Items.new, opt: {})
       logger.benchmark(:filter_items, :start)
-      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/i
 
       if items.nil? || items.empty?
         section = opt[:section] ? guess_section(opt[:section]) : 'All'

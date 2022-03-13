@@ -83,7 +83,6 @@ command %i[now next] do |c|
 
       date = d.nil? ? date : d
       @wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
-      @wwid.write(@wwid.doing_file)
     elsif args.length.positive?
       d, title, note = @wwid.format_input(args.join(' '))
       date = d.nil? ? date : d
@@ -97,7 +96,6 @@ command %i[now next] do |c|
           entry.tag('done')
         end
       end
-      @wwid.write(@wwid.doing_file)
     elsif global_options[:stdin]
       input = global_options[:stdin]
       d, title, note = @wwid.format_input(input)
@@ -118,7 +116,6 @@ command %i[now next] do |c|
           entry.tag('done')
         end
       end
-      @wwid.write(@wwid.doing_file)
     else
       tags = @wwid.all_tags(@wwid.content)
       $stderr.puts Doing::Color.boldgreen("Add a new entry. Tab will autocomplete known tags. Ctrl-c to cancel.")
@@ -139,7 +136,8 @@ command %i[now next] do |c|
           entry.tag('done')
         end
       end
-      @wwid.write(@wwid.doing_file)
     end
+
+    @wwid.write(@wwid.doing_file)
   end
 end

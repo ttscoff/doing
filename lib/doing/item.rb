@@ -202,6 +202,16 @@ module Doing
     end
 
     ##
+    ## Return all tags including parenthetical values
+    ##
+    ## @return     [Array<Array>] Array of array pairs,
+    ##             [[tag1, value], [tag2, value]]
+    ##
+    def tags_with_values
+      @title.scan(/(?<= |\A)@([^\s(]+)(?:\((.*?)\))?/).map { |tag| [tag[0], tag[1]] }.sort.uniq
+    end
+
+    ##
     ## convert tags on item to an array with @ symbols removed
     ##
     ## @return     [Array] array of tags
@@ -557,6 +567,12 @@ module Doing
       false
     end
 
+    def tag_pattern?(tags)
+      query = tags.to_query
+
+      no_tags?(query[:must_not]) && all_tags?(query[:must]) && any_tags?(query[:should])
+    end
+
     def tag_value(tag)
       res = @title.match(/@#{tag.sub(/^@/, '').wildcard_to_rx}\((.*?)\)/)
       res ? res[1] : nil
@@ -607,76 +623,150 @@ module Doing
       true
     end
 
+    def duration_matches?(value, comp)
+      return false if interval.nil?
+
+      val = value.chronify_qty
+      case comp
+      when /^<$/
+        interval < val
+      when /^<=$/
+        interval <= val
+      when /^>$/
+        interval > val
+      when /^>=$/
+        interval >= val
+      when /^!=/
+        interval != val
+      when /^=/
+        interval == val
+      end
+    end
+
+    def date_matches?(value, comp)
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/i
+      value = "#{@date.strftime('%Y-%m-%d')} #{value}" if value =~ time_rx
+
+      val = value.chronify(guess: :begin)
+      raise InvalidTimeExpression, 'Unrecognized date/time expression' if val.nil?
+
+      case comp
+      when /^<$/
+        @date < val
+      when /^<=$/
+        @date <= val
+      when /^>$/
+        @date > val
+      when /^>=$/
+        @date >= val
+      when /^!=/
+        @date != val
+      when /^=/
+        @date == val
+      end
+    end
+
+    def value_string_matches?(tag_val, comp, value)
+      case comp
+      when /\^=/
+        tag_val =~ /^#{value.wildcard_to_rx}/i
+      when /\$=/
+        tag_val =~ /#{value.wildcard_to_rx}$/i
+      when %r{==}
+        tag_val =~ /^#{value.wildcard_to_rx}$/i
+      else
+        tag_val =~ /#{value.wildcard_to_rx}/i
+      end
+    end
+
+    def value_number_matches?(tag_val, comp, value)
+      case comp
+      when /^<$/
+        tag_val < value
+      when /^<=$/
+        tag_val <= value
+      when /^>$/
+        tag_val > value
+      when /^>=$/
+        tag_val >= value
+      when /^!=/
+        tag_val != value
+      when /^=/
+        tag_val == value
+      end
+    end
+
+    ##
+    ## Test if a tag's value matches a given value. Value
+    ## can be a date string, a text string, or a
+    ## number/percentage. Type of comparison is determined
+    ## by the comparitor and the objects being compared.
+    ##
+    ## @param      tag     [String] The tag name from which
+    ##                     to get the value
+    ## @param      comp    [String] The comparator (e.g. >=
+    ##                     or *=)
+    ## @param      value   [String] The value to test
+    ##                     against
+    ## @param      negate  [Boolean] Negate the response
+    ##
+    ## @return     True if tag value matches, False otherwise.
+    ##
     def tag_value_matches?(tag, comp, value, negate)
-      if tag =~ /^(elapsed|dur(ation)?|int(erval)?|t(ime)?)$/
+      # If tag name matches a trigger for elapsed time test
+      if tag =~ /^(elapsed|dur(ation)?|int(erval)?)$/i
+        is_match = duration_matches?(value, comp)
 
-        return false if interval.nil?
-
-        val = value.chronify_qty
-        is_match = case comp
-                   when /^<$/
-                     interval < val
-                   when /^<=$/
-                     interval <= val
-                   when /^>$/
-                     interval > val
-                   when /^>=$/
-                     interval >= val
-                   when /^!=/
-                     interval != val
-                   when /^=/
-                     interval == val
-                   end
         comp =~ /!/ || negate ? !is_match : is_match
+      # Else if tag name matches a trigger for start date
+      elsif tag =~ /^(d(ate)?|t(ime)?)$/i
+        is_match = date_matches?(value, comp)
+
+        comp =~ /!/ || negate ? !is_match : is_match
+      # Else if tag name matches a trigger for all text
+      elsif tag =~ /text/i
+        is_match = value_string_matches?([@title, @note.to_s(prefix: '')].join(' '), comp, value)
+
+        comp =~ /!/ || negate ? !is_match : is_match
+      # Else if tag name matches a trigger for title
+      elsif tag =~ /title/i
+        is_match = value_string_matches?(@title, comp, value)
+
+        comp =~ /!/ || negate ? !is_match : is_match
+      # Else if tag name matches a trigger for note
+      elsif tag =~ /note/i
+        is_match = value_string_matches?(@note.to_s(prefix: ''), comp, value)
+
+        comp =~ /!/ || negate ? !is_match : is_match
+      # Else if item contains tag being tested
       elsif all_tags?([tag])
         tag_val = tag_value(tag)
 
+        # If the tag value is not a date and contains alpha
+        # characters and comparison is ==, or comparison is
+        # a string comparitor (*= ^= $=)
         if (value.chronify.nil? && value =~ /[a-z]/i && comp =~ /^!?==?$/) || comp =~ /[$*^]=/
-          is_match = case comp
-                     when /\^=/
-                       tag_val =~ /^#{value.wildcard_to_rx}/i
-                     when /\$=/
-                       tag_val =~ /#{value.wildcard_to_rx}$/i
-                     when %r{==}
-                       tag_val =~ /^#{value.wildcard_to_rx}$/i
-                     else
-                       tag_val =~ /#{value.wildcard_to_rx}/i
-                     end
+          is_match = value_string_matches?(tag_val, comp, value)
 
           comp =~ /!/ || negate ? !is_match : is_match
         else
+          # Convert values to either a number or a date
           tag_val = number_or_date(tag_val)
           val = number_or_date(value)
 
+          # Fail if either value is nil
           return false if val.nil? || tag_val.nil?
 
+          # Fail unless both values are of the same class (float or date)
           return false unless val.class == tag_val.class
 
-          matches = case comp
-                    when /^<$/
-                      tag_val < val
-                    when /^<=$/
-                      tag_val <= val
-                    when /^>$/
-                      tag_val > val
-                    when /^>=$/
-                      tag_val >= val
-                    when /^!=/
-                      tag_val != val
-                    when /^=/
-                      tag_val == val
-                    end
-          negate.nil? ? matches : !matches
+          is_match = value_number_matches?(tag_val, comp, val)
+
+          negate.nil? ? is_match : !is_match
         end
       else
         false
       end
-    end
-
-    def tag_pattern?(tags)
-      query = tags.to_query
-
-      no_tags?(query[:must_not]) && all_tags?(query[:must]) && any_tags?(query[:should])
     end
 
     def split_tags(tags)
