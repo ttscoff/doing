@@ -1,6 +1,6 @@
 ### 2.1.39
 
-2022-03-13 03:36
+2022-03-13 03:58
 
 #### NEW
 
@@ -8,11 +8,15 @@
 
 #### IMPROVED
 
-- `--editor` flag for `doing show` to batch edit results
-- When adding a tag via `doing select`, allow a tag with a value to update an existing value
 - Allow time filtering for `--val` where if only a time is supplied for a date query, ignore the date and filter entries by time of day
 - Check for tag matching property name before assuming property in `--val` comparisons
 - Allow `doing tag 'name(value)'` to update an existing value (already works with `--value` flag)
+- `--editor` flag for `doing show` to batch edit results
+- When adding a tag via `doing select`, allow a tag with a value to update an existing value
+
+#### FIXED
+
+- Sort entries by both date and title to prevent shuffling between revisions
 
 ### 2.1.38
 
