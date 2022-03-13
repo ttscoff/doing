@@ -1,10 +1,14 @@
 ### 2.1.39
 
-2022-03-13 00:17
+2022-03-13 00:28
 
 #### NEW
 
 - `--val` accepts date, time, title, note, text for comparisons
+
+#### IMPROVED
+
+- Allow time filtering for `--val` where if only a time is supplied for a date query, ignore the date and filter entries by time of day
 
 ### 2.1.38
 

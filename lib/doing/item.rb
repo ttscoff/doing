@@ -608,6 +608,7 @@ module Doing
 
       queries.each do |q|
         parts = split_value_query(q)
+
         return false unless tag_value_matches?(parts[2], parts[3], parts[4], parts[1])
       end
       true
@@ -713,33 +714,8 @@ module Doing
     ## @return     True if tag value matches, False otherwise.
     ##
     def tag_value_matches?(tag, comp, value, negate)
-      # If tag name matches a trigger for elapsed time test
-      if tag =~ /^(elapsed|dur(ation)?|int(erval)?)$/i
-        is_match = duration_matches?(value, comp)
-
-        comp =~ /!/ || negate ? !is_match : is_match
-      # Else if tag name matches a trigger for start date
-      elsif tag =~ /^(d(ate)?|t(ime)?)$/i
-        is_match = date_matches?(value, comp)
-
-        comp =~ /!/ || negate ? !is_match : is_match
-      # Else if tag name matches a trigger for all text
-      elsif tag =~ /text/i
-        is_match = value_string_matches?([@title, @note.to_s(prefix: '')].join(' '), comp, value)
-
-        comp =~ /!/ || negate ? !is_match : is_match
-      # Else if tag name matches a trigger for title
-      elsif tag =~ /title/i
-        is_match = value_string_matches?(@title, comp, value)
-
-        comp =~ /!/ || negate ? !is_match : is_match
-      # Else if tag name matches a trigger for note
-      elsif tag =~ /note/i
-        is_match = value_string_matches?(@note.to_s(prefix: ''), comp, value)
-
-        comp =~ /!/ || negate ? !is_match : is_match
-      # Else if item contains tag being tested
-      elsif all_tags?([tag])
+      # If tag matches existing tag
+      if tags?(tag, :and)
         tag_val = tag_value(tag)
 
         # If the tag value is not a date and contains alpha
@@ -764,6 +740,32 @@ module Doing
 
           negate.nil? ? is_match : !is_match
         end
+      # If tag name matches a trigger for elapsed time test
+      elsif tag =~ /^(elapsed|dur(ation)?|int(erval)?)$/i
+        is_match = duration_matches?(value, comp)
+
+        comp =~ /!/ || negate ? !is_match : is_match
+      # Else if tag name matches a trigger for start date
+      elsif tag =~ /^(d(ate)?|t(ime)?)$/i
+        is_match = date_matches?(value, comp)
+
+        comp =~ /!/ || negate ? !is_match : is_match
+      # Else if tag name matches a trigger for all text
+      elsif tag =~ /^text$/i
+        is_match = value_string_matches?([@title, @note.to_s(prefix: '')].join(' '), comp, value)
+
+        comp =~ /!/ || negate ? !is_match : is_match
+      # Else if tag name matches a trigger for title
+      elsif tag =~ /^title$/i
+        is_match = value_string_matches?(@title, comp, value)
+
+        comp =~ /!/ || negate ? !is_match : is_match
+      # Else if tag name matches a trigger for note
+      elsif tag =~ /^note$/i
+        is_match = value_string_matches?(@note.to_s(prefix: ''), comp, value)
+
+        comp =~ /!/ || negate ? !is_match : is_match
+      # Else if item contains tag being tested
       else
         false
       end

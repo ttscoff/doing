@@ -1292,8 +1292,13 @@ module Doing
               next
             end
 
-
             tag = tag.strip
+
+            if tag =~ /^(\S+)\((.*?)\)$/
+              m = Regexp.last_match
+              tag = m[1]
+              opt[:value] = opt[:value] ? opt[:value] : m[2]
+            end
 
             if tag =~ /^done$/ && opt[:date] && item.should_time?
               max_elapsed = Doing.setting('interaction.confirm_longer_than', 0)
