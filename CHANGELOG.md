@@ -1,3 +1,11 @@
+### 2.1.39
+
+2022-03-13 00:17
+
+#### NEW
+
+- `--val` accepts date, time, title, note, text for comparisons
+
 ### 2.1.38
 
 2022-03-12 15:40

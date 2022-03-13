@@ -648,7 +648,7 @@ module Doing
       value = "#{@date.strftime('%Y-%m-%d')} #{value}" if value =~ time_rx
 
       val = value.chronify(guess: :begin)
-      raise InvalidTimeExpression, 'Unrecognized date/time expression' if val.nil?
+      raise InvalidTimeExpression, "Unrecognized date/time expression (#{value})" if val.nil?
 
       case comp
       when /^<$/
