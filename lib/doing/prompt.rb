@@ -58,14 +58,12 @@ module Doing
         comp = proc { |s| completions.grep(/^#{Regexp.escape(s)}/) }
         Readline.completion_append_character = ' '
         Readline.completion_proc = comp
-        prompt_text = []
-        prompt_text << boldgreen(prompt.sub(/:?$/, ':'))
-        prompt_text << yellow(' Enter a blank line (')
-        prompt_text << boldwhite('return twice')
-        prompt_text << yellow(') to end editing and save, ')
-        prompt_text << boldwhite('CTRL-C')
-        prompt_text << yellow(' to cancel')
-        puts prompt_text.join('')
+        puts format(['%<promptcolor>s%<prompt>s %<textcolor>sEnter a blank line',
+          '(%<keycolor>sreturn twice%<textcolor>s)',
+          'to end editing and save,',
+          '%<keycolor>sCTRL-C%<textcolor>s to cancel%<reset>s'].join(' '),
+          { promptcolor: boldgreen, prompt: prompt.sub(/:?$/, ':'),
+            textcolor: yellow, keycolor: boldwhite, reset: reset })
 
         res = []
 

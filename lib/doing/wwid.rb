@@ -665,7 +665,7 @@ module Doing
     ##
     def filter_items(items = Items.new, opt: {})
       logger.benchmark(:filter_items, :start)
-      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/i
 
       if items.nil? || items.empty?
         section = opt[:section] ? guess_section(opt[:section]) : 'All'
@@ -1292,8 +1292,13 @@ module Doing
               next
             end
 
-
             tag = tag.strip
+
+            if tag =~ /^(\S+)\((.*?)\)$/
+              m = Regexp.last_match
+              tag = m[1]
+              opt[:value] ||= m[2]
+            end
 
             if tag =~ /^done$/ && opt[:date] && item.should_time?
               max_elapsed = Doing.setting('interaction.confirm_longer_than', 0)

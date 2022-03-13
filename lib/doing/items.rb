@@ -179,7 +179,7 @@ module Doing
       out = []
       @sections.each do |section|
         out.push(section.original)
-        items = in_section(section.title).sort_by(&:date)
+        items = in_section(section.title).sort_by { |i| [i.date, i.title] }
         items.reverse! if Doing.setting('doing_file_sort').normalize_order == :desc
         items.each { |item| out.push(item.to_s) }
       end

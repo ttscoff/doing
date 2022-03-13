@@ -61,8 +61,14 @@ end
 
 desc 'Run tests in Docker'
 task :dockertest, :version, :login do |_, args|
-  args.with_defaults(version: '2.7', login: false)
+  args.with_defaults(version: 'all', login: false)
   case args[:version]
+  when /^a/
+    %w[6 7 3].each do |v|
+      Rake::Task['dockertest'].reenable
+      Rake::Task['dockertest'].invoke(v, false)
+    end
+    Process.exit 0
   when /^3/
     img = 'doingtest3'
     file = 'Dockerfile-3.0'

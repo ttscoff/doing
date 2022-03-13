@@ -38,6 +38,18 @@ class DoingItemTest < Test::Unit::TestCase
     assert(item.search('string search'), 'Pattern matching should work')
   end
 
+  def test_value_comparison
+    item = Item.new(Time.now - 3600, "Test item with search string @tag1(50%) @tag2(2021-03-03 12:00) @tag3(string value)", @wwid.current_section, ['note content'])
+    assert(item.tag_values?(['tag1 > 25']), 'Item should match value comparison')
+    assert_equal(false, item.tag_values?(['tag1 < 25']), 'Item should not match value comparison')
+
+    assert(item.tag_values?(['tag2 < 2021-03-04']), 'Item should match date comparison')
+    assert_equal(false, item.tag_values?(['tag2 < 2021-03-01']), 'Item should not match date comparison')
+
+    assert(item.tag_values?(['tag3 ^= string']), 'Item should match string comparison')
+    assert_equal(false, item.tag_values?(['tag3 $= testing']), 'Item should not match string comparison')
+  end
+
   def test_move_item
     section = 'Test Section'
     item = Item.new(Time.now - 3600, "Test item with search string @done(#{(Time.now - 1200).strftime('%F %R')})", @wwid.current_section)

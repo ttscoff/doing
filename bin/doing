@@ -96,22 +96,22 @@ accept TemplateName do |value|
 end
 
 accept DateBeginString do |value|
-  if value =~ REGEX_TIME
-    res = value
-  else
-    res = value.chronify(guess: :begin, future: false)
-  end
+  res = if value =~ REGEX_TIME
+          value
+        else
+          value.chronify(guess: :begin, future: false)
+        end
   raise InvalidTimeExpression, 'Invalid start date' unless res
 
   res
 end
 
 accept DateEndString do |value|
-  if value =~ REGEX_TIME
-    res = value
-  else
-    res = value.chronify(guess: :end, future: false)
-  end
+  res = if value =~ REGEX_TIME
+          value
+        else
+          value.chronify(guess: :end, future: false)
+        end
   raise InvalidTimeExpression, 'Invalid end date' unless res
 
   res
@@ -211,18 +211,19 @@ add_commands(%w[undo redo])
 ## Hidden commands
 add_commands(%w[commands_accepting install_fzf])
 ## Optional commands
-add_commands(%w[again cancel flag meanwhile reset tags today yesterday since tag_dir colors completion plugins sections template views changes])
+add_commands(%w[again cancel flag meanwhile reset tags today yesterday since])
+add_commands(%w[tag_dir colors completion plugins sections template views changes])
 
 pre do |global, _command, _options, _args|
   # global[:pager] ||= Doing.setting('paginate')
   Doing::Pager.paginate = global[:pager]
 
   $stdout.puts "doing v#{Doing::VERSION}" if global[:version]
-  unless $stdout.isatty
-    Doing::Color.coloring = global[:pager] ? global[:color] : false
-  else
-    Doing::Color.coloring = global[:color]
-  end
+  Doing::Color.coloring = if $stdout.isatty
+                            global[:color]
+                          else
+                            global[:pager] ? global[:color] : false
+                          end
 
   # Return true to proceed; false to abort and not call the
   # chosen command
@@ -232,9 +233,9 @@ pre do |global, _command, _options, _args|
 end
 
 on_error do |exception|
-  if exception.kind_of?(GLI::UnknownCommand) && ARGV.count > 1
+  if exception.is_a?(GLI::UnknownCommand) && ARGV.count > 1
     exit run(['now'].concat(ARGV.unshift(@command)))
-  elsif exception.kind_of?(SystemExit)
+  elsif exception.is_a?(SystemExit)
     false
   else
     # Doing.logger.error('Fatal:', exception)
@@ -243,7 +244,7 @@ on_error do |exception|
   end
 end
 
-post do |global, _command, _options, _args|
+post do |_global, _command, _options, _args|
   # Use skips_post before a command to skip this
   # block on that command only
   Doing.logger.output_results
@@ -251,23 +252,16 @@ post do |global, _command, _options, _args|
   Doing.logger.log_benchmarks
 end
 
-around do |global, command, options, arguments, code|
+around do |global, command, _options, _arguments, code|
   Doing.logger.benchmark("command_#{command.name}".to_sym, :start)
-  # Doing.logger.debug('Pager:', "Global: #{global[:pager]}, Config: #{Doing.setting('paginate')}, Pager: #{Doing::Pager.paginate}")
-  if env_log_level.nil?
-    Doing.logger.adjust_verbosity(global)
-  end
+  # pager_msg = "Global: #{global[:pager]}, Config: #{Doing.setting('paginate')}, Pager: #{Doing::Pager.paginate}"
+  # Doing.logger.debug('Pager:', pager_msg)
+  Doing.logger.adjust_verbosity(global) if env_log_level.nil?
 
-  global[:stdin] = if $stdin.stat.size.positive? || $stdin.fcntl(Fcntl::F_GETFL, 0) == 0
-                     $stdin.read.strip
-                   else
-                     nil
-                   end
+  global[:stdin] = $stdin.read.strip if $stdin.stat.size.positive? || $stdin.fcntl(Fcntl::F_GETFL, 0).zero?
   global[:stdin] = nil unless global[:stdin].good?
 
-  if global[:stdout]
-    Doing.logger.logdev = $stdout
-  end
+  Doing.logger.logdev = $stdout if global[:stdout]
 
   if global[:yes]
     Doing::Prompt.force_answer = :yes
@@ -286,8 +280,12 @@ around do |global, command, options, arguments, code|
   end
 
   if global[:config_file] && global[:config_file] != Doing.config.config_file
-    Doing.logger.warn(format('%sWARNING:%s %sThe use of --config_file is deprecated, please set the environment variable DOING_CONFIG instead.', @colors.flamingo, @colors.default, @colors.boldred))
-    Doing.logger.warn(format('%sTo set it just for the current command, use: %sDOING_CONFIG=/path/to/doingrc doing [command]%s',  @colors.red, @colors.boldwhite, @colors.default))
+    Doing.logger.warn(format(['%<promptcolor>sWARNING: %<textcolor>sThe use of --config_file is deprecated,',
+                              'please set the environment variable DOING_CONFIG instead.'].join(' '),
+                             { promptcolor: @colors.flamingo, textcolor: @colors.boldred }))
+    Doing.logger.warn(format(['%<promptcolor>sTo set it just for the current command,',
+                              'use: %<highlight>sDOING_CONFIG=/path/to/doingrc doing [command]%<reset>s'].join(' '),
+                             { promptcolor: @colors.red, highlight: @colors.boldwhite, reset: @colors.default }))
 
     cf = File.expand_path(global[:config_file])
     raise MissingConfigFile, "Config file not found (#{global[:config_file]})" unless File.exist?(cf)
@@ -310,7 +308,7 @@ around do |global, command, options, arguments, code|
 
   code.call
 
-  Doing.logger.benchmark("command_#{command.name.to_s}".to_sym, :finish)
+  Doing.logger.benchmark("command_#{command.name}".to_sym, :finish)
 end
 
 commands_from File.expand_path(Doing.setting('plugins.command_path')) if Doing.setting('plugins.command_path')

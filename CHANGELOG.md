@@ -1,3 +1,24 @@
+### 2.1.39
+
+2022-03-13 04:32
+
+#### NEW
+
+- `--val` accepts date, time, title, note, text for comparisons
+
+#### IMPROVED
+
+- Allow time filtering for `--val` where if only a time is supplied for a date query, ignore the date and filter entries by time of day
+- Check for tag matching property name before assuming property in `--val` comparisons
+- Allow `doing tag 'name(value)'` to update an existing value (already works with `--value` flag)
+- `--editor` flag for `doing show` to batch edit results
+- When adding a tag via `doing select`, allow a tag with a value to update an existing value
+
+#### FIXED
+
+- `doing on today` breaking on Ruby 2.6
+- Sort entries by both date and title to prevent shuffling between revisions
+
 ### 2.1.38
 
 2022-03-12 15:40

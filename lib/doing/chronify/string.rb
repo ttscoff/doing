@@ -196,7 +196,9 @@ module Doing
           finish = dates[-1].chronify(guess: inclusive ? :end : :begin, future: true)
         end
 
-        raise Errors::InvalidTimeExpression, 'Unrecognized date string' if start.nil? || finish.nil?
+        raise Errors::InvalidTimeExpression, "Unrecognized date string (#{dates[0]})" if start.nil?
+
+        raise Errors::InvalidTimeExpression, "Unrecognized date string (#{dates[-1]})" if finish.nil?
 
       else
         if date_string.strip =~ time_rx
