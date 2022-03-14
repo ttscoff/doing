@@ -1,10 +1,11 @@
 ### 2.1.40
 
-2022-03-14 06:28
+2022-03-14 12:19
 
 #### IMPROVED
 
 - Code refactoring, split up WWID class
+- Better diff method available to hooks to see what changed
 
 #### FIXED
 

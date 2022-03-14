@@ -217,6 +217,8 @@ module Doing
           added = []
           removed = []
 
+          item.date = opt[:start_date] if opt[:start_date]
+
           if opt[:autotag]
             new_title = autotag(item.title) if Doing.auto_tag
             if new_title == item.title
@@ -228,7 +230,9 @@ module Doing
               item.title = new_title
             end
           else
-            if opt[:sequential]
+            if opt[:done_date]
+              done_date = opt[:done_date]
+            elsif opt[:sequential]
               next_entry = next_item(item)
 
               done_date = if next_entry.nil?

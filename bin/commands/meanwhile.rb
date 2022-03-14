@@ -19,6 +19,8 @@ command :meanwhile do |c|
   c.switch %i[a archive], negatable: false, default_value: false
 
   add_options(:add_entry, c)
+  # TODO: Add took and from handling for post-dating meanwhile entries
+  # add_options(:add_dated, c)
 
   c.action do |global_options, options, args|
     Doing.auto_tag = !options[:noauto]
@@ -31,17 +33,18 @@ command :meanwhile do |c|
       date = Time.now
     end
 
-    if options[:section]
-      section = @wwid.guess_section(options[:section]) || options[:section].cap_first
-    else
-      section = Doing.setting('current_section')
-    end
+    section = if options[:section]
+                @wwid.guess_section(options[:section]) || options[:section].cap_first
+              else
+                Doing.setting('current_section')
+              end
     input = ''
 
     ask_note = options[:ask] ? Doing::Prompt.read_lines(prompt: 'Add a note') : []
 
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+
       input += date.strftime('%F %R | ')
       input += args.join(' ') unless args.empty?
       input += "\n#{options[:note]}" if options[:note]
@@ -70,7 +73,11 @@ command :meanwhile do |c|
       note.add(ask_note) if ask_note.good?
     end
 
-    @wwid.stop_start('meanwhile', { new_item: input, back: date, section: section, archive: options[:archive], note: note })
+    @wwid.stop_start('meanwhile', { new_item: input,
+                                    back: date,
+                                    section: section,
+                                    archive: options[:archive],
+                                    note: note })
     @wwid.write(@wwid.doing_file)
   end
 end
