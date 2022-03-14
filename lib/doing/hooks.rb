@@ -15,7 +15,7 @@ module Doing
       post_entry_removed: [], # wwid, entry.dup
       pre_export: [],         # wwid, format, entries
       pre_write: [],          # wwid, file
-      post_write: []          # wwid, file
+      post_write: []          # file
     }
 
     # map of all hooks and their priorities

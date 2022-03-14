@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  # Items Array
+  # A collection of Item objects
   class Items < Array
     attr_accessor :sections
 
@@ -27,13 +27,29 @@ module Doing
     def section?(section)
       has_section = false
       section = section.is_a?(Section) ? section.title.downcase : section.downcase
-      @sections.each do |s|
-        if s.title.downcase == section
-          has_section = true
-          break
-        end
+      @sections.map { |i| i.title.downcase }.include?(section)
+    end
+
+    ##
+    ## Return the best section match for a search query
+    ##
+    ## @param      frag      The search query
+    ## @param      distance  The distance apart characters can be (fuzziness)
+    ##
+    ## @return     [Section] (first) matching section object
+    ##
+    def guess_section(frag, distance: 2)
+      section = nil
+      re = frag.to_rx(distance: distance, case_type: :ignore)
+      @sections.each do |sect|
+        next unless sect.title =~ /#{re}/i
+
+        Doing.logger.debug('Match:', %(Assuming "#{sect.title}" from "#{frag}"))
+        section = sect
+        break
       end
-      has_section
+
+      section
     end
 
     # Add a new section to the sections array. Accepts
@@ -140,16 +156,17 @@ module Doing
     ##
     def diff(items)
       a = clone
+      b = items.clone
 
       a.delete_if do |item|
-        if items.index(item)
-          items.delete(item)
+        if b.index(item)
+          b.delete(item)
           true
         else
           false
         end
       end
-      { deleted: items, added: a }
+      { deleted: b, added: a }
     end
 
     ##

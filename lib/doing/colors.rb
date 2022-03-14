@@ -66,7 +66,7 @@ module Doing
       [:redacted,    '0;30;40'],
       [:alert,       '1;31;43'],
       [:error,       '1;37;41'],
-      [:default,        '0;39']
+      [:default, '0;39']
     ].map(&:freeze).freeze
 
     ATTRIBUTE_NAMES = ATTRIBUTES.transpose.first
@@ -133,10 +133,33 @@ module Doing
       def coloring
         @coloring ||= true
       end
+
+      ##
+      ## Convert a template string to a colored string.
+      ## Colors are specified with single letters inside
+      ## curly braces. Uppercase changes background color.
+      ##
+      ## @param      template  The template string
+      ##
+      ## @return     { description_of_the_return_value }
+      ##
+      def template(str)
+        fmt = str.gsub(/\{(\w+)\}/) do
+          Regexp.last_match(1).split('').map { |c| "%<#{c}>s" }.join('')
+        end
+
+        colors = { w: white, k: black, g: green, l: blue,
+                   y: yellow, c: cyan, m: magenta, r: red,
+                   W: bgwhite, K: bgblack, G: bggreen, L: bgblue,
+                   Y: bgyellow, C: bgcyan, M: bgmagenta, R: bgred,
+                   b: bold, u: underline, i: italic, x: reset }
+
+        format(fmt, colors)
+      end
     end
 
     ATTRIBUTES.each do |c, v|
-      eval <<-EOT
+      new_method = <<-EOSCRIPT
         def #{c}(string = nil)
           result = ''
           result << "\e[#{v}m" if Doing::Color.coloring?
@@ -152,33 +175,37 @@ module Doing
           result << "\e[0m" if Doing::Color.coloring?
           result
         end
-      EOT
+      EOSCRIPT
+
+      module_eval(new_method)
+
+      next unless c =~ /bold/
 
       # Accept brightwhite in addition to boldwhite
-      if c =~ /bold/
-        eval <<-EOT
-          def #{c.to_s.sub(/bold/, 'bright')}(string = nil)
-            result = ''
-            result << "\e[#{v}m" if Doing::Color.coloring?
-            if block_given?
-              result << yield
-            elsif string.respond_to?(:to_str)
-              result << string.to_str
-            elsif respond_to?(:to_str)
-              result << to_str
-            else
-              return result #only switch on
-            end
-            result << "\e[0m" if Doing::Color.coloring?
-            result
+      new_method = <<-EOSCRIPT
+        def #{c.to_s.sub(/bold/, 'bright')}(string = nil)
+          result = ''
+          result << "\e[#{v}m" if Doing::Color.coloring?
+          if block_given?
+            result << yield
+          elsif string.respond_to?(:to_str)
+            result << string.to_str
+          elsif respond_to?(:to_str)
+            result << to_str
+          else
+            return result #only switch on
           end
-        EOT
-      end
+          result << "\e[0m" if Doing::Color.coloring?
+          result
+        end
+      EOSCRIPT
+
+      module_eval(new_method)
     end
 
     # Regular expression that is used to scan for ANSI-sequences while
     # uncoloring strings.
-    COLORED_REGEXP = /\e\[(?:(?:[349]|10)[0-7]|[0-9])?m/
+    COLORED_REGEXP = /\e\[(?:(?:[349]|10)[0-7]|[0-9])?m/.freeze
 
     # Returns an uncolored version of the string, that is all
     # ANSI-sequences are stripped from the string.
@@ -193,8 +220,6 @@ module Doing
         ''
       end
     end
-
-    module_function
 
     # Returns an array of all Doing::Color attributes as symbols.
     def attributes

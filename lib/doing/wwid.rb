@@ -9,14 +9,14 @@ require 'erb'
 
 require_relative 'wwid/display'
 require_relative 'wwid/editor'
-require_relative 'wwid/file'
+require_relative 'wwid/filetools'
 require_relative 'wwid/filter'
 require_relative 'wwid/guess'
 require_relative 'wwid/interactive'
 require_relative 'wwid/modify'
 require_relative 'wwid/tags'
 require_relative 'wwid/timers'
-require_relative 'wwid/util'
+require_relative 'wwid/wwidutil'
 
 module Doing
   ##
@@ -28,6 +28,16 @@ module Doing
     attr_accessor :config, :config_file, :default_option
 
     include Color
+    include Display
+    include Editor
+    include FileTools
+    include Filter
+    include Guess
+    include Interactive
+    include Modify
+    include Tags
+    include Timers
+    include WWIDUtil
     # include Util
 
     ##

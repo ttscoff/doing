@@ -1,3 +1,15 @@
+### 2.1.40
+
+2022-03-14 06:28
+
+#### IMPROVED
+
+- Code refactoring, split up WWID class
+
+#### FIXED
+
+- Search highlighting was being skipped in all cases
+
 ### 2.1.39
 
 2022-03-13 04:32
