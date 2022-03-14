@@ -93,6 +93,10 @@ module Doing
                   'Import plugin'
                 when /^e/
                   'Export plugin'
+                when /^h/
+                  'Hook'
+                when /^u/
+                  'Unrecognized'
                 else
                   type.to_s
                 end

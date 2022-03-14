@@ -136,16 +136,20 @@ module Doing
     ##
     ## @param      items  [Items] Receiver
     ##
-    ## @return     [Array<Item>] Array of items not found in
-    ##             compared Items array
+    ## @return     [Hash] Hash of added and deleted items
     ##
     def diff(items)
-      diff = Items.new
-      each do |item|
-        res = items.select { |i| i.equal?(item) }
-        diff.push(item) unless res.count.positive?
+      a = clone
+
+      a.delete_if do |item|
+        if items.index(item)
+          items.delete(item)
+          true
+        else
+          false
+        end
       end
-      diff
+      { deleted: items, added: a }
     end
 
     ##

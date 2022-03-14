@@ -126,7 +126,7 @@ module Doing
 
         output.gsub!(/\\%/, '%')
 
-        output.highlight_search!(opt[:search]) if opt[:template] =~ /^temp/ && opt[:search] && !opt[:not] && opt[:hilite]
+        output.highlight_search!(opt[:search]) if opt[:output] =~ /^temp/ && opt[:search] && !opt[:not] && opt[:hilite]
 
         out += "#{output}\n"
       end

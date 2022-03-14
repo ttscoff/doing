@@ -98,7 +98,7 @@ module Doing
         run_after if Doing.setting('run_after')
       end
 
-      # puts @content.diff(@initial_content)
+      # pp @content.diff(@initial_content)
     end
 
     ##
