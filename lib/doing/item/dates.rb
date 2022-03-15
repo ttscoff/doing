@@ -1,5 +1,5 @@
 module Doing
-  class Item
+  module ItemDates
     # def date=(new_date)
     #   @date = new_date.is_a?(Time) ? new_date : Time.parse(new_date)
     # end

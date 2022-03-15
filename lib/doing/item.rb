@@ -10,6 +10,11 @@ module Doing
   ## This class describes a single WWID item
   ##
   class Item
+    include ItemDates
+    include ItemQuery
+    include ItemState
+    include ItemTags
+
     attr_accessor :date, :title, :section, :note
 
     # attr_reader :id

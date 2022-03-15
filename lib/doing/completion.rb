@@ -2,7 +2,7 @@
 
 require 'tty-progressbar'
 
-require_relative 'completion/string'
+require_relative 'completion/completion_string'
 require_relative 'completion/fish_completion'
 require_relative 'completion/zsh_completion'
 require_relative 'completion/bash_completion'

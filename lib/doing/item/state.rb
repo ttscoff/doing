@@ -1,6 +1,6 @@
 module Doing
   # State queries for a Doing entry
-  class Item
+  module ItemState
     ##
     ## Test if item has a @done tag
     ##
