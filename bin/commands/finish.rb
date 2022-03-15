@@ -58,10 +58,6 @@ command :finish do |c|
 
         end
 
-        # raise InvalidArgument, '--back and --took can not be used together' if options[:back] && options[:took]
-
-        # raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
-
         if options[:at]
           finish_date = options[:at]
           finish_date = finish_date.chronify(guess: :begin) if finish_date.is_a? String
@@ -75,7 +71,7 @@ command :finish do |c|
           raise InvalidTimeExpression, 'Unable to parse date string' if start_date.nil?
 
         else
-          start_date = nil
+          start_date = options[:took] ? Time.now - took : nil
           finish_date = Time.now
         end
       end

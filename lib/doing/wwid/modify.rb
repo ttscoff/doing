@@ -77,10 +77,15 @@ module Doing
       # @param      item    [Item] the item to reset/resume
       # @param      resume  [Boolean] removing @done tag if true
       #
-      def reset_item(item, date: nil, resume: false)
+      def reset_item(item, date: nil, finish_date: nil, resume: false)
         date ||= Time.now
         item.date = date
-        item.tag('done', remove: true) if resume
+        if finish_date
+          item.tag('done', remove: true)
+          item.tag('done', value: finish_date.strftime('%F %R'))
+        else
+          item.tag('done', remove: true) if resume
+        end
         logger.info('Reset:', %(Reset #{resume ? 'and resumed ' : ''} "#{item.title}" in #{item.section}))
         item
       end

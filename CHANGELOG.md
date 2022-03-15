@@ -1,6 +1,12 @@
 ### 2.1.40
 
-2022-03-14 12:19
+2022-03-14 14:50
+
+#### NEW
+
+- `doing finish` accepts `--from` ranges to update both start and finish dates
+- `doing finish` allows `--back` and `--took` to be used together
+- `doing finish` allows `--search` and `--tag` to be used together
 
 #### IMPROVED
 
