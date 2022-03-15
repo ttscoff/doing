@@ -271,6 +271,7 @@ module Doing
           format: cfg['date_format'],
           interval_format: options[:interval_format],
           not: options[:negate],
+          output: options[:output],
           section: section,
           template: options[:template] || cfg['template'],
           times: times,

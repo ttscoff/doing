@@ -36,24 +36,13 @@ command :show do |c|
   c.arg_name 'ORDER'
   c.flag %i[s sort], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
 
-  c.desc "Output using a template from configuration"
-  c.arg_name 'TEMPLATE_KEY'
-  c.flag [:config_template], type: TemplateName, default_value: 'default'
-
-  c.desc 'Override output format with a template string containing %placeholders'
-  c.arg_name 'TEMPLATE_STRING'
-  c.flag [:template]
-
   c.desc 'Select section or tag to display from a menu'
   c.switch %i[m menu], negatable: false, default_value: false
 
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
 
-  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
-  c.arg_name 'FORMAT'
-  c.flag %i[o output]
-
+  add_options(:output_template, c)
   add_options(:time_display, c)
   add_options(:search, c)
   add_options(:tag_filter, c)

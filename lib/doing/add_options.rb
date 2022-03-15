@@ -30,6 +30,18 @@ def add_options(type, cmd)
            end
 
   case type
+  when :output_template
+    cmd.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
+    cmd.arg_name 'FORMAT'
+    cmd.flag %i[o output]
+
+    cmd.desc "Output using a template from configuration"
+    cmd.arg_name 'TEMPLATE_KEY'
+    cmd.flag [:config_template], type: TemplateName, default_value: 'default'
+
+    cmd.desc 'Override output format with a template string containing %placeholders'
+    cmd.arg_name 'TEMPLATE_STRING'
+    cmd.flag [:template]
   when :add_entry
     cmd.desc 'Exclude auto tags and default tags'
     cmd.switch %i[X noauto], default_value: false, negatable: false

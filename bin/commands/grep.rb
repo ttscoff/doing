@@ -16,24 +16,11 @@ command %i[grep search] do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
-  c.arg_name 'FORMAT'
-  c.flag %i[o output]
-
-  c.desc "Output using a template from configuration"
-  c.arg_name 'TEMPLATE_KEY'
-  c.flag [:config_template], type: TemplateName, default_value: 'default'
-
-  c.desc 'Override output format with a template string containing %placeholders'
-  c.arg_name 'TEMPLATE_STRING'
-  c.flag [:template]
-
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false
 
   c.desc 'Force exact string matching (case sensitive)'
   c.switch %i[x exact], default_value: Doing.config.exact_match?, negatable: Doing.config.exact_match?
-
 
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
@@ -53,6 +40,7 @@ command %i[grep search] do |c|
   c.desc 'Display an interactive menu of results to perform further operations'
   c.switch %i[i interactive], default_value: false, negatable: false
 
+  add_options(:output_template, c)
   add_options(:tag_filter, c)
   add_options(:date_filter, c)
   add_options(:time_display, c)
