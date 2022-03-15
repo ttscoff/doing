@@ -139,6 +139,21 @@ module Doing
       ## Colors are specified with single letters inside
       ## curly braces. Uppercase changes background color.
       ##
+      ## w: white
+      ## k: black
+      ## g: green
+      ## l: blue
+      ## y: yellow
+      ## c: cyan
+      ## m: magenta
+      ## r: red
+      ## b: bold
+      ## u: underline
+      ## i: italic
+      ## x: reset (remove background, color, emphasis)
+      ##
+      ## @example Color.template('{Rwb}Warning:{x} {w}you look a little {g}ill{x}')
+      ##
       ## @param      input  [String, Array] The template
       ##                    string. If this is an array, the
       ##                    elements will be joined with a
