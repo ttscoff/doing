@@ -101,9 +101,9 @@ _doing_done() {
 _doing_finish() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--archive --finished --auto --started --bool --case --date --interactive --not --remove --section --search --for --tag --unfinished --update --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--archive --finished --auto --started --bool --case --date --from --interactive --not --remove --section --search --for --tag --unfinished --update --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-a -i -r -s -u -x --archive --finished --auto --started --bool --case --date --interactive --not --remove --section --search --for --tag --unfinished --update --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-a -i -r -s -u -x --archive --finished --auto --started --bool --case --date --from --interactive --not --remove --section --search --for --tag --unfinished --update --val --exact' -- $token ) )
   
   fi
 }
@@ -141,9 +141,9 @@ _doing_import() {
 _doing_last() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--bool --case --config_template --delete --duration --editor --hilite --not --section --search --tag --template --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--bool --case --config_template --delete --duration --editor --hilite --not --output --section --search --tag --template --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-d -e -h -s -x --bool --case --config_template --delete --duration --editor --hilite --not --section --search --tag --template --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-d -e -h -o -s -x --bool --case --config_template --delete --duration --editor --hilite --not --output --section --search --tag --template --val --exact' -- $token ) )
   
   fi
 }
@@ -221,9 +221,9 @@ _doing_plugins() {
 _doing_recent() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--config_template --duration --interactive --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '--config_template --duration --interactive --output --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-i -s -t --config_template --duration --interactive --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
+    COMPREPLY=( $( compgen -W '-i -o -s -t --config_template --duration --interactive --output --only_timed --section --times --tag_order --tag_sort --template --totals' -- $token ) )
   
   fi
 }
@@ -241,9 +241,9 @@ _doing_redo() {
 _doing_reset() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--bool --case --interactive --not --resume --section --search --tag --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '--bool --case --from --interactive --not --resume --section --search --for --tag --val --exact' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-i -r -s -x --bool --case --interactive --not --resume --section --search --tag --val --exact' -- $token ) )
+    COMPREPLY=( $( compgen -W '-i -r -s -x --bool --case --from --interactive --not --resume --section --search --for --tag --val --exact' -- $token ) )
   
   fi
 }

@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.39
+v2.1.40
 
 === Global Options
 === --config_file arg
@@ -645,7 +645,7 @@ way to add entries in post and maintain accurate (albeit manual) time tracking.
 ===== --at|--finished DATE_STRING
 
 Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
-  Used with --took, backdates start date
+    Used with --took, backdates start date
 
 [Default Value] None
 
@@ -660,7 +660,7 @@ Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
 ===== --from TIME_RANGE
 
 Start and end times as a date/time range `doing done --from "1am to 8am"`.
-        Overrides other date flags.
+          Overrides other date flags.
 
 [Default Value] None
 [Must Match] (?i-mx:^\S+.*? +(?:to|through|thru|(?:un)?til|-+) +\S+.*?$)
@@ -683,8 +683,8 @@ Section
 ===== -t|--took|--for INTERVAL
 
 Set completion date to start date plus interval (XX[mhd] or HH:MM).
-  If used without the --back option, the start date will be moved back to allow
-  the completion date to be the current time.
+    If used without the --back option, the start date will be moved back to allow
+    the completion date to be the current time.
 
 [Default Value] None
 
@@ -731,7 +731,8 @@ Marks the last X entries with a @done tag and current date. Does not alter alrea
 ===== Options
 ===== --at|--finished DATE_STRING
 
-Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.
+Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
+    Used with --took, backdates start date
 
 [Default Value] None
 
@@ -759,6 +760,15 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 [Must Match] (?i-mx:^[cis].*?$)
 
 
+===== --from TIME_RANGE
+
+Start and end times as a date/time range `doing done --from "1am to 8am"`.
+          Overrides other date flags.
+
+[Default Value] None
+[Must Match] (?i-mx:^\S+.*? +(?:to|through|thru|(?:un)?til|-+) +\S+.*?$)
+
+
 ===== -s|--section NAME
 
 Section
@@ -776,7 +786,9 @@ Filter entries using a search query, surround with slashes for regex (e.g. "/que
 
 ===== -t|--took|--for INTERVAL
 
-Set the completed date to the start date plus XX[hmd]
+Set completion date to start date plus interval (XX[mhd] or HH:MM).
+    If used without the --back option, the start date will be moved back to allow
+    the completion date to be the current time.
 
 [Default Value] None
 
@@ -1142,6 +1154,13 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 Output using a template from configuration
 
 [Default Value] last
+
+
+===== -o|--output FORMAT
+
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+
+[Default Value] None
 
 
 ===== -s|--section NAME
@@ -1706,6 +1725,13 @@ Output using a template from configuration
 [Default Value] recent
 
 
+===== -o|--output FORMAT
+
+Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+
+[Default Value] None
+
+
 ===== -s|--section NAME
 
 Section
@@ -1801,6 +1827,15 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 [Must Match] (?i-mx:^[cis].*?$)
 
 
+===== --from TIME_RANGE
+
+Start and end times as a date/time range `doing done --from "1am to 8am"`.
+        Overrides any date argument and disables --resume.
+
+[Default Value] None
+[Must Match] (?i-mx:^\S+.*? +(?:to|through|thru|(?:un)?til|-+) +\S+.*?$)
+
+
 ===== -s|--section NAME
 
 Limit search to section
@@ -1812,6 +1847,13 @@ Limit search to section
 
 Filter entries using a search query, surround with slashes for regex (e.g. "/query.*/"),
             start with single quote for exact match ("'query")
+
+[Default Value] None
+
+
+===== -t|--took|--for INTERVAL
+
+Set completion date to start date plus interval (XX[mhd] or HH:MM). Disables --resume
 
 [Default Value] None
 
