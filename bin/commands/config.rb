@@ -29,7 +29,7 @@ command :config do |c|
   c.long_desc 'Config files are listed in order of precedence (if there are multiple configs detected).
   Values defined in the top item in the list will override values in configutations below it.'
   c.command :list do |list|
-    list.action do |global, options, args|
+    list.action do
       puts Doing.config.additional_configs.join("\n")
       puts Doing.config.config_file
     end
@@ -54,7 +54,8 @@ command :config do |c|
       edit.arg_name 'BUNDLE_ID'
       edit.flag %i[b bundle_id]
 
-      edit.desc "Use the config editor defined in ~/.config/doing/config.yml (#{Doing.setting('editors.config', 'editors.config not set')})"
+      default_editor = Doing.setting('editors.config', 'editors.config not set')
+      edit.desc "Use the config editor defined in ~/.config/doing/config.yml (#{default_editor})"
       edit.switch %i[x default], negatable: false
     end
 
@@ -68,10 +69,11 @@ command :config do |c|
         end
         action = cmd.send(:get_action, nil)
         action.call(global, options, args)
-        Doing.logger.warn('Deprecated:', '--dump and --update are deprecated,
-                             use `doing config get` and `doing config update`')
-        Doing.logger.output_results
-        return
+
+        raise DoingNoTraceError.new('--dump and --update are deprecated,
+                                    use `doing config get` and `doing config update`',
+                                    level: :warn,
+                                    topic: 'Deprecated:')
       end
 
       config_file = Doing.config.choose_config
@@ -79,14 +81,12 @@ command :config do |c|
       if `uname` =~ /Darwin/
         if options[:default]
           editor = Doing::Util.find_default_editor('config')
-          if editor
-            if Doing::Util.exec_available(editor.split(/ /).first)
-              system %(#{editor} "#{config_file}")
-            else
-              `open -a "#{editor}" "#{config_file}"`
-            end
+          raise InvalidArgument, 'No viable editor found in config or environment.' unless editor
+
+          if Doing::Util.exec_available(editor.split(/ /).first)
+            system %(#{editor} "#{config_file}")
           else
-            raise InvalidArgument, 'No viable editor found in config or environment.'
+            `open -a "#{editor}" "#{config_file}"`
           end
         elsif options[:app] || options[:bundle_id]
           if options[:app]
@@ -107,7 +107,10 @@ command :config do |c|
         end
       else
         editor = options[:editor] || Doing::Util.default_editor
-        raise MissingEditor, 'No EDITOR variable defined in environment' unless editor && Doing::Util.exec_available(editor.split(/ /).first)
+        unless editor && Doing::Util.exec_available(editor.split(/ /).first)
+          raise MissingEditor, 'No EDITOR variable defined in environment'
+
+        end
 
         system %(#{editor} "#{config_file}")
       end
@@ -117,8 +120,8 @@ command :config do |c|
   # @@config.update @@config.refresh
   c.desc 'Update default config file, adding any missing keys'
   c.command %i[update refresh] do |update|
-    update.action do |_global, options, args|
-      Doing.config.configure({rewrite: true, ignore_local: true})
+    update.action do
+      Doing.config.configure({ rewrite: true, ignore_local: true })
       Doing.logger.warn('Config:', 'config refreshed')
     end
   end
@@ -126,7 +129,7 @@ command :config do |c|
   # @@config.undo
   c.desc 'Undo the last change to a config file'
   c.command :undo do |undo|
-    undo.action do |_global, options, args|
+    undo.action do
       config_file = Doing.config.choose_config
       Doing::Util::Backup.restore_last_backup(config_file, count: 1)
     end
@@ -137,22 +140,24 @@ command :config do |c|
   c.arg 'KEY_PATH'
   c.command %i[get dump] do |dump|
     dump.example 'doing config get', desc: 'Output the entire configuration'
-    dump.example 'doing config get timer_format --output raw', desc: 'Output the value of timer_format as a plain string'
-    dump.example 'doing config get doing_file', desc: 'Output the value of the doing_file setting, respecting local configurations'
-    dump.example 'doing config get -o json plug.plugpath', desc: 'Key path is fuzzy matched: output the value of plugins.plugin_path as JSON'
+    dump.example 'doing config get timer_format --output raw',
+                 desc: 'Output the value of timer_format as a plain string'
+    dump.example 'doing config get doing_file',
+                 desc: 'Output the value of the doing_file setting, respecting local configurations'
+    dump.example 'doing config get -o json plug.plugpath',
+                 desc: 'Key path is fuzzy matched: output the value of plugins.plugin_path as JSON'
 
     dump.desc 'Format for output (json|yaml|raw)'
     dump.arg_name 'FORMAT'
     dump.flag %i[o output], default_value: 'yaml', must_match: /^(?:y(?:aml)?|j(?:son)?|r(?:aw)?)$/
 
     dump.action do |_global, options, args|
-
       keypath = args.join('.')
       cfg = Doing.config.value_for_key(keypath)
       real_path = Doing.config.resolve_key_path(keypath)
 
       if cfg
-        val = cfg.map {|k, v| v }[0]
+        val = cfg.map { |_, v| v }[0]
         if real_path.count.positive?
           nested_cfg = {}
           nested_cfg.deep_set(real_path, val)
@@ -161,13 +166,15 @@ command :config do |c|
         end
 
         if options[:output] =~ /^r/
-          if val.is_a?(Hash)
-            $stdout.puts YAML.dump(val)
-          elsif val.is_a?(Array)
-            $stdout.puts val.join(', ')
-          else
-            $stdout.puts val.to_s
-          end
+
+          $stdout.puts case val
+                       when Hash
+                         YAML.dump(val)
+                       when Array
+                         val.join(', ')
+                       else
+                         val.to_s
+                       end
         else
           $stdout.puts case options[:output]
                        when /^j/
@@ -188,13 +195,14 @@ command :config do |c|
   c.arg 'KEY VALUE'
   c.command :set do |set|
     set.example 'doing config set timer_format human', desc: 'Set the value of timer_format to "human"'
-    set.example 'doing config set plug.plugpath ~/my_plugins', desc: 'Key path is fuzzy matched: set the value of plugins.plugin_path'
+    set.example 'doing config set plug.plugpath ~/my_plugins',
+                desc: 'Key path is fuzzy matched: set the value of plugins.plugin_path'
 
     set.desc 'Delete specified key'
     set.switch %i[r remove], negatable: false
 
     set.desc 'Force update to .doingrc in the current directory'
-    set.switch %[local], negatable: false
+    set.switch %i[local], negatable: false
 
     set.action do |_global, options, args|
       if args.count < 2 && !options[:remove]
@@ -209,10 +217,11 @@ command :config do |c|
       old_type = old_value&.class.to_s || nil
 
       if old_value.is_a?(Hash) && !options[:remove]
-        Doing.logger.log_now(:warn, 'Config:', "Config key must point to a single value, #{real_path.join('.').boldwhite} is a mapping")
+        Doing.logger.log_now(:warn, 'Config:', ['Config key must point to a single value, ',
+                                                "#{real_path.join('.').boldwhite} is a mapping"].join(' '))
         didyou = 'Did you mean:'
-        old_value.keys.each do |k|
-          Doing.logger.log_now(:warn, "#{didyou}", "#{keypath}.#{k}?")
+        old_value.each_key do |k|
+          Doing.logger.log_now(:warn, didyou, "#{keypath}.#{k}?")
           didyou = '..........or:'
         end
         raise InvalidArgument, 'Config value is a mapping, can not be set to a single value'

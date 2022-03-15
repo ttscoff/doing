@@ -139,12 +139,16 @@ module Doing
       ## Colors are specified with single letters inside
       ## curly braces. Uppercase changes background color.
       ##
-      ## @param      template  The template string
+      ## @param      input  [String, Array] The template
+      ##                    string. If this is an array, the
+      ##                    elements will be joined with a
+      ##                    space.
       ##
-      ## @return     { description_of_the_return_value }
+      ## @return     [String] Colorized string
       ##
-      def template(str)
-        fmt = str.gsub(/\{(\w+)\}/) do
+      def template(input)
+        input = input.join(' ') if input.is_a? Array
+        fmt = input.gsub(/\{(\w+)\}/) do
           Regexp.last_match(1).split('').map { |c| "%<#{c}>s" }.join('')
         end
 

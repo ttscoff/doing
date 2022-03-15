@@ -287,12 +287,12 @@ around do |global, command, _options, _arguments, code|
   end
 
   if global[:config_file] && global[:config_file] != Doing.config.config_file
-    Doing.logger.warn(format(['%<promptcolor>sWARNING: %<textcolor>sThe use of --config_file is deprecated,',
-                              'please set the environment variable DOING_CONFIG instead.'].join(' '),
-                             { promptcolor: @colors.flamingo, textcolor: @colors.boldred }))
-    Doing.logger.warn(format(['%<promptcolor>sTo set it just for the current command,',
-                              'use: %<highlight>sDOING_CONFIG=/path/to/doingrc doing [command]%<reset>s'].join(' '),
-                             { promptcolor: @colors.red, highlight: @colors.boldwhite, reset: @colors.default }))
+    msg = Doing::Color.template(['{Rwb}WARNING:{x} {br}The use of --config_file is deprecated,',
+                                 'please set the environment variable DOING_CONFIG instead.{x}'])
+    Doing.logger.warn(msg)
+    msg = Doing::Color.template(['{r}To set it just for the current command, use:',
+                                 '{bw}DOING_CONFIG=/path/to/doingrc doing [command]{x}'])
+    Doing.logger.warn(msg)
 
     cf = File.expand_path(global[:config_file])
     raise MissingConfigFile, "Config file not found (#{global[:config_file]})" unless File.exist?(cf)
