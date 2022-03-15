@@ -11,7 +11,7 @@ command :yesterday do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  add_options(:output_template, c)
+  add_options(:output_template, c, default_template: 'today')
   add_options(:time_filter, c)
   add_options(:time_display, c)
 

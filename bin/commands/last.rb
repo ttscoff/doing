@@ -27,7 +27,7 @@ command :last do |c|
   c.desc 'Show elapsed time if entry is not tagged @done'
   c.switch [:duration]
 
-  add_options(:output_template, c)
+  add_options(:output_template, c, default_template: 'last')
   add_options(:search, c)
   add_options(:tag_filter, c)
 

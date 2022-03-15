@@ -14,7 +14,7 @@
 ## @param      type  [Symbol] The type
 ## @param      cmd   The GLI command to which the options will be added
 ##
-def add_options(type, cmd)
+def add_options(type, cmd, default_template: 'default')
   cmd_name = cmd.name.to_s
   action = case cmd_name
            when /again/
@@ -37,7 +37,7 @@ def add_options(type, cmd)
 
     cmd.desc "Output using a template from configuration"
     cmd.arg_name 'TEMPLATE_KEY'
-    cmd.flag [:config_template], type: TemplateName, default_value: 'default'
+    cmd.flag [:config_template], type: TemplateName, default_value: default_template
 
     cmd.desc 'Override output format with a template string containing %placeholders'
     cmd.arg_name 'TEMPLATE_STRING'

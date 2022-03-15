@@ -15,7 +15,7 @@ command :recent do |c|
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
 
-  add_options(:output_template, c)
+  add_options(:output_template, c, default_template: 'recent')
   add_options(:time_display, c)
 
   c.action do |global_options, options, args|

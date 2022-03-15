@@ -22,15 +22,15 @@ command :show do |c|
   c.arg_name 'MAX'
   c.flag %i[c count], default_value: 0, must_match: /^\d+$/, type: Integer
 
-  c.desc 'Age (oldest|newest)'
-  c.arg_name 'AGE'
-  c.flag %i[a age], default_value: :newest, type: AgeSymbol
-
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
   c.desc "Edit matching entries with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
+
+  c.desc 'Age (oldest|newest)'
+  c.arg_name 'AGE'
+  c.flag %i[a age], default_value: :newest, type: AgeSymbol
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'

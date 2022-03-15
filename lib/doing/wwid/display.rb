@@ -264,7 +264,7 @@ module Doing
 
         opts = {
           case: options[:case],
-          config_template: 'last',
+          config_template: options[:config_template] || 'last',
           count: 1,
           delete: options[:delete],
           duration: options[:duration],
