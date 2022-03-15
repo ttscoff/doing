@@ -2,9 +2,18 @@
 
 # Cribbed from <https://github.com/flori/term-ansicolor>
 module Doing
-  # Terminal color functions
+  # Terminal output color functions.
   module Color
-    # :stopdoc:
+    # All available color names. Available as methods and string extensions.
+    #
+    # @example Use a color as a method. Color reset will be added to end of string.
+    #   Color.yellow('This text is yellow') => "\e[33mThis text is yellow\e[0m"
+    #
+    # @example Use a color as a string extension. Color reset added automatically.
+    #   'This text is green'.green => "\e[1;32mThis text is green\e[0m"
+    #
+    # @example Send a text string as a color
+    #   Color.send('red') => "\e[31m"
     ATTRIBUTES = [
       [:clear,               0], # String#clear is already used to empty string in Ruby 1.9
       [:reset,               0], # synonym for :clear
@@ -119,7 +128,7 @@ module Doing
     end
 
     class << self
-      # Returns true, if the coloring function of this module
+      # Returns true if the coloring function of this module
       # is switched on, false otherwise.
       def coloring?
         @coloring
