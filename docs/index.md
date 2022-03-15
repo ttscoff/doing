@@ -8,7 +8,7 @@ _If you're one of the rare people like me who find this useful, feel free to
 
 
 
-The current version of `doing` is 2.1.31.
+The current version of `doing` is 2.1.39.
 
 Find all of the documentation in the [doing wiki][wiki].
 
