@@ -125,11 +125,13 @@ module Doing
         @coloring
       end
 
-      # Turns the coloring on or off globally, so you can easily do
-      # this for example:
-      #  Doing::Color::coloring = STDOUT.isatty
       attr_writer :coloring
 
+      ##
+      ## Enables colored output
+      ##
+      ## @example Turn color on or off based on TTY
+      ##   Doing::Color.coloring = STDOUT.isatty
       def coloring
         @coloring ||= true
       end
@@ -139,20 +141,12 @@ module Doing
       ## Colors are specified with single letters inside
       ## curly braces. Uppercase changes background color.
       ##
-      ## w: white
-      ## k: black
-      ## g: green
-      ## l: blue
-      ## y: yellow
-      ## c: cyan
-      ## m: magenta
-      ## r: red
-      ## b: bold
-      ## u: underline
-      ## i: italic
+      ## w: white, k: black, g: green, l: blue, y: yellow, c: cyan,
+      ## m: magenta, r: red, b: bold, u: underline, i: italic,
       ## x: reset (remove background, color, emphasis)
       ##
-      ## @example Color.template('{Rwb}Warning:{x} {w}you look a little {g}ill{x}')
+      ## @example Convert a templated string
+      ##   Color.template('{Rwb}Warning:{x} {w}you look a little {g}ill{x}')
       ##
       ## @param      input  [String, Array] The template
       ##                    string. If this is an array, the

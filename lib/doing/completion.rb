@@ -2,11 +2,10 @@
 
 require 'tty-progressbar'
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'completion'))
-require 'string'
-require 'fish_completion'
-require 'zsh_completion'
-require 'bash_completion'
+require_relative 'completion/string'
+require_relative 'completion/fish_completion'
+require_relative 'completion/zsh_completion'
+require_relative 'completion/bash_completion'
 
 module Doing
   # Completion script generator
