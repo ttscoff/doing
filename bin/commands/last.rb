@@ -21,20 +21,13 @@ command :last do |c|
   c.desc "Delete the last entry"
   c.switch %i[d delete], negatable: false, default_value: false
 
-  c.desc "Output using a template from configuration"
-  c.arg_name 'TEMPLATE_KEY'
-  c.flag [:config_template], type: TemplateName, default_value: 'last'
-
-  c.desc 'Override output format with a template string containing %placeholders'
-  c.arg_name 'TEMPLATE_STRING'
-  c.flag [:template]
-
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
   c.desc 'Show elapsed time if entry is not tagged @done'
   c.switch [:duration]
 
+  add_options(:output_template, c, default_template: 'last')
   add_options(:search, c)
   add_options(:tag_filter, c)
 
@@ -69,6 +62,7 @@ command :last do |c|
                         case: options[:case],
                         hilite: options[:hilite],
                         negate: options[:not],
+                        output: options[:output],
                         tag: options[:tag],
                         tag_bool: options[:bool],
                         delete: options[:delete],

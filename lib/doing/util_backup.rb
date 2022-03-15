@@ -62,7 +62,7 @@ module Doing
         filename ||= Doing.setting('doing_file')
 
         backup_file = last_backup(filename, count: count)
-        raise DoingRuntimeError, 'End of undo history' if backup_file.nil?
+        raise HistoryLimitError, 'End of undo history' if backup_file.nil?
 
         save_undone(filename)
         FileUtils.mv(backup_file, filename)
@@ -86,7 +86,7 @@ module Doing
         skipped = undones.slice!(0, count)
         undone = skipped.pop
 
-        raise DoingRuntimeError, 'End of redo history' if undone.nil?
+        raise HistoryLimitError, 'End of redo history' if undone.nil?
 
         redo_file = File.join(backup_dir, undone)
 
@@ -118,8 +118,7 @@ module Doing
         filename ||= Doing.setting('doing_file')
 
         undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort
-
-        raise DoingRuntimeError, 'End of redo history' if undones.empty?
+        raise HistoryLimitError, 'End of redo history' if undones.empty?
 
         total = undones.count
         options = undones.each_with_object([]) do |file, arr|
@@ -128,8 +127,7 @@ module Doing
 
           arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
         end
-
-        raise DoingRuntimeError, 'No backup files to load' if options.empty?
+        raise MissingBackupFile, 'No backup files to load' if options.empty?
 
         backup_file = show_menu(options, filename)
         idx = undones.index(File.basename(backup_file))
@@ -163,7 +161,7 @@ module Doing
           arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
         end
 
-        raise DoingRuntimeError, 'No backup files to load' if options.empty?
+        raise MissingBackupFile, 'No backup files to load' if options.empty?
 
         backup_file = show_menu(options, filename)
         Util.write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
@@ -281,7 +279,7 @@ module Doing
       def create_backup_dir
         dir = File.expand_path(Doing.setting('backup_dir')) || File.join(user_home, '.doing_backup')
         if File.exist?(dir) && !File.directory?(dir)
-          raise DoingRuntimeError, "Backup error: #{dir} is not a directory"
+          raise DoingNoTraceError.new("#{dir} is not a directory", topic: 'History:', exit_code: 27)
 
         end
 

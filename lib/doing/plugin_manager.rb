@@ -84,11 +84,11 @@ module Doing
       def validate_plugin(title, type, klass)
         type = valid_type(type)
         if type == :import && !klass.respond_to?(:import)
-          raise Errors::PluginUncallable.new('Import plugins must respond to :import', type: type, plugin: title)
+          raise Errors::PluginUncallable.new('Import plugins must respond to :import', type, title)
         end
 
         if type == :export && !klass.respond_to?(:render)
-          raise Errors::PluginUncallable.new('Export plugins must respond to :render', type: type, plugin: title)
+          raise Errors::PluginUncallable.new('Export plugins must respond to :render', type, title)
         end
 
         type
@@ -113,7 +113,7 @@ module Doing
                when /^e(x(p(o(r(t)?)?)?)?)?$/
                  :export
                else
-                 raise Errors::InvalidPluginType, 'Invalid plugin type'
+                 raise Errors::InvalidPluginType.new('Invalid plugin type', 'unrecognized')
                end
 
         type.to_sym

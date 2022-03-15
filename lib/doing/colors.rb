@@ -2,9 +2,18 @@
 
 # Cribbed from <https://github.com/flori/term-ansicolor>
 module Doing
-  # Terminal color functions
+  # Terminal output color functions.
   module Color
-    # :stopdoc:
+    # All available color names. Available as methods and string extensions.
+    #
+    # @example Use a color as a method. Color reset will be added to end of string.
+    #   Color.yellow('This text is yellow') => "\e[33mThis text is yellow\e[0m"
+    #
+    # @example Use a color as a string extension. Color reset added automatically.
+    #   'This text is green'.green => "\e[1;32mThis text is green\e[0m"
+    #
+    # @example Send a text string as a color
+    #   Color.send('red') => "\e[31m"
     ATTRIBUTES = [
       [:clear,               0], # String#clear is already used to empty string in Ruby 1.9
       [:reset,               0], # synonym for :clear
@@ -66,7 +75,7 @@ module Doing
       [:redacted,    '0;30;40'],
       [:alert,       '1;31;43'],
       [:error,       '1;37;41'],
-      [:default,        '0;39']
+      [:default, '0;39']
     ].map(&:freeze).freeze
 
     ATTRIBUTE_NAMES = ATTRIBUTES.transpose.first
@@ -119,24 +128,60 @@ module Doing
     end
 
     class << self
-      # Returns true, if the coloring function of this module
+      # Returns true if the coloring function of this module
       # is switched on, false otherwise.
       def coloring?
         @coloring
       end
 
-      # Turns the coloring on or off globally, so you can easily do
-      # this for example:
-      #  Doing::Color::coloring = STDOUT.isatty
       attr_writer :coloring
 
+      ##
+      ## Enables colored output
+      ##
+      ## @example Turn color on or off based on TTY
+      ##   Doing::Color.coloring = STDOUT.isatty
       def coloring
         @coloring ||= true
+      end
+
+      ##
+      ## Convert a template string to a colored string.
+      ## Colors are specified with single letters inside
+      ## curly braces. Uppercase changes background color.
+      ##
+      ## w: white, k: black, g: green, l: blue, y: yellow, c: cyan,
+      ## m: magenta, r: red, b: bold, u: underline, i: italic,
+      ## x: reset (remove background, color, emphasis)
+      ##
+      ## @example Convert a templated string
+      ##   Color.template('{Rwb}Warning:{x} {w}you look a little {g}ill{x}')
+      ##
+      ## @param      input  [String, Array] The template
+      ##                    string. If this is an array, the
+      ##                    elements will be joined with a
+      ##                    space.
+      ##
+      ## @return     [String] Colorized string
+      ##
+      def template(input)
+        input = input.join(' ') if input.is_a? Array
+        fmt = input.gsub(/\{(\w+)\}/) do
+          Regexp.last_match(1).split('').map { |c| "%<#{c}>s" }.join('')
+        end
+
+        colors = { w: white, k: black, g: green, l: blue,
+                   y: yellow, c: cyan, m: magenta, r: red,
+                   W: bgwhite, K: bgblack, G: bggreen, L: bgblue,
+                   Y: bgyellow, C: bgcyan, M: bgmagenta, R: bgred,
+                   b: bold, u: underline, i: italic, x: reset }
+
+        format(fmt, colors)
       end
     end
 
     ATTRIBUTES.each do |c, v|
-      eval <<-EOT
+      new_method = <<-EOSCRIPT
         def #{c}(string = nil)
           result = ''
           result << "\e[#{v}m" if Doing::Color.coloring?
@@ -152,33 +197,37 @@ module Doing
           result << "\e[0m" if Doing::Color.coloring?
           result
         end
-      EOT
+      EOSCRIPT
+
+      module_eval(new_method)
+
+      next unless c =~ /bold/
 
       # Accept brightwhite in addition to boldwhite
-      if c =~ /bold/
-        eval <<-EOT
-          def #{c.to_s.sub(/bold/, 'bright')}(string = nil)
-            result = ''
-            result << "\e[#{v}m" if Doing::Color.coloring?
-            if block_given?
-              result << yield
-            elsif string.respond_to?(:to_str)
-              result << string.to_str
-            elsif respond_to?(:to_str)
-              result << to_str
-            else
-              return result #only switch on
-            end
-            result << "\e[0m" if Doing::Color.coloring?
-            result
+      new_method = <<-EOSCRIPT
+        def #{c.to_s.sub(/bold/, 'bright')}(string = nil)
+          result = ''
+          result << "\e[#{v}m" if Doing::Color.coloring?
+          if block_given?
+            result << yield
+          elsif string.respond_to?(:to_str)
+            result << string.to_str
+          elsif respond_to?(:to_str)
+            result << to_str
+          else
+            return result #only switch on
           end
-        EOT
-      end
+          result << "\e[0m" if Doing::Color.coloring?
+          result
+        end
+      EOSCRIPT
+
+      module_eval(new_method)
     end
 
     # Regular expression that is used to scan for ANSI-sequences while
     # uncoloring strings.
-    COLORED_REGEXP = /\e\[(?:(?:[349]|10)[0-7]|[0-9])?m/
+    COLORED_REGEXP = /\e\[(?:(?:[349]|10)[0-7]|[0-9])?m/.freeze
 
     # Returns an uncolored version of the string, that is all
     # ANSI-sequences are stripped from the string.
@@ -193,8 +242,6 @@ module Doing
         ''
       end
     end
-
-    module_function
 
     # Returns an array of all Doing::Color attributes as symbols.
     def attributes

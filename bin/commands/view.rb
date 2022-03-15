@@ -59,7 +59,7 @@ command :view do |c|
   c.action do |global_options, options, args|
     options[:fuzzy] = false
     if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
-      raise DoingRuntimeError, %(Invalid output type "#{options[:output]}")
+      raise InvalidPlugin.new('output', options[:output])
 
     end
 

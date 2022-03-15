@@ -19,24 +19,6 @@ command %i[done did] do |c|
   c.desc 'Immediately archive the entry'
   c.switch %i[a archive], negatable: false, default_value: false
 
-  c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
-  Used with --took, backdates start date)
-  c.arg_name 'DATE_STRING'
-  c.flag %i[at finished], type: DateEndString
-
-  c.desc %(
-        Start and end times as a date/time range `doing done --from "1am to 8am"`.
-        Overrides other date flags.
-      )
-  c.arg_name 'TIME_RANGE'
-  c.flag [:from], must_match: REGEX_RANGE
-
-  c.desc %(Set completion date to start date plus interval (XX[mhd] or HH:MM).
-  If used without the --back option, the start date will be moved back to allow
-  the completion date to be the current time.)
-  c.arg_name 'INTERVAL'
-  c.flag %i[t took for], type: DateIntervalString
-
   c.desc 'Section'
   c.arg_name 'NAME'
   c.flag %i[s section]
@@ -45,6 +27,7 @@ command %i[done did] do |c|
   c.switch %i[u unfinished], negatable: false, default_value: false
 
   add_options(:add_entry, c)
+  add_options(:finish_entry, c)
 
   c.action do |global_options, options, args|
     Doing.auto_tag = !options[:noauto]

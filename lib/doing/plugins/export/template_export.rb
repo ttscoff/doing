@@ -17,7 +17,7 @@ module Doing
     end
 
     def self.render(wwid, items, variables: {})
-      # Doing.logger.benchmark(:template_render, :start)
+      Doing.logger.benchmark(:template_render, :start)
       return if items.nil?
 
       opt = variables[:options]
@@ -126,18 +126,18 @@ module Doing
 
         output.gsub!(/\\%/, '%')
 
-        output.highlight_search!(opt[:search]) if opt[:template] =~ /^temp/ && opt[:search] && !opt[:not] && opt[:hilite]
+        output.highlight_search!(opt[:search]) if opt[:output] =~ /^temp/ && opt[:search] && !opt[:not] && opt[:hilite]
 
         out += "#{output}\n"
       end
 
-      # Doing.logger.debug('Template Export:', "#{items.count} items output to template #{opt[:template]}")
+      # Doing.logger.debug('Template Export:', "#{items.count} items output to template #{opt[:output]}")
       if opt[:totals]
         out += wwid.tag_times(format: Doing.setting('timer_format').to_sym,
                               sort_by: opt[:sort_tags],
                               sort_order: opt[:tag_order])
       end
-      # Doing.logger.benchmark(:template_render, :finish)
+      Doing.logger.benchmark(:template_render, :finish)
       out
     end
 

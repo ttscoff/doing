@@ -14,14 +14,6 @@ command :finish do |c|
   c.arg_name 'DATE_STRING'
   c.flag %i[b back started], type: DateBeginString
 
-  c.desc 'Set the completed date to the start date plus XX[hmd]'
-  c.arg_name 'INTERVAL'
-  c.flag %i[t took for], type: DateIntervalString
-
-  c.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm). If used, ignores --back.)
-  c.arg_name 'DATE_STRING'
-  c.flag %i[at finished], type: DateEndString
-
   c.desc 'Overwrite existing @done tag with new date'
   c.switch %i[update], negatable: false, default_value: false
 
@@ -48,32 +40,43 @@ command :finish do |c|
 
   add_options(:search, c)
   add_options(:tag_filter, c)
+  add_options(:finish_entry, c)
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
     unless options[:auto]
-      if options[:took]
-        took = options[:took]
-        raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
-      end
-
-      raise InvalidArgument, '--back and --took can not be used together' if options[:back] && options[:took]
-
-      raise InvalidArgument, '--search and --tag can not be used together' if options[:search] && options[:tag]
-
-      if options[:at]
-        finish_date = options[:at]
-        finish_date = finish_date.chronify(guess: :begin) if finish_date.is_a? String
-        raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
-
-        date = options[:took] ? finish_date - took : finish_date
-      elsif options[:back]
-        date = options[:back]
-
-        raise InvalidTimeExpression, 'Unable to parse date string' if date.nil?
+      if options[:from]
+        options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
+          time =~ REGEX_TIME ? "today #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}" : time
+        end.join(' to ').split_date_range
+        start_date, finish_date = options[:from]
+        finish_date ||= Time.now
       else
-        date = Time.now
+        if options[:took]
+          took = options[:took]
+          raise InvalidTimeExpression, 'Unable to parse date string for --took' if took.nil?
+
+        end
+
+        if options[:at]
+          finish_date = options[:at]
+          finish_date = finish_date.chronify(guess: :begin) if finish_date.is_a? String
+          raise InvalidTimeExpression, 'Unable to parse date string for --at' if finish_date.nil?
+
+          start_date = options[:took] ? finish_date - took : nil
+        elsif options[:back]
+          start_date = options[:back]
+          finish_date = options[:took] ? start_date + took : Time.now
+
+          raise InvalidTimeExpression, 'Unable to parse date string' if start_date.nil?
+
+        else
+          start_date = options[:took] ? Time.now - took : nil
+          finish_date = Time.now
+        end
       end
+
+
     end
 
     if options[:tag].nil?
@@ -101,10 +104,11 @@ command :finish do |c|
 
     opts = {
       archive: options[:archive],
-      back: date,
+      back: start_date,
       case: options[:case].normalize_case,
       count: count,
       date: options[:date],
+      done_date: finish_date,
       fuzzy: options[:fuzzy],
       interactive: options[:interactive],
       not: options[:not],
@@ -112,6 +116,7 @@ command :finish do |c|
       search: search,
       section: options[:section],
       sequential: options[:auto],
+      start_date: start_date,
       tag: tags,
       tag_bool: options[:bool].normalize_bool,
       tags: ['done'],

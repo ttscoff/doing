@@ -12,17 +12,10 @@ command :recent do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc "Output using a template from configuration"
-  c.arg_name 'TEMPLATE_KEY'
-  c.flag [:config_template], type: TemplateName, default_value: 'recent'
-
-  c.desc 'Override output format with a template string containing %placeholders'
-  c.arg_name 'TEMPLATE_STRING'
-  c.flag [:template]
-
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
 
+  add_options(:output_template, c, default_template: 'recent')
   add_options(:time_display, c)
 
   c.action do |global_options, options, args|
@@ -53,6 +46,7 @@ command :recent do |c|
         times: options[:times],
         totals: options[:totals],
         interactive: options[:interactive],
+        output: options[:output],
         duration: options[:duration],
         config_template: options[:config_template],
         template: options[:template]

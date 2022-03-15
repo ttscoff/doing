@@ -17,6 +17,17 @@ command %i[reset begin] do |c|
   c.desc 'Resume entry (remove @done)'
   c.switch %i[r resume], default_value: true
 
+  c.desc %(
+        Start and end times as a date/time range `doing done --from "1am to 8am"`.
+        Overrides any date argument and disables --resume.
+      )
+  c.arg_name 'TIME_RANGE'
+  c.flag [:from], must_match: REGEX_RANGE
+
+  c.desc %(Set completion date to start date plus interval (XX[mhd] or HH:MM). Disables --resume)
+  c.arg_name 'INTERVAL'
+  c.flag %i[t took for], type: DateIntervalString
+
   c.desc 'Change start date but do not remove @done (shortcut for --no-resume)'
   c.switch [:n]
 
@@ -62,9 +73,21 @@ command %i[reset begin] do |c|
 
     raise NoResults, 'No entry matching parameters was found.' unless last_entry
 
+    finish_date = nil
+
+    if options[:from]
+      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
+        time =~ REGEX_TIME ? "today #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}" : time
+      end.join(' to ').split_date_range
+      reset_date, finish_date = options[:from]
+      options[:resume] = false if finish_date
+    end
+
+    finish_date = reset_date + options[:took] if options[:took]
+
     old_item = last_entry.clone
 
-    @wwid.reset_item(last_entry, date: reset_date, resume: options[:resume])
+    @wwid.reset_item(last_entry, date: reset_date, finish_date: finish_date, resume: options[:resume])
     Doing::Hooks.trigger :post_entry_updated, @wwid, last_entry, old_item
     # new_entry = Doing::Item.new(last_entry.date, last_entry.title, last_entry.section, new_note)
 

@@ -1,3 +1,26 @@
+### 2.1.40
+
+2022-03-14 19:56
+
+#### NEW
+
+- `doing finish` accepts `--from` ranges to update both start and finish dates
+- `doing finish` allows `--back` and `--took` to be used together
+- `doing finish` allows `--search` and `--tag` to be used together
+- `doing finish --from 'DATE to DATE'` allows you to set a new start and end time with a single range string
+- `doing reset --from 'DATE to DATE'` allows you to reset an entry's start time and update or add @done time
+- `doing reset` accepts a `--took Xm` flag to change the finish time
+- `--output FORMAT` option for all display commands, including last, recent and today
+
+#### IMPROVED
+
+- Code refactoring, split up WWID class
+- Better diff method available to hooks to see what changed
+
+#### FIXED
+
+- Search highlighting was being skipped in all cases
+
 ### 2.1.39
 
 2022-03-13 04:32

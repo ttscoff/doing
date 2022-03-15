@@ -15,7 +15,7 @@ module Doing
       post_entry_removed: [], # wwid, entry.dup
       pre_export: [],         # wwid, format, entries
       pre_write: [],          # wwid, file
-      post_write: []          # wwid, file
+      post_write: []          # file
     }
 
     # map of all hooks and their priorities
@@ -40,10 +40,10 @@ module Doing
     # register a single hook to be called later, internal API
     def self.register_one(event, priority, &block)
       unless @registry[event]
-        raise Doing::Errors::HookUnavailable, "Invalid hook. Doing only supports #{@registry.keys.inspect}"
+        raise Doing::Errors::HookUnavailable.new("Invalid hook. Doing only supports #{@registry.keys.inspect}", 'hook', event)
       end
 
-      raise Doing::Errors::PluginUncallable, 'Hooks must respond to :call' unless block.respond_to? :call
+      raise Doing::Errors::PluginUncallable.new('Hooks must respond to :call', 'hook', event) unless block.respond_to? :call
 
       Doing.logger.debug('Hook Manager:', "Registered #{event} hook") if ENV['DOING_PLUGIN_DEBUG']
 

@@ -22,27 +22,19 @@ command :show do |c|
   c.arg_name 'MAX'
   c.flag %i[c count], default_value: 0, must_match: /^\d+$/, type: Integer
 
-  c.desc 'Age (oldest|newest)'
-  c.arg_name 'AGE'
-  c.flag %i[a age], default_value: :newest, type: AgeSymbol
-
   c.desc "Highlight search matches in output. Only affects command line output"
   c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
   c.desc "Edit matching entries with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
+  c.desc 'Age (oldest|newest)'
+  c.arg_name 'AGE'
+  c.flag %i[a age], default_value: :newest, type: AgeSymbol
+
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
   c.flag %i[s sort], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
-
-  c.desc "Output using a template from configuration"
-  c.arg_name 'TEMPLATE_KEY'
-  c.flag [:config_template], type: TemplateName, default_value: 'default'
-
-  c.desc 'Override output format with a template string containing %placeholders'
-  c.arg_name 'TEMPLATE_STRING'
-  c.flag [:template]
 
   c.desc 'Select section or tag to display from a menu'
   c.switch %i[m menu], negatable: false, default_value: false
@@ -50,10 +42,7 @@ command :show do |c|
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
 
-  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
-  c.arg_name 'FORMAT'
-  c.flag %i[o output]
-
+  add_options(:output_template, c)
   add_options(:time_display, c)
   add_options(:search, c)
   add_options(:tag_filter, c)
@@ -62,7 +51,7 @@ command :show do |c|
   c.action do |global_options, options, args|
     options[:fuzzy] = false
     if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
-      raise DoingRuntimeError, %(Invalid output type "#{options[:output]}")
+      raise InvalidPlugin.new('output', options[:output])
 
     end
 

@@ -13,34 +13,21 @@ command :on do |c|
   c.arg_name 'NAME'
   c.flag %i[s section], default_value: 'All'
 
-  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
-  c.arg_name 'FORMAT'
-  c.flag %i[o output]
-
-  c.desc "Output using a template from configuration"
-  c.arg_name 'TEMPLATE_KEY'
-  c.flag [:config_template], type: TemplateName, default_value: 'default'
-
-  c.desc 'Override output format with a template string containing %placeholders'
-  c.arg_name 'TEMPLATE_STRING'
-  c.flag [:template]
-
+  add_options(:output_template, c)
   add_options(:time_display, c)
   add_options(:search, c)
   add_options(:tag_filter, c)
   add_options(:time_filter, c)
 
   c.action do |_global_options, options, args|
-    raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    raise InvalidPlugin.new('output', options[:output]) if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
     raise MissingArgument, 'Missing date argument' if args.empty?
 
     date_string = args.join(' ').strip
     if date_string =~ /^tod(?:ay)?/i
-      date_string = 'today 01:00 to today 23:59'
+      date_string = 'midnight to today 23:59'
     end
-
-    puts date_string
 
     start, finish = date_string.split_date_range
 

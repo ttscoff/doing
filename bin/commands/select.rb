@@ -94,7 +94,7 @@ command :select do |c|
 
   c.action do |_global_options, options, _args|
     if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
-      raise DoingRuntimeError, %(Invalid output type "#{options[:output]}")
+      raise InvalidPlugin.new('output', options[:output])
 
     end
 

@@ -14,7 +14,7 @@
 ## @param      type  [Symbol] The type
 ## @param      cmd   The GLI command to which the options will be added
 ##
-def add_options(type, cmd)
+def add_options(type, cmd, default_template: 'default')
   cmd_name = cmd.name.to_s
   action = case cmd_name
            when /again/
@@ -30,6 +30,18 @@ def add_options(type, cmd)
            end
 
   case type
+  when :output_template
+    cmd.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
+    cmd.arg_name 'FORMAT'
+    cmd.flag %i[o output]
+
+    cmd.desc "Output using a template from configuration"
+    cmd.arg_name 'TEMPLATE_KEY'
+    cmd.flag [:config_template], type: TemplateName, default_value: default_template
+
+    cmd.desc 'Override output format with a template string containing %placeholders'
+    cmd.arg_name 'TEMPLATE_STRING'
+    cmd.flag [:template]
   when :add_entry
     cmd.desc 'Exclude auto tags and default tags'
     cmd.switch %i[X noauto], default_value: false, negatable: false
@@ -47,6 +59,24 @@ def add_options(type, cmd)
     cmd.desc 'Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]'
     cmd.arg_name 'DATE_STRING'
     cmd.flag %i[b back started], type: DateBeginString
+  when :finish_entry
+    cmd.desc %(Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
+    Used with --took, backdates start date)
+    cmd.arg_name 'DATE_STRING'
+    cmd.flag %i[at finished], type: DateEndString
+
+    cmd.desc %(
+          Start and end times as a date/time range `doing done --from "1am to 8am"`.
+          Overrides other date flags.
+        )
+    cmd.arg_name 'TIME_RANGE'
+    cmd.flag [:from], must_match: REGEX_RANGE
+
+    cmd.desc %(Set completion date to start date plus interval (XX[mhd] or HH:MM).
+    If used without the --back option, the start date will be moved back to allow
+    the completion date to be the current time.)
+    cmd.arg_name 'INTERVAL'
+    cmd.flag %i[t took for], type: DateIntervalString
   when :search
     cmd.desc 'Filter entries using a search query, surround with slashes for regex (e.g. "/query.*/"),
             start with single quote for exact match ("\'query")'
