@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'item/dates'
-require_relative 'item/tags'
-require_relative 'item/state'
-require_relative 'item/query'
+require_relative 'dates'
+require_relative 'tags'
+require_relative 'state'
+require_relative 'query'
 
 module Doing
   ##
