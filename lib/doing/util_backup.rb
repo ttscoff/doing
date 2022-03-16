@@ -65,7 +65,8 @@ module Doing
         raise HistoryLimitError, 'End of undo history' if backup_file.nil?
 
         save_undone(filename)
-        FileUtils.mv(backup_file, filename)
+        move_file(backup_file, filename)
+
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{backup_file}")
         Doing.logger.benchmark(:restore_backup, :finish)
@@ -90,7 +91,7 @@ module Doing
 
         redo_file = File.join(backup_dir, undone)
 
-        FileUtils.move(redo_file, filename)
+        move_file(redo_file, filename)
 
         skipped.each do |f|
           FileUtils.mv(File.join(backup_dir, f), File.join(backup_dir, f.sub(/^undone/, '')))
@@ -136,7 +137,7 @@ module Doing
 
         redo_file = File.join(backup_dir, undone)
 
-        FileUtils.move(redo_file, filename)
+        move_file(redo_file, filename)
 
         skipped.each do |f|
           FileUtils.mv(File.join(backup_dir, f), File.join(backup_dir, f.sub(/^undone/, '')))
@@ -165,9 +166,15 @@ module Doing
 
         backup_file = show_menu(options, filename)
         Util.write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
-        FileUtils.mv(backup_file, filename)
+        move_file(backup_file, filename)
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{backup_file}")
+      end
+
+      def move_file(source, dest)
+        Hooks.trigger :pre_write, dest
+        FileUtils.mv(source, dest)
+        Hooks.trigger :post_write, dest
       end
 
       def show_menu(options, filename)
