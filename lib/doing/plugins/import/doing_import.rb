@@ -125,7 +125,7 @@ module Doing
         next if line =~ /^\s*$/
 
         case line
-        when /^(\S[\S ]+):\s*(@\S+\s*)*$/
+        when /^(\S[\S ]+):(\s+@[\w\-_.]+(?= |$))*\s*$/
           section = Regexp.last_match(1)
           current = 0
         when /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/
