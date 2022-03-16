@@ -321,9 +321,9 @@ _doing_tag() {
 _doing_tag_dir() {
   
   if [[ "$token" == --* ]]; then
-    COMPREPLY=( $( compgen -W '--remove' -- $token ) )
+    COMPREPLY=( $( compgen -W '--clear --editor --remove' -- $token ) )
   elif [[ "$token" == -* ]]; then
-    COMPREPLY=( $( compgen -W '-r --remove' -- $token ) )
+    COMPREPLY=( $( compgen -W '-e -r --clear --editor --remove' -- $token ) )
   
   fi
 }

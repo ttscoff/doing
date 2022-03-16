@@ -505,7 +505,9 @@ complete -c doing -l unfinished -s u -f  -n '__fish_doing_using_command tag' -d 
 complete -c doing -l value -s v -f -r -n '__fish_doing_using_command tag' -d Include\ a\ value
 complete -c doing -l val  -f -r -n '__fish_doing_using_command tag' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command tag' -d Force\ exact\ search\ string\ matching
-complete -c doing -l remove -s r -f  -n '__fish_doing_using_command tag_dir' -d Remove\ all\ default_tags\ from\ the\ local
+complete -c doing -l clear  -f  -n '__fish_doing_using_command tag_dir' -d Remove\ all\ default_tags\ from\ the\ local
+complete -c doing -l editor -s e -f  -n '__fish_doing_using_command tag_dir' -d Use\ default\ editor\ to\ edit\ tag\ list
+complete -c doing -l remove -s r -f  -n '__fish_doing_using_command tag_dir' -d Delete\ tag\(s\)\ from\ the\ current\ list
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command tags' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l counts -s c -f  -n '__fish_doing_using_command tags' -d Show\ count\ of\ occurrences
 complete -c doing -l case  -f -r -n '__fish_doing_using_command tags' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive

@@ -127,7 +127,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#humanize-instance_method" title="#humanize (instance method)">#<strong>humanize</strong>(seconds)  &#x21d2; Object </a>
+      <a href="#humanize-instance_method" title="#humanize (instance method)">#<strong>humanize</strong>(seconds)  &#x21d2; String </a>
     
 
     
@@ -141,7 +141,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Format seconds as a natural language string.</p>
+</div></span>
   
 </li>
 
@@ -149,7 +150,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#relative_date-instance_method" title="#relative_date (instance method)">#<strong>relative_date</strong>  &#x21d2; Object </a>
+      <a href="#relative_date-instance_method" title="#relative_date (instance method)">#<strong>relative_date</strong>  &#x21d2; String </a>
     
 
     
@@ -163,7 +164,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Format time as a relative date.</p>
+</div></span>
   
 </li>
 
@@ -171,7 +173,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#time_ago-instance_method" title="#time_ago (instance method)">#<strong>time_ago</strong>  &#x21d2; Object </a>
+      <a href="#time_ago-instance_method" title="#time_ago (instance method)">#<strong>time_ago</strong>  &#x21d2; String </a>
     
 
     
@@ -185,7 +187,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Format date as &quot;X hours ago&quot;.</p>
+</div></span>
   
 </li>
 
@@ -202,37 +205,140 @@
       <div class="method_details first">
   <h3 class="signature first" id="humanize-instance_method">
   
-    #<strong>humanize</strong>(seconds)  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>humanize</strong>(seconds)  &#x21d2; <tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Format seconds as a natural language string</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>seconds</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>number of seconds</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Date formatted as &quot;X days, X hours, X minutes, X seconds&quot;</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
   <h3 class="signature " id="relative_date-instance_method">
   
-    #<strong>relative_date</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>relative_date</strong>  &#x21d2; <tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Format time as a relative date. Dates from today get
+just a time, from the last week get a time and day,
+from the last year get a month/day/time, and older
+entries get month/day/year/time</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>formatted date</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
   <h3 class="signature " id="time_ago-instance_method">
   
-    #<strong>time_ago</strong>  &#x21d2; <tt><span class='object_link'><a href="Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>time_ago</strong>  &#x21d2; <tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Format date as &quot;X hours ago&quot;</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Formatted date</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
   </div>
@@ -240,7 +346,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Mar 16 06:37:54 2022 by
+  Generated on Wed Mar 16 09:42:15 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>
