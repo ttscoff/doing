@@ -2,7 +2,7 @@
 
 module Doing
   ## Tag and search highlighting
-  class ::String
+  module StringHighlight
     ## @param (see #highlight_tags)
     def highlight_tags!(color = 'yellow', last_color: nil)
       replace highlight_tags(color)

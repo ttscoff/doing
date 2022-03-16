@@ -23,20 +23,40 @@ module Doing
   ## Main "What Was I Doing" methods
   ##
   class WWID
-    attr_reader   :additional_configs, :current_section, :doing_file, :content, :initial_content
+    # Local configuration files detected at initialization
+    attr_reader :additional_configs
 
-    attr_accessor :config, :config_file, :default_option
+    # The Currently section defined in configuration
+    attr_reader :current_section
+
+    # The location of the Doing file defined in configuration
+    attr_reader :doing_file
+
+    # The Items object into which all entries are read
+    attr_reader :content
+
+    # A frozen copy of the content object before any modification
+    attr_reader :initial_content
+
+    # The configuration object for the instance
+    attr_accessor :config
+
+    # The location of the main config file
+    attr_accessor :config_file
+
+    # [Boolean] the default option to provide in Y/N dialogs
+    attr_accessor :default_option
 
     include Color
-    include Display
-    include Editor
-    include FileTools
-    include Filter
-    include Guess
-    include Interactive
-    include Modify
-    include Tags
-    include Timers
+    include WWIDDisplay
+    include WWIDEditor
+    include WWIDFileTools
+    include WWIDFilter
+    include WWIDGuess
+    include WWIDInteractive
+    include WWIDModify
+    include WWIDTags
+    include WWIDTimers
     include WWIDUtil
     # include Util
 

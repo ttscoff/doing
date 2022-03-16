@@ -2,7 +2,7 @@
 
 module Doing
   # Handling of @tags in strings
-  class ::String
+  module StringTags
     ##
     ## Add @ prefix to string if needed, maintains +/- prefix
     ##

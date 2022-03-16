@@ -4,7 +4,7 @@ module Doing
   ##
   ## String helpers
   ##
-  class ::String
+  module StringTransform
     # Compress multiple spaces to single space
     def compress
       gsub(/ +/, ' ').strip

@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 module Doing
+  # Numeric helpers
+  class ::Numeric
+    # Test of number is positive
+    def good?
+      positive?
+    end
+  end
+
   # Object helpers
   class ::Object
     ##

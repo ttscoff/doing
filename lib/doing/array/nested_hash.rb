@@ -2,7 +2,7 @@ module Doing
   ##
   ## Array helpers
   ##
-  class ::Array
+  module ArrayNestedHash
     ##
     ## Convert array to nested hash, setting last key to value
     ##

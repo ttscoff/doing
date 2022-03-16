@@ -4,7 +4,7 @@ module Doing
   ##
   ## Number helpers
   ##
-  class ::Numeric
+  module ChronifyNumeric
     ##
     ## Format human readable time from seconds
     ##

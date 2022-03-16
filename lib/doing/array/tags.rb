@@ -4,7 +4,7 @@ module Doing
   ##
   ## Array helpers
   ##
-  class ::Array
+  module ArrayTags
     ##
     ## Convert an array of @tags to plain strings
     ##

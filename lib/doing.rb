@@ -24,7 +24,7 @@ require 'tty-markdown'
 require 'tty-reader'
 require 'tty-screen'
 
-require_relative 'doing/changelog'
+require_relative 'doing/changelog/changelog'
 require_relative 'doing/hash'
 require_relative 'doing/types'
 require_relative 'doing/colors'

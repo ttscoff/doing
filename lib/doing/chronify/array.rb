@@ -2,7 +2,7 @@
 
 module Doing
   # Chronify array helpers
-  class ::Array
+  module ChronifyArray
     # Convert [d, h, m] to [y, d, h, m]
     def to_years
       d, h, m = self
