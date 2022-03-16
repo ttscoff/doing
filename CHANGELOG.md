@@ -1,3 +1,11 @@
+### 2.1.41
+
+2022-03-15 19:10
+
+#### IMPROVED
+
+- `doing tag_dir -r TAG` can remove an indivudal tag from default_tags (--clear removes all)
+
 ### 2.1.40
 
 2022-03-14 19:56
