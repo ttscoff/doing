@@ -2,6 +2,22 @@
 
 module Doing
   class Items < Array
+    # # Create a deep copy of Items
+    # def clone
+    #   Marshal.load(Marshal.dump(self))
+    # end
+
+    def delete(item)
+      deleted = nil
+      each_with_index do |i, idx|
+        if i.equal?(item, match_section: true)
+          deleted = delete_at(idx)
+          break
+        end
+      end
+      deleted
+    end
+
     ##
     ## Get all tags on Items in self
     ##
@@ -26,14 +42,14 @@ module Doing
       b = items.clone
 
       a.delete_if do |item|
-        if b.index(item)
+        if b.include?(item)
           b.delete(item)
           true
         else
           false
         end
       end
-      { deleted: b, added: a }
+      { added: b, deleted: a }
     end
 
     ##

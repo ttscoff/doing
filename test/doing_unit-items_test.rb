@@ -39,12 +39,14 @@ class DoingItemsTest < Test::Unit::TestCase
   end
 
   def test_diff_items
-    orig = @content.dup
     other = Marshal.load(Marshal.dump(@content))
+
     other[2].date = Time.now - 3600
-    orig[1].title = 'Modified entry'
-    diff = orig.diff(other)
-    assert_equal(2, diff.count, 'Difference should be 2 items')
+    other[1].title = 'Modified entry'
+    diff = @content.diff(other)
+    puts
+    pp [@content, other, diff]
+    assert_equal(2, diff[:deleted].count, '2 items should be added')
   end
 
   def test_all_tags

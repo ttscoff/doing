@@ -61,7 +61,7 @@ module Doing
 
       return false unless @note.equal?(other.note)
 
-      return false if match_section && @section != other.section
+      return false if match_section && !@section.equal?(other.section)
 
       true
     end
