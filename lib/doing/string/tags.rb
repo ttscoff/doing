@@ -22,6 +22,17 @@ module Doing
     end
 
     ##
+    ## Split a string of tags, remove @ symbols, with or
+    ## without @ symbols, with or without parenthetical
+    ## values
+    ##
+    ## @return     [Array] array of tags without @ symbols
+    ##
+    def split_tags
+      gsub(/ *, */, ' ').scan(/(@?(?:\S+(?:\(.+\)))|@?(?:\S+))/).map(&:first).map(&:remove_at).sort.uniq
+    end
+
+    ##
     ## Convert a list of tags to an array. Tags can be with
     ## or without @ symbols, separated by any character, and
     ## can include parenthetical values (with spaces)
@@ -29,7 +40,7 @@ module Doing
     ## @return     [Array] array of tags including @ symbols
     ##
     def to_tags
-      arr = gsub(/ *, */, ' ').scan(/(@?(?:\S+(?:\(.+\)))|@?(?:\S+))/).map(&:first).sort.uniq.map(&:add_at)
+      arr = split_tags.map(&:add_at)
       if block_given?
         yield arr
       else

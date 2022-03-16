@@ -13,12 +13,12 @@ module Doing
 
       raise MissingEditor, 'No EDITOR variable defined in environment' if Util.default_editor.nil?
 
-      tmpfile = Tempfile.new(['doing', '.md'])
+      tmpfile = Tempfile.new(['doing', '.txt'])
 
       File.open(tmpfile.path, 'w+') do |f|
         f.puts input
         unless message.nil?
-          f.puts message == :default ? "# The first line is the entry title, any lines after that are added as a note" : message
+          f.puts message == :default ? '# First line is the entry title, lines after are added as a note' : message
         end
       end
 

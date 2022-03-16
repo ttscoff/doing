@@ -14,13 +14,24 @@ command :tag_dir do |c|
   c.desc 'Delete tag(s) from the current list'
   c.switch %i[r remove], negatable: false
 
+  c.desc 'Use default editor to edit tag list'
+  c.switch %i[e editor], negatable: false
+
   c.action do |global, options, args|
-    tags = args.join(' ').gsub(/ *, */, ' ').split(' ').tags_to_array
+    if args.empty? && !options[:clear] && !options[:editor]
+      all_tags = @wwid.content.all_tags
+      $stderr.puts Doing::Color.boldwhite('Enter tags separated by spaces, tab to complete')
+      input = Doing::Prompt.read_line(prompt: "Tags to #{options[:remove] ? 'remove' : 'add'}", completions: all_tags)
+      tags = input.split_tags
+    else
+      tags = args.join(' ').split_tags
+    end
 
     cfg_cmd = commands[:config]
     set_cmd = cfg_cmd.commands[:set]
 
     set_options = { local: true }
+
     if options[:clear]
       set_args = ['default_tags']
       set_options[:remove] = true
@@ -37,7 +48,7 @@ command :tag_dir do |c|
           end
         end
 
-        raise EmptyInput, 'No new tags provided' if tags.empty?
+        raise EmptyInput, 'No new tags provided' if tags.empty? && !options[:editor]
 
       end
 
@@ -47,14 +58,25 @@ command :tag_dir do |c|
 
         if options[:remove]
           tags.each { |tag| dir_tags.delete(tag) }
-          tags = dir_tags
+          tags = dir_tags.sort
         else
           tags.concat(dir_tags)
           tags.sort!.uniq!
+        end
 
-          raise UserCancelled, 'Tag(s) already exist for directory' if tags == dir_tags.sort
+        if tags == dir_tags.sort && !options[:remove] && !options[:editor]
+          raise UserCancelled, 'Tag(s) already exist for directory'
 
         end
+
+      end
+
+      if options[:editor]
+        input = @wwid.fork_editor(tags.join(' '), message: '# Enter tags separated by spaces')
+        input_lines = input.split(/[\n\r]+/).delete_if(&:ignore?)
+        edited = input_lines[0]&.strip
+
+        tags = edited.nil? ? [] : edited.split_tags
       end
 
       set_args = ['default_tags', tags.join(',')]
