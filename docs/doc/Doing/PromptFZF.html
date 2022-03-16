@@ -4,7 +4,7 @@
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
-  Module: Doing::ItemState
+  Module: Doing::PromptFZF
   
     &mdash; Documentation by YARD 0.9.27
   
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../css/common.css" type="text/css" />
 
 <script type="text/javascript">
-  pathId = "Doing::ItemState";
+  pathId = "Doing::PromptFZF";
   relpath = '../';
 </script>
 
@@ -36,10 +36,10 @@
       <div id="header">
         <div id="menu">
   
-    <a href="../_index.html">Index (I)</a> &raquo;
+    <a href="../_index.html">Index (P)</a> &raquo;
     <span class='title'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span>
      &raquo; 
-    <span class="title">ItemState</span>
+    <span class="title">PromptFZF</span>
   
 </div>
 
@@ -59,7 +59,7 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><h1>Module: Doing::ItemState
+      <div id="content"><h1>Module: Doing::PromptFZF
   
   
   
@@ -76,21 +76,21 @@
   
   <dl>
     <dt>Included in:</dt>
-    <dd><span class='object_link'><a href="Item.html" title="Doing::Item (class)">Item</a></span></dd>
+    <dd><span class='object_link'><a href="Prompt.html" title="Doing::Prompt (module)">Prompt</a></span></dd>
   </dl>
   
 
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/doing/item/state.rb</dd>
+    <dd>lib/doing/prompt/fzf.rb</dd>
   </dl>
   
 </div>
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>State queries for a Doing entry</p>
+    <p>Methods for working installing/using FuzzyFileFinder</p>
 
 
   </div>
@@ -116,7 +116,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#finished%3F-instance_method" title="#finished? (instance method)">#<strong>finished?</strong>  &#x21d2; Boolean </a>
+      <a href="#fzf-instance_method" title="#fzf (instance method)">#<strong>fzf</strong>  &#x21d2; String </a>
     
 
     
@@ -130,7 +130,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Test if item has a @done tag.</p>
+    <span class="summary_desc"><div class='inline'><p>Get path to fzf binary, installing if needed.</p>
 </div></span>
   
 </li>
@@ -139,7 +139,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#should_finish%3F-instance_method" title="#should_finish? (instance method)">#<strong>should_finish?</strong>  &#x21d2; Boolean </a>
+      <a href="#install_fzf-instance_method" title="#install_fzf (instance method)">#<strong>install_fzf</strong>(force: false)  &#x21d2; String </a>
     
 
     
@@ -153,7 +153,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Test if item is included in never_finish config and thus should not receive a @done tag.</p>
+    <span class="summary_desc"><div class='inline'><p>Install fzf on the current system.</p>
 </div></span>
   
 </li>
@@ -162,7 +162,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#should_time%3F-instance_method" title="#should_time? (instance method)">#<strong>should_time?</strong>  &#x21d2; Boolean </a>
+      <a href="#uninstall_fzf-instance_method" title="#uninstall_fzf (instance method)">#<strong>uninstall_fzf</strong>  &#x21d2; Object </a>
     
 
     
@@ -176,7 +176,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Test if item is included in never_time config and thus should not receive a date on the @done tag.</p>
+    <span class="summary_desc"><div class='inline'><p>Remove fzf binary.</p>
 </div></span>
   
 </li>
@@ -185,7 +185,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#unfinished%3F-instance_method" title="#unfinished? (instance method)">#<strong>unfinished?</strong>  &#x21d2; Boolean </a>
+      <a href="#which_fzf-instance_method" title="#which_fzf (instance method)">#<strong>which_fzf</strong>  &#x21d2; String </a>
     
 
     
@@ -199,7 +199,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Test if item does not contain @done tag.</p>
+    <span class="summary_desc"><div class='inline'><p>Return the path to the fzf binary.</p>
 </div></span>
   
 </li>
@@ -215,9 +215,9 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="finished?-instance_method">
+  <h3 class="signature first" id="fzf-instance_method">
   
-    #<strong>finished?</strong>  &#x21d2; <tt>Boolean</tt> 
+    #<strong>fzf</strong>  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
   
 
   
@@ -225,7 +225,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Test if item has a @done tag</p>
+    <p>Get path to fzf binary, installing if needed</p>
 
 
   </div>
@@ -238,12 +238,12 @@
     <li>
       
       
-        <span class='type'>(<tt>Boolean</tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>true item has @done tag</p>
+        <div class='inline'><p>Path to fzf binary</p>
 </div>
       
     </li>
@@ -254,9 +254,9 @@
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="should_finish?-instance_method">
+  <h3 class="signature " id="install_fzf-instance_method">
   
-    #<strong>should_finish?</strong>  &#x21d2; <tt>Boolean</tt> 
+    #<strong>install_fzf</strong>(force: false)  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
   
 
   
@@ -264,26 +264,48 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Test if item is included in never_finish config and
-thus should not receive a @done tag</p>
+    <p>Install fzf on the current system. Installs to a
+subdirectory of the gem</p>
 
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>force</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If true, reinstall if
+needed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
   
     <li>
       
       
-        <span class='type'>(<tt>Boolean</tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>item should receive @done tag</p>
+        <div class='inline'><p>Path to fzf binary</p>
 </div>
       
     </li>
@@ -294,9 +316,9 @@ thus should not receive a @done tag</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="should_time?-instance_method">
+  <h3 class="signature " id="uninstall_fzf-instance_method">
   
-    #<strong>should_time?</strong>  &#x21d2; <tt>Boolean</tt> 
+    #<strong>uninstall_fzf</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
   
 
   
@@ -304,39 +326,21 @@ thus should not receive a @done tag</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Test if item is included in never_time config and
-thus should not receive a date on the @done tag</p>
+    <p>Remove fzf binary</p>
 
 
   </div>
 </div>
 <div class="tags">
   
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>item should receive @done date</p>
-</div>
-      
-    </li>
-  
-</ul>
 
 </div>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="unfinished?-instance_method">
+  <h3 class="signature " id="which_fzf-instance_method">
   
-    #<strong>unfinished?</strong>  &#x21d2; <tt>Boolean</tt> 
+    #<strong>which_fzf</strong>  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
   
 
   
@@ -344,7 +348,7 @@ thus should not receive a date on the @done tag</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Test if item does not contain @done tag</p>
+    <p>Return the path to the fzf binary</p>
 
 
   </div>
@@ -357,12 +361,12 @@ thus should not receive a date on the @done tag</p>
     <li>
       
       
-        <span class='type'>(<tt>Boolean</tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>true if item is missing @done tag</p>
+        <div class='inline'><p>Path to fzf</p>
 </div>
       
     </li>

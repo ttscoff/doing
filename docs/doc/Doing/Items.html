@@ -208,7 +208,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#between_dates-instance_method" title="#between_dates (instance method)">#<strong>between_dates</strong>(start, finish)  &#x21d2; Object </a>
+      <a href="#between_dates-instance_method" title="#between_dates (instance method)">#<strong>between_dates</strong>(start, finish)  &#x21d2; Items </a>
     
 
     
@@ -438,7 +438,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#search-instance_method" title="#search (instance method)">#<strong>search</strong>(query, case_type: :smart)  &#x21d2; Object </a>
+      <a href="#search-instance_method" title="#search (instance method)">#<strong>search</strong>(query, case_type: :smart)  &#x21d2; Items </a>
     
 
     
@@ -507,7 +507,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#tagged-instance_method" title="#tagged (instance method)">#<strong>tagged</strong>(tags, bool: :and)  &#x21d2; Object </a>
+      <a href="#tagged-instance_method" title="#tagged (instance method)">#<strong>tagged</strong>(tags, bool: :and)  &#x21d2; Items </a>
     
 
     
@@ -784,7 +784,7 @@ creation of the section.</p>
       <div class="method_details ">
   <h3 class="signature " id="between_dates-instance_method">
   
-    #<strong>between_dates</strong>(start, finish)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>between_dates</strong>(start, finish)  &#x21d2; <tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt> 
   
 
   
@@ -792,7 +792,8 @@ creation of the section.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Filter Items by date. String arguments will be chronified</p>
+    <p>Filter Items by date. String arguments will be
+chronified</p>
 
 
   </div>
@@ -811,7 +812,8 @@ creation of the section.</p>
       
       
         &mdash;
-        <div class='inline'><p>Filter items after this date</p>
+        <div class='inline'><p>Filter items after
+this date</p>
 </div>
       
     </li>
@@ -826,13 +828,32 @@ creation of the section.</p>
       
       
         &mdash;
-        <div class='inline'><p>Filter items before this date</p>
+        <div class='inline'><p>Filter items before
+this date</p>
 </div>
       
     </li>
   
 </ul>
 
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>array of items with dates between
+targets</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -1250,7 +1271,7 @@ specified section</p>
       <div class="method_details ">
   <h3 class="signature " id="search-instance_method">
   
-    #<strong>search</strong>(query, case_type: :smart)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>search</strong>(query, case_type: :smart)  &#x21d2; <tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt> 
   
 
   
@@ -1294,13 +1315,31 @@ specified section</p>
       
       
         &mdash;
-        <div class='inline'><p>The case type (:smart, :sensitive, :ignore)</p>
+        <div class='inline'><p>The case type
+(:smart, :sensitive, :ignore)</p>
 </div>
       
     </li>
   
 </ul>
 
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>array of items matching search</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -1405,7 +1444,7 @@ specified section</p>
       <div class="method_details ">
   <h3 class="signature " id="tagged-instance_method">
   
-    #<strong>tagged</strong>(tags, bool: :and)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>tagged</strong>(tags, bool: :and)  &#x21d2; <tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt> 
   
 
   
@@ -1432,7 +1471,8 @@ specified section</p>
       
       
         &mdash;
-        <div class='inline'><p>The tags to filter by</p>
+        <div class='inline'><p>The tags by which to
+filter</p>
 </div>
       
     </li>
@@ -1449,13 +1489,31 @@ specified section</p>
       
       
         &mdash;
-        <div class='inline'><p>The bool with which to combine multiple tags</p>
+        <div class='inline'><p>The bool with which to
+combine multiple tags</p>
 </div>
       
     </li>
   
 </ul>
 
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Doing::Items (class)">Items</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>array of items matching tag filter</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -1556,7 +1614,7 @@ specified section</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Mar 16 06:26:09 2022 by
+  Generated on Wed Mar 16 06:37:54 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>

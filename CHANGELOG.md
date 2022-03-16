@@ -1,13 +1,18 @@
 ### 2.1.41
 
-2022-03-16 04:28
+2022-03-16 06:35
+
+#### NEW
+
+- Filter methods available to plugins on Items collection - #in_section, #search, #tagged, #between_dates
 
 #### IMPROVED
 
+- Further API documentation
+- `doing tag_dir -r TAG` can remove an indivudal tag from default_tags (--clear removes all)
 - `doing tag_dir` accepts `--editor` to edit tag list in default editor
 - `doing tag_dir` without arguments requests input via readline
 - Use `.txt` instead of `.md` for editor temp file to avoid incorrect syntax higlighting in editor
-- `doing tag_dir -r TAG` can remove an indivudal tag from default_tags (--clear removes all)
 
 ### 2.1.40
 
