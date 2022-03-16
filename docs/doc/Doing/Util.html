@@ -169,7 +169,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Non-destructive version of deep_merge_hashes! See that method.</p>
+    <span class="summary_desc"><div class='inline'><p>Non-destructive version of deep_merge_hashes!.</p>
 </div></span>
   
 </li>
@@ -178,7 +178,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#deep_merge_hashes!-instance_method" title="#deep_merge_hashes! (instance method)">#<strong>deep_merge_hashes!</strong>(target, overwrite)  &#x21d2; Object </a>
+      <a href="#deep_merge_hashes!-instance_method" title="#deep_merge_hashes! (instance method)">#<strong>deep_merge_hashes!</strong>(target, overwrite)  &#x21d2; Hash </a>
     
 
     
@@ -519,8 +519,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Non-destructive version of deep_merge_hashes! See that
-method.</p>
+    <p>Non-destructive version of deep_merge_hashes!</p>
 
 
   </div>
@@ -579,13 +578,20 @@ method.</p>
   
 </ul>
 
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>{deep_merge_hashes!}</li>
+    
+  </ul>
+
 </div>
 </div>
     
       <div class="method_details ">
   <h3 class="signature " id="deep_merge_hashes!-instance_method">
   
-    #<strong>deep_merge_hashes!</strong>(target, overwrite)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+    #<strong>deep_merge_hashes!</strong>(target, overwrite)  &#x21d2; <tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt> 
   
 
   
@@ -594,9 +600,6 @@ method.</p>
 </h3><div class="docstring">
   <div class="discussion">
     <p>Merges a master hash with another hash, recursively.</p>
-
-<p>master_hash - the &quot;parent&quot; hash whose values will be overridden
-other_hash  - the other hash whose values will be persisted after the merge</p>
 
 <p>This code was lovingly stolen from some random gem:
 <a href="http://gemjack.com/gems/tartan-0.1.1/classes/Hash.html">http://gemjack.com/gems/tartan-0.1.1/classes/Hash.html</a></p>
@@ -607,7 +610,61 @@ other_hash  - the other hash whose values will be persisted after the merge</p>
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>target</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the &quot;parent&quot; hash whose
+values will be overridden</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>overwrite</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the other hash whose
+values will be persisted after
+the merge</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>merged hashes</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div>
 </div>
@@ -925,7 +982,7 @@ other_hash  - the other hash whose values will be persisted after the merge</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Mar 16 09:42:15 2022 by
+  Generated on Wed Mar 16 16:07:01 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>

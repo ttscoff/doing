@@ -20,7 +20,7 @@ module Doing
     ##
     ## Add note contents, optionally replacing existing note
     ##
-    ## @param      note     [Array] The note to add, can be
+    ## @param      note     [Array|String|Note] The note to add, can be
     ##                      String, Array, or Note
     ## @param      replace  [Boolean] replace existing
     ##                      content
