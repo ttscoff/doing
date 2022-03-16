@@ -1,3 +1,11 @@
+### 2.1.42
+
+2022-03-16 14:59
+
+#### FIXED
+
+- Trigger pre/post_write hooks when using undo/redo
+
 ### 2.1.41
 
 2022-03-16 09:29
