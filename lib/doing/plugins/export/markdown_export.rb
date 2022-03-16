@@ -5,6 +5,7 @@
 # author: Brett Terpstra
 # url: https://brettterpstra.com
 module Doing
+  # @private
   class MarkdownRenderer
     attr_accessor :items, :page_title, :totals
 
@@ -15,12 +16,13 @@ module Doing
     end
 
     def get_binding
-      binding()
+      binding
     end
   end
 
+  # Markdown Export Plugin
   class MarkdownExport
-    include Doing::Util
+    include Util
 
     def self.settings
       {

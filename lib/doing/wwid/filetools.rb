@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  # File methods for WWID class
-  module WWIDFileTools
+  class WWID
     ##
     ## Initializes the doing file.
     ##

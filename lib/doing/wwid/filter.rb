@@ -1,26 +1,36 @@
 # frozen_string_literal: true
 
 module Doing
-  # Filter methods for WWID class
-  module WWIDFilter
-    def fuzzy_filter_items(items, opt: {})
+  class WWID
+    # Use fzf to filter an Items object with a search query.
+    # Faster than {#filter_items} when all you need is a
+    # text search of the title and note
+    #
+    # @param      items      [Items] an Items object
+    # @param      query      [String] The search query
+    # @param      case_type  [Symbol] The case type (:smart, :sensitive, :ignore)
+    #
+    # @return     [Items] Filtered Items array
+    #
+    def fuzzy_filter_items(items, query, case_type: :smart)
       scannable = items.map.with_index { |item, idx| "#{item.title} #{item.note.join(' ')}".gsub(/[|*?!]/, '') + "|#{idx}"  }.join("\n")
 
       fzf_args = [
         '--multi',
-        %(--filter="#{opt[:search].sub(/^'?/, "'")}"),
+        %(--filter="#{query.sub(/^'?/, "'")}"),
         '--no-sort',
         '-d "\|"',
         '--nth=1'
       ]
-      if opt[:case]
-        fzf_args << case opt[:case].normalize_case
-                    when :sensitive
-                      '+i'
-                    when :ignore
-                      '-i'
-                    end
-      end
+      fzf_args << case case_type.normalize_case
+                  when :smart
+                    query =~ /[A-Z]/ ? '+i' : '-i'
+                  when :sensitive
+                    '+i'
+                  when :ignore
+                    '-i'
+                  end
+
       # fzf_args << '-e' if opt[:exact]
       # puts fzf_args.join(' ')
       res = `echo #{Shellwords.escape(scannable)}|#{Prompt.fzf} #{fzf_args.join(' ')}`
@@ -62,7 +72,7 @@ module Doing
         items = section =~ /^all$/i ? @content.clone : @content.in_section(section)
       end
 
-      if !opt[:time_filter]
+      unless opt[:time_filter]
         opt[:time_filter] = [nil, nil]
         if opt[:from] && !opt[:date_filter]
           if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx

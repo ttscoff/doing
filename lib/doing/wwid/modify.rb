@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  # Item modification methods for WWID class
-  module WWIDModify
+  class WWID
     ##
     ## Adds an entry
     ##
@@ -11,7 +10,7 @@ module Doing
     ## @param      opt      [Hash] Additional Options
     ##
     ## @option opt :date [Date] item start date
-    ## @option opt :note [Array] item note (will be converted if value is String)
+    ## @option opt :note [Note] item note (will be converted if value is String)
     ## @option opt :back [Date] backdate
     ## @option opt :timed [Boolean] new item is timed entry, marks previous entry as @done
     ## @option opt :done [Date] If set, adds a @done tag to new entry

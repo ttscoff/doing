@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  # Timer methods for WWID class
-  module WWIDTimers
+  class WWID
     ##
     ## Get total elapsed time for all tags in
     ##             selection

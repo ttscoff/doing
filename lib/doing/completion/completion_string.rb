@@ -17,9 +17,9 @@ module Doing
         replace ltrunc(max)
       end
     end
-
-    class ::String
-      include StringUtils
-    end
   end
+end
+
+class ::String
+  include Doing::Completion::StringUtils
 end

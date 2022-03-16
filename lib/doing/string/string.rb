@@ -7,22 +7,25 @@ require_relative 'transform'
 require_relative 'truncate'
 require_relative 'url'
 
-module Doing
-  class ::String
-    include Color
-    include StringHighlight
-    include StringQuery
-    include StringTags
-    include StringTransform
-    include StringTruncate
-    include StringURL
+class ::String
+  include Doing::Color
+  include Doing::StringHighlight
+  include Doing::StringQuery
+  include Doing::StringTags
+  include Doing::StringTransform
+  include Doing::StringTruncate
+  include Doing::StringURL
 
-    def utf8
-      if String.method_defined? :force_encoding
-        dup.force_encoding('utf-8')
-      else
-        self
-      end
+  ##
+  ## Force UTF-8 encoding if available
+  ##
+  ## @return     [String] UTF-8 encoded string
+  ##
+  def utf8
+    if String.method_defined? :force_encoding
+      dup.force_encoding('utf-8')
+    else
+      self
     end
   end
 end

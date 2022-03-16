@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module Doing
-  # Util methods for WWID class
-  module WWIDUtil
+  class WWID
     ##
     ## Remove items from an array that already exist in
-    ## @content based on start and end times
+    ## :content based on start and end times
     ##
     ## @param      items       [Array] The items to
     ##                         deduplicate

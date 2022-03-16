@@ -6,7 +6,7 @@ require 'test_helper'
 $LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
 require 'doing'
 require 'doing/item'
-require 'doing/items'
+require 'doing/items/items'
 # require 'gli'
 
 # Tests for Item class

@@ -74,6 +74,11 @@
   
 
   
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></dd>
+  </dl>
+  
 
   
   <dl>
@@ -148,7 +153,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>The tagged string.</p>
+    <span class="summary_desc"><div class='inline'><p>Adds tags to a string.</p>
 </div></span>
   
 </li>
@@ -239,6 +244,29 @@
 
   
     <span class="summary_desc"><div class='inline'><p>Removes @ prefix if needed, maintains +/- prefix.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#split_tags-instance_method" title="#split_tags (instance method)">#<strong>split_tags</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Split a string of tags, remove @ symbols, with or without @ symbols, with or without parenthetical values.</p>
 </div></span>
   
 </li>
@@ -372,7 +400,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns the tagged string.</p>
+    <p>Adds tags to a string</p>
 
 
   </div>
@@ -561,6 +589,47 @@
       
         &mdash;
         <div class='inline'><p>string without @ prefix</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="split_tags-instance_method">
+  
+    #<strong>split_tags</strong>  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Split a string of tags, remove @ symbols, with or
+without @ symbols, with or without parenthetical
+values</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>array of tags without @ symbols</p>
 </div>
       
     </li>
@@ -805,7 +874,7 @@ can include parenthetical values (with spaces)</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 15 17:54:05 2022 by
+  Generated on Wed Mar 16 06:26:08 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>

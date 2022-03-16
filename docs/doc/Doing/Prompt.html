@@ -71,7 +71,7 @@
   
   <dl>
       <dt>Extended by:</dt>
-      <dd><span class='object_link'><a href="Color.html" title="Doing::Color (module)">Color</a></span></dd>
+      <dd><span class='object_link'><a href="Color.html" title="Doing::Color (module)">Color</a></span>, <span class='object_link'><a href="PromptChoose.html" title="Doing::PromptChoose (module)">PromptChoose</a></span>, <span class='object_link'><a href="PromptFZF.html" title="Doing::PromptFZF (module)">PromptFZF</a></span>, <span class='object_link'><a href="PromptInput.html" title="Doing::PromptInput (module)">PromptInput</a></span>, <span class='object_link'><a href="PromptSTD.html" title="Doing::PromptSTD (module)">PromptSTD</a></span>, <span class='object_link'><a href="PromptYN.html" title="Doing::PromptYN (module)">PromptYN</a></span></dd>
   </dl>
   
   
@@ -83,7 +83,7 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/doing/prompt.rb</dd>
+    <dd>lib/doing/prompt/prompt.rb</dd>
   </dl>
   
 </div>
@@ -114,7 +114,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#default_answer-class_method" title="default_answer (class method)">.<strong>default_answer</strong>  &#x21d2; Object </a>
+      <a href="#default_answer-class_method" title="default_answer (class method)">.<strong>default_answer</strong>  &#x21d2; Boolean </a>
     
 
     
@@ -131,7 +131,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>If true, always return the default answer without prompting.</p>
+</div></span>
   
 </li>
 
@@ -156,7 +157,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Value to return if prompt is skipped.</p>
+</div></span>
   
 </li>
 
@@ -166,68 +168,19 @@
 
 
 
-  
-    <h2>
-      Class Method Summary
-      <small><a href="#" class="summary_toggle">collapse</a></small>
-    </h2>
-
-    <ul class="summary">
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#choose_from-class_method" title="choose_from (class method)">.<strong>choose_from</strong>(options, prompt: &#39;Make a selection: &#39;, multiple: false, sorted: true, fzf_args: [])  &#x21d2; String </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
 
   
-    <span class="summary_desc"><div class='inline'><p>Generate a menu of options and allow user selection.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#choose_from_items-class_method" title="choose_from_items (class method)">.<strong>choose_from_items</strong>(items, **opt)  &#x21d2; Object </a>
-    
-
-    
-  </span>
   
   
   
   
   
+  <h2>Method Summary</h2>
   
-  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="PromptChoose.html" title="Doing::PromptChoose (module)">PromptChoose</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="PromptChoose.html#choose_from-instance_method" title="Doing::PromptChoose#choose_from (method)">choose_from</a></span>, <span class='object_link'><a href="PromptChoose.html#choose_from_items-instance_method" title="Doing::PromptChoose#choose_from_items (method)">choose_from_items</a></span></p>
 
   
-    <span class="summary_desc"><div class='inline'><p>Create an interactive menu to select from a set of Items.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#clear_screen-class_method" title="clear_screen (class method)">.<strong>clear_screen</strong>(msg = nil)  &#x21d2; Object </a>
-    
-
-    
-  </span>
   
   
   
@@ -235,22 +188,10 @@
   
   
   
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="PromptFZF.html" title="Doing::PromptFZF (module)">PromptFZF</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="PromptFZF.html#fzf-instance_method" title="Doing::PromptFZF#fzf (method)">fzf</a></span>, <span class='object_link'><a href="PromptFZF.html#install_fzf-instance_method" title="Doing::PromptFZF#install_fzf (method)">install_fzf</a></span>, <span class='object_link'><a href="PromptFZF.html#uninstall_fzf-instance_method" title="Doing::PromptFZF#uninstall_fzf (method)">uninstall_fzf</a></span>, <span class='object_link'><a href="PromptFZF.html#which_fzf-instance_method" title="Doing::PromptFZF#which_fzf (method)">which_fzf</a></span></p>
 
   
-    <span class="summary_desc"><div class='inline'><p>Clear the terminal screen.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#enter_text-class_method" title="enter_text (class method)">.<strong>enter_text</strong>(prompt, default_response: &#39;&#39;)  &#x21d2; Object </a>
-    
-
-    
-  </span>
   
   
   
@@ -258,21 +199,10 @@
   
   
   
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="PromptYN.html" title="Doing::PromptYN (module)">PromptYN</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="PromptYN.html#yn-instance_method" title="Doing::PromptYN#yn (method)">yn</a></span></p>
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#fzf-class_method" title="fzf (class method)">.<strong>fzf</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
   
   
   
@@ -280,215 +210,19 @@
   
   
   
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="PromptInput.html" title="Doing::PromptInput (module)">PromptInput</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="PromptInput.html#enter_text-instance_method" title="Doing::PromptInput#enter_text (method)">enter_text</a></span>, <span class='object_link'><a href="PromptInput.html#read_line-instance_method" title="Doing::PromptInput#read_line (method)">read_line</a></span>, <span class='object_link'><a href="PromptInput.html#read_lines-instance_method" title="Doing::PromptInput#read_lines (method)">read_lines</a></span>, <span class='object_link'><a href="PromptInput.html#request_lines-instance_method" title="Doing::PromptInput#request_lines (method)">request_lines</a></span></p>
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
   
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#install_fzf-class_method" title="install_fzf (class method)">.<strong>install_fzf</strong>(force: false)  &#x21d2; Object </a>
-    
-
-    
-  </span>
   
   
   
   
   
   
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#read_line-class_method" title="read_line (class method)">.<strong>read_line</strong>(prompt: &#39;Enter text&#39;, completions: [], default_response: &#39;&#39;)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#read_lines-class_method" title="read_lines (class method)">.<strong>read_lines</strong>(prompt: &#39;Enter text&#39;, completions: [], default_response: &#39;&#39;)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#request_lines-class_method" title="request_lines (class method)">.<strong>request_lines</strong>(prompt: &#39;Enter text&#39;, default_response: &#39;&#39;)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#restore_std-class_method" title="restore_std (class method)">.<strong>restore_std</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#silence_std-class_method" title="silence_std (class method)">.<strong>silence_std</strong>(file = &#39;/dev/null&#39;)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#uninstall_fzf-class_method" title="uninstall_fzf (class method)">.<strong>uninstall_fzf</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#which_fzf-class_method" title="which_fzf (class method)">.<strong>which_fzf</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#yn-class_method" title="yn (class method)">.<strong>yn</strong>(question, default_response: false)  &#x21d2; Bool </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Ask a yes or no question in the terminal.</p>
-</div></span>
-  
-</li>
-
-      
-    </ul>
-  
-
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="PromptSTD.html" title="Doing::PromptSTD (module)">PromptSTD</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="PromptSTD.html#clear_screen-instance_method" title="Doing::PromptSTD#clear_screen (method)">clear_screen</a></span>, <span class='object_link'><a href="PromptSTD.html#restore_std-instance_method" title="Doing::PromptSTD#restore_std (method)">restore_std</a></span>, <span class='object_link'><a href="PromptSTD.html#silence_std-instance_method" title="Doing::PromptSTD#silence_std (method)">silence_std</a></span></p>
 
   
   
@@ -509,13 +243,40 @@
       <div class="method_details first">
   <h3 class="signature first" id="default_answer-class_method">
   
-    .<strong>default_answer</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+    .<strong>default_answer</strong>  &#x21d2; <tt>Boolean</tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>If true, always return the default answer without prompting</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>default answer</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       
@@ -529,28 +290,9 @@
   
 
   
-</h3>
-</div>
-    
-  </div>
-
-
-  <div id="class_method_details" class="method_details_list">
-    <h2>Class Method Details</h2>
-
-    
-      <div class="method_details first">
-  <h3 class="signature first" id="choose_from-class_method">
-  
-    .<strong>choose_from</strong>(options, prompt: &#39;Make a selection: &#39;, multiple: false, sorted: true, fzf_args: [])  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
-  
-
-  
-
-  
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Generate a menu of options and allow user selection</p>
+    <p>Value to return if prompt is skipped</p>
 
 
   </div>
@@ -561,408 +303,14 @@
 <ul class="return">
   
     <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>The selected option</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="choose_from_items-class_method">
-  
-    .<strong>choose_from_items</strong>(items, **opt)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Create an interactive menu to select from a set of Items</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>items</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>list of items</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>opt</span>
       
       
         <span class='type'></span>
       
       
       
-        &mdash;
-        <div class='inline'><p>Additional options</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-  
-    
-    
-    
-    
-    <p class="tag_title">Options Hash (<tt>**opt</tt>):</p>
-    <ul class="option">
-      
-        <li>
-          <span class="name">:include_section</span>
-          <span class="type">(<tt>Boolean</tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>Include section name for each item in menu</p>
-</div>
-          
-        </li>
-      
-        <li>
-          <span class="name">:header</span>
-          <span class="type">(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>A custom header string</p>
-</div>
-          
-        </li>
-      
-        <li>
-          <span class="name">:prompt</span>
-          <span class="type">(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>A custom prompt string</p>
-</div>
-          
-        </li>
-      
-        <li>
-          <span class="name">:query</span>
-          <span class="type">(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>Initial query</p>
-</div>
-          
-        </li>
-      
-        <li>
-          <span class="name">:show_if_single</span>
-          <span class="type">(<tt>Boolean</tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>Show menu even if there&#39;s only one option</p>
-</div>
-          
-        </li>
-      
-        <li>
-          <span class="name">:menu</span>
-          <span class="type">(<tt>Boolean</tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>Show menu</p>
-</div>
-          
-        </li>
-      
-        <li>
-          <span class="name">:sort</span>
-          <span class="type">(<tt>Boolean</tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>Sort options</p>
-</div>
-          
-        </li>
-      
-        <li>
-          <span class="name">:multiple</span>
-          <span class="type">(<tt>Boolean</tt>)</span>
-          <span class="default">
-            
-          </span>
-          
-            &mdash; <div class='inline'><p>Allow multiple selections</p>
-</div>
-          
-        </li>
-      
-        <li>
-          <span class="name">:case</span>
-          <span class="type">(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
-          <span class="default">
-            
-              &mdash; default:
-              <tt>:sensitive</tt>, <tt>:ignore</tt>, <tt>:smart</tt>
-            
-          </span>
-          
-        </li>
-      
-    </ul>
-  
-
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="clear_screen-class_method">
-  
-    .<strong>clear_screen</strong>(msg = nil)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Clear the terminal screen</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="enter_text-class_method">
-  
-    .<strong>enter_text</strong>(prompt, default_response: &#39;&#39;)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="fzf-class_method">
-  
-    .<strong>fzf</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="install_fzf-class_method">
-  
-    .<strong>install_fzf</strong>(force: false)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="read_line-class_method">
-  
-    .<strong>read_line</strong>(prompt: &#39;Enter text&#39;, completions: [], default_response: &#39;&#39;)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="read_lines-class_method">
-  
-    .<strong>read_lines</strong>(prompt: &#39;Enter text&#39;, completions: [], default_response: &#39;&#39;)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="request_lines-class_method">
-  
-    .<strong>request_lines</strong>(prompt: &#39;Enter text&#39;, default_response: &#39;&#39;)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="restore_std-class_method">
-  
-    .<strong>restore_std</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="silence_std-class_method">
-  
-    .<strong>silence_std</strong>(file = &#39;/dev/null&#39;)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="uninstall_fzf-class_method">
-  
-    .<strong>uninstall_fzf</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="which_fzf-class_method">
-  
-    .<strong>which_fzf</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="yn-class_method">
-  
-    .<strong>yn</strong>(question, default_response: false)  &#x21d2; <tt>Bool</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Ask a yes or no question in the terminal</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>question</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>The question
-to ask</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>default_response</span>
-      
-      
-        <span class='type'>(<tt>Bool</tt>)</span>
-      
-      
-        <em class="default">(defaults to: <tt>false</tt>)</em>
-      
-      
-        &mdash;
-        <div class='inline'><p>default
-response if no input</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Bool</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>yes or no</p>
+        
+        <div class='inline'><p>Force answer value</p>
 </div>
       
     </li>
@@ -973,11 +321,12 @@ response if no input</p>
 </div>
     
   </div>
+
 
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 15 17:54:05 2022 by
+  Generated on Wed Mar 16 06:26:08 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>

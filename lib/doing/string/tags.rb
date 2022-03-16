@@ -49,7 +49,7 @@ module Doing
     end
 
     ##
-    ## @brief      Adds tags to a string
+    ## Adds tags to a string
     ##
     ## @param      tags    [String or Array] List of tags to add. @ symbol optional
     ## @param      remove  [Boolean] remove tags instead of adding

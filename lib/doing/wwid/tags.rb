@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  # Tag methods for WWID class
-  module WWIDTags
+  class WWID
     ##
     ## List all tags that exist on given items
     ##

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  # Editor methods for WWID class
-  module WWIDEditor
+  class WWID
     ##
     ## Create a process for an editor and wait for the file handle to return
     ##

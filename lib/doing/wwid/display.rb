@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  # Display methods for WWID class
-  module WWIDDisplay
+  class WWID
     ##
     ## Display contents of a section based on options
     ##

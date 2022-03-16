@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  # Interactive methods for WWID class
-  module WWIDInteractive
+  class WWID
     ##
     ## Display an interactive menu of entries
     ##
@@ -115,7 +114,8 @@ module Doing
 
             tags = type == 'add' ? all_tags(@content) : all_tags(items)
 
-            puts "#{yellow}Separate multiple tags with spaces, hit tab to complete known tags#{type == 'add' ? ', include values with tag(value)' : ''}"
+            add_msg = type == 'add' ? ', include values with tag(value)' : ''
+            puts "#{yellow}Separate multiple tags with spaces, hit tab to complete known tags#{add_msg}"
             puts "#{boldgreen}Available tags: #{boldwhite}#{tags.sort.map(&:add_at).join(', ')}" if type == 'remove'
             tag = Prompt.read_line(prompt: "Tags to #{type}", completions: tags)
 
@@ -176,11 +176,11 @@ module Doing
           repeat_item(item, { editor: opt[:editor] }) # hooked
         elsif opt[:reset]
           res = Prompt.enter_text('Start date (blank for current time)', default_response: '')
-          if res =~ /^ *$/
-            date = Time.now
-          else
-            date = res.chronify(guess: :begin)
-          end
+          date = if res =~ /^ *$/
+                   Time.now
+                 else
+                   res.chronify(guess: :begin)
+                 end
 
           res = if item.tags?('done', :and) && !opt[:resume]
                   opt[:force] ? true : Prompt.yn('Remove @done tag?', default_response: 'y')
@@ -216,12 +216,12 @@ module Doing
       if opt[:finish] || opt[:cancel]
         tag = 'done'
         items.map! do |i|
-          if i.should_finish?
-            old_item = i.clone
-            should_date = !opt[:cancel] && i.should_time?
-            i.tag(tag, date: should_date, remove: opt[:remove], single: single)
-            Hooks.trigger :post_entry_updated, self, i, old_item
-          end
+          next unless i.should_finish?
+
+          old_item = i.clone
+          should_date = !opt[:cancel] && i.should_time?
+          i.tag(tag, date: should_date, remove: opt[:remove], single: single)
+          Hooks.trigger :post_entry_updated, self, i, old_item
         end
       end
 
@@ -325,8 +325,12 @@ module Doing
       items ||= @content.in_section(section)
       tags = all_tags(items, counts: true).map { |t, c| "@#{t} (#{c})" }
       tags.unshift('No tag filter') if include_all
-      choice = Prompt.choose_from(tags, sorted: false, multiple: true, prompt: 'Choose tag(s) > ', fzf_args: ['--height=60%'])
-      choice ? choice.split(/\n/).map { |t| t.strip.sub(/ \(.*?\)$/, '')}.join(' ') : choice
+      choice = Prompt.choose_from(tags,
+                                  sorted: false,
+                                  multiple: true,
+                                  prompt: 'Choose tag(s) > ',
+                                  fzf_args: ['--height=60%'])
+      choice ? choice.split(/\n/).map { |t| t.strip.sub(/ \(.*?\)$/, '') }.join(' ') : choice
     end
 
     ##

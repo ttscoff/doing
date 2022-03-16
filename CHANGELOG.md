@@ -1,9 +1,12 @@
 ### 2.1.41
 
-2022-03-15 19:10
+2022-03-16 04:28
 
 #### IMPROVED
 
+- `doing tag_dir` accepts `--editor` to edit tag list in default editor
+- `doing tag_dir` without arguments requests input via readline
+- Use `.txt` instead of `.md` for editor temp file to avoid incorrect syntax higlighting in editor
 - `doing tag_dir -r TAG` can remove an indivudal tag from default_tags (--clear removes all)
 
 ### 2.1.40

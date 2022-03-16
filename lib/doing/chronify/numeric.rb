@@ -8,7 +8,8 @@ module Doing
     ##
     ## Format human readable time from seconds
     ##
-    ## @param      seconds  [Integer] Seconds
+    ## @param      human  [Boolean] if True, don't convert
+    ##                    hours into days
     ##
     def format_time(human: false)
       return [0, 0, 0] if nil?

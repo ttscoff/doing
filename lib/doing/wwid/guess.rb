@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Doing
-  # Section and view guessing methods for WWID class
-  module WWIDGuess
+  class WWID
     ##
     ## Attempt to match a string with an existing section
     ##
@@ -11,6 +10,7 @@ module Doing
     ##
     def guess_section(frag, guessed: false, suggest: false)
       return 'All' if frag =~ /^all$/i
+
       frag ||= Doing.setting('current_section')
 
       return frag.cap_first if @content.section?(frag)
@@ -53,7 +53,7 @@ module Doing
     ##
     def guess_view(frag, guessed: false, suggest: false)
       views.each { |view| return view if frag.downcase == view.downcase }
-      view = false
+      view = nil
       re = frag.to_rx(distance: 2, case_type: :ignore)
       views.each do |v|
         next unless v =~ /#{re}/i

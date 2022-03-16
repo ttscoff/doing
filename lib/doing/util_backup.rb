@@ -27,7 +27,7 @@ module Doing
       ##
       ## Delete all redo files
       ##
-      ## @param      limit  Maximum number of backups to retain
+      ## @param      filename  [String] The filename
       ##
       def clear_redo(filename)
         filename ||= Doing.setting('doing_file')
@@ -213,7 +213,7 @@ module Doing
       ## Writes a copy of the content to a dated backup file
       ## in a hidden directory
       ##
-      ## @param      content  The data to back up
+      ## @param      filename  [String] The filename
       ##
       def write_backup(filename = nil)
         Doing.logger.benchmark(:_write_backup, :start)
