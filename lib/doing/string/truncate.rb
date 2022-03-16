@@ -4,7 +4,7 @@ module Doing
   ##
   ## String truncation
   ##
-  class ::String
+  module StringTruncate
     ##
     ## Truncate to nearest word
     ##

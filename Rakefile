@@ -71,16 +71,16 @@ task :dockertest, :version, :login do |_, args|
     Process.exit 0
   when /^3/
     img = 'doingtest3'
-    file = 'Dockerfile-3.0'
+    file = 'docker/Dockerfile-3.0'
   when /6$/
     img = 'doingtest26'
-    file = 'Dockerfile-2.6'
+    file = 'docker/Dockerfile-2.6'
   when /(^2|7$)/
     img = 'doingtest27'
-    file = 'Dockerfile-2.7'
+    file = 'docker/Dockerfile-2.7'
   else
     img = 'doingtest'
-    file = 'Dockerfile'
+    file = 'docker/Dockerfile'
   end
 
   puts `docker build . --file #{file} -t #{img}`

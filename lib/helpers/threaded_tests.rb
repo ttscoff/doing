@@ -122,6 +122,7 @@ class ThreadedTests
         res = Doing::Prompt.yn('Display error report?', default_response: false)
         Doing::Pager.paginate = true
         Doing::Pager.page(@error_out.join("\n----\n".boldwhite)) if res
+        Process.exit 1
       end
     end
   end

@@ -2,7 +2,7 @@
 
 module Doing
   # A Doing entry
-  class Item
+  module ItemTags
     ##
     ## Add (or remove) tags from the title of the item
     ##

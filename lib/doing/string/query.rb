@@ -2,7 +2,7 @@
 
 module Doing
   ## Handling of search and regex strings
-  class ::String
+  module StringQuery
     ##
     ## Determine whether case should be ignored for string
     ##

@@ -2,7 +2,7 @@
 
 module Doing
   # Chronify methods for strings
-  class ::String
+  module ChronifyString
     ##
     ## Converts input string into a Time object when input
     ## takes on the following formats:

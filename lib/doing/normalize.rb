@@ -4,7 +4,7 @@ module Doing
   ##
   ## String to symbol conversion
   ##
-  class ::String
+  module StringNormalize
     ##
     ## Convert tag sort string to a qualified type
     ##
@@ -160,7 +160,7 @@ module Doing
   ##
   ## Symbol helpers
   ##
-  class ::Symbol
+  module SymbolNormalize
     def normalize_tag_sort(default = :name)
       to_s.normalize_tag_sort
     end
@@ -185,4 +185,12 @@ module Doing
       to_s.normalize_matching(default)
     end
   end
+end
+
+class ::String
+  include Doing::StringNormalize
+end
+
+class ::Symbol
+  include Doing::SymbolNormalize
 end

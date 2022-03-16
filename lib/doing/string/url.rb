@@ -4,7 +4,7 @@ module Doing
   ##
   ## URL linking and formatting
   ##
-  class ::String
+  module StringURL
     ##
     ## Turn raw urls into HTML links
     ##

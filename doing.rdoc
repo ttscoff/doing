@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.40
+v2.1.41
 
 === Global Options
 === --config_file arg
@@ -439,7 +439,7 @@ Look up a specific version. Specify versions as "MAJ.MIN.PATCH", MIN
            to a version. Wildcards (*?) accepted unless using < or >.
 
 [Default Value] None
-[Must Match] (?-mix:^(?:(?:(?:[<>=]+|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[0-9.*?]+ *)+|(?:[\d.]+ *(?:-|to)+ *[0-9.]+))$)
+[Must Match] (?-mix:^(?:(?:(?:[<>=]+|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[0-9.*?]{1,10} *)+|(?:[\d.]+ *(?:-|to)+ *[0-9.]{1,10}))$)
 
 
 ===== -s|--search arg
@@ -2628,8 +2628,18 @@ Adds default_tags to a .doingrc file in the current directory. Any entry created
 subdirectories will be tagged with the default tags. You can modify these any time using the `config set` commnand or
 manually editing the .doingrc file.
 ===== Options
-===== -r|--remove
+===== --clear
 Remove all default_tags from the local .doingrc
+
+
+
+===== -e|--editor
+Use default editor to edit tag list
+
+
+
+===== -r|--remove
+Delete tag(s) from the current list
 
 
 

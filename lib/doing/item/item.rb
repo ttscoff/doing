@@ -1,15 +1,20 @@
 # frozen_string_literal: true
 
-require_relative 'item/dates'
-require_relative 'item/tags'
-require_relative 'item/state'
-require_relative 'item/query'
+require_relative 'dates'
+require_relative 'tags'
+require_relative 'state'
+require_relative 'query'
 
 module Doing
   ##
   ## This class describes a single WWID item
   ##
   class Item
+    include ItemDates
+    include ItemQuery
+    include ItemState
+    include ItemTags
+
     attr_accessor :date, :title, :section, :note
 
     # attr_reader :id
@@ -56,7 +61,7 @@ module Doing
 
       return false unless @note.equal?(other.note)
 
-      return false if match_section && @section != other.section
+      return false if match_section && !@section.equal?(other.section)
 
       true
     end

@@ -2,7 +2,7 @@
 
 module Doing
   # Tag and search filtering for a Doing entry
-  class Item
+  module ItemQuery
     ##
     ## Test if item contains tag(s)
     ##

@@ -17,6 +17,10 @@ module Doing
                   end
     end
 
+    def equal?(other)
+      @title == other.title
+    end
+
     # Outputs section title
     def to_s
       @title

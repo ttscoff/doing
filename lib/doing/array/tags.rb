@@ -4,12 +4,14 @@ module Doing
   ##
   ## Array helpers
   ##
-  class ::Array
+  module ArrayTags
     ##
     ## Convert an array of @tags to plain strings
     ##
-    ## @return     [Array] array of strings
+    ## @return     [Array] array of strings without @ symbols
     ##
+    ## @example Convert an array of tags to strings
+    ##   ['@one', '@two', 'three'].to_tags => ['one', 'two', 'three']
     def tags_to_array
       map(&:remove_at).map(&:strip)
     end
@@ -18,9 +20,8 @@ module Doing
     #
     # @return     [Array] Array of @tags
     #
-    # @example
-    #   ['one', '@two', 'three'].to_tags
-    #   # => ['@one', '@two', '@three']
+    # @example Convert an array of strings with or without @ symbols
+    #   ['one', '@two', 'three'].to_tags => ['@one', '@two', '@three']
     def to_tags
       map(&:add_at)
     end

@@ -3,18 +3,31 @@ module Doing
   ## Date helpers
   ##
   class ::Time
+    # Format time as a relative date. Dates from today get
+    # just a time, from the last week get a time and day,
+    # from the last year get a month/day/time, and older
+    # entries get month/day/year/time
+    #
+    # @return     [String] formatted date
+    #
     def relative_date
       if self > Date.today.to_time
         strftime('%_I:%M%P')
       elsif self > (Date.today - 6).to_time
         strftime('%a %_I:%M%P')
-      elsif self.year == Date.today.year || (self.year + 1 == Date.today.year && self.month > Date.today.month)
+      elsif year == Date.today.year || (year + 1 == Date.today.year && month > Date.today.month)
         strftime('%m/%d %_I:%M%P')
       else
         strftime('%m/%d/%y %_I:%M%P')
       end
     end
 
+    ##
+    ## Format seconds as a natural language string
+    ##
+    ## @param      seconds  [Integer] number of seconds
+    ##
+    ## @return [String] Date formatted as "X days, X hours, X minutes, X seconds"
     def humanize(seconds)
       s = seconds
       m = (s / 60).floor
@@ -32,6 +45,11 @@ module Doing
       output.join(', ')
     end
 
+    ##
+    ## Format date as "X hours ago"
+    ##
+    ## @return     [String] Formatted date
+    ##
     def time_ago
       if self > Date.today.to_time
         output = humanize(Time.now - self)
