@@ -1,9 +1,20 @@
 ### 2.1.42
 
-2022-03-16 14:59
+2022-03-17 07:00
+
+#### NEW
+
+- Config option `editors.pager` allows you to force a pager (ignore env settings) # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is up to date with 'origin/develop'. # # Changes to be committed: #	modified:   bin/commands/again.rb #	modified:   bin/commands/config.rb #	modified:   bin/commands/now.rb #	modified:   bin/commands/undo.rb #	modified:   lib/doing.rb #	modified:   lib/doing/add_options.rb #	modified:   lib/doing/array/array.rb #	modified:   lib/doing/configuration.rb #	modified:   lib/doing/pager.rb #	modified:   lib/doing/util_backup.rb # # Untracked files: #	lib/doing/array/cleanup.rb # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/bin/commands/again.rb b/bin/commands/again.rb index 66015d9..8ff1c7e 100644 --- a/bin/commands/again.rb +++ b/bin/commands/again.rb @@ -33,9 +33,7 @@ command %i[again resume] do |c|    c.action do |_global_options, options, _args|      options[:fuzzy] = false  
+
+#### IMPROVED
+
+- Change pager preference order to $PAGER, less -Xr, $GIT_PAGER
+- Remove `bat` from pager options as it just falls back to `less -Xr` anyway
 
 #### FIXED
 
+- `doing config set` issues with keys that default to nil
+- Notification for `doing config set --remove` missing last element of key path
 - Trigger pre/post_write hooks when using undo/redo
 
 ### 2.1.41
