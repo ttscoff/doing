@@ -1,6 +1,6 @@
 ### 2.1.42
 
-2022-03-17 07:08
+2022-03-17 09:38
 
 #### NEW
 
@@ -8,12 +8,14 @@
 
 #### IMPROVED
 
-- Using CTRL-C when entring a note interactively won't cancel the whole operation, just the note
 - Change pager preference order to $PAGER, less -Xr, $GIT_PAGER
 - Remove `bat` from pager options as it just falls back to `less -Xr` anyway
+- Using CTRL-C when entring a note interactively won't cancel the whole operation, just the note
 
 #### FIXED
 
+- Add delay between `doing select --editor` and opening the editor, fixes some TTY echo issues
+- If `doing last --editor` has no changes, exit gracefully
 - Trigger pre/post_write hooks when using undo/redo
 - `doing config set` issues with keys that default to nil
 - Notification for `doing config set --remove` missing last element of key path
