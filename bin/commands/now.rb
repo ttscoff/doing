@@ -115,7 +115,7 @@ module Doing
       note ||= Doing::Note.new
       note.add(options[:note]) if options[:note]
 
-      res = prompt ? Doing::Prompt.yn('Add a note', default_response: false) : true
+      res = prompt ? Doing::Prompt.yn('Add a note', default_response: false) : false
 
       if options[:ask_note].empty? && (res || options[:ask])
         options[:ask_note] = Doing::Prompt.read_lines(prompt: 'Enter note')
