@@ -52,7 +52,7 @@ module Doing
         raise HistoryLimitError, 'End of undo history' if backup_file.nil?
 
         save_undone(filename)
-        move_file(backup_file, filename)
+        move_backup(backup_file, filename)
 
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{backup_file}")
@@ -66,7 +66,7 @@ module Doing
       ##
       def redo_backup(filename = nil, count: 1)
         filename ||= Doing.setting('doing_file')
-        # redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
+
         undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort.reverse
         total = undones.count
         count = total if count > total
@@ -78,7 +78,7 @@ module Doing
 
         redo_file = File.join(backup_dir, undone)
 
-        move_file(redo_file, filename)
+        move_backup(redo_file, filename)
 
         skipped.each do |f|
           FileUtils.mv(File.join(backup_dir, f), File.join(backup_dir, f.sub(/^undone/, '')))
@@ -116,7 +116,7 @@ module Doing
 
         redo_file = File.join(backup_dir, undone)
 
-        move_file(redo_file, filename)
+        move_backup(redo_file, filename)
 
         skipped.each do |f|
           FileUtils.mv(File.join(backup_dir, f), File.join(backup_dir, f.sub(/^undone/, '')))
@@ -145,7 +145,7 @@ module Doing
 
         backup_file = show_menu(options, filename)
         Util.write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
-        move_file(backup_file, filename)
+        move_backup(backup_file, filename)
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{backup_file}")
       end
@@ -180,8 +180,8 @@ module Doing
 
       private
 
-      def move_file(source, dest)
-        Hooks.trigger :pre_write, dest
+      def move_backup(source, dest)
+        Hooks.trigger :pre_write, WWID.new, dest
         FileUtils.mv(source, dest)
         Hooks.trigger :post_write, dest
       end

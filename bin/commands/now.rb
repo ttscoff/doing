@@ -1,4 +1,155 @@
 # @@now @@next
+
+module Doing
+  # Methods for the now command
+  class NowCommand
+    def initialize(wwid)
+      @wwid = wwid
+    end
+
+    def setup(cmd)
+      add_examples(cmd)
+      add_options(cmd)
+    end
+
+    def process_now_options(options)
+      raise InvalidArgument, '--back and --from cannot be used together' if options[:back] && options[:from]
+
+      if options[:back]
+        options[:date] = options[:back]
+      elsif options[:from]
+        options[:date], finish_date = options[:from]
+        options[:done] = finish_date
+      else
+        options[:date] = Time.now
+      end
+      raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if options[:date].nil?
+
+      options[:section] = if options[:section]
+                            @wwid.guess_section(options[:section]) || options[:section].cap_first
+                          else
+                            Doing.setting('current_section')
+                          end
+
+      options[:ask_note] = if options[:ask] && !options[:editor] && options[:has_args]
+                             Doing::Prompt.read_lines(prompt: 'Add a note')
+                           else
+                             ''
+                           end
+
+      options
+    end
+
+    def now_with_editor(options, args)
+      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+
+      input = options[:date].strftime('%F %R | ')
+      input += args.join(' ') unless args.empty?
+      input += " @done(#{options[:done].strftime('%F %R')})" if options[:done]
+      input += "\n#{options[:note]}" if options[:note]
+      input += "\n#{options[:ask_note]}" if options[:ask_note].good?
+      input = @wwid.fork_editor(input).strip
+
+      d, title, note = @wwid.format_input(input)
+      raise EmptyInput, 'No content' unless title.good?
+
+      note = ask_note(options, note, prompt: false)
+
+      options[:date] = d.nil? ? options[:date] : d
+      opts = { note: note, back: options[:date], timed: options[:finish_last] }
+      @wwid.add_item(title.cap_first, options[:section], opts)
+    end
+
+    def now_with_args(options, args)
+      d, title, note = @wwid.format_input(args.join(' '))
+      options[:date] = d.nil? ? options[:date] : d
+
+      note = ask_note(options, note, prompt: false)
+
+      opts = { note: note, back: options[:date], timed: options[:finish_last] }
+      entry = @wwid.add_item(title.cap_first, options[:section], opts)
+      return unless options[:done] && entry.should_finish?
+
+      entry.should_time? ? entry.tag('done', value: options[:done]) : entry.tag('done')
+    end
+
+    def now_with_stdin(global_options, options, _args)
+      d, title, note = @wwid.format_input(global_options[:stdin])
+
+      unless d.nil?
+        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
+        options[:date] = d
+      end
+
+      note = ask_note(options, note, prompt: false)
+
+      opts = { note: note, back: options[:date], timed: options[:finish_last] }
+      entry = @wwid.add_item(title.cap_first, options[:section], opts)
+      return unless options[:done] && entry.should_finish?
+
+      entry.should_time? ? entry.tag('done', value: options[:done]) : entry.tag('done')
+    end
+
+    def interactive_now(options, _args)
+      tags = @wwid.all_tags(@wwid.content)
+      puts Doing::Color.boldgreen('Add a new entry. Tab will autocomplete known tags. Ctrl-c to cancel.')
+      title = Doing::Prompt.read_line(prompt: 'Entry content', completions: tags)
+      raise EmptyInput, 'You must provide content when creating a new entry' unless title.good?
+
+      note = ask_note(options, prompt: true)
+
+      opts = { note: note, back: options[:date], timed: options[:finish_last] }
+      entry = @wwid.add_item(title.cap_first, options[:section], opts)
+      return unless options[:done] && entry.should_finish?
+
+      if entry.should_time?
+        entry.tag('done', value: options[:done])
+      else
+        entry.tag('done')
+      end
+    end
+
+    private
+
+    def ask_note(options, note = nil, prompt: false)
+      note ||= Doing::Note.new
+      note.add(options[:note]) if options[:note]
+
+      res = prompt ? Doing::Prompt.yn('Add a note', default_response: false) : true
+
+      if options[:ask_note].empty? && (res || options[:ask])
+        options[:ask_note] = Doing::Prompt.read_lines(prompt: 'Enter note')
+      end
+
+      note.add(options[:ask_note]) if options[:ask_note].good?
+      note
+    end
+
+    def add_examples(cmd)
+      cmd.example 'doing now', desc: 'Create a new entry with interactive prompts'
+      cmd.example 'doing now -e', desc: "Open #{Doing::Util.default_editor} to input an entry and optional note"
+      cmd.example 'doing now working on a new project', desc: 'Add a new entry at the current time'
+      cmd.example 'doing now debugging @project2', desc: 'Add an entry with a tag'
+      cmd.example 'doing now adding an entry (with a note)', desc: 'Parenthetical at end is converted to note'
+      cmd.example 'doing now --back 2pm A thing I started at 2:00 and am still doing...', desc: 'Backdate an entry'
+    end
+
+    def add_options(cmd)
+      cmd.desc 'Section'
+      cmd.arg_name 'NAME'
+      cmd.flag %i[s section]
+
+      cmd.desc %(Set a start and optionally end time as a date range ("from 1pm to 2:30pm").
+            If an end time is provided, a dated @done tag will be added)
+      cmd.arg_name 'TIME_RANGE'
+      cmd.flag [:from], type: DateRangeString
+
+      cmd.desc 'Timed entry, marks last entry in section as @done'
+      cmd.switch %i[f finish_last], negatable: false, default_value: false
+    end
+  end
+end
+
 desc 'Add an entry'
 long_desc %(Record what you're starting now, or backdate the start time using natural language.
 
@@ -9,133 +160,26 @@ Run without arguments to create a new entry interactively.
 Run with --editor to create a new entry using #{Doing::Util.default_editor}.)
 arg_name 'ENTRY'
 command %i[now next] do |c|
-  c.example 'doing now', desc: 'Create a new entry with interactive prompts'
-  c.example 'doing now -e', desc: "Open #{Doing::Util.default_editor} to input an entry and optional note"
-  c.example 'doing now working on a new project', desc: 'Add a new entry at the current time'
-  c.example 'doing now debugging @project2', desc: 'Add an entry with a tag'
-  c.example 'doing now adding an entry (with a note)', desc: 'Parenthetical at end is converted to note'
-  c.example 'doing now --back 2pm A thing I started at 2:00 and am still doing...', desc: 'Backdate an entry'
-
-  c.desc 'Section'
-  c.arg_name 'NAME'
-  c.flag %i[s section]
-
-  c.desc %(
-        Set a start and optionally end time as a date range ("from 1pm to 2:30pm").
-        If an end time is provided, a dated @done tag will be added
-      )
-  c.arg_name 'TIME_RANGE'
-  c.flag [:from], type: DateRangeString
-
-  c.desc 'Timed entry, marks last entry in section as @done'
-  c.switch %i[f finish_last], negatable: false, default_value: false
-
+  cmd = Doing::NowCommand.new(@wwid)
+  cmd.setup(c)
   add_options(:add_entry, c)
 
   # c.desc "Edit entry with specified app"
   # c.arg_name 'editor_app'
   # # c.flag [:a, :app]
-
   c.action do |global_options, options, args|
     Doing.auto_tag = !options[:noauto]
-
-    raise InvalidArgument, '--back and --from cannot be used together' if options[:back] && options[:from]
-
-    if options[:back]
-      date = options[:back]
-    elsif options[:from]
-      date, finish_date = options[:from]
-      options[:done] = finish_date
-    else
-      date = Time.now
-    end
-    raise InvalidTimeExpression.new('unable to parse date string', topic: 'Parser:') if date.nil?
-
-    section = if options[:section]
-                @wwid.guess_section(options[:section]) || options[:section].cap_first
-              else
-                Doing.setting('current_section')
-              end
-
-    ask_note = if options[:ask] && !options[:editor] && args.count.positive?
-                 Doing::Prompt.read_lines(prompt: 'Add a note')
-               else
-                 ''
-               end
+    options[:has_args] = args.count.positive?
+    options = cmd.process_now_options(options)
 
     if options[:editor]
-      raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
-
-      input = date.strftime('%F %R | ')
-      input += args.join(' ') unless args.empty?
-      input += " @done(#{options[:done].strftime('%F %R')})" if options[:done]
-      input += "\n#{options[:note]}" if options[:note]
-      input += "\n#{ask_note}" if ask_note.good?
-      input = @wwid.fork_editor(input).strip
-
-      d, title, note = @wwid.format_input(input)
-      raise EmptyInput, 'No content' unless title.good?
-
-      if ask_note.empty? && options[:ask]
-        ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
-        note.add(ask_note) if ask_note.good?
-      end
-
-      date = d.nil? ? date : d
-      @wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
+      cmd.now_with_editor(options, args)
     elsif args.length.positive?
-      d, title, note = @wwid.format_input(args.join(' '))
-      date = d.nil? ? date : d
-      note.add(options[:note]) if options[:note]
-      note.add(ask_note) if ask_note.good?
-      entry = @wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
-      if options[:done] && entry.should_finish?
-        if entry.should_time?
-          entry.tag('done', value: options[:done])
-        else
-          entry.tag('done')
-        end
-      end
+      cmd.now_with_args(options, args)
     elsif global_options[:stdin]
-      input = global_options[:stdin]
-      d, title, note = @wwid.format_input(input)
-      unless d.nil?
-        Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')
-        date = d
-      end
-      note.add(options[:note]) if options[:note]
-      if ask_note.empty? && options[:ask]
-        ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
-        note.add(ask_note) if ask_note.good?
-      end
-      entry = @wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
-      if options[:done] && entry.should_finish?
-        if entry.should_time?
-          entry.tag('done', value: options[:done])
-        else
-          entry.tag('done')
-        end
-      end
+      cmd.now_with_stdin(global_options, options, args)
     else
-      tags = @wwid.all_tags(@wwid.content)
-      $stderr.puts Doing::Color.boldgreen("Add a new entry. Tab will autocomplete known tags. Ctrl-c to cancel.")
-      title = Doing::Prompt.read_line(prompt: 'Entry content', completions: tags)
-      raise EmptyInput, 'You must provide content when creating a new entry' unless title.good?
-
-      note = Doing::Note.new
-      note.add(options[:note]) if options[:note]
-      res = Doing::Prompt.yn('Add a note', default_response: false)
-      ask_note = res ? Doing::Prompt.read_lines(prompt: 'Enter note') : []
-      note.add(ask_note)
-
-      entry = @wwid.add_item(title.cap_first, section, { note: note, back: date, timed: options[:finish_last] })
-      if options[:done] && entry.should_finish?
-        if entry.should_time?
-          entry.tag('done', value: options[:done])
-        else
-          entry.tag('done')
-        end
-      end
+      cmd.interactive_now(options, args)
     end
 
     @wwid.write(@wwid.doing_file)

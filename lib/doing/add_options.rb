@@ -3,11 +3,19 @@
 ##
 ## Add presets of flags and switches to a command.
 ##
+## :output_template => --output, --config_template, --template
+##
 ## :add_entry => --noauto, --note, --ask, --editor, --back
+##
+## :finish_entry => --at/finished, --from, --took
+##
+## :time_display => --times, --duration, --totals, --tag_sort, --tag_order, --only_timed
 ##
 ## :search => --search, --case, --exact
 ##
 ## :tag_filter => --tag, --bool, --not, --val
+##
+## :time_filter => --before, --after, --from
 ##
 ## :date_filter => --before, --after, --from
 ##

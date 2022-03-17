@@ -70,14 +70,20 @@ module Doing
       end
 
       def pagers
-        [ENV['GIT_PAGER'], ENV['PAGER'], git_pager,
-         'bat -p --pager="less -Xr"', 'less -Xr', 'more -r'].compact
+        [
+          Doing.setting('editors.pager'),
+          ENV['PAGER'],
+          'less -Xr',
+          ENV['GIT_PAGER'],
+          git_pager,
+          'more -r'
+        ].remove_bad
       end
 
       def find_executable(*commands)
         execs = commands.empty? ? pagers : commands
         execs
-          .compact.map(&:strip).reject(&:empty?).uniq
+          .remove_bad.uniq
           .find { |cmd| TTY::Which.exist?(cmd.split.first) }
       end
 
