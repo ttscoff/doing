@@ -263,6 +263,7 @@ module Doing
       write(@doing_file)
 
       if opt[:editor]
+        sleep 2
         edit_items(items) # hooked
 
         write(@doing_file)

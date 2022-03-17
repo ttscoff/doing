@@ -12,7 +12,7 @@ module Doing
 
       raise MissingEditor, 'No EDITOR variable defined in environment' if Util.default_editor.nil?
 
-      tmpfile = Tempfile.new(['doing', '.txt'])
+      tmpfile = Tempfile.new(['doing_temp', '.doing'])
 
       File.open(tmpfile.path, 'w+') do |f|
         f.puts input
@@ -134,14 +134,15 @@ module Doing
       end
       divider = "-----------"
       notice =<<~EONOTICE
+
       # - You may delete entries, but leave all divider lines (---) in place.
       # - Start and @done dates replaced with a time string (yesterday 3pm) will
       #   be parsed automatically. Do not delete the pipe (|) between start date
       #   and entry title.
       EONOTICE
-      input =  "#{editable_items.map(&:strip).join("\n#{divider}\n")}\n\n#{notice}"
+      input =  "#{editable_items.map(&:strip).join("\n#{divider}\n")}\n"
 
-      new_items = fork_editor(input).split(/^#{divider}/).map(&:strip)
+      new_items = fork_editor(input, message: notice).split(/^#{divider}/).map(&:strip)
 
       new_items.each_with_index do |new_item, i|
         input_lines = new_item.split(/[\n\r]+/).delete_if(&:ignore?)
@@ -190,6 +191,8 @@ module Doing
       content = ["#{item.date.strftime('%F %R')} | #{item.title.dup}"]
       content << item.note.strip_lines.join("\n") unless item.note.empty?
       new_item = fork_editor(content.join("\n"))
+      raise UserCancelled, 'No change' if new_item.strip == content.join("\n").strip
+
       date, title, note = format_input(new_item)
       date ||= item.date
 
