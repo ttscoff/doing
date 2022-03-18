@@ -92,22 +92,21 @@ module Doing
 
         actions.concat(['resume/repeat', 'begin/reset']) if items.count == 1
 
-        choice = Prompt.choose_from(actions,
+        choice = Prompt.choose_from(actions.map(&:titlecase),
                                     prompt: 'What do you want to do with the selected items? > ',
                                     multiple: true,
                                     sorted: false,
                                     fzf_args: ["--height=#{actions.count + 3}", '--tac', '--no-sort', '--info=hidden'])
         return unless choice
 
-        to_do = choice.strip.split(/\n/)
+        to_do = choice.strip.split(/\n/).map(&:downcase)
+
         to_do.each do |action|
           case action
-          when /resume/
-            opt[:resume] = true
-          when /reset/
-            opt[:reset] = true
-          when /autotag/
-            opt[:autotag] = true
+          when /(resume|reset|autotag|archive|delete|finish|cancel|flag)/
+            opt[action.to_sym] = true
+          when /edit/
+            opt[:editor] = true
           when /(add|remove) tag/
             type = action =~ /^add/ ? 'add' : 'remove'
             raise InvalidArgument, "'add tag' and 'remove tag' can not be used together" if opt[:tag]
@@ -149,21 +148,9 @@ module Doing
 
               opt[:save_to] = filename
             end
-          when /archive/
-            opt[:archive] = true
-          when /delete/
-            opt[:delete] = true
-          when /edit/
-            opt[:editor] = true
-          when /finish/
-            opt[:finish] = true
-          when /cancel/
-            opt[:cancel] = true
           when /move/
             section = choose_section.strip
             opt[:move] = section.strip unless section =~ /^ *$/
-          when /flag/
-            opt[:flag] = true
           end
         end
       end
@@ -263,7 +250,9 @@ module Doing
       write(@doing_file)
 
       if opt[:editor]
-        sleep 2
+        sleep 2 # This seems to be necessary between running fzf
+                # and forking the editor, otherwise vim gets all
+                # screwy and I can't figure out why
         edit_items(items) # hooked
 
         write(@doing_file)

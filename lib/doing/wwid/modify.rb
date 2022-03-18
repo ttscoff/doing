@@ -509,6 +509,8 @@ module Doing
             new_tag = r
 
             m.to_a.slice(1, m.length - 1).each_with_index do |v, idx|
+              next if v.nil?
+
               new_tag.gsub!("\\#{idx + 1}", v)
             end
             # Replace original tag if /r
