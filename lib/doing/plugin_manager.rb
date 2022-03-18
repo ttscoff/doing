@@ -4,10 +4,17 @@ module Doing
   # Plugin handling
   module Plugins
     class << self
+      # Return the user's home directory
       def user_home
         @user_home ||= Util.user_home
       end
 
+      # Storage for registered plugins. Hash with :import
+      # and :export keys containing hashes of available
+      # plugins.
+      #
+      # @return     [Hash] registered plugins
+      #
       def plugins
         @plugins ||= {
           import: {},
@@ -81,6 +88,17 @@ module Doing
         Doing.logger.debug('Plugin Manager:', "Registered #{type} plugin \"#{title}\"")
       end
 
+      ##
+      ## Verifies that a plugin is properly configured with
+      ## necessary methods for its type. If the plugin fails
+      ## validation, a PluginUncallable exception will be
+      ## raised.
+      ##
+      ## @param      title  [String] The title
+      ## @param      type   [Symbol] type, :import or
+      ##                    :export
+      ## @param      klass  [Class] Plugin class
+      ##
       def validate_plugin(title, type, klass)
         type = valid_type(type)
         if type == :import && !klass.respond_to?(:import)
@@ -122,8 +140,10 @@ module Doing
       ##
       ## List available plugins to stdout
       ##
-      ## @param      options  { type, separator }
+      ## @param      options  [Hash] additional options
       ##
+      ## @option options :column [Boolean] display results in a single column
+      ## @option options :type [String] Plugin type: all, import, or export
       def list_plugins(options = {})
         separator = options[:column] ? "\n" : "\t"
         type = options[:type].nil? || options[:type] =~ /all/i ? 'all' : valid_type(options[:type])
@@ -144,9 +164,9 @@ module Doing
       ##
       ## Return array of available plugin names
       ##
-      ## @param      type  Plugin type (:import, :export)
+      ## @param      type  [Symbol] Plugin type (:import, :export)
       ##
-      ## @return     [Array<String>] plugin names
+      ## @return     [Array] Array of plugin names (String)
       ##
       def available_plugins(type: :export)
         type = valid_type(type)
@@ -159,7 +179,7 @@ module Doing
       ## @param      type       Plugin type (:import, :export)
       ## @param      separator  The separator to join names with
       ##
-      ## @return     [String]   Plugin names
+      ## @return     [String]   Plugin names joined with separator
       ##
       def plugin_names(type: :export, separator: '|')
         type = valid_type(type)
@@ -190,7 +210,7 @@ module Doing
       ## @param      type  [Symbol] Plugin type (:import,
       ##                   :export)
       ##
-      ## @return     [Array<String>] template names
+      ## @return     [Array] Array of template names (String)
       ##
       def plugin_templates(type: :export)
         type = valid_type(type)
@@ -236,6 +256,9 @@ module Doing
       ## @param      trigger  [String] The trigger to test
       ## @param      type     [Symbol] the plugin type
       ##                      (:import, :export)
+      ## @param      save_to  [String] if a path is
+      ##                      specified, write the template
+      ##                      to that path. Nil for STDOUT
       ##
       ## @return     [String] string content of template for trigger
       ##
@@ -254,6 +277,8 @@ module Doing
         end
         raise Errors::InvalidArgument, "No template type matched \"#{trigger}\""
       end
+
+      private
 
       def save_template(tpl, dir, filename)
         dir = File.expand_path(dir)

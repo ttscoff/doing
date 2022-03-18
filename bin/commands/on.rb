@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@on
 desc 'List entries for a date'
 long_desc %(Date argument can be natural language. "thursday" would be interpreted as "last thursday,"
@@ -20,14 +22,15 @@ command :on do |c|
   add_options(:time_filter, c)
 
   c.action do |_global_options, options, args|
-    raise InvalidPlugin.new('output', options[:output]) if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+      raise InvalidPlugin.new('output', options[:output])
+
+    end
 
     raise MissingArgument, 'Missing date argument' if args.empty?
 
     date_string = args.join(' ').strip
-    if date_string =~ /^tod(?:ay)?/i
-      date_string = 'midnight to today 23:59'
-    end
+    date_string = 'midnight to today 23:59' if date_string =~ /^tod(?:ay)?/i
 
     start, finish = date_string.split_date_range
 

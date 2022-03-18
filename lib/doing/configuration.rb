@@ -23,7 +23,8 @@ module Doing
       'editors' => {
         'default' => ENV['DOING_EDITOR'] || ENV['GIT_EDITOR'] || ENV['EDITOR'],
         'doing_file' => nil,
-        'config' => nil
+        'config' => nil,
+        'pager' => nil
       },
       'plugins' => {
         'plugin_path' => File.join(Util.user_home, '.config', 'doing', 'plugins'),
@@ -204,6 +205,7 @@ module Doing
       real_path = []
       unless keypath =~ /^[.*]?$/
         paths = keypath.split(/[:.]/)
+        element_count = paths.count
         while paths.length.positive? && !cfg.nil?
           path = paths.shift
           new_cfg = nil
@@ -220,6 +222,8 @@ module Doing
           end
 
           if new_cfg.nil?
+            return real_path if real_path[-1] == path && real_path.count == element_count
+
             if distance < 5 && !create
               return resolve_key_path(keypath, create: false, distance: distance + 1)
             else
@@ -228,12 +232,12 @@ module Doing
 
             resolved = real_path.count.positive? ? "Resolved #{real_path.join('.')}, but " : ''
             Doing.logger.log_now(:warn, "#{resolved}#{path} is unknown")
-            new_path = [*real_path, path, *paths].join('.')
+            new_path = [*real_path, path, *paths].compact.join('.')
             Doing.logger.log_now(:warn, "Continuing will create the path #{new_path}")
             res = Prompt.yn('Key path not found, create it?', default_response: true)
             raise InvalidArgument, 'Invalid key path' unless res
 
-            real_path.push(path).concat(paths)
+            real_path.push(path).concat(paths).compact!
             Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}")
             return real_path
           end

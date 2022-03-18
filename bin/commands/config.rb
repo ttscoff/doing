@@ -214,7 +214,7 @@ command :config do |c|
       keypath = args.join('.')
       real_path = Doing.config.resolve_key_path(keypath, create: true)
       old_value = Doing.config.settings.dig(*real_path)
-      old_type = old_value&.class.to_s || nil
+      old_type = old_value.good? ? old_value&.class.to_s : nil
 
       if old_value.is_a?(Hash) && !options[:remove]
         Doing.logger.log_now(:warn, 'Config:', ['Config key must point to a single value, ',
@@ -235,8 +235,8 @@ command :config do |c|
       $stderr.puts ">      Config: Updating #{config_file}".yellow
 
       if options[:remove]
-        cfg.deep_set(real_path, nil)
         $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('.').boldwhite}"
+        cfg.deep_set(real_path, nil)
       else
         current_value = cfg.dig(*real_path)
         cfg.deep_set(real_path, value.set_type(old_type))

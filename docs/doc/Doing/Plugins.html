@@ -111,7 +111,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#available_plugins-class_method" title="available_plugins (class method)">.<strong>available_plugins</strong>(type: :export)  &#x21d2; Array&lt;String&gt; </a>
+      <a href="#available_plugins-class_method" title="available_plugins (class method)">.<strong>available_plugins</strong>(type: :export)  &#x21d2; Array </a>
     
 
     
@@ -226,7 +226,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#plugin_templates-class_method" title="plugin_templates (class method)">.<strong>plugin_templates</strong>(type: :export)  &#x21d2; Array&lt;String&gt; </a>
+      <a href="#plugin_templates-class_method" title="plugin_templates (class method)">.<strong>plugin_templates</strong>(type: :export)  &#x21d2; Array </a>
     
 
     
@@ -249,7 +249,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#plugins-class_method" title="plugins (class method)">.<strong>plugins</strong>  &#x21d2; Object </a>
+      <a href="#plugins-class_method" title="plugins (class method)">.<strong>plugins</strong>  &#x21d2; Hash </a>
     
 
     
@@ -263,7 +263,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Storage for registered plugins.</p>
+</div></span>
   
 </li>
 
@@ -310,28 +311,6 @@
   
     <span class="summary_desc"><div class='inline'><p>Register a plugin.</p>
 </div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#save_template-class_method" title="save_template (class method)">.<strong>save_template</strong>(tpl, dir, filename)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -399,7 +378,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Return the user&#39;s home directory.</p>
+</div></span>
   
 </li>
 
@@ -444,7 +424,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Verifies that a plugin is properly configured with necessary methods for its type.</p>
+</div></span>
   
 </li>
 
@@ -461,7 +442,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="available_plugins-class_method">
   
-    .<strong>available_plugins</strong>(type: :export)  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span>&lt;<span class='object_link'><a href="../String.html" title="String (class)">String</a></span>&gt;</tt> 
+    .<strong>available_plugins</strong>(type: :export)  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
   
 
   
@@ -483,7 +464,7 @@
         <span class='name'>type</span>
       
       
-        <span class='type'></span>
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
       
       
         <em class="default">(defaults to: <tt>:export</tt>)</em>
@@ -503,12 +484,12 @@
     <li>
       
       
-        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span>&lt;<span class='object_link'><a href="../String.html" title="String (class)">String</a></span>&gt;</tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>plugin names</p>
+        <div class='inline'><p>Array of plugin names (String)</p>
 </div>
       
     </li>
@@ -543,15 +524,52 @@
         <span class='name'>options</span>
       
       
-        <span class='type'>(<tt>type</tt>, <tt>separator</tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
       
       
         <em class="default">(defaults to: <tt>{}</tt>)</em>
       
       
+        &mdash;
+        <div class='inline'><p>additional options</p>
+</div>
+      
     </li>
   
 </ul>
+
+  
+    
+    
+    <p class="tag_title">Options Hash (<tt>options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:column</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'><p>display results in a single column</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:type</span>
+          <span class="type">(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'><p>Plugin type: all, import, or export</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
 
 
 </div>
@@ -646,7 +664,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Plugin names</p>
+        <div class='inline'><p>Plugin names joined with separator</p>
 </div>
       
     </li>
@@ -721,7 +739,7 @@ for type</p>
       <div class="method_details ">
   <h3 class="signature " id="plugin_templates-class_method">
   
-    .<strong>plugin_templates</strong>(type: :export)  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span>&lt;<span class='object_link'><a href="../String.html" title="String (class)">String</a></span>&gt;</tt> 
+    .<strong>plugin_templates</strong>(type: :export)  &#x21d2; <tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt> 
   
 
   
@@ -764,12 +782,12 @@ for type</p>
     <li>
       
       
-        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span>&lt;<span class='object_link'><a href="../String.html" title="String (class)">String</a></span>&gt;</tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>template names</p>
+        <div class='inline'><p>Array of template names (String)</p>
 </div>
       
     </li>
@@ -782,13 +800,42 @@ for type</p>
       <div class="method_details ">
   <h3 class="signature " id="plugins-class_method">
   
-    .<strong>plugins</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+    .<strong>plugins</strong>  &#x21d2; <tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt> 
   
 
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Storage for registered plugins. Hash with :import
+and :export keys containing hashes of available
+plugins.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>registered plugins</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -944,40 +991,6 @@ plugin (can be an array of names)</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="save_template-class_method">
-  
-    .<strong>save_template</strong>(tpl, dir, filename)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Raises:</p>
-<ul class="raise">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>DoingRuntimeError</tt>)</span>
-      
-      
-      
-    </li>
-  
-</ul>
-
-</div>
-</div>
-    
-      <div class="method_details ">
   <h3 class="signature " id="template_for_trigger-class_method">
   
     .<strong>template_for_trigger</strong>(trigger, type: :export, save_to: nil)  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
@@ -1028,6 +1041,25 @@ written out to the terminal for redirection</p>
         &mdash;
         <div class='inline'><p>the plugin type
 (:import, :export)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>save_to</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>if a path is
+specified, write the template
+to that path. Nil for STDOUT</p>
 </div>
       
     </li>
@@ -1139,7 +1171,17 @@ triggers for type</p>
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the user&#39;s home directory</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 </div>
     
       <div class="method_details ">
@@ -1227,7 +1269,70 @@ e.g. :imp =&gt; :import</p>
   
 
   
-</h3>
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Verifies that a plugin is properly configured with
+necessary methods for its type. If the plugin fails
+validation, a PluginUncallable exception will be
+raised.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>title</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The title</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Symbol.html" title="Symbol (class)">Symbol</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>type, :import or
+:export</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>klass</span>
+      
+      
+        <span class='type'>(<tt>Class</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Plugin class</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div>
 </div>
     
   </div>
@@ -1235,7 +1340,7 @@ e.g. :imp =&gt; :import</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Mar 16 09:42:15 2022 by
+  Generated on Fri Mar 18 12:56:58 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>

@@ -94,7 +94,7 @@ module Doing
           res << line.chomp
         end
       rescue Interrupt
-        raise UserCancelled
+        return nil
       end
 
       res.join("\n").strip

@@ -2,11 +2,13 @@
 
 require_relative 'tags'
 require_relative 'nested_hash'
+require_relative 'cleanup'
 
 module Doing
   class ::Array
     include ArrayTags
     include ArrayNestedHash
+    include ArrayCleanup
     ##
     ## Force UTF-8 encoding of strings in array
     ##

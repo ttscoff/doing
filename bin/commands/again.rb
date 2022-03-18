@@ -33,9 +33,7 @@ command %i[again resume] do |c|
   c.action do |_global_options, options, _args|
     options[:fuzzy] = false
 
-    if options[:search]
-      options[:search] = options[:exact] ? options[:search].sub(/^'?/, "'") : options[:search]
-    end
+    options[:search] = options[:search].sub(/^'?/, "'") if options[:search] && options[:exact]
 
     if options[:back]
       options[:date] = options[:back]

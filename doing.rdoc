@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.41
+v2.1.42
 
 === Global Options
 === --config_file arg
@@ -435,8 +435,8 @@ Display a formatted list of changes in recent versions.
 ===== -l|--lookup VERSION
 
 Look up a specific version. Specify versions as "MAJ.MIN.PATCH", MIN
-           and PATCH are optional. Use > or < to see all changes since or prior
-           to a version. Wildcards (*?) accepted unless using < or >.
+               and PATCH are optional. Use > or < to see all changes since or prior
+               to a version. Wildcards (*?) accepted unless using < or >.
 
 [Default Value] None
 [Must Match] (?-mix:^(?:(?:(?:[<>=]+|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[0-9.*?]{1,10} *)+|(?:[\d.]+ *(?:-|to)+ *[0-9.]{1,10}))$)
@@ -445,7 +445,7 @@ Look up a specific version. Specify versions as "MAJ.MIN.PATCH", MIN
 ===== -s|--search arg
 
 Show changelogs matching search terms (uses pattern-based searching).
-           Add slashes to search with regular expressions, e.g. `--search "/output.*flag/"`
+               Add slashes to search with regular expressions, e.g. `--search "/output.*flag/"`
 
 [Default Value] None
 
@@ -816,8 +816,8 @@ Archive entries
 
 ===== --auto
 Auto-generate finish dates from next entry's start time.
-  Automatically generate completion dates 1 minute before next item (in any section) began.
-  --auto overrides the --date and --back parameters.
+      Automatically generate completion dates 1 minute before next item (in any section) began.
+      --auto overrides the --date and --back parameters.
 
 
 
@@ -1482,7 +1482,7 @@ Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
 ===== --from TIME_RANGE
 
 Set a start and optionally end time as a date range ("from 1pm to 2:30pm").
-        If an end time is provided, a dated @done tag will be added
+            If an end time is provided, a dated @done tag will be added
 
 [Default Value] None
 

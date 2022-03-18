@@ -47,13 +47,13 @@ module Doing
       end
     end
 
-    # Non-destructive version of deep_merge_hashes! See that
-    # method.
+    # Non-destructive version of deep_merge_hashes!
+    # @see        {deep_merge_hashes!}
     #
     # @return     the merged hashes.
     #
-    # @param      [Hash] master_hash  The master hash
-    # @param      [Hash] other_hash   The other hash
+    # @param      master_hash  [Hash]  The master hash
+    # @param      other_hash   [Hash]    The other hash
     #
     def deep_merge_hashes(master_hash, other_hash)
       deep_merge_hashes!(master_hash.clone, other_hash)
@@ -61,13 +61,19 @@ module Doing
 
     # Merges a master hash with another hash, recursively.
     #
-    # master_hash - the "parent" hash whose values will be overridden
-    # other_hash  - the other hash whose values will be persisted after the merge
+    # @param      target     [Hash] the "parent" hash whose
+    #                        values will be overridden
+    # @param      overwrite  [Hash] the other hash whose
+    #                        values will be persisted after
+    #                        the merge
     #
     # This code was lovingly stolen from some random gem:
     # http://gemjack.com/gems/tartan-0.1.1/classes/Hash.html
     #
     # Thanks to whoever made it.
+    #
+    # @return     [Hash] merged hashes
+    #
     def deep_merge_hashes!(target, overwrite)
       merge_values(target, overwrite)
       merge_default_proc(target, overwrite)

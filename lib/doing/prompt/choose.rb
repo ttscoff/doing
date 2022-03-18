@@ -104,8 +104,8 @@ module Doing
 
         fzf_args.concat([%(--filter="#{query}"), opt.fetch(:sort) ? '' : '--no-sort'])
       end
-
       res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{fzf_args.join(' ')}`
+
       selected = []
       res.split(/\n/).each do |item|
         idx = item.match(/^ *(\d+)\)/)[1].to_i

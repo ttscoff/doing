@@ -25,19 +25,6 @@ module Doing
       end
 
       ##
-      ## Delete all redo files
-      ##
-      ## @param      filename  [String] The filename
-      ##
-      def clear_redo(filename)
-        filename ||= Doing.setting('doing_file')
-        backups = Dir.glob("undone*___#{File.basename(filename)}", base: backup_dir).sort.reverse
-        backups.each do |file|
-          FileUtils.rm(File.join(backup_dir, file))
-        end
-      end
-
-      ##
       ## Retrieve the most recent backup
       ##
       ## @param      filename  The filename
@@ -65,7 +52,8 @@ module Doing
         raise HistoryLimitError, 'End of undo history' if backup_file.nil?
 
         save_undone(filename)
-        FileUtils.mv(backup_file, filename)
+        move_backup(backup_file, filename)
+
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{backup_file}")
         Doing.logger.benchmark(:restore_backup, :finish)
@@ -78,7 +66,7 @@ module Doing
       ##
       def redo_backup(filename = nil, count: 1)
         filename ||= Doing.setting('doing_file')
-        # redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
+
         undones = Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).sort.reverse
         total = undones.count
         count = total if count > total
@@ -90,7 +78,7 @@ module Doing
 
         redo_file = File.join(backup_dir, undone)
 
-        FileUtils.move(redo_file, filename)
+        move_backup(redo_file, filename)
 
         skipped.each do |f|
           FileUtils.mv(File.join(backup_dir, f), File.join(backup_dir, f.sub(/^undone/, '')))
@@ -98,14 +86,6 @@ module Doing
 
         Doing.logger.warn('File update:', "restored undo step #{count}/#{total}")
         Doing.logger.debug('Backup:', "#{total - skipped.count - 1} redos remaining")
-      end
-
-      def clear_undone(filename = nil)
-        filename ||= Doing.setting('doing_file')
-        # redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
-        Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).each do |f|
-          FileUtils.rm(File.join(backup_dir, f))
-        end
       end
 
       ##
@@ -136,7 +116,7 @@ module Doing
 
         redo_file = File.join(backup_dir, undone)
 
-        FileUtils.move(redo_file, filename)
+        move_backup(redo_file, filename)
 
         skipped.each do |f|
           FileUtils.mv(File.join(backup_dir, f), File.join(backup_dir, f.sub(/^undone/, '')))
@@ -165,9 +145,45 @@ module Doing
 
         backup_file = show_menu(options, filename)
         Util.write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
-        FileUtils.mv(backup_file, filename)
+        move_backup(backup_file, filename)
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{backup_file}")
+      end
+
+      ##
+      ## Writes a copy of the content to a dated backup file
+      ## in a hidden directory
+      ##
+      ## @param      filename  [String] The filename
+      ##
+      def write_backup(filename = nil)
+        Doing.logger.benchmark(:_write_backup, :start)
+        filename ||= Doing.setting('doing_file')
+
+        unless File.exist?(filename)
+          Doing.logger.debug('Backup:', "original file doesn't exist (#{filename})")
+          return
+        end
+
+        backup_file = File.join(backup_dir, "#{timestamp_filename}___#{File.basename(filename)}")
+        # compressed = Zlib::Deflate.deflate(content)
+        # Zlib::GzipWriter.open(backup_file + '.gz') do |gz|
+        #   gz.write(IO.read(filename))
+        # end
+
+        FileUtils.cp(filename, backup_file)
+
+        prune_backups(filename, Doing.setting('history_size').to_i)
+        clear_undone(filename)
+        Doing.logger.benchmark(:_write_backup, :finish)
+      end
+
+      private
+
+      def move_backup(source, dest)
+        Hooks.trigger :pre_write, WWID.new, dest
+        FileUtils.mv(source, dest)
+        Hooks.trigger :post_write, dest
       end
 
       def show_menu(options, filename)
@@ -209,35 +225,26 @@ module Doing
         result.strip.split(/\t/).last
       end
 
+      def clear_undone(filename = nil)
+        filename ||= Doing.setting('doing_file')
+        # redo_file = File.join(backup_dir, "undone___#{File.basename(filename)}")
+        Dir.glob("undone*#{File.basename(filename)}", base: backup_dir).each do |f|
+          FileUtils.rm(File.join(backup_dir, f))
+        end
+      end
+
       ##
-      ## Writes a copy of the content to a dated backup file
-      ## in a hidden directory
+      ## Delete all redo files
       ##
       ## @param      filename  [String] The filename
       ##
-      def write_backup(filename = nil)
-        Doing.logger.benchmark(:_write_backup, :start)
+      def clear_redo(filename)
         filename ||= Doing.setting('doing_file')
-
-        unless File.exist?(filename)
-          Doing.logger.debug('Backup:', "original file doesn't exist (#{filename})")
-          return
+        backups = Dir.glob("undone*___#{File.basename(filename)}", base: backup_dir).sort.reverse
+        backups.each do |file|
+          FileUtils.rm(File.join(backup_dir, file))
         end
-
-        backup_file = File.join(backup_dir, "#{timestamp_filename}___#{File.basename(filename)}")
-        # compressed = Zlib::Deflate.deflate(content)
-        # Zlib::GzipWriter.open(backup_file + '.gz') do |gz|
-        #   gz.write(IO.read(filename))
-        # end
-
-        FileUtils.cp(filename, backup_file)
-
-        prune_backups(filename, Doing.setting('history_size').to_i)
-        clear_undone(filename)
-        Doing.logger.benchmark(:_write_backup, :finish)
       end
-
-      private
 
       def timestamp_filename
         Time.now.strftime('%Y-%m-%d_%H.%M.%S')
