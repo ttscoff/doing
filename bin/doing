@@ -26,7 +26,7 @@ include Doing::Errors
 
 version Doing::VERSION
 hide_commands_without_desc true
-autocomplete_commands true
+autocomplete_commands false
 wrap_help_text :one_line unless $stdout.isatty
 
 include Doing::Types
