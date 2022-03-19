@@ -8,7 +8,7 @@ command %i[mark flag] do |c|
   c.example 'doing flag --tag project1 --count 2', desc: 'Add @flagged to the last 2 entries tagged @project1'
   c.example 'doing flag --interactive --search "/(develop|cod)ing/"',
             desc: 'Find entries matching regular expression and create a menu allowing multiple selections,
-                   selected items will be @flagged'
+                  selected items will be @flagged'
 
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'

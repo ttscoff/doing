@@ -236,9 +236,10 @@ on_error do |exception|
   case exception
   when GLI::UnknownCommand
     if ARGV.count > 1
+      exit run(['view'].concat(ARGV.unshift(@command))) if @wwid.get_view(@command, fallback: false)
       exit run(['now'].concat(ARGV.unshift(@command)))
     else
-      exit run(['view', @command]) if @wwid.get_view(@command, fallback: false)
+      exit run(['view'].concat(ARGV.unshift(@command))) if @wwid.get_view(@command, fallback: false)
 
       Doing::Color.coloring = $stdout.isatty
       Doing.logger.error('Unknown Command:', @command)

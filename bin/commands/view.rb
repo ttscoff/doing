@@ -15,28 +15,24 @@ command :view do |c|
   c.arg_name 'COUNT'
   c.flag %i[c count], must_match: /^\d+$/, type: Integer
 
-  c.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
-  c.arg_name 'FORMAT'
-  c.flag %i[o output]
-
   c.desc 'Age (oldest|newest)'
   c.arg_name 'AGE'
-  c.flag %i[age], default_value: :newest, type: AgeSymbol
+  c.flag %i[age], type: AgeSymbol
 
   c.desc 'Show time intervals on @done tasks'
   c.switch %i[t times], default_value: true, negatable: true
 
   c.desc 'Show elapsed time on entries without @done tag'
-  c.switch [:duration]
+  c.switch [:duration], default_value: false, negatable: false
 
   c.desc 'Show intervals with totals at the end of output'
   c.switch [:totals], default_value: false, negatable: false
 
   c.desc 'Include colors in output'
-  c.switch [:color], default_value: true, negatable: true
+  c.switch [:color], negatable: true
 
   c.desc "Highlight search matches in output. Only affects command line output"
-  c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
+  c.switch %i[h hilite], default_value: false, negatable: true
 
   c.desc 'Sort tags by (name|time)'
   c.arg_name 'KEY'
@@ -53,8 +49,9 @@ command :view do |c|
   c.switch %i[i interactive], negatable: false, default_value: false
 
   add_options(:search, c)
-  add_options(:tag_filter, c)
+  add_options(:tag_filter_no_defaults, c)
   add_options(:date_filter, c)
+  add_options(:output_template_no_defaults, c)
 
   c.action do |global_options, options, args|
     options[:fuzzy] = false
@@ -86,13 +83,22 @@ command :view do |c|
               end
 
     view = @wwid.view_to_options(title)
-    options = Doing::Util.deep_merge_hashes(options, view)
+
+    options = Doing::Util.deep_merge_hashes(view, options)
+
+    options[:totals] = view[:totals] unless options[:totals]
+    options[:only_timed] = view[:only_timed] unless options[:only_timed]
+    options[:times] = view[:times] if options[:times]
+    options[:times] = true if options[:totals]
+    options[:duration] = view[:duration] unless options[:duration]
+    options[:hilite] = view[:hilite] unless options[:hilite]
+
     if view
       page_title = options[:title] || title.cap_first
       tag_filter = false
       if options[:tag] && options[:tag].good
         tag_filter = { 'tags' => [], 'bool' => 'OR' }
-        bool = options[:bool]
+        bool = options[:bool].normalize_bool
         tag_filter['bool'] = bool
         tag_filter['tags'] = if bool == :pattern
                                options[:tag]
@@ -100,6 +106,7 @@ command :view do |c|
                                options[:tag].gsub(/[, ]+/, ' ').split(' ').map(&:strip)
                              end
         options[:tags] = nil
+        options[:bool] = bool
       elsif options[:tags]
         tag_filter = { 'tags' => [], 'bool' => 'OR' }
         bool = options[:bool] ? options[:bool].normalize_bool : :pattern
@@ -122,6 +129,7 @@ command :view do |c|
       options[:times] = true if totals
 
       options.rename_key(:tag_sort, :sort_tags)
+      options[:sort_tags] ||= :name
       options.rename_key(:date_format, :format)
       options.rename_key(:color, :highlight)
       search = nil

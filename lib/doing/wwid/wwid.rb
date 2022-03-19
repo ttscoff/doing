@@ -109,6 +109,7 @@ module Doing
       # options.rename_key(:tags, :tag, keep: true)
       options.rename_key(:output_format, :output)
       options.rename_key(:tags_bool, :bool)
+      options.rename_key(:tag_sort, :sort_tags)
       options.rename_key(:negate, :not)
       options.rename_key(:order, :sort)
 

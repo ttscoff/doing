@@ -30,7 +30,7 @@ command :last do |c|
   add_options(:output_template, c, default_template: 'last')
   add_options(:search, c)
   add_options(:tag_filter, c)
-  add_options(:save)
+  add_options(:save, c)
 
   c.action do |global_options, options, _args|
     options[:fuzzy] = false
