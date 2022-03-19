@@ -233,16 +233,19 @@ pre do |global, _command, _options, _args|
 end
 
 on_error do |exception|
-  if exception.is_a?(GLI::UnknownCommand)
+  case exception
+  when GLI::UnknownCommand
     if ARGV.count > 1
       exit run(['now'].concat(ARGV.unshift(@command)))
     else
+      exit run(['view', @command]) if @wwid.get_view(@command, fallback: false)
+
       Doing::Color.coloring = $stdout.isatty
       Doing.logger.error('Unknown Command:', @command)
       Doing.logger.output_results
       false
     end
-  elsif exception.is_a?(SystemExit)
+  when SystemExit
     false
   else
     # Doing.logger.error('Fatal:', exception)

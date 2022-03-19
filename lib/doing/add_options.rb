@@ -186,5 +186,9 @@ def add_options(type, cmd, default_template: 'default')
     end
     cmd.arg_name 'DATE_OR_RANGE'
     cmd.flag [:from], type: DateRangeString
+  when :save
+    cmd.desc 'Save all current command line options as a new view'
+    cmd.arg_name 'VIEW_NAME'
+    cmd.flag %i[save]
   end
 end

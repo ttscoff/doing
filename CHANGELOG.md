@@ -1,3 +1,15 @@
+### 2.1.43
+
+2022-03-19 05:13
+
+#### NEW
+
+- 'parent' key in view config allows inheritance
+
+#### IMPROVED
+
+- Allow all show options in view config
+
 ### 2.1.42
 
 2022-03-17 09:38

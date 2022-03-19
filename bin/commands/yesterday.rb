@@ -14,6 +14,7 @@ command :yesterday do |c|
   add_options(:output_template, c, default_template: 'today')
   add_options(:time_filter, c)
   add_options(:time_display, c)
+  add_options(:save, c)
 
   c.action do |_global_options, options, _args|
     raise InvalidPlugin.new('output', options[:output]) if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
@@ -22,7 +23,8 @@ command :yesterday do |c|
 
     opt = options.clone
     opt[:order] = Doing.setting(['templates', options[:config_template], 'order'])
-
+    opt[:yesterday] = true
     Doing::Pager.page @wwid.yesterday(options[:section], options[:times], options[:output], opt).chomp
+    Doing.config.save_view(opt.to_view, options[:save].downcase) if options[:save]
   end
 end

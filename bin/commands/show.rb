@@ -47,6 +47,7 @@ command :show do |c|
   add_options(:search, c)
   add_options(:tag_filter, c)
   add_options(:date_filter, c)
+  add_options(:save, c)
 
   c.action do |global_options, options, args|
     options[:fuzzy] = false
@@ -153,5 +154,7 @@ command :show do |c|
     opt[:tags_color] = template['tags_color']
 
     Doing::Pager.page @wwid.list_section(opt, items: items)
+
+    Doing.config.save_view(opt.to_view, options[:save].downcase) if options[:save]
   end
 end
