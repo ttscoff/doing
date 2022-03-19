@@ -30,6 +30,7 @@ command :last do |c|
   add_options(:output_template, c, default_template: 'last')
   add_options(:search, c)
   add_options(:tag_filter, c)
+  add_options(:save)
 
   c.action do |global_options, options, _args|
     options[:fuzzy] = false
@@ -70,6 +71,7 @@ command :last do |c|
                         val: options[:val]
                       })
       Doing::Pager::page last.strip if last
+      Doing.config.save_view(options.to_view, options[:save].downcase) if options[:save]
     end
   end
 end

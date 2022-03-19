@@ -17,6 +17,7 @@ command :recent do |c|
 
   add_options(:output_template, c, default_template: 'recent')
   add_options(:time_display, c)
+  add_options(:save, c)
 
   c.action do |global_options, options, args|
     section = @wwid.guess_section(options[:section]) || options[:section].cap_first
@@ -53,7 +54,8 @@ command :recent do |c|
       }
 
       Doing::Pager::page @wwid.recent(count, section.cap_first, opts)
-
+      opts[:count] = count
+      Doing.config.save_view(opts.to_view, options[:save].downcase) if options[:save]
     end
   end
 end

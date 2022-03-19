@@ -15,7 +15,7 @@ command :since do |c|
   add_options(:time_display, c)
   add_options(:tag_filter, c)
   add_options(:search, c)
-
+  add_options(:save, c)
   c.action do |_global_options, options, args|
     raise DoingRuntimeError, %(Invalid output type "#{options[:output]}") if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
 
@@ -37,5 +37,6 @@ command :since do |c|
     options[:sort_tags] = options[:tag_sort]
 
     Doing::Pager.page @wwid.list_date([start, finish], options[:section], options[:times], options[:output], options).chomp
+    Doing.config.save_view(options.to_view, options[:save].downcase) if options[:save]
   end
 end

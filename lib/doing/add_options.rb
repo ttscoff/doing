@@ -19,6 +19,8 @@
 ##
 ## :date_filter => --before, --after, --from
 ##
+## :save => --save
+##
 ## @param      type  [Symbol] The type
 ## @param      cmd   The GLI command to which the options will be added
 ##

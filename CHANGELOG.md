@@ -1,9 +1,11 @@
 ### 2.1.43
 
-2022-03-19 05:13
+2022-03-19 07:00
 
 #### NEW
 
+- Use `--save NAME` with view commands to store command line options as a view in config
+- Views function as commands, so you can run `doing custom` and get `doing view custom` if 'custom' is not a recognized command
 - 'parent' key in view config allows inheritance
 
 #### IMPROVED
