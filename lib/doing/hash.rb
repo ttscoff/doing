@@ -87,5 +87,21 @@ module Doing
         end
       end
     end
+
+    ##
+    ## Rename a key, deleting old key
+    ##
+    ## @param      old_key  The original key
+    ## @param      new_key  The new key
+    ## @param      keep     [Boolean] if true, keep old key
+    ##                      in addition to new key
+    ##
+    def rename_key(old_key, new_key, keep: false)
+      return unless key?(old_key)
+
+      self[new_key] = self[old_key]
+      self[new_key.to_s] = self[old_key]
+      delete(old_key) unless keep
+    end
   end
 end
