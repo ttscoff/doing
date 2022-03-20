@@ -1,6 +1,6 @@
 ### 2.1.43
 
-2022-03-20 12:43
+2022-03-20 12:44
 
 #### NEW
 
@@ -14,10 +14,11 @@
 
 #### IMPROVED
 
-- Include -F switch in `less` when paging to avoid pager if less than one screen
+- `doing changes --only [changed,new,improved,fixed]` to only show changes of a type
 - Allow all show options in view config
 - Disable autocorrect for command names so custom views can better override similarly-spelled commands
 - `doing changes --prefix` will output each change with a type prefix
+- Include -F switch in `less` when paging to avoid pager if less than one screen
 
 #### FIXED
 
