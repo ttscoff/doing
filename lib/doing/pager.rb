@@ -73,7 +73,7 @@ module Doing
         [
           Doing.setting('editors.pager'),
           ENV['PAGER'],
-          'less -Xr',
+          'less -FXr',
           ENV['GIT_PAGER'],
           git_pager,
           'more -r'
