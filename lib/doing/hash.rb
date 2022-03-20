@@ -130,7 +130,7 @@ module Doing
       return unless key?(old_key)
 
       self[new_key] = self[old_key]
-      self[new_key.to_s] = self[old_key]
+      self[new_key.to_s] = self[old_key] if key?(new_key.to_s)
       delete(old_key) unless keep
     end
 

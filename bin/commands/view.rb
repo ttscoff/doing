@@ -84,16 +84,15 @@ command :view do |c|
 
     view = @wwid.view_to_options(title)
 
-    options = Doing::Util.deep_merge_hashes(view, options)
-
-    options[:totals] = view[:totals] unless options[:totals]
-    options[:only_timed] = view[:only_timed] unless options[:only_timed]
-    options[:times] = view[:times] if options[:times]
-    options[:times] = true if options[:totals]
-    options[:duration] = view[:duration] unless options[:duration]
-    options[:hilite] = view[:hilite] unless options[:hilite]
-
     if view
+      options = Doing::Util.deep_merge_hashes(view, options)
+
+      options[:totals] = view[:totals] unless options[:totals]
+      options[:only_timed] = view[:only_timed] unless options[:only_timed]
+      options[:times] = view[:times] if options[:times]
+      options[:duration] = view[:duration] unless options[:duration]
+      options[:hilite] = view[:hilite] unless options[:hilite]
+
       page_title = options[:title] || title.cap_first
       tag_filter = false
       if options[:tag] && options[:tag].good

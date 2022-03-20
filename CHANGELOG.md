@@ -1,16 +1,17 @@
 ### 2.1.43
 
-2022-03-19 11:37
+2022-03-19 11:40
 
 #### NEW
 
-- Breaking change - boolean switches on the command line no longer override views
 - 'parent' key in view config allows inheritance
 - Use `--save NAME` with view commands to store command line options as a view in config
 - Views function as commands, so you can run `doing custom` and get `doing view custom` if 'custom' is not a recognized command
+- Breaking change - boolean switches on the command line no longer override views
 
 #### IMPROVED
 
+- Disable autocorrect for command names so custom views can better override similarly-spelled commands
 - Allow all show options in view config
 
 ### 2.1.42
