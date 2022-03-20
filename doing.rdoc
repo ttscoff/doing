@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.42
+v2.1.43
 
 === Global Options
 === --config_file arg
@@ -442,6 +442,13 @@ Look up a specific version. Specify versions as "MAJ.MIN.PATCH", MIN
 [Must Match] (?-mix:^(?:(?:(?:[<>=]+|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[0-9.*?]{1,10} *)+|(?:[\d.]+ *(?:-|to)+ *[0-9.]{1,10}))$)
 
 
+===== --only TYPES
+
+Only show changes of type(s), comma-separated
+
+[Default Value] changed,new,improved,fixed
+
+
 ===== -s|--search arg
 
 Show changelogs matching search terms (uses pattern-based searching).
@@ -475,6 +482,11 @@ Open changelog in interactive viewer
 
 ===== -m|--md|--markdown
 Output raw Markdown
+
+
+
+===== -p|--[no-]prefix
+Include (CHANGE|NEW|IMPROVED|FIXED) prefix on each line
 
 
 
@@ -927,6 +939,13 @@ Section
 [Default Value] All
 
 
+===== --save VIEW_NAME
+
+Save all current command line options as a new view
+
+[Default Value] None
+
+
 ===== --tag TAG
 
 Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)
@@ -1168,6 +1187,13 @@ Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|m
 Specify a section
 
 [Default Value] All
+
+
+===== --save VIEW_NAME
+
+Save all current command line options as a new view
+
+[Default Value] None
 
 
 ===== --search QUERY
@@ -1587,6 +1613,13 @@ Section
 [Default Value] All
 
 
+===== --save VIEW_NAME
+
+Save all current command line options as a new view
+
+[Default Value] None
+
+
 ===== --search QUERY
 
 Filter entries using a search query, surround with slashes for regex (e.g. "/query.*/"),
@@ -1737,6 +1770,13 @@ Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|m
 Section
 
 [Default Value] All
+
+
+===== --save VIEW_NAME
+
+Save all current command line options as a new view
+
+[Default Value] None
 
 
 ===== --tag_order DIRECTION
@@ -2273,6 +2313,13 @@ Sort order (asc/desc)
 [Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
+===== --save VIEW_NAME
+
+Save all current command line options as a new view
+
+[Default Value] None
+
+
 ===== --search QUERY
 
 Filter entries using a search query, surround with slashes for regex (e.g. "/query.*/"),
@@ -2411,6 +2458,13 @@ Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|m
 Section
 
 [Default Value] All
+
+
+===== --save VIEW_NAME
+
+Save all current command line options as a new view
+
+[Default Value] None
 
 
 ===== --search QUERY
@@ -2817,6 +2871,13 @@ Specify a section
 [Default Value] All
 
 
+===== --save VIEW_NAME
+
+Save all current command line options as a new view
+
+[Default Value] None
+
+
 ===== --tag_order DIRECTION
 
 Tag sort direction (asc|desc)
@@ -2910,7 +2971,7 @@ Show entries newer than date (natural language). If this is only a time (8am, 1:
 
 Age (oldest|newest)
 
-[Default Value] newest
+[Default Value] None
 
 
 ===== --before DATE_STRING
@@ -2925,7 +2986,7 @@ Show entries older than date (natural language). If this is only a time (8am, 1:
 
 Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
 
-[Default Value] pattern
+[Default Value] None
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
@@ -2943,6 +3004,13 @@ Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart
 
 [Default Value] smart
 [Must Match] (?i-mx:^[cis].*?$)
+
+
+===== --config_template TEMPLATE_KEY
+
+Output using a template from configuration
+
+[Default Value] None
 
 
 ===== --from DATE_OR_RANGE
@@ -3001,6 +3069,13 @@ Sort tags by (name|time)
 [Must Match] (?i-mx:^(?:n(?:ame)?|t(?:ime)?)$)
 
 
+===== --template TEMPLATE_STRING
+
+Override output format with a template string containing %placeholders
+
+[Default Value] None
+
+
 ===== --val QUERY
 
 Perform a tag value query ("@done > two hours ago" or "@progress < 50").
@@ -3015,7 +3090,7 @@ Include colors in output
 
 
 
-===== --[no-]duration
+===== --duration
 Show elapsed time on entries without @done tag
 
 
@@ -3055,13 +3130,26 @@ Force exact search string matching (case sensitive)
 
 
 
-==== Command: <tt>views </tt>
-List available custom views
+==== Command: <tt>views  [NAME(S)]</tt>
+List available custom views. Specify view names to see YAML configurations.
 
 
 ===== Options
+===== -o|--output FORMAT
+
+Output/edit view in alternative format (json, yaml)
+
+[Default Value] yaml
+[Must Match] (?i-mx:^[jy])
+
+
 ===== -c|--[no-]column
 List in single column
+
+
+
+===== -e|--[no-]editor
+Open YAML for view in editor (requires argument)
 
 
 
@@ -3174,6 +3262,13 @@ Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|m
 Specify a section
 
 [Default Value] All
+
+
+===== --save VIEW_NAME
+
+Save all current command line options as a new view
+
+[Default Value] None
 
 
 ===== --tag_order DIRECTION

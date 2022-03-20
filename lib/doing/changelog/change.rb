@@ -7,9 +7,13 @@ module Doing
 
     attr_accessor :entries, :change_date
 
-    def initialize(version, content)
+    attr_writer :prefix
+
+    def initialize(version, content, prefix: false, only: %i[changed new improved fixed])
       @version = Version.new(version)
       @content = content
+      @prefix = prefix
+      @only = only
       parse_entries
     end
 
@@ -18,10 +22,10 @@ module Doing
       @change_date = Time.parse(date[0]) if date
 
       @entries = []
-      types = @content.scan(/(?<=\n|\A)#### (NEW|IMPROVED|FIXED)(.*?)(?=\n####|\Z)/m)
+      types = @content.scan(/(?<=\n|\A)#### (CHANGED|NEW|IMPROVED|FIXED)(.*?)(?=\n####|\Z)/m)
       types.each do |type|
         type[1].scan(/\s*- +(.*?)$/).each do |entry|
-          @entries << Entry.new(entry[0].strip, type[0])
+          @entries << Entry.new(entry[0].strip, type[0], prefix: @prefix)
         end
       end
     end
@@ -57,7 +61,7 @@ module Doing
     end
 
     def split_items
-      items = { new: [], improved: [], fixed: [], other: [] }
+      items = { changed: [], new: [], improved: [], fixed: [], other: [] }
 
       @entries.each do |e|
         type = e.type.downcase.to_sym
@@ -76,6 +80,8 @@ module Doing
       out = ["### __#{@version}__#{date}"]
 
       split_items.each do |type, members|
+        next unless @only.include?(type)
+
         if members.count.positive?
           out << "#### #{type.to_s.capitalize}"
           out << members.map(&:to_s).join("\n")
@@ -88,7 +94,9 @@ module Doing
     def changes_only
       out = []
 
-      split_items.each do |_, members|
+      split_items.each do |type, members|
+        next unless @only.include?(type)
+
         out << members.map(&:to_s).join("\n")
       end
 

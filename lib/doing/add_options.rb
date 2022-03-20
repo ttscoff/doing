@@ -19,6 +19,8 @@
 ##
 ## :date_filter => --before, --after, --from
 ##
+## :save => --save
+##
 ## @param      type  [Symbol] The type
 ## @param      cmd   The GLI command to which the options will be added
 ##
@@ -46,6 +48,18 @@ def add_options(type, cmd, default_template: 'default')
     cmd.desc "Output using a template from configuration"
     cmd.arg_name 'TEMPLATE_KEY'
     cmd.flag [:config_template], type: TemplateName, default_value: default_template
+
+    cmd.desc 'Override output format with a template string containing %placeholders'
+    cmd.arg_name 'TEMPLATE_STRING'
+    cmd.flag [:template]
+  when :output_template_no_defaults
+    cmd.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
+    cmd.arg_name 'FORMAT'
+    cmd.flag %i[o output]
+
+    cmd.desc "Output using a template from configuration"
+    cmd.arg_name 'TEMPLATE_KEY'
+    cmd.flag [:config_template], type: TemplateName
 
     cmd.desc 'Override output format with a template string containing %placeholders'
     cmd.arg_name 'TEMPLATE_STRING'
@@ -138,6 +152,23 @@ def add_options(type, cmd, default_template: 'default')
     cmd.flag [:bool], must_match: REGEX_BOOL,
                       default_value: :pattern,
                       type: BooleanSymbol
+  when :tag_filter_no_defaults
+    cmd.desc 'Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
+    cmd.arg_name 'TAG'
+    cmd.flag [:tag], type: TagArray
+
+    cmd.desc 'Perform a tag value query ("@done > two hours ago" or "@progress < 50").
+            May be used multiple times, combined with --bool'
+    cmd.arg_name 'QUERY'
+    cmd.flag [:val], multiple: true, must_match: REGEX_VALUE_QUERY
+
+    cmd.desc "#{action} items that *don't* match search/tag filters"
+    cmd.switch [:not], negatable: false
+
+    cmd.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
+    cmd.arg_name 'BOOLEAN'
+    cmd.flag [:bool], must_match: REGEX_BOOL,
+                      type: BooleanSymbol
   when :time_filter
     cmd.desc 'View entries before specified time (e.g. 8am, 12:30pm, 15:00)'
     cmd.arg_name 'TIME_STRING'
@@ -186,5 +217,9 @@ def add_options(type, cmd, default_template: 'default')
     end
     cmd.arg_name 'DATE_OR_RANGE'
     cmd.flag [:from], type: DateRangeString
+  when :save
+    cmd.desc 'Save all current command line options as a new view'
+    cmd.arg_name 'VIEW_NAME'
+    cmd.flag %i[save]
   end
 end

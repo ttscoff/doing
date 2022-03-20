@@ -361,6 +361,23 @@ module Doing
       config
     end
 
+    ##
+    ## Save a set of options to the `views` configuration
+    ##
+    ## @param      view   [Hash] view options
+    ## @param      title  [String] view title
+    ##
+    def save_view(view, title)
+      title.downcase!
+      user_config = Util.safe_load_file(config_file)
+      user_config['views'] = {} unless user_config.key?('views')
+      user_config['views'][title] = view
+      Util.write_to_file(config_file, YAML.dump(user_config), backup: true)
+      Doing.logger.warn('Config:', %(View "#{title}" saved to #{config_file}))
+      Doing.logger.info('Config:', %(to use, run `doing view #{title}`))
+      Hooks.trigger :post_config, self
+    end
+
     # @private
     def inspect
       %(<Doing::Configuration #{@settings.hash}>)

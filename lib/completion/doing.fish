@@ -228,6 +228,8 @@ complete -c doing -l all -s a -f  -n '__fish_doing_using_command changes changel
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command changes changelog' -d Open\ changelog\ in\ interactive\ viewer
 complete -c doing -l lookup -s l -f -r -n '__fish_doing_using_command changes changelog' -d Look\ up\ a\ specific\ version
 complete -c doing -l markdown  -f  -n '__fish_doing_using_command changes changelog' -d Output\ raw\ Markdown
+complete -c doing -l only  -f -r -n '__fish_doing_using_command changes changelog' -d Only\ show\ changes\ of\ type\(s\)
+complete -c doing -l prefix -s p -f  -n '__fish_doing_using_command changes changelog' -d Include
 complete -c doing -l render  -f  -n '__fish_doing_using_command changes changelog' -d Force\ rendered\ output
 complete -c doing -l search -s s -f -r -n '__fish_doing_using_command changes changelog' -d Show\ changelogs\ matching\ search\ terms
 complete -c doing -l sort  -f -r -n '__fish_doing_using_command changes changelog' -d Sort\ order
@@ -281,6 +283,7 @@ complete -c doing -l not  -f  -n '__fish_doing_using_command grep search' -d Sea
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command grep search' -d Output\ to\ export\ format
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command grep search' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command grep search' -d Section
+complete -c doing -l save  -f -r -n '__fish_doing_using_command grep search' -d Save\ all\ current\ command\ line\ options\ as\ a\ new\ view
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command grep search' -d Show\ time\ intervals\ on\ @done\ tasks
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command grep search' -d Filter\ entries\ by\ tag
 complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command grep search' -d Tag\ sort\ direction
@@ -314,6 +317,7 @@ complete -c doing -l hilite -s h -f  -n '__fish_doing_using_command last' -d Hig
 complete -c doing -l not  -f  -n '__fish_doing_using_command last' -d Show\ items\ that\ \*don\'t\*\ match\ search/tag\ filters
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command last' -d Output\ to\ export\ format
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command last' -d Specify\ a\ section
+complete -c doing -l save  -f -r -n '__fish_doing_using_command last' -d Save\ all\ current\ command\ line\ options\ as\ a\ new\ view
 complete -c doing -l search  -f -r -n '__fish_doing_using_command last' -d Filter\ entries\ using\ a\ search\ query
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command last' -d Filter\ entries\ by\ tag
 complete -c doing -l template  -f -r -n '__fish_doing_using_command last' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
@@ -371,6 +375,7 @@ complete -c doing -l not  -f  -n '__fish_doing_using_command on' -d Show\ items\
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command on' -d Output\ to\ export\ format
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command on' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command on' -d Section
+complete -c doing -l save  -f -r -n '__fish_doing_using_command on' -d Save\ all\ current\ command\ line\ options\ as\ a\ new\ view
 complete -c doing -l search  -f -r -n '__fish_doing_using_command on' -d Filter\ entries\ using\ a\ search\ query
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command on' -d Show\ time\ intervals\ on\ @done\ tasks
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command on' -d Filter\ entries\ by\ tag
@@ -391,6 +396,7 @@ complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command recent'
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command recent' -d Output\ to\ export\ format
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command recent' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command recent' -d Section
+complete -c doing -l save  -f -r -n '__fish_doing_using_command recent' -d Save\ all\ current\ command\ line\ options\ as\ a\ new\ view
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command recent' -d Show\ time\ intervals\ on\ @done\ tasks
 complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command recent' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command recent' -d Sort\ tags\ by
@@ -461,6 +467,7 @@ complete -c doing -l not  -f  -n '__fish_doing_using_command show' -d Show\ item
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command show' -d Output\ to\ export\ format
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command show' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l sort -s s -f -r -n '__fish_doing_using_command show' -d Sort\ order
+complete -c doing -l save  -f -r -n '__fish_doing_using_command show' -d Save\ all\ current\ command\ line\ options\ as\ a\ new\ view
 complete -c doing -l search  -f -r -n '__fish_doing_using_command show' -d Filter\ entries\ using\ a\ search\ query
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command show' -d Show\ time\ intervals\ on\ @done\ tasks
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command show' -d Filter\ entries\ by\ tag
@@ -478,6 +485,7 @@ complete -c doing -l not  -f  -n '__fish_doing_using_command since' -d Since\ it
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command since' -d Output\ to\ export\ format
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command since' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command since' -d Section
+complete -c doing -l save  -f -r -n '__fish_doing_using_command since' -d Save\ all\ current\ command\ line\ options\ as\ a\ new\ view
 complete -c doing -l search  -f -r -n '__fish_doing_using_command since' -d Filter\ entries\ using\ a\ search\ query
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command since' -d Show\ time\ intervals\ on\ @done\ tasks
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command since' -d Filter\ entries\ by\ tag
@@ -533,6 +541,7 @@ complete -c doing -l from  -f -r -n '__fish_doing_using_command today' -d Time\ 
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command today' -d Output\ to\ export\ format
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command today' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command today' -d Specify\ a\ section
+complete -c doing -l save  -f -r -n '__fish_doing_using_command today' -d Save\ all\ current\ command\ line\ options\ as\ a\ new\ view
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command today' -d Show\ time\ intervals\ on\ @done\ tasks
 complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command today' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command today' -d Sort\ tags\ by
@@ -549,6 +558,7 @@ complete -c doing -l bool  -f -r -n '__fish_doing_using_command view' -d Boolean
 complete -c doing -l count -s c -f -r -n '__fish_doing_using_command view' -d Count\ to\ display
 complete -c doing -l case  -f -r -n '__fish_doing_using_command view' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l color  -f  -n '__fish_doing_using_command view' -d Include\ colors\ in\ output
+complete -c doing -l config_template  -f -r -n '__fish_doing_using_command view' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command view' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
 complete -c doing -l from  -f -r -n '__fish_doing_using_command view' -d Date\ range
 complete -c doing -l hilite -s h -f  -n '__fish_doing_using_command view' -d Highlight\ search\ matches\ in\ output
@@ -562,10 +572,13 @@ complete -c doing -l times -s t -f  -n '__fish_doing_using_command view' -d Show
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command view' -d Filter\ entries\ by\ tag
 complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command view' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command view' -d Sort\ tags\ by
+complete -c doing -l template  -f -r -n '__fish_doing_using_command view' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l totals  -f  -n '__fish_doing_using_command view' -d Show\ intervals\ with\ totals\ at\ the\ end\ of\ output
 complete -c doing -l val  -f -r -n '__fish_doing_using_command view' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command view' -d Force\ exact\ search\ string\ matching
 complete -c doing -l column -s c -f  -n '__fish_doing_using_command views' -d List\ in\ single\ column
+complete -c doing -l editor -s e -f  -n '__fish_doing_using_command views' -d Open\ YAML\ for\ view\ in\ editor
+complete -c doing -l output -s o -f -r -n '__fish_doing_using_command views' -d Output/edit\ view\ in\ alternative\ format
 complete -c doing -l after  -f -r -n '__fish_doing_using_command wiki' -d Include\ entries\ newer\ than\ date
 complete -c doing -l bool -s b -f -r -n '__fish_doing_using_command wiki' -d Tag\ boolean
 complete -c doing -l before  -f -r -n '__fish_doing_using_command wiki' -d Include\ entries\ older\ than\ date
@@ -582,12 +595,13 @@ complete -c doing -l from  -f -r -n '__fish_doing_using_command yesterday' -d Ti
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command yesterday' -d Output\ to\ export\ format
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command yesterday' -d Only\ show\ items\ with\ recorded\ time\ intervals
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command yesterday' -d Specify\ a\ section
+complete -c doing -l save  -f -r -n '__fish_doing_using_command yesterday' -d Save\ all\ current\ command\ line\ options\ as\ a\ new\ view
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command yesterday' -d Show\ time\ intervals\ on\ @done\ tasks
 complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command yesterday' -d Tag\ sort\ direction
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command yesterday' -d Sort\ tags\ by
 complete -c doing -l template  -f -r -n '__fish_doing_using_command yesterday' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l totals  -f  -n '__fish_doing_using_command yesterday' -d Show\ time\ totals\ at\ the\ end\ of\ output
-complete -f -c doing -s o -l output -x -n '__fish_doing_using_command grep search last on recent select show since today view yesterday' -a '(__fish_doing_export_plugin)'
+complete -f -c doing -s o -l output -x -n '__fish_doing_using_command grep search last on recent select show since today view views yesterday' -a '(__fish_doing_export_plugin)'
 complete -f -c doing -s b -l bool -x -n '__fish_doing_using_command again resume archive move autotag cancel finish grep search last mark flag note on reset begin rotate show since tag tags view wiki' -a 'and or not pattern'
 complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel finish grep search import last mark flag note on reset begin rotate select show since tag tags view' -a 'case-sensitive ignore smart'
 complete -f -c doing -l sort -x -n '__fish_doing_using_command changes changelog show tags' -a 'asc desc'

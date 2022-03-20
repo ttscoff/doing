@@ -6,8 +6,10 @@ module Doing
     attr_reader :changes
     attr_writer :changes_only
 
-    def initialize(lookup: nil, search: nil, changes: false, sort: :desc)
+    def initialize(lookup: nil, search: nil, changes: false, sort: :desc, prefix: false, only: %i[changed new improved fixed])
       @changes_only = changes
+      @prefix = prefix
+      @only = only
       changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'CHANGELOG.md'))
       raise 'Error locating changelog' unless File.exist?(changelog)
 
@@ -56,9 +58,10 @@ module Doing
       @changes = @content.scan(change_rx).each_with_object([]) do |m, a|
         next if m[0].nil? || m[1].nil?
 
-        a << Change.new(m[0], m[1].strip)
+        a << Change.new(m[0], m[1].strip, prefix: @prefix)
       end
 
+      select_type
       lookup(lookup) unless lookup.nil?
       search(search) unless search.nil?
     end
@@ -97,6 +100,12 @@ module Doing
       end
 
       @changes.delete_if { |c| c.nil? || c.entries.nil? }
+    end
+
+    def select_type
+      @changes.map do |c|
+        c.entries.delete_if { |e| !@only.include?(e.type.normalize_change_type) }
+      end
     end
   end
 end

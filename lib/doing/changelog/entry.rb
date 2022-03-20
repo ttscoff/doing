@@ -5,17 +5,24 @@ module Doing
   class Entry
     attr_reader :type, :string
 
-    def initialize(string, type)
+    attr_writer :prefix
+
+    def initialize(string, type, prefix: false)
       @string = string
       @type = type
+      @prefix = prefix
     end
 
     def clean(string)
       string.gsub(/\|/, '\|')
     end
 
+    def print_prefix
+      @prefix ? "#{@type}: " : ''
+    end
+
     def to_s
-      "- #{clean(@string)}"
+      "- #{print_prefix}#{clean(@string)}"
     end
   end
 end

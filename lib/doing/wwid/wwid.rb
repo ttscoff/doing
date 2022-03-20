@@ -100,10 +100,28 @@ module Doing
     ##
     ## @param      title  [String] The title of the view to retrieve
     ##
-    def get_view(title)
-      return Doing.setting(['views', title], nil)
+    def get_view(title, fallback: nil)
+      Doing.setting(['views', title], fallback)
+    end
 
-      false
+    def rename_view_keys(view)
+      options = view.symbolize_keys
+      # options.rename_key(:tags, :tag, keep: true)
+      options.rename_key(:output_format, :output)
+      options.rename_key(:tags_bool, :bool)
+      options.rename_key(:tag_sort, :sort_tags)
+      options.rename_key(:negate, :not)
+      options.rename_key(:order, :sort)
+
+      options
+    end
+
+    def view_to_options(title)
+      view = rename_view_keys(get_view(guess_view(title)))
+      view.deep_merge(rename_view_keys(get_view(guess_view(view[:parent]), fallback: {}))) if view.key?(:parent)
+      view.deep_merge(rename_view_keys(get_view(view[:config_template], fallback: {}))) if view.key?(:config_template)
+      view.deep_merge(Doing.setting('templates.default').symbolize_keys)
+      view
     end
 
     private

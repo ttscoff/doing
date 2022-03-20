@@ -1,3 +1,29 @@
+### 2.1.43
+
+2022-03-20 12:44
+
+#### NEW
+
+- 'parent' key in view config allows inheritance
+- Use `--save NAME` with view commands to store command line options as a view in config
+- Views function as commands, so you can run `doing custom` and get `doing view custom` if 'custom' is not a recognized command
+- Breaking change - boolean switches on the command line no longer override views
+- Add an argument to `doing views` to dump the YAML for a single view
+- Use `doing views NAME --editor` to open the YAML for a single view in the default editor, saving the result to main config
+- Use `doing views [-e] -o json NAME` to dump or edit a view as json instead of YAML
+
+#### IMPROVED
+
+- `doing changes --only [changed,new,improved,fixed]` to only show changes of a type
+- Allow all show options in view config
+- Disable autocorrect for command names so custom views can better override similarly-spelled commands
+- `doing changes --prefix` will output each change with a type prefix
+- Include -F switch in `less` when paging to avoid pager if less than one screen
+
+#### FIXED
+
+- `doing templates --list` returning error
+
 ### 2.1.42
 
 2022-03-17 09:38

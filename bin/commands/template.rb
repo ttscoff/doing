@@ -28,34 +28,23 @@ command :template do |c|
       else
         $stdout.puts "Available templates: #{Doing::Plugins.plugin_templates.join(', ')}"
       end
-      return
-    end
-
-    if args.empty?
-      type = Doing::Prompt.choose_from(Doing::Plugins.plugin_templates, sorted: false, prompt: 'Select template type > ')
-      type.sub!(/ \(.*?\)$/, '').strip!
-      options[:save] = Doing::Prompt.yn("Save to #{options[:path]}? (No outputs to STDOUT)", default_response: false)
     else
-      type = args[0]
+
+      if args.empty?
+        type = Doing::Prompt.choose_from(Doing::Plugins.plugin_templates, sorted: false, prompt: 'Select template type > ')
+        type.sub!(/ \(.*?\)$/, '').strip!
+        options[:save] = Doing::Prompt.yn("Save to #{options[:path]}? (No outputs to STDOUT)", default_response: false)
+      else
+        type = args[0]
+      end
+
+      raise InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" unless type
+
+      if options[:save]
+        Doing::Plugins.template_for_trigger(type, save_to: options[:path])
+      else
+        $stdout.puts Doing::Plugins.template_for_trigger(type, save_to: nil)
+      end
     end
-
-    raise InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" unless type
-
-    if options[:save]
-      Doing::Plugins.template_for_trigger(type, save_to: options[:path])
-    else
-      $stdout.puts Doing::Plugins.template_for_trigger(type, save_to: nil)
-    end
-
-    # case args[0]
-    # when /html|haml/i
-    #   $stdout.puts @wwid.haml_template
-    # when /css/i
-    #   $stdout.puts @wwid.css_template
-    # when /markdown|md|erb/i
-    #   $stdout.puts @wwid.markdown_template
-    # else
-    #   exit_now! 'Invalid type specified, must be HAML or CSS'
-    # end
   end
 end

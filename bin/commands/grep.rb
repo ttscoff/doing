@@ -25,7 +25,7 @@ command %i[grep search] do |c|
   c.desc 'Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]'
   c.arg_name 'TYPE'
   c.flag [:case], must_match: REGEX_CASE,
-                  default_value: Doing.settings.dig('search', 'case').normalize_case,
+                  default_value: Doing.setting('search.case', :smart).normalize_case,
                   type: CaseSymbol
 
   c.desc "Highlight search matches in output. Only affects command line output"
@@ -44,6 +44,7 @@ command %i[grep search] do |c|
   add_options(:tag_filter, c)
   add_options(:date_filter, c)
   add_options(:time_display, c)
+  add_options(:save, c)
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
@@ -66,5 +67,6 @@ command %i[grep search] do |c|
     options[:tags_color] = tags_color
 
     Doing::Pager.page @wwid.list_section(options)
+    Doing.config.save_view(options.to_view, options[:save].downcase) if options[:save]
   end
 end
