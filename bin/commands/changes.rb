@@ -43,6 +43,10 @@ module Doing
       cmd.desc 'Include (CHANGE|NEW|IMPROVED|FIXED) prefix on each line'
       cmd.switch %i[p prefix]
 
+      cmd.desc 'Only show changes of type(s), comma-separated'
+      cmd.arg_name 'TYPES'
+      cmd.flag %i[only], default_value: 'changed,new,improved,fixed'
+
       cmd.desc 'Output raw Markdown'
       cmd.switch %i[m md markdown], default_value: false, negatable: false
 
@@ -75,11 +79,13 @@ command %i[changes changelog] do |c|
   cmd.add_examples(c)
 
   c.action do |_global_options, options, _args|
+    only = options[:only].split(/ *, */).map(&:normalize_change_type)
     cl = Doing::Changes.new(lookup: options[:lookup],
                             search: options[:search],
                             changes: options[:changes],
                             prefix: options[:prefix],
-                            sort: options[:sort])
+                            sort: options[:sort],
+                            only: only)
 
     if options[:interactive]
       cl.interactive

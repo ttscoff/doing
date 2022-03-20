@@ -155,6 +155,19 @@ module Doing
     def normalize_trigger!
       replace normalize_trigger
     end
+
+    def normalize_change_type
+      case self
+      when /^c/i
+        :changed
+      when /^i/i
+        :improved
+      when /^f/i
+        :fixed
+      when /^n/i
+        :new
+      end
+    end
   end
 
   ##
