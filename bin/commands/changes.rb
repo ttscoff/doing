@@ -40,6 +40,9 @@ module Doing
       cmd.desc 'Only output changes, no version numbers, headers, or dates'
       cmd.switch %i[C changes], default_value: false, negatable: false
 
+      cmd.desc 'Include (CHANGE|NEW|IMPROVED|FIXED) prefix on each line'
+      cmd.switch %i[p prefix]
+
       cmd.desc 'Output raw Markdown'
       cmd.switch %i[m md markdown], default_value: false, negatable: false
 
@@ -75,6 +78,7 @@ command %i[changes changelog] do |c|
     cl = Doing::Changes.new(lookup: options[:lookup],
                             search: options[:search],
                             changes: options[:changes],
+                            prefix: options[:prefix],
                             sort: options[:sort])
 
     if options[:interactive]

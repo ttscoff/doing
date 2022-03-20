@@ -6,8 +6,9 @@ module Doing
     attr_reader :changes
     attr_writer :changes_only
 
-    def initialize(lookup: nil, search: nil, changes: false, sort: :desc)
+    def initialize(lookup: nil, search: nil, changes: false, sort: :desc, prefix: false)
       @changes_only = changes
+      @prefix = prefix
       changelog = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'CHANGELOG.md'))
       raise 'Error locating changelog' unless File.exist?(changelog)
 
@@ -56,7 +57,7 @@ module Doing
       @changes = @content.scan(change_rx).each_with_object([]) do |m, a|
         next if m[0].nil? || m[1].nil?
 
-        a << Change.new(m[0], m[1].strip)
+        a << Change.new(m[0], m[1].strip, prefix: @prefix)
       end
 
       lookup(lookup) unless lookup.nil?

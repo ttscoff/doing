@@ -7,9 +7,12 @@ module Doing
 
     attr_accessor :entries, :change_date
 
-    def initialize(version, content)
+    attr_writer :prefix
+
+    def initialize(version, content, prefix: false)
       @version = Version.new(version)
       @content = content
+      @prefix = prefix
       parse_entries
     end
 
@@ -18,10 +21,10 @@ module Doing
       @change_date = Time.parse(date[0]) if date
 
       @entries = []
-      types = @content.scan(/(?<=\n|\A)#### (NEW|IMPROVED|FIXED)(.*?)(?=\n####|\Z)/m)
+      types = @content.scan(/(?<=\n|\A)#### (CHANGED|NEW|IMPROVED|FIXED)(.*?)(?=\n####|\Z)/m)
       types.each do |type|
         type[1].scan(/\s*- +(.*?)$/).each do |entry|
-          @entries << Entry.new(entry[0].strip, type[0])
+          @entries << Entry.new(entry[0].strip, type[0], prefix: @prefix)
         end
       end
     end
