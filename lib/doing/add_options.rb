@@ -220,6 +220,10 @@ def add_options(type, cmd, default_template: 'default')
   when :save
     cmd.desc 'Save all current command line options as a new view'
     cmd.arg_name 'VIEW_NAME'
-    cmd.flag %i[save]
+    cmd.flag %i[save], type: String
+
+    cmd.desc 'Title string to be used for output formats that require it'
+    cmd.arg_name 'TITLE'
+    cmd.flag %i[title], type: String
   end
 end

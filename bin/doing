@@ -103,7 +103,7 @@ accept ExportTemplate do |value|
     break
   end
 
-  tpl.nil? ? 'template' : tpl
+  tpl.nil? ? 'template' : value
 end
 
 accept TemplateName do |value|
