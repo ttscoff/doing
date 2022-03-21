@@ -25,6 +25,7 @@ command :today do |c|
     filter_options = %i[after before times duration from section sort_tags totals tag_order template config_template only_timed].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
     filter_options[:today] = true
     Doing::Pager.page @wwid.today(options[:times], options[:output], filter_options).chomp
+    filter_options[:title] = options[:title]
     Doing.config.save_view(filter_options.to_view, options[:save].downcase) if options[:save]
   end
 end

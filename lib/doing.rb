@@ -85,6 +85,15 @@ module Doing
       config.settings
     end
 
+    def original_options
+      @original_options ||= {
+        date_begin: nil,
+        date_end: nil,
+        date_range: nil,
+        date_interval: nil
+      }
+    end
+
     ##
     ## Fetch a config setting using a dot-separated keypath
     ## or array of keys

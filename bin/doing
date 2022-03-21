@@ -88,14 +88,33 @@ accept TagSortSymbol do |value|
   value.normalize_tag_sort(Doing.config.fetch('tag_sort', :name))
 end
 
+accept ExportTemplate do |value|
+  if value !~ Doing::Plugins.plugin_regex(type: :export)
+    raise Doing::Errors::InvalidPlugin.new('output', value)
+
+  end
+
+  tpl = nil
+
+  Doing::Plugins.plugins[:export].each do |k, options|
+    next unless value =~ /^(#{options[:trigger].normalize_trigger})$/i
+
+    tpl = k
+    break
+  end
+
+  tpl.nil? ? 'template' : value
+end
+
 accept TemplateName do |value|
   res = Doing.setting('templates').keys.select { |k| k =~ value.to_rx(distance: 2) }
-  raise InvalidArgument, "Unknown template: #{value}" unless res.good?
+  raise Doing::Errors::InvalidArgument, "Unknown template: #{value}" unless res.good?
 
   res.group_by(&:length).min.last[0]
 end
 
 accept DateBeginString do |value|
+  Doing.original_options[:date_begin] = value
   res = if value =~ REGEX_TIME
           value
         else
@@ -107,6 +126,7 @@ accept DateBeginString do |value|
 end
 
 accept DateEndString do |value|
+  Doing.original_options[:date_end] = value
   res = if value =~ REGEX_TIME
           value
         else
@@ -118,6 +138,7 @@ accept DateEndString do |value|
 end
 
 accept DateRangeString do |value|
+  Doing.original_options[:date_range] = value
   start, finish = value.split_date_range
   raise InvalidTimeExpression, 'Invalid range' unless start
 
@@ -126,6 +147,7 @@ accept DateRangeString do |value|
 end
 
 accept DateRangeOptionalString do |value|
+  Doing.original_options[:date_range] = value
   start, finish = value.split_date_range
   raise InvalidTimeExpression, 'Invalid range' unless start
 
@@ -133,6 +155,7 @@ accept DateRangeOptionalString do |value|
 end
 
 accept DateIntervalString do |value|
+  Doing.original_options[:date_interval] = value
   res = value.chronify_qty
   raise InvalidTimeExpression, 'Invalid time quantity' unless res
 

@@ -1,3 +1,22 @@
+### 2.1.44
+
+2022-03-21 07:46
+
+#### NEW
+
+- `doing views --remove NAME` to delete a view
+- Deleting all view content in editor (`doing views -e`) deletes the view
+
+#### IMPROVED
+
+- When saving a view, ignore keys that are the same as the default template
+- Commands accepting `--save` also accept `--title TITLE`
+
+#### FIXED
+
+- When saving a view, store original date string instead of chronified result
+- Error when testing for valid date
+
 ### 2.1.43
 
 2022-03-20 12:44
