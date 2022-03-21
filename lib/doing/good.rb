@@ -18,10 +18,24 @@ module Doing
     ##             has content
     ##
     def good?
-      !nil? && !empty?
+      !nil? && !self&.empty? || false
     end
   end
 
+  # Time helpers
+  class ::Time
+    ##
+    ## Tests if object is nil
+    ##
+    ## @return     [Boolean] true if object is defined and
+    ##             has content
+    ##
+    def good?
+      !nil?
+    end
+  end
+
+  # String helpers
   class ::String
     ##
     ## Tests if object is nil or empty
@@ -34,6 +48,7 @@ module Doing
     end
   end
 
+  # Array helpers
   class ::Array
     ##
     ## Tests if object is nil or empty
@@ -46,6 +61,7 @@ module Doing
     end
   end
 
+  # Boolean helpers
   class ::FalseClass
     ##
     ## Tests if object is nil or empty
@@ -62,6 +78,7 @@ module Doing
     end
   end
 
+  # Boolean helpers
   class ::TrueClass
     ##
     ## Tests if object is nil or empty

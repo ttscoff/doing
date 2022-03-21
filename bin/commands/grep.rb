@@ -49,7 +49,10 @@ command %i[grep search] do |c|
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
 
-    raise InvalidPlugin.new('output', options[:output]) if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+      raise InvalidPlugin.new('output', options[:output])
+
+    end
 
     template = Doing.setting(['templates', options[:config_template]]).deep_merge(Doing.settings)
     tags_color = template.key?('tags_color') ? template['tags_color'] : nil
@@ -67,6 +70,11 @@ command %i[grep search] do |c|
     options[:tags_color] = tags_color
 
     Doing::Pager.page @wwid.list_section(options)
-    Doing.config.save_view(options.to_view, options[:save].downcase) if options[:save]
+    if options[:save]
+      options[:before] = Doing.original_options[:date_begin] if Doing.original_options[:date_begin].good?
+      options[:after] = Doing.original_options[:date_end] if Doing.original_options[:date_end].good?
+      options[:from] = Doing.original_options[:date_range] if Doing.original_options[:date_range].good?
+      Doing.config.save_view(options.to_view, options[:save].downcase)
+   end
   end
 end

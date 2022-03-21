@@ -25,7 +25,7 @@ command :since do |c|
 
     date_string.sub!(/(day) (\d)/, '\1 at \2')
     date_string.sub!(/(\d+)d( ago)?/, '\1 days ago')
-
+    Doing.original_options[:date_begin] = date_string
     start = date_string.chronify(guess: :begin)
     finish = Time.now
 
@@ -37,6 +37,9 @@ command :since do |c|
     options[:sort_tags] = options[:tag_sort]
 
     Doing::Pager.page @wwid.list_date([start, finish], options[:section], options[:times], options[:output], options).chomp
-    Doing.config.save_view(options.to_view, options[:save].downcase) if options[:save]
+    if options[:save]
+      options[:after] = Doing.original_options[:date_begin] if Doing.original_options[:date_begin].good?
+      Doing.config.save_view(options.to_view, options[:save].downcase)
+    end
   end
 end

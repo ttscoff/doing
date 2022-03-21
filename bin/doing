@@ -96,6 +96,7 @@ accept TemplateName do |value|
 end
 
 accept DateBeginString do |value|
+  Doing.original_options[:date_begin] = value
   res = if value =~ REGEX_TIME
           value
         else
@@ -107,6 +108,7 @@ accept DateBeginString do |value|
 end
 
 accept DateEndString do |value|
+  Doing.original_options[:date_end] = value
   res = if value =~ REGEX_TIME
           value
         else
@@ -118,6 +120,7 @@ accept DateEndString do |value|
 end
 
 accept DateRangeString do |value|
+  Doing.original_options[:date_range] = value
   start, finish = value.split_date_range
   raise InvalidTimeExpression, 'Invalid range' unless start
 
@@ -126,6 +129,7 @@ accept DateRangeString do |value|
 end
 
 accept DateRangeOptionalString do |value|
+  Doing.original_options[:date_range] = value
   start, finish = value.split_date_range
   raise InvalidTimeExpression, 'Invalid range' unless start
 
@@ -133,6 +137,7 @@ accept DateRangeOptionalString do |value|
 end
 
 accept DateIntervalString do |value|
+  Doing.original_options[:date_interval] = value
   res = value.chronify_qty
   raise InvalidTimeExpression, 'Invalid time quantity' unless res
 

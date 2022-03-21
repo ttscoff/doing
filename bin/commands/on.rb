@@ -50,6 +50,11 @@ command :on do |c|
                                       options[:output],
                                       options).chomp
 
-    Doing.config.save_view(options.to_view, options[:save].downcase) if options[:save]
+    if options[:save]
+      options[:before] = Doing.original_options[:date_end] if Doing.original_options[:date_end].good?
+      options[:after] = Doing.original_options[:date_begin] if Doing.original_options[:date_begin].good?
+      options[:from] = Doing.original_options[:date_range] if Doing.original_options[:date_range].good?
+      Doing.config.save_view(options.to_view, options[:save].downcase)
+    end
   end
 end

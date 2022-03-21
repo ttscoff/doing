@@ -155,6 +155,11 @@ command :show do |c|
 
     Doing::Pager.page @wwid.list_section(opt, items: items)
 
-    Doing.config.save_view(opt.to_view, options[:save].downcase) if options[:save]
+    if options[:save]
+      opt[:before] = Doing.original_options[:date_begin] if Doing.original_options[:date_begin].good?
+      opt[:after] = Doing.original_options[:date_end] if Doing.original_options[:date_end].good?
+      opt[:from] = Doing.original_options[:date_range] if Doing.original_options[:date_range].good?
+      Doing.config.save_view(opt.to_view, options[:save].downcase)
+    end
   end
 end
