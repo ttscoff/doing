@@ -9,7 +9,6 @@
 
 #### IMPROVED
 
-- Commands accepting `--save` also accept `--title TITLE`
 - When saving a view, ignore keys that are the same as the default template
 - Commands accepting `--save` also accept `--title TITLE`
 
