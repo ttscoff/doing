@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.43
+v2.1.44
 
 === Global Options
 === --config_file arg
@@ -976,6 +976,13 @@ Override output format with a template string containing %placeholders
 [Default Value] None
 
 
+===== --title TITLE
+
+Title string to be used for output formats that require it
+
+[Default Value] None
+
+
 ===== --val QUERY
 
 Perform a tag value query ("@done > two hours ago" or "@progress < 50").
@@ -1214,6 +1221,13 @@ Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*,
 ===== --template TEMPLATE_STRING
 
 Override output format with a template string containing %placeholders
+
+[Default Value] None
+
+
+===== --title TITLE
+
+Title string to be used for output formats that require it
 
 [Default Value] None
 
@@ -1658,6 +1672,13 @@ Override output format with a template string containing %placeholders
 [Default Value] None
 
 
+===== --title TITLE
+
+Title string to be used for output formats that require it
+
+[Default Value] None
+
+
 ===== --val QUERY
 
 Perform a tag value query ("@done > two hours ago" or "@progress < 50").
@@ -1798,6 +1819,13 @@ Sort tags by (name|time)
 ===== --template TEMPLATE_STRING
 
 Override output format with a template string containing %placeholders
+
+[Default Value] None
+
+
+===== --title TITLE
+
+Title string to be used for output formats that require it
 
 [Default Value] None
 
@@ -2358,6 +2386,13 @@ Override output format with a template string containing %placeholders
 [Default Value] None
 
 
+===== --title TITLE
+
+Title string to be used for output formats that require it
+
+[Default Value] None
+
+
 ===== --val QUERY
 
 Perform a tag value query ("@done > two hours ago" or "@progress < 50").
@@ -2501,6 +2536,13 @@ Sort tags by (name|time)
 ===== --template TEMPLATE_STRING
 
 Override output format with a template string containing %placeholders
+
+[Default Value] None
+
+
+===== --title TITLE
+
+Title string to be used for output formats that require it
 
 [Default Value] None
 
@@ -2901,6 +2943,13 @@ Override output format with a template string containing %placeholders
 [Default Value] None
 
 
+===== --title TITLE
+
+Title string to be used for output formats that require it
+
+[Default Value] None
+
+
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
 
@@ -3143,13 +3192,18 @@ Output/edit view in alternative format (json, yaml)
 [Must Match] (?i-mx:^[jy])
 
 
-===== -c|--[no-]column
+===== -c|--column
 List in single column
 
 
 
-===== -e|--[no-]editor
+===== -e|--editor
 Open YAML for view in editor (requires argument)
+
+
+
+===== -r|--remove
+Delete view config
 
 
 
@@ -3290,6 +3344,13 @@ Sort tags by (name|time)
 ===== --template TEMPLATE_STRING
 
 Override output format with a template string containing %placeholders
+
+[Default Value] None
+
+
+===== --title TITLE
+
+Title string to be used for output formats that require it
 
 [Default Value] None
 
