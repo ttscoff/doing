@@ -55,6 +55,7 @@ command :recent do |c|
 
       Doing::Pager::page @wwid.recent(count, section.cap_first, opts)
       opts[:count] = count
+      opts[:title] = options[:title]
       Doing.config.save_view(opts.to_view, options[:save].downcase) if options[:save]
     end
   end

@@ -1,6 +1,6 @@
 ### 2.1.44
 
-2022-03-21 07:27
+2022-03-21 07:46
 
 #### NEW
 
@@ -9,7 +9,9 @@
 
 #### IMPROVED
 
+- Commands accepting `--save` also accept `--title TITLE`
 - When saving a view, ignore keys that are the same as the default template
+- Commands accepting `--save` also accept `--title TITLE`
 
 #### FIXED
 
