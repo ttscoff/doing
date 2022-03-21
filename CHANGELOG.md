@@ -1,3 +1,17 @@
+### 2.1.44
+
+2022-03-21 06:49
+
+#### NEW
+
+- `doing views --remove NAME` to delete a view
+- Deleting all view content in editor (`doing views -e`) deletes the view
+
+#### FIXED
+
+- When saving a view, store original date string instead of chronified result
+- Error when testing for valid date
+
 ### 2.1.43
 
 2022-03-20 12:44

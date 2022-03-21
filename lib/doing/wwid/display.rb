@@ -357,7 +357,10 @@ module Doing
       opt ||= {}
       out = nil
 
-      raise InvalidArgument, 'Unknown output format' unless opt[:output] =~ Plugins.plugin_regex(type: :export)
+      unless opt[:output] =~ Plugins.plugin_regex(type: :export)
+        raise InvalidPlugin.new('Unknown output format', opt[:output])
+
+      end
 
       export_options = { page_title: title, is_single: is_single, options: opt }
 

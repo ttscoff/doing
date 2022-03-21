@@ -369,8 +369,12 @@ module Doing
     ##
     def save_view(view, title)
       title.downcase!
+      default_template = Doing.setting('templates.default')
       user_config = Util.safe_load_file(config_file)
       user_config['views'] = {} unless user_config.key?('views')
+
+      view.delete_if { |k, v| v == default_template[k] }
+
       user_config['views'][title] = view
       Util.write_to_file(config_file, YAML.dump(user_config), backup: true)
       Doing.logger.warn('Config:', %(View "#{title}" saved to #{config_file}))

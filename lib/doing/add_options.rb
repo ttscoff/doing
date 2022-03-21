@@ -43,7 +43,7 @@ def add_options(type, cmd, default_template: 'default')
   when :output_template
     cmd.desc "Output to export format (#{Doing::Plugins.plugin_names(type: :export)})"
     cmd.arg_name 'FORMAT'
-    cmd.flag %i[o output]
+    cmd.flag %i[o output], type: ExportTemplate
 
     cmd.desc "Output using a template from configuration"
     cmd.arg_name 'TEMPLATE_KEY'
