@@ -1,3 +1,11 @@
+### 2.1.45
+
+2022-03-22 08:57
+
+#### FIXED
+
+- Specifying '12am' as a start time filter resulted in a Nil error
+
 ### 2.1.44
 
 2022-03-21 07:46
