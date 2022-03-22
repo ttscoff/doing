@@ -146,21 +146,24 @@ module Doing
         end
 
         if keep && opt[:time_filter][0] || opt[:time_filter][1]
+          opt[:time_filter][0] = '00:00' if opt[:time_filter][0] =~ /12 *am/i
+          opt[:time_filter][1] = '00:00' if opt[:time_filter][1] =~ /12 *am/i
           start_string = if opt[:time_filter][0].nil?
-                           "#{item.date.strftime('%Y-%m-%d')} 12am"
+                           "#{item.date.strftime('%Y-%m-%d')} 00:00"
                          else
                            "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][0]}"
                          end
           start_time = start_string.chronify(guess: :begin)
 
           end_string = if opt[:time_filter][1].nil?
-                         "#{item.date.to_datetime.next_day.strftime('%Y-%m-%d')} 12am"
+                         "#{item.date.to_datetime.next_day.strftime('%Y-%m-%d')} 00:00"
                        else
                          "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][1]}"
                        end
-          end_time = end_string.chronify(guess: :end)
+          end_time = end_string.chronify(guess: :end) || Time.now
 
           in_time_range = item.date >= start_time && item.date <= end_time
+
           keep = false unless in_time_range
           keep = opt[:not] ? !keep : keep
         end
