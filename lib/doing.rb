@@ -16,6 +16,7 @@ require 'json'
 require 'logger'
 require 'safe_yaml/load'
 require 'fcntl'
+require 'digest'
 
 require 'chronic'
 require 'tty-link'

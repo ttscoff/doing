@@ -84,5 +84,11 @@ class DoingItemsTest < Test::Unit::TestCase
     @content.add_section(Section.new('Test Section 2'))
     assert(@content.sections.map { |s| s.title }.include?('Test Section 2'), 'Section 2 should have been added from Section input')
   end
-end
 
+  def test_search_id
+    item = @content[2].clone
+    id = item.id
+    assert(item.equal?(@content.find_id(id)), 'Located item should be equal')
+    assert_equal(2, @content.index_for_id(id), 'Located item should be at index 2')
+  end
+end

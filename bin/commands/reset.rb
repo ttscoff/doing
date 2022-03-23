@@ -46,6 +46,9 @@ command %i[reset begin] do |c|
       reset_date = Time.now
     end
 
+    from = options[:from]
+    options[:from] = nil
+
     options[:fuzzy] = false
 
     options[:section] = @wwid.guess_section(options[:section]) || options[:section].cap_first if options[:section]
@@ -70,16 +73,15 @@ command %i[reset begin] do |c|
                    items.reverse.last
                  end
 
-
     raise NoResults, 'No entry matching parameters was found.' unless last_entry
 
     finish_date = nil
 
-    if options[:from]
-      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
+    if from
+      from = from.split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
         time =~ REGEX_TIME ? "today #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}" : time
       end.join(' to ').split_date_range
-      reset_date, finish_date = options[:from]
+      reset_date, finish_date = from
       options[:resume] = false if finish_date
     end
 
