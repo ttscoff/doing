@@ -156,6 +156,32 @@
       <li class="public ">
   <span class="summary_signature">
     
+      <a href="#id-instance_method" title="#id (instance method)">#<strong>id</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute id.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#note-instance_method" title="#note (instance method)">#<strong>note</strong>  &#x21d2; Object </a>
     
 
@@ -292,7 +318,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#id-instance_method" title="#id (instance method)">#<strong>id</strong>  &#x21d2; String </a>
+      <a href="#gen_id-instance_method" title="#gen_id (instance method)">#<strong>gen_id</strong>  &#x21d2; Object </a>
     
 
     
@@ -306,8 +332,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Generate a hash that represents the entry.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -315,7 +340,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(date, title, section, note = nil)  &#x21d2; Item </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(date, title, section, note = nil, id = nil)  &#x21d2; Item </a>
     
 
     
@@ -470,7 +495,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(date, title, section, note = nil)  &#x21d2; <tt><span class='object_link'><a href="" title="Doing::Item (class)">Item</a></span></tt> 
+    #<strong>initialize</strong>(date, title, section, note = nil, id = nil)  &#x21d2; <tt><span class='object_link'><a href="" title="Doing::Item (class)">Item</a></span></tt> 
   
 
   
@@ -552,6 +577,23 @@ the item belongs</p>
       
     </li>
   
+    <li>
+      
+        <span class='name'>id</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>MD5 identifier</p>
+</div>
+      
+    </li>
+  
 </ul>
 
 
@@ -577,6 +619,30 @@ the item belongs</p>
 </h3><div class="docstring">
   <div class="discussion">
     <p>Returns the value of attribute date.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+</div>
+    
+      
+      <span id="id=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="id-instance_method">
+  
+    #<strong>id</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute id.</p>
 
 
   </div>
@@ -754,42 +820,15 @@ the item belongs</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="id-instance_method">
+  <h3 class="signature " id="gen_id-instance_method">
   
-    #<strong>id</strong>  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
-  
-
+    #<strong>gen_id</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
   
 
   
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Generate a hash that represents the entry</p>
 
-
-  </div>
-</div>
-<div class="tags">
   
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>entry hash</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -952,7 +991,7 @@ section) tag</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 22 10:06:16 2022 by
+  Generated on Wed Mar 23 08:25:51 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.1).
 </div>

@@ -40,7 +40,7 @@ module Doing
         if line =~ /^(\S[\S ]+):\s*(@[\w\-_.]+\s*)*$/
           section = Regexp.last_match(1)
           @content.add_section(Section.new(section, original: line), log: false)
-        elsif line =~ /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/
+        elsif line =~ /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*?)(?: +<([a-z0-9]{32})>)? *$/
           if section.nil?
             section = 'Uncategorized'
             @content.add_section(Section.new(section, original: 'Uncategorized:'), log: false)
@@ -48,7 +48,8 @@ module Doing
 
           date = Regexp.last_match(1).strip
           title = Regexp.last_match(2).strip
-          item = Item.new(date, title, section)
+          id = Regexp.last_match(3) || nil
+          item = Item.new(date, title, section, [], id)
           @content.push(item)
         elsif @content.count.zero?
           # if content[section].items.length - 1 == current

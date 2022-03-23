@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.45
+v2.1.46
 
 === Global Options
 === --config_file arg
@@ -1055,7 +1055,7 @@ List commands one per line, to assist with shell completion
 ==== Command: <tt>import  PATH</tt>
 Import entries from an external source
 
-Imports entries from other sources. Available plugins: calendar, capturething, doing, timing
+Imports entries from other sources. Available plugins: calendar, capturething, doing, json, timing
 ===== Options
 ===== --after DATE_STRING
 
@@ -1123,7 +1123,7 @@ Tag all imported entries
 
 ===== --type TYPE
 
-Import type (calendar|capturething|doing|timing)
+Import type (calendar|capturething|doing|json|timing)
 
 [Default Value] doing
 

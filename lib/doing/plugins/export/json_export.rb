@@ -15,7 +15,18 @@ module Doing
     end
 
     def self.render(wwid, items, variables: {})
-      return if items.nil?
+      if items.nil? || items.empty?
+        return case variables[:options][:output]
+               when 'json'
+                 {
+                   'section' => '',
+                   'items' => [],
+                   'timers' => ""
+                 }.to_json
+               when 'timeline'
+                "<html></html>"
+               end
+      end
 
       opt = variables[:options]
       opt[:output] =  case opt[:output]
@@ -25,6 +36,7 @@ module Doing
                         'json'
                       end
       items_out = []
+
       last_date = items[-1].date + (60 * 60 * 24)
       max = last_date.strftime('%F')
       min = items[0].date.strftime('%F')
@@ -51,10 +63,12 @@ module Doing
             date: i.date,
             end_date: end_date,
             title: title.strip, #+ " #{note}"
+            section: i.section,
             note: note.to_s(prefix: ''),
             time: interval.time_string(format: :clock),
             duration: duration.time_string(format: :clock),
-            tags: tags
+            tags: tags,
+            id: i.id
           }
 
           attributes.each { |attr, val| i[attr.to_sym] = val }

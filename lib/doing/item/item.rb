@@ -15,7 +15,7 @@ module Doing
     include ItemState
     include ItemTags
 
-    attr_accessor :date, :title, :section, :note
+    attr_accessor :date, :title, :section, :note, :id
 
     # attr_reader :id
 
@@ -31,19 +31,18 @@ module Doing
     ##                      the item belongs
     ## @param      note     [Array or String] The note
     ##                      (optional)
+    ## @param      id       MD5 identifier
     ##
-    def initialize(date, title, section, note = nil)
+    def initialize(date, title, section, note = nil, id = nil)
       @date = date.is_a?(Time) ? date : Time.parse(date)
       @title = title
       @section = section
       @note = Note.new(note)
+      @id = id&.valid_id? ? id.strip : gen_id
     end
 
-    # Generate a hash that represents the entry
-    #
-    # @return [String] entry hash
-    def id
-      @id ||= (@date.to_s + @title + @section).hash
+    def gen_id
+      Digest::MD5.hexdigest(to_s)
     end
 
     ##
@@ -91,7 +90,7 @@ module Doing
 
     # outputs item in Doing file format, including leading tab
     def to_s
-      "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title}#{@note.good? ? "\n#{@note}" : ''}"
+      "\t- #{@date.strftime('%Y-%m-%d %H:%M')} | #{@title} <#{@id}>#{@note.good? ? "\n#{@note}" : ''}"
     end
 
     ##

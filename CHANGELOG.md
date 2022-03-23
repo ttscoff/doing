@@ -1,3 +1,16 @@
+### 2.1.46
+
+2022-03-23 08:19
+
+#### NEW
+
+- Store MD5 ids with each entry
+- JSON import takes Doing format JSON and updates existing items with matching ids, adding new entries for unmatched
+
+#### IMPROVED
+
+- JSON output includes section and id for each entry
+
 ### 2.1.45
 
 2022-03-22 08:57

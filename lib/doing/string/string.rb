@@ -17,6 +17,15 @@ class ::String
   include Doing::StringURL
 
   ##
+  ## Test if string is a valid 32-character MD5 id
+  ##
+  ## @return     [Boolean] string is valid identifier
+  ##
+  def valid_id?
+    strip =~ /^[a-z0-9]{32}$/ ? true : false
+  end
+
+  ##
   ## Force UTF-8 encoding if available
   ##
   ## @return     [String] UTF-8 encoded string

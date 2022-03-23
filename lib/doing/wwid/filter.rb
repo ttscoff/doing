@@ -146,8 +146,8 @@ module Doing
         end
 
         if keep && opt[:time_filter][0] || opt[:time_filter][1]
-          opt[:time_filter][0] = '00:00' if opt[:time_filter][0] =~ /12 *am/i
-          opt[:time_filter][1] = '00:00' if opt[:time_filter][1] =~ /12 *am/i
+          opt[:time_filter].map! { |v| v =~ /(12 *am|midnight)/i ? '00:00' : v }
+
           start_string = if opt[:time_filter][0].nil?
                            "#{item.date.strftime('%Y-%m-%d')} 00:00"
                          else

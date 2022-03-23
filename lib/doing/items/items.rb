@@ -35,6 +35,30 @@ module Doing
       includes
     end
 
+    # Find an item by ID
+    #
+    # @param      id    The identifier to match
+    #
+    def find_id(id)
+      select { |item| item.id == id }[0]
+    end
+
+    ##
+    ## Return the index for an entry matching ID
+    ##
+    ## @param      id    The identifier to match
+    ##
+    def index_for_id(id)
+      i = nil
+      each_with_index do |item, idx|
+        if item.id == id
+          i = idx
+          break
+        end
+      end
+      i
+    end
+
     # Output sections and items in Doing file format
     def to_s
       out = []
