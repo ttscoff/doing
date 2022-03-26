@@ -1,9 +1,10 @@
 ### 2.1.47
 
-2022-03-26 06:19
+2022-03-26 11:12
 
 #### IMPROVED
 
+- `--output doing` now outputs true Doing file format, including IDs, so existing entries can be updated when re-importing this output
 - Add `doing config open` as a synonym for `edit`
 - Help output for `--bool` flag
 
