@@ -5,6 +5,7 @@
 # author: Brett Terpstra
 # url: https://brettterpstra.com
 module Doing
+  # JSON importer
   class JSONImport
     include Doing::Util
 

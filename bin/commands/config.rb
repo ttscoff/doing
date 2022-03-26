@@ -37,7 +37,7 @@ command :config do |c|
 
   # @@config.edit
   c.desc 'Open config file in editor'
-  c.command :edit do |edit|
+  c.command %i[edit open] do |edit|
     edit.example 'doing config edit', desc: 'Open a config file in the default editor'
     edit.example 'doing config edit --editor vim', desc: 'Open config in specific editor'
 
