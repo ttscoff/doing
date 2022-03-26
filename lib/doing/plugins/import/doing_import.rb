@@ -29,6 +29,7 @@ module Doing
       exit_now! 'File not found' unless File.exist?(File.expand_path(path))
 
       options[:no_overlap] ||= false
+
       options[:autotag] ||= Doing.auto_tag
 
       tags = options[:tag] ? options[:tag].split(/[ ,]+/).map { |t| t.sub(/^@?/, '') } : []
@@ -47,6 +48,7 @@ module Doing
       Doing.logger.debug('Skipped:', %(#{skipped} items that didn't match filter criteria)) if skipped.positive?
 
       imported = []
+      updated = 0
 
       new_items.each do |item|
         next if duplicate?(item)
@@ -65,8 +67,7 @@ module Doing
         section = options[:section] || item.section
         section ||= Doing.setting('current_section')
 
-        new_item = Item.new(item.date, title, section)
-        new_item.note = item.note
+        new_item = Item.new(item.date, title, section, item.note, item.id)
 
         is_match = true
 
@@ -79,13 +80,21 @@ module Doing
           is_match = options[:not] ? !is_match : is_match
         end
 
-        imported.push(new_item) if is_match
+        if wwid.content.find_id(new_item.id)
+          old_index = wwid.content.index_for_id(new_item.id)
+          old_item = wwid.content[old_index].clone
+          wwid.content[old_index] = new_item
+          Hooks.trigger :post_entry_updated, self, new_item, old_item
+          updated += 1
+        else
+          imported.push(new_item) if is_match
+        end
       end
 
       dups = new_items.count - imported.count
       Doing.logger.info('Skipped:', %(#{dups} duplicate items)) if dups.positive?
 
-      imported = wwid.dedup(imported, no_overlap: !options[:overlap])
+      imported = wwid.dedup(imported, no_overlap: options[:no_overlap])
       overlaps = new_items.count - imported.count - dups
       Doing.logger.debug('Skipped:', "#{overlaps} items with overlapping times") if overlaps.positive?
 
@@ -96,6 +105,7 @@ module Doing
         Hooks.trigger :post_entry_added, self, item
       end
 
+      Doing.logger.info('Updated:', %(#{updated} items))
       Doing.logger.info('Imported:', "#{imported.count} items")
     end
 
@@ -128,10 +138,11 @@ module Doing
         when /^(\S[\S ]+):(\s+@[\w\-_.]+(?= |$))*\s*$/
           section = Regexp.last_match(1)
           current = 0
-        when /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*)/
+        when /^\s*- (\d{4}-\d\d-\d\d \d\d:\d\d) \| (.*?)(?: <([a-z0-9]{32})>)? *$/
           date = Regexp.last_match(1).strip
           title = Regexp.last_match(2).strip
-          item = Item.new(date, title, section)
+          id = Regexp.last_match(3)
+          item = Item.new(date, title, section, nil, id)
           items.push(item)
           current += 1
         when /^\S/

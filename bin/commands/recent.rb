@@ -53,7 +53,7 @@ command :recent do |c|
         template: options[:template]
       }
 
-      Doing::Pager::page @wwid.recent(count, section.cap_first, opts)
+      Doing::Pager.page @wwid.recent(count, section.cap_first, opts)
       opts[:count] = count
       opts[:title] = options[:title]
       Doing.config.save_view(opts.to_view, options[:save].downcase) if options[:save]

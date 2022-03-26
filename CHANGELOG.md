@@ -1,3 +1,12 @@
+### 2.1.47
+
+2022-03-26 06:19
+
+#### IMPROVED
+
+- Add `doing config open` as a synonym for `edit`
+- Help output for `--bool` flag
+
 ### 2.1.46
 
 2022-03-23 08:19

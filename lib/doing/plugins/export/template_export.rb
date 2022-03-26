@@ -12,7 +12,7 @@ module Doing
 
     def self.settings
       {
-        trigger: 'template|doing'
+        trigger: 'template'
       }
     end
 
@@ -49,6 +49,8 @@ module Doing
         else
           note = []
         end
+
+        placeholders['id'] = item.id
 
         placeholders['tags'] = item.tags
 
@@ -141,6 +143,6 @@ module Doing
       out
     end
 
-    Doing::Plugins.register ['template', 'doing'], :export, self
+    Doing::Plugins.register 'template', :export, self
   end
 end
