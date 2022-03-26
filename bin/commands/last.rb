@@ -70,7 +70,7 @@ command :last do |c|
                         bool: options[:bool],
                         val: options[:val]
                       })
-      Doing::Pager::page last.strip if last
+      Doing::Pager.page last.strip if last
       Doing.config.save_view(options.to_view, options[:save].downcase) if options[:save]
     end
   end

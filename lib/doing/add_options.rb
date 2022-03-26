@@ -147,7 +147,7 @@ def add_options(type, cmd, default_template: 'default')
     cmd.desc "#{action} items that *don't* match search/tag filters"
     cmd.switch [:not], default_value: false, negatable: false
 
-    cmd.desc 'Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans'
+    cmd.desc 'Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans'
     cmd.arg_name 'BOOLEAN'
     cmd.flag [:bool], must_match: REGEX_BOOL,
                       default_value: :pattern,

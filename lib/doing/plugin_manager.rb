@@ -201,7 +201,7 @@ module Doing
         plugins[type].each do |_, options|
           pattern << options[:trigger].normalize_trigger
         end
-        Regexp.new("^(?:#{pattern.join('|')})$", true)
+        Regexp.new("^(?:#{pattern.sort.uniq.join('|')})$", true)
       end
 
       ##
