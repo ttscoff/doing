@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.46
+v2.1.47
 
 === Global Options
 === --config_file arg
@@ -98,7 +98,7 @@ Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
 
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -211,7 +211,7 @@ Archive entries older than date (natural language).
 
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -354,7 +354,7 @@ Adds @done tag without datestamp so no elapsed time is recorded.
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -574,7 +574,7 @@ DEPRECATED
 
 
 ===== Commands
-====== Command: <tt>edit </tt>
+====== Command: <tt>edit|open </tt>
 Open config file in editor
 
 
@@ -758,7 +758,7 @@ Backdate completed date to date string [4pm|20m|2h|yesterday noon]
 
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -893,7 +893,7 @@ Search entries older than date (natural language). If this is only a time (8am, 
 
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -1161,7 +1161,7 @@ allowing `doing last` to target historical entries.
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -1278,7 +1278,7 @@ Mark last entry as flagged
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -1426,7 +1426,7 @@ If -r is provided with no other arguments, the last note is removed.
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -1584,7 +1584,7 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -1881,7 +1881,7 @@ If a date string is provided as an argument, the start time will be set to the p
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -1984,7 +1984,7 @@ Rotate entries older than date
 
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -2286,7 +2286,7 @@ Show entries older than date (natural language). If this is only a time (8am, 1:
 
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -2460,7 +2460,7 @@ and "2d" would be interpreted as "two days ago."
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -2605,7 +2605,7 @@ Add (or remove) tags from the last entry, or from multiple entries
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
@@ -2746,7 +2746,7 @@ List all tags in the current Doing file
 ===== Options
 ===== --bool BOOLEAN
 
-Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
+Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
