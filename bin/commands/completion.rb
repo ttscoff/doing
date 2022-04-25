@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 SHELLS = %w[zsh bash fish all].freeze
-SHELL_RX = /^(?:[bzf](?:[ai]?sh)?|all)$/i.freeze
+SHELL_RX = /^(?:[bzf](?:[ai]?sh)?|fig|all)$/i.freeze
 
 # @@completion
 desc 'Generate shell completion scripts for doing'
