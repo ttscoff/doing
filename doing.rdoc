@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.47
+v2.1.48
 
 === Global Options
 === --config_file arg
@@ -524,7 +524,7 @@ so typing 'doing' and hitting tab will offer completions of subcommands and thei
 Deprecated, specify shell as argument to subcommand
 
 [Default Value] None
-[Must Match] (?i-mx:^(?:[bzf](?:[ai]?sh)?|all)$)
+[Must Match] (?i-mx:^(?:[bzf](?:[ai]?sh)?|fig|all)$)
 
 
 ===== Commands
