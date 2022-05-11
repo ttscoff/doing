@@ -6,6 +6,7 @@ require_relative 'completion/completion_string'
 require_relative 'completion/fish_completion'
 require_relative 'completion/zsh_completion'
 require_relative 'completion/bash_completion'
+require_relative 'completion/fig_completion'
 
 module Doing
   # Completion script generator
@@ -15,8 +16,8 @@ module Doing
     COMMAND_RX = /^(?<cmd>[^, \t]+)(?<alias>(?:, [^, \t]+)*)?\s+- (?<desc>.*?)$/.freeze
 
     class << self
-      def get_help_sections(command = '')
-        res = `doing help #{command}`.strip
+      def get_help_sections(command = "")
+        res = `doing help #{command}|command cat`.strip
         scanned = res.scan(SECTIONS_RX)
         sections = {}
         scanned.each do |sect|
@@ -85,7 +86,7 @@ module Doing
         type = normalize_type(type)
         raise InvalidArgument, 'Unrecognized shell specified' if type == :invalid
 
-        return %i[zsh bash fish].each { |t| link_default(t) } if type == :all
+        return %i[zsh bash fish fig].each { |t| link_default(t) } if type == :all
 
         install_builtin(type)
 
@@ -98,6 +99,7 @@ module Doing
 
         if File.exist?(File.join(default_dir, default_filenames[type]))
           return unless Doing::Prompt.yn("Update #{type} completion script", default_response: 'n')
+
         end
 
         FileUtils.cp(src, default_dir)
@@ -106,6 +108,8 @@ module Doing
 
       def normalize_type(type)
         case type.to_s
+        when /^fig/i
+          :fig
         when /^f/i
           :fish
         when /^b/i
@@ -123,6 +127,8 @@ module Doing
 
       def generate_type(type)
         generator = case type.to_s
+                    when /^fig/i
+                      FigCompletions.new
                     when /^f/i
                       FishCompletions.new
                     when /^b/i
@@ -149,7 +155,7 @@ module Doing
       end
 
       def default_filenames
-        { zsh: '_doing.zsh', bash: 'doing.bash', fish: 'doing.fish' }
+        { zsh: '_doing.zsh', bash: 'doing.bash', fish: 'doing.fish', fig: 'doing.ts' }
       end
 
       def default_file(type)
@@ -188,6 +194,8 @@ module Doing
         Doing.logger.warn('File written:', 'zsh completions written to lib/completion/_doing.zsh')
         generate_completion(type: 'bash', file: 'lib/completion/doing.bash', link: false)
         Doing.logger.warn('File written:', 'bash completions written to lib/completion/doing.bash')
+        generate_completion(type: 'fig', file: 'lib/completion/doing.ts', link: false)
+        Doing.logger.warn('File written:', 'Fig completions written to lib/completion/doing.ts')
       end
 
       def link_completion_type(type, file)
@@ -197,6 +205,7 @@ module Doing
           unless dir =~ %r{(\.bash_it/completion|bash_completion/completions)}
             link_completion(file, ['~/.bash_it/completion/enabled', '/usr/share/bash_completion/completions'], 'doing.bash')
           end
+        when /^fig/i
         when /^f/i
           link_completion(file, ['~/.config/fish/completions'], 'doing.fish') unless dir =~ %r{.config/fish/completions}
         when /^z/i
@@ -214,6 +223,7 @@ module Doing
 
         targets.each do |target|
           next unless File.directory?(File.expand_path(target))
+
           found = true
 
           target_file = File.join(File.expand_path(target), filename)

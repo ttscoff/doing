@@ -6,8 +6,6 @@
 # url: https://brettterpstra.com
 module Doing
   class DoingExport
-    include Doing::Util
-
     def self.settings
       {
         trigger: 'doing'

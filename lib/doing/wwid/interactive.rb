@@ -355,7 +355,8 @@ module Doing
     def verify_duration(date, finish_date, title: nil)
       max_elapsed = Doing.setting('interaction.confirm_longer_than', 0)
       max_elapsed = max_elapsed.chronify_qty if max_elapsed.is_a?(String)
-      date = date.chronify(guess: :end, context: :today) if finish_date.is_a?(String)
+      date = date.chronify(guess: :end, context: :today) if date.is_a?(String)
+      finish_date = finish_date.chronify(guess: :end, context: :today) if finish_date.is_a?(String)
 
       elapsed = finish_date - date
 

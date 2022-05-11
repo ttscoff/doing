@@ -39,7 +39,8 @@ module Doing
 
       if opt[:done] && entry.should_finish?
         if entry.should_time?
-          entry.tag('done', value: opt[:done])
+          finish = opt[:done].is_a?(String) ? opt[:done].chronify(guess: :end, context: :today) : opt[:done]
+          entry.tag('done', value: finish)
         else
           entry.tag('done')
         end
@@ -47,15 +48,11 @@ module Doing
 
       entry.note = note
 
-      items = @content.clone
       if opt[:timed]
-        items.reverse!
-        items.each_with_index do |i, x|
-          next if i.title =~ / @done/
-
-          finish_date = verify_duration(i.date, opt[:back], title: i.title)
-          items[x].tag('done', value: finish_date.strftime('%F %R'))
-          break
+        last_item = last_entry({ section: section })
+        if last_item.tags?(['done'], :not)
+          finish_date = verify_duration(last_item.date, opt[:back], title: last_item.title)
+          last_item.tag('done', value: finish_date.strftime('%F %R'))
         end
       end
 
