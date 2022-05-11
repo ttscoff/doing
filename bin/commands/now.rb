@@ -19,7 +19,8 @@ module Doing
         options[:date] = options[:back]
       elsif options[:from]
         options[:date], finish_date = options[:from]
-        options[:done] = finish_date
+        finish_date = finish_date.is_a?(String) ? finish_date.chronify(guess: :end, context: :today) : finish_date
+        options[:done] = finish_date.strftime('%F %R')
       else
         options[:date] = Time.now
       end
