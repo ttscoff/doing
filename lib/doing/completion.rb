@@ -203,7 +203,7 @@ module Doing
         case type.to_s
         when /^b/i
           unless dir =~ %r{(\.bash_it/completion|bash_completion/completions)}
-            link_completion(file, ['~/.bash_it/completion/enabled', '/usr/share/bash_completion/completions'], 'doing.bash')
+            link_completion(file, ['~/.bash_it/completion/enabled', '/usr/share/bash-completion/completions', '/usr/share/bash_completion/completions'], 'doing.bash')
           end
         when /^fig/i
         when /^f/i
