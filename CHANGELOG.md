@@ -1,3 +1,11 @@
+### 2.1.50
+
+2022-05-16 07:40
+
+#### FIXED
+
+- Bash completion linking dash vs underscore in path
+
 ### 2.1.49
 
 2022-05-12 08:49
