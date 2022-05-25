@@ -1,3 +1,19 @@
+### 2.1.50
+
+2022-05-16 07:40
+
+#### FIXED
+
+- Bash completion linking dash vs underscore in path
+
+### 2.1.49
+
+2022-05-12 08:49
+
+#### FIXED
+
+- When using `doing again`, don't replace an existing @done tag on the entry to be repeated
+
 ### 2.1.48
 
 2022-05-11 10:13
