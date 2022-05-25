@@ -238,13 +238,13 @@ module Doing
             raise InvalidArgument, 'Invalid key path' unless res
 
             real_path.push(path).concat(paths).compact!
-            Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}")
+            Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}") unless keypath == real_path.join('.')
             return real_path
           end
           cfg = new_cfg
         end
       end
-      Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}")
+      Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}") unless keypath == real_path.join('.')
       real_path
     end
 

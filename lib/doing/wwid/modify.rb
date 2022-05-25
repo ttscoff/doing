@@ -100,7 +100,7 @@ module Doing
     def repeat_item(item, opt)
       opt ||= {}
       old_item = item.clone
-      if item.should_finish?
+      if item.unfinished? && item.should_finish?
         if item.should_time?
           finish_date = verify_duration(item.date, Time.now, title: item.title)
           item.title.tag!('done', value: finish_date.strftime('%F %R'))
@@ -560,7 +560,7 @@ module Doing
       count = opt[:count] || 0
       tags  = opt[:tags] || []
       bool  = opt[:bool] || :and
-      label = opt[:label] || true
+      label = opt[:label]
 
       section = guess_section(section)
       destination = guess_section(destination)

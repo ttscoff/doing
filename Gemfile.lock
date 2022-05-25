@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    doing (2.1.48)
+    doing (2.1.54)
       chronic (~> 0.10, >= 0.10.2)
       deep_merge (~> 1.2, >= 1.2.1)
       gli (~> 2.20, >= 2.20.1)
@@ -26,7 +26,7 @@ GEM
     haml (5.0.4)
       temple (>= 0.8.0)
       tilt
-    kramdown (2.3.2)
+    kramdown (2.4.0)
       rexml
     parallel (1.21.0)
     parallel_tests (3.7.3)
