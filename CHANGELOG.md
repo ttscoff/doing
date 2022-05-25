@@ -6,6 +6,10 @@
 
 - permissions issue
 
+#### IMPROVED
+
+- Reduce keypath translation logging
+
 ### 2.1.52
 
 2022-05-25 12:36
