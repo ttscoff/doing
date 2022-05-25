@@ -102,6 +102,9 @@ module Doing
         to_do = choice.strip.split(/\n/).map(&:downcase)
 
         to_do.each do |action|
+          action = 'resume' if action =~ /^resume/i
+          action = 'reset' if action =~ /^begin/i
+
           case action
           when /(resume|reset|autotag|archive|delete|finish|cancel|flag)/
             opt[action.to_sym] = true

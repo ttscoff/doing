@@ -1,11 +1,19 @@
 ### 2.1.51
 
+<<<<<<< HEAD
+2022-05-25 12:33
+=======
 2022-05-25 12:10
+>>>>>>> 4e43e6e403da2d14152b7bb05352f985dbf7b693
 
 #### FIXED
 
 - Bash completion linking dash vs underscore in path
 - `doing archive --no-label` not being respected
+<<<<<<< HEAD
+- `doing select` -> select repeat/resume from menu, failed to repeat
+=======
+>>>>>>> 4e43e6e403da2d14152b7bb05352f985dbf7b693
 
 ### 2.1.50
 
