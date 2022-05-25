@@ -1,3 +1,17 @@
+### 2.1.53
+
+2022-05-25 13:21
+
+#### IMPROVED
+
+- Reduce keypath translation logging
+
+#### FIXED
+
+- Bash completion linking dash vs underscore in path
+- `doing archive --no-label` not being respected
+- `doing select` -> select repeat/resume from menu, failed to repeat
+
 ### 2.1.52
 
 2022-05-25 12:36
