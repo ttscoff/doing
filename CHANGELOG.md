@@ -1,3 +1,12 @@
+### 2.1.51
+
+2022-05-25 12:10
+
+#### FIXED
+
+- Bash completion linking dash vs underscore in path
+- `doing archive --no-label` not being respected
+
 ### 2.1.50
 
 2022-05-16 07:40
