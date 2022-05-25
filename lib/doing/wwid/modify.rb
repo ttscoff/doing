@@ -560,7 +560,7 @@ module Doing
       count = opt[:count] || 0
       tags  = opt[:tags] || []
       bool  = opt[:bool] || :and
-      label = opt[:label] || true
+      label = opt[:label]
 
       section = guess_section(section)
       destination = guess_section(destination)
