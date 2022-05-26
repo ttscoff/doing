@@ -1,3 +1,11 @@
+### 2.1.56
+
+2022-05-26 08:00
+
+#### FIXED
+
+- `doing recent --interactive XX` wasn't respecting XX count and instead showing all # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is up to date with 'origin/develop'. # # Changes to be committed: #	modified:   Gemfile.lock #	modified:   bin/commands/recent.rb #	modified:   lib/doing/wwid/display.rb # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/Gemfile.lock b/Gemfile.lock index 1fa1558..ce62324 100644 --- a/Gemfile.lock +++ b/Gemfile.lock @@ -1,7 +1,7 @@  PATH    remote: .    specs:
+
 ### 2.1.55
 
 2022-05-26 07:11

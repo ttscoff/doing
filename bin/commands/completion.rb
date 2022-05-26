@@ -18,7 +18,7 @@ command :completion do |c|
   c.flag %i[t type], must_match: SHELL_RX
 
   c.desc 'Generate completion scripts, including custom plugins and command options'
-  c.long_desc "Argument specifies which shell to install for: #{SHELLS.join(', ')}"
+  c.long_desc "Argument specifies which shell to generate for: #{SHELLS.join(', ')}"
   c.arg_name "[#{SHELLS.join('|')}]"
   c.command :generate do |gen|
     gen.example 'doing completion generate fish', desc: 'Generate fish completion script and link to autoload directory'

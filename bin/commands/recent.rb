@@ -39,15 +39,15 @@ command :recent do |c|
       tags_color = template.key?('tags_color') ? template['tags_color'] : nil
 
       opts = {
-        sort_tags: options[:sort_tags],
-        tags_color: tags_color,
-        times: options[:times],
-        totals: options[:totals],
+        config_template: options[:config_template],
+        duration: options[:duration],
         interactive: options[:interactive],
         output: options[:output],
-        duration: options[:duration],
-        config_template: options[:config_template],
-        template: options[:template]
+        sort_tags: options[:sort_tags],
+        tags_color: tags_color,
+        template: options[:template],
+        times: options[:times],
+        totals: options[:totals]
       }
 
       Doing::Pager.page @wwid.recent(count, section.cap_first, opts)
