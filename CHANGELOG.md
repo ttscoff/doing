@@ -1,10 +1,11 @@
 ### 2.1.56
 
-2022-05-26 08:00
+2022-05-26 09:35
 
 #### FIXED
 
-- `doing recent --interactive XX` wasn't respecting XX count and instead showing all # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is up to date with 'origin/develop'. # # Changes to be committed: #	modified:   Gemfile.lock #	modified:   bin/commands/recent.rb #	modified:   lib/doing/wwid/display.rb # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/Gemfile.lock b/Gemfile.lock index 1fa1558..ce62324 100644 --- a/Gemfile.lock +++ b/Gemfile.lock @@ -1,7 +1,7 @@  PATH    remote: .    specs:
+- `doing recent --section SECT COUNT` not respecting count when section is provided # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is ahead of 'origin/develop' by 1 commit. # # Changes to be committed: #	modified:   CHANGELOG.md #	modified:   bin/commands/completion.rb #	modified:   bin/commands/recent.rb #	modified:   test/test.doingrc # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/CHANGELOG.md b/CHANGELOG.md index 47136e1..97a71bc 100644 --- a/CHANGELOG.md +++ b/CHANGELOG.md @@ -1,3 +1,11 @@ +### 2.1.56 + +2022-05-26 08:00 + +#### FIXED + +- `doing recent --interactive XX` wasn't respecting XX count and instead showing all # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # On branch develop # Your branch is up to date with 'origin/develop'. # # Changes to be committed: #	modified:   Gemfile.lock #	modified:   bin/commands/recent.rb #	modified:   lib/doing/wwid/display.rb # # ------------------------ >8 ------------------------ # Do not modify or remove the line above. # Everything below it will be ignored. diff --git a/Gemfile.lock b/Gemfile.lock index 1fa1558..ce62324 100644 --- a/Gemfile.lock +++ b/Gemfile.lock @@ -1,7 +1,7 @@  PATH    remote: .    specs: +  ### 2.1.55    2022-05-26 07:11 diff --git a/bin/commands/completion.rb b/bin/commands/completion.rb index 6f0d5fe..3b9519b 100644 --- a/bin/commands/completion.rb +++ b/bin/commands/completion.rb @@ -18,7 +18,7 @@ command :completion do |c|    c.flag %i[t type], must_match: SHELL_RX      c.desc 'Generate completion scripts, including custom plugins and command options'
+- `doing recent --interactive XX` wasn't respecting XX count and instead showing all
 
 ### 2.1.55
 

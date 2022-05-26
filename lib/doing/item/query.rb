@@ -152,6 +152,133 @@ module Doing
       negate ? !matches : matches
     end
 
+    ##
+    ## Used by filter_items determine whether an item matches a set of criteria
+    ##
+    ## @param      opt   [Hash] filter parameters
+    ##
+    ## @return     [Boolean] whether the item matches all filter criteria
+    ##
+    def keep_item?(opt)
+      item = dup
+      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/i
+
+      keep = true
+      if opt[:unfinished]
+        finished = item.tags?('done', :and)
+        finished = opt[:not] ? !finished : finished
+        keep = false if finished
+      end
+
+      if keep && opt[:val]&.count&.positive?
+        bool = opt[:bool].normalize_bool if opt[:bool]
+        bool ||= :and
+        bool = :and if bool == :pattern
+
+        val_match = opt[:val].nil? || opt[:val].empty? ? true : item.tag_values?(opt[:val], bool)
+        keep = false unless val_match
+        keep = opt[:not] ? !keep : keep
+      end
+
+      if keep && opt[:tag]
+        opt[:tag_bool] = opt[:bool].normalize_bool if opt[:bool]
+        opt[:tag_bool] ||= :and
+        tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
+        keep = false unless tag_match
+        keep = opt[:not] ? !keep : keep
+      end
+
+      if keep && opt[:search]
+        search_match = if opt[:search].nil? || opt[:search].empty?
+                         true
+                       else
+                         item.search(opt[:search], case_type: opt[:case].normalize_case)
+                       end
+
+        keep = false unless search_match
+        keep = opt[:not] ? !keep : keep
+      end
+
+      if keep && opt[:date_filter]&.length == 2
+        start_date = opt[:date_filter][0]
+        end_date = opt[:date_filter][1]
+
+        in_date_range = if end_date
+                          item.date >= start_date && item.date <= end_date
+                        else
+                          item.date.strftime('%F') == start_date.strftime('%F')
+                        end
+        keep = false unless in_date_range
+        keep = opt[:not] ? !keep : keep
+      end
+
+      if keep && opt[:time_filter][0] || opt[:time_filter][1]
+        opt[:time_filter].map! { |v| v =~ /(12 *am|midnight)/i ? '00:00' : v }
+
+        start_string = if opt[:time_filter][0].nil?
+                         "#{item.date.strftime('%Y-%m-%d')} 00:00"
+                       else
+                         "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][0]}"
+                       end
+        start_time = start_string.chronify(guess: :begin)
+
+        end_string = if opt[:time_filter][1].nil?
+                       "#{item.date.to_datetime.next_day.strftime('%Y-%m-%d')} 00:00"
+                     else
+                       "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][1]}"
+                     end
+        end_time = end_string.chronify(guess: :end) || Time.now
+
+        in_time_range = item.date >= start_time && item.date <= end_time
+
+        keep = false unless in_time_range
+        keep = opt[:not] ? !keep : keep
+      end
+
+      keep = false if keep && opt[:only_timed] && !item.interval
+
+      if keep && opt[:tag_filter]
+        keep = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
+        keep = opt[:not] ? !keep : keep
+      end
+
+      if keep && opt[:before]
+        before = opt[:before]
+        cutoff = if before =~ time_rx
+                   "#{item.date.strftime('%Y-%m-%d')} #{before}".chronify(guess: :begin)
+                 elsif before.is_a?(String)
+                   before.chronify(guess: :begin)
+                 else
+                   before
+                 end
+        keep = cutoff && item.date <= cutoff
+        keep = opt[:not] ? !keep : keep
+      end
+
+      if keep && opt[:after]
+        after = opt[:after]
+        cutoff = if after =~ time_rx
+                   "#{item.date.strftime('%Y-%m-%d')} #{after}".chronify(guess: :end)
+                 elsif after.is_a?(String)
+                   after.chronify(guess: :end)
+                 else
+                   after
+                 end
+        keep = cutoff && item.date >= cutoff
+        keep = opt[:not] ? !keep : keep
+      end
+
+      if keep && opt[:today]
+        keep = item.date >= Date.today.to_time && item.date < Date.today.next_day.to_time
+        keep = opt[:not] ? !keep : keep
+      elsif keep && opt[:yesterday]
+        keep = item.date >= Date.today.prev_day.to_time && item.date < Date.today.to_time
+        keep = opt[:not] ? !keep : keep
+      end
+
+      keep
+    end
+
     private
 
     def all_searches?(searches, case_type: :smart)
@@ -191,11 +318,9 @@ module Doing
       return true unless tags.good?
 
       tags.each do |tag|
-        if tag =~ /done/ && !should_finish?
-          next
-        else
-          return false unless @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
-        end
+        next if tag =~ /done/ && !should_finish?
+
+        return false unless @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       true
     end
@@ -204,11 +329,9 @@ module Doing
       return true unless tags.good?
 
       tags.each do |tag|
-        if tag =~ /done/ && !should_finish?
-          return false
-        else
-          return false if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
-        end
+        return false if tag =~ /done/ && !should_finish?
+
+        return false if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       true
     end
@@ -217,11 +340,9 @@ module Doing
       return true unless tags.good?
 
       tags.each do |tag|
-        if tag =~ /done/ && !should_finish?
-          return true
-        else
-          return true if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
-        end
+        return true if tag =~ /done/ && !should_finish?
+
+        return true if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
       end
       false
     end
@@ -393,7 +514,7 @@ module Doing
           return false if val.nil? || tag_val.nil?
 
           # Fail unless both values are of the same class (float or date)
-          return false unless val.class == tag_val.class
+          return false unless val.instance_of?(tag_val.class)
 
           is_match = value_number_matches?(tag_val, comp, val)
 
