@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.56
+v2.1.57
 
 === Global Options
 === --config_file arg
@@ -2721,7 +2721,7 @@ Force exact search string matching (case sensitive)
 Set the default tags for the current directory
 
 Adds default_tags to a .doingrc file in the current directory. Any entry created in this directory or its
-subdirectories will be tagged with the default tags. You can modify these any time using the `config set` commnand or
+subdirectories will be tagged with the default tags. You can modify these any time using the `config set` command or
 manually editing the .doingrc file.
 ===== Options
 ===== --clear
