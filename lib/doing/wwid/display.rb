@@ -212,7 +212,7 @@ module Doing
     ##
     def recent(count = 10, section = nil, opt)
       opt ||= {}
-      times = opt[:t] || true
+      opt[:times] ||= false
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
@@ -236,7 +236,6 @@ module Doing
       opt[:format] = cfg['date_format']
       opt[:template] = opt[:template] || cfg['template']
       opt[:order] = :asc
-      opt[:times] = times
 
       list_section(opt)
     end
