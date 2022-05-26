@@ -1,7 +1,7 @@
 # @@tag_dir
 desc 'Set the default tags for the current directory'
 long_desc 'Adds default_tags to a .doingrc file in the current directory. Any entry created in this directory or its
-subdirectories will be tagged with the default tags. You can modify these any time using the `config set` commnand or
+subdirectories will be tagged with the default tags. You can modify these any time using the `config set` command or
 manually editing the .doingrc file.'
 arg_name 'TAG [TAG..]'
 command :tag_dir do |c|

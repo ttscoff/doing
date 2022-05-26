@@ -13,15 +13,19 @@ module Doing
     # @return     [Items] Filtered Items array
     #
     def fuzzy_filter_items(items, query, case_type: :smart)
-      scannable = items.map.with_index { |item, idx| "#{item.title} #{item.note.join(' ')}".gsub(/[|*?!]/, '') + "|#{idx}"  }.join("\n")
+      scannable = items.map.with_index { |item, idx| "#{item.title} #{item.note.join(' ')}".gsub(/[|*?!]/, '') + "|#{idx}" }.join("\n")
 
-      fzf_args = [
-        '--multi',
-        %(--filter="#{query.sub(/^'?/, "'")}"),
-        '--no-sort',
-        '-d "\|"',
-        '--nth=1'
-      ]
+      res = `echo #{Shellwords.escape(scannable)}|#{Prompt.fzf} #{fuzzy_filter_args(query, case_type).join(' ')}`
+      selected = Items.new
+      res.split(/\n/).each do |item|
+        idx = item.match(/\|(\d+)$/)[1].to_i
+        selected.push(items[idx])
+      end
+      selected
+    end
+
+    def fuzzy_filter_args(query, case_type)
+      fzf_args = ['--multi', %(--filter="#{query.sub(/^'?/, "'")}"), '--no-sort', '-d "\|"', '--nth=1']
       fzf_args << case case_type.normalize_case
                   when :smart
                     query =~ /[A-Z]/ ? '+i' : '-i'
@@ -30,16 +34,7 @@ module Doing
                   when :ignore
                     '-i'
                   end
-
-      # fzf_args << '-e' if opt[:exact]
-      # puts fzf_args.join(' ')
-      res = `echo #{Shellwords.escape(scannable)}|#{Prompt.fzf} #{fzf_args.join(' ')}`
-      selected = Items.new
-      res.split(/\n/).each do |item|
-        idx = item.match(/\|(\d+)$/)[1].to_i
-        selected.push(items[idx])
-      end
-      selected
+      fzf_args
     end
 
     ##
@@ -95,122 +90,8 @@ module Doing
 
       items.sort_by! { |item| [item.date, item.title.downcase] }.reverse
 
-      filtered_items = items.select do |item|
-        keep = true
-        if opt[:unfinished]
-          finished = item.tags?('done', :and)
-          finished = opt[:not] ? !finished : finished
-          keep = false if finished
-        end
+      filtered_items = items.select { |item| item.keep_item?(opt) }
 
-        if keep && opt[:val]&.count&.positive?
-          bool = opt[:bool].normalize_bool if opt[:bool]
-          bool ||= :and
-          bool = :and if bool == :pattern
-
-          val_match = opt[:val].nil? || opt[:val].empty? ? true : item.tag_values?(opt[:val], bool)
-          keep = false unless val_match
-          keep = opt[:not] ? !keep : keep
-        end
-
-        if keep && opt[:tag]
-          opt[:tag_bool] = opt[:bool].normalize_bool if opt[:bool]
-          opt[:tag_bool] ||= :and
-          tag_match = opt[:tag].nil? || opt[:tag].empty? ? true : item.tags?(opt[:tag], opt[:tag_bool])
-          keep = false unless tag_match
-          keep = opt[:not] ? !keep : keep
-        end
-
-        if keep && opt[:search]
-          search_match = if opt[:search].nil? || opt[:search].empty?
-                           true
-                         else
-                           item.search(opt[:search], case_type: opt[:case].normalize_case)
-                         end
-
-          keep = false unless search_match
-          keep = opt[:not] ? !keep : keep
-        end
-
-        if keep && opt[:date_filter]&.length == 2
-          start_date = opt[:date_filter][0]
-          end_date = opt[:date_filter][1]
-
-          in_date_range = if end_date
-                            item.date >= start_date && item.date <= end_date
-                          else
-                            item.date.strftime('%F') == start_date.strftime('%F')
-                          end
-          keep = false unless in_date_range
-          keep = opt[:not] ? !keep : keep
-        end
-
-        if keep && opt[:time_filter][0] || opt[:time_filter][1]
-          opt[:time_filter].map! { |v| v =~ /(12 *am|midnight)/i ? '00:00' : v }
-
-          start_string = if opt[:time_filter][0].nil?
-                           "#{item.date.strftime('%Y-%m-%d')} 00:00"
-                         else
-                           "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][0]}"
-                         end
-          start_time = start_string.chronify(guess: :begin)
-
-          end_string = if opt[:time_filter][1].nil?
-                         "#{item.date.to_datetime.next_day.strftime('%Y-%m-%d')} 00:00"
-                       else
-                         "#{item.date.strftime('%Y-%m-%d')} #{opt[:time_filter][1]}"
-                       end
-          end_time = end_string.chronify(guess: :end) || Time.now
-
-          in_time_range = item.date >= start_time && item.date <= end_time
-
-          keep = false unless in_time_range
-          keep = opt[:not] ? !keep : keep
-        end
-
-        keep = false if keep && opt[:only_timed] && !item.interval
-
-        if keep && opt[:tag_filter]
-          keep = item.tags?(opt[:tag_filter]['tags'], opt[:tag_filter]['bool'])
-          keep = opt[:not] ? !keep : keep
-        end
-
-        if keep && opt[:before]
-          before = opt[:before]
-          cutoff = if before =~ time_rx
-                     "#{item.date.strftime('%Y-%m-%d')} #{before}".chronify(guess: :begin)
-                   elsif before.is_a?(String)
-                     before.chronify(guess: :begin)
-                   else
-                     before
-                   end
-          keep = cutoff && item.date <= cutoff
-          keep = opt[:not] ? !keep : keep
-        end
-
-        if keep && opt[:after]
-          after = opt[:after]
-          cutoff = if after =~ time_rx
-                     "#{item.date.strftime('%Y-%m-%d')} #{after}".chronify(guess: :end)
-                   elsif after.is_a?(String)
-                     after.chronify(guess: :end)
-                   else
-                     after
-                   end
-          keep = cutoff && item.date >= cutoff
-          keep = opt[:not] ? !keep : keep
-        end
-
-        if keep && opt[:today]
-          keep = item.date >= Date.today.to_time && item.date < Date.today.next_day.to_time
-          keep = opt[:not] ? !keep : keep
-        elsif keep && opt[:yesterday]
-          keep = item.date >= Date.today.prev_day.to_time && item.date < Date.today.to_time
-          keep = opt[:not] ? !keep : keep
-        end
-
-        keep
-      end
       count = opt[:count].to_i&.positive? ? opt[:count].to_i : filtered_items.count
 
       output = Items.new

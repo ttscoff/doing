@@ -60,6 +60,7 @@ module Doing
         all_items << {
           date: i.date.strftime('%a %-I:%M%p'),
           shortdate: i.date.relative_date,
+          flagged: i.title =~ /(?<= |^)@#{Doing.setting('marker_tag')}/,
           done: done,
           note: note,
           section: i.section,
