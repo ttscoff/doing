@@ -1,6 +1,10 @@
 ### 2.1.56
 
-2022-05-26 10:08
+2022-05-26 10:20
+
+#### IMPROVED
+
+- In Markdown templates (erb), `i[:flagged]` will be set to true or false based on whether the item has @flagged (or whatever marker_tag is set to) present
 
 #### FIXED
 

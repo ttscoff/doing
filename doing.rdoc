@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.55
+v2.1.56
 
 === Global Options
 === --config_file arg
@@ -531,14 +531,14 @@ Deprecated, specify shell as argument to subcommand
 ====== Command: <tt>generate  [zsh|bash|fish|all]</tt>
 Generate completion scripts, including custom plugins and command options
 
-Argument specifies which shell to install for: zsh, bash, fish, all
+Argument specifies which shell to generate for: zsh, bash, fish, all
 ======= Options
 ======= -f|--file PATH
 
 Alternative file to write output to
 
 [Default Value] None
-Argument specifies which shell to install for: zsh, bash, fish, all
+Argument specifies which shell to generate for: zsh, bash, fish, all
 
 ======= --stdout
 Output result to STDOUT only
