@@ -55,13 +55,15 @@ module Doing
         interval = wwid.get_interval(i, record: true) if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
         interval ||= false
 
-        done = i.title =~ /(?<= |^)@done/ ? 'x' : ' '
+        finished = i.title =~ /(?<= |^)@done/ ? true : false
+        done = finished ? 'x' : ' '
 
         all_items << {
           date: i.date.strftime('%a %-I:%M%p'),
           shortdate: i.date.relative_date,
           flagged: i.title =~ /(?<= |^)@#{Doing.setting('marker_tag')}/,
           done: done,
+          finished: finished,
           note: note,
           section: i.section,
           time: interval,

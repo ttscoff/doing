@@ -1,3 +1,11 @@
+### 2.1.57
+
+2022-05-26 11:20
+
+#### IMPROVED
+
+- Add `i[:finished]` as a boolean in Markdown export template (tests for @done tag and provides true/false)
+
 ### 2.1.56
 
 2022-05-26 10:20
