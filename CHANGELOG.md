@@ -1,3 +1,15 @@
+### 2.1.58
+
+2022-05-28 12:40
+
+#### CHANGED
+
+- BREAKING: The `-s` flag on `doing show` now means section instead of search. Use `--search` for the search flag.
+
+#### NEW
+
+- `doing show --section NAME` allows limiting tag results to a section (same as running `doing show SECTION_NAME @TAG` but added for compatibility with other commands)
+
 ### 2.1.57
 
 2022-05-26 11:20
