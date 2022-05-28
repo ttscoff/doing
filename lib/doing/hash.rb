@@ -70,6 +70,12 @@ module Doing
       end
     end
 
+    ##
+    ## Turn all non-numeric values into strings
+    ##
+    ## @return     [Hash] a copy of the hash where all
+    ##             non-numeric values are strings
+    ##
     def stringify_values
       transform_values do |v|
         if v.is_a?(Hash)
