@@ -1,6 +1,6 @@
 ### 2.1.58
 
-2022-05-28 12:40
+2022-06-01 10:20
 
 #### CHANGED
 
@@ -8,6 +8,7 @@
 
 #### NEW
 
+- You can now use %#FFFFFF style hex strings to set colors in templates. Use %bg#FFFFFF to set a background color. Colors must be 6-digit hex codesAllow hex colors in template strings
 - `doing show --section NAME` allows limiting tag results to a section (same as running `doing show SECTION_NAME @TAG` but added for compatibility with other commands)
 
 ### 2.1.57
