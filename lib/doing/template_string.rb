@@ -65,12 +65,13 @@ module Doing
       working = dup
       color_array = []
 
-      scan(/(?<!\\)(%([a-z]+))/).each do |color|
+      scan(/(?<!\\)(%((?:[fb]g?)?#[a-fA-F0-9]{6}|[a-z]+))/).each do |color|
         valid_color = color[1].validate_color
         next unless valid_color
 
         idx = working.match(/(?<!\\)%#{valid_color}/).begin(0)
-        color_array.push({ name: valid_color, color: Color.send(valid_color), index: idx })
+        color = Color.attributes.include?(valid_color.to_sym) ? Color.send(valid_color) : Color.rgb(valid_color)
+        color_array.push({ name: valid_color, color: color, index: idx })
         working.sub!(/(?<!\\)%#{valid_color}/, '')
       end
 

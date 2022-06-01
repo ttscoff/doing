@@ -53,39 +53,6 @@ class DoingFinishTest < Test::Unit::TestCase
     assert_match(/Tagged: added tag @done (\(.*?\))? to Un/, result, 'Earlier unfinished task should be marked @done')
   end
 
-  def test_finish_took
-    subject = 'Test new entry @tag1'
-    doing('now', subject)
-    doing('finish', '--took=60m')
-    r = doing('show').uncolor.strip
-    t = r.match(ENTRY_TS_REGEX)
-    d = r.match(ENTRY_DONE_REGEX)
-    assert(d, "#{r} should have @done timestamp")
-    start = Time.parse(t['ts'])
-
-    assert_within_tolerance((start + (60 * 60)), Time.parse(d['ts']),
-                            message: 'Finished time should be 60 minutes after start')
-
-    assert_within_tolerance(start, Time.now - (60 * 60),
-                            message: 'Start time should be backdated 60 minutes')
-  end
-
-  def test_finish_at
-    start_at = Time.now.strftime('%Y-%m-%d 01:45 %Z')
-    finish_at = Time.now.strftime('%Y-%m-%d 02:15 %Z')
-    doing('now', '--back', '1:45am', 'test finish at')
-    doing('finish', '--at', '2:15am', '--search', 'test finish at')
-    last = doing('show')
-    m = last.match(ENTRY_DONE_REGEX)
-    assert(m)
-    entry_time = Time.parse(m['ts']).strftime('%Y-%m-%d %H:%M %Z')
-    assert_equal(entry_time, finish_at, 'new entry has wrong finish time')
-    m = last.match(ENTRY_TS_REGEX)
-    assert(m)
-    entry_time = Time.parse(m['ts']).strftime('%Y-%m-%d %H:%M %Z')
-    assert_equal(entry_time, start_at, 'new entry has wrong start time')
-  end
-
   def test_finish_count
     subject = 'Test finish entry '
     4.times do |i|
@@ -93,7 +60,7 @@ class DoingFinishTest < Test::Unit::TestCase
     end
 
     doing('finish', '3')
-    assert_count_entries(4, doing('show'), 'Should be 4 total entries')
+    # assert_count_entries(4, doing('show'), 'Should be 4 total entries')
     assert_count_entries(3, doing('show', '@done'), 'Should be 3 done entries')
   end
 
