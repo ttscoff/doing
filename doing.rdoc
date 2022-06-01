@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.57
+v2.1.58
 
 === Global Options
 === --config_file arg
@@ -2333,12 +2333,11 @@ Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|m
 [Default Value] None
 
 
-===== -s|--sort ORDER
+===== -s|--section NAME
 
-Sort order (asc/desc)
+Only show entries within section
 
-[Default Value] asc
-[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
+[Default Value] None
 
 
 ===== --save VIEW_NAME
@@ -2354,6 +2353,14 @@ Filter entries using a search query, surround with slashes for regex (e.g. "/que
             start with single quote for exact match ("'query")
 
 [Default Value] None
+
+
+===== --sort ORDER
+
+Sort order (asc/desc)
+
+[Default Value] asc
+[Must Match] (?i-mx:^(?:a(?:sc)?|d(?:esc)?)$)
 
 
 ===== --tag TAG

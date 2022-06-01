@@ -470,9 +470,10 @@ complete -c doing -l menu -s m -f  -n '__fish_doing_using_command show' -d Selec
 complete -c doing -l not  -f  -n '__fish_doing_using_command show' -d Show\ items\ that\ \*don\'t\*\ match\ search/tag\ filters
 complete -c doing -l output -s o -f -r -n '__fish_doing_using_command show' -d Output\ to\ export\ format
 complete -c doing -l only_timed  -f  -n '__fish_doing_using_command show' -d Only\ show\ items\ with\ recorded\ time\ intervals
-complete -c doing -l sort -s s -f -r -n '__fish_doing_using_command show' -d Sort\ order
+complete -c doing -l section -s s -f -r -n '__fish_doing_using_command show' -d Only\ show\ entries\ within\ section
 complete -c doing -l save  -f -r -n '__fish_doing_using_command show' -d Save\ all\ current\ command\ line\ options\ as\ a\ new\ view
 complete -c doing -l search  -f -r -n '__fish_doing_using_command show' -d Filter\ entries\ using\ a\ search\ query
+complete -c doing -l sort  -f -r -n '__fish_doing_using_command show' -d Sort\ order
 complete -c doing -l times -s t -f  -n '__fish_doing_using_command show' -d Show\ time\ intervals\ on\ @done\ tasks
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command show' -d Filter\ entries\ by\ tag
 complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command show' -d Tag\ sort\ direction
@@ -617,4 +618,4 @@ complete -f -c doing -l sort -x -n '__fish_doing_using_command changes changelog
 complete -f -c doing -l tag_sort -x -n '__fish_doing_using_command grep search on recent show since today view yesterday' -a 'name time'
 complete -f -c doing -l tag_order -x -n '__fish_doing_using_command grep search on recent show since today view yesterday' -a 'asc desc'
 complete -f -c doing -s a -l age -x -n '__fish_doing_using_command show view' -a 'oldest newest'
-complete -f -c doing -s s -l section -x -n '__fish_doing_using_command again resume autotag cancel done did finish grep search import last mark flag meanwhile note now next on recent reset begin rotate select since tag tags today view wiki yesterday' -a '(__fish_doing_complete_sections)'
+complete -f -c doing -s s -l section -x -n '__fish_doing_using_command again resume autotag cancel done did finish grep search import last mark flag meanwhile note now next on recent reset begin rotate select show since tag tags today view wiki yesterday' -a '(__fish_doing_complete_sections)'

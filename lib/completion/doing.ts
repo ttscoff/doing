@@ -3648,11 +3648,11 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["-s", "--sort"],
-            description: "Sort order",
+            name: ["-s", "--section"],
+            description: "Only show entries within section",
             args: {
-                  name: "ORDER",
-                  description: "ORDER",
+                  name: "NAME",
+                  description: "NAME",
             },
 
           },
@@ -3673,6 +3673,16 @@ const completionSpec: Fig.Spec = {
             args: {
                   name: "QUERY",
                   description: "QUERY",
+            },
+
+          },
+
+          {
+            name: ["--sort"],
+            description: "Sort order",
+            args: {
+                  name: "ORDER",
+                  description: "ORDER",
             },
 
           },
