@@ -281,6 +281,7 @@ module Doing
 
             if opt[:remove] || opt[:rename] || opt[:value]
               rename_to = nil
+
               if opt[:value]
                 rename_to = tag
               elsif opt[:rename]

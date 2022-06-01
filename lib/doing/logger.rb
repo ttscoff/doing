@@ -258,7 +258,7 @@ module Doing
       results = @results.select { |msg| write_message?(msg[:level]) }.uniq
 
       if @logdev == $stdout
-        $stdout.print results.map {|res| res[:message].uncolor }.join("\n")
+        $stdout.print results.map { |res| res[:message].uncolor }.join("\n")
         $stdout.puts
       else
         results.each do |msg|
@@ -324,7 +324,6 @@ module Doing
       end
     end
 
-
     def log_change(tags_added: [], tags_removed: [], count: 1, item: nil, single: false)
       if tags_added.empty? && tags_removed.empty?
         count(:skipped, level: :debug, message: '%count %items with no change', count: count)
@@ -348,9 +347,9 @@ module Doing
         if tags_removed.empty?
           count(:skipped, level: :debug, message: 'no tags removed from %count %items')
         elsif single && item
-          added = tags_added.log_tags
+          removed = tags_removed.log_tags
           info('Untagged:',
-               %(removed #{tags_removed.count == 1 ? 'tag' : 'tags'} #{added} from #{item.title}))
+               %(removed #{tags_removed.count == 1 ? 'tag' : 'tags'} #{removed} from #{item.title}))
         else
           count(:removed_tags, level: :info, tag: tags_removed, message: '%tags removed from %count %items')
         end

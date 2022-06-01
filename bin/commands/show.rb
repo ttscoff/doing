@@ -34,7 +34,11 @@ command :show do |c|
 
   c.desc 'Sort order (asc/desc)'
   c.arg_name 'ORDER'
-  c.flag %i[s sort], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
+  c.flag %i[sort], must_match: REGEX_SORT_ORDER, default_value: :asc, type: OrderSymbol
+
+  c.desc 'Only show entries within section'
+  c.arg_name 'NAME'
+  c.flag %i[s section]
 
   c.desc 'Select section or tag to display from a menu'
   c.switch %i[m menu], negatable: false, default_value: false
@@ -69,10 +73,11 @@ command :show do |c|
 
         args.shift
       when /^[@+-]/
-        section = 'All'
+        section = options[:section] ? @wwid.guess_section(options[:section]) : 'All'
       else
+        sect = options[:section] ? options[:section] : args[0]
         begin
-          section = @wwid.guess_section(args[0])
+          section = @wwid.guess_section(sect)
         rescue WrongCommand
           cmd = commands[:view]
           action = cmd.send(:get_action, nil)
@@ -91,7 +96,11 @@ command :show do |c|
         end
       end
     else
-      section = options[:menu] ? @wwid.choose_section(include_all: true) : Doing.setting('current_section')
+      if options[:section]
+        section = @wwid.guess_section(options[:section]) || 'All'
+      else
+        section = options[:menu] ? @wwid.choose_section(include_all: true) : Doing.setting('current_section')
+      end
       section ||= 'All'
     end
 

@@ -109,7 +109,7 @@ module Doing
         compiled = ''
         normalize_color.split('').each do |char|
           compiled += char
-          valid_color = compiled if Color.attributes.include?(compiled.to_sym)
+          valid_color = compiled if Color.attributes.include?(compiled.to_sym) || compiled =~ /^([fb]g?)?#([a-f0-9]{6})$/i
         end
 
         valid_color
@@ -223,6 +223,19 @@ module Doing
       EOSCRIPT
 
       module_eval(new_method)
+    end
+
+    def rgb(hex)
+      is_bg = hex.match(/^bg?#/) ? true : false
+      hex_string = hex.sub(/^([fb]g?)?#/, '')
+
+      parts = hex_string.match(/(?<r>..)(?<g>..)(?<b>..)/)
+      t = []
+      %w[r g b].each do |e|
+        t << parts[e].hex
+      end
+      color =
+      "\e[#{is_bg ? '48' : '38'};2;#{t.join(';')}m"
     end
 
     # Regular expression that is used to scan for ANSI-sequences while
