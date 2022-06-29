@@ -1,3 +1,16 @@
+### 2.1.61
+
+2022-06-29 05:54
+
+#### IMPROVED
+
+- Remove @meanwhile from tag totals
+- Less spacing between items in default HTML export CSS
+
+#### FIXED
+
+- Code duplication in timers.rb
+
 ### 2.1.60
 
 2022-06-29 02:06

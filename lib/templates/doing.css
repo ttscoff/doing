@@ -50,7 +50,7 @@ article > ul > li:hover {
 .date {
   color: #7d9ca2;
   font-size: 17px;
-  padding: 15px 1ch 0 0;
+  padding: 3px 1ch 0 0;
   text-align: right;
   white-space: nowrap;
   transition: color .2s ease-in-out;
@@ -59,7 +59,7 @@ article > ul > li:hover {
 .entry {
   border-left: solid 1px #ccc;
   line-height: 1.2;
-  padding: 10px 10px 10px 3ch;
+  padding: 2px 10px 2px 3ch;
   text-indent: -2ch;
 }
 
