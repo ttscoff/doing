@@ -1,3 +1,11 @@
+### 2.1.59
+
+2022-06-29 01:22
+
+#### FIXED
+
+- `doing done ...` wasn't autotagging the new entry
+
 ### 2.1.58
 
 2022-06-01 10:20
