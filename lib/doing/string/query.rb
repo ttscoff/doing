@@ -85,6 +85,11 @@ module Doing
       Regexp.new(pattern, !case_sensitive)
     end
 
+    ##
+    ## Returns a phrase query (elastic search) representation of the object as a phrase parser.
+    ##
+    ## @return     Phrase query representation of the object.
+    ##
     def to_phrase_query
       parser = PhraseParser::QueryParser.new
       transformer = PhraseParser::QueryTransformer.new
@@ -92,6 +97,11 @@ module Doing
       transformer.apply(parse_tree).to_elasticsearch
     end
 
+    ##
+    ## Returns a query (elastic search) representation of the object as a boolean term parser.
+    ##
+    ## @return     Query representation of the object.
+    ##
     def to_query
       parser = BooleanTermParser::QueryParser.new
       transformer = BooleanTermParser::QueryTransformer.new

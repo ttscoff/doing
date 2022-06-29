@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.58
+v2.1.60
 
 === Global Options
 === --config_file arg
@@ -3006,6 +3006,16 @@ Select from recent backups
 
 ===== -r|--[no-]redo
 Redo last undo. Note: you cannot undo a redo
+
+
+
+==== Command: <tt>update </tt>
+Update doing to the latest version
+
+Checks for the latest available version of doing and updates your local install if needed.
+===== Options
+===== -p|--pre|--beta
+Check for pre-release version
 
 
 

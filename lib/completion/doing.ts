@@ -4464,6 +4464,20 @@ const completionSpec: Fig.Spec = {
     },
 
     {
+      name: "update",
+      description: "Update doing to the latest version",
+      options: [
+          {
+            name: ["--beta"],
+            description: "Check for pre-release version",
+            
+          },
+
+        ],
+
+    },
+
+    {
       name: "view",
       description: "Display a user-created view",
       options: [
