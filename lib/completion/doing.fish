@@ -172,6 +172,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'template' -d Output\ HTML
 complete -xc doing -n '__fish_doing_needs_command' -a 'test' -d Test\ Stuff
 complete -xc doing -n '__fish_doing_needs_command' -a 'today' -d List\ entries\ from\ today
 complete -xc doing -n '__fish_doing_needs_command' -a 'undo' -d Undo\ the\ last\ X\ changes\ to\ the\ Doing\ file
+complete -xc doing -n '__fish_doing_needs_command' -a 'update' -d Update\ doing\ to\ the\ latest\ version
 complete -xc doing -n '__fish_doing_needs_command' -a 'view' -d Display\ a\ user-created\ view
 complete -xc doing -n '__fish_doing_needs_command' -a 'views' -d List\ available\ custom\ views
 complete -xc doing -n '__fish_doing_needs_command' -a 'wiki' -d Output\ a\ tag\ wiki
@@ -559,6 +560,7 @@ complete -c doing -l file -s f -f -r -n '__fish_doing_using_command undo' -d Spe
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command undo' -d Select\ from\ recent\ backups
 complete -c doing -l prune -s p -f -r -n '__fish_doing_using_command undo' -d Remove\ old\ backups
 complete -c doing -l redo -s r -f  -n '__fish_doing_using_command undo' -d Redo\ last\ undo
+complete -c doing -l beta  -f  -n '__fish_doing_using_command update' -d Check\ for\ pre-release\ version
 complete -c doing -l after  -f -r -n '__fish_doing_using_command view' -d Show\ entries\ newer\ than\ date
 complete -c doing -l age  -f -r -n '__fish_doing_using_command view' -d Age
 complete -c doing -l before  -f -r -n '__fish_doing_using_command view' -d Show\ entries\ older\ than\ date

@@ -1,6 +1,10 @@
 ### 2.1.59
 
-2022-06-29 01:22
+2022-06-29 01:59
+
+#### NEW
+
+- `doing update` will update doing to the latest available version
 
 #### FIXED
 

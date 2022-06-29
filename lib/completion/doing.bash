@@ -368,6 +368,16 @@ _doing_undo() {
   fi
 }
 
+_doing_update() {
+  
+  if [[ "$token" == --* ]]; then
+    COMPREPLY=( $( compgen -W '--beta' -- $token ) )
+  elif [[ "$token" == -* ]]; then
+    COMPREPLY=( $( compgen -W ' --beta' -- $token ) )
+  
+  fi
+}
+
 _doing_view() {
   OLD_IFS="$IFS"
 local token=${COMP_WORDS[$COMP_CWORD]}
@@ -466,6 +476,7 @@ _doing()
     elif [[ $last =~ (template) ]]; then _doing_template
     elif [[ $last =~ (today) ]]; then _doing_today
     elif [[ $last =~ (undo) ]]; then _doing_undo
+    elif [[ $last =~ (update) ]]; then _doing_update
     elif [[ $last =~ (view) ]]; then _doing_view
     elif [[ $last =~ (views) ]]; then _doing_views
     elif [[ $last =~ (wiki) ]]; then _doing_wiki

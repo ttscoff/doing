@@ -52,6 +52,7 @@ function _doing() {
                   'test:Test Stuff'
                   'today:List entries from today'
                   'undo:Undo the last X changes to the Doing file'
+                  'update:Update doing to the latest version'
                   'view:Display a user-created view'
                   'views:List available custom views'
                   'wiki:Output a tag wiki'
@@ -199,6 +200,9 @@ function _doing() {
             ;;
             undo) 
                 args=( {'(--file)-f','(-f)--file'}"[Specify alternate doing file]:PATH:" {'(--interactive)-i','(-i)--interactive'}"[Select from recent backups]" {'(--prune)-p','(-p)--prune'}"[Remove old backups]:COUNT:" {'(--redo)-r','(-r)--redo'}"[Redo last undo]" )
+            ;;
+            update) 
+                args=( "--beta[Check for pre-release version]" )
             ;;
             view) 
                 args=( "--after[Show entries newer than date]:DATE_STRING:" "--age[Age]:AGE:" "--before[Show entries older than date]:DATE_STRING:" "--bool[Boolean used to combine multiple tags]:BOOLEAN:" {'(--count)-c','(-c)--count'}"[Count to display]:COUNT:" "--case[Case sensitivity for search string matching [(c)ase-sensitive]:TYPE:" "--color[Include colors in output]" "--config_template[Output using a template from configuration]:TEMPLATE_KEY:" "--duration[Show elapsed time on entries without @done tag]" "--from[Date range]:DATE_OR_RANGE:" {'(--hilite)-h','(-h)--hilite'}"[Highlight search matches in output]" {'(--interactive)-i','(-i)--interactive'}"[Select from a menu of matching entries to perform additional operations]" "--not[Show items that *don't* match search/tag filters]" {'(--output)-o','(-o)--output'}"[Output to export format]:FORMAT:" "--only_timed[Only show items with recorded time intervals]" {'(--section)-s','(-s)--section'}"[Section]:NAME:" "--search[Filter entries using a search query]:QUERY:" {'(--times)-t','(-t)--times'}"[Show time intervals on @done tasks]" "--tag[Filter entries by tag]:TAG:" "--tag_order[Tag sort direction]:DIRECTION:" "--tag_sort[Sort tags by]:KEY:" "--template[Override output format with a template string containing %placeholders]:TEMPLATE_STRING:" "--totals[Show intervals with totals at the end of output]" "--val[Perform a tag value query]:QUERY:" {'(--exact)-x','(-x)--exact'}"[Force exact search string matching]" )
