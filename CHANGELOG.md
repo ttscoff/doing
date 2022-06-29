@@ -1,3 +1,11 @@
+### 2.1.60
+
+2022-06-29 02:06
+
+#### FIXED
+
+- Failed to include update command in release
+
 ### 2.1.59
 
 2022-06-29 01:59
