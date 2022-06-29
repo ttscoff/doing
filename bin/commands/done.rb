@@ -84,16 +84,14 @@ command %i[done did] do |c|
       section = Doing.setting('current_section')
     end
 
-
     note = Doing::Note.new
     note.add(options[:note]) if options[:note]
 
-    if options[:ask] && !options[:editor]
-      note.add(Doing::Prompt.read_lines(prompt: 'Add a note'))
-    end
+    note.add(Doing::Prompt.read_lines(prompt: 'Add a note')) if options[:ask] && !options[:editor]
 
     if options[:editor]
       raise MissingEditor, 'No EDITOR variable defined in environment' if Doing::Util.default_editor.nil?
+
       is_new = false
 
       if args.empty?
@@ -120,6 +118,11 @@ command %i[done did] do |c|
       if options[:ask]
         ask_note = Doing::Prompt.read_lines(prompt: 'Add a note')
         note.add(ask_note) if ask_note.good?
+      end
+
+      if Doing.auto_tag
+        title = @wwid.autotag(title)
+        title.add_tags!(Doing.setting('default_tags')) if Doing.setting('default_tags').good?
       end
 
       date = d.nil? ? date : d
@@ -171,6 +174,12 @@ command %i[done did] do |c|
       new_note.add(options[:note])
       title.chomp!
       section = 'Archive' if options[:archive]
+
+      if Doing.auto_tag
+        title = @wwid.autotag(title)
+        title.add_tags!(Doing.setting('default_tags')) if Doing.setting('default_tags').good?
+      end
+
       new_entry = Doing::Item.new(date, title, section, new_note)
 
       if new_entry.should_finish?

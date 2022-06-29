@@ -159,7 +159,6 @@ module Doing
       write(@doing_file)
     end
 
-
     ##
     ## Tag the last entry or X entries
     ##
