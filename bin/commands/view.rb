@@ -32,7 +32,7 @@ command :view do |c|
   c.switch [:color], negatable: true
 
   c.desc "Highlight search matches in output. Only affects command line output"
-  c.switch %i[h hilite], default_value: false, negatable: true
+  c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight'), negatable: true
 
   c.desc 'Sort tags by (name|time)'
   c.arg_name 'KEY'
