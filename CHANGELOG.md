@@ -1,3 +1,15 @@
+### 2.1.62
+
+2022-07-01 10:02
+
+#### IMPROVED
+
+- Better way to insert a colored string into a another string and return the the previous color at the end of the inserted string. Whew, that was a weird way to say it.
+
+#### FIXED
+
+- `doing view` not respecting search.highlight config
+
 ### 2.1.61
 
 2022-06-29 05:54

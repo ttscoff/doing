@@ -127,7 +127,11 @@ module Doing
         gsub(/_/, '').sub(/bright/i, 'bold').sub(/bgbold/, 'boldbg')
       end
 
-      # Get the final color setting of the string
+      # Get the calculated ANSI color at the end of the
+      # string
+      #
+      # @return     ANSI escape sequence to match color
+      #
       def last_color_code
         m = scan(ESCAPE_REGEX)
 
