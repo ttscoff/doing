@@ -17,14 +17,9 @@ module Doing
     ##
     def highlight_tags(color = 'yellow', last_color: nil)
       unless last_color
-        escapes = scan(/(\e\[[\d;]+m)[^\e]+@/)
         color = color.split(' ') unless color.is_a?(Array)
         tag_color = color.each_with_object([]) { |c, arr| arr << Doing::Color.send(c) }.join('')
-        last_color = if escapes.good?
-                       (escapes.count > 1 ? escapes[-2..-1] : [escapes[-1]]).map { |v| v[0] }.join('')
-                     else
-                       Doing::Color.default
-                     end
+        last_color = last_color_code
       end
       gsub(/(\s|m)(@[^ ("']+)/, "\\1#{tag_color}\\2#{last_color}")
     end
@@ -54,7 +49,11 @@ module Doing
         qs.concat(query[:should]) if query[:should]
         qs.each do |s|
           rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
-          out.gsub!(rx) { |m| m.bgyellow.black }
+          out.gsub!(rx) do
+            m = Regexp.last_match
+            last = m.pre_match.last_color_code
+            "#{m[0].bgyellow.black}#{last}"
+          end
         end
       end
       out
