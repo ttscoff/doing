@@ -32,6 +32,17 @@ module Doing
           end
         end
 
+        Gem.find_latest_files('doing-plugin-*', true).sort.each do |plugin|
+          load plugin
+        end
+
+        # Gem.path.each do |path|
+        #   $LOAD_PATH.unshift path
+        #   Dir.glob(File.join(path, 'gems', 'doing-plugin-*', 'lib', '*.rb')).sort.each do |plugin|
+        #     require plugin.sub(%r{#{path}/gems/(.*?)-[\d.]+$}, '\1')
+        #   end
+        # end
+
         plugins
       end
 
