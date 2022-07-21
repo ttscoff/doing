@@ -1,3 +1,11 @@
+### 2.1.63
+
+2022-07-21 07:11
+
+#### NEW
+
+- Allow gem-based plugins. Any gem that starts with `doing-plugin-*` will be loaded and available to doing.
+
 ### 2.1.62
 
 2022-07-01 10:02

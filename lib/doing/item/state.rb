@@ -46,9 +46,11 @@ module Doing
       return true unless config[key].is_a?(Array)
 
       config[key].each do |tag|
+        next if tag.nil?
+
         if tag =~ /^@/
           return false if tags?(tag.sub(/^@/, '').downcase)
-        elsif section.downcase == tag.downcase
+        elsif section&.downcase == tag.downcase
           return false
         end
       end
