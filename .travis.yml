@@ -1,0 +1,7 @@
+---
+language: ruby
+sudo: required
+dist: trusty
+cache: bundler
+rvm:
+  - 2
