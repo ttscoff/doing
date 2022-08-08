@@ -10,6 +10,7 @@ module Doing
     # @return     [Items] Array of items
     #
     def in_section(section)
+      sect = section.is_a?(Section) ? section.title : section
       if section =~ /^all$/i
         dup
       else
