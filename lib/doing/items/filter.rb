@@ -11,7 +11,7 @@ module Doing
     #
     def in_section(section)
       sect = section.is_a?(Section) ? section.title : section
-      if section =~ /^all$/i
+      if sect =~ /^all$/i
         dup
       else
         items = Items.new.concat(select { |item| !item.nil? && item.section == section })
