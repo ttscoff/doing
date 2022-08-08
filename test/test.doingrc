@@ -84,24 +84,24 @@ views:
 marker_tag: flagged
 marker_color: red
 export_templates:
-  css:
-  haml:
-  markdown:
-  tester:
-  calendar:
-  timing:
-  csv:
-  html:
-  timeline:
-  taskpaper:
-  template:
-  doing:
-  say:
-  trizzer:
-  wiki:
-  dayone:
-  dayone-days:
-  dayone-entries:
+  css: 
+  haml: 
+  markdown: 
+  tester: 
+  calendar: 
+  timing: 
+  csv: 
+  html: 
+  timeline: 
+  taskpaper: 
+  template: 
+  doing: 
+  say: 
+  trizzer: 
+  wiki: 
+  dayone: 
+  dayone-days: 
+  dayone-entries: 
 tag_sort: name
 never_time:
 - "@nevertime"
@@ -111,8 +111,8 @@ timer_format: text
 include_notes: true
 editors:
   default: vim
-  doing_file:
-  config:
+  doing_file: 
+  config: 
 paginate: false
 backup_dir: test/doing_test_backup
 history_size: 15
