@@ -1,5 +1,9 @@
 # doing
 
+[![Gem](https://img.shields.io/gem/v/doing.svg)](https://rubygems.org/gems/howzit)
+[![Travis](https://api.travis-ci.com/ttscoff/doing.svg?branch=main)](https://travis-ci.org/makenew/ruby-gem)
+[![GitHub license](https://img.shields.io/github/license/ttscoff/doing.svg)](./LICENSE.txt)
+
 **A command line tool for remembering what you were doing and tracking what
 you've done.**
 

@@ -10,4 +10,4 @@ rvm:
 install:
   - gem install bundler --version '2.2.29'
   - bundle install
-script: "bundle exec rake test"
+script: "bundle exec rake parallel:test"
