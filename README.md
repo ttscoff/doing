@@ -1,5 +1,9 @@
 # doing
 
+[![Gem](https://img.shields.io/gem/v/doing.svg)](https://rubygems.org/gems/howzit)
+[![Travis](https://api.travis-ci.com/ttscoff/doing.svg?branch=develop)](https://travis-ci.org/makenew/ruby-gem)
+[![GitHub license](https://img.shields.io/github/license/ttscoff/doing.svg)](./LICENSE.txt)
+
 **A command line tool for remembering what you were doing and tracking what
 you've done.**
 
@@ -8,7 +12,7 @@ _If you're one of the rare people like me who find this useful, feel free to
 
 <!--README-->
 
-The current version of `doing` is <!--VER-->2.1.63<!--END VER-->.
+The current version of `doing` is <!--VER-->2.1.64<!--END VER-->.
 
 Find all of the documentation in the [doing wiki][wiki].
 
