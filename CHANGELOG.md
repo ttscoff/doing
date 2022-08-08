@@ -1,3 +1,11 @@
+### 2.1.68
+
+2022-08-08 12:19
+
+#### FIXED
+
+- Comparison of Doing::Section to string
+
 ### 2.1.66
 
 2022-08-08 12:05
