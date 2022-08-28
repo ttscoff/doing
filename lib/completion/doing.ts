@@ -19,7 +19,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -153,7 +153,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -947,7 +947,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -1057,7 +1057,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -2286,7 +2286,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -2446,7 +2446,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -2518,7 +2518,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",

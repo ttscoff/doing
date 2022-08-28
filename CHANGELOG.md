@@ -1,3 +1,15 @@
+### 2.1.69
+
+2022-08-28 14:37
+
+#### IMPROVED
+
+- Add --since as alias for --back on again, done, meanwhile and now
+
+#### FIXED
+
+- Comparison of Doing::Section to string
+
 ### 2.1.68
 
 2022-08-08 12:19

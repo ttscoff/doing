@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.68
+v2.1.69
 
 === Global Options
 === --config_file arg
@@ -89,7 +89,7 @@ Repeat last entry as new entry
 This command is designed to allow multiple time intervals to be created
            for an entry by duplicating it with a new start (and end, eventually) time
 ===== Options
-===== -b|--back|--started DATE_STRING
+===== -b|--back|--started|--since DATE_STRING
 
 Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
 
@@ -662,7 +662,7 @@ Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm
 [Default Value] None
 
 
-===== -b|--back|--started DATE_STRING
+===== -b|--back|--started|--since DATE_STRING
 
 Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
 
@@ -1374,7 +1374,7 @@ This command makes it easy to start and stop these overarching entries. Just run
 big project` to start a @meanwhile entry, add other entries as you work on the project, then use `doing meanwhile` by
 itself to mark the entry as @done.
 ===== Options
-===== -b|--back|--started DATE_STRING
+===== -b|--back|--started|--since DATE_STRING
 
 Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
 
@@ -1512,7 +1512,7 @@ Run without arguments to create a new entry interactively.
 
 Run with --editor to create a new entry using vim.
 ===== Options
-===== -b|--back|--started DATE_STRING
+===== -b|--back|--started|--since DATE_STRING
 
 Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]
 
