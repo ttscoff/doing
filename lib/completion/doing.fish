@@ -150,6 +150,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'grep search' -d Search\ f
 complete -xc doing -n '__fish_doing_needs_command' -a 'help' -d Shows\ a\ list\ of\ commands\ or\ help\ for\ one\ command
 complete -xc doing -n '__fish_doing_needs_command' -a 'import' -d Import\ entries\ from\ an\ external\ source
 complete -xc doing -n '__fish_doing_needs_command' -a 'last' -d Show\ the\ last\ entry
+complete -xc doing -n '__fish_doing_needs_command' -a 'later' -d Add\ an\ item\ to\ the\ Later\ section
 complete -xc doing -n '__fish_doing_needs_command' -a 'mark flag' -d Mark\ last\ entry\ as\ flagged
 complete -xc doing -n '__fish_doing_needs_command' -a 'meanwhile' -d Finish\ any\ running\ @meanwhile\ tasks\ and\ optionally\ create\ a\ new\ one
 complete -xc doing -n '__fish_doing_needs_command' -a 'note' -d Add\ a\ note\ to\ the\ last\ entry
@@ -326,6 +327,10 @@ complete -c doing -l template  -f -r -n '__fish_doing_using_command last' -d Ove
 complete -c doing -l title  -f -r -n '__fish_doing_using_command last' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l val  -f -r -n '__fish_doing_using_command last' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command last' -d Force\ exact\ search\ string\ matching
+complete -c doing -l ask  -f  -n '__fish_doing_using_command later' -d Prompt\ for\ note\ via\ multi-line\ input
+complete -c doing -l started  -f -r -n '__fish_doing_using_command later' -d Backdate\ start\ time\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
+complete -c doing -l editor -s e -f  -n '__fish_doing_using_command later' -d Edit\ entry\ with\ vim
+complete -c doing -l note -s n -f -r -n '__fish_doing_using_command later' -d Note
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command mark flag' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l count -s c -f -r -n '__fish_doing_using_command mark flag' -d How\ many\ recent\ entries\ to\ tag
 complete -c doing -l case  -f -r -n '__fish_doing_using_command mark flag' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive

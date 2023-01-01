@@ -148,6 +148,16 @@ _doing_last() {
   fi
 }
 
+_doing_later() {
+  
+  if [[ "$token" == --* ]]; then
+    COMPREPLY=( $( compgen -W '--ask --started --editor --note' -- $token ) )
+  elif [[ "$token" == -* ]]; then
+    COMPREPLY=( $( compgen -W '-e -n --ask --started --editor --note' -- $token ) )
+  
+  fi
+}
+
 _doing_mark() {
   
   if [[ "$token" == --* ]]; then
@@ -456,6 +466,7 @@ _doing()
     elif [[ $last =~ (help) ]]; then _doing_help
     elif [[ $last =~ (import) ]]; then _doing_import
     elif [[ $last =~ (last) ]]; then _doing_last
+    elif [[ $last =~ (later) ]]; then _doing_later
     elif [[ $last =~ (mark|flag) ]]; then _doing_mark
     elif [[ $last =~ (meanwhile) ]]; then _doing_meanwhile
     elif [[ $last =~ (note) ]]; then _doing_note

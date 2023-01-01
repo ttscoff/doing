@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.69
+v2.1.72
 
 === Global Options
 === --config_file arg
@@ -504,11 +504,29 @@ Enable and disable Doing commands
 
 
 ===== Commands
-====== Command: <tt>add|enable  COMMAND [COMMAND...]</tt>
+====== Command: <tt>add|enable  [COMMAND [COMMAND...]]</tt>
 Enable Doing commands
 
 Run without arguments to select commands from a list.
-====== Command: <tt>remove|disable </tt>
+====== Command: <tt>ls|list  [QUERY]...</tt>
+List enabled commands
+
+
+======= Options
+======= -s|--style QUERY
+
+List style (column, tab, comma, *space)
+
+[Default Value] None
+[Must Match] (?-mix:^[cts].*)
+
+
+======= -d|--[no-]disabled
+List disabled commands
+
+
+
+====== Command: <tt>remove|disable  [COMMAND [COMMAND...]]</tt>
 Disable Doing commands
 
 
@@ -1268,6 +1286,35 @@ Show items that *don't* match search/tag filters
 
 ===== -x|--exact
 Force exact search string matching (case sensitive)
+
+
+
+==== Command: <tt>later  ENTRY</tt>
+Add an item to the Later section
+
+
+===== Options
+===== -b|--back|--started DATE_STRING
+
+Backdate start time to date string [4pm|20m|2h|yesterday noon]
+
+[Default Value] None
+
+
+===== -n|--note TEXT
+
+Note
+
+[Default Value] None
+
+
+===== --ask
+Prompt for note via multi-line input
+
+
+
+===== -e|--editor
+Edit entry with vim
 
 
 

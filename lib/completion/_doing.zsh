@@ -27,6 +27,7 @@ function _doing() {
                   'help:Shows a list of commands or help for one command'
                   'import:Import entries from an external source'
                   'last:Show the last entry'
+                  'later:Add an item to the Later section'
                   'mark:Mark last entry as flagged'
                   'flag:Mark last entry as flagged'
                   'meanwhile:Finish any running @meanwhile tasks and optionally create a new one'
@@ -125,6 +126,9 @@ function _doing() {
             ;;
             last) 
                 args=( "--bool[Boolean used to combine multiple tags]:BOOLEAN:" "--case[Case sensitivity for search string matching [(c)ase-sensitive]:TYPE:" "--config_template[Output using a template from configuration]:TEMPLATE_KEY:" {'(--delete)-d','(-d)--delete'}"[Delete the last entry]" "--duration[Show elapsed time if entry is not tagged @done]" {'(--editor)-e','(-e)--editor'}"[Edit entry with vim]" {'(--hilite)-h','(-h)--hilite'}"[Highlight search matches in output]" "--not[Show items that *don't* match search/tag filters]" {'(--output)-o','(-o)--output'}"[Output to export format]:FORMAT:" {'(--section)-s','(-s)--section'}"[Specify a section]:NAME:" "--save[Save all current command line options as a new view]:VIEW_NAME:" "--search[Filter entries using a search query]:QUERY:" "--tag[Filter entries by tag]:TAG:" "--template[Override output format with a template string containing %placeholders]:TEMPLATE_STRING:" "--title[Title string to be used for output formats that require it]:TITLE:" "--val[Perform a tag value query]:QUERY:" {'(--exact)-x','(-x)--exact'}"[Force exact search string matching]" )
+            ;;
+            later) 
+                args=( "--ask[Prompt for note via multi-line input]" "--started[Backdate start time to date string [4pm|20m|2h|yesterday noon]]:DATE_STRING:" {'(--editor)-e','(-e)--editor'}"[Edit entry with vim]" {'(--note)-n','(-n)--note'}"[Note]:TEXT:" )
             ;;
             mark) 
                 args=( "--bool[Boolean used to combine multiple tags]:BOOLEAN:" {'(--count)-c','(-c)--count'}"[How many recent entries to tag]:COUNT:" "--case[Case sensitivity for search string matching [(c)ase-sensitive]:TYPE:" {'(--date)-d','(-d)--date'}"[Include current date/time with tag]" "--force[Don't ask permission to flag all entries when count is 0]" {'(--interactive)-i','(-i)--interactive'}"[Select item(s) to flag from a menu of matching entries]" "--not[Flag items that *don't* match search/tag filters]" {'(--remove)-r','(-r)--remove'}"[Remove flag]" {'(--section)-s','(-s)--section'}"[Section]:SECTION_NAME:" "--search[Filter entries using a search query]:QUERY:" "--tag[Filter entries by tag]:TAG:" {'(--unfinished)-u','(-u)--unfinished'}"[Flag last entry]" "--val[Perform a tag value query]:QUERY:" {'(--exact)-x','(-x)--exact'}"[Force exact search string matching]" )
