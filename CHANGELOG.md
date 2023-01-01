@@ -1,30 +1,10 @@
-### 2.1.74
+### 2.1.75
 
-2023-01-01 07:19
-
-### 2.1.73
-
-2023-01-01 07:10
+2023-01-01 07:30
 
 #### FIXED
 
-- Comparison of Doing::Section to string
-
-### 2.1.72
-
-2023-01-01 06:30
-
-#### NEW
-
-- `doing commands list [QUERY]` command to display enabled and disabled commands
-
-#### IMPROVED
-
-- Add --since as alias for --back on again, done, meanwhile and now
-
-#### FIXED
-
-- Comparison of Doing::Section to string
+- Error running `commands list` without `--style` flag
 
 ### 2.1.69
 
@@ -33,10 +13,6 @@
 #### IMPROVED
 
 - Add --since as alias for --back on again, done, meanwhile and now
-
-#### FIXED
-
-- Comparison of Doing::Section to string
 
 ### 2.1.68
 
