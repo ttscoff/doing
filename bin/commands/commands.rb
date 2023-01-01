@@ -9,7 +9,7 @@ module Doing
       cmd.example 'doing commands remove COMMAND', desc: 'Specify a command to disable'
     end
 
-    def list_commands(args, column = true)
+    def list_commands(args, style: :space)
       available = Dir.glob(File.join(File.dirname(__FILE__), '*.rb')).map { |cmd| File.basename(cmd, '.rb') }
       custom_dir = Doing.setting('plugins.command_path')
       custom_commands = Dir.glob(File.join(File.expand_path(custom_dir), '*.rb'))
@@ -17,13 +17,31 @@ module Doing
       disabled = Doing.setting('disabled_commands')
       disabled.each { |cmd| available.delete(cmd) }
       available.delete_if { |cmd| cmd !~ /(#{args.join('|')})/i } if args.good?
-      puts column ? available.join("\n") : available.join(' ')
+      case style
+      when :column
+        puts available.join("\n")
+      when :tab
+        puts available.join("\t")
+      when :comma
+        puts available.join(', ')
+      else
+        puts available.join(' ')
+      end
     end
 
-    def list_disabled_commands(args, column = true)
+    def list_disabled_commands(args, style: :space)
       disabled = Doing.setting('disabled_commands')
       disabled.delete_if { |cmd| cmd !~ /#{args}/i } if args.good?
-      puts column ? disabled.join("\n") : disabled.join(' ')
+      case style
+      when :column
+        puts disabled.join("\n")
+      when :tab
+        puts disabled.join("\t")
+      when :comma
+        puts disabled.join(', ')
+      else
+        puts disabled.join(' ')
+      end
     end
 
     def remove_command(args)
@@ -113,19 +131,19 @@ command :commands do |c|
 
   # @@commands.list
   c.desc 'List enabled commands'
-  c.arg_name 'QUERY [QUERY...]', optional: true
+  c.arg_name 'QUERY', optional: true, multiple: true
   c.command %i[ls list] do |list|
-    list.desc 'List in single column'
-    list.switch %i[c column]
+    list.desc 'List style (column, tab, comma, *space)'
+    list.flag %i[s style], must_match: /^[cts].*/
 
     list.desc 'List disabled commands'
     list.switch %i[d disabled]
 
     list.action do |_global, options, args|
       if options[:disabled]
-        cmd.list_disabled_commands(args, options[:column])
+        cmd.list_disabled_commands(args, style: options[:style].normalize_list_style)
       else
-        cmd.list_commands(args, options[:column])
+        cmd.list_commands(args, style: options[:style].normalize_list_style)
       end
     end
   end
