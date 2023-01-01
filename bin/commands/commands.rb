@@ -140,10 +140,11 @@ command :commands do |c|
     list.switch %i[d disabled]
 
     list.action do |_global, options, args|
+      style = options[:style] ? options[:style].normalize_list_style : :space
       if options[:disabled]
-        cmd.list_disabled_commands(args, style: options[:style].normalize_list_style)
+        cmd.list_disabled_commands(args, style: style)
       else
-        cmd.list_commands(args, style: options[:style].normalize_list_style)
+        cmd.list_commands(args, style: style)
       end
     end
   end
