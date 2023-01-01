@@ -18,7 +18,6 @@ spec = Gem::Specification.new do |s|
     `git ls-files -z`.split("\x0").reject { |f| f.strip =~ %r{^((test|spec|features)/|\.git|buildnotes)} }
   end
   s.require_paths << 'lib'
-
   s.extra_rdoc_files = ['README.md']
   s.rdoc_options << '--title' << 'doing' << '--main' << 'README.md' << '--markup' << 'markdown'
   s.bindir = 'bin'
