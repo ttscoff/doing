@@ -17,7 +17,7 @@ module Doing
     def choose_from(options, prompt: 'Make a selection: ', multiple: false, sorted: true, fzf_args: [])
       return nil unless $stdout.isatty
 
-      # fzf_args << '-1' # User is expecting a menu, and even if only one it seves as confirmation
+      # fzf_args << '-1' # User is expecting a menu, and even if only one it serves as confirmation
       default_args = []
       default_args << %(--prompt="#{prompt}")
       default_args << "--height=#{options.count + 2}"

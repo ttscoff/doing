@@ -19,7 +19,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -153,7 +153,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -947,7 +947,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -1057,7 +1057,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -2024,6 +2024,46 @@ const completionSpec: Fig.Spec = {
     },
 
     {
+      name: "later",
+      description: "Add an item to the Later section",
+      options: [
+          {
+            name: ["--ask"],
+            description: "Prompt for note via multi-line input",
+            
+          },
+
+          {
+            name: ["--started"],
+            description: "Backdate start time to date string [4pm|20m|2h|yesterday noon]",
+            args: {
+                  name: "DATE_STRING",
+                  description: "DATE_STRING",
+            },
+
+          },
+
+          {
+            name: ["-e", "--editor"],
+            description: "Edit entry with vim",
+            
+          },
+
+          {
+            name: ["-n", "--note"],
+            description: "Note",
+            args: {
+                  name: "TEXT",
+                  description: "TEXT",
+            },
+
+          },
+
+        ],
+
+    },
+
+    {
       name: "mark",
       description: "Mark last entry as flagged",
       options: [
@@ -2286,7 +2326,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -2446,7 +2486,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",
@@ -2518,7 +2558,7 @@ const completionSpec: Fig.Spec = {
           },
 
           {
-            name: ["--started"],
+            name: ["--since"],
             description: "Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]",
             args: {
                   name: "DATE_STRING",

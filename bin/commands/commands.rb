@@ -9,6 +9,41 @@ module Doing
       cmd.example 'doing commands remove COMMAND', desc: 'Specify a command to disable'
     end
 
+    def list_commands(args, style: :space)
+      available = Dir.glob(File.join(File.dirname(__FILE__), '*.rb')).map { |cmd| File.basename(cmd, '.rb') }
+      custom_dir = Doing.setting('plugins.command_path')
+      custom_commands = Dir.glob(File.join(File.expand_path(custom_dir), '*.rb'))
+      available.concat(custom_commands.map { |cmd| File.basename(cmd, '.rb') })
+      disabled = Doing.setting('disabled_commands')
+      disabled.each { |cmd| available.delete(cmd) }
+      available.delete_if { |cmd| cmd !~ /(#{args.join('|')})/i } if args.good?
+      case style
+      when :column
+        puts available.join("\n")
+      when :tab
+        puts available.join("\t")
+      when :comma
+        puts available.join(', ')
+      else
+        puts available.join(' ')
+      end
+    end
+
+    def list_disabled_commands(args, style: :space)
+      disabled = Doing.setting('disabled_commands')
+      disabled.delete_if { |cmd| cmd !~ /#{args}/i } if args.good?
+      case style
+      when :column
+        puts disabled.join("\n")
+      when :tab
+        puts disabled.join("\t")
+      when :comma
+        puts disabled.join(', ')
+      else
+        puts disabled.join(' ')
+      end
+    end
+
     def remove_command(args)
       available = Dir.glob(File.join(File.dirname(__FILE__), '*.rb')).map { |cmd| File.basename(cmd, '.rb') }
       cfg = Doing.settings
@@ -21,7 +56,7 @@ module Doing
                      args
                    else
                      Prompt.choose_from(available,
-                                        prompt: 'Select commands to enable',
+                                        prompt: 'Select commands to disable',
                                         multiple: true,
                                         sorted: true)
                    end
@@ -94,10 +129,29 @@ command :commands do |c|
 
   cmd.add_examples(c)
 
+  # @@commands.list
+  c.desc 'List enabled commands'
+  c.arg_name 'QUERY', optional: true, multiple: true
+  c.command %i[ls list] do |list|
+    list.desc 'List style (column, tab, comma, *space)'
+    list.flag %i[s style], must_match: /^[cts].*/
+
+    list.desc 'List disabled commands'
+    list.switch %i[d disabled]
+
+    list.action do |_global, options, args|
+      if options[:disabled]
+        cmd.list_disabled_commands(args, style: options[:style].normalize_list_style)
+      else
+        cmd.list_commands(args, style: options[:style].normalize_list_style)
+      end
+    end
+  end
+
   # @@commands.enable
   c.desc 'Enable Doing commands'
   c.long_desc 'Run without arguments to select commands from a list.'
-  c.arg_name 'COMMAND [COMMAND...]'
+  c.arg_name 'COMMAND [COMMAND...]', optional: true
   c.command %i[add enable] do |add|
     add.action do |_global, _options, args|
       cmd.add_command(args)
@@ -106,6 +160,7 @@ command :commands do |c|
 
   # @@commands.disable
   c.desc 'Disable Doing commands'
+  c.arg_name 'COMMAND [COMMAND...]', optional: true
   c.command %i[remove disable] do |remove|
     remove.action do |_global, _options, args|
       cmd.remove_command(args)

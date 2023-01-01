@@ -150,6 +150,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'grep search' -d Search\ f
 complete -xc doing -n '__fish_doing_needs_command' -a 'help' -d Shows\ a\ list\ of\ commands\ or\ help\ for\ one\ command
 complete -xc doing -n '__fish_doing_needs_command' -a 'import' -d Import\ entries\ from\ an\ external\ source
 complete -xc doing -n '__fish_doing_needs_command' -a 'last' -d Show\ the\ last\ entry
+complete -xc doing -n '__fish_doing_needs_command' -a 'later' -d Add\ an\ item\ to\ the\ Later\ section
 complete -xc doing -n '__fish_doing_needs_command' -a 'mark flag' -d Mark\ last\ entry\ as\ flagged
 complete -xc doing -n '__fish_doing_needs_command' -a 'meanwhile' -d Finish\ any\ running\ @meanwhile\ tasks\ and\ optionally\ create\ a\ new\ one
 complete -xc doing -n '__fish_doing_needs_command' -a 'note' -d Add\ a\ note\ to\ the\ last\ entry
@@ -179,7 +180,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'wiki' -d Output\ a\ tag\ 
 complete -xc doing -n '__fish_doing_needs_command' -a 'yesterday' -d List\ entries\ from\ yesterday
 complete -c doing -l noauto -s X -f  -n '__fish_doing_using_command again resume' -d Exclude\ auto\ tags\ and\ default\ tags
 complete -c doing -l ask  -f  -n '__fish_doing_using_command again resume' -d Prompt\ for\ note\ via\ multi-line\ input
-complete -c doing -l started  -f -r -n '__fish_doing_using_command again resume' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
+complete -c doing -l since  -f -r -n '__fish_doing_using_command again resume' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command again resume' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l case  -f -r -n '__fish_doing_using_command again resume' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command again resume' -d Edit\ entry\ with\ vim
@@ -241,7 +242,7 @@ complete -c doing -l noauto -s X -f  -n '__fish_doing_using_command done did' -d
 complete -c doing -l archive -s a -f  -n '__fish_doing_using_command done did' -d Immediately\ archive\ the\ entry
 complete -c doing -l ask  -f  -n '__fish_doing_using_command done did' -d Prompt\ for\ note\ via\ multi-line\ input
 complete -c doing -l finished  -f -r -n '__fish_doing_using_command done did' -d Set\ finish\ date\ to\ specific\ date/time
-complete -c doing -l started  -f -r -n '__fish_doing_using_command done did' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
+complete -c doing -l since  -f -r -n '__fish_doing_using_command done did' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
 complete -c doing -l date  -f  -n '__fish_doing_using_command done did' -d Include\ date
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command done did' -d Edit\ entry\ with\ vim
 complete -c doing -l from  -f -r -n '__fish_doing_using_command done did' -d Start\ and\ end\ times\ as\ a\ date/time\ range\ \`doing\ done\ --from\ \"1am\ to\ 8am\"\`
@@ -326,6 +327,10 @@ complete -c doing -l template  -f -r -n '__fish_doing_using_command last' -d Ove
 complete -c doing -l title  -f -r -n '__fish_doing_using_command last' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l val  -f -r -n '__fish_doing_using_command last' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command last' -d Force\ exact\ search\ string\ matching
+complete -c doing -l ask  -f  -n '__fish_doing_using_command later' -d Prompt\ for\ note\ via\ multi-line\ input
+complete -c doing -l started  -f -r -n '__fish_doing_using_command later' -d Backdate\ start\ time\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
+complete -c doing -l editor -s e -f  -n '__fish_doing_using_command later' -d Edit\ entry\ with\ vim
+complete -c doing -l note -s n -f -r -n '__fish_doing_using_command later' -d Note
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command mark flag' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l count -s c -f -r -n '__fish_doing_using_command mark flag' -d How\ many\ recent\ entries\ to\ tag
 complete -c doing -l case  -f -r -n '__fish_doing_using_command mark flag' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
@@ -343,7 +348,7 @@ complete -c doing -l exact -s x -f  -n '__fish_doing_using_command mark flag' -d
 complete -c doing -l noauto -s X -f  -n '__fish_doing_using_command meanwhile' -d Exclude\ auto\ tags\ and\ default\ tags
 complete -c doing -l archive -s a -f  -n '__fish_doing_using_command meanwhile' -d Archive\ previous\ @meanwhile\ entry
 complete -c doing -l ask  -f  -n '__fish_doing_using_command meanwhile' -d Prompt\ for\ note\ via\ multi-line\ input
-complete -c doing -l started  -f -r -n '__fish_doing_using_command meanwhile' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
+complete -c doing -l since  -f -r -n '__fish_doing_using_command meanwhile' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command meanwhile' -d Edit\ entry\ with\ vim
 complete -c doing -l note -s n -f -r -n '__fish_doing_using_command meanwhile' -d Include\ a\ note
 complete -c doing -l section -s s -f -r -n '__fish_doing_using_command meanwhile' -d Section
@@ -361,7 +366,7 @@ complete -c doing -l val  -f -r -n '__fish_doing_using_command note' -d Perform\
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command note' -d Force\ exact\ search\ string\ matching
 complete -c doing -l noauto -s X -f  -n '__fish_doing_using_command now next' -d Exclude\ auto\ tags\ and\ default\ tags
 complete -c doing -l ask  -f  -n '__fish_doing_using_command now next' -d Prompt\ for\ note\ via\ multi-line\ input
-complete -c doing -l started  -f -r -n '__fish_doing_using_command now next' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
+complete -c doing -l since  -f -r -n '__fish_doing_using_command now next' -d Backdate\ start\ date\ for\ new\ entry\ to\ date\ string\ \[4pm\|20m\|2h\|yesterday\ noon\]
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command now next' -d Edit\ entry\ with\ vim
 complete -c doing -l finish_last -s f -f  -n '__fish_doing_using_command now next' -d Timed\ entry
 complete -c doing -l from  -f -r -n '__fish_doing_using_command now next' -d Set\ a\ start\ and\ optionally\ end\ time\ as\ a\ date\ range

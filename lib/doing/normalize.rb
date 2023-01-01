@@ -27,6 +27,26 @@ module Doing
     end
 
     ##
+    ## Normalize list output style
+    ##
+    ## @param      default  The default
+    ##
+    ## @return [Symbol] :comma, :column, :tab, :space
+    ##
+    def normalize_list_style(default = :space)
+      case self
+      when /^com/i
+        :comma
+      when /^c/i
+        :column
+      when /^t/i
+        :tab
+      else
+        :space
+      end
+    end
+
+    ##
     ## Convert an age string to a qualified type
     ##
     ## @return     [Symbol] :oldest or :newest
