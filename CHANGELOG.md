@@ -1,3 +1,19 @@
+### 2.1.72
+
+2023-01-01 06:30
+
+#### NEW
+
+- `doing commands list [QUERY]` command to display enabled and disabled commands
+
+#### IMPROVED
+
+- Add --since as alias for --back on again, done, meanwhile and now
+
+#### FIXED
+
+- Comparison of Doing::Section to string
+
 ### 2.1.69
 
 2022-08-28 14:37
