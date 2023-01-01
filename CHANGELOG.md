@@ -4,11 +4,7 @@
 
 #### FIXED
 
-- Fixing gem release script
-
-#### NEW
-
-- `doing commands list [QUERY]` command to display enabled and disabled commands
+- Error running `commands list` without `--style` flag
 
 ### 2.1.69
 
