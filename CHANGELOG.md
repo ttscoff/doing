@@ -1,3 +1,11 @@
+### 2.1.73
+
+2023-01-01 07:10
+
+#### FIXED
+
+- Comparison of Doing::Section to string
+
 ### 2.1.72
 
 2023-01-01 06:30
