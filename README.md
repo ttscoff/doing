@@ -1,6 +1,6 @@
 # doing
 
-[![Gem](https://img.shields.io/gem/v/doing.svg)](https://rubygems.org/gems/howzit)
+[![Gem](https://img.shields.io/gem/v/doing.svg)](https://rubygems.org/gems/doing)
 [![Travis](https://app.travis-ci.com/ttscoff/doing.svg?branch=master)](https://travis-ci.org/makenew/ruby-gem)
 [![GitHub license](https://img.shields.io/github/license/ttscoff/doing.svg)](./LICENSE.txt)
 
