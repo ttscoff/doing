@@ -1,6 +1,6 @@
 # doing
 
-[![Gem](https://img.shields.io/gem/v/doing.svg)](https://rubygems.org/gems/howzit)
+[![Gem](https://img.shields.io/gem/v/doing.svg)](https://rubygems.org/gems/doing)
 [![Travis](https://app.travis-ci.com/ttscoff/doing.svg?branch=master)](https://travis-ci.org/makenew/ruby-gem)
 [![GitHub license](https://img.shields.io/github/license/ttscoff/doing.svg)](./LICENSE.txt)
 
@@ -12,7 +12,7 @@ _If you're one of the rare people like me who find this useful, feel free to
 
 <!--README-->
 
-The current version of `doing` is <!--VER-->2.1.74<!--END VER-->.
+The current version of `doing` is <!--VER-->2.1.75<!--END VER-->.
 
 Find all of the documentation in the [doing wiki][wiki].
 
