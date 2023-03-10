@@ -1,3 +1,11 @@
+### 2.1.76
+
+2023-03-10 15:16
+
+#### NEW
+
+- 'byday' export plugin to allow display of items grouped by day with total times
+
 ### 2.1.75
 
 2023-01-01 07:30

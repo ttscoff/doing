@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.75
+v2.1.76
 
 === Global Options
 === --config_file arg
@@ -945,7 +945,7 @@ Date range (natural language) to search, or a single day to filter on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1202,7 +1202,7 @@ Output using a template from configuration
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1662,7 +1662,7 @@ Time range to show `doing on --from "12pm to 4pm"`
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -1828,7 +1828,7 @@ Output using a template from configuration
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2185,7 +2185,7 @@ Move selected items to section
 
 ===== -o|--output FORMAT
 
-Output entries to format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output entries to format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2375,7 +2375,7 @@ Date range (natural language) to show, or a single day to filter on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2537,7 +2537,7 @@ Output using a template from configuration
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -2955,7 +2955,7 @@ Time range to show `doing today --from "12pm to 4pm"`
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -3139,7 +3139,7 @@ Date range (natural language) to show, or a single day to filter on.
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
@@ -3370,7 +3370,7 @@ Time range to show `doing yesterday --from "12pm to 4pm"`
 
 ===== -o|--output FORMAT
 
-Output to export format (csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
+Output to export format (byday|csv|dayone|dayone-days|dayone-entries|doing|html|json|markdown|say|taskpaper|template|timeline|wiki)
 
 [Default Value] None
 
