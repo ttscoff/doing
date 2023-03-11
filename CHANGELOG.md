@@ -1,3 +1,12 @@
+### 2.1.77
+
+2023-03-11 05:50
+
+#### IMPROVED
+
+- Formatting and color for byday table
+- Remove @done tag from byday items
+
 ### 2.1.76
 
 2023-03-10 15:16

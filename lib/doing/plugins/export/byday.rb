@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# title: Doing File Export
-# description: Export Doing format data
+# title: By Day Export
+# description: Export a table of items grouped by day with daily totals
 # author: Brett Terpstra
 # url: https://brettterpstra.com
 module Doing
