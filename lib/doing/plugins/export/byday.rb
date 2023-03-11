@@ -57,10 +57,9 @@ module Doing
         out << divider
       end
       all_total = "Grand Total: #{total.time_string(format: :clock)}"
-      out << divider
       out << "{wd}|{xrb}#{all_total.rjust(width + 20)}{wd}|{x}"
       out << divider
-      Doing::Pager.page Doing::Color.template(out.join("\n"))
+      Doing::Color.template(out.join("\n"))
     end
 
     Doing::Plugins.register 'byday', :export, self
