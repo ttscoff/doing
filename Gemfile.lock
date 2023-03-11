@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    doing (2.1.76)
+    doing (2.1.77)
       chronic (~> 0.10, >= 0.10.2)
       deep_merge (~> 1.2, >= 1.2.1)
       gli (~> 2.20, >= 2.20.1)
@@ -74,7 +74,7 @@ GEM
     tty-spinner (0.9.3)
       tty-cursor (~> 0.7)
     tty-which (0.5.0)
-    unicode-display_width (2.3.0)
+    unicode-display_width (2.4.2)
     unicode_utils (1.4.0)
     webrick (1.7.0)
     wisper (2.0.1)

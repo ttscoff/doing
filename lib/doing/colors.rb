@@ -223,7 +223,8 @@ module Doing
       ##
       def template(input)
         input = input.join(' ') if input.is_a? Array
-        fmt = input.gsub(/\{(\w+)\}/) do
+        fmt = input.gsub(/%/, '%%')
+        fmt = fmt.gsub(/(?<!\\u|\$)\{(\w+)\}/i) do
           Regexp.last_match(1).split('').map { |c| "%<#{c}>s" }.join('')
         end
 
@@ -231,9 +232,9 @@ module Doing
                    y: yellow, c: cyan, m: magenta, r: red,
                    W: bgwhite, K: bgblack, G: bggreen, L: bgblue,
                    Y: bgyellow, C: bgcyan, M: bgmagenta, R: bgred,
-                   b: bold, u: underline, i: italic, x: reset }
+                   d: dark, b: bold, u: underline, i: italic, x: reset }
 
-        format(fmt, colors)
+        fmt.empty? ? input : format(fmt, colors)
       end
     end
 
