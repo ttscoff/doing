@@ -137,14 +137,21 @@ module Doing
       opt[:totals] ||= false
       opt[:sort_tags] ||= false
 
-      cfg = Doing.setting('templates').deep_merge(Doing.setting('templates.default'), { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
-        'wrap_width' => Doing.setting('wrap_width') || 0,
-        'date_format' => Doing.setting('default_date_format'),
-        'order' => Doing.setting('order') || :asc,
-        'tags_color' => Doing.setting('tags_color'),
-        'duration' => Doing.setting('duration'),
-        'interval_format' => Doing.setting('interval_format')
-      }, { extend_existing_arrays: true, sort_merged_arrays: true })
+      cfg = Doing.setting('templates')
+                 .deep_merge(Doing.setting('templates.default'), {
+                               extend_existing_arrays: true,
+                               sort_merged_arrays: true
+                             }).deep_merge({
+                                             'wrap_width' => Doing.setting('wrap_width') || 0,
+                                             'date_format' => Doing.setting('default_date_format'),
+                                             'order' => Doing.setting('order') || :asc,
+                                             'tags_color' => Doing.setting('tags_color'),
+                                             'duration' => Doing.setting('duration'),
+                                             'interval_format' => Doing.setting('interval_format')
+                                           }, {
+                                             extend_existing_arrays: true,
+                                             sort_merged_arrays: true
+                                           })
 
       template = opt[:template] || cfg['template']
 

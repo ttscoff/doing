@@ -46,10 +46,12 @@ module Doing
       days.each do |day, day_items|
         first = day_items.slice!(0, 1)[0]
         interval = wwid.get_interval(first, formatted: true) || '00:00:00'
-        out << "{wd}|{xm}#{day}{wd}|{xbw}#{first.title.tag('done', remove: true).trunc(width - 2).ljust(width)}{wd}|{xy}#{interval}{wd}|{x}"
+        title = first.title.tag('done', remove: true).trunc(width - 2).ljust(width)
+        out << "{wd}|{xm}#{day}{wd}|{xbw}#{title}{wd}|{xy}#{interval}{wd}|{x}"
         day_items.each do |item|
           interval = wwid.get_interval(item, formatted: true) || '00:00:00'
-          out << "{wd}|          |{xbw}#{item.title.tag('done', remove: true).trunc(width - 2).ljust(width)}{wd}|{xy}#{interval}{wd}|{x}"
+          title = item.title.tag('done', remove: true).trunc(width - 2).ljust(width)
+          out << "{wd}|          |{xbw}#{title}{wd}|{xy}#{interval}{wd}|{x}"
         end
         day_total = "Total: #{totals[day].time_string(format: :clock)}"
         out << divider
@@ -57,10 +59,9 @@ module Doing
         out << divider
       end
       all_total = "Grand Total: #{total.time_string(format: :clock)}"
-      out << divider
       out << "{wd}|{xrb}#{all_total.rjust(width + 20)}{wd}|{x}"
       out << divider
-      Doing::Pager.page Doing::Color.template(out.join("\n"))
+      Doing::Color.template(out.join("\n"))
     end
 
     Doing::Plugins.register 'byday', :export, self

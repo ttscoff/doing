@@ -1,3 +1,11 @@
+### 2.1.80
+
+2023-03-11 10:50
+
+#### FIXED
+
+- Remove extra divider line before grand total in byday table
+
 ### 2.1.79
 
 2023-03-11 10:21
