@@ -8,7 +8,10 @@ module Doing
   class ByDayExport
     def self.settings
       {
-        trigger: 'byday'
+        trigger: 'byday',
+        config: {
+          'item_width' => 60
+        }
       }
     end
 
@@ -34,28 +37,28 @@ module Doing
           total += duration
         end
       end
-
-      divider = "{wd}+{xk}#{'-' *10}{wd}+{xk}#{'-' * 60}{wd}+{xk}#{'-' * 8}{wd}+{x}"
+      width = wwid.config['plugins']['byday']['item_width'].to_i || 60
+      divider = "{wd}+{xk}#{'-' *10}{wd}+{xk}#{'-' * width}{wd}+{xk}#{'-' * 8}{wd}+{x}"
       out = []
       out << divider
-      out << '{wd}|{xm}date      {wd}|{xbw}item                                                        {wd}|{xy}duration{wd}|{x}'
+      out << '{wd}|{xm}date      {wd}|{xbw}item#{' ' * (width - 4)}{wd}|{xy}duration{wd}|{x}'
       out << divider
       days.each do |day, day_items|
         first = day_items.slice!(0, 1)[0]
         interval = wwid.get_interval(first, formatted: true) || '00:00:00'
-        out << "{wd}|{xm}#{day}{wd}|{xbw}#{first.title.tag('done', remove: true).trunc(58).ljust(60)}{wd}|{xy}#{interval}{wd}|{x}"
+        out << "{wd}|{xm}#{day}{wd}|{xbw}#{first.title.tag('done', remove: true).trunc(width - 2).ljust(width)}{wd}|{xy}#{interval}{wd}|{x}"
         day_items.each do |item|
           interval = wwid.get_interval(item, formatted: true) || '00:00:00'
-          out << "{wd}|          |{xbw}#{item.title.tag('done', remove: true).trunc(58).ljust(60)}{wd}|{xy}#{interval}{wd}|{x}"
+          out << "{wd}|          |{xbw}#{item.title.tag('done', remove: true).trunc(width - 2).ljust(width)}{wd}|{xy}#{interval}{wd}|{x}"
         end
         day_total = "Total: #{totals[day].time_string(format: :clock)}"
         out << divider
-        out << "{wd}|{xg}#{day_total.rjust(80)}{wd}|{x}"
+        out << "{wd}|{xg}#{day_total.rjust(width + 20)}{wd}|{x}"
         out << divider
       end
       all_total = "Grand Total: #{total.time_string(format: :clock)}"
       out << divider
-      out << "{wd}|{xrb}#{all_total.rjust(80)}{wd}|{x}"
+      out << "{wd}|{xrb}#{all_total.rjust(width + 20)}{wd}|{x}"
       out << divider
       Doing::Pager.page Doing::Color.template(out.join("\n"))
     end
