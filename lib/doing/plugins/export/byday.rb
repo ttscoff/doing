@@ -41,7 +41,7 @@ module Doing
       divider = "{wd}+{xk}#{'-' *10}{wd}+{xk}#{'-' * width}{wd}+{xk}#{'-' * 8}{wd}+{x}"
       out = []
       out << divider
-      out << '{wd}|{xm}date      {wd}|{xbw}item#{' ' * (width - 4)}{wd}|{xy}duration{wd}|{x}'
+      out << "{wd}|{xm}date      {wd}|{xbw}item#{' ' * (width - 4)}{wd}|{xy}duration{wd}|{x}"
       out << divider
       days.each do |day, day_items|
         first = day_items.slice!(0, 1)[0]
