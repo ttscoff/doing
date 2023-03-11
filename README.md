@@ -12,7 +12,7 @@ _If you're one of the rare people like me who find this useful, feel free to
 
 <!--README-->
 
-The current version of `doing` is <!--VER-->2.1.77<!--END VER-->.
+The current version of `doing` is <!--VER-->2.1.78<!--END VER-->.
 
 Find all of the documentation in the [doing wiki][wiki].
 
