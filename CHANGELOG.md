@@ -1,3 +1,11 @@
+### 2.1.78
+
+2023-03-11 06:03
+
+#### IMPROVED
+
+- Add plugins.byday.item_width config for byday plugin
+
 ### 2.1.77
 
 2023-03-11 05:50
