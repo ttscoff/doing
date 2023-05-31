@@ -13,7 +13,7 @@ command :last do |c|
 
   c.desc 'Specify a section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   c.desc "Edit entry with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false

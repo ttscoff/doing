@@ -1,7 +1,7 @@
 # @@grep @@search
 desc 'Search for entries'
 long_desc %(
-Search all sections (or limit to a single section) for entries matching text or regular expression. Normal strings are fuzzy matched.
+Search all sections (or limit to a specific sections) for entries matching text or regular expression. Normal strings are fuzzy matched.
 
 To search with regular expressions, single quote the string and surround with slashes: `doing search '/\bm.*?x\b/'`
 )
@@ -11,10 +11,11 @@ command %i[grep search] do |c|
   c.example 'doing search "\'search command"', desc: 'Find entries containing "search command" using exact matching (search is an alias for grep)'
   c.example 'doing grep "/do.*?wiki.*?@done/"', desc: 'Find entries matching regular expression'
   c.example 'doing search --before 12/21 "doing wiki"', desc: 'Find entries containing "doing wiki" with entry dates before 12/21 of the current year'
+  c.example 'doing grep @project1 -s currently -s projects', desc: 'Search only in Currently and Projects'
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   # c.desc '[DEPRECATED] Use alternative fuzzy matching for search string'
   # c.switch [:fuzzy], default_value: false, negatable: false

@@ -9,7 +9,15 @@ module Doing
     ## @param      guessed  [Boolean] already guessed and failed
     ##
     def guess_section(frag, guessed: false, suggest: false)
-      return 'All' if frag =~ /^all$/i
+      if frag.is_a?(Array) && frag.count == 1
+        frag = frag[0]
+      end
+
+      frag = frag.split(/ *, */).map(&:strip) if frag.is_a?(String) && frag =~ /,/
+
+      return frag.map { |s| guess_section(s, guessed: guessed, suggest: suggest) } if frag.is_a?(Array)
+
+      return 'All' if frag =~ /^all$/i || frag.empty? || frag.nil?
 
       frag ||= Doing.setting('current_section')
 

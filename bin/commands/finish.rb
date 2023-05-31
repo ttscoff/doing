@@ -41,7 +41,7 @@ module Doing
 
       cmd.desc 'Section'
       cmd.arg_name 'NAME'
-      cmd.flag %i[s section]
+      cmd.flag %i[s section], multiple: true
 
       cmd.desc 'Select item(s) to finish from a menu of matching entries'
       cmd.switch %i[i interactive], negatable: false, default_value: false

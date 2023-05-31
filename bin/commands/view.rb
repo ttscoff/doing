@@ -9,7 +9,7 @@ command :view do |c|
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section]
+  c.flag %i[s section], multiple: true
 
   c.desc 'Count to display'
   c.arg_name 'COUNT'

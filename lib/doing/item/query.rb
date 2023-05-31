@@ -342,7 +342,7 @@ module Doing
       tags.each do |tag|
         return true if tag =~ /done/ && !should_finish?
 
-        return true if @title =~ /@#{tag.wildcard_to_rx}(?= |\(|\Z)/i
+        return true if @title =~ /@#{Regexp.escape(tag.wildcard_to_rx)}(?= |\(|\Z)/i
       end
       false
     end

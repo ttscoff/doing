@@ -4,7 +4,6 @@ require 'doing/version'
 require 'time'
 require 'date'
 require 'yaml'
-require 'pp'
 require 'csv'
 require 'tempfile'
 require 'zlib'
@@ -14,9 +13,9 @@ require 'readline'
 require 'haml'
 require 'json'
 require 'logger'
-require 'safe_yaml/load'
 require 'fcntl'
 require 'digest'
+require 'safe_yaml/load'
 
 require 'chronic'
 require 'tty-link'
@@ -59,6 +58,7 @@ require_relative 'doing/chronify/chronify'
 module Doing
   class << self
     attr_accessor :auto_tag
+
     #
     # Fetch the logger
     #

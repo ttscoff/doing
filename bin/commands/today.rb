@@ -10,7 +10,7 @@ command :today do |c|
 
   c.desc 'Specify a section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   add_options(:output_template, c, default_template: 'today')
   add_options(:time_filter, c)

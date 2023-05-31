@@ -38,7 +38,7 @@ command :show do |c|
 
   c.desc 'Only show entries within section'
   c.arg_name 'NAME'
-  c.flag %i[s section]
+  c.flag %i[s section], multiple: true
 
   c.desc 'Select section or tag to display from a menu'
   c.switch %i[m menu], negatable: false, default_value: false

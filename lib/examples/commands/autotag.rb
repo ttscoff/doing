@@ -8,7 +8,7 @@ command :autotag do |c|
   # to tag command.
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   c.desc 'How many recent entries to autotag (0 for all)'
   c.arg_name 'COUNT'

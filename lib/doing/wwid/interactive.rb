@@ -33,8 +33,9 @@ module Doing
       menu_options = %i[search query exact multiple show_if_single menu sort case].each_with_object({}) {
         |k, hsh| hsh[k] = opt[k]
       }
+      include_section = (opt[:section].is_a?(Array) && opt[:section][0] =~ /^all$/i) || (opt[:section].is_a?(String) && opt[:section] =~ /^all$/i)
 
-      selection = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, **menu_options)
+      selection = Prompt.choose_from_items(items, include_section: include_section, **menu_options)
 
       raise NoResults, 'no items selected' if selection.nil? || selection.empty?
 

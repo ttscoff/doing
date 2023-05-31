@@ -11,7 +11,7 @@ command :recent do |c|
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false

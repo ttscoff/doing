@@ -23,7 +23,7 @@ command :select do |c|
 
   c.desc 'Select from a specific section'
   c.arg_name 'SECTION'
-  c.flag %i[s section]
+  c.flag %i[s section], multiple: true
 
   c.desc 'Tag selected entries'
   c.arg_name 'TAG'

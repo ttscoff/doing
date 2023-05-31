@@ -82,7 +82,7 @@ module Doing
       res = if @options[:output] =~ /^j/i
               JSON.parse(@wwid.fork_editor(JSON.pretty_generate(@views), message: nil))
             else
-              YAML.safe_load(@wwid.fork_editor(YAML.dump(@views), message: nil))
+              Doing::Util.safe_load_file(@wwid.fork_editor(YAML.dump(@views), message: nil))
             end
       @args.each do |v|
         save_view(v, res)

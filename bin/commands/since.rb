@@ -9,7 +9,7 @@ command :since do |c|
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   add_options(:output_template, c)
   add_options(:time_display, c)

@@ -108,6 +108,7 @@ module Doing
       tags = []
       tags.concat(opt[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if opt[:tag]
       bool  = opt[:bool] || :and
+
       sect = opt[:section] !~ /^all$/i ? guess_section(opt[:section]) : 'all'
 
       section = guess_section(sect)
