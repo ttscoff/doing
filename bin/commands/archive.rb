@@ -39,7 +39,7 @@ command %i[archive move] do |c|
                     elsif args[0] =~ /^@\S+/
                       ['all', args.tags_to_array]
                     else
-                      [args.shift.cap_first, args.tags_to_array]
+                      [@wwid.guess_section(args.shift.cap_first), args.tags_to_array]
                     end
 
     raise InvalidArgument, '--keep and --count can not be used together' if options[:keep] && options[:count]

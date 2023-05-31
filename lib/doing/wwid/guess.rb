@@ -17,7 +17,7 @@ module Doing
 
       return frag.map { |s| guess_section(s, guessed: guessed, suggest: suggest) } if frag.is_a?(Array)
 
-      return 'All' if frag =~ /^all$/i || frag.empty? || frag.nil?
+      return 'All' if frag.empty? || frag.nil? || frag =~ /^all$/i
 
       frag ||= Doing.setting('current_section')
 
@@ -27,7 +27,10 @@ module Doing
 
       section = found ? found.title : nil
 
-      return section if suggest
+      if suggest
+        Doing.logger.debug('Match:', %(Assuming "#{sect.title}" from "#{frag}"))
+        return section
+      end
 
       unless section || guessed
         alt = guess_view(frag, guessed: true, suggest: true)

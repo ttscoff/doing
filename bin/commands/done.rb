@@ -21,7 +21,7 @@ command %i[done did] do |c|
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section], multiple: true
+  c.flag %i[s section]
 
   c.desc 'Finish last entry not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false

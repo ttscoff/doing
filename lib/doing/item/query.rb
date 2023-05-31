@@ -244,7 +244,7 @@ module Doing
 
       if keep && opt[:before]
         before = opt[:before]
-        cutoff = if before =~ time_rx
+        cutoff = if before.is_a?(String) && before =~ time_rx
                    "#{item.date.strftime('%Y-%m-%d')} #{before}".chronify(guess: :begin)
                  elsif before.is_a?(String)
                    before.chronify(guess: :begin)
@@ -257,7 +257,7 @@ module Doing
 
       if keep && opt[:after]
         after = opt[:after]
-        cutoff = if after =~ time_rx
+        cutoff = if after.is_a?(String) && after =~ time_rx
                    "#{item.date.strftime('%Y-%m-%d')} #{after}".chronify(guess: :end)
                  elsif after.is_a?(String)
                    after.chronify(guess: :end)
