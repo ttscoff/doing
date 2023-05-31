@@ -22,5 +22,14 @@ module Doing
         self
       end
     end
+
+    ##
+    ## Capitalize first letter of each element
+    ##
+    ## @return     [Array] capitalized items
+    ##
+    def cap_first
+      map(&:cap_first)
+    end
   end
 end

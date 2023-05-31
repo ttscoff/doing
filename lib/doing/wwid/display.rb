@@ -46,7 +46,9 @@ module Doing
       if opt[:section].nil?
         opt[:section] = choose_section
         title = opt[:section]
-      elsif opt[:section].instance_of?(String)
+      elsif opt[:section].is_a?(Array)
+        title = opt[:section].join(', ')
+      elsif opt[:section].is_a?(String)
         title = if opt[:section] =~ /^all$/i
                   if opt[:page_title]
                     opt[:page_title]
@@ -254,7 +256,8 @@ module Doing
     ## @param      section  [String] Section to pull from, default Currently
     ##
     def last(times: true, section: nil, options: {})
-      section = section.nil? || section =~ /all/i ? 'All' : guess_section(section)
+      section = section[0] if section.is_a?(Array) && section.count == 1
+      section = section.nil? ? 'All' : guess_section(section)
       cfg = Doing.setting(['templates', options[:config_template]]).deep_merge(Doing.setting('templates.default'), { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
         'wrap_width' => Doing.setting('wrap_width', 0),
         'date_format' => Doing.setting('default_date_format'),

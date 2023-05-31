@@ -14,7 +14,7 @@ command :cancel do |c|
 
   c.desc 'Section'
   c.arg_name 'NAME'
-  c.flag %i[s section]
+  c.flag %i[s section], multiple: true
 
   c.desc 'Cancel last entry (or entries) not already marked @done'
   c.switch %i[u unfinished], negatable: false, default_value: false

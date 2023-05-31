@@ -17,7 +17,7 @@ command %i[again resume] do |c|
 
   c.desc 'Get last entry from a specific section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   c.desc 'Add new entry to section (default: same section as repeated entry)'
   c.arg_name 'SECTION_NAME'

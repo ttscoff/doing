@@ -63,8 +63,15 @@ module Doing
       time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/i
 
       if items.nil? || items.empty?
-        section = opt[:section] ? guess_section(opt[:section]) : 'All'
-        items = section =~ /^all$/i ? @content.clone : @content.in_section(section)
+        section = !opt[:section] || opt[:section].empty? ? 'All' : guess_section(opt[:section])
+        if section.is_a?(Array)
+          section.each do |s|
+            s = s[0] if s.is_a?(Array)
+            items.concat(s =~ /^all$/i ? @content.clone : @content.in_section(s))
+          end
+        else
+          items = section =~ /^all$/i ? @content.clone : @content.in_section(section)
+        end
       end
 
       unless opt[:time_filter]

@@ -1,3 +1,11 @@
+### 2.1.81
+
+2023-05-31 11:47
+
+#### IMPROVED
+
+- Most commands that allow --section can now take multiple values, either by using --section multiple times or providing a comma separated list of sections to the flag
+
 ### 2.1.80
 
 2023-03-11 10:50

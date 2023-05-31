@@ -296,19 +296,15 @@ module Doing
       "\e[#{is_bg ? '48' : '38'};2;#{t.join(';')}m"
     end
 
-    # Regular expression that is used to scan for ANSI-sequences while
-    # uncoloring strings.
-    COLORED_REGEXP = /\e\[(?:(?:[349]|10)[0-7]|[0-9])?m/.freeze
-
     # Returns an uncolored version of the string, that is all
     # ANSI-sequences are stripped from the string.
     def uncolor(string = nil) # :yields:
       if block_given?
-        yield.to_str.gsub(COLORED_REGEXP, '')
+        yield.to_str.gsub(ESCAPE_REGEX, '')
       elsif string.respond_to?(:to_str)
-        string.to_str.gsub(COLORED_REGEXP, '')
+        string.to_str.gsub(ESCAPE_REGEX, '')
       elsif respond_to?(:to_str)
-        to_str.gsub(COLORED_REGEXP, '')
+        to_str.gsub(ESCAPE_REGEX, '')
       else
         ''
       end

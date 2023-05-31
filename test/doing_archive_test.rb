@@ -44,7 +44,7 @@ class DoingArchiveTest < Test::Unit::TestCase
     result = doing('--stdout', 'archive', '--tag', 'writing,bunch', '--bool', 'or')
     assert_match(/Archived: 3 items/, result, "Should have archived 3 items")
     assert_count_entries(5, doing('show', 'archive'), 'Archive should contain 5 items')
-    assert_count_entries(entries - 5, doing('show'), "Currently shoud contain #{entries - 5} items")
+    assert_count_entries(entries - 5, doing('show'), "Currently should contain #{entries - 5} items")
     assert_valid_file(@wwid_file)
   end
 

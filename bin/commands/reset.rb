@@ -12,7 +12,7 @@ command %i[reset begin] do |c|
 
   c.desc 'Limit search to section'
   c.arg_name 'NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   c.desc 'Resume entry (remove @done)'
   c.switch %i[r resume], default_value: true

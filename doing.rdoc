@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.80
+v2.1.81
 
 === Global Options
 === --config_file arg
@@ -889,7 +889,7 @@ Force exact search string matching (case sensitive)
 ==== Command: <tt>grep|search  SEARCH_PATTERN</tt>
 Search for entries
 
-Search all sections (or limit to a single section) for entries matching text or regular expression. Normal strings are fuzzy matched.
+Search all sections (or limit to a specific sections) for entries matching text or regular expression. Normal strings are fuzzy matched.
 
 To search with regular expressions, single quote the string and surround with slashes: `doing search '/m.*?x/'`
 ===== Options

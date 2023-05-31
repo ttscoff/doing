@@ -38,7 +38,7 @@ command :show do |c|
 
   c.desc 'Only show entries within section'
   c.arg_name 'NAME'
-  c.flag %i[s section]
+  c.flag %i[s section], multiple: true
 
   c.desc 'Select section or tag to display from a menu'
   c.switch %i[m menu], negatable: false, default_value: false
@@ -75,7 +75,8 @@ command :show do |c|
       when /^[@+-]/
         section = options[:section] ? @wwid.guess_section(options[:section]) : 'All'
       else
-        sect = options[:section] ? options[:section] : args[0]
+        sect = options[:section].empty? ? args[0] : options[:section]
+
         begin
           section = @wwid.guess_section(sect)
         rescue WrongCommand
@@ -88,6 +89,7 @@ command :show do |c|
 
         args.shift
       end
+
       if args.length.positive?
         args.each do |arg|
           arg.split(/,/).each do |tag|
@@ -96,7 +98,7 @@ command :show do |c|
         end
       end
     else
-      if options[:section]
+      if options[:section] && !options[:section].empty?
         section = @wwid.guess_section(options[:section]) || 'All'
       else
         section = options[:menu] ? @wwid.choose_section(include_all: true) : Doing.setting('current_section')

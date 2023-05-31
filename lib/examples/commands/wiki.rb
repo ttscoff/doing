@@ -2,7 +2,7 @@ desc 'Output a tag wiki'
 command :wiki do |c|
   c.desc 'Section to rotate'
   c.arg_name 'SECTION_NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   c.desc 'Tag filter, combine multiple tags with a comma, use with --bool'
   c.arg_name 'TAG'

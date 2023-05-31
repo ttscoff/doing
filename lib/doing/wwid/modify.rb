@@ -421,7 +421,8 @@ module Doing
       tags        = options[:tags] || []
       bool        = options[:bool] || :and
 
-      section = choose_section if section.nil? || section =~ /choose/i
+      section = section[0] if section.is_a?(Array) && section.count == 1
+      section = choose_section if section.nil? || section.empty? || section.is_a?(String) && section =~ /choose/i
       archive_all = section =~ /^all$/i # && !(tags.nil? || tags.empty?)
       section = guess_section(section) unless archive_all
 

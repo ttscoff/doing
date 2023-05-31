@@ -23,7 +23,7 @@ command :tag do |c|
 
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   c.desc 'How many recent entries to tag (0 for all)'
   c.arg_name 'COUNT'
@@ -73,25 +73,18 @@ command :tag do |c|
       section = @wwid.guess_section(options[:section]) || options[:section].cap_first
     end
 
-
-    if options[:tag].nil?
-      search_tags = []
-    else
-      search_tags = options[:tag]
-    end
+    search_tags = options[:tag].nil? ? [] : options[:tag]
 
     if options[:autotag]
       tags = []
     else
-      if args.empty?
-        tags = []
-      else
-        tags = if args.join('') =~ /,/
-                 args.join('').split(/ *, */)
-               else
-                 args.join(' ').split(' ') # in case tags are quoted as one arg
-               end
-      end
+      tags = if args.empty?
+               []
+             elsif args.join('') =~ /,/
+               args.join('').split(/ *, */)
+             else
+               args.join(' ').split(' ') # in case tags are quoted as one arg
+             end
 
       tags.map! { |tag| tag.sub(/^@/, '').strip }
     end

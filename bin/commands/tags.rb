@@ -4,7 +4,7 @@ arg_name 'MAX_COUNT', optional: true, type: Integer
 command :tags do |c|
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'
-  c.flag %i[s section], default_value: 'All'
+  c.flag %i[s section], default_value: 'All', multiple: true
 
   c.desc 'Show count of occurrences'
   c.switch %i[c counts]
