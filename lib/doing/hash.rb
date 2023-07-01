@@ -99,7 +99,7 @@ module Doing
     #
     def deep_set(path, value)
       if path.count == 1
-        if value.nil? || value =~ /^ *$/
+        if value.nil? || (value.is_a?(String) && value =~ /^ *$/) || (value.is_a?(Array) && value.empty?)
           delete(path[0])
         else
           self[path[0]] = value
