@@ -1,6 +1,10 @@
 ### 2.1.82
 
-2023-07-01 12:21
+2023-07-01 12:39
+
+#### IMPROVED
+
+- Better handling of defaults for normalize functions
 
 #### FIXED
 
