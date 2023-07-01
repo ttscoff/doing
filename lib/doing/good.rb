@@ -5,7 +5,7 @@ module Doing
   class ::Numeric
     # Test of number is positive
     def good?
-      positive?
+      self >= 0
     end
   end
 
