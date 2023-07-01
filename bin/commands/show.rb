@@ -68,7 +68,7 @@ command :show do |c|
       when /^all$/i
         section = 'All'
         args.shift
-      when /^(choose|pick)$/i
+      when /^(choose|pick|menu)$/i
         section = @wwid.choose_section(include_all: true)
 
         args.shift
@@ -98,11 +98,11 @@ command :show do |c|
         end
       end
     else
-      if options[:section] && !options[:section].empty?
-        section = @wwid.guess_section(options[:section]) || 'All'
-      else
-        section = options[:menu] ? @wwid.choose_section(include_all: true) : Doing.setting('current_section')
-      end
+      section = if options[:section] && !options[:section].empty?
+                  @wwid.guess_section(options[:section]) || 'All'
+                else
+                  options[:menu] ? @wwid.choose_section(include_all: true) : Doing.setting('current_section')
+                end
       section ||= 'All'
     end
 
@@ -111,11 +111,11 @@ command :show do |c|
     options[:times] = true if options[:totals]
 
     template = Doing.setting(['templates', options[:config_template]]).deep_merge({
-                                                    'wrap_width' => Doing.setting('wrap_width') || 0,
-                                                    'date_format' => Doing.setting('default_date_format'),
-                                                    'order' => Doing.setting('order')&.normalize_order || :asc,
-                                                    'tags_color' => Doing.setting('tags_color')
-                                                  })
+                              'wrap_width' => Doing.setting('wrap_width') || 0,
+                              'date_format' => Doing.setting('default_date_format'),
+                              'order' => Doing.setting('order')&.normalize_order || :asc,
+                              'tags_color' => Doing.setting('tags_color')
+                            })
 
     if options[:search]
       search = options[:search]

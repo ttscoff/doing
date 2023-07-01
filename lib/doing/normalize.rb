@@ -17,7 +17,7 @@ module Doing
       when /^t/i
         :time
       else
-        default
+        default.is_a?(Symbol) ? default : default.normalize_tag_sort
       end
     end
 
@@ -35,14 +35,14 @@ module Doing
     ##
     def normalize_list_style(default = :space)
       case self
-      when /^com/i
+      when /^c(om|sv)/i
         :comma
       when /^c/i
         :column
       when /^t/i
         :tab
       else
-        :space
+        default.is_a?(Symbol) ? default : default.normalize_list_style
       end
     end
 
@@ -58,7 +58,7 @@ module Doing
       when /^n/i
         :newest
       else
-        default
+        default.is_a?(Symbol) ? default : default.normalize_age
       end
     end
 
@@ -83,7 +83,7 @@ module Doing
       when /^d/i
         :desc
       else
-        default
+        default.is_a?(Symbol) ? default : default.normalize_order
       end
     end
 

@@ -70,7 +70,7 @@ module Doing
 
     class InvalidPlugin < DoingRuntimeError
       def initialize(kind = 'output', msg = nil)
-        super(%(Invalid #{kind} type (#{msg})), 128, topic: 'Invalid:')
+        super(%(Invalid #{kind} type (#{msg})), 128, topic: 'Plugin:')
       end
     end
 

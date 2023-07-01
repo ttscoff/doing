@@ -158,7 +158,7 @@ module Doing
 
     def tag_filter_to_options
       hsh = dup
-      if hsh.key?(:tag_filter)
+      if hsh.key?(:tag_filter) && hsh[:tag_filter]
         hsh[:tags] = hsh[:tag_filter][:tags]
         hsh[:bool] = hsh[:tag_filter][:bool]
         hsh.delete(:tag_filter)
@@ -173,8 +173,8 @@ module Doing
     ##
     def to_view
       hsh = symbolize_keys
-      %w[x save c a s o h e editor m menu i interactive d delete t fuzzy time_filter sort_tags].each do |key|
-        hsh.delete(key.to_sym) if hsh.key?(key.to_sym)
+      %i[x save c a s o h e editor m menu i interactive d delete t fuzzy time_filter sort_tags].each do |key|
+        hsh.delete(key) if hsh.key?(key)
       end
 
       hsh.delete_unless_key(:tag, %i[bool])
