@@ -1,3 +1,11 @@
+### 2.1.83
+
+2023-07-01 12:49
+
+#### FIXED
+
+- Error on deep_set when value is an array
+
 ### 2.1.82
 
 2023-07-01 12:39
