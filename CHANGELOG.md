@@ -1,3 +1,11 @@
+### 2.1.82
+
+2023-07-01 12:21
+
+#### FIXED
+
+- Allow value of 0 to be considered a good result when testing for good values
+
 ### 2.1.81
 
 2023-05-31 11:47
