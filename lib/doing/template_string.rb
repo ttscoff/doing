@@ -116,7 +116,8 @@ module Doing
           pad = m['width'].to_i
           mark = m['mchar'] || ''
           if placeholder == 'shortdate' && m['width'].nil?
-            pad = 13
+            fmt_string = Doing.setting('shortdate_format.older', '%m/%d/%y %_I:%M%P', exact: true)
+            pad = Date.today.strftime(fmt_string).length
           end
           indent = nil
           if m['ichar']

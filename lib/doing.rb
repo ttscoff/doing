@@ -106,14 +106,14 @@ module Doing
     ## @param      default  A default value to return if the
     ##                      provided path returns nil result
     ##
-    def setting(keypath, default = nil)
+    def setting(keypath, default = nil, exact: false)
       cfg = config.settings
       case keypath
       when Array
         cfg.dig(*keypath) || default
       when String
         unless keypath =~ /^[.*]?$/
-          real_path = config.resolve_key_path(keypath, create: false)
+          real_path = config.resolve_key_path(keypath, create: false, distance: 0, exact: exact)
           return default unless real_path&.count&.positive?
 
           cfg = cfg.dig(*real_path)

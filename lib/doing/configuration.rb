@@ -44,6 +44,15 @@ module Doing
       'timer_format' => 'text',
       'interval_format' => 'text',
 
+      'order' => 'asc',
+
+      'shortdate_format' => {
+        'today' => '%_I:%M%P',
+        'this_week' => '%a %_I:%M%P',
+        'this_month' => '%m/%d %_I:%M%P',
+        'older' => '%m/%d/%y %_I:%M%P'
+      },
+
       'templates' => {
         'default' => {
           'date_format' => '%Y-%m-%d %H:%M',
@@ -200,7 +209,7 @@ module Doing
     ##                      matched, first match wins)
     ## @return     [Array] ordered array of resolved keys
     ##
-    def resolve_key_path(keypath, create: false, distance: 2)
+    def resolve_key_path(keypath, create: false, distance: 2, exact: false)
       cfg = @settings
       real_path = []
       unless keypath =~ /^[.*]?$/
@@ -211,7 +220,11 @@ module Doing
           new_cfg = nil
 
           if cfg.is_a?(Hash)
-            matches = cfg.select { |key, val| key =~ path.to_rx(distance: distance) }
+            matches = if exact
+                        cfg.select { |key, _| key == path }
+                      else
+                        cfg.select { |key, _| key =~ path.to_rx(distance: distance) }
+                      end
             if matches.count.positive?
               shortest = matches.keys.group_by(&:length).min.last[0]
               real_path << shortest
