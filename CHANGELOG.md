@@ -1,3 +1,11 @@
+### 2.1.84
+
+2023-08-17 09:49
+
+#### NEW
+
+- Shortdate format config options (run `doing config update` and see the new `shortdate_format` section in your config file)
+
 ### 2.1.83
 
 2023-07-01 12:49
