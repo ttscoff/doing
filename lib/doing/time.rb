@@ -12,13 +12,13 @@ module Doing
     #
     def relative_date
       if self > Date.today.to_time
-        strftime('%_I:%M%P')
+        strftime(Doing.setting('shortdate_format.today', '%_I:%M%P', exact: true))
       elsif self > (Date.today - 6).to_time
-        strftime('%a %_I:%M%P')
+        strftime(Doing.setting('shortdate_format.this_week', '%a %_I:%M%P', exact: true))
       elsif year == Date.today.year || (year + 1 == Date.today.year && month > Date.today.month)
-        strftime('%m/%d %_I:%M%P')
+        strftime(Doing.setting('shortdate_format.this_month', '%m/%d %_I:%M%P', exact: true))
       else
-        strftime('%m/%d/%y %_I:%M%P')
+        strftime(Doing.setting('shortdate_format.older', '%m/%d/%y %_I:%M%P', exact: true))
       end
     end
 
