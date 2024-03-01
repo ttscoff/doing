@@ -29,7 +29,7 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency('redcarpet', '~> 3.5', '>= 3.5.1')
   s.add_development_dependency('test-unit', '~> 3.4.4')
   s.add_development_dependency('tty-spinner', '~> 0.9', '>= 0.9.3')
-  s.add_development_dependency('yard', '~> 0.9', '>= 0.9.26')
+  s.add_development_dependency('yard', '~> 0.9', '>= 0.9.36')
   s.add_runtime_dependency('chronic', '~> 0.10', '>= 0.10.2')
   s.add_runtime_dependency('deep_merge', '~> 1.2', '>= 1.2.1')
   s.add_runtime_dependency('gli', '~> 2.20', '>= 2.20.1')
