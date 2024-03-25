@@ -37,7 +37,7 @@ GEM
     plist (3.7.0)
     power_assert (2.0.3)
     rake (13.0.6)
-    rdoc (6.3.3)
+    rdoc (6.3.4.1)
     redcarpet (3.6.0)
     rexml (3.2.5)
     rouge (4.1.2)
