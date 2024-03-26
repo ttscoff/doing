@@ -4464,6 +4464,36 @@ const completionSpec: Fig.Spec = {
     },
 
     {
+      name: "todo",
+      description: "Add an item as a Todo",
+      options: [
+          {
+            name: ["--ask"],
+            description: "Prompt for note via multi-line input",
+            
+          },
+
+          {
+            name: ["-e", "--editor"],
+            description: "Edit entry with vim",
+            
+          },
+
+          {
+            name: ["-n", "--note"],
+            description: "Note",
+            args: {
+                  name: "TEXT",
+                  description: "TEXT",
+            },
+
+          },
+
+        ],
+
+    },
+
+    {
       name: "undo",
       description: "Undo the last X changes to the Doing file",
       options: [
