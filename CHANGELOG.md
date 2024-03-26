@@ -1,6 +1,10 @@
 ### 2.1.85
 
-2024-03-26 10:02
+2024-03-26 10:17
+
+#### NEW
+
+- Add todo as an example command plugin
 
 #### FIXED
 
