@@ -1,3 +1,15 @@
+### 2.1.85
+
+2024-03-26 10:17
+
+#### NEW
+
+- Add todo as an example command plugin
+
+#### FIXED
+
+- Error thrown when trying to guess a section/view when there's no match.
+
 ### 2.1.84
 
 2023-08-17 09:49
