@@ -27,8 +27,8 @@ module Doing
 
       section = found ? found.title : nil
 
-      if suggest
-        Doing.logger.debug('Match:', %(Assuming "#{sect.title}" from "#{frag}"))
+      if section && suggest
+        Doing.logger.debug('Match:', %(Assuming "#{section}" from "#{frag}"))
         return section
       end
 
@@ -53,7 +53,7 @@ module Doing
 
         raise Errors::InvalidSection.new("unknown section #{frag.bold.white}", topic: 'Missing:')
       end
-      section ? section.cap_first : guessed
+      section ? section.cap_first : nil
     end
 
     ##
