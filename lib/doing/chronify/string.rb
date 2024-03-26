@@ -206,7 +206,7 @@ module Doing
           finish = '11:59pm'
         else
           start = date_string.strip.chronify(guess: :begin, future: false)
-          finish = date_string.strip.chronify(guess: :end)
+          finish = nil
         end
         raise Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
 
