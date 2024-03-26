@@ -206,7 +206,7 @@ module Doing
           finish = '11:59pm'
         else
           start = date_string.strip.chronify(guess: :begin, future: false)
-          finish = nil
+          finish = start + (24 * 60 * 60)
         end
         raise Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
 
@@ -214,9 +214,11 @@ module Doing
 
 
       if start.is_a? String
-        Doing.logger.debug('Parser:', "--from string interpreted as time span, from #{start || '12am'} to #{finish || '11:59pm'}")
+        Doing.logger.debug('Parser:',
+                           "--from string interpreted as time span, from #{start || '12am'} to #{finish || '11:59pm'}")
       else
-        Doing.logger.debug('Parser:', "date range interpreted as #{start.strftime('%F %R')} -- #{finish ? finish.strftime('%F %R') : 'now'}")
+        Doing.logger.debug('Parser:',
+                           "date range interpreted as #{start.strftime('%F %R')} -- #{finish ? finish.strftime('%F %R') : 'now'}")
       end
       [start, finish]
     end
