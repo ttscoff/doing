@@ -368,6 +368,16 @@ _doing_today() {
   fi
 }
 
+_doing_todo() {
+  
+  if [[ "$token" == --* ]]; then
+    COMPREPLY=( $( compgen -W '--ask --editor --note' -- $token ) )
+  elif [[ "$token" == -* ]]; then
+    COMPREPLY=( $( compgen -W '-e -n --ask --editor --note' -- $token ) )
+  
+  fi
+}
+
 _doing_undo() {
   
   if [[ "$token" == --* ]]; then
@@ -486,6 +496,7 @@ _doing()
     elif [[ $last =~ (tags) ]]; then _doing_tags
     elif [[ $last =~ (template) ]]; then _doing_template
     elif [[ $last =~ (today) ]]; then _doing_today
+    elif [[ $last =~ (todo) ]]; then _doing_todo
     elif [[ $last =~ (undo) ]]; then _doing_undo
     elif [[ $last =~ (update) ]]; then _doing_update
     elif [[ $last =~ (view) ]]; then _doing_view

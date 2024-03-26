@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.84
+v2.1.86
 
 === Global Options
 === --config_file arg
@@ -3021,6 +3021,28 @@ Show time intervals on @done tasks
 
 ===== --totals
 Show time totals at the end of output
+
+
+
+==== Command: <tt>todo  ENTRY</tt>
+Add an item as a Todo
+
+Adds an item to a Todo section, and tags it with @todo
+===== Options
+===== -n|--note TEXT
+
+Note
+
+[Default Value] None
+
+
+===== --ask
+Prompt for note via multi-line input
+
+
+
+===== -e|--editor
+Edit entry with vim
 
 
 

@@ -52,6 +52,7 @@ function _doing() {
                   'template:Output HTML'
                   'test:Test Stuff'
                   'today:List entries from today'
+                  'todo:Add an item as a Todo'
                   'undo:Undo the last X changes to the Doing file'
                   'update:Update doing to the latest version'
                   'view:Display a user-created view'
@@ -201,6 +202,9 @@ function _doing() {
             ;;
             today) 
                 args=( "--after[View entries after specified time]:TIME_STRING:" "--before[View entries before specified time]:TIME_STRING:" "--config_template[Output using a template from configuration]:TEMPLATE_KEY:" "--duration[Show elapsed time on entries without @done tag]" "--from[Time range to show `doing today --from \"12pm to 4pm\"`]:TIME_RANGE:" {'(--output)-o','(-o)--output'}"[Output to export format]:FORMAT:" "--only_timed[Only show items with recorded time intervals]" {'(--section)-s','(-s)--section'}"[Specify a section]:NAME:" "--save[Save all current command line options as a new view]:VIEW_NAME:" {'(--times)-t','(-t)--times'}"[Show time intervals on @done tasks]" "--tag_order[Tag sort direction]:DIRECTION:" "--tag_sort[Sort tags by]:KEY:" "--template[Override output format with a template string containing %placeholders]:TEMPLATE_STRING:" "--title[Title string to be used for output formats that require it]:TITLE:" "--totals[Show time totals at the end of output]" )
+            ;;
+            todo) 
+                args=( "--ask[Prompt for note via multi-line input]" {'(--editor)-e','(-e)--editor'}"[Edit entry with vim]" {'(--note)-n','(-n)--note'}"[Note]:TEXT:" )
             ;;
             undo) 
                 args=( {'(--file)-f','(-f)--file'}"[Specify alternate doing file]:PATH:" {'(--interactive)-i','(-i)--interactive'}"[Select from recent backups]" {'(--prune)-p','(-p)--prune'}"[Remove old backups]:COUNT:" {'(--redo)-r','(-r)--redo'}"[Redo last undo]" )

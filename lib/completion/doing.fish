@@ -172,6 +172,7 @@ complete -xc doing -n '__fish_doing_needs_command' -a 'tags' -d List\ all\ tags\
 complete -xc doing -n '__fish_doing_needs_command' -a 'template' -d Output\ HTML
 complete -xc doing -n '__fish_doing_needs_command' -a 'test' -d Test\ Stuff
 complete -xc doing -n '__fish_doing_needs_command' -a 'today' -d List\ entries\ from\ today
+complete -xc doing -n '__fish_doing_needs_command' -a 'todo' -d Add\ an\ item\ as\ a\ Todo
 complete -xc doing -n '__fish_doing_needs_command' -a 'undo' -d Undo\ the\ last\ X\ changes\ to\ the\ Doing\ file
 complete -xc doing -n '__fish_doing_needs_command' -a 'update' -d Update\ doing\ to\ the\ latest\ version
 complete -xc doing -n '__fish_doing_needs_command' -a 'view' -d Display\ a\ user-created\ view
@@ -561,6 +562,9 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command today' -d So
 complete -c doing -l template  -f -r -n '__fish_doing_using_command today' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l title  -f -r -n '__fish_doing_using_command today' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l totals  -f  -n '__fish_doing_using_command today' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l ask  -f  -n '__fish_doing_using_command todo' -d Prompt\ for\ note\ via\ multi-line\ input
+complete -c doing -l editor -s e -f  -n '__fish_doing_using_command todo' -d Edit\ entry\ with\ vim
+complete -c doing -l note -s n -f -r -n '__fish_doing_using_command todo' -d Note
 complete -c doing -l file -s f -f -r -n '__fish_doing_using_command undo' -d Specify\ alternate\ doing\ file
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command undo' -d Select\ from\ recent\ backups
 complete -c doing -l prune -s p -f -r -n '__fish_doing_using_command undo' -d Remove\ old\ backups

@@ -1,3 +1,11 @@
+### 2.1.86
+
+2024-03-26 10:57
+
+#### FIXED
+
+- Unterminated date range, e.g. `--from today` will now assume current time as end date. Results of `doing show all --from today` will now match `doing today`.
+
 ### 2.1.85
 
 2024-03-26 10:17
