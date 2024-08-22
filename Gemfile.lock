@@ -39,7 +39,7 @@ GEM
     rake (13.0.6)
     rdoc (6.3.4.1)
     redcarpet (3.6.0)
-    rexml (3.3.3)
+    rexml (3.3.6)
       strscan
     rouge (4.2.0)
     safe_yaml (1.0.5)
