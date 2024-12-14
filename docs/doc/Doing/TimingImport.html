@@ -6,7 +6,7 @@
 <title>
   Class: Doing::TimingImport
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -255,7 +255,169 @@ file</p>
 </ul>
 
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/plugins/import/timing_import.rb', line 25</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_import'>import</span><span class='lparen'>(</span><span class='id identifier rubyid_wwid'>wwid</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='label'>options:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_exit_now!'>exit_now!</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Path to JSON report required</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_section'>section</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:section</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>current_section</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:no_overlap</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='kw'>false</span>
+  <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:autotag</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_auto_tag'>auto_tag</span>
+  <span class='id identifier rubyid_wwid'>wwid</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_add_section'>add_section</span><span class='lparen'>(</span><span class='id identifier rubyid_section'>section</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_wwid'>wwid</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_section?'>section?</span><span class='lparen'>(</span><span class='id identifier rubyid_section'>section</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_add_tags'>add_tags</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:tag</span><span class='rbracket'>]</span> <span class='op'>?</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:tag</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[ ,]+</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^@?</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_prefix'>prefix</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:prefix</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>[Timing.app]</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_exit_now!'>exit_now!</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>File not found</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='const'>IO</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_new_items'>new_items</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span>
+    <span class='comment'># Only process task entries
+</span>    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>activityType</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>activityType</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Task</span><span class='tstring_end'>&#39;</span></span>
+    <span class='comment'># Only process entries with a start and end date
+</span>    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>startDate</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>endDate</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+    <span class='comment'># Round down seconds and convert UTC to local time
+</span>    <span class='id identifier rubyid_start_time'>start_time</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>startDate</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>:\d\dZ$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>:00Z</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_getlocal'>getlocal</span>
+    <span class='id identifier rubyid_end_time'>end_time</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>endDate</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>:\d\dZ$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>:00Z</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_getlocal'>getlocal</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_start_time'>start_time</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_time'>end_time</span>
+
+    <span class='id identifier rubyid_tags'>tags</span> <span class='op'>=</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>project</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> ▸ </span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_proj'>proj</span><span class='op'>|</span> <span class='id identifier rubyid_proj'>proj</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[^a-z0-9]+</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_tags'>tags</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_add_tags'>add_tags</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_title'>title</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_prefix'>prefix</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_title'>title</span> <span class='op'>+=</span> <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>activityTitle</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>activityTitle</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(Untitled Task)</span><span class='tstring_end'>&#39;</span></span> <span class='op'>?</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>activityTitle</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Working on</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_tags'>tags</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tag'>tag</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_title'>title</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\b</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='embexpr_end'>}</span><span class='tstring_content'>\b</span><span class='regexp_end'>/i</span></span>
+        <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_sub!'>sub!</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\b</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='embexpr_end'>}</span><span class='tstring_content'>\b</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_title'>title</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> @</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag'>tag</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_title'>title</span> <span class='op'>=</span> <span class='id identifier rubyid_wwid'>wwid</span><span class='period'>.</span><span class='id identifier rubyid_autotag'>autotag</span><span class='lparen'>(</span><span class='id identifier rubyid_title'>title</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:autotag</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_title'>title</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> @done(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_end_time'>end_time</span><span class='period'>.</span><span class='id identifier rubyid_strftime'>strftime</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%Y-%m-%d %H:%M</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_gsub!'>gsub!</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> +</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_strip!'>strip!</span>
+    <span class='id identifier rubyid_new_item'>new_item</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Item.html" title="Doing::Item (class)">Item</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Item.html#initialize-instance_method" title="Doing::Item#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_start_time'>start_time</span><span class='comma'>,</span> <span class='id identifier rubyid_title'>title</span><span class='comma'>,</span> <span class='id identifier rubyid_section'>section</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_new_item'>new_item</span><span class='period'>.</span><span class='id identifier rubyid_note'>note</span><span class='period'>.</span><span class='id identifier rubyid_add'>add</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>notes</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>notes</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_is_match'>is_match</span> <span class='op'>=</span> <span class='kw'>true</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:search</span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_is_match'>is_match</span> <span class='op'>=</span> <span class='id identifier rubyid_new_item'>new_item</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:search</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>case_type:</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:case</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>negate:</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:not</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_is_match'>is_match</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:date_filter</span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_is_match'>is_match</span> <span class='op'>=</span> <span class='id identifier rubyid_start_time'>start_time</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:date_filter</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_start_time'>start_time</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:date_filter</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_is_match'>is_match</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:not</span><span class='rbracket'>]</span> <span class='op'>?</span> <span class='op'>!</span><span class='id identifier rubyid_is_match'>is_match</span> <span class='op'>:</span> <span class='id identifier rubyid_is_match'>is_match</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_new_items'>new_items</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_new_item'>new_item</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_is_match'>is_match</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_total'>total</span> <span class='op'>=</span> <span class='id identifier rubyid_new_items'>new_items</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
+  <span class='id identifier rubyid_skipped'>skipped</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='op'>-</span> <span class='id identifier rubyid_total'>total</span>
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Skipped:</span><span class='tstring_end'>&#39;</span></span> <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_skipped'>skipped</span><span class='embexpr_end'>}</span><span class='tstring_content'> items, invalid type or no time interval</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_skipped'>skipped</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span>
+
+  <span class='id identifier rubyid_new_items'>new_items</span> <span class='op'>=</span> <span class='id identifier rubyid_wwid'>wwid</span><span class='period'>.</span><span class='id identifier rubyid_filter_items'>filter_items</span><span class='lparen'>(</span><span class='id identifier rubyid_new_items'>new_items</span><span class='comma'>,</span> <span class='label'>opt:</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_filtered'>filtered</span> <span class='op'>=</span> <span class='id identifier rubyid_skipped'>skipped</span> <span class='op'>-</span> <span class='id identifier rubyid_new_items'>new_items</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Skipped:</span><span class='tstring_end'>&#39;</span></span> <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_filtered'>filtered</span><span class='embexpr_end'>}</span><span class='tstring_content'> items that didn&#39;t match filter criteria</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_filtered'>filtered</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span>
+
+  <span class='id identifier rubyid_new_items'>new_items</span> <span class='op'>=</span> <span class='id identifier rubyid_wwid'>wwid</span><span class='period'>.</span><span class='id identifier rubyid_dedup'>dedup</span><span class='lparen'>(</span><span class='id identifier rubyid_new_items'>new_items</span><span class='comma'>,</span> <span class='label'>no_overlap:</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:no_overlap</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_dups'>dups</span> <span class='op'>=</span> <span class='id identifier rubyid_filtered'>filtered</span> <span class='op'>-</span> <span class='id identifier rubyid_new_items'>new_items</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Skipped:</span><span class='tstring_end'>&#39;</span></span> <span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dups'>dups</span><span class='embexpr_end'>}</span><span class='tstring_content'> items with overlapping times</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_dups'>dups</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span>
+
+  <span class='id identifier rubyid_new_items'>new_items</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='const'><span class='object_link'><a href="Hooks.html" title="Doing::Hooks (module)">Hooks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_trigger'><span class='object_link'><a href="Hooks.html#trigger-class_method" title="Doing::Hooks.trigger (method)">trigger</a></span></span> <span class='symbol'>:pre_entry_add</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_item'>item</span> <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_wwid'>wwid</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_new_items'>new_items</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_new_items'>new_items</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='const'><span class='object_link'><a href="Hooks.html" title="Doing::Hooks (module)">Hooks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_trigger'><span class='object_link'><a href="Hooks.html#trigger-class_method" title="Doing::Hooks.trigger (method)">trigger</a></span></span> <span class='symbol'>:post_entry_added</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_item'>item</span> <span class='rbrace'>}</span>
+
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Imported:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_new_items'>new_items</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='embexpr_end'>}</span><span class='tstring_content'> items to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_section'>section</span><span class='embexpr_end'>}</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -267,7 +429,29 @@ file</p>
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+11
+12
+13
+14
+15</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/plugins/import/timing_import.rb', line 11</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_settings'>settings</span>
+  <span class='lbrace'>{</span>
+    <span class='label'>trigger:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tim(?:ing)?</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -275,9 +459,9 @@ file</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 26 11:00:42 2024 by
+  Generated on Sun Dec  1 11:01:06 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.0).
+  0.9.37 (ruby-3.3.0).
 </div>
 
     </div>

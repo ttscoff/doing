@@ -6,7 +6,7 @@
 <title>
   Module: Doing::Color
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -128,23 +128,23 @@
 <div class="tags">
   
   <div class="examples">
-    <p class="tag_title">Examples:</p>
+    <h4 class="tag_title">Examples:</h4>
     
       
-        <p class="example_title"><div class='inline'><p>Use a color as a method. Color reset will be added to end of string.</p>
-</div></p>
+        <h5 class="example_title"><div class='inline'><p>Use a color as a method. Color reset will be added to end of string.</p>
+</div></h5>
       
       <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_yellow'>yellow</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>This text is yellow</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\e[33mThis text is yellow\e[0m</span><span class='tstring_end'>&quot;</span></span></code></pre>
     
       
-        <p class="example_title"><div class='inline'><p>Use a color as a string extension. Color reset added automatically.</p>
-</div></p>
+        <h5 class="example_title"><div class='inline'><p>Use a color as a string extension. Color reset added automatically.</p>
+</div></h5>
       
       <pre class="example code"><code><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>This text is green</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_green'>green</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\e[1;32mThis text is green\e[0m</span><span class='tstring_end'>&quot;</span></span></code></pre>
     
       
-        <p class="example_title"><div class='inline'><p>Send a text string as a color</p>
-</div></p>
+        <h5 class="example_title"><div class='inline'><p>Send a text string as a color</p>
+</div></h5>
       
       <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>red</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\e[31m</span><span class='tstring_end'>&quot;</span></span></code></pre>
     
@@ -444,18 +444,36 @@
 <div class="tags">
   
   <div class="examples">
-    <p class="tag_title">Examples:</p>
+    <h4 class="tag_title">Examples:</h4>
     
       
-        <p class="example_title"><div class='inline'><p>Turn color on or off based on TTY</p>
-</div></p>
+        <h5 class="example_title"><div class='inline'><p>Turn color on or off based on TTY</p>
+</div></h5>
       
       <pre class="example code"><code><span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_coloring'>coloring</span> <span class='op'>=</span> <span class='const'>STDOUT</span><span class='period'>.</span><span class='id identifier rubyid_isatty'>isatty</span></code></pre>
     
   </div>
 
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+201
+202
+203</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 201</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_coloring'>coloring</span>
+  <span class='ivar'>@coloring</span> <span class='op'>||=</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -498,7 +516,25 @@ is switched on, false otherwise.</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+190
+191
+192</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 190</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_coloring?'>coloring?</span>
+  <span class='ivar'>@coloring</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -526,11 +562,11 @@ x: reset (remove background, color, emphasis)</p>
 <div class="tags">
   
   <div class="examples">
-    <p class="tag_title">Examples:</p>
+    <h4 class="tag_title">Examples:</h4>
     
       
-        <p class="example_title"><div class='inline'><p>Convert a templated string</p>
-</div></p>
+        <h5 class="example_title"><div class='inline'><p>Convert a templated string</p>
+</div></h5>
       
       <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>{Rwb}Warning:{x} {w}you look a little {g}ill{x}</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span></code></pre>
     
@@ -576,7 +612,49 @@ space.</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 224</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></span>
+  <span class='id identifier rubyid_fmt'>fmt</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>%</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%%</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_fmt'>fmt</span> <span class='op'>=</span> <span class='id identifier rubyid_fmt'>fmt</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(?&lt;!\\u|\$)\{(\w+)\}</span><span class='regexp_end'>/i</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_c'>c</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>%&lt;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_c'>c</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;s</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_colors'>colors</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>w:</span> <span class='id identifier rubyid_white'>white</span><span class='comma'>,</span> <span class='label'>k:</span> <span class='id identifier rubyid_black'>black</span><span class='comma'>,</span> <span class='label'>g:</span> <span class='id identifier rubyid_green'>green</span><span class='comma'>,</span> <span class='label'>l:</span> <span class='id identifier rubyid_blue'>blue</span><span class='comma'>,</span>
+             <span class='label'>y:</span> <span class='id identifier rubyid_yellow'>yellow</span><span class='comma'>,</span> <span class='label'>c:</span> <span class='id identifier rubyid_cyan'>cyan</span><span class='comma'>,</span> <span class='label'>m:</span> <span class='id identifier rubyid_magenta'>magenta</span><span class='comma'>,</span> <span class='label'>r:</span> <span class='id identifier rubyid_red'>red</span><span class='comma'>,</span>
+             <span class='label'>W:</span> <span class='id identifier rubyid_bgwhite'>bgwhite</span><span class='comma'>,</span> <span class='label'>K:</span> <span class='id identifier rubyid_bgblack'>bgblack</span><span class='comma'>,</span> <span class='label'>G:</span> <span class='id identifier rubyid_bggreen'>bggreen</span><span class='comma'>,</span> <span class='label'>L:</span> <span class='id identifier rubyid_bgblue'>bgblue</span><span class='comma'>,</span>
+             <span class='label'>Y:</span> <span class='id identifier rubyid_bgyellow'>bgyellow</span><span class='comma'>,</span> <span class='label'>C:</span> <span class='id identifier rubyid_bgcyan'>bgcyan</span><span class='comma'>,</span> <span class='label'>M:</span> <span class='id identifier rubyid_bgmagenta'>bgmagenta</span><span class='comma'>,</span> <span class='label'>R:</span> <span class='id identifier rubyid_bgred'>bgred</span><span class='comma'>,</span>
+             <span class='label'>d:</span> <span class='id identifier rubyid_dark'>dark</span><span class='comma'>,</span> <span class='label'>b:</span> <span class='id identifier rubyid_bold'>bold</span><span class='comma'>,</span> <span class='label'>u:</span> <span class='id identifier rubyid_underline'>underline</span><span class='comma'>,</span> <span class='label'>i:</span> <span class='id identifier rubyid_italic'>italic</span><span class='comma'>,</span> <span class='label'>x:</span> <span class='id identifier rubyid_reset'>reset</span> <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_fmt'>fmt</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='id identifier rubyid_input'>input</span> <span class='op'>:</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='id identifier rubyid_fmt'>fmt</span><span class='comma'>,</span> <span class='id identifier rubyid_colors'>colors</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -604,7 +682,25 @@ space.</p>
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+314
+315
+316</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 314</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attributes'>attributes</span>
+  <span class='const'><span class='object_link'><a href="#ATTRIBUTE_NAMES-constant" title="Doing::Color::ATTRIBUTE_NAMES (constant)">ATTRIBUTE_NAMES</a></span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -616,7 +712,43 @@ space.</p>
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 286</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_rgb'>rgb</span><span class='lparen'>(</span><span class='id identifier rubyid_hex'>hex</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_is_bg'>is_bg</span> <span class='op'>=</span> <span class='id identifier rubyid_hex'>hex</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^bg?#</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
+  <span class='id identifier rubyid_hex_string'>hex_string</span> <span class='op'>=</span> <span class='id identifier rubyid_hex'>hex</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^([fb]g?)?#</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_parts'>parts</span> <span class='op'>=</span> <span class='id identifier rubyid_hex_string'>hex_string</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(?&lt;r&gt;..)(?&lt;g&gt;..)(?&lt;b&gt;..)</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_t'>t</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='qwords_beg'>%w[</span><span class='tstring_content'>r</span><span class='words_sep'> </span><span class='tstring_content'>g</span><span class='words_sep'> </span><span class='tstring_content'>b</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t'>t</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_parts'>parts</span><span class='lbracket'>[</span><span class='id identifier rubyid_e'>e</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_hex'>hex</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_color'>color</span> <span class='op'>=</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\e[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_is_bg'>is_bg</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>48</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>38</span><span class='tstring_end'>&#39;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>;2;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>m</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -656,7 +788,31 @@ attribute instead.</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+90
+91
+92
+93
+94
+95</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 90</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_support?'>support?</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_feature'>feature</span>
+  <span class='kw'>when</span> <span class='symbol'>:clear</span>
+    <span class='op'>!</span><span class='const'><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></span><span class='period'>.</span><span class='id identifier rubyid_instance_methods'>instance_methods</span><span class='lparen'>(</span><span class='kw'>false</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_sym</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='symbol'>:clear</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -679,7 +835,41 @@ ANSI-sequences are stripped from the string.</p>
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/colors.rb', line 301</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_uncolor'>uncolor</span><span class='lparen'>(</span><span class='id identifier rubyid_string'>string</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='comment'># :yields:
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='kw'>yield</span><span class='period'>.</span><span class='id identifier rubyid_to_str'>to_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#ESCAPE_REGEX-constant" title="Doing::Color::ESCAPE_REGEX (constant)">ESCAPE_REGEX</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_string'>string</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:to_str</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_string'>string</span><span class='period'>.</span><span class='id identifier rubyid_to_str'>to_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#ESCAPE_REGEX-constant" title="Doing::Color::ESCAPE_REGEX (constant)">ESCAPE_REGEX</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:to_str</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_to_str'>to_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#ESCAPE_REGEX-constant" title="Doing::Color::ESCAPE_REGEX (constant)">ESCAPE_REGEX</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -687,9 +877,9 @@ ANSI-sequences are stripped from the string.</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 26 11:00:41 2024 by
+  Generated on Sun Dec  1 11:01:05 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.0).
+  0.9.37 (ruby-3.3.0).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Doing::Logger
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -137,19 +137,19 @@
           
         </dt>
         <dd><pre class="code"><span class='qsymbols_beg'>%i[</span><span class='words_sep'>
-  </span><span class='tstring_content'>added</span><span class='words_sep'>
-  </span><span class='tstring_content'>added_tags</span><span class='words_sep'>
-  </span><span class='tstring_content'>archived</span><span class='words_sep'>
-  </span><span class='tstring_content'>autotag</span><span class='words_sep'>
-  </span><span class='tstring_content'>completed</span><span class='words_sep'>
-  </span><span class='tstring_content'>completed_archived</span><span class='words_sep'>
-  </span><span class='tstring_content'>deleted</span><span class='words_sep'>
-  </span><span class='tstring_content'>moved</span><span class='words_sep'>
-  </span><span class='tstring_content'>removed_tags</span><span class='words_sep'>
-  </span><span class='tstring_content'>rotated</span><span class='words_sep'>
-  </span><span class='tstring_content'>skipped</span><span class='words_sep'>
-  </span><span class='tstring_content'>updated</span><span class='words_sep'>
-  </span><span class='tstring_content'>exported</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>added</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>added_tags</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>archived</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>autotag</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>completed</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>completed_archived</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>deleted</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>moved</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>removed_tags</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>rotated</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>skipped</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>updated</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>exported</span><span class='words_sep'>
 </span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
     </dl>
@@ -771,7 +771,39 @@
 </ul>
 
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 49</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='symbol'>:info</span><span class='rparen'>)</span>
+  <span class='ivar'>@messages</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='ivar'>@counters</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='const'><span class='object_link'><a href="#COUNT_KEYS-constant" title="Doing::Logger::COUNT_KEYS (constant)">COUNT_KEYS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='op'>|</span> <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>tag:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>count:</span> <span class='int'>0</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+  <span class='ivar'>@results</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='ivar'>@logdev</span> <span class='op'>=</span> <span class='gvar'>$stderr</span>
+  <span class='ivar'>@max_length</span> <span class='op'>=</span> <span class='const'>TTY</span><span class='op'>::</span><span class='const'>Screen</span><span class='period'>.</span><span class='id identifier rubyid_columns'>columns</span> <span class='op'>-</span> <span class='int'>5</span> <span class='op'>||</span> <span class='int'>85</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span>
+  <span class='ivar'>@prev_level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
   
 </div>
@@ -800,7 +832,25 @@
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+15
+16
+17</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 15</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_level'>level</span>
+  <span class='ivar'>@level</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       
@@ -824,7 +874,25 @@
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+9
+10
+11</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 9</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_logdev='>logdev=</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='ivar'>@logdev</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       
@@ -848,7 +916,25 @@
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+12
+13
+14</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 12</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_max_length='>max_length=</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='ivar'>@max_length</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       
@@ -872,7 +958,25 @@
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_messages'>messages</span>
+  <span class='ivar'>@messages</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       
@@ -896,7 +1000,25 @@
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_results'>results</span>
+  <span class='ivar'>@results</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -982,7 +1104,27 @@ omitted)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+187
+188
+189
+190</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 187</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_abort_with'>abort_with</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_error'>error</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_abort'>abort</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -994,7 +1136,41 @@ omitted)</p>
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 100</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_adjust_verbosity'>adjust_verbosity</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:log_level</span><span class='rbracket'>]</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:log_level</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:quiet</span><span class='rbracket'>]</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='symbol'>:error</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:verbose</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:debug</span><span class='rbracket'>]</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='symbol'>:debug</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_log_now'>log_now</span> <span class='symbol'>:debug</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Logging at level:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='ivar'>@level</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='comment'># log_now :debug, &#39;Doing Version:&#39;, Doing::VERSION
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1006,7 +1182,33 @@ omitted)</p>
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+270
+271
+272
+273
+274
+275
+276</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 270</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_benchmark'>benchmark</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>DOING_BENCHMARK</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+
+  <span class='ivar'>@benchmarks</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='ivar'>@benchmarks</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='lbrace'>{</span> <span class='label'>start:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>finish:</span> <span class='kw'>nil</span> <span class='rbrace'>}</span>
+  <span class='ivar'>@benchmarks</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_state'>state</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>Process</span><span class='period'>.</span><span class='id identifier rubyid_clock_gettime'>clock_gettime</span><span class='lparen'>(</span><span class='const'>Process</span><span class='op'>::</span><span class='const'>CLOCK_MONOTONIC</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1040,7 +1242,35 @@ omitted)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+112
+113
+114
+115
+116
+117
+118
+119</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 112</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>level:</span> <span class='symbol'>:info</span><span class='comma'>,</span> <span class='label'>count:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>tag:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>invalid counter key</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="#COUNT_KEYS-constant" title="Doing::Logger::COUNT_KEYS (constant)">COUNT_KEYS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+
+  <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:count</span><span class='rbracket'>]</span> <span class='op'>+=</span> <span class='id identifier rubyid_count'>count</span>
+  <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tag</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_tag'>tag</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span> <span class='kw'>unless</span> <span class='id identifier rubyid_tag'>tag</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='id identifier rubyid_level'>level</span>
+  <span class='ivar'>@counters</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='id identifier rubyid_message'>message</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1115,7 +1345,25 @@ omitted)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+129
+130
+131</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 129</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='symbol'>:debug</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1192,7 +1440,25 @@ omitted)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+171
+172
+173</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 171</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_error'>error</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='symbol'>:error</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1269,7 +1535,37 @@ omitted)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+202
+203
+204
+205
+206
+207
+208
+209
+210</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 202</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_formatted_topic'>formatted_topic</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='label'>colon:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_colon'>colon</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_topic'>topic</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#TOPIC_WIDTH-constant" title="Doing::Logger::TOPIC_WIDTH (constant)">TOPIC_WIDTH</a></span></span><span class='rparen'>)</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_topic'>topic</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>:$</span><span class='regexp_end'>/</span></span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_topic'>topic</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#TOPIC_WIDTH-constant" title="Doing::Logger::TOPIC_WIDTH (constant)">TOPIC_WIDTH</a></span></span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_topic'>topic</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1346,7 +1642,25 @@ omitted)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+143
+144
+145</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 143</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_info'>info</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='symbol'>:info</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1358,7 +1672,115 @@ omitted)</p>
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 278</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_log_benchmarks'>log_benchmarks</span>
+  <span class='kw'>if</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>DOING_BENCHMARK</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+
+    <span class='id identifier rubyid_output'>output</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_beginning'>beginning</span> <span class='op'>=</span> <span class='ivar'>@benchmarks</span><span class='lbracket'>[</span><span class='symbol'>:total</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:start</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_ending'>ending</span> <span class='op'>=</span> <span class='ivar'>@benchmarks</span><span class='lbracket'>[</span><span class='symbol'>:total</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:finish</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_total'>total</span> <span class='op'>=</span> <span class='id identifier rubyid_ending'>ending</span> <span class='op'>-</span> <span class='id identifier rubyid_beginning'>beginning</span>
+    <span class='id identifier rubyid_factor'>factor</span> <span class='op'>=</span> <span class='const'>TTY</span><span class='op'>::</span><span class='const'>Screen</span><span class='period'>.</span><span class='id identifier rubyid_columns'>columns</span> <span class='op'>/</span> <span class='id identifier rubyid_total'>total</span>
+
+    <span class='id identifier rubyid_cols'>cols</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='const'>TTY</span><span class='op'>::</span><span class='const'>Screen</span><span class='period'>.</span><span class='id identifier rubyid_columns'>columns</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_colors'>colors</span> <span class='op'>=</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>bgred</span><span class='words_sep'> </span><span class='tstring_content'>bggreen</span><span class='words_sep'> </span><span class='tstring_content'>bgyellow</span><span class='words_sep'> </span><span class='tstring_content'>bgblue</span><span class='words_sep'> </span><span class='tstring_content'>bgmagenta</span><span class='words_sep'> </span><span class='tstring_content'>bgcyan</span><span class='words_sep'> </span><span class='tstring_content'>bgwhite</span><span class='words_sep'> </span><span class='tstring_content'>boldbgred</span><span class='words_sep'> </span><span class='tstring_content'>boldbggreen</span><span class='words_sep'> </span><span class='tstring_content'>boldbgyellow</span><span class='words_sep'> </span><span class='tstring_content'>boldbgblue</span><span class='words_sep'> </span><span class='tstring_content'>boldbgwhite</span><span class='tstring_end'>]</span></span>
+    <span class='id identifier rubyid_idx'>idx</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='comment'># @benchmarks.delete(:total)
+</span>
+    <span class='ivar'>@benchmarks</span><span class='period'>.</span><span class='id identifier rubyid_sort_by'>sort_by</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid__'>_</span><span class='comma'>,</span> <span class='id identifier rubyid_timers'>timers</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_timers'>timers</span><span class='lbracket'>[</span><span class='symbol'>:start</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_timers'>timers</span><span class='lbracket'>[</span><span class='symbol'>:finish</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_timers'>timers</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_timers'>timers</span><span class='lbracket'>[</span><span class='symbol'>:finish</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_timers'>timers</span><span class='lbracket'>[</span><span class='symbol'>:start</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_color'>color</span> <span class='op'>=</span> <span class='id identifier rubyid_colors'>colors</span><span class='lbracket'>[</span><span class='id identifier rubyid_idx'>idx</span> <span class='op'>%</span> <span class='id identifier rubyid_colors'>colors</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_fg'>fg</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_idx'>idx</span> <span class='op'>&lt;</span> <span class='int'>7</span>
+               <span class='const'><span class='object_link'><a href="Color.html" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_boldblack'>boldblack</span>
+             <span class='kw'>else</span>
+               <span class='const'><span class='object_link'><a href="Color.html" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_boldwhite'>boldwhite</span>
+             <span class='kw'>end</span>
+        <span class='id identifier rubyid_color'>color</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Color.html" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_color'>color</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_fg'>fg</span>
+
+        <span class='id identifier rubyid_start'>start</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_timers'>timers</span><span class='lbracket'>[</span><span class='symbol'>:start</span><span class='rbracket'>]</span> <span class='op'>-</span> <span class='id identifier rubyid_beginning'>beginning</span><span class='rparen'>)</span> <span class='op'>*</span> <span class='id identifier rubyid_factor'>factor</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_floor'>floor</span>
+        <span class='id identifier rubyid_finish'>finish</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_timers'>timers</span><span class='lbracket'>[</span><span class='symbol'>:finish</span><span class='rbracket'>]</span> <span class='op'>-</span> <span class='id identifier rubyid_beginning'>beginning</span><span class='rparen'>)</span> <span class='op'>*</span> <span class='id identifier rubyid_factor'>factor</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_ceil'>ceil</span>
+
+        <span class='id identifier rubyid_cols'>cols</span><span class='period'>.</span><span class='id identifier rubyid_fill'>fill</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_color'>color</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_start'>start</span><span class='op'>..</span><span class='id identifier rubyid_finish'>finish</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_cols'>cols</span><span class='lbracket'>[</span><span class='id identifier rubyid_start'>start</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_color'>color</span><span class='embexpr_end'>}</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_cols'>cols</span><span class='lbracket'>[</span><span class='id identifier rubyid_finish'>finish</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_color'>color</span><span class='embexpr_end'>}</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_color'>color</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_k'>k</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="Color.html" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_default'>default</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_timers'>timers</span><span class='lbracket'>[</span><span class='symbol'>:finish</span><span class='rbracket'>]</span> <span class='op'>-</span> <span class='id identifier rubyid_timers'>timers</span><span class='lbracket'>[</span><span class='symbol'>:start</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_k'>k</span><span class='embexpr_end'>}</span><span class='tstring_content'>: error</span><span class='tstring_end'>&quot;</span></span>
+      <span class='kw'>end</span>
+
+      <span class='id identifier rubyid_idx'>idx</span> <span class='op'>+=</span> <span class='int'>1</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_output'>output</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_msg'>msg</span><span class='op'>|</span>
+      <span class='gvar'>$stdout</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_color_message'>color_message</span><span class='lparen'>(</span><span class='symbol'>:debug</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Benchmark:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='gvar'>$stdout</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_color_message'>color_message</span><span class='lparen'>(</span><span class='symbol'>:debug</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Benchmark:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Total: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_total'>total</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+    <span class='gvar'>$stdout</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_cols'>cols</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='const'>TTY</span><span class='op'>::</span><span class='const'>Screen</span><span class='period'>.</span><span class='id identifier rubyid_columns'>columns</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span> <span class='op'>+</span> <span class='const'><span class='object_link'><a href="Color.html" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_reset'>reset</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1370,7 +1792,81 @@ omitted)</p>
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 327</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_log_change'>log_change</span><span class='lparen'>(</span><span class='label'>tags_added:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>tags_removed:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>count:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>item:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>single:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_tags_added'>tags_added</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_tags_removed'>tags_removed</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='symbol'>:skipped</span><span class='comma'>,</span> <span class='label'>level:</span> <span class='symbol'>:debug</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%count %items with no change</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>count:</span> <span class='id identifier rubyid_count'>count</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_tags_added'>tags_added</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='symbol'>:skipped</span><span class='comma'>,</span> <span class='label'>level:</span> <span class='symbol'>:debug</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no tags added to %count %items</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_single'>single</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_item'>item</span>
+      <span class='id identifier rubyid_elapsed'>elapsed</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_item'>item</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_tags_added'>tags_added</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>done</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+                  <span class='id identifier rubyid_item'>item</span><span class='period'>.</span><span class='id identifier rubyid_interval'>interval</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_item'>item</span><span class='period'>.</span><span class='id identifier rubyid_interval'>interval</span><span class='op'>&amp;.</span><span class='id identifier rubyid_time_string'>time_string</span><span class='lparen'>(</span><span class='label'>format:</span> <span class='symbol'>:dhm</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+                <span class='kw'>else</span>
+                  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+                <span class='kw'>end</span>
+
+      <span class='id identifier rubyid_added'>added</span> <span class='op'>=</span> <span class='id identifier rubyid_tags_added'>tags_added</span><span class='period'>.</span><span class='id identifier rubyid_log_tags'>log_tags</span>
+      <span class='id identifier rubyid_info'>info</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Tagged:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+           <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>added </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tags_added'>tags_added</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='op'>==</span> <span class='int'>1</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tag</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tags</span><span class='tstring_end'>&#39;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_added'>added</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_elapsed'>elapsed</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_item'>item</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='symbol'>:added_tags</span><span class='comma'>,</span> <span class='label'>level:</span> <span class='symbol'>:info</span><span class='comma'>,</span> <span class='label'>tag:</span> <span class='id identifier rubyid_tags_added'>tags_added</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%tags added to %count %items</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_tags_removed'>tags_removed</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='symbol'>:skipped</span><span class='comma'>,</span> <span class='label'>level:</span> <span class='symbol'>:debug</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no tags removed from %count %items</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_single'>single</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_item'>item</span>
+      <span class='id identifier rubyid_removed'>removed</span> <span class='op'>=</span> <span class='id identifier rubyid_tags_removed'>tags_removed</span><span class='period'>.</span><span class='id identifier rubyid_log_tags'>log_tags</span>
+      <span class='id identifier rubyid_info'>info</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Untagged:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+           <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>removed </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tags_removed'>tags_removed</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='op'>==</span> <span class='int'>1</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tag</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tags</span><span class='tstring_end'>&#39;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_removed'>removed</span><span class='embexpr_end'>}</span><span class='tstring_content'> from </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_item'>item</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='symbol'>:removed_tags</span><span class='comma'>,</span> <span class='label'>level:</span> <span class='symbol'>:info</span><span class='comma'>,</span> <span class='label'>tag:</span> <span class='id identifier rubyid_tags_removed'>tags_removed</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%tags removed from %count %items</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1430,7 +1926,51 @@ omitted)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 67</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_log_level='>log_level=</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>info</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+
+  <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_level'>level</span>
+          <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[e0]</span><span class='regexp_end'>/i</span></span>
+            <span class='symbol'>:error</span>
+          <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[w1]</span><span class='regexp_end'>/i</span></span>
+            <span class='symbol'>:warn</span>
+          <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[d3]</span><span class='regexp_end'>/i</span></span>
+            <span class='symbol'>:debug</span>
+          <span class='kw'>else</span>
+            <span class='symbol'>:info</span>
+          <span class='kw'>end</span>
+
+  <span class='ivar'>@level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1518,7 +2058,37 @@ omitted)</p>
 </ul>
 
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+241
+242
+243
+244
+245
+246
+247
+248
+249</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 241</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_write_message?'>write_message?</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+
+  <span class='kw'>if</span> <span class='ivar'>@logdev</span> <span class='op'>==</span> <span class='gvar'>$stdout</span>
+    <span class='ivar'>@logdev</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_message'>message</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='ivar'>@logdev</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_color_message'>color_message</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1557,7 +2127,45 @@ omitted)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 256</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_output_results'>output_results</span>
+  <span class='id identifier rubyid_total_counters'>total_counters</span>
+  <span class='id identifier rubyid_results'>results</span> <span class='op'>=</span> <span class='ivar'>@results</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_msg'>msg</span><span class='op'>|</span> <span class='id identifier rubyid_write_message?'>write_message?</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
+
+  <span class='kw'>if</span> <span class='ivar'>@logdev</span> <span class='op'>==</span> <span class='gvar'>$stdout</span>
+    <span class='gvar'>$stdout</span><span class='period'>.</span><span class='id identifier rubyid_print'>print</span> <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_res'>res</span><span class='op'>|</span> <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_uncolor'>uncolor</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='gvar'>$stdout</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_msg'>msg</span><span class='op'>|</span>
+      <span class='ivar'>@logdev</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_color_message'>color_message</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1579,7 +2187,31 @@ omitted)</p>
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+93
+94
+95
+96
+97
+98</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 93</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_restore_level'>restore_level</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='ivar'>@prev_level</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='ivar'>@prev_level</span> <span class='op'>==</span> <span class='ivar'>@log_level</span>
+
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_level'>log_level</span> <span class='op'>=</span> <span class='ivar'>@prev_level</span>
+  <span class='ivar'>@prev_level</span> <span class='op'>=</span> <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1601,7 +2233,31 @@ omitted)</p>
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+85
+86
+87
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 85</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_temp_level'>temp_level</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='op'>==</span> <span class='ivar'>@log_level</span>
+
+  <span class='ivar'>@prev_level</span> <span class='op'>=</span> <span class='id identifier rubyid_log_level'>log_level</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
+  <span class='ivar'>@log_level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1678,7 +2334,25 @@ omitted)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+157
+158
+159</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 157</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='symbol'>:warn</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1789,7 +2463,27 @@ message (optional)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+228
+229
+230
+231</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/logger.rb', line 228</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_level_of_message'>level_of_message</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='ivar'>@results</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span> <span class='label'>level:</span> <span class='id identifier rubyid_level_of_message'>level_of_message</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span><span class='lparen'>(</span><span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -1797,9 +2491,9 @@ message (optional)</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 26 11:00:42 2024 by
+  Generated on Sun Dec  1 11:01:05 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.0).
+  0.9.37 (ruby-3.3.0).
 </div>
 
     </div>

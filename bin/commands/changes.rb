@@ -1,4 +1,5 @@
 # @@changelog @@changes
+require 'tty-markdown'
 
 MARKDOWN_THEME = {
   em: %i[white dark],

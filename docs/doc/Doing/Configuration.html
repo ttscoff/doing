@@ -6,7 +6,7 @@
 <title>
   Class: Doing::Configuration
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -679,7 +679,29 @@
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+121
+122
+123
+124
+125</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 121</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>options:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='ivar'>@config_file</span> <span class='op'>=</span> <span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='id identifier rubyid_default_config_file'>default_config_file</span> <span class='op'>:</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span><span class='rparen'>)</span>
+
+  <span class='ivar'>@settings</span> <span class='op'>=</span> <span class='id identifier rubyid_configure'>configure</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
   
 </div>
@@ -698,7 +720,25 @@
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+127
+128
+129</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 127</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_config_file'>config_file</span>
+  <span class='ivar'>@config_file</span> <span class='op'>||=</span> <span class='id identifier rubyid_default_config_file'>default_config_file</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       
@@ -712,7 +752,25 @@
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+12
+13
+14</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 12</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_force_answer'>force_answer</span>
+  <span class='ivar'>@force_answer</span> <span class='op'>||=</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       
@@ -755,7 +813,25 @@
 </ul>
 
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+10
+11
+12</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 10</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ignore_local='>ignore_local=</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='ivar'>@ignore_local</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       
@@ -779,7 +855,25 @@
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+8
+9
+10</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 8</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_settings'>settings</span>
+  <span class='ivar'>@settings</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -798,7 +892,25 @@
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+160
+161
+162</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 160</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_additional_configs'>additional_configs</span>
+  <span class='ivar'>@additional_configs</span> <span class='op'>||=</span> <span class='id identifier rubyid_find_local_config'>find_local_config</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -837,7 +949,75 @@
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 169</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_choose_config'>choose_config</span><span class='lparen'>(</span><span class='label'>create:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>local:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_local'>local</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_create'>create</span>
+    <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.doingrc</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='const'>FileUtils</span><span class='period'>.</span><span class='id identifier rubyid_touch'>touch</span><span class='lparen'>(</span><span class='id identifier rubyid_res'>res</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_res'>res</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>return</span> <span class='ivar'>@config_file</span> <span class='kw'>if</span> <span class='ivar'>@force_answer</span>
+
+  <span class='kw'>if</span> <span class='ivar'>@additional_configs</span><span class='op'>&amp;.</span><span class='id identifier rubyid_count'>count</span><span class='op'>&amp;.</span><span class='id identifier rubyid_positive?'>positive?</span> <span class='op'>||</span> <span class='id identifier rubyid_create'>create</span>
+    <span class='id identifier rubyid_choices'>choices</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='ivar'>@config_file</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@additional_configs</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_choices'>choices</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Create a new .doingrc in the current directory</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_create'>create</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.doingrc</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Prompt.html" title="Doing::Prompt (module)">Prompt</a></span></span><span class='period'>.</span><span class='id identifier rubyid_choose_from'><span class='object_link'><a href="PromptChoose.html#choose_from-instance_method" title="Doing::PromptChoose#choose_from (method)">choose_from</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_choices'>choices</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_reverse'>reverse</span><span class='comma'>,</span>
+                                    <span class='label'>sorted:</span> <span class='kw'>false</span><span class='comma'>,</span>
+                                    <span class='label'>prompt:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Local configs found, select which to update &gt; </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>UserCancelled</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Cancelled</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_res'>res</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_res'>res</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^Create a new</span><span class='regexp_end'>/</span></span>
+      <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.doingrc</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+      <span class='const'>FileUtils</span><span class='period'>.</span><span class='id identifier rubyid_touch'>touch</span><span class='lparen'>(</span><span class='id identifier rubyid_res'>res</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_res'>res</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='op'>||</span> <span class='ivar'>@config_file</span>
+  <span class='kw'>else</span>
+    <span class='ivar'>@config_file</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -849,7 +1029,25 @@
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+131
+132
+133</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 131</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_config_dir'>config_dir</span>
+  <span class='ivar'>@config_dir</span> <span class='op'>||=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Util.html" title="Doing::Util (module)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_user_home'><span class='object_link'><a href="Util.html#user_home-instance_method" title="Doing::Util#user_home (method)">user_home</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.config</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>doing</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -892,7 +1090,95 @@
 </ul>
 
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 338</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_configure'>configure</span><span class='lparen'>(</span><span class='id identifier rubyid_opt'>opt</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_update_deprecated_config'>update_deprecated_config</span> <span class='kw'>if</span> <span class='id identifier rubyid_config_file'>config_file</span> <span class='op'>==</span> <span class='id identifier rubyid_default_config_file'>default_config_file</span>
+
+  <span class='ivar'>@ignore_local</span> <span class='op'>=</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:ignore_local</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:ignore_local</span><span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='id identifier rubyid_read_config'>read_config</span><span class='period'>.</span><span class='id identifier rubyid_clone'>clone</span>
+
+  <span class='id identifier rubyid_plugin_config'>plugin_config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Util.html" title="Doing::Util (module)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_deep_merge_hashes'><span class='object_link'><a href="Util.html#deep_merge_hashes-instance_method" title="Doing::Util#deep_merge_hashes (method)">deep_merge_hashes</a></span></span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#DEFAULTS-constant" title="Doing::Configuration::DEFAULTS (constant)">DEFAULTS</a></span></span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plugins</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plugins</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_load_plugins'>load_plugins</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_config'>plugin_config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plugin_path</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+  <span class='const'><span class='object_link'><a href="Plugins.html" title="Doing::Plugins (module)">Plugins</a></span></span><span class='period'>.</span><span class='id identifier rubyid_plugins'><span class='object_link'><a href="Plugins.html#plugins-class_method" title="Doing::Plugins.plugins (method)">plugins</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid__type'>_type</span><span class='comma'>,</span> <span class='id identifier rubyid_plugins'>plugins</span><span class='op'>|</span>
+    <span class='id identifier rubyid_plugins'>plugins</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_title'>title</span><span class='comma'>,</span> <span class='id identifier rubyid_plugin'>plugin</span><span class='op'>|</span>
+      <span class='id identifier rubyid_plugin_config'>plugin_config</span><span class='lbracket'>[</span><span class='id identifier rubyid_title'>title</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_plugin'>plugin</span><span class='lbracket'>[</span><span class='symbol'>:config</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_plugin'>plugin</span><span class='lbracket'>[</span><span class='symbol'>:config</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_good?'>good?</span>
+      <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>export_templates</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_title'>title</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_plugin'>plugin</span><span class='lbracket'>[</span><span class='symbol'>:templates</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_plugin'>plugin</span><span class='lbracket'>[</span><span class='symbol'>:templates</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Util.html" title="Doing::Util (module)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_deep_merge_hashes'><span class='object_link'><a href="Util.html#deep_merge_hashes-instance_method" title="Doing::Util#deep_merge_hashes (method)">deep_merge_hashes</a></span></span><span class='lparen'>(</span><span class='lbrace'>{</span>
+                                    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plugins</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_plugin_config'>plugin_config</span>
+                                  <span class='rbrace'>}</span><span class='comma'>,</span> <span class='id identifier rubyid_config'>config</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='id identifier rubyid_find_deprecations'>find_deprecations</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='rparen'>)</span>
+
+  <span class='kw'>if</span> <span class='op'>!</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_config_file'>config_file</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:rewrite</span><span class='rbracket'>]</span>
+    <span class='const'><span class='object_link'><a href="Util.html" title="Doing::Util (module)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_write_to_file'><span class='object_link'><a href="Util.html#write_to_file-instance_method" title="Doing::Util#write_to_file (method)">write_to_file</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_config_file'>config_file</span><span class='comma'>,</span> <span class='const'>YAML</span><span class='period'>.</span><span class='id identifier rubyid_dump'>dump</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>backup:</span> <span class='kw'>true</span><span class='rparen'>)</span>
+    <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Config:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Config file written to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_config_file'>config_file</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='const'><span class='object_link'><a href="Hooks.html" title="Doing::Hooks (module)">Hooks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_trigger'><span class='object_link'><a href="Hooks.html#trigger-class_method" title="Doing::Hooks.trigger (method)">trigger</a></span></span> <span class='symbol'>:post_config</span><span class='comma'>,</span> <span class='kw'>self</span>
+
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='id identifier rubyid_local_config'>local_config</span><span class='period'>.</span><span class='id identifier rubyid_deep_merge'>deep_merge</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>extend_existing_arrays:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>sort_merged_arrays:</span> <span class='kw'>true</span> <span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='ivar'>@ignore_local</span>
+  <span class='comment'># config = Util.deep_merge_hashes(config, local_config) unless @ignore_local
+</span>
+  <span class='const'><span class='object_link'><a href="Hooks.html" title="Doing::Hooks (module)">Hooks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_trigger'><span class='object_link'><a href="Hooks.html#trigger-class_method" title="Doing::Hooks.trigger (method)">trigger</a></span></span> <span class='symbol'>:post_local_config</span><span class='comma'>,</span> <span class='kw'>self</span>
+
+  <span class='id identifier rubyid_config'>config</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -904,7 +1190,45 @@
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 146</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default_config_file'>default_config_file</span>
+  <span class='kw'>if</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_config_dir'>config_dir</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_directory?'>directory?</span><span class='lparen'>(</span><span class='id identifier rubyid_config_dir'>config_dir</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>DoingRuntimeError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_config_dir'>config_dir</span><span class='embexpr_end'>}</span><span class='tstring_content'> exists but is not a directory</span><span class='tstring_end'>&quot;</span></span>
+
+  <span class='kw'>end</span>
+
+  <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_config_dir'>config_dir</span><span class='rparen'>)</span>
+    <span class='const'>FileUtils</span><span class='period'>.</span><span class='id identifier rubyid_mkdir_p'>mkdir_p</span><span class='lparen'>(</span><span class='id identifier rubyid_config_dir'>config_dir</span><span class='rparen'>)</span>
+    <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='symbol'>:warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Config directory created at </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_config_dir'>config_dir</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_config_dir'>config_dir</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>config.yml</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -943,7 +1267,29 @@
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+140
+141
+142
+143
+144</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 140</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_exact_match?'>exact_match?</span>
+  <span class='id identifier rubyid_search_settings'>search_settings</span> <span class='op'>=</span> <span class='ivar'>@settings</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>search</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_matching'>matching</span> <span class='op'>=</span> <span class='id identifier rubyid_search_settings'>search_settings</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>matching</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>pattern</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_normalize_matching'>normalize_matching</span>
+  <span class='id identifier rubyid_matching'>matching</span> <span class='op'>==</span> <span class='symbol'>:exact</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -955,7 +1301,25 @@
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+198
+199
+200</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 198</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_default'>default</span><span class='rparen'>)</span>
+  <span class='ivar'>@settings</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_default'>default</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1016,7 +1380,27 @@ defaults.</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+296
+297
+298
+299</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 296</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_from'>from</span><span class='lparen'>(</span><span class='id identifier rubyid_user_config'>user_config</span><span class='rparen'>)</span>
+  <span class='comment'># Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
+</span>  <span class='const'><span class='object_link'><a href="" title="Doing::Configuration (class)">Configuration</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_user_config'>user_config</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_stringify_keys'>stringify_keys</span><span class='period'>.</span><span class='id identifier rubyid_deep_merge'>deep_merge</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#DEFAULTS-constant" title="Doing::Configuration::DEFAULTS (constant)">DEFAULTS</a></span></span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>extend_existing_arrays:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>sort_merged_arrays:</span> <span class='kw'>true</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1078,7 +1462,121 @@ matched, first match wins)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 212</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_resolve_key_path'>resolve_key_path</span><span class='lparen'>(</span><span class='id identifier rubyid_keypath'>keypath</span><span class='comma'>,</span> <span class='label'>create:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>distance:</span> <span class='int'>2</span><span class='comma'>,</span> <span class='label'>exact:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_cfg'>cfg</span> <span class='op'>=</span> <span class='ivar'>@settings</span>
+  <span class='id identifier rubyid_real_path'>real_path</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_keypath'>keypath</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[.*]?$</span><span class='regexp_end'>/</span></span>
+    <span class='id identifier rubyid_paths'>paths</span> <span class='op'>=</span> <span class='id identifier rubyid_keypath'>keypath</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[:.]</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_element_count'>element_count</span> <span class='op'>=</span> <span class='id identifier rubyid_paths'>paths</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
+    <span class='kw'>while</span> <span class='id identifier rubyid_paths'>paths</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_cfg'>cfg</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+      <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='id identifier rubyid_paths'>paths</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span>
+      <span class='id identifier rubyid_new_cfg'>new_cfg</span> <span class='op'>=</span> <span class='kw'>nil</span>
+
+      <span class='kw'>if</span> <span class='id identifier rubyid_cfg'>cfg</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_matches'>matches</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_exact'>exact</span>
+                    <span class='id identifier rubyid_cfg'>cfg</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid__'>_</span><span class='op'>|</span> <span class='id identifier rubyid_key'>key</span> <span class='op'>==</span> <span class='id identifier rubyid_path'>path</span> <span class='rbrace'>}</span>
+                  <span class='kw'>else</span>
+                    <span class='id identifier rubyid_cfg'>cfg</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid__'>_</span><span class='op'>|</span> <span class='id identifier rubyid_key'>key</span> <span class='op'>=~</span> <span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_to_rx'>to_rx</span><span class='lparen'>(</span><span class='label'>distance:</span> <span class='id identifier rubyid_distance'>distance</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+                  <span class='kw'>end</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_matches'>matches</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span>
+          <span class='id identifier rubyid_shortest'>shortest</span> <span class='op'>=</span> <span class='id identifier rubyid_matches'>matches</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_group_by'>group_by</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:length</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_min'>min</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+          <span class='id identifier rubyid_real_path'>real_path</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_shortest'>shortest</span>
+          <span class='id identifier rubyid_new_cfg'>new_cfg</span> <span class='op'>=</span> <span class='id identifier rubyid_matches'>matches</span><span class='lbracket'>[</span><span class='id identifier rubyid_shortest'>shortest</span><span class='rbracket'>]</span>
+        <span class='kw'>end</span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_new_cfg'>new_cfg</span> <span class='op'>=</span> <span class='id identifier rubyid_cfg'>cfg</span>
+      <span class='kw'>end</span>
+
+      <span class='kw'>if</span> <span class='id identifier rubyid_new_cfg'>new_cfg</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+        <span class='kw'>return</span> <span class='id identifier rubyid_real_path'>real_path</span> <span class='kw'>if</span> <span class='id identifier rubyid_real_path'>real_path</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_path'>path</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_real_path'>real_path</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='op'>==</span> <span class='id identifier rubyid_element_count'>element_count</span>
+
+        <span class='kw'>if</span> <span class='id identifier rubyid_distance'>distance</span> <span class='op'>&lt;</span> <span class='int'>5</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_create'>create</span>
+          <span class='kw'>return</span> <span class='id identifier rubyid_resolve_key_path'>resolve_key_path</span><span class='lparen'>(</span><span class='id identifier rubyid_keypath'>keypath</span><span class='comma'>,</span> <span class='label'>create:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>distance:</span> <span class='id identifier rubyid_distance'>distance</span> <span class='op'>+</span> <span class='int'>1</span><span class='rparen'>)</span>
+        <span class='kw'>else</span>
+          <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_create'>create</span>
+        <span class='kw'>end</span>
+
+        <span class='id identifier rubyid_resolved'>resolved</span> <span class='op'>=</span> <span class='id identifier rubyid_real_path'>real_path</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Resolved </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_real_path'>real_path</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>, but </span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+        <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='symbol'>:warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_resolved'>resolved</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_content'> is unknown</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_new_path'>new_path</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='op'>*</span><span class='id identifier rubyid_real_path'>real_path</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_paths'>paths</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+        <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='symbol'>:warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Continuing will create the path </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_new_path'>new_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Prompt.html" title="Doing::Prompt (module)">Prompt</a></span></span><span class='period'>.</span><span class='id identifier rubyid_yn'><span class='object_link'><a href="PromptYN.html#yn-instance_method" title="Doing::PromptYN#yn (method)">yn</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Key path not found, create it?</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>default_response:</span> <span class='kw'>true</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_raise'>raise</span> <span class='const'>InvalidArgument</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Invalid key path</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_res'>res</span>
+
+        <span class='id identifier rubyid_real_path'>real_path</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_paths'>paths</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_compact!'>compact!</span>
+        <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Config:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>translated key path </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_keypath'>keypath</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_real_path'>real_path</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_keypath'>keypath</span> <span class='op'>==</span> <span class='id identifier rubyid_real_path'>real_path</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+        <span class='kw'>return</span> <span class='id identifier rubyid_real_path'>real_path</span>
+      <span class='kw'>end</span>
+      <span class='id identifier rubyid_cfg'>cfg</span> <span class='op'>=</span> <span class='id identifier rubyid_new_cfg'>new_cfg</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Config:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>translated key path </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_keypath'>keypath</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_real_path'>real_path</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_keypath'>keypath</span> <span class='op'>==</span> <span class='id identifier rubyid_real_path'>real_path</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_real_path'>real_path</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1134,7 +1632,47 @@ matched, first match wins)</p>
 </ul>
 
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 383</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_save_view'>save_view</span><span class='lparen'>(</span><span class='id identifier rubyid_view'>view</span><span class='comma'>,</span> <span class='id identifier rubyid_title'>title</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_title'>title</span><span class='period'>.</span><span class='id identifier rubyid_downcase!'>downcase!</span>
+  <span class='id identifier rubyid_default_template'>default_template</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>templates.default</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_user_config'>user_config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Util.html" title="Doing::Util (module)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_safe_load_file'><span class='object_link'><a href="Util.html#safe_load_file-instance_method" title="Doing::Util#safe_load_file (method)">safe_load_file</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_config_file'>config_file</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_user_config'>user_config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>views</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_user_config'>user_config</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>views</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_view'>view</span><span class='period'>.</span><span class='id identifier rubyid_delete_if'>delete_if</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='op'>|</span> <span class='id identifier rubyid_v'>v</span> <span class='op'>==</span> <span class='id identifier rubyid_default_template'>default_template</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_user_config'>user_config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>views</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_title'>title</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_view'>view</span>
+  <span class='const'><span class='object_link'><a href="Util.html" title="Doing::Util (module)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_write_to_file'><span class='object_link'><a href="Util.html#write_to_file-instance_method" title="Doing::Util#write_to_file (method)">write_to_file</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_config_file'>config_file</span><span class='comma'>,</span> <span class='const'>YAML</span><span class='period'>.</span><span class='id identifier rubyid_dump'>dump</span><span class='lparen'>(</span><span class='id identifier rubyid_user_config'>user_config</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>backup:</span> <span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Config:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>View &quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_content'>&quot; saved to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_config_file'>config_file</span><span class='embexpr_end'>}</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Config:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>to use, run `doing view </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_content'>`</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="Hooks.html" title="Doing::Hooks (module)">Hooks</a></span></span><span class='period'>.</span><span class='id identifier rubyid_trigger'><span class='object_link'><a href="Hooks.html#trigger-class_method" title="Doing::Hooks.trigger (method)">trigger</a></span></span> <span class='symbol'>:post_config</span><span class='comma'>,</span> <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1156,7 +1694,75 @@ matched, first match wins)</p>
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 304</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_update_deprecated_config'>update_deprecated_config</span>
+  <span class='comment'># return # Until further notice
+</span>  <span class='kw'>return</span> <span class='kw'>if</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_default_config_file'>default_config_file</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_old_file'>old_file</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Util.html" title="Doing::Util (module)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_user_home'><span class='object_link'><a href="Util.html#user_home-instance_method" title="Doing::Util#user_home (method)">user_home</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.doingrc</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_old_file'>old_file</span><span class='rparen'>)</span>
+
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='symbol'>:warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Deprecated:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>main config file location has changed to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_config_file'>config_file</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Prompt.html" title="Doing::Prompt (module)">Prompt</a></span></span><span class='period'>.</span><span class='id identifier rubyid_yn'><span class='object_link'><a href="PromptYN.html#yn-instance_method" title="Doing::PromptYN#yn (method)">yn</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Move </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_old_file'>old_file</span><span class='embexpr_end'>}</span><span class='tstring_content'> to new location, preserving settings?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>default_response:</span> <span class='kw'>true</span><span class='rparen'>)</span>
+
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_res'>res</span>
+
+  <span class='kw'>if</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_default_config_file'>default_config_file</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Prompt.html" title="Doing::Prompt (module)">Prompt</a></span></span><span class='period'>.</span><span class='id identifier rubyid_yn'><span class='object_link'><a href="PromptYN.html#yn-instance_method" title="Doing::PromptYN#yn (method)">yn</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_default_config_file'>default_config_file</span><span class='embexpr_end'>}</span><span class='tstring_content'> already exists, overwrite it?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>default_response:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+
+    <span class='kw'>unless</span> <span class='id identifier rubyid_res'>res</span>
+      <span class='ivar'>@config_file</span> <span class='op'>=</span> <span class='id identifier rubyid_old_file'>old_file</span>
+      <span class='kw'>return</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='const'>FileUtils</span><span class='period'>.</span><span class='id identifier rubyid_mv'>mv</span> <span class='id identifier rubyid_old_file'>old_file</span><span class='comma'>,</span> <span class='id identifier rubyid_default_config_file'>default_config_file</span><span class='comma'>,</span> <span class='label'>force:</span> <span class='kw'>true</span>
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='symbol'>:warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Config:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Config file moved to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_default_config_file'>default_config_file</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='symbol'>:warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Config:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>If ~/.doingrc exists in the future,
+                       it will be considered a local config and its values will override the
+                       default configuration.</span><span class='tstring_end'>)</span></span><span class='rparen'>)</span>
+  <span class='const'>Process</span><span class='period'>.</span><span class='id identifier rubyid_exit'>exit</span> <span class='int'>0</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -1220,7 +1826,43 @@ matched, first match wins)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/configuration.rb', line 274</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_value_for_key'>value_for_key</span><span class='lparen'>(</span><span class='id identifier rubyid_keypath'>keypath</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_cfg'>cfg</span> <span class='op'>=</span> <span class='ivar'>@settings</span>
+  <span class='id identifier rubyid_real_path'>real_path</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>config</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_keypath'>keypath</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[.*]?$</span><span class='regexp_end'>/</span></span>
+    <span class='id identifier rubyid_real_path'>real_path</span> <span class='op'>=</span> <span class='id identifier rubyid_resolve_key_path'>resolve_key_path</span><span class='lparen'>(</span><span class='id identifier rubyid_keypath'>keypath</span><span class='comma'>,</span> <span class='label'>create:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_real_path'>real_path</span><span class='op'>&amp;.</span><span class='id identifier rubyid_count'>count</span><span class='op'>&amp;.</span><span class='id identifier rubyid_positive?'>positive?</span>
+
+    <span class='id identifier rubyid_cfg'>cfg</span> <span class='op'>=</span> <span class='id identifier rubyid_cfg'>cfg</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_real_path'>real_path</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_cfg'>cfg</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='kw'>nil</span> <span class='op'>:</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_real_path'>real_path</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_cfg'>cfg</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -1228,9 +1870,9 @@ matched, first match wins)</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 26 11:00:42 2024 by
+  Generated on Sun Dec  1 11:01:06 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.0).
+  0.9.37 (ruby-3.3.0).
 </div>
 
     </div>

@@ -20,7 +20,6 @@ require 'safe_yaml/load'
 require 'chronic'
 require 'tty-link'
 require 'tty-which'
-require 'tty-markdown'
 require 'tty-reader'
 require 'tty-screen'
 

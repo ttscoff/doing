@@ -6,7 +6,7 @@
 <title>
   Module: Doing::StringQuery
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -365,7 +365,27 @@
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+24
+25
+26
+27</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string/query.rb', line 24</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ignore?'>ignore?</span>
+  <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='kw'>self</span>
+  <span class='id identifier rubyid_line'>line</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^#</span><span class='regexp_end'>/</span></span> <span class='op'>||</span> <span class='id identifier rubyid_line'>line</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*$</span><span class='regexp_end'>/</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -439,7 +459,25 @@
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+15
+16
+17</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string/query.rb', line 15</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ignore_case'>ignore_case</span><span class='lparen'>(</span><span class='id identifier rubyid_search'>search</span><span class='comma'>,</span> <span class='id identifier rubyid_case_type'>case_type</span><span class='rparen'>)</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_case_type'>case_type</span> <span class='op'>==</span> <span class='symbol'>:smart</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_search'>search</span> <span class='op'>!~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[A-Z]</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_case_type'>case_type</span> <span class='op'>==</span> <span class='symbol'>:ignore</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -478,7 +516,25 @@
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+34
+35
+36</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string/query.rb', line 34</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_rx?'>rx?</span>
+  <span class='kw'>self</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>(^/.*?/$|^&#39;)</span><span class='regexp_end'>}</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -517,7 +573,35 @@
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+130
+131
+132
+133
+134
+135
+136
+137</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string/query.rb', line 130</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_bool'>to_bool</span>
+  <span class='kw'>case</span> <span class='kw'>self</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[yt1]</span><span class='regexp_end'>/i</span></span>
+    <span class='kw'>true</span>
+  <span class='kw'>else</span>
+    <span class='kw'>false</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -556,7 +640,31 @@
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+93
+94
+95
+96
+97
+98</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string/query.rb', line 93</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_phrase_query'>to_phrase_query</span>
+  <span class='id identifier rubyid_parser'>parser</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../PhraseParser.html" title="PhraseParser (module)">PhraseParser</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../PhraseParser/QueryParser.html" title="PhraseParser::QueryParser (class)">QueryParser</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_transformer'>transformer</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../PhraseParser.html" title="PhraseParser (module)">PhraseParser</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../PhraseParser/QueryTransformer.html" title="PhraseParser::QueryTransformer (class)">QueryTransformer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_parse_tree'>parse_tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_transformer'>transformer</span><span class='period'>.</span><span class='id identifier rubyid_apply'>apply</span><span class='lparen'>(</span><span class='id identifier rubyid_parse_tree'>parse_tree</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_elasticsearch'>to_elasticsearch</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -595,7 +703,31 @@
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+105
+106
+107
+108
+109
+110</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string/query.rb', line 105</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_query'>to_query</span>
+  <span class='id identifier rubyid_parser'>parser</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../BooleanTermParser.html" title="BooleanTermParser (module)">BooleanTermParser</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../BooleanTermParser/QueryParser.html" title="BooleanTermParser::QueryParser (class)">QueryParser</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_transformer'>transformer</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../BooleanTermParser.html" title="BooleanTermParser (module)">BooleanTermParser</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../BooleanTermParser/QueryTransformer.html" title="BooleanTermParser::QueryTransformer (class)">QueryTransformer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_parse_tree'>parse_tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_transformer'>transformer</span><span class='period'>.</span><span class='id identifier rubyid_apply'>apply</span><span class='lparen'>(</span><span class='id identifier rubyid_parse_tree'>parse_tree</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_elasticsearch'>to_elasticsearch</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -619,7 +751,7 @@ haystack, spaces indicate unlimited distance.</p>
 <div class="tags">
   
   <div class="examples">
-    <p class="tag_title">Examples:</p>
+    <h4 class="tag_title">Examples:</h4>
     
       
       <pre class="example code"><code><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>this word</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_to_rx'>to_rx</span><span class='lparen'>(</span><span class='int'>3</span><span class='rparen'>)</span>
@@ -684,7 +816,67 @@ between characters</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string/query.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_rx'>to_rx</span><span class='lparen'>(</span><span class='label'>distance:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>case_type:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_distance'>distance</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>search</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>distance</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>3</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+  <span class='id identifier rubyid_case_type'>case_type</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>search</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>case</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>smart</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_normalize_case'>normalize_case</span>
+  <span class='id identifier rubyid_case_sensitive'>case_sensitive</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_case_type'>case_type</span>
+                   <span class='kw'>when</span> <span class='symbol'>:smart</span>
+                     <span class='kw'>self</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[A-Z]</span><span class='regexp_end'>/</span></span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
+                   <span class='kw'>when</span> <span class='symbol'>:sensitive</span>
+                     <span class='kw'>true</span>
+                   <span class='kw'>else</span>
+                     <span class='kw'>false</span>
+                   <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_pattern'>pattern</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_dup'>dup</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
+            <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^/.*?/$</span><span class='regexp_end'>}</span></span>
+              <span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>/(.*?)/</span><span class='regexp_end'>}</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+            <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^&#39;</span><span class='regexp_end'>/</span></span>
+              <span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^&#39;(.*?)&#39;?$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+            <span class='kw'>else</span>
+              <span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> +</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_w'>w</span><span class='op'>|</span>
+                <span class='id identifier rubyid_w'>w</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.{0,</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_distance'>distance</span><span class='embexpr_end'>}</span><span class='tstring_content'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\+</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_wildcard_to_rx'>wildcard_to_rx</span>
+              <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.*?</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+            <span class='kw'>end</span>
+  <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='op'>!</span><span class='id identifier rubyid_case_sensitive'>case_sensitive</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -723,7 +915,33 @@ between characters</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+117
+118
+119
+120
+121
+122
+123</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string/query.rb', line 117</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_truthy?'>truthy?</span>
+  <span class='kw'>if</span> <span class='kw'>self</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^(0|f(alse)?|n(o)?)$</span><span class='regexp_end'>/i</span></span>
+    <span class='kw'>false</span>
+  <span class='kw'>else</span>
+    <span class='kw'>true</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -763,7 +981,25 @@ Uses \S (non-whitespace) instead of . (any character)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/string/query.rb', line 44</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_wildcard_to_rx'>wildcard_to_rx</span>
+  <span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\?</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\S</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\*</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\S*?</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\]\]</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>--</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -771,9 +1007,9 @@ Uses \S (non-whitespace) instead of . (any character)</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 26 11:00:42 2024 by
+  Generated on Sun Dec  1 11:01:05 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.0).
+  0.9.37 (ruby-3.3.0).
 </div>
 
     </div>

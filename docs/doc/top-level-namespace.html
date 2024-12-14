@@ -6,7 +6,7 @@
 <title>
   Top Level Namespace
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -208,7 +208,425 @@
 </ul>
 
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/add_options.rb', line 27</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_options'>add_options</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_cmd'>cmd</span><span class='comma'>,</span> <span class='label'>default_template:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_cmd_name'>cmd_name</span> <span class='op'>=</span> <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_action'>action</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_cmd_name'>cmd_name</span>
+           <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>again</span><span class='regexp_end'>/</span></span>
+             <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Repeat</span><span class='tstring_end'>&#39;</span></span>
+           <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>grep</span><span class='regexp_end'>/</span></span>
+             <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Search</span><span class='tstring_end'>&#39;</span></span>
+           <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>mark</span><span class='regexp_end'>/</span></span>
+             <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Flag</span><span class='tstring_end'>&#39;</span></span>
+           <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(last|tags|view|on)</span><span class='regexp_end'>/</span></span>
+             <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Show</span><span class='tstring_end'>&#39;</span></span>
+           <span class='kw'>else</span>
+             <span class='id identifier rubyid_cmd_name'>cmd_name</span><span class='period'>.</span><span class='id identifier rubyid_capitalize'>capitalize</span>
+           <span class='kw'>end</span>
+
+  <span class='kw'>case</span> <span class='id identifier rubyid_type'>type</span>
+  <span class='kw'>when</span> <span class='symbol'>:output_template</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Output to export format (</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Doing/Plugins.html" title="Doing::Plugins (module)">Plugins</a></span></span><span class='period'>.</span><span class='id identifier rubyid_plugin_names'><span class='object_link'><a href="Doing/Plugins.html#plugin_names-class_method" title="Doing::Plugins.plugin_names (method)">plugin_names</a></span></span><span class='lparen'>(</span><span class='label'>type:</span> <span class='symbol'>:export</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FORMAT</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>o</span><span class='words_sep'> </span><span class='tstring_content'>output</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>ExportTemplate</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Output using a template from configuration</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TEMPLATE_KEY</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:config_template</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>TemplateName</span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='id identifier rubyid_default_template'>default_template</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Override output format with a template string containing %placeholders</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TEMPLATE_STRING</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:template</span><span class='rbracket'>]</span>
+  <span class='kw'>when</span> <span class='symbol'>:output_template_no_defaults</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Output to export format (</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Doing/Plugins.html" title="Doing::Plugins (module)">Plugins</a></span></span><span class='period'>.</span><span class='id identifier rubyid_plugin_names'><span class='object_link'><a href="Doing/Plugins.html#plugin_names-class_method" title="Doing::Plugins.plugin_names (method)">plugin_names</a></span></span><span class='lparen'>(</span><span class='label'>type:</span> <span class='symbol'>:export</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FORMAT</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>o</span><span class='words_sep'> </span><span class='tstring_content'>output</span><span class='tstring_end'>]</span></span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Output using a template from configuration</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TEMPLATE_KEY</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:config_template</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>TemplateName</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Override output format with a template string containing %placeholders</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TEMPLATE_STRING</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:template</span><span class='rbracket'>]</span>
+  <span class='kw'>when</span> <span class='symbol'>:add_entry</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Exclude auto tags and default tags</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>X</span><span class='words_sep'> </span><span class='tstring_content'>noauto</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>negatable:</span> <span class='kw'>false</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Include a note</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TEXT</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>n</span><span class='words_sep'> </span><span class='tstring_content'>note</span><span class='tstring_end'>]</span></span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Prompt for note via multi-line input</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>ask</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>negatable:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='kw'>false</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Edit entry with </span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Doing/Util.html" title="Doing::Util (module)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_default_editor'><span class='object_link'><a href="Doing/Util.html#default_editor-instance_method" title="Doing::Util#default_editor (method)">default_editor</a></span></span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>e</span><span class='words_sep'> </span><span class='tstring_content'>editor</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>negatable:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='kw'>false</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Backdate start date for new entry to date string [4pm|20m|2h|yesterday noon]</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>DATE_STRING</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>b</span><span class='words_sep'> </span><span class='tstring_content'>back</span><span class='words_sep'> </span><span class='tstring_content'>started</span><span class='words_sep'> </span><span class='tstring_content'>since</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>DateBeginString</span>
+  <span class='kw'>when</span> <span class='symbol'>:finish_entry</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>Set finish date to specific date/time (natural langauge parsed, e.g. --at=1:30pm).
+    Used with --took, backdates start date</span><span class='tstring_end'>)</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>DATE_STRING</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>at</span><span class='words_sep'> </span><span class='tstring_content'>finished</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>DateEndString</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>
+          Start and end times as a date/time range `doing done --from &quot;1am to 8am&quot;`.
+          Overrides other date flags.
+        </span><span class='tstring_end'>)</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TIME_RANGE</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:from</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>must_match:</span> <span class='const'>REGEX_RANGE</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>Set completion date to start date plus interval (XX[mhd] or HH:MM).
+    If used without the --back option, the start date will be moved back to allow
+    the completion date to be the current time.</span><span class='tstring_end'>)</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INTERVAL</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>t</span><span class='words_sep'> </span><span class='tstring_content'>took</span><span class='words_sep'> </span><span class='tstring_content'>for</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>DateIntervalString</span>
+  <span class='kw'>when</span> <span class='symbol'>:search</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Filter entries using a search query, surround with slashes for regex (e.g. &quot;/query.*/&quot;),
+            start with single quote for exact match (&quot;\&#39;query&quot;)</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>QUERY</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:search</span><span class='rbracket'>]</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TYPE</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:case</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>must_match:</span> <span class='const'>REGEX_CASE</span><span class='comma'>,</span>
+                      <span class='label'>default_value:</span> <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_settings'>settings</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>search</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>case</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_normalize_case'>normalize_case</span><span class='comma'>,</span>
+                      <span class='label'>type:</span> <span class='const'>CaseSymbol</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Force exact search string matching (case sensitive)</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>x</span><span class='words_sep'> </span><span class='tstring_content'>exact</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_exact_match?'>exact_match?</span><span class='comma'>,</span> <span class='label'>negatable:</span> <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_exact_match?'>exact_match?</span>
+  <span class='kw'>when</span> <span class='symbol'>:time_display</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Show time intervals on @done tasks</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>t</span><span class='words_sep'> </span><span class='tstring_content'>times</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>negatable:</span> <span class='kw'>true</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Show elapsed time on entries without @done tag</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='lbracket'>[</span><span class='symbol'>:duration</span><span class='rbracket'>]</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Show time totals at the end of output</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='lbracket'>[</span><span class='symbol'>:totals</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>negatable:</span> <span class='kw'>false</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Sort tags by (name|time)</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_default'>default</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tag_sort</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_normalize_tag_sort'>normalize_tag_sort</span> <span class='op'>||</span> <span class='symbol'>:name</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>KEY</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:tag_sort</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>must_match:</span> <span class='const'>REGEX_TAG_SORT</span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='id identifier rubyid_default'>default</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>TagSortSymbol</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Tag sort direction (asc|desc)</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>DIRECTION</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:tag_order</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>must_match:</span> <span class='const'>REGEX_SORT_ORDER</span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='symbol'>:asc</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>OrderSymbol</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Only show items with recorded time intervals</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='lbracket'>[</span><span class='symbol'>:only_timed</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>negatable:</span> <span class='kw'>false</span>
+  <span class='kw'>when</span> <span class='symbol'>:tag_filter</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TAG</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:tag</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>TagArray</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Perform a tag value query (&quot;@done &gt; two hours ago&quot; or &quot;@progress &lt; 50&quot;).
+            May be used multiple times, combined with --bool</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>QUERY</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:val</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>multiple:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>must_match:</span> <span class='const'>REGEX_VALUE_QUERY</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_action'>action</span><span class='embexpr_end'>}</span><span class='tstring_content'> items that *don&#39;t* match search/tag filters</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='lbracket'>[</span><span class='symbol'>:not</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>default_value:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>negatable:</span> <span class='kw'>false</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and - as booleans</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BOOLEAN</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:bool</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>must_match:</span> <span class='const'>REGEX_BOOL</span><span class='comma'>,</span>
+                      <span class='label'>default_value:</span> <span class='symbol'>:pattern</span><span class='comma'>,</span>
+                      <span class='label'>type:</span> <span class='const'>BooleanSymbol</span>
+  <span class='kw'>when</span> <span class='symbol'>:tag_filter_no_defaults</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TAG</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:tag</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>TagArray</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Perform a tag value query (&quot;@done &gt; two hours ago&quot; or &quot;@progress &lt; 50&quot;).
+            May be used multiple times, combined with --bool</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>QUERY</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:val</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>multiple:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>must_match:</span> <span class='const'>REGEX_VALUE_QUERY</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_action'>action</span><span class='embexpr_end'>}</span><span class='tstring_content'> items that *don&#39;t* match search/tag filters</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_switch'>switch</span> <span class='lbracket'>[</span><span class='symbol'>:not</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>negatable:</span> <span class='kw'>false</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BOOLEAN</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:bool</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>must_match:</span> <span class='const'>REGEX_BOOL</span><span class='comma'>,</span>
+                      <span class='label'>type:</span> <span class='const'>BooleanSymbol</span>
+  <span class='kw'>when</span> <span class='symbol'>:time_filter</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>View entries before specified time (e.g. 8am, 12:30pm, 15:00)</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TIME_STRING</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:before</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>DateEndString</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>View entries after specified time (e.g. 8am, 12:30pm, 15:00)</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TIME_STRING</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:after</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>DateBeginString</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>
+      Time range to show `doing </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> --from &quot;12pm to 4pm&quot;`
+    </span><span class='tstring_end'>)</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TIME_RANGE</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:from</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>DateRangeString</span><span class='comma'>,</span> <span class='label'>must_match:</span> <span class='const'>REGEX_TIME_RANGE</span>
+  <span class='kw'>when</span> <span class='symbol'>:date_filter</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_action'>action</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Archive</span><span class='regexp_end'>/</span></span>
+      <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Archive entries older than date (natural language).</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_action'>action</span><span class='embexpr_end'>}</span><span class='tstring_content'> entries older than date (natural language). If this is only a time (8am, 1:30pm, 15:00), all
+              dates will be included, but entries will be filtered by time of day</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>DATE_STRING</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:before</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>DateBeginString</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_action'>action</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Archive</span><span class='regexp_end'>/</span></span>
+      <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Archive entries newer than date (natural language).</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_action'>action</span><span class='embexpr_end'>}</span><span class='tstring_content'> entries newer than date (natural language). If this is only a time (8am, 1:30pm, 15:00), all
+              dates will be included, but entries will be filtered by time of day</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>DATE_STRING</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:after</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>DateEndString</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_action'>action</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Archive</span><span class='regexp_end'>/</span></span>
+      <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>
+          Date range (natural language) to archive: `doing archive --from &quot;1/1/21 to 12/31/21&quot;`.
+        </span><span class='tstring_end'>)</span></span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>%(</span><span class='tstring_content'>
+        Date range (natural language) to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_action'>action</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='embexpr_end'>}</span><span class='tstring_content'>, or a single day to filter on.
+        To specify a range, use &quot;to&quot;: `doing </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_cmd_name'>cmd_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> --from &quot;monday 8am to friday 5pm&quot;`.
+
+        If values are only time(s) (6am to noon) all dates will be included, but entries will be filtered
+        by time of day.
+      </span><span class='tstring_end'>)</span></span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>DATE_OR_RANGE</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='lbracket'>[</span><span class='symbol'>:from</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'>DateRangeString</span>
+  <span class='kw'>when</span> <span class='symbol'>:save</span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Save all current command line options as a new view</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>VIEW_NAME</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>save</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'><span class='object_link'><a href="String.html" title="String (class)">String</a></span></span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Title string to be used for output formats that require it</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_arg_name'>arg_name</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TITLE</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_flag'>flag</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>title</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='label'>type:</span> <span class='const'><span class='object_link'><a href="String.html" title="String (class)">String</a></span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -216,9 +634,9 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 26 11:00:41 2024 by
+  Generated on Sun Dec  1 11:01:05 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.0).
+  0.9.37 (ruby-3.3.0).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Module: Doing::ItemDates
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -281,7 +281,55 @@
   
 
   
-</h3>
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/item/dates.rb', line 35</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_calculate_end_date'>calculate_end_date</span><span class='lparen'>(</span><span class='id identifier rubyid_opt'>opt</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:took</span><span class='rbracket'>]</span>
+    <span class='kw'>if</span> <span class='ivar'>@date</span> <span class='op'>+</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:took</span><span class='rbracket'>]</span> <span class='op'>&gt;</span> <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span>
+      <span class='ivar'>@date</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span> <span class='op'>-</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:took</span><span class='rbracket'>]</span>
+      <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span>
+    <span class='kw'>else</span>
+      <span class='ivar'>@date</span> <span class='op'>+</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:took</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:back</span><span class='rbracket'>]</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:back</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Integer</span>
+      <span class='ivar'>@date</span> <span class='op'>+</span> <span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:back</span><span class='rbracket'>]</span>
+    <span class='kw'>else</span>
+      <span class='ivar'>@date</span> <span class='op'>+</span> <span class='lparen'>(</span><span class='id identifier rubyid_opt'>opt</span><span class='lbracket'>[</span><span class='symbol'>:back</span><span class='rbracket'>]</span> <span class='op'>-</span> <span class='ivar'>@date</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>else</span>
+    <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -303,7 +351,33 @@
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+8
+9
+10
+11
+12
+13
+14</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/item/dates.rb', line 8</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_duration'>duration</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_should_time?'>should_time?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_should_finish?'>should_finish?</span>
+
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='ivar'>@title</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(?&lt;=^| )@done\b</span><span class='regexp_end'>/</span></span>
+
+  <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span> <span class='op'>-</span> <span class='ivar'>@date</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -342,7 +416,25 @@
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/item/dates.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_end_date'>end_date</span>
+  <span class='ivar'>@end_date</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="../Time.html" title="Time (class)">Time</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@title</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)</span><span class='regexp_end'>/</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -389,7 +481,25 @@ dates</p>
 </ul>
 
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+94
+95
+96</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/item/dates.rb', line 94</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_expand_date_tags'>expand_date_tags</span><span class='lparen'>(</span><span class='id identifier rubyid_additional_tags'>additional_tags</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='ivar'>@title</span><span class='period'>.</span><span class='id identifier rubyid_expand_date_tags'>expand_date_tags</span><span class='lparen'>(</span><span class='id identifier rubyid_additional_tags'>additional_tags</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -429,7 +539,25 @@ the value of its @done tag (if present)</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+22
+23
+24</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/item/dates.rb', line 22</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_interval'>interval</span>
+  <span class='ivar'>@interval</span> <span class='op'>||=</span> <span class='id identifier rubyid_calc_interval'>calc_interval</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -488,7 +616,41 @@ value overlaps with another item&#39;s</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/item/dates.rb', line 73</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_overlapping_time?'>overlapping_time?</span><span class='lparen'>(</span><span class='id identifier rubyid_item_b'>item_b</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_same_time?'>same_time?</span><span class='lparen'>(</span><span class='id identifier rubyid_item_b'>item_b</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>=</span> <span class='id identifier rubyid_date'>date</span>
+  <span class='id identifier rubyid_a_interval'>a_interval</span> <span class='op'>=</span> <span class='id identifier rubyid_interval'>interval</span>
+  <span class='id identifier rubyid_end_a'>end_a</span> <span class='op'>=</span> <span class='id identifier rubyid_a_interval'>a_interval</span> <span class='op'>?</span> <span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>+</span> <span class='id identifier rubyid_a_interval'>a_interval</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>:</span> <span class='id identifier rubyid_start_a'>start_a</span>
+  <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>=</span> <span class='id identifier rubyid_item_b'>item_b</span><span class='period'>.</span><span class='id identifier rubyid_date'>date</span>
+  <span class='id identifier rubyid_b_interval'>b_interval</span> <span class='op'>=</span> <span class='id identifier rubyid_item_b'>item_b</span><span class='period'>.</span><span class='id identifier rubyid_interval'>interval</span>
+  <span class='id identifier rubyid_end_b'>end_b</span> <span class='op'>=</span> <span class='id identifier rubyid_b_interval'>b_interval</span> <span class='op'>?</span> <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>+</span> <span class='id identifier rubyid_b_interval'>b_interval</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>:</span> <span class='id identifier rubyid_start_b'>start_b</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_end_b'>end_b</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid_end_a'>end_a</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_a'>end_a</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_end_b'>end_b</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid_start_a'>start_a</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_start_b'>start_b</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_a'>end_a</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_end_b'>end_b</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
       <div class="method_details ">
@@ -546,7 +708,25 @@ value overlaps with another item&#39;s</p>
   
 </ul>
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+61
+62
+63</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/item/dates.rb', line 61</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_same_time?'>same_time?</span><span class='lparen'>(</span><span class='id identifier rubyid_item_b'>item_b</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_date'>date</span> <span class='op'>==</span> <span class='id identifier rubyid_item_b'>item_b</span><span class='period'>.</span><span class='id identifier rubyid_date'>date</span> <span class='op'>?</span> <span class='id identifier rubyid_interval'>interval</span> <span class='op'>==</span> <span class='id identifier rubyid_item_b'>item_b</span><span class='period'>.</span><span class='id identifier rubyid_interval'>interval</span> <span class='op'>:</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
     
   </div>
@@ -554,9 +734,9 @@ value overlaps with another item&#39;s</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 26 11:00:42 2024 by
+  Generated on Sun Dec  1 11:01:05 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.0).
+  0.9.37 (ruby-3.3.0).
 </div>
 
     </div>

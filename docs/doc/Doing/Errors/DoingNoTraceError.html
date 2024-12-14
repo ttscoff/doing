@@ -6,7 +6,7 @@
 <title>
   Exception: Doing::Errors::DoingNoTraceError
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -171,7 +171,37 @@
 <div class="tags">
   
 
-</div>
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8
+9
+10
+11
+12
+13
+14</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/doing/errors.rb', line 6</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>level:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>topic:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Error:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>exit_code:</span> <span class='int'>1</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_level'>level</span> <span class='op'>||=</span> <span class='symbol'>:error</span>
+  <span class='const'><span class='object_link'><a href="../../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_output_results'>output_results</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_msg'>msg</span>
+    <span class='const'><span class='object_link'><a href="../../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_now'>log_now</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_topic'>topic</span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='const'>Process</span><span class='period'>.</span><span class='id identifier rubyid_exit'>exit</span> <span class='id identifier rubyid_exit_code'>exit_code</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
 </div>
   
 </div>
@@ -180,9 +210,9 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 26 11:00:42 2024 by
+  Generated on Sun Dec  1 11:01:05 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.0).
+  0.9.37 (ruby-3.3.0).
 </div>
 
     </div>
