@@ -248,25 +248,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-25
-26
-27</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/cli_status.rb', line 25</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_clear'>clear</span>
-  <span class='gvar'>$stderr</span><span class='period'>.</span><span class='id identifier rubyid_print'>print</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\r</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kill</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -278,25 +260,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-2
-3
-4</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/cli_status.rb', line 2</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_cols'>cols</span>
-  <span class='ivar'>@cols</span> <span class='op'>||=</span> <span class='backtick'>`</span><span class='tstring_content'>tput cols</span><span class='tstring_end'>`</span></span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -308,109 +272,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/cli_status.rb', line 29</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_esc'>esc</span>
-  <span class='id identifier rubyid_e'>e</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kill</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[2K</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>reset</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[A\033[2K</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>black</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;0;30m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>red</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;0;31m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>green</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;0;32m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yellow</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;0;33m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>blue</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;0;34m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>magenta</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;0;35m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>cyan</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;0;36m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>white</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;0;37m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bgblack</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[40m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bgred</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[41m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bggreen</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[42m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bgyellow</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[43m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bgblue</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[44m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bgmagenta</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[45m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bgcyan</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[46m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bgwhite</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[47m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldblack</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;30m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldred</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;31m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldgreen</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;1;32m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldyellow</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;1;33m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldblue</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;1;34m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldmagenta</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;1;35m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldcyan</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;1;36m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldwhite</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;1;37m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldbgblack</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;40m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldbgred</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;41m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldbggreen</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;42m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldbgyellow</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;43m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldbgblue</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;44m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldbgmagenta</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;45m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldbgcyan</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;46m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldbgwhite</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;47m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>softpurple</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;35;40m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>hotpants</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[7;34;40m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>knightrider</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[7;30;40m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>flamingo</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[7;31;47m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yeller</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;37;43m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>whiteboard</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[1;30;47m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\033[0;39m</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_e'>e</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -422,25 +284,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-21
-22
-23</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/cli_status.rb', line 21</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_msg'>msg</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='label'>reset:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>color:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>green</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>end_char:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='gvar'>$stderr</span><span class='period'>.</span><span class='id identifier rubyid_print'>print</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kill</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='id identifier rubyid_color'>color</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>%s</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>%s</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='id identifier rubyid_reset'>reset</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\r</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='id identifier rubyid_end_char'>end_char</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -452,39 +296,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/cli_status.rb', line 6</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_progress'>progress</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='comma'>,</span> <span class='id identifier rubyid_total'>total</span><span class='comma'>,</span> <span class='id identifier rubyid_tail'>tail</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_status_width'>status_width</span> <span class='op'>=</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&gt; %s [%</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_total'>total</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'>d/%d]: </span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='id identifier rubyid_total'>total</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
-  <span class='id identifier rubyid_max_width'>max_width</span> <span class='op'>=</span> <span class='id identifier rubyid_cols'>cols</span> <span class='op'>-</span> <span class='id identifier rubyid_status_width'>status_width</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_tail'>tail</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'><span class='object_link'><a href="Array.html" title="Array (class)">Array</a></span></span>
-    <span class='id identifier rubyid_tail'>tail</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span> <span class='kw'>while</span> <span class='id identifier rubyid_tail'>tail</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>, </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>+</span> <span class='int'>3</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_max_width'>max_width</span>
-    <span class='id identifier rubyid_tail'>tail</span> <span class='op'>=</span> <span class='id identifier rubyid_tail'>tail</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>, </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_tail'>tail</span><span class='period'>.</span><span class='id identifier rubyid_ltrunc!'>ltrunc!</span><span class='lparen'>(</span><span class='id identifier rubyid_max_width'>max_width</span><span class='rparen'>)</span>
-  <span class='gvar'>$stderr</span><span class='period'>.</span><span class='id identifier rubyid_print'>print</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kill</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldyellow</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt; </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldgreen</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>%s </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>white</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldwhite</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>%</span><span class='embexpr_beg'>#{</span><span class='ivar'>@commands</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'>d</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldblack</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldyellow</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>%d</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>white</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>]: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldcyan</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>%s</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>\r</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='comma'>,</span> <span class='id identifier rubyid_total'>total</span><span class='comma'>,</span> <span class='id identifier rubyid_tail'>tail</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -496,25 +308,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-17
-18
-19</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/cli_status.rb', line 17</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_status'>status</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='label'>reset:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>end_char:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='gvar'>$stderr</span><span class='period'>.</span><span class='id identifier rubyid_print'>print</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kill</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boldyellow</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt; </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>whiteboard</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>%s</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_esc'>esc</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>%s</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='id identifier rubyid_reset'>reset</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\r</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='id identifier rubyid_end_char'>end_char</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
   </div>
@@ -522,7 +316,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Dec  1 11:01:05 2024 by
+  Generated on Sat Dec 14 15:35:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.0).
 </div>

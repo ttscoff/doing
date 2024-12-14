@@ -180,29 +180,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-11
-12
-13
-14
-15</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/array/nested_hash.rb', line 11</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_nested_hash'>nested_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_hsh'>hsh</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_h'>h</span><span class='comma'>,</span> <span class='id identifier rubyid_k'>k</span><span class='op'>|</span> <span class='id identifier rubyid_h'>h</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Hash.html" title="Hash (class)">Hash</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_h'>h</span><span class='period'>.</span><span class='id identifier rubyid_default_proc'>default_proc</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-  <span class='id identifier rubyid_hsh'>hsh</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='op'>*</span><span class='kw'>self</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='op'>-</span><span class='int'>2</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
-  <span class='id identifier rubyid_hsh'>hsh</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -210,7 +188,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Dec  1 11:01:05 2024 by
+  Generated on Sat Dec 14 15:35:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.0).
 </div>

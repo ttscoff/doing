@@ -288,79 +288,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/highlight.rb', line 31</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_highlight_search'>highlight_search</span><span class='lparen'>(</span><span class='id identifier rubyid_search'>search</span><span class='comma'>,</span> <span class='label'>distance:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>negate:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>case_type:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_out'>out</span> <span class='op'>=</span> <span class='id identifier rubyid_dup'>dup</span>
-  <span class='id identifier rubyid_matching'>matching</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>search.matching</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>pattern</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_normalize_matching'>normalize_matching</span>
-  <span class='id identifier rubyid_distance'>distance</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>search.distance</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>3</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-  <span class='id identifier rubyid_case_type'>case_type</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>search.case</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>smart</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_normalize_case'>normalize_case</span>
-
-  <span class='kw'>if</span> <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_rx?'>rx?</span> <span class='op'>||</span> <span class='id identifier rubyid_matching'>matching</span> <span class='op'>==</span> <span class='symbol'>:fuzzy</span>
-    <span class='id identifier rubyid_rx'>rx</span> <span class='op'>=</span> <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_to_rx'>to_rx</span><span class='lparen'>(</span><span class='label'>distance:</span> <span class='id identifier rubyid_distance'>distance</span><span class='comma'>,</span> <span class='label'>case_type:</span> <span class='id identifier rubyid_case_type'>case_type</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_out'>out</span><span class='period'>.</span><span class='id identifier rubyid_gsub!'>gsub!</span><span class='lparen'>(</span><span class='id identifier rubyid_rx'>rx</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span> <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_bgyellow'>bgyellow</span><span class='period'>.</span><span class='id identifier rubyid_black'>black</span> <span class='rbrace'>}</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_query'>query</span> <span class='op'>=</span> <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_to_phrase_query'>to_phrase_query</span>
-
-    <span class='kw'>if</span> <span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:must</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:must_not</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
-      <span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:must</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:should</span><span class='rbracket'>]</span>
-      <span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:should</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-    <span class='kw'>end</span>
-    <span class='id identifier rubyid_qs'>qs</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_qs'>qs</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:must</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:must</span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_qs'>qs</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:should</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:should</span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_qs'>qs</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span>
-      <span class='id identifier rubyid_rx'>rx</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_wildcard_to_rx'>wildcard_to_rx</span><span class='comma'>,</span> <span class='id identifier rubyid_ignore_case'>ignore_case</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='comma'>,</span> <span class='id identifier rubyid_case_type'>case_type</span><span class='rparen'>)</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_out'>out</span><span class='period'>.</span><span class='id identifier rubyid_gsub!'>gsub!</span><span class='lparen'>(</span><span class='id identifier rubyid_rx'>rx</span><span class='rparen'>)</span> <span class='kw'>do</span>
-        <span class='id identifier rubyid_m'>m</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span>
-        <span class='id identifier rubyid_last'>last</span> <span class='op'>=</span> <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_pre_match'>pre_match</span><span class='period'>.</span><span class='id identifier rubyid_last_color_code'>last_color_code</span>
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_bgyellow'>bgyellow</span><span class='period'>.</span><span class='id identifier rubyid_black'>black</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last'>last</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-      <span class='kw'>end</span>
-    <span class='kw'>end</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_out'>out</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -372,25 +300,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-27
-28
-29</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/highlight.rb', line 27</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_highlight_search!'>highlight_search!</span><span class='lparen'>(</span><span class='id identifier rubyid_search'>search</span><span class='comma'>,</span> <span class='label'>distance:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>negate:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>case_type:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_highlight_search'>highlight_search</span><span class='lparen'>(</span><span class='id identifier rubyid_search'>search</span><span class='comma'>,</span> <span class='label'>distance:</span> <span class='id identifier rubyid_distance'>distance</span><span class='comma'>,</span> <span class='label'>negate:</span> <span class='id identifier rubyid_negate'>negate</span><span class='comma'>,</span> <span class='label'>case_type:</span> <span class='id identifier rubyid_case_type'>case_type</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -450,35 +360,7 @@
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-18
-19
-20
-21
-22
-23
-24
-25</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/highlight.rb', line 18</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_highlight_tags'>highlight_tags</span><span class='lparen'>(</span><span class='id identifier rubyid_color'>color</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yellow</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>last_color:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='kw'>unless</span> <span class='id identifier rubyid_last_color'>last_color</span>
-    <span class='id identifier rubyid_color'>color</span> <span class='op'>=</span> <span class='id identifier rubyid_color'>color</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_color'>color</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../Array.html" title="Array (class)">Array</a></span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_tag_color'>tag_color</span> <span class='op'>=</span> <span class='id identifier rubyid_color'>color</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_c'>c</span><span class='comma'>,</span> <span class='id identifier rubyid_arr'>arr</span><span class='op'>|</span> <span class='id identifier rubyid_arr'>arr</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Color.html" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_c'>c</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_last_color'>last_color</span> <span class='op'>=</span> <span class='id identifier rubyid_last_color_code'>last_color_code</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(\s|m)(@[^ (&quot;&#39;]+)</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\\1</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tag_color'>tag_color</span><span class='embexpr_end'>}</span><span class='tstring_content'>\\2</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_color'>last_color</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -520,25 +402,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-7
-8
-9</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/highlight.rb', line 7</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_highlight_tags!'>highlight_tags!</span><span class='lparen'>(</span><span class='id identifier rubyid_color'>color</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yellow</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>last_color:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_highlight_tags'>highlight_tags</span><span class='lparen'>(</span><span class='id identifier rubyid_color'>color</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -584,25 +448,7 @@ may not render the same style.</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-73
-74
-75</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/highlight.rb', line 73</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_last_color'>last_color</span>
-  <span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\e\[[\d;]+m</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -641,25 +487,7 @@ may not render the same style.</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-82
-83
-84</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/highlight.rb', line 82</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_uncolor'>uncolor</span>
-  <span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\e\[[\d;]+m</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -687,25 +515,7 @@ may not render the same style.</p>
     
   </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-89
-90
-91</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/highlight.rb', line 89</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_uncolor!'>uncolor!</span>
-  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_uncolor'>uncolor</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -713,7 +523,7 @@ may not render the same style.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun Dec  1 11:01:05 2024 by
+  Generated on Sat Dec 14 15:35:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.0).
 </div>

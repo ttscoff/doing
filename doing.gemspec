@@ -1,5 +1,5 @@
 # Ensure we require the local version and not one we might have installed already
-require File.join([File.dirname(__FILE__), 'lib', 'doing', 'version.rb'])
+require './lib/doing/version.rb'
 spec = Gem::Specification.new do |s|
   s.name = 'doing'
   s.version = Doing::VERSION
@@ -14,9 +14,7 @@ spec = Gem::Specification.new do |s|
     'what they accomplished at 2 in the morning.'
   ].join(' ')
   s.license = 'MIT'
-  s.files = Dir.chdir(File.expand_path('..', __FILE__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.strip =~ %r{^((test|spec|features)/|\.git|buildnotes)} }
-  end
+  s.files = `git ls-files -z`.split("\x0").reject { |f| f.strip =~ %r{^((test|spec|features)/|\.git|buildnotes)} }
   s.require_paths << 'lib'
   s.extra_rdoc_files = ['README.md']
   s.rdoc_options << '--title' << 'doing' << '--main' << 'README.md' << '--markup' << 'markdown'

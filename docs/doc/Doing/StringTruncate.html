@@ -295,47 +295,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/truncate.rb', line 13</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_trunc'>trunc</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_len'>len</span>
-
-  <span class='id identifier rubyid_total'>total</span> <span class='op'>=</span> <span class='int'>0</span>
-  <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-
-  <span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> </span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_word'>word</span><span class='op'>|</span>
-    <span class='kw'>break</span> <span class='kw'>if</span> <span class='id identifier rubyid_total'>total</span> <span class='op'>+</span> <span class='int'>1</span> <span class='op'>+</span> <span class='id identifier rubyid_word'>word</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_len'>len</span>
-
-    <span class='id identifier rubyid_total'>total</span> <span class='op'>+=</span> <span class='int'>1</span> <span class='op'>+</span> <span class='id identifier rubyid_word'>word</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
-    <span class='id identifier rubyid_res'>res</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_word'>word</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_res'>res</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_ellipsis'>ellipsis</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -347,25 +307,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-28
-29
-30</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/truncate.rb', line 28</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_trunc!'>trunc!</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_trunc'>trunc</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='id identifier rubyid_ellipsis'>ellipsis</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -406,47 +348,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/truncate.rb', line 37</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_truncend'>truncend</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_len'>len</span>
-
-  <span class='id identifier rubyid_total'>total</span> <span class='op'>=</span> <span class='int'>0</span>
-  <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-
-  <span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'> </span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reverse'>reverse</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_word'>word</span><span class='op'>|</span>
-    <span class='kw'>break</span> <span class='kw'>if</span> <span class='id identifier rubyid_total'>total</span> <span class='op'>+</span> <span class='int'>1</span> <span class='op'>+</span> <span class='id identifier rubyid_word'>word</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_len'>len</span>
-
-    <span class='id identifier rubyid_total'>total</span> <span class='op'>+=</span> <span class='int'>1</span> <span class='op'>+</span> <span class='id identifier rubyid_word'>word</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
-    <span class='id identifier rubyid_res'>res</span><span class='period'>.</span><span class='id identifier rubyid_unshift'>unshift</span><span class='lparen'>(</span><span class='id identifier rubyid_word'>word</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_ellipsis'>ellipsis</span> <span class='op'>+</span> <span class='id identifier rubyid_res'>res</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -458,25 +360,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-52
-53
-54</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/truncate.rb', line 52</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_truncend!'>truncend!</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_truncend'>truncend</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='id identifier rubyid_ellipsis'>ellipsis</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -534,35 +418,7 @@
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-62
-63
-64
-65
-66
-67
-68
-69</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/truncate.rb', line 62</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_truncmiddle'>truncmiddle</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_len'>len</span>
-  <span class='id identifier rubyid_len'>len</span> <span class='op'>-=</span> <span class='lparen'>(</span><span class='id identifier rubyid_ellipsis'>ellipsis</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>/</span> <span class='int'>2</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-  <span class='id identifier rubyid_half'>half</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span> <span class='op'>/</span> <span class='int'>2</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-  <span class='id identifier rubyid_start'>start</span> <span class='op'>=</span> <span class='id identifier rubyid_trunc'>trunc</span><span class='lparen'>(</span><span class='id identifier rubyid_half'>half</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='id identifier rubyid_ellipsis'>ellipsis</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_finish'>finish</span> <span class='op'>=</span> <span class='id identifier rubyid_truncend'>truncend</span><span class='lparen'>(</span><span class='id identifier rubyid_half'>half</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_start'>start</span> <span class='op'>+</span> <span class='id identifier rubyid_finish'>finish</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -574,25 +430,7 @@
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-71
-72
-73</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/string/truncate.rb', line 71</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_truncmiddle!'>truncmiddle!</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>...</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_truncmiddle'>truncmiddle</span><span class='lparen'>(</span><span class='id identifier rubyid_len'>len</span><span class='comma'>,</span> <span class='label'>ellipsis:</span> <span class='id identifier rubyid_ellipsis'>ellipsis</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
   </div>
@@ -600,7 +438,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Dec  1 11:01:05 2024 by
+  Generated on Sat Dec 14 15:35:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.0).
 </div>

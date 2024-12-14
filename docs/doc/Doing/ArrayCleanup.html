@@ -234,25 +234,7 @@ removes empty strings, zero or negative numbers and FalseClass items</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-9
-10
-11</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/array/cleanup.rb', line 9</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_remove_bad'>remove_bad</span>
-  <span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_x'>x</span><span class='op'>|</span> <span class='id identifier rubyid_x'>x</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_x'>x</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='op'>:</span> <span class='id identifier rubyid_x'>x</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:good?</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -264,25 +246,7 @@ removes empty strings, zero or negative numbers and FalseClass items</p>
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-13
-14
-15</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/array/cleanup.rb', line 13</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_remove_bad!'>remove_bad!</span>
-  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_remove_empty'>remove_empty</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
       <div class="method_details ">
@@ -322,25 +286,7 @@ removes empty elements</p>
   
 </ul>
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-23
-24
-25</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/array/cleanup.rb', line 23</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_remove_empty'>remove_empty</span>
-  <span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_x'>x</span><span class='op'>|</span> <span class='id identifier rubyid_x'>x</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_x'>x</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='op'>:</span> <span class='id identifier rubyid_x'>x</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_x'>x</span><span class='op'>|</span> <span class='id identifier rubyid_x'>x</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_x'>x</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>:</span> <span class='kw'>false</span> <span class='rbrace'>}</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -352,25 +298,7 @@ removes empty elements</p>
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-27
-28
-29</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/array/cleanup.rb', line 27</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_remove_empty!'>remove_empty!</span>
-  <span class='id identifier rubyid_replace'>replace</span> <span class='id identifier rubyid_remove_empty'>remove_empty</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</h3>
 </div>
     
   </div>
@@ -378,7 +306,7 @@ removes empty elements</p>
 </div>
 
       <div id="footer">
-  Generated on Sun Dec  1 11:01:05 2024 by
+  Generated on Sat Dec 14 15:35:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.0).
 </div>

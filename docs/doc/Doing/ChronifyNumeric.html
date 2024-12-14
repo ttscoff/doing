@@ -209,51 +209,7 @@ hours into days</p>
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/chronify/numeric.rb', line 14</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_format_time'>format_time</span><span class='lparen'>(</span><span class='label'>human:</span> <span class='kw'>false</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_nil?'>nil?</span>
-
-  <span class='id identifier rubyid_seconds'>seconds</span> <span class='op'>=</span> <span class='id identifier rubyid_dup'>dup</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-  <span class='id identifier rubyid_minutes'>minutes</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_seconds'>seconds</span> <span class='op'>/</span> <span class='int'>60</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-  <span class='id identifier rubyid_hours'>hours</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_minutes'>minutes</span> <span class='op'>/</span> <span class='int'>60</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_human'>human</span>
-    <span class='id identifier rubyid_minutes'>minutes</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_minutes'>minutes</span> <span class='op'>%</span> <span class='int'>60</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-    <span class='lbracket'>[</span><span class='int'>0</span><span class='comma'>,</span> <span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span> <span class='id identifier rubyid_minutes'>minutes</span><span class='rbracket'>]</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_days'>days</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_hours'>hours</span> <span class='op'>/</span> <span class='int'>24</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-    <span class='id identifier rubyid_hours'>hours</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_hours'>hours</span> <span class='op'>%</span> <span class='int'>24</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-    <span class='id identifier rubyid_minutes'>minutes</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_minutes'>minutes</span> <span class='op'>%</span> <span class='int'>60</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-    <span class='lbracket'>[</span><span class='id identifier rubyid_days'>days</span><span class='comma'>,</span> <span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span> <span class='id identifier rubyid_minutes'>minutes</span><span class='rbracket'>]</span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
       <div class="method_details ">
@@ -297,25 +253,7 @@ hours into days</p>
 </ul>
 
 
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-37
-38
-39</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/doing/chronify/numeric.rb', line 37</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_time_string'>time_string</span><span class='lparen'>(</span><span class='label'>format:</span> <span class='symbol'>:dhm</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_format_time'>format_time</span><span class='lparen'>(</span><span class='label'>human:</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_time_string'>time_string</span><span class='lparen'>(</span><span class='label'>format:</span> <span class='id identifier rubyid_format'>format</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
+</div>
 </div>
     
   </div>
@@ -323,7 +261,7 @@ hours into days</p>
 </div>
 
       <div id="footer">
-  Generated on Sun Dec  1 11:01:05 2024 by
+  Generated on Sat Dec 14 15:35:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.0).
 </div>
