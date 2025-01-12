@@ -62,24 +62,7 @@ function enableToggles() {
     evt.stopPropagation();
     evt.preventDefault();
     $(this).parent().parent().toggleClass('collapsed');
-    $(this).attr('aria-expanded', function (i, attr) {
-        return attr == 'true' ? 'false' : 'true'
-    });
     highlight();
-  });
-
-  // navigation of nested classes using keyboard
-  $('#full_list a.toggle').on('keypress',function(evt) {
-    // enter key is pressed
-    if (evt.which == 13) {
-      evt.stopPropagation();
-      evt.preventDefault();
-      $(this).parent().parent().toggleClass('collapsed');
-      $(this).attr('aria-expanded', function (i, attr) {
-          return attr == 'true' ? 'false' : 'true'
-      });
-      highlight();
-    }
   });
 }
 
@@ -108,7 +91,7 @@ function enableSearch() {
     }
   });
 
-  $('#full_list').after("<div id='noresults' role='status' style='display: none'></div>");
+  $('#full_list').after("<div id='noresults' style='display:none'></div>");
 }
 
 function ignoredKeyPress(event) {
@@ -171,14 +154,11 @@ function partialSearch(searchString, offset) {
 function searchDone() {
   searchTimeout = null;
   highlight();
-  var found = $('#full_list li:visible').size();
-  if (found === 0) {
-    $('#noresults').text('No results were found.');
+  if ($('#full_list li:visible').size() === 0) {
+    $('#noresults').text('No results were found.').hide().fadeIn();
   } else {
-    // This is read out to screen readers
-    $('#noresults').text('There are ' + found + ' results.');
+    $('#noresults').text('').hide();
   }
-  $('#noresults').show();
   $('#content').removeClass('insearch');
 }
 
@@ -208,12 +188,6 @@ function expandTo(path) {
   $target.addClass('clicked');
   $target.removeClass('collapsed');
   $target.parentsUntil('#full_list', 'li').removeClass('collapsed');
-
-  $target.find('a.toggle').attr('aria-expanded', 'true')
-  $target.parentsUntil('#full_list', 'li').each(function(i, el) {
-    $(el).find('> div > a.toggle').attr('aria-expanded', 'true');
-  });
-
   if($target[0]) {
     window.scrollTo(window.scrollX, $target.offset().top - 250);
     highlight();

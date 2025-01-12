@@ -6,7 +6,7 @@
 <title>
   Module: Doing::Color
   
-    &mdash; Documentation by YARD 0.9.37
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -128,23 +128,23 @@
 <div class="tags">
   
   <div class="examples">
-    <h4 class="tag_title">Examples:</h4>
+    <p class="tag_title">Examples:</p>
     
       
-        <h5 class="example_title"><div class='inline'><p>Use a color as a method. Color reset will be added to end of string.</p>
-</div></h5>
+        <p class="example_title"><div class='inline'><p>Use a color as a method. Color reset will be added to end of string.</p>
+</div></p>
       
       <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_yellow'>yellow</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>This text is yellow</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\e[33mThis text is yellow\e[0m</span><span class='tstring_end'>&quot;</span></span></code></pre>
     
       
-        <h5 class="example_title"><div class='inline'><p>Use a color as a string extension. Color reset added automatically.</p>
-</div></h5>
+        <p class="example_title"><div class='inline'><p>Use a color as a string extension. Color reset added automatically.</p>
+</div></p>
       
       <pre class="example code"><code><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>This text is green</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_green'>green</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\e[1;32mThis text is green\e[0m</span><span class='tstring_end'>&quot;</span></span></code></pre>
     
       
-        <h5 class="example_title"><div class='inline'><p>Send a text string as a color</p>
-</div></h5>
+        <p class="example_title"><div class='inline'><p>Send a text string as a color</p>
+</div></p>
       
       <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>red</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\e[31m</span><span class='tstring_end'>&quot;</span></span></code></pre>
     
@@ -444,11 +444,11 @@
 <div class="tags">
   
   <div class="examples">
-    <h4 class="tag_title">Examples:</h4>
+    <p class="tag_title">Examples:</p>
     
       
-        <h5 class="example_title"><div class='inline'><p>Turn color on or off based on TTY</p>
-</div></h5>
+        <p class="example_title"><div class='inline'><p>Turn color on or off based on TTY</p>
+</div></p>
       
       <pre class="example code"><code><span class='const'><span class='object_link'><a href="../Doing.html" title="Doing (module)">Doing</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_coloring'>coloring</span> <span class='op'>=</span> <span class='const'>STDOUT</span><span class='period'>.</span><span class='id identifier rubyid_isatty'>isatty</span></code></pre>
     
@@ -526,11 +526,11 @@ x: reset (remove background, color, emphasis)</p>
 <div class="tags">
   
   <div class="examples">
-    <h4 class="tag_title">Examples:</h4>
+    <p class="tag_title">Examples:</p>
     
       
-        <h5 class="example_title"><div class='inline'><p>Convert a templated string</p>
-</div></h5>
+        <p class="example_title"><div class='inline'><p>Convert a templated string</p>
+</div></p>
       
       <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="Doing::Color (module)">Color</a></span></span><span class='period'>.</span><span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>{Rwb}Warning:{x} {w}you look a little {g}ill{x}</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span></code></pre>
     
@@ -687,9 +687,9 @@ ANSI-sequences are stripped from the string.</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Dec 14 15:35:58 2024 by
+  Generated on Sun Jan 12 12:17:13 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.37 (ruby-3.3.0).
+  0.9.36 (ruby-3.4.1).
 </div>
 
     </div>

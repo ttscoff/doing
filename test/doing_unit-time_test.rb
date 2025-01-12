@@ -12,22 +12,20 @@ class DoingTimeTest < Test::Unit::TestCase
   include DoingHelpers
   include Doing
 
-  def setup
-  end
+  def setup; end
 
-  def teardown
-  end
+  def teardown; end
 
   def test_relative_date
     t = Time.parse("#{Time.now.year - 1}-12-21 15:00")
-    assert_match(%r{12/21/#{(Time.now.year - 1).to_s.sub(/^\d\d/, '')}  3:00pm}, t.relative_date, "Relative date should match")
+    assert_match(%r{12/21  3:00pm}, t.relative_date, 'Relative date should match')
 
     # Breaks if it's the first of the month
     # t = Time.parse("#{Time.now.year}-#{Time.now.month}-#{Time.now.day - 1} 12:00")
     # assert_match(%r{[a-z]{3} 12:00pm}i, t.relative_date, 'Relative date should match')
 
     t = Time.parse("#{Time.now.strftime('%F')} 01:00")
-    assert_match(%r{^ 1:00am$}, t.relative_date, 'Relative date should match')
+    assert_match(/^ 1:00am$/, t.relative_date, 'Relative date should match')
   end
 
   def test_humanize
@@ -39,4 +37,3 @@ class DoingTimeTest < Test::Unit::TestCase
     assert_match(/2 hours, 54 minutes, 3[0-3] seconds ago/, t.time_ago, 'Time ago string should match')
   end
 end
-

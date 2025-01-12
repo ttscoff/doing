@@ -84,7 +84,7 @@ module PhraseParser
     end
 
     def to_elasticsearch
-      CLAUSE_TYPES.each_with_object({}) do |type, query|
+      QueryParser::CLAUSE_TYPES.each_with_object({}) do |type, query|
         clauses = instance_variable_get("@#{type}_clauses")
         query[type] = clauses.map { |clause| clause_to_query(clause) } if clauses&.any?
       end
