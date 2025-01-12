@@ -1,6 +1,6 @@
 # Ensure we require the local version and not one we might have installed already
-require './lib/doing/version.rb'
-spec = Gem::Specification.new do |s|
+require './lib/doing/version'
+Gem::Specification.new do |s|
   s.name = 'doing'
   s.version = Doing::VERSION
   s.author = 'Brett Terpstra'
@@ -28,12 +28,17 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency('test-unit', '~> 3.4.4')
   s.add_development_dependency('tty-spinner', '~> 0.9', '>= 0.9.3')
   s.add_development_dependency('yard', '~> 0.9', '>= 0.9.36')
+  s.add_runtime_dependency('base64', '~> 0.2')
   s.add_runtime_dependency('chronic', '~> 0.10', '>= 0.10.2')
+  s.add_runtime_dependency('csv', '~> 3.3')
   s.add_runtime_dependency('deep_merge', '~> 1.2', '>= 1.2.1')
   s.add_runtime_dependency('gli', '~> 2.20', '>= 2.20.1')
   s.add_runtime_dependency('haml', '~>5.0.0', '>= 5.0.0')
+  s.add_runtime_dependency('logger', '~> 1.4', '>= 1.4.2')
+  s.add_runtime_dependency('ostruct', '~> 0.6')
   s.add_runtime_dependency('parslet', '~> 2.0', '>= 2.0.0')
   s.add_runtime_dependency('plist', '~> 3.6', '>= 3.6.0')
+  s.add_runtime_dependency('reline', '~> 0.6')
   s.add_runtime_dependency('safe_yaml', '~> 1.0')
   s.add_runtime_dependency('tty-link', '~> 0.1', '>= 0.1.1')
   s.add_runtime_dependency('tty-markdown', '~> 0.7', '>= 0.7.0')

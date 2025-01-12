@@ -7,6 +7,8 @@ module PhraseParser
   # terms. This is done creating multiple types of clauses instead of just one.
   # A phrase clause generates an Elasticsearch match_phrase query.
   class QueryParser < Parslet::Parser
+    CLAUSE_TYPES = %i[should must must_not].freeze
+
     rule(:term) { match('[^\s"]').repeat(1).as(:term) }
     rule(:quote) { str('"') }
     rule(:operator) { (str('+') | str('-')).as(:operator) }
@@ -19,8 +21,9 @@ module PhraseParser
     root(:query)
   end
 
+  # Transforms the parsed query into a Query object
   class QueryTransformer < Parslet::Transform
-    rule(:clause => subtree(:clause)) do
+    rule(clause: subtree(:clause)) do
       if clause[:term]
         TermClause.new(clause[:operator]&.to_s, clause[:term].to_s)
       elsif clause[:phrase]
@@ -33,6 +36,7 @@ module PhraseParser
     rule(query: sequence(:clauses)) { Query.new(clauses) }
   end
 
+  # Represents an operator
   class Operator
     def self.symbol(str)
       case str
@@ -48,6 +52,7 @@ module PhraseParser
     end
   end
 
+  # Represents a term clause
   class TermClause
     attr_accessor :operator, :term
 
@@ -57,7 +62,7 @@ module PhraseParser
     end
   end
 
-  # Phrase
+  # Represents a phrase clause
   class PhraseClause
     attr_accessor :operator, :phrase
 
@@ -79,27 +84,10 @@ module PhraseParser
     end
 
     def to_elasticsearch
-      query = {}
-
-      if should_clauses.any?
-        query[:should] = should_clauses.map do |clause|
-          clause_to_query(clause)
-        end
+      CLAUSE_TYPES.each_with_object({}) do |type, query|
+        clauses = instance_variable_get("@#{type}_clauses")
+        query[type] = clauses.map { |clause| clause_to_query(clause) } if clauses&.any?
       end
-
-      if must_clauses.any?
-        query[:must] = must_clauses.map do |clause|
-          clause_to_query(clause)
-        end
-      end
-
-      if must_not_clauses.any?
-        query[:must_not] = must_not_clauses.map do |clause|
-          clause_to_query(clause)
-        end
-      end
-
-      query
     end
 
     def clause_to_query(clause)

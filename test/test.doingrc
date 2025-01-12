@@ -128,3 +128,4 @@ search:
   highlight: false
 interaction:
   confirm_longer_than: 5h
+doing_file_sort: asc
