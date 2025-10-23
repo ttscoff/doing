@@ -6,7 +6,6 @@
 # url: https://brettterpstra.com
 module Doing
   class WikiExport
-
     def self.settings
       {
         trigger: 'wiki',
@@ -55,7 +54,7 @@ module Doing
 
         items_out << {
           date: i.date.strftime('%a %-I:%M%p'),
-          title: title, #+ " #{note}"
+          title: title, # + " #{note}"
           note: note,
           time: interval,
           section: i.section
@@ -78,10 +77,10 @@ module Doing
       engine = Haml::Engine.new(template)
       Doing.logger.debug('Wiki Export:', "#{items_out.count} items output to #{variables[:page_title]} wiki page")
       @out = engine.render(Object.new,
-                         { :@items => items_out, :@page_title => variables[:page_title], :@style => style, :@totals => totals })
+                           { :@items => items_out, :@page_title => variables[:page_title], :@style => style,
+                             :@totals => totals })
     end
 
     Doing::Plugins.register 'wiki', :export, self
   end
 end
-

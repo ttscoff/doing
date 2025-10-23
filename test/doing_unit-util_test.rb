@@ -37,18 +37,21 @@ class DoingUtilTest < Test::Unit::TestCase
 
   def test_tag_strings
     tag_array = '@test1 +test2 test3 test4(value)'.to_tags
-    assert_equal(["+@test2", "@test1", "@test3", "@test4(value)"], tag_array, 'String should be converted to array of @tags')
-    assert_equal("+@test2, @test1, @test3, @test4(value)", tag_array.log_tags, 'Array should be output as comma-separated string')
-    assert_equal(["+test2", "test1", "test3", "test4(value)"], tag_array.tags_to_array, 'Array should have @ symbols removed')
+    assert_equal(['+@test2', '@test1', '@test3', '@test4(value)'], tag_array,
+                 'String should be converted to array of @tags')
+    assert_equal('+@test2, @test1, @test3, @test4(value)', tag_array.log_tags,
+                 'Array should be output as comma-separated string')
+    assert_equal(['+test2', 'test1', 'test3', 'test4(value)'], tag_array.tags_to_array,
+                 'Array should have @ symbols removed')
     assert_equal(tag_array, tag_array.to_tags, 'Array should not be changed')
     assert_equal('@testtag', 'testtag'.add_at, '@ symbol should be added')
     assert_equal('@testtag', '@testtag'.add_at, '@ symbol should not be duped')
     assert_equal('testtag', '@testtag'.remove_at, '@ symbol should be removed')
   end
 
-
   def test_format_time
-    item = Doing::Item.new(Time.now - 3600, "Test item @done(#{(Time.now - 1200).strftime('%F %R')})", @wwid.current_section)
+    item = Doing::Item.new(Time.now - 3600, "Test item @done(#{(Time.now - 1200).strftime('%F %R')})",
+                           @wwid.current_section)
     distance = (item.end_date - item.date).to_i
     interval = @wwid.get_interval(item, formatted: false, record: false)
     assert_equal(distance, interval, 'Interval should match')
@@ -109,7 +112,7 @@ class DoingUtilTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({ 'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir },
+                   '--doing_file', @wwid_file, *args)
   end
 end
-

@@ -43,8 +43,10 @@ module Doing
         Doing.logger.debug('Parser:', %(date/time string "#{self}" interpreted as #{res} (#{secs_ago} seconds ago)))
       else
         date_string = dup
-        date_string = 'today' if date_string.match(Types::REGEX_DAY) && now.strftime('%a') =~ /^#{Regexp.last_match(1)}/i
-        date_string = "#{options[:context].to_s} #{date_string}" if date_string =~ Types::REGEX_TIME && options[:context]
+        if date_string.match(Types::REGEX_DAY) && now.strftime('%a') =~ /^#{Regexp.last_match(1)}/i
+          date_string = 'today'
+        end
+        date_string = "#{options[:context]} #{date_string}" if date_string =~ Types::REGEX_TIME && options[:context]
 
         res = Chronic.parse(date_string, {
                               guess: options.fetch(:guess, :begin),
@@ -69,7 +71,7 @@ module Doing
     ##
     def chronify_qty
       minutes = 0
-      case self.strip
+      case strip
       when /^(\d+):(\d\d)$/
         minutes += Regexp.last_match(1).to_i * 60
         minutes += Regexp.last_match(2).to_i
@@ -211,7 +213,6 @@ module Doing
         raise Errors::InvalidTimeExpression, 'Unrecognized date string' unless start
 
       end
-
 
       if start.is_a? String
         Doing.logger.debug('Parser:',

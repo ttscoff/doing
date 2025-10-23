@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@yesterday
 desc 'List entries from yesterday'
 long_desc 'Show only entries with start times within the previous 24 hour period. Use --before, --after, and --from to limit to
@@ -17,7 +19,10 @@ command :yesterday do |c|
   add_options(:save, c)
 
   c.action do |_global_options, options, _args|
-    raise InvalidPlugin.new('output', options[:output]) if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+      raise InvalidPlugin.new('output',
+                              options[:output])
+    end
 
     options[:sort_tags] = options[:tag_sort]
 

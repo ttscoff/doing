@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FakeStdOut
   attr_reader :strings
 
@@ -5,7 +7,7 @@ class FakeStdOut
     @strings = []
   end
 
-  def puts(string=nil)
+  def puts(string = nil)
     @strings << string unless string.nil?
   end
 
@@ -19,7 +21,7 @@ class FakeStdOut
 
   # Returns true if the regexp matches anything in the output
   def contained?(regexp)
-    strings.find{ |x| x =~ regexp }
+    strings.find { |x| x =~ regexp }
   end
 
   def flush; end

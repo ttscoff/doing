@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'tty-progressbar'
 require 'shellwords'
 
@@ -21,11 +23,10 @@ class ::String
 end
 
 class ZshCompletions
-
   attr_accessor :commands, :global_options
 
   def generate_helpers
-    out=<<~EOFUNCTIONS
+    out = <<~EOFUNCTIONS
       compdef _doing doing
 
       function _doing() {
@@ -103,7 +104,7 @@ class ZshCompletions
 
   def generate_subcommand_completions
     out = []
-    @commands.each_with_index do |cmd, i|
+    @commands.each_with_index do |cmd, _i|
       cmd[:commands].each do |c|
         out << "'#{c}:#{cmd[:description].gsub(/'/, '\\\'')}'"
       end
@@ -112,10 +113,9 @@ class ZshCompletions
   end
 
   def generate_subcommand_option_completions(indent: '        ')
-
     out = []
 
-    @commands.each_with_index do |cmd, i|
+    @commands.each_with_index do |cmd, _i|
       @bar.advance
 
       data = get_help_sections(cmd[:commands].first)
@@ -130,7 +130,8 @@ class ZshCompletions
           option_arr << if option[:short]
                           %({-#{option[:short]},--#{option[:long]}#{arg}}"[#{option[:description].gsub(/'/, '\\\'')}]")
                         else
-                          %("(--#{option[:long]}#{arg})--#{option[:long]}#{arg}}[#{option[:description].gsub(/'/, '\\\'')}]")
+                          %("(--#{option[:long]}#{arg})--#{option[:long]}#{arg}}[#{option[:description].gsub(/'/,
+                                                                                                             '\\\'')}]")
                         end
         end
       end
@@ -147,7 +148,8 @@ class ZshCompletions
     data = get_help_sections
     @global_options = parse_options(data[:global_options])
     @commands = parse_commands(data[:commands])
-    @bar = TTY::ProgressBar.new(" \033[0;0;33mGenerating Zsh completions: \033[0;35;40m[:bar]\033[0m", total: @commands.count, bar_format: :blade)
+    @bar = TTY::ProgressBar.new(" \033[0;0;33mGenerating Zsh completions: \033[0;35;40m[:bar]\033[0m",
+                                total: @commands.count, bar_format: :blade)
     @bar.resize(25)
   end
 

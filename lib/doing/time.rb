@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Doing
   ##
   ## Date helpers
@@ -35,7 +37,7 @@ module Doing
       h = (m / 60).floor
       m = (m % 60).floor
       d = (h / 24).floor
-      h = h % 24
+      h %= 24
 
       output = []
       output.push("#{d} #{'day'.to_p(d)}") if d.positive?
@@ -58,7 +60,7 @@ module Doing
         "Yesterday at #{strftime('%_I:%M:%S%P')}"
       elsif self > (Date.today - 6).to_time
         strftime('%a %I:%M:%S%P')
-      elsif self.year == Date.today.year
+      elsif year == Date.today.year
         strftime('%m/%d %I:%M:%S%P')
       else
         strftime('%m/%d/%Y %I:%M:%S%P')

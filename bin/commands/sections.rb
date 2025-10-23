@@ -51,10 +51,11 @@ command :sections do |c|
       items = @wwid.content.in_section(section)
 
       if items.count.positive?
-        res = Doing::Prompt.yn("#{options[:archive] ? 'Archive' : 'Delete'} #{items.count} entries from #{section}", default_response: 'n')
+        res = Doing::Prompt.yn("#{options[:archive] ? 'Archive' : 'Delete'} #{items.count} entries from #{section}",
+                               default_response: 'n')
 
         if options[:archive] && res
-          @wwid.archive(section, {keep: 0})
+          @wwid.archive(section, { keep: 0 })
         elsif res
           items.each { |item| @wwid.content.delete_item(item) }
         end
@@ -83,4 +84,3 @@ command :add_section do |c|
     action.call(g, o, a)
   end
 end
-

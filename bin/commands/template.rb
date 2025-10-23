@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@template
 desc 'Output HTML, CSS, and Markdown (ERB) templates for customization'
 long_desc %(
@@ -31,14 +33,18 @@ command :template do |c|
     else
 
       if args.empty?
-        type = Doing::Prompt.choose_from(Doing::Plugins.plugin_templates, sorted: false, prompt: 'Select template type > ')
+        type = Doing::Prompt.choose_from(Doing::Plugins.plugin_templates, sorted: false,
+                                                                          prompt: 'Select template type > ')
         type.sub!(/ \(.*?\)$/, '').strip!
         options[:save] = Doing::Prompt.yn("Save to #{options[:path]}? (No outputs to STDOUT)", default_response: false)
       else
         type = args[0]
       end
 
-      raise InvalidPluginType, "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`" unless type
+      unless type
+        raise InvalidPluginType,
+              "No type specified, use `doing template [#{Doing::Plugins.plugin_templates.join('|')}]`"
+      end
 
       if options[:save]
         Doing::Plugins.template_for_trigger(type, save_to: options[:path])

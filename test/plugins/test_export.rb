@@ -14,14 +14,15 @@ module Doing
       }
     end
 
-
     def self.template(trigger)
       return unless trigger =~ /^tr/
+
       "This was triggered with #{trigger}: %content"
     end
 
     def self.render(wwid, items, variables: {})
       return if items.nil? || items.empty?
+
       opt = variables[:options]
 
       i = items[-1]

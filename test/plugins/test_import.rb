@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Doing
   class TestImport
     include Doing::Util
@@ -9,7 +11,7 @@ module Doing
       }
     end
 
-    def self.import(wwid, path, options: {})
+    def self.import(_wwid, path, options: {})
       if path.nil?
         Doing.logger.info('Test with no paths')
       else

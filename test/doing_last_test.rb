@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -38,7 +40,8 @@ class DoingLastTest < Test::Unit::TestCase
     doing('now', "Test new entry @tag2 #{unique_keyword}")
     doing('now', 'Test new entry @tag3 burly man')
 
-    assert_match(/#{unique_keyword}/, doing('last', '--search', unique_keyword), 'returned entry should contain unique keyword')
+    assert_match(/#{unique_keyword}/, doing('last', '--search', unique_keyword),
+                 'returned entry should contain unique keyword')
     assert_match(/@#{unique_tag}/, doing('last', '--tag', unique_tag), 'returned entry should contain unique tag')
   end
 
@@ -52,7 +55,7 @@ class DoingLastTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end
-

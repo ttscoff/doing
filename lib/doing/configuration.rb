@@ -116,7 +116,7 @@ module Doing
       'interaction' => {
         'confirm_longer_than' => '5h'
       }
-    }
+    }.freeze
 
     def initialize(file = nil, options: {})
       @config_file = file.nil? ? default_config_file : File.expand_path(file)
@@ -237,11 +237,9 @@ module Doing
           if new_cfg.nil?
             return real_path if real_path[-1] == path && real_path.count == element_count
 
-            if distance < 5 && !create
-              return resolve_key_path(keypath, create: false, distance: distance + 1)
-            else
-              return nil unless create
-            end
+            return resolve_key_path(keypath, create: false, distance: distance + 1) if distance < 5 && !create
+
+            return nil unless create
 
             resolved = real_path.count.positive? ? "Resolved #{real_path.join('.')}, but " : ''
             Doing.logger.log_now(:warn, "#{resolved}#{path} is unknown")
@@ -251,13 +249,19 @@ module Doing
             raise InvalidArgument, 'Invalid key path' unless res
 
             real_path.push(path).concat(paths).compact!
-            Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}") unless keypath == real_path.join('.')
+            unless keypath == real_path.join('.')
+              Doing.logger.debug('Config:',
+                                 "translated key path #{keypath} to #{real_path.join('.')}")
+            end
             return real_path
           end
           cfg = new_cfg
         end
       end
-      Doing.logger.debug('Config:', "translated key path #{keypath} to #{real_path.join('.')}") unless keypath == real_path.join('.')
+      unless keypath == real_path.join('.')
+        Doing.logger.debug('Config:',
+                           "translated key path #{keypath} to #{real_path.join('.')}")
+      end
       real_path
     end
 
@@ -295,7 +299,8 @@ module Doing
     #
     def from(user_config)
       # Util.deep_merge_hashes(DEFAULTS, Configuration[user_config].stringify_keys)
-      Configuration[user_config].stringify_keys.deep_merge(DEFAULTS, { extend_existing_arrays: true, sort_merged_arrays: true })
+      Configuration[user_config].stringify_keys.deep_merge(DEFAULTS,
+                                                           { extend_existing_arrays: true, sort_merged_arrays: true })
     end
 
     ##
@@ -346,7 +351,7 @@ module Doing
 
       load_plugins(plugin_config['plugin_path'])
 
-      Plugins.plugins.each do |_type, plugins|
+      Plugins.plugins.each_value do |plugins|
         plugins.each do |title, plugin|
           plugin_config[title] = plugin[:config] if plugin[:config].good?
           config['export_templates'][title] ||= nil if plugin[:templates] && !plugin[:templates].empty?
@@ -366,7 +371,10 @@ module Doing
 
       Hooks.trigger :post_config, self
 
-      config = local_config.deep_merge(config, { extend_existing_arrays: true, sort_merged_arrays: true }) unless @ignore_local
+      unless @ignore_local
+        config = local_config.deep_merge(config,
+                                         { extend_existing_arrays: true, sort_merged_arrays: true })
+      end
       # config = Util.deep_merge_hashes(config, local_config) unless @ignore_local
 
       Hooks.trigger :post_local_config, self
@@ -483,13 +491,13 @@ module Doing
       end
 
       begin
-
         user_config = Util.safe_load_file(config_file)
         raise StandardError, 'Invalid config file format' unless user_config.is_a?(Hash)
 
         if user_config.key?('html_template')
           user_config['export_templates'] ||= {}
-          user_config['export_templates'].deep_merge(user_config.delete('html_template'), { extend_existing_arrays: true, sort_merged_arrays: true })
+          user_config['export_templates'].deep_merge(user_config.delete('html_template'),
+                                                     { extend_existing_arrays: true, sort_merged_arrays: true })
         end
 
         user_config['include_notes'] = user_config.delete(':include_notes') if user_config.key?(':include_notes')

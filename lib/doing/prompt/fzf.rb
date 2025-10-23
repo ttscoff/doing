@@ -71,9 +71,10 @@ module Doing
       end
       restore_std
       unless File.exist?(fzf_bin)
-        Doing.logger.error('fzf:', 'unable to install fzf. You can install manually and Doing will use the system version.')
+        Doing.logger.error('fzf:',
+                           'unable to install fzf. You can install manually and Doing will use the system version.')
         Doing.logger.error('fzf:', 'see https://github.com/junegunn/fzf#installation')
-        raise RuntimeError.new('Error installing fzf, please report at https://github.com/ttscoff/doing/issues')
+        raise 'Error installing fzf, please report at https://github.com/ttscoff/doing/issues'
       end
 
       Doing.logger.info('fzf:', "installed to #{fzf}")

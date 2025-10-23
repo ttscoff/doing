@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@update
 
 desc 'Update doing to the latest version'
@@ -8,13 +10,13 @@ command %i[update] do |c|
   c.desc 'Check for pre-release version'
   c.switch %i[p pre beta], negatable: false, default_value: false
 
-  c.action do |global_options, options, args|
+  c.action do |_global_options, options, _args|
     my_version = `doing -v`.match(/doing version (?<v>[\d.]+)(?:\.?pre[,)])?/)['v']
-    if options[:beta]
-      latest_version = `gem search doing --pre`.match(/^doing \((?<v>[\d.]+)\.?pre[,)]/)['v']
-    else
-      latest_version = `gem search doing`.match(/^doing \((?<v>[\d.]+)\)/)['v']
-    end
+    latest_version = if options[:beta]
+                       `gem search doing --pre`.match(/^doing \((?<v>[\d.]+)\.?pre[,)]/)['v']
+                     else
+                       `gem search doing`.match(/^doing \((?<v>[\d.]+)\)/)['v']
+                     end
     my_version = Doing::Version.new(my_version)
     latest_version = Doing::Version.new(latest_version)
 
@@ -23,7 +25,7 @@ command %i[update] do |c|
     if outdated
       pre = options[:beta] ? '--pre' : ''
       res = `gem install doing #{pre} 2> /dev/null`
-      res = `sudo gem install doing #{pre}` unless res
+      res ||= `sudo gem install doing #{pre}`
       ver = res.match(/doing-(?<v>[\d.]+)\n/)['v']
       if ver
         Doing.logger.info("Version #{ver} installed")

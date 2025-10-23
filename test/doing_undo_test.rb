@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 
@@ -76,6 +78,7 @@ class DoingUndoTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_BACKUP_DIR' => @backup_dir, 'DOING_CONFIG' => @config_file}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_BACKUP_DIR' => @backup_dir, 'DOING_CONFIG' => @config_file }, '--doing_file', @wwid_file,
+                   *args)
   end
 end

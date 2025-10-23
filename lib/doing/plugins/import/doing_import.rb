@@ -86,8 +86,8 @@ module Doing
           wwid.content[old_index] = new_item
           Hooks.trigger :post_entry_updated, self, new_item, old_item
           updated += 1
-        else
-          imported.push(new_item) if is_match
+        elsif is_match
+          imported.push(new_item)
         end
       end
 

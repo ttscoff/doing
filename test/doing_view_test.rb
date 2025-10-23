@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -28,7 +30,7 @@ class DoingViewTest < Test::Unit::TestCase
   end
 
   def test_views_command
-    views = doing('views').strip.split(/\s+/).delete_if {|v| v.strip == ''}
+    views = doing('views').strip.split(/\s+/).delete_if { |v| v.strip == '' }
     assert_equal(5, views.length, 'Should have 3 views as defined in test configuration')
   end
 
@@ -51,31 +53,31 @@ class DoingViewTest < Test::Unit::TestCase
     result = doing('--stdout', 'view', 'test2')
     assert_count_entries(6, result, '6 entries should be shown')
     assert_matches([
-                   [/Tag Totals/, 'Should contain tag totals', false],
-                   [/untimed entry/, 'Should not show untimed entry', true],
-                   [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
+                     [/Tag Totals/, 'Should contain tag totals', false],
+                     [/untimed entry/, 'Should not show untimed entry', true],
+                     [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
                    ], result)
 
     result = doing('--stdout', 'view', 'test3')
     assert_count_entries(6, result, '6 entries should be shown')
     assert_matches([
-                   [/Tag Totals/, 'Should not contain tag totals', true],
-                   [/untimed entry/, 'Should show untimed entry', false],
-                   [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
+                     [/Tag Totals/, 'Should not contain tag totals', true],
+                     [/untimed entry/, 'Should show untimed entry', false],
+                     [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
                    ], result)
 
     # flag override
     result = doing('--stdout', 'view', '-c', '4', '--totals', '--only_timed', 'test3')
     assert_count_entries(4, result, '4 entries should be shown')
     assert_matches([
-                   [/Tag Totals/, 'Should contain tag totals', false],
-                   [/untimed entry/, 'Should not show untimed entry', true],
-                   [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
+                     [/Tag Totals/, 'Should contain tag totals', false],
+                     [/untimed entry/, 'Should not show untimed entry', true],
+                     [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
                    ], result)
 
     result = doing('--stdout', 'view', '--no-times', 'test3')
     assert_matches([
-                   [/\d\d:\d\d:\d\d/, 'Entries should not contain intervals', true]
+                     [/\d\d:\d\d:\d\d/, 'Entries should not contain intervals', true]
                    ], result)
 
     # tag sort
@@ -116,7 +118,7 @@ class DoingViewTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end
-

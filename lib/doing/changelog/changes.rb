@@ -6,7 +6,8 @@ module Doing
     attr_reader :changes
     attr_writer :changes_only
 
-    def initialize(lookup: nil, search: nil, changes: false, sort: :desc, prefix: false, only: %i[changed new improved fixed])
+    def initialize(lookup: nil, search: nil, changes: false, sort: :desc, prefix: false,
+                   only: %i[changed new improved fixed])
       @changes_only = changes
       @prefix = prefix
       @only = only
@@ -28,7 +29,7 @@ module Doing
     end
 
     def versions
-      @changes.select { |change| change.entries&.count > 0 }.map { |change| change.version }
+      @changes.select { |change| change.entries&.count&.> 0 }.map(&:version)
     end
 
     def interactive
@@ -45,7 +46,7 @@ module Doing
 
     def to_s
       if @changes_only
-        @changes.map(&:changes_only).delete_if(&:empty?).join().gsub(/\n+/, "\n").force_encoding('utf-8')
+        @changes.map(&:changes_only).delete_if(&:empty?).join.gsub(/\n+/, "\n").force_encoding('utf-8')
       else
         @changes.map(&:to_s).join("\n\n").force_encoding('utf-8')
       end
@@ -67,8 +68,6 @@ module Doing
     end
 
     def lookup(lookup_version)
-      range = []
-
       if lookup_version =~ /([\d.]+) *(?:-|to)+ *([\d.]+)/
         m = Regexp.last_match
         lookup("> #{m[1]}")

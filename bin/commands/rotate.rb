@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@rotate
 desc 'Move entries to archive file'
 long_desc 'As your doing file grows, commands can get slow. Given that your historical data (and your archive section)
@@ -5,8 +7,10 @@ probably aren\'t providing any useful insights a year later, use this command to
 file. You\'ll still have access to all historical data, but it won\'t be slowing down daily operation.'
 command :rotate do |c|
   c.example 'doing rotate', desc: 'Move all entries in doing file to a dated secondary file'
-  c.example 'doing rotate --section Archive --keep 10', desc: 'Move entries in the Archive section to a secondary file, keeping the most recent 10 entries'
-  c.example 'doing rotate --tag project1,done --bool AND', desc: 'Move entries tagged @project1 and @done to a secondary file'
+  c.example 'doing rotate --section Archive --keep 10',
+            desc: 'Move entries in the Archive section to a secondary file, keeping the most recent 10 entries'
+  c.example 'doing rotate --tag project1,done --bool AND',
+            desc: 'Move entries tagged @project1 and @done to a secondary file'
 
   c.desc 'How many items to keep in each section (most recent)'
   c.arg_name 'X'
@@ -56,4 +60,3 @@ end
 #     @wwid.write(@wwid.doing_file)
 #   end
 # end
-

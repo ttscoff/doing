@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'open3'
 require 'time'
 $LOAD_PATH.unshift File.join(__dir__, '..', '..', 'lib')
@@ -21,7 +23,7 @@ module DoingHelpers
     out, err, status = Open3.capture3(env, *cmd, stdin_data: stdin)
     unless status.success?
       raise [
-        "Error (#{status}): #{cmd.inspect} failed", "STDOUT:", out.inspect, "STDERR:", err.inspect
+        "Error (#{status}): #{cmd.inspect} failed", 'STDOUT:', out.inspect, 'STDERR:', err.inspect
       ].join("\n")
     end
 

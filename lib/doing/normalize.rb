@@ -194,7 +194,7 @@ module Doing
   ## Symbol helpers
   ##
   module SymbolNormalize
-    def normalize_tag_sort(default = :name)
+    def normalize_tag_sort(_default = :name)
       to_s.normalize_tag_sort
     end
 

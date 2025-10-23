@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -21,7 +23,7 @@ class DoingShowSearchTest < Test::Unit::TestCase
     @backup_dir = File.join(@basedir, 'doing_backup')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
-    @config = YAML.load(IO.read(@config_file))
+    @config = YAML.safe_load(IO.read(@config_file))
   end
 
   def teardown
@@ -91,7 +93,7 @@ class DoingShowSearchTest < Test::Unit::TestCase
     result = doing('show', '--search', 'barley', '--not')
     assert_count_entries(1, result, 'Search should ignore 2 entries')
   end
-  
+
   private
 
   def assert_matches(matches, shown)
@@ -116,6 +118,7 @@ class DoingShowSearchTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end

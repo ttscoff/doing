@@ -79,11 +79,11 @@ module Doing
       Readline.completion_append_character = ' '
       Readline.completion_proc = comp
       puts format(['%<promptcolor>s%<prompt>s %<textcolor>sEnter a blank line',
-        '(%<keycolor>sreturn twice%<textcolor>s)',
-        'to end editing and save,',
-        '%<keycolor>sCTRL-C%<textcolor>s to cancel%<reset>s'].join(' '),
-        { promptcolor: boldgreen, prompt: prompt.sub(/:?$/, ':'),
-          textcolor: yellow, keycolor: boldwhite, reset: reset })
+                   '(%<keycolor>sreturn twice%<textcolor>s)',
+                   'to end editing and save,',
+                   '%<keycolor>sCTRL-C%<textcolor>s to cancel%<reset>s'].join(' '),
+                  { promptcolor: boldgreen, prompt: prompt.sub(/:?$/, ':'),
+                    textcolor: yellow, keycolor: boldwhite, reset: reset })
 
       res = []
 
@@ -116,7 +116,8 @@ module Doing
 
       ask_note = []
       reader = TTY::Reader.new(interrupt: -> { raise Errors::UserCancelled }, track_history: false)
-      puts "#{boldgreen(prompt.sub(/:?$/, ':'))} #{yellow('Hit return for a new line, ')}#{boldwhite('enter a blank line (')}#{boldyellow('return twice')}#{boldwhite(') to end editing')}"
+      puts "#{boldgreen(prompt.sub(/:?$/,
+                                   ':'))} #{yellow('Hit return for a new line, ')}#{boldwhite('enter a blank line (')}#{boldyellow('return twice')}#{boldwhite(') to end editing')}"
       loop do
         res = reader.read_line(green('> '))
         break if res.strip.empty?

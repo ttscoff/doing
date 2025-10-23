@@ -19,7 +19,7 @@ module Doing
       opt ||= {}
       section ||= Doing.setting('current_section')
       @content.add_section(section, log: false)
-      opt[:back] ||= opt[:date] ? opt[:date] : Time.now
+      opt[:back] ||= opt[:date] || Time.now
       opt[:date] ||= Time.now
       note = Note.new
       opt[:timed] ||= false
@@ -78,8 +78,8 @@ module Doing
       if finish_date
         item.tag('done', remove: true)
         item.tag('done', value: finish_date.strftime('%F %R'))
-      else
-        item.tag('done', remove: true) if resume
+      elsif resume
+        item.tag('done', remove: true)
       end
       logger.info('Reset:', %(Reset #{resume ? 'and resumed ' : ''} "#{item.title}" in #{item.section}))
       item
@@ -118,7 +118,7 @@ module Doing
       note = opt[:note] || Note.new
 
       if opt[:editor]
-        start = opt[:date] ? opt[:date] : Time.now
+        start = opt[:date] || Time.now
         to_edit = "#{start.strftime('%F %R')} | #{title}"
         to_edit += "\n#{note.strip_lines.join("\n")}" unless note.empty?
         new_item = fork_editor(to_edit)
@@ -168,7 +168,8 @@ module Doing
     ##
     ## @see        #filter_items
     ##
-    def tag_last(opt) # hooked
+    # hooked
+    def tag_last(opt)
       opt ||= {}
       opt[:count] ||= 1
       opt[:archive] ||= false
@@ -186,11 +187,11 @@ module Doing
 
       if opt[:interactive]
         items = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, menu: true,
-                                    header: '',
-                                    prompt: 'Select entries to tag > ',
-                                    multiple: true,
-                                    sort: true,
-                                    show_if_single: true)
+                                                header: '',
+                                                prompt: 'Select entries to tag > ',
+                                                multiple: true,
+                                                sort: true,
+                                                show_if_single: true)
 
         raise NoResults, 'no items selected' if items.empty?
 
@@ -270,7 +271,7 @@ module Doing
                 res = Prompt.yn(yellow("Did this actually take #{human}"), default_response: true)
                 unless res
                   new_elapsed = Prompt.enter_text('How long did it take?').chronify_qty
-                  raise InvalidTimeExpression, 'Unrecognized time span entry' unless new_elapsed > 0
+                  raise InvalidTimeExpression, 'Unrecognized time span entry' unless new_elapsed.positive?
 
                   opt[:took] = new_elapsed
                   done_date = item.calculate_end_date(opt) if opt[:took]
@@ -289,7 +290,8 @@ module Doing
               end
               old_title = item.title.dup
               force = opt[:value].nil? ? false : true
-              item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex], value: opt[:value], force: force)
+              item.title.tag!(tag, remove: opt[:remove], rename_to: rename_to, regex: opt[:regex], value: opt[:value],
+                                   force: force)
               if old_title != item.title
                 removed << tag
                 added << rename_to if rename_to
@@ -310,7 +312,7 @@ module Doing
 
         item.note.add(opt[:note]) if opt[:note]
 
-        if opt[:archive] && opt[:section] != 'Archive' && (opt[:count]).positive?
+        if opt[:archive] && opt[:section] != 'Archive' && opt[:count].positive?
           item.move_to('Archive', label: true)
         elsif opt[:archive] && opt[:count].zero?
           logger.warn('Skipped:', 'Archiving is skipped when operating on all entries')
@@ -376,7 +378,6 @@ module Doing
         Hooks.trigger :post_entry_updated, self, item, old_item
       end
 
-
       logger.debug('Skipped:', "No active @#{tag} tasks found.") if found_items.zero?
 
       if opt[:new_item]
@@ -431,12 +432,13 @@ module Doing
 
       destination = guess_section(destination)
 
-      if @content.section?(destination) && (@content.section?(section) || archive_all)
-        do_archive(section, destination, { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label], before: options[:before], after: options[:after], from: options[:from] })
-        write(doing_file)
-      else
+      unless @content.section?(destination) && (@content.section?(section) || archive_all)
         raise InvalidArgument, 'Either source or destination does not exist'
       end
+
+      do_archive(section, destination,
+                 { count: count, tags: tags, bool: bool, search: options[:search], label: options[:label], before: options[:before], after: options[:after], from: options[:from] })
+      write(doing_file)
     end
 
     ##
@@ -483,43 +485,41 @@ module Doing
         end
       end
 
-      if Doing.setting('autotag.transform')
-        Doing.setting('autotag.transform').each do |tag|
-          next unless tag =~ /\S+:\S+/
+      Doing.setting('autotag.transform')&.each do |tag|
+        next unless tag =~ /\S+:\S+/
 
-          if tag =~ /::/
-            rx, r = tag.split(/::/)
+        if tag =~ /::/
+          rx, r = tag.split(/::/)
+        else
+          rx, r = tag.split(/:/)
+        end
+
+        flag_rx = %r{/(r+)$}
+        if r =~ flag_rx
+          flags = r.match(flag_rx)[1].split(//)
+          r.sub!(flag_rx, '')
+        end
+        r.gsub!(/\$/, '\\')
+        rx.sub!(/^@?/, '@')
+        regex = Regexp.new("(?<= |\\A)#{rx}(?= |\\Z)")
+
+        text.sub!(regex) do
+          m = Regexp.last_match
+          new_tag = r
+
+          m.to_a.slice(1, m.length - 1).each_with_index do |v, idx|
+            next if v.nil?
+
+            new_tag.gsub!("\\#{idx + 1}", v)
+          end
+          # Replace original tag if /r
+          if flags&.include?('r')
+            tagged[:replaced].concat(new_tag.split(/ /).map { |t| t.sub(/^@/, '') })
+            new_tag.split(/ /).map { |t| t.sub(/^@?/, '@') }.join(' ')
           else
-            rx, r = tag.split(/:/)
-          end
-
-          flag_rx = %r{/([r]+)$}
-          if r =~ flag_rx
-            flags = r.match(flag_rx)[1].split(//)
-            r.sub!(flag_rx, '')
-          end
-          r.gsub!(/\$/, '\\')
-          rx.sub!(/^@?/, '@')
-          regex = Regexp.new("(?<= |\\A)#{rx}(?= |\\Z)")
-
-          text.sub!(regex) do
-            m = Regexp.last_match
-            new_tag = r
-
-            m.to_a.slice(1, m.length - 1).each_with_index do |v, idx|
-              next if v.nil?
-
-              new_tag.gsub!("\\#{idx + 1}", v)
-            end
-            # Replace original tag if /r
-            if flags&.include?('r')
-              tagged[:replaced].concat(new_tag.split(/ /).map { |t| t.sub(/^@/, '') })
-              new_tag.split(/ /).map { |t| t.sub(/^@?/, '@') }.join(' ')
-            else
-              tagged[:transformed].concat(new_tag.split(/ /).map { |t| t.sub(/^@/, '') })
-              tagged[:transformed] = tagged[:transformed].uniq
-              m[0]
-            end
+            tagged[:transformed].concat(new_tag.split(/ /).map { |t| t.sub(/^@/, '') })
+            tagged[:transformed] = tagged[:transformed].uniq
+            m[0]
           end
         end
       end

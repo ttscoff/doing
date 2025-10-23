@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@recent
 desc 'List recent entries'
 default_value 10
@@ -21,39 +23,51 @@ command :recent do |c|
   add_options(:save, c)
 
   c.action do |global_options, options, args|
-    section = @wwid.guess_section(options[:section]) || options[:section].cap_first
+    Doing.logger.measure(:recent_command) do
+      section = @wwid.guess_section(options[:section]) || options[:section].cap_first
 
-    unless global_options[:version]
-      config_count = if Doing.setting('templates.recent.count')
-                       Doing.setting('templates.recent.count').to_i
-                     else
-                       10
-                     end
+      unless global_options[:version]
+        count = nil
+        opts = nil
 
-      count = args.empty? ? config_count : args[0].to_i
+        Doing.logger.measure(:recent_config) do
+          config_count = if Doing.setting('templates.recent.count')
+                           Doing.setting('templates.recent.count').to_i
+                         else
+                           10
+                         end
 
-      options[:times] = true if options[:totals]
-      options[:sort_tags] = options[:tag_sort]
+          count = args.empty? ? config_count : args[0].to_i
 
-      template = Doing.setting('templates.recent').deep_merge(Doing.setting('templates.default'))
-      tags_color = template.key?('tags_color') ? template['tags_color'] : nil
+          options[:times] = true if options[:totals]
+          options[:sort_tags] = options[:tag_sort]
 
-      opts = {
-        config_template: options[:config_template],
-        duration: options[:duration],
-        interactive: options[:interactive],
-        output: options[:output],
-        sort_tags: options[:sort_tags],
-        tags_color: tags_color,
-        template: options[:template],
-        times: options[:times],
-        totals: options[:totals]
-      }
+          template = Doing.setting('templates.recent').deep_merge(Doing.setting('templates.default'))
+          tags_color = template.key?('tags_color') ? template['tags_color'] : nil
 
-      Doing::Pager.page @wwid.recent(count, section.cap_first, opts)
-      opts[:count] = count
-      opts[:title] = options[:title]
-      Doing.config.save_view(opts.to_view, options[:save].downcase) if options[:save]
+          opts = {
+            config_template: options[:config_template],
+            duration: options[:duration],
+            interactive: options[:interactive],
+            output: options[:output],
+            sort_tags: options[:sort_tags],
+            tags_color: tags_color,
+            template: options[:template],
+            times: options[:times],
+            totals: options[:totals]
+          }
+        end
+
+        Doing.logger.measure(:recent_pager) do
+          Doing::Pager.page @wwid.recent(count, section.cap_first, opts)
+        end
+
+        Doing.logger.measure(:recent_save) do
+          opts[:count] = count
+          opts[:title] = options[:title]
+          Doing.config.save_view(opts.to_view, options[:save].downcase) if options[:save]
+        end
+      end
     end
   end
 end

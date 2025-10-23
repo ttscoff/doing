@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@meanwhile
 desc 'Finish any running @meanwhile tasks and optionally create a new one'
 long_desc 'The @meanwhile tag allows you to have long-running entries that encompass smaller entries.
@@ -6,10 +8,12 @@ big project` to start a @meanwhile entry, add other entries as you work on the p
 itself to mark the entry as @done.'
 arg_name 'ENTRY', optional: true
 command :meanwhile do |c|
-  c.example 'doing meanwhile "Long task that will have others after it before it\'s done"', desc: 'Add a new long-running entry, completing any current @meanwhile entry'
+  c.example 'doing meanwhile "Long task that will have others after it before it\'s done"',
+            desc: 'Add a new long-running entry, completing any current @meanwhile entry'
   c.example 'doing meanwhile', desc: 'Finish any open @meanwhile entry'
   c.example 'doing meanwhile --archive', desc: 'Finish any open @meanwhile entry and archive it'
-  c.example 'doing meanwhile --back 2h "Something I\'ve been working on for a while', desc: 'Add a @meanwhile entry with a start date 2 hours ago'
+  c.example 'doing meanwhile --back 2h "Something I\'ve been working on for a while',
+            desc: 'Add a @meanwhile entry with a start date 2 hours ago'
 
   c.desc 'Section'
   c.arg_name 'NAME'

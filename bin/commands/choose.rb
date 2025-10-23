@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@choose
 desc 'Select a section to display from a menu'
 command :choose do |c|

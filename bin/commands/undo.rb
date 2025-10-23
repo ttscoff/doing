@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@undo
 desc 'Undo the last X changes to the Doing file'
 long_desc 'Reverts the last X commands that altered the doing file.

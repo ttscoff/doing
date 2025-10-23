@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'awesome_print'
 
-input = STDIN.read.force_encoding('utf-8')
+input = $stdin.read.force_encoding('utf-8')
 
 commands = input.split(/^# @@/).delete_if(&:empty?).sort
 # commands.each do |cmd|
@@ -53,7 +55,7 @@ commands.each do |cmd|
   key = cmd.match(/^(\w+)/)[1]
   idx = indexes.index(key)
   result[idx] = "#@@#{cmd}"
-# puts commands.join('# @@')
+  # puts commands.join('# @@')
 end
 
 puts result.join('')

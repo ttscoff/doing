@@ -1,3 +1,25 @@
+### 2.1.90
+
+2025-10-23 06:25
+
+#### NEW
+
+- Add benchmark_stats() and all_benchmark_stats() for detailed analysis
+- Add benchmark_summary() for compact performance overview
+
+#### IMPROVED
+
+- Add 4-decimal-place rounding to all benchmark timing outputs
+- Implement new measure() method for automatic start/finish timing
+- Optimize log_benchmarks() with better sorting and I/O efficiency
+
+#### FIXED
+
+- Fix coloring? method to return boolean instead of nil
+- Move color method definitions to class methods (Doing::Color.reset)
+- Add string extension methods for all color attributes ("text".reset)
+- Move attributes() method to class methods for proper access
+
 ### 2.1.89
 
 2025-05-19 04:35

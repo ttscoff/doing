@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -30,7 +32,7 @@ class DoingTagTest < Test::Unit::TestCase
     # Default tag defined in config
     subject = 'Test new entry'
     doing('now', subject)
-    assert_match(/@defaulttag(?=[ (]|$)/, doing('last').uncolor, "should have added @defaulttag to last entry")
+    assert_match(/@defaulttag(?=[ (]|$)/, doing('last').uncolor, 'should have added @defaulttag to last entry')
   end
 
   def test_tag_entry
@@ -131,7 +133,7 @@ class DoingTagTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end
-

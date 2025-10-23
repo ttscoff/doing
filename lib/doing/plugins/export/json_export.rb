@@ -21,10 +21,10 @@ module Doing
                  {
                    'section' => '',
                    'items' => [],
-                   'timers' => ""
+                   'timers' => ''
                  }.to_json
                when 'timeline'
-                "<html></html>"
+                 '<html></html>'
                end
       end
 
@@ -62,7 +62,7 @@ module Doing
           i = {
             date: i.date,
             end_date: end_date,
-            title: title.strip, #+ " #{note}"
+            title: title.strip, # + " #{note}"
             section: i.section,
             note: note.to_s(prefix: ''),
             time: interval.time_string(format: :clock),
@@ -78,7 +78,7 @@ module Doing
         when 'timeline'
           new_item = {
             'id' => index + 1,
-            'content' => title.strip, #+ " #{note}"
+            'content' => title.strip, # + " #{note}"
             'title' => title.strip + " (#{interval.time_string(format: :clock)})",
             'start' => i.date.strftime('%F %T'),
             'type' => 'box',
@@ -151,4 +151,3 @@ module Doing
     Doing::Plugins.register 'timeline', :export, self
   end
 end
-

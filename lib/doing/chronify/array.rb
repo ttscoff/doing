@@ -9,12 +9,12 @@ module Doing
 
       if d.zero? && h > 24
         d = (h / 24).floor
-        h = h % 24
+        h %= 24
       end
 
       if d > 365
         y = (d / 365).floor
-        d = d % 365
+        d %= 365
       else
         y = 0
       end
@@ -41,7 +41,7 @@ module Doing
 
         if d.zero? && h > 24
           d = (h / 24).floor
-          h = h % 24
+          h %= 24
         end
       end
 
@@ -68,7 +68,7 @@ module Doing
       when :clock
         if d.zero? && h > 24
           d = (h / 24).floor
-          h = h % 24
+          h %= 24
         end
         format('%<d>02d:%<h>02d:%<m>02d', d: d, h: h, m: m)
       when :hmclock

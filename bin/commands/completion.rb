@@ -22,7 +22,8 @@ command :completion do |c|
   c.arg_name "[#{SHELLS.join('|')}]"
   c.command :generate do |gen|
     gen.example 'doing completion generate fish', desc: 'Generate fish completion script and link to autoload directory'
-    gen.example 'doing completion generate zsh --file ~/.zsh-completions/doing.zsh', desc: 'Generate zsh completion script and save to alternative file'
+    gen.example 'doing completion generate zsh --file ~/.zsh-completions/doing.zsh',
+                desc: 'Generate zsh completion script and save to alternative file'
 
     gen.desc 'Alternative file to write output to'
     gen.arg_name 'PATH'

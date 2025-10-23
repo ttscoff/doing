@@ -8,7 +8,7 @@ module Doing
     ## @param      path  [String] Override path to a doing file, optional
     ##
     def init_doing_file(path = nil)
-      @doing_file =  File.expand_path(Doing.setting('doing_file'))
+      @doing_file = File.expand_path(Doing.setting('doing_file'))
 
       if path.nil?
         create(@doing_file) unless File.exist?(@doing_file)
@@ -107,7 +107,7 @@ module Doing
       keep = opt[:keep] || 0
       tags = []
       tags.concat(opt[:tag].split(/ *, */).map { |t| t.sub(/^@/, '').strip }) if opt[:tag]
-      bool  = opt[:bool] || :and
+      bool = opt[:bool] || :and
 
       sect = opt[:section] !~ /^all$/i ? guess_section(opt[:section]) : 'all'
 
@@ -121,27 +121,29 @@ module Doing
 
       section_items.each do |item|
         break if counter >= max
+
         if opt[:before]
           time_string = opt[:before]
           cutoff = time_string.chronify(guess: :begin)
         end
 
-        unless ((!tags.empty? && !item.tags?(tags, bool)) || (opt[:search] && !item.search(opt[:search].to_s)) || (opt[:before] && item.date >= cutoff))
-          new_item = @content.delete(item)
-          Hooks.trigger :post_entry_removed, self, item.clone
-          raise DoingRuntimeError, "Error deleting item: #{item}" if new_item.nil?
+        next if (!tags.empty? && !item.tags?(tags,
+                                             bool)) || (opt[:search] && !item.search(opt[:search].to_s)) || (opt[:before] && item.date >= cutoff)
 
-          new_content.add_section(new_item.section, log: false)
-          new_content.push(new_item)
-          counter += 1
-        end
+        new_item = @content.delete(item)
+        Hooks.trigger :post_entry_removed, self, item.clone
+        raise DoingRuntimeError, "Error deleting item: #{item}" if new_item.nil?
+
+        new_content.add_section(new_item.section, log: false)
+        new_content.push(new_item)
+        counter += 1
       end
 
       if counter.positive?
         logger.count(:rotated,
                      level: :info,
                      count: counter,
-                     message: "Rotated %count %items")
+                     message: 'Rotated %count %items')
       else
         logger.info('Skipped:', 'No items were rotated')
       end

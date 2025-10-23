@@ -6,9 +6,7 @@ module Doing
       def initialize(msg = nil, level: nil, topic: 'Error:', exit_code: 1)
         level ||= :error
         Doing.logger.output_results
-        if msg
-          Doing.logger.log_now(level, topic, msg)
-        end
+        Doing.logger.log_now(level, topic, msg) if msg
 
         Process.exit exit_code
       end
@@ -52,7 +50,6 @@ module Doing
     class NoResults < DoingNoTraceError
       def initialize(msg = 'No results', topic = 'Exited:')
         super(msg, level: :warn, topic: topic, exit_code: 0)
-
       end
     end
 

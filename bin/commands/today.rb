@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@today
 desc 'List entries from today'
 long_desc 'List entries from the current day. Use --before, --after, and
@@ -18,11 +20,17 @@ command :today do |c|
   add_options(:save, c)
 
   c.action do |_global_options, options, _args|
-    raise InvalidPlugin.new('output', options[:output]) if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+    if options[:output] && options[:output] !~ Doing::Plugins.plugin_regex(type: :export)
+      raise InvalidPlugin.new('output',
+                              options[:output])
+    end
 
     options[:times] = true if options[:totals]
     options[:sort_tags] = options[:tag_sort]
-    filter_options = %i[after before times duration from section sort_tags totals tag_order template config_template only_timed].each_with_object({}) { |k, hsh| hsh[k] = options[k] }
+    filter_options = %i[after before times duration from section sort_tags totals tag_order template config_template
+                        only_timed].each_with_object({}) do |k, hsh|
+      hsh[k] = options[k]
+    end
     filter_options[:today] = true
     Doing::Pager.page @wwid.today(options[:times], options[:output], filter_options).chomp
     filter_options[:title] = options[:title]

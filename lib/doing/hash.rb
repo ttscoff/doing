@@ -153,7 +153,7 @@ module Doing
     ## Remove keys with empty values
     ##
     def remove_empty
-      delete_if { |k, v| !v.is_a?(FalseClass) && !v.good? }
+      delete_if { |_k, v| !v.is_a?(FalseClass) && !v.good? }
     end
 
     def tag_filter_to_options
@@ -193,9 +193,9 @@ module Doing
     ## @param      to_delete  [Array] the keys to delete if key doesn't exist
     ##
     def delete_unless_key(key, to_delete)
-      unless key?(key)
-        to_delete.each { |k| delete(k) }
-      end
+      return if key?(key)
+
+      to_delete.each { |k| delete(k) }
     end
   end
 end

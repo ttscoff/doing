@@ -40,10 +40,14 @@ module Doing
     # register a single hook to be called later, internal API
     def self.register_one(event, priority, &block)
       unless @registry[event]
-        raise Doing::Errors::HookUnavailable.new("Invalid hook. Doing only supports #{@registry.keys.inspect}", 'hook', event)
+        raise Doing::Errors::HookUnavailable.new("Invalid hook. Doing only supports #{@registry.keys.inspect}", 'hook',
+                                                 event)
       end
 
-      raise Doing::Errors::PluginUncallable.new('Hooks must respond to :call', 'hook', event) unless block.respond_to? :call
+      unless block.respond_to? :call
+        raise Doing::Errors::PluginUncallable.new('Hooks must respond to :call', 'hook',
+                                                  event)
+      end
 
       Doing.logger.debug('Hook Manager:', "Registered #{event} hook") if ENV['DOING_PLUGIN_DEBUG']
 

@@ -52,7 +52,10 @@ module Doing
 
         title = "#{title} @section(#{i.section})" unless variables[:is_single]
 
-        interval = wwid.get_interval(i, record: true) if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+        if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+          interval = wwid.get_interval(i,
+                                       record: true)
+        end
         interval ||= false
 
         finished = i.title =~ /(?<= |^)@done/ ? true : false
@@ -77,7 +80,12 @@ module Doing
                    self.template(nil)
                  end
 
-      totals = opt[:totals] ? wwid.tag_times(format: :markdown, sort_by: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+      totals = if opt[:totals]
+                 wwid.tag_times(format: :markdown, sort_by: opt[:sort_tags],
+                                sort_order: opt[:tag_order])
+               else
+                 ''
+               end
 
       mdx = MarkdownRenderer.new(variables[:page_title], all_items, totals)
       Doing.logger.debug('Markdown Export:', "#{all_items.count} items output to Markdown")

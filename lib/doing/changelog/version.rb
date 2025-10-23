@@ -36,7 +36,6 @@ module Doing
       val.is_a?(String)
     end
 
-
     def compare(other, comp, inclusive: false)
       case comp
       when :older
@@ -81,18 +80,16 @@ module Doing
             true
           elsif wild?(other.min)
             @min.to_s =~ /^#{other.min}/ ? true : false
-          else
-            if @min == other.min
-              if other.patch.nil?
-                true
-              elsif wild?(other.patch)
-                @patch.to_s =~ /^#{other.patch}/ ? true : false
-              else
-                @patch == other.patch
-              end
+          elsif @min == other.min
+            if other.patch.nil?
+              true
+            elsif wild?(other.patch)
+              @patch.to_s =~ /^#{other.patch}/ ? true : false
             else
-              false
+              @patch == other.patch
             end
+          else
+            false
           end
         end
       end

@@ -79,7 +79,7 @@ module Doing
 
       new_items = wwid.filter_items(new_items, opt: options)
       filtered = total - new_items.count
-      Doing.logger.debug('Skipped:' , %(#{filtered} items that didn't match filter criteria)) if filtered.positive?
+      Doing.logger.debug('Skipped:', %(#{filtered} items that didn't match filter criteria)) if filtered.positive?
 
       new_items = wwid.dedup(new_items, no_overlap: options[:no_overlap])
       dups = filtered - new_items.count

@@ -448,16 +448,16 @@ module Doing
     end
 
     def value_string_matches?(tag_val, comp, value)
-      case comp
-      when /\^=/
-        tag_val =~ /^#{value.wildcard_to_rx}/i
-      when /\$=/
-        tag_val =~ /#{value.wildcard_to_rx}$/i
-      when %r{==}
-        tag_val =~ /^#{value.wildcard_to_rx}$/i
-      else
-        tag_val =~ /#{value.wildcard_to_rx}/i
-      end
+      tag_val =~ case comp
+                 when /\^=/
+                   /^#{value.wildcard_to_rx}/i
+                 when /\$=/
+                   /#{value.wildcard_to_rx}$/i
+                 when /==/
+                   /^#{value.wildcard_to_rx}$/i
+                 else
+                   /#{value.wildcard_to_rx}/i
+                 end
     end
 
     def value_number_matches?(tag_val, comp, value)

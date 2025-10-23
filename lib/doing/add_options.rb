@@ -45,7 +45,7 @@ def add_options(type, cmd, default_template: 'default')
     cmd.arg_name 'FORMAT'
     cmd.flag %i[o output], type: ExportTemplate
 
-    cmd.desc "Output using a template from configuration"
+    cmd.desc 'Output using a template from configuration'
     cmd.arg_name 'TEMPLATE_KEY'
     cmd.flag [:config_template], type: TemplateName, default_value: default_template
 
@@ -57,7 +57,7 @@ def add_options(type, cmd, default_template: 'default')
     cmd.arg_name 'FORMAT'
     cmd.flag %i[o output]
 
-    cmd.desc "Output using a template from configuration"
+    cmd.desc 'Output using a template from configuration'
     cmd.arg_name 'TEMPLATE_KEY'
     cmd.flag [:config_template], type: TemplateName
 

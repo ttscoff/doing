@@ -17,8 +17,7 @@ class DoingItemTest < Test::Unit::TestCase
     @wwid = WWID.new
   end
 
-  def teardown
-  end
+  def teardown; end
 
   # TODO: tests for duration, interval, end_date, overlapping_time?, tags?, tag_values?
 
@@ -31,7 +30,8 @@ class DoingItemTest < Test::Unit::TestCase
   end
 
   def test_search_item
-    item = Item.new(Time.now - 3600, "Test item with search string @done(#{(Time.now - 1200).strftime('%F %R')})", @wwid.current_section)
+    item = Item.new(Time.now - 3600, "Test item with search string @done(#{(Time.now - 1200).strftime('%F %R')})",
+                    @wwid.current_section)
     assert(item.search('search string'), 'Item should match search string')
     assert(item.search('/s.*?ch s.*?g/'), 'Item should match regex query')
     assert_equal(false, item.search('Search String', case_type: :smart), 'Item should not match case')
@@ -39,7 +39,8 @@ class DoingItemTest < Test::Unit::TestCase
   end
 
   def test_value_comparison
-    item = Item.new(Time.now - 3600, "Test item with search string @tag1(50%) @tag2(2021-03-03 12:00) @tag3(string value)", @wwid.current_section, ['note content'])
+    item = Item.new(Time.now - 3600,
+                    'Test item with search string @tag1(50%) @tag2(2021-03-03 12:00) @tag3(string value)', @wwid.current_section, ['note content'])
     assert(item.tag_values?(['tag1 > 25']), 'Item should match value comparison')
     assert_equal(false, item.tag_values?(['tag1 < 25']), 'Item should not match value comparison')
 
@@ -52,9 +53,9 @@ class DoingItemTest < Test::Unit::TestCase
 
   def test_move_item
     section = 'Test Section'
-    item = Item.new(Time.now - 3600, "Test item with search string @done(#{(Time.now - 1200).strftime('%F %R')})", @wwid.current_section)
+    item = Item.new(Time.now - 3600, "Test item with search string @done(#{(Time.now - 1200).strftime('%F %R')})",
+                    @wwid.current_section)
     item.move_to(section, label: true, log: false)
     assert_equal(section, item.section, 'Section should match')
   end
 end
-

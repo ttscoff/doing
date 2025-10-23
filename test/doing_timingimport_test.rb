@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -42,12 +44,12 @@ class DoingTimingImportTest < Test::Unit::TestCase
 
   def test_timing_import_date_range
     result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--from', '7/19/21', @timing_import_file)
-    assert_match(/Imported: 2 items/, result, "Should have imported 2 entries")
+    assert_match(/Imported: 2 items/, result, 'Should have imported 2 entries')
   end
 
   def test_timing_import_search_filter
     result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--search', 'overtired', @timing_import_file)
-    assert_match(/Imported: 2 items/, result, "Should have imported 2 entries")
+    assert_match(/Imported: 2 items/, result, 'Should have imported 2 entries')
   end
 
   def test_timing_import_no_arg
@@ -78,7 +80,7 @@ class DoingTimingImportTest < Test::Unit::TestCase
     doing('done', '--back', '2021-07-19 12am', '--took', '24h', 'Testing overlapping entry')
     # doing('done', '--back', '2021-07-22 11:20', '--took', '30m', 'Testing overlapping entry')
     result = doing('--stdout', '--debug', 'import', '--type', 'timing', '--no-overlap', @timing_import_file)
-    assert_match(/Skipped: 2 overlapping item/, result, "Should have skipped 2 duplicate entries")
+    assert_match(/Skipped: 2 overlapping item/, result, 'Should have skipped 2 duplicate entries')
     assert_match(/Imported: #{target - 2} items/, result, "Should have imported #{target - 2} entries")
   end
 
@@ -98,7 +100,6 @@ class DoingTimingImportTest < Test::Unit::TestCase
     assert_equal(count, shown.uncolor.strip.scan(ENTRY_REGEX).count, message)
   end
 
-
   def mktmpdir
     tmpdir = Dir.mktmpdir
     @tmpdirs.push(tmpdir)
@@ -107,7 +108,7 @@ class DoingTimingImportTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end
-

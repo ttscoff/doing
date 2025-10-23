@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@open
 desc 'Open the "doing" file in an editor'
 long_desc "`doing open` defaults to using the editors.doing_file setting
@@ -25,7 +27,10 @@ command :open do |c|
     end
 
     if options[:editor]
-      raise MissingEditor, "Editor #{options[:editor]} not found" unless Doing::Util.exec_available(options[:editor].split(/ /).first)
+      unless Doing::Util.exec_available(options[:editor].split(/ /).first)
+        raise MissingEditor,
+              "Editor #{options[:editor]} not found"
+      end
 
       editor = TTY::Which.which(options[:editor])
       system %(#{editor} "#{File.expand_path(@wwid.doing_file)}")

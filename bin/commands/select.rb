@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@select
 desc 'Display an interactive menu to perform operations'
 long_desc 'List all entries and select with typeahead fuzzy matching.

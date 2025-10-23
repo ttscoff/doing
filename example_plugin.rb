@@ -83,7 +83,6 @@ module Doing
       }
     end
 
-
     #-------------------------------------------------------
     ## Output a template. Only required if template(s) are
     ## included in settings. The method should return a
@@ -106,7 +105,6 @@ module Doing
       'On %date, you were %title, recorded in section %section%took'
     end
 
-
     ##
     ## Render data received from an output
     ##             command
@@ -122,7 +120,7 @@ module Doing
     ##
     ## @return     [String] Rendered output
     ##
-    def self.render(wwid, items, variables: {})
+    def self.render(_wwid, items, variables: {})
       return unless items.good?
 
       config = Doing.config.settings
@@ -153,7 +151,6 @@ module Doing
           took = '. You finished on '
           finished_at = i.end_date
           took += finished_at.strftime('%A %B %e at %I:%M%p')
-
 
           took += ' and it took'
           took += interval.time_string(format: :natural)

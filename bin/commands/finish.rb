@@ -10,8 +10,10 @@ module Doing
 
     def add_examples(cmd)
       cmd.example 'doing finish', desc: 'Mark the last entry @done'
-      cmd.example 'doing finish --auto --section Later 10', desc: 'Add @done to any unfinished entries in the last 10 in Later, setting the finish time based on the start time of the task after it'
-      cmd.example 'doing finish --search "a specific entry" --at "yesterday 3pm"', desc: 'Search for an entry containing string and set its @done time to yesterday at 3pm'
+      cmd.example 'doing finish --auto --section Later 10',
+                  desc: 'Add @done to any unfinished entries in the last 10 in Later, setting the finish time based on the start time of the task after it'
+      cmd.example 'doing finish --search "a specific entry" --at "yesterday 3pm"',
+                  desc: 'Search for an entry containing string and set its @done time to yesterday at 3pm'
     end
 
     def add_options(cmd)

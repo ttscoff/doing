@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@grep @@search
 desc 'Search for entries'
 long_desc %(
@@ -8,9 +10,11 @@ To search with regular expressions, single quote the string and surround with sl
 arg_name 'SEARCH_PATTERN'
 command %i[grep search] do |c|
   c.example 'doing grep "doing wiki"', desc: 'Find entries containing "doing wiki" using fuzzy matching'
-  c.example 'doing search "\'search command"', desc: 'Find entries containing "search command" using exact matching (search is an alias for grep)'
+  c.example 'doing search "\'search command"',
+            desc: 'Find entries containing "search command" using exact matching (search is an alias for grep)'
   c.example 'doing grep "/do.*?wiki.*?@done/"', desc: 'Find entries matching regular expression'
-  c.example 'doing search --before 12/21 "doing wiki"', desc: 'Find entries containing "doing wiki" with entry dates before 12/21 of the current year'
+  c.example 'doing search --before 12/21 "doing wiki"',
+            desc: 'Find entries containing "doing wiki" with entry dates before 12/21 of the current year'
   c.example 'doing grep @project1 -s currently -s projects', desc: 'Search only in Currently and Projects'
 
   c.desc 'Section'
@@ -29,13 +33,13 @@ command %i[grep search] do |c|
                   default_value: Doing.setting('search.case', :smart).normalize_case,
                   type: CaseSymbol
 
-  c.desc "Highlight search matches in output. Only affects command line output"
+  c.desc 'Highlight search matches in output. Only affects command line output'
   c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
   c.desc "Edit matching entries with #{Doing::Util.default_editor}"
   c.switch %i[e editor], negatable: false, default_value: false
 
-  c.desc "Delete matching entries"
+  c.desc 'Delete matching entries'
   c.switch %i[d delete], negatable: false, default_value: false
 
   c.desc 'Display an interactive menu of results to perform further operations'
@@ -76,6 +80,6 @@ command %i[grep search] do |c|
       options[:after] = Doing.original_options[:date_end] if Doing.original_options[:date_end].good?
       options[:from] = Doing.original_options[:date_range] if Doing.original_options[:date_range].good?
       Doing.config.save_view(options.to_view, options[:save].downcase)
-   end
+    end
   end
 end

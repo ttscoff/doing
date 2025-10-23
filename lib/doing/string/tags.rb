@@ -111,18 +111,21 @@ module Doing
           title.tag!(rename_to, value: value, single: single)
         elsif m
           title.gsub!(rx) do
-            rename_to ? "@#{rename_to}#{value.nil? ? m['parens'] : "(#{value})"}" : ''
+            if rename_to
+              "@#{rename_to}#{value.nil? ? m['parens'] : "(#{value})"}"
+            else
+              ''
+            end
           end
 
           title.dedup_tags!
           title.chomp!
 
+          f = "@#{tag}".cyan
           if rename_to
-            f = "@#{tag}".cyan
             t = "@#{rename_to}".cyan
             Doing.logger.write(log_level, 'Tag:', %(renamed #{f} to #{t} in "#{title}"))
           else
-            f = "@#{tag}".cyan
             Doing.logger.write(log_level, 'Tag:', %(removed #{f} from "#{title}"))
           end
         else
@@ -145,7 +148,7 @@ module Doing
 
         title.dedup_tags!
         title.chomp!
-        Doing.logger.write(log_level, 'Tag:', %(added #{('@' + tag).cyan} to "#{title}"))
+        Doing.logger.write(log_level, 'Tag:', %(added #{"@#{tag}".cyan} to "#{title}"))
       end
 
       title.gsub(/ +/, ' ')

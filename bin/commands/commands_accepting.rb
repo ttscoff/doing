@@ -17,7 +17,7 @@ module Doing
     def all_flags?(options, args)
       args.each do |arg|
         has_flag = false
-        options.flags.merge(options.switches).each do |_, flag|
+        options.flags.merge(options.switches).each_value do |flag|
           if flag.name == arg.to_sym || flag.aliases&.include?(arg.to_sym)
             has_flag = true
             break
@@ -31,7 +31,7 @@ module Doing
 
     def any_flags?(options, args)
       args.each do |option|
-        options.flags.merge(options.switches).each do |_, flag|
+        options.flags.merge(options.switches).each_value do |flag|
           return true if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
         end
       end
@@ -41,7 +41,7 @@ module Doing
 
     def no_flags?(options, args)
       args.each do |option|
-        options.flags.merge(options.switches).each do |_, flag|
+        options.flags.merge(options.switches).each_value do |flag|
           return false if flag.name == option.to_sym || flag.aliases&.include?(option.to_sym)
         end
       end

@@ -12,7 +12,7 @@ module Doing
       }
     end
 
-    def self.render(wwid, items, variables: {})
+    def self.render(_wwid, items, variables: {})
       return if items.nil?
 
       content = Doing::Items.new

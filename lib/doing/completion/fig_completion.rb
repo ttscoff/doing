@@ -13,15 +13,15 @@ module Doing
       attr_accessor :commands, :global_options
 
       def generate_helpers
-        out=<<~EOFUNCTIONS
-        const completionSpec: Fig.Spec = {
-          name: "doing",
-          description: "A CLI for a What Was I Doing system",
-          subcommands: [
-            #{generate_subcommand_completions.join("\n    ")}
-          ],
-        };
-        export default completionSpec;
+        out = <<~EOFUNCTIONS
+          const completionSpec: Fig.Spec = {
+            name: "doing",
+            description: "A CLI for a What Was I Doing system",
+            subcommands: [
+              #{generate_subcommand_completions.join("\n    ")}
+            ],
+          };
+          export default completionSpec;
         EOFUNCTIONS
         @bar.advance(status: '✅')
         @bar.finish
@@ -62,34 +62,33 @@ module Doing
             arg = ''
 
             if option[:arg]
-              arg =<<~EOARG
-              args: {
-              #{indent}        name: "#{option[:arg]}",
-              #{indent}        description: "#{option[:arg]}",
-              #{indent}  },
+              arg = <<~EOARG
+                args: {
+                #{indent}        name: "#{option[:arg]}",
+                #{indent}        description: "#{option[:arg]}",
+                #{indent}  },
               EOARG
             end
 
-            if option[:short]
-              opt_data =<<~EOOPT
-              {
-              #{indent}  name: ["-#{option[:short]}", "--#{option[:long]}"],
-              #{indent}  description: "#{option[:description].sanitize}",
-              #{indent}  #{arg}
-              #{indent}},
-              EOOPT
-            else
-              opt_data = <<~EOOPT
-              {
-              #{indent}  name: ["--#{option[:long]}"],
-              #{indent}  description: "#{option[:description].sanitize}",
-              #{indent}  #{arg}
-              #{indent}},
-              EOOPT
-            end
+            opt_data = if option[:short]
+                         <<~EOOPT
+                           {
+                           #{indent}  name: ["-#{option[:short]}", "--#{option[:long]}"],
+                           #{indent}  description: "#{option[:description].sanitize}",
+                           #{indent}  #{arg}
+                           #{indent}},
+                         EOOPT
+                       else
+                         <<~EOOPT
+                           {
+                           #{indent}  name: ["--#{option[:long]}"],
+                           #{indent}  description: "#{option[:description].sanitize}",
+                           #{indent}  #{arg}
+                           #{indent}},
+                         EOOPT
+                       end
 
             option_arr << opt_data
-
           end
 
           cmd_opts = <<~EOCMD
@@ -107,7 +106,8 @@ module Doing
         data = Completion.get_help_sections
         @global_options = Completion.parse_options(data[:global_options])
         @commands = Completion.parse_commands(data[:commands])
-        @bar = TTY::ProgressBar.new(" \033[0;0;33mGenerating Fig completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'processing subcommands')
+        @bar = TTY::ProgressBar.new(" \033[0;0;33mGenerating Fig completions: \033[0;35;40m[:bar] :status\033[0m",
+                                    total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'processing subcommands')
         width = TTY::Screen.columns - 45
         @bar.resize(width)
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'yaml'
@@ -29,8 +31,10 @@ class DoingConfigTest < Test::Unit::TestCase
   end
 
   def test_missing_config
-    res = doing_with_env({'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @temp_config}, '--stdout', '--doing_file', @wwid_file)
-    assert_match(/Config file written to .*?#{File.basename(@temp_config)}/, res, 'Missing config file should have been written')
+    res = doing_with_env({ 'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @temp_config }, '--stdout', '--doing_file',
+                         @wwid_file)
+    assert_match(/Config file written to .*?#{File.basename(@temp_config)}/, res,
+                 'Missing config file should have been written')
   end
 
   # def test_bad_config
@@ -40,10 +44,10 @@ class DoingConfigTest < Test::Unit::TestCase
   # end
 
   def test_user_config
-    user_config = YAML.load(IO.read(@config_file))
-    path = ['plugins', 'say', 'say_voice']
+    user_config = YAML.safe_load(IO.read(@config_file))
+    path = %w[plugins say say_voice]
     setting = user_config.dig(*path)
-    res = doing('config', 'get', "#{path.join('.')}")
+    res = doing('config', 'get', path.join('.').to_s)
     assert_match(/#{setting}/, res, 'Correct config setting should be returned to STDOUT')
   end
 
@@ -57,7 +61,7 @@ class DoingConfigTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir },
+                   '--doing_file', @wwid_file, *args)
   end
 end
-

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -61,14 +63,14 @@ class DoingNoteTest < Test::Unit::TestCase
     unique_title = "Test new entry #{unique_keyword} sad monkey"
     note = 'This is a test note'
     doing('now', unique_title)
-    doing('now', "Test new entry @tag2 koolaid")
+    doing('now', 'Test new entry @tag2 koolaid')
     doing('now', 'Test new entry @tag3 burly man')
     doing('note', '--search', unique_keyword, note)
     assert_match(/.*?#{unique_keyword}.*?\n\t#{note}/, doing('show'), 'Tagged entry should contain note')
   end
 
   def test_note_stdin
-    unique_title = "Test new entry with note from STDIN"
+    unique_title = 'Test new entry with note from STDIN'
     note = 'This is a test note from STDIN'
     doing('now', unique_title)
     doing('note', note, stdin: note)
@@ -80,7 +82,7 @@ class DoingNoteTest < Test::Unit::TestCase
     unique_title = "Test new entry @#{unique_tag} sad monkey"
     note = 'This is a test note'
     doing('now', unique_title)
-    doing('now', "Test new entry @tag2 jumping jesus")
+    doing('now', 'Test new entry @tag2 jumping jesus')
     doing('now', 'Test new entry @tag3 burly man')
     doing('note', '--tag', unique_tag, note)
     assert_match(/#{unique_title}\n\t#{note}/, doing('show'), 'Tagged entry should contain note')
@@ -96,6 +98,7 @@ class DoingNoteTest < Test::Unit::TestCase
   end
 
   def doing(*args, stdin: nil)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args, stdin: stdin)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args, stdin: stdin)
   end
 end

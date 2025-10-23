@@ -15,10 +15,10 @@ module BooleanTermParser
   end
 
   class QueryTransformer < Parslet::Transform
-    rule(:clause => subtree(:clause)) do
+    rule(clause: subtree(:clause)) do
       Clause.new(clause[:operator]&.to_s, clause[:term].to_s)
     end
-    rule(:query => sequence(:clauses)) { Query.new(clauses) }
+    rule(query: sequence(:clauses)) { Query.new(clauses) }
   end
 
   class Operator
@@ -49,7 +49,7 @@ module BooleanTermParser
     attr_accessor :should_terms, :must_not_terms, :must_terms
 
     def initialize(clauses)
-      grouped = clauses.chunk { |c| c.operator }.to_h
+      grouped = clauses.chunk(&:operator).to_h
       self.should_terms = grouped.fetch(:should, []).map(&:term)
       self.must_not_terms = grouped.fetch(:must_not, []).map(&:term)
       self.must_terms = grouped.fetch(:must, []).map(&:term)

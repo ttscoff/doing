@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Ensure we require the local version and not one we might have installed already
 require './lib/doing/version'
 Gem::Specification.new do |s|

@@ -96,10 +96,13 @@ module Doing
 
     def fill(placeholder, value, wrap_width: 0, color: '', tags_color: '', reset: '')
       reparse
-      rx = /(?mi)(?<!\\)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?#{placeholder.sub(/^%/, '')}(?<after>.*?)$/
+      rx = /(?mi)(?<!\\)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?#{placeholder.sub(
+        /^%/, ''
+      )}(?<after>.*?)$/
       ph = raw.match(rx)
 
       return unless ph
+
       placeholder_offset = ph.begin(0)
       last_colors = parsed_colors[:colors].select { |v| v[:index] <= placeholder_offset + 4 }
 
@@ -148,13 +151,11 @@ module Doing
                                                      after: after,
                                                      reset: reset,
                                                      pad_first: false)
-              out.highlight_tags!(tags_color, last_color: color) if tags_color && !tags_color.empty?
-              out
             else
               out = format("%s%s%#{pad}s%s", prefix, color, value.gsub(/%/, '\%').sub(/\s*$/, ''), after)
-              out.highlight_tags!(tags_color, last_color: color) if tags_color && !tags_color.empty?
-              out
             end
+            out.highlight_tags!(tags_color, last_color: color) if tags_color && !tags_color.empty?
+            out
           elsif placeholder =~ /^note/
             if wrap_width.positive? || pad.positive?
               width = pad.positive? ? pad : wrap_width
@@ -162,14 +163,16 @@ module Doing
                 if l.empty?
                   '  '
                 else
-                  line = l.gsub(/%/, '\%').strip.wrap(width, pad: pad, indent: indent, offset: 0, prefix: prefix, color: last_color, after: after, reset: reset, pad_first: true)
+                  line = l.gsub(/%/, '\%').strip.wrap(width, pad: pad, indent: indent, offset: 0, prefix: prefix,
+                                                             color: last_color, after: after, reset: reset, pad_first: true)
                   line.highlight_tags!(tags_color, last_color: last_color) unless !tags_color || !tags_color.good?
                   "#{line}  "
                 end
               end.join("\n")
               "\n#{last_color}#{mark}#{outstring}  "
             else
-              out = format("\n%s%s%s%#{pad}s%s", indent, prefix, last_color, value.join("\n#{indent}#{prefix}").gsub(/%/, '\%').sub(/\s*$/, ''), after)
+              out = format("\n%s%s%s%#{pad}s%s", indent, prefix, last_color,
+                           value.join("\n#{indent}#{prefix}").gsub(/%/, '\%').sub(/\s*$/, ''), after)
               out.highlight_tags!(tags_color, last_color: last_color) if tags_color && !tags_color.empty?
               out
             end

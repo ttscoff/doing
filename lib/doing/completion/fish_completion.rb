@@ -4,7 +4,6 @@ module Doing
   module Completion
     # Generate completions for Fish
     class FishCompletions
-
       attr_accessor :commands, :global_options
 
       def generate_helpers
@@ -152,7 +151,6 @@ module Doing
       end
 
       def generate_subcommand_option_completions
-
         out = []
         need_export = []
         need_bool = []
@@ -163,32 +161,32 @@ module Doing
         need_age = []
         need_section = []
 
-        @commands.each_with_index do |cmd, i|
+        @commands.each_with_index do |cmd, _i|
           @bar.advance(status: cmd[:commands].first)
           data = Completion.get_help_sections(cmd[:commands].first)
 
           if data[:synopsis].join(' ').strip.split(/ /).last =~ /(path|file)/i
-            out << "complete -c doing -F -n '__fish_doing_using_command #{cmd[:commands].join(" ")}'"
+            out << "complete -c doing -F -n '__fish_doing_using_command #{cmd[:commands].join(' ')}'"
           end
 
-          if data[:command_options]
-            Completion.parse_options(data[:command_options]).each do |option|
-              next if option.nil?
+          next unless data[:command_options]
 
-              arg = option[:arg] ? '-r' : ''
-              short = option[:short] ? "-s #{option[:short]}" : ''
-              long = option[:long] ? "-l #{option[:long]}" : ''
-              out << "complete -c doing #{long} #{short} -f #{arg} -n '__fish_doing_using_command #{cmd[:commands].join(' ')}' -d #{Shellwords.escape(option[:description])}"
+          Completion.parse_options(data[:command_options]).each do |option|
+            next if option.nil?
 
-              need_export.concat(cmd[:commands]) if option[:long] == 'output'
-              need_bool.concat(cmd[:commands]) if option[:long] == 'bool'
-              need_case.concat(cmd[:commands]) if option[:long] == 'case'
-              need_sort.concat(cmd[:commands]) if option[:long] == 'sort'
-              need_tag_sort.concat(cmd[:commands]) if option[:long] == 'tag_sort'
-              need_tag_order.concat(cmd[:commands]) if option[:long] == 'tag_order'
-              need_age.concat(cmd[:commands]) if option[:long] == 'age'
-              need_section.concat(cmd[:commands]) if option[:long] == 'section'
-            end
+            arg = option[:arg] ? '-r' : ''
+            short = option[:short] ? "-s #{option[:short]}" : ''
+            long = option[:long] ? "-l #{option[:long]}" : ''
+            out << "complete -c doing #{long} #{short} -f #{arg} -n '__fish_doing_using_command #{cmd[:commands].join(' ')}' -d #{Shellwords.escape(option[:description])}"
+
+            need_export.concat(cmd[:commands]) if option[:long] == 'output'
+            need_bool.concat(cmd[:commands]) if option[:long] == 'bool'
+            need_case.concat(cmd[:commands]) if option[:long] == 'case'
+            need_sort.concat(cmd[:commands]) if option[:long] == 'sort'
+            need_tag_sort.concat(cmd[:commands]) if option[:long] == 'tag_sort'
+            need_tag_order.concat(cmd[:commands]) if option[:long] == 'tag_order'
+            need_age.concat(cmd[:commands]) if option[:long] == 'age'
+            need_section.concat(cmd[:commands]) if option[:long] == 'section'
           end
         end
 
@@ -232,7 +230,8 @@ module Doing
         data = Completion.get_help_sections
         @global_options = Completion.parse_options(data[:global_options])
         @commands = Completion.parse_commands(data[:commands])
-        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Fish completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'processing subcommands')
+        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Fish completions: \033[0;35;40m[:bar] :status\033[0m",
+                                    total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'processing subcommands')
         width = TTY::Screen.columns - 45
         @bar.resize(width)
       end

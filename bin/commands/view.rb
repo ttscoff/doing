@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@view
 desc 'Display a user-created view'
 long_desc 'Views are defined in your configuration (use `doing config` to edit).
@@ -5,7 +7,8 @@ Command line options override view configuration.'
 arg_name 'VIEW_NAME'
 command :view do |c|
   c.example 'doing view color', desc: 'Display entries according to config for view "color"'
-  c.example 'doing view color --section Archive --count 10', desc: 'Display view "color", overriding some configured settings'
+  c.example 'doing view color --section Archive --count 10',
+            desc: 'Display view "color", overriding some configured settings'
 
   c.desc 'Section'
   c.arg_name 'NAME'
@@ -31,7 +34,7 @@ command :view do |c|
   c.desc 'Include colors in output'
   c.switch [:color], negatable: true
 
-  c.desc "Highlight search matches in output. Only affects command line output"
+  c.desc 'Highlight search matches in output. Only affects command line output'
   c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight'), negatable: true
 
   c.desc 'Sort tags by (name|time)'
@@ -76,11 +79,11 @@ command :view do |c|
               end
             end
 
-    section = if options[:section]
-                @wwid.guess_section(options[:section]) || options[:section].cap_first
-              else
-                Doing.setting('current_section')
-              end
+    if options[:section]
+      @wwid.guess_section(options[:section]) || options[:section].cap_first
+    else
+      Doing.setting('current_section')
+    end
 
     view = @wwid.view_to_options(title)
 
@@ -95,7 +98,7 @@ command :view do |c|
 
       page_title = options[:title] || title.cap_first
       tag_filter = false
-      if options[:tag] && options[:tag].good
+      if options[:tag]&.good
         tag_filter = { 'tags' => [], 'bool' => 'OR' }
         bool = options[:bool].normalize_bool
         tag_filter['bool'] = bool

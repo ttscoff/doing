@@ -50,7 +50,7 @@ module Doing
       new_items = wwid.filter_items(new_items, opt: options)
 
       skipped = total - new_items.count
-      Doing.logger.debug('Skipped:' , %(#{skipped} items that didn't match filter criteria)) if skipped.positive?
+      Doing.logger.debug('Skipped:', %(#{skipped} items that didn't match filter criteria)) if skipped.positive?
 
       imported = []
 

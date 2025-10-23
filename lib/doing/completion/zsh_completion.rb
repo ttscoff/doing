@@ -13,7 +13,7 @@ module Doing
       attr_accessor :commands, :global_options
 
       def generate_helpers
-        out=<<~EOFUNCTIONS
+        out = <<~EOFUNCTIONS
           compdef _doing doing
 
           function _doing() {
@@ -49,7 +49,7 @@ module Doing
 
       def generate_subcommand_completions
         out = []
-        @commands.each_with_index do |cmd, i|
+        @commands.each_with_index do |cmd, _i|
           cmd[:commands].each do |c|
             out << "'#{c}:#{cmd[:description].gsub(/'/, '\\\'')}'"
           end
@@ -58,10 +58,9 @@ module Doing
       end
 
       def generate_subcommand_option_completions(indent: '        ')
-
         out = []
 
-        @commands.each_with_index do |cmd, i|
+        @commands.each_with_index do |cmd, _i|
           @bar.advance(status: cmd[:commands].first)
 
           data = Completion.get_help_sections(cmd[:commands].first)
@@ -93,7 +92,8 @@ module Doing
         data = Completion.get_help_sections
         @global_options = Completion.parse_options(data[:global_options])
         @commands = Completion.parse_commands(data[:commands])
-        @bar = TTY::ProgressBar.new(" \033[0;0;33mGenerating Zsh completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'processing subcommands')
+        @bar = TTY::ProgressBar.new(" \033[0;0;33mGenerating Zsh completions: \033[0;35;40m[:bar] :status\033[0m",
+                                    total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'processing subcommands')
         width = TTY::Screen.columns - 45
         @bar.resize(width)
       end

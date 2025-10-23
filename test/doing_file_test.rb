@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'yaml'
@@ -62,7 +64,7 @@ class DoingFileTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_DEBUG' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir },
+                   '--doing_file', @wwid_file, *args)
   end
 end
-

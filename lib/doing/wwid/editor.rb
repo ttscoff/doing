@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'English'
 module Doing
   class WWID
     ##
@@ -37,7 +38,7 @@ module Doing
       Process.wait(pid)
 
       begin
-        if $?.exitstatus == 0
+        if $CHILD_STATUS.exitstatus.zero?
           input = IO.read(tmpfile.path)
         else
           exit_now! 'Cancelled'
@@ -84,7 +85,7 @@ module Doing
       end
 
       note = Note.new
-      note.add(input_lines[1..-1]) if input_lines.length > 1
+      note.add(input_lines[1..]) if input_lines.length > 1
       # If title line ends in a parenthetical, use that as the note
       if note.empty? && title =~ /\s+\(.*?\)$/
         title.sub!(/\s+\((?<note>.*?)\)$/) do
@@ -123,24 +124,24 @@ module Doing
     end
 
     def edit_items(items)
-      items.sort_by! { |i| i.date }
+      items.sort_by!(&:date)
       editable_items = []
 
       items.each do |i|
         editable = "#{i.date.strftime('%F %R')} | #{i.title}"
-        old_note = i.note ? i.note.strip_lines.join("\n") : nil
+        old_note = i.note&.strip_lines&.join("\n")
         editable += "\n#{old_note}" unless old_note.nil?
         editable_items << editable
       end
-      divider = "-----------"
-      notice =<<~EONOTICE
+      divider = '-----------'
+      notice = <<~EONOTICE
 
-      # - You may delete entries, but leave all divider lines (---) in place.
-      # - Start and @done dates replaced with a time string (yesterday 3pm) will
-      #   be parsed automatically. Do not delete the pipe (|) between start date
-      #   and entry title.
+        # - You may delete entries, but leave all divider lines (---) in place.
+        # - Start and @done dates replaced with a time string (yesterday 3pm) will
+        #   be parsed automatically. Do not delete the pipe (|) between start date
+        #   and entry title.
       EONOTICE
-      input =  "#{editable_items.map(&:strip).join("\n#{divider}\n")}\n"
+      input = "#{editable_items.map(&:strip).join("\n#{divider}\n")}\n"
 
       new_items = fork_editor(input, message: notice).split(/^#{divider}/).map(&:strip)
 
@@ -162,7 +163,7 @@ module Doing
           item.date = date || items[i].date
           item.title = title
           item.note = note
-          if (item.equal?(old_item))
+          if item.equal?(old_item)
             Doing.logger.count(:skipped, level: :debug)
           else
             Doing.logger.count(:updated)

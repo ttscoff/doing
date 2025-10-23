@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -46,7 +48,7 @@ class DoingDoneTest < Test::Unit::TestCase
     doing('done')
     r = doing('show').uncolor.strip
     d = r.match(ENTRY_DONE_REGEX)
-    assert(d, "Entry should have @done timestamp")
+    assert(d, 'Entry should have @done timestamp')
   end
 
   def test_done_with_args
@@ -92,9 +94,9 @@ class DoingDoneTest < Test::Unit::TestCase
     start_time = Time.parse(t['ts'])
     end_time = Time.parse(d['ts'])
     assert_within_tolerance(start, start_time,
-                 message: 'Start time should be 30 minutes ago')
+                            message: 'Start time should be 30 minutes ago')
     assert_within_tolerance(finish, end_time,
-                 message: 'Finish time should be now')
+                            message: 'Finish time should be now')
   end
 
   def test_done_complete_with_took
@@ -114,7 +116,7 @@ class DoingDoneTest < Test::Unit::TestCase
     assert(d, 'Entry should have done date')
     end_time = Time.parse(d['ts'])
     assert_within_tolerance(end_time, finish,
-                 message: 'Finish time should be 30 minutes ago')
+                            message: 'Finish time should be 30 minutes ago')
   end
 
   def test_done_back_took
@@ -125,14 +127,14 @@ class DoingDoneTest < Test::Unit::TestCase
     r = doing('show').uncolor.strip
     t = r.match(ENTRY_TS_REGEX)
     d = r.match(ENTRY_DONE_REGEX)
-    assert(t, "Entry should have timestamp")
+    assert(t, 'Entry should have timestamp')
     assert(d, 'Entry should have @done with timestamp')
     start_time = Time.parse(t['ts'])
     end_time = Time.parse(d['ts'])
     assert_within_tolerance(start_time, start,
-                 message: 'Start time should be equal to the nearest minute')
+                            message: 'Start time should be equal to the nearest minute')
     assert_within_tolerance(end_time, finish,
-                 message: 'Finish time should be equal to the nearest minute')
+                            message: 'Finish time should be equal to the nearest minute')
   end
 
   private
@@ -141,7 +143,7 @@ class DoingDoneTest < Test::Unit::TestCase
     assert_equal(count, shown.uncolor.strip.scan(ENTRY_REGEX).count, message)
   end
 
-  def assert_within_tolerance(t1, t2, message: "Times should be within tolerance of each other", tolerance: 2)
+  def assert_within_tolerance(t1, t2, message: 'Times should be within tolerance of each other', tolerance: 2)
     assert(t1.close_enough?(t2, tolerance: tolerance), message)
   end
 
@@ -153,6 +155,7 @@ class DoingDoneTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end

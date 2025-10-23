@@ -10,10 +10,10 @@ require 'doing'
 # Tests for Item class
 class DoingUnitGoodTest < Test::Unit::TestCase
   def test_good
-    good_string = "has content"
+    good_string = 'has content'
     empty_string = ''
     nil_string = nil
-    good_array = ['has', 'content']
+    good_array = %w[has content]
     empty_array = []
     true_bool = true
     false_bool = false
@@ -33,17 +33,16 @@ class DoingUnitGoodTest < Test::Unit::TestCase
   end
 
   def test_truthy
-    assert_equal(true, "yes".truthy?)
-    assert_equal(true, "Y".truthy?)
-    assert_equal(true, "true".truthy?)
-    assert_equal(true, "TRUE".truthy?)
-    assert_equal(true, "1".truthy?)
+    assert_equal(true, 'yes'.truthy?)
+    assert_equal(true, 'Y'.truthy?)
+    assert_equal(true, 'true'.truthy?)
+    assert_equal(true, 'TRUE'.truthy?)
+    assert_equal(true, '1'.truthy?)
 
-    assert_not_equal(true, "no".truthy?)
-    assert_not_equal(true, "N".truthy?)
-    assert_not_equal(true, "false".truthy?)
-    assert_not_equal(true, "FALSE".truthy?)
-    assert_not_equal(true, "0".truthy?)
+    assert_not_equal(true, 'no'.truthy?)
+    assert_not_equal(true, 'N'.truthy?)
+    assert_not_equal(true, 'false'.truthy?)
+    assert_not_equal(true, 'FALSE'.truthy?)
+    assert_not_equal(true, '0'.truthy?)
   end
 end
-

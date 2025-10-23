@@ -8,7 +8,7 @@ input.gsub!(/^===== Options/, "##### Options\n\n")
 input.gsub!(/^===== Commands/, "### Commands\n")
 input.gsub!(/^=== Commands/, "## Commands\n")
 
-input.gsub!(/^(?<pre>={4,6}) Command: <tt>(?<cmd>.*?) (?<arg> .*?)?<\/tt>\n(?<after>.*?)$/) do
+input.gsub!(%r{^(?<pre>={4,6}) Command: <tt>(?<cmd>.*?) (?<arg> .*?)?</tt>\n(?<after>.*?)$}) do
   m = Regexp.last_match
   level = m['pre'].length == 6 ? '####' : '###'
   r = "#{level} #{m['cmd'].sub(/\|(.*?)$/, ' (*or* \1)')}"
@@ -28,15 +28,16 @@ input.gsub!(/^=== (.*?)\n+(.*?)$/) do
   m = Regexp.last_match
   "`#{m[1]}`\n: #{m[2].gsub(/\|/, '\\|')}"
 end
-input.gsub!(/^== (.*?) - (.*?)$\n\n(.*?)$/, "**\\1: \\2**\n\n*\\3*\n\n## Table of Contents\n{:.no_toc}\n\n* Table of Contents\n{:toc}")
+input.gsub!(/^== (.*?) - (.*?)$\n\n(.*?)$/,
+            "**\\1: \\2**\n\n*\\3*\n\n## Table of Contents\n{:.no_toc}\n\n* Table of Contents\n{:toc}")
 input.gsub!(/^\[(Default Value|Must Match)\] (.*?)$/, ': *\1:* `\2`')
 input.gsub!(/\n  (?=\S)/, ' ')
 input.gsub!(/^([^:`\n#*](.*?))$/, "\\1\n")
 input.gsub!(/\n{3,}/, "\n\n")
 input.gsub!(/^(: .*?)\n\n(:.*?)$/, "\\1\n\\2")
 input.gsub!(/^\[Default Command\] (.*?)$/, '> **Default Command:** [`\1`](#\1)')
-input.gsub!(/\/Users\/ttscoff\/scripts\/editor.sh/, '$EDITOR')
-input.gsub!(/\/Users\/ttscoff/, '~')
+input.gsub!(%r{/Users/ttscoff/scripts/editor.sh}, '$EDITOR')
+input.gsub!(%r{/Users/ttscoff}, '~')
 puts %(---
 layout: page
 title: "Doing - All Commands"

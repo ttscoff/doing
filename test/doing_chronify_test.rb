@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -32,7 +34,8 @@ class DoingChronifyTest < Test::Unit::TestCase
     doing('now', '--back', '20m', 'test interval format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
-    assert_within_tolerance(Time.parse(m['ts']), (now - (20 * 60)), tolerance: 2, message: 'New entry should be equal to the nearest minute')
+    assert_within_tolerance(Time.parse(m['ts']), now - (20 * 60), tolerance: 2,
+                                                                  message: 'New entry should be equal to the nearest minute')
   end
 
   def test_back_strftime
@@ -40,7 +43,8 @@ class DoingChronifyTest < Test::Unit::TestCase
     doing('now', '--back', ts, 'test strftime format')
     m = doing('show').match(ENTRY_TS_REGEX)
     assert(m)
-    assert_within_tolerance(Time.parse(m['ts']), Time.parse(ts), tolerance: 2, message: 'New entry should be equal to the nearest minute')
+    assert_within_tolerance(Time.parse(m['ts']), Time.parse(ts), tolerance: 2,
+                                                                 message: 'New entry should be equal to the nearest minute')
   end
 
   def test_back_semantic
@@ -54,7 +58,7 @@ class DoingChronifyTest < Test::Unit::TestCase
 
   private
 
-  def assert_within_tolerance(t1, t2, message: "Times should be within tolerance of each other", tolerance: 2)
+  def assert_within_tolerance(t1, t2, message: 'Times should be within tolerance of each other', tolerance: 2)
     assert(t1.close_enough?(t2, tolerance: tolerance), message)
   end
 
@@ -66,6 +70,7 @@ class DoingChronifyTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end

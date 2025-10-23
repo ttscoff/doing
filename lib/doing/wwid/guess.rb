@@ -9,9 +9,7 @@ module Doing
     ## @param      guessed  [Boolean] already guessed and failed
     ##
     def guess_section(frag, guessed: false, suggest: false)
-      if frag.is_a?(Array) && frag.count == 1
-        frag = frag[0]
-      end
+      frag = frag[0] if frag.is_a?(Array) && frag.count == 1
 
       frag = frag.split(/ *, */).map(&:strip) if frag.is_a?(String) && frag =~ /,/
 
@@ -25,7 +23,7 @@ module Doing
 
       found = @content.guess_section(frag, distance: 2)
 
-      section = found ? found.title : nil
+      section = found&.title
 
       if section && suggest
         Doing.logger.debug('Match:', %(Assuming "#{section}" from "#{frag}"))
@@ -53,7 +51,7 @@ module Doing
 
         raise Errors::InvalidSection.new("unknown section #{frag.bold.white}", topic: 'Missing:')
       end
-      section ? section.cap_first : nil
+      section&.cap_first
     end
 
     ##

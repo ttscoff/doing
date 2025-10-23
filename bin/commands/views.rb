@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@views
 desc 'List available custom views. Specify view names to see YAML configurations.'
 arg_name 'NAME(S)', optional: true

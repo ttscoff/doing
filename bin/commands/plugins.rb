@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@plugins
 desc 'List installed plugins'
 long_desc %(Lists available plugins, including user-installed plugins.

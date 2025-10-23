@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@config
 desc 'Edit the configuration file or output a value from it'
 long_desc %(Run without arguments, `doing config` opens your `config.yml` in an editor.
@@ -232,18 +234,18 @@ command :config do |c|
 
       cfg = Doing::Util.safe_load_file(config_file) || {}
 
-      $stderr.puts ">      Config: Updating #{config_file}".yellow
+      warn ">      Config: Updating #{config_file}".yellow
 
       if options[:remove]
-        $stderr.puts "#{'Deleting key:'.yellow} #{real_path.join('.').boldwhite}"
+        warn "#{'Deleting key:'.yellow} #{real_path.join('.').boldwhite}"
         cfg.deep_set(real_path, nil)
       else
         current_value = cfg.dig(*real_path)
         cfg.deep_set(real_path, value.set_type(old_type))
-        $stderr.puts "#{'     Key path:'.yellow} #{real_path.join('.').boldwhite}"
-        $stderr.puts "#{'    Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
-        $stderr.puts "#{'      Current:'.yellow} #{ (current_value ? current_value.to_s : 'empty').boldwhite }"
-        $stderr.puts "#{'          New:'.yellow} #{value.set_type(old_type).to_s.boldwhite}"
+        warn "#{'     Key path:'.yellow} #{real_path.join('.').boldwhite}"
+        warn "#{'    Inherited:'.yellow} #{(old_value ? old_value.to_s : 'empty').boldwhite}"
+        warn "#{'      Current:'.yellow} #{(current_value ? current_value.to_s : 'empty').boldwhite}"
+        warn "#{'          New:'.yellow} #{value.set_type(old_type).to_s.boldwhite}"
       end
 
       res = Doing::Prompt.yn('Update selected config', default_response: true)

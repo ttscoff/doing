@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -20,7 +22,7 @@ class DoingEntryTest < Test::Unit::TestCase
     @wwid_file = File.join(@basedir, 'wwid.md')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @backup_dir = File.join(@basedir, 'doing_backup')
-    @config = YAML.load(IO.read(@config_file))
+    @config = YAML.safe_load(IO.read(@config_file))
   end
 
   def teardown
@@ -41,9 +43,9 @@ class DoingEntryTest < Test::Unit::TestCase
     doing('now', subject)
     doing('now', '--finish_last', subject2)
     assert_matches([
-      [/#{subject} @done/, 'First entry should be @done'],
-      [/#{subject2}\s*$/, 'Second entry should be added']
-    ], doing('show'))
+                     [/#{subject} @done/, 'First entry should be @done'],
+                     [/#{subject2}\s*$/, 'Second entry should be added']
+                   ], doing('show'))
     assert_valid_file(@wwid_file)
   end
 
@@ -111,7 +113,7 @@ class DoingEntryTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end
-

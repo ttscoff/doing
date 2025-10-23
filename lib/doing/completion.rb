@@ -16,7 +16,7 @@ module Doing
     COMMAND_RX = /^(?<cmd>[^, \t]+)(?<alias>(?:, [^, \t]+)*)?\s+- (?<desc>.*?)$/.freeze
 
     class << self
-      def get_help_sections(command = "")
+      def get_help_sections(command = '')
         res = `doing help #{command}|command cat`.strip
         scanned = res.scan(SECTIONS_RX)
         sections = {}
@@ -97,8 +97,10 @@ module Doing
         FileUtils.mkdir_p(default_dir)
         src = File.expand_path(File.join(File.dirname(__FILE__), '..', 'completion', default_filenames[type]))
 
-        if File.exist?(File.join(default_dir, default_filenames[type]))
-          return unless Doing::Prompt.yn("Update #{type} completion script", default_response: 'n')
+        if File.exist?(File.join(default_dir,
+                                 default_filenames[type])) && !Doing::Prompt.yn("Update #{type} completion script",
+                                                                                default_response: 'n')
+          return
 
         end
 
@@ -203,7 +205,8 @@ module Doing
         case type.to_s
         when /^b/i
           unless dir =~ %r{(\.bash_it/completion|bash_completion/completions)}
-            link_completion(file, ['~/.bash_it/completion/enabled', '/usr/share/bash-completion/completions', '/usr/share/bash_completion/completions'], 'doing.bash')
+            link_completion(file,
+                            ['~/.bash_it/completion/enabled', '/usr/share/bash-completion/completions', '/usr/share/bash_completion/completions'], 'doing.bash')
           end
         when /^fig/i
         when /^f/i

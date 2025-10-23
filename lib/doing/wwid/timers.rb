@@ -69,13 +69,11 @@ EOTAIL
         pad = sorted_tags_data.map { |k, _| k }.group_by(&:size).max.last[0].length
         pad = 7 if pad < 7
         output = <<~EOHEADER
-  | #{' ' * (pad - 7)}project | time     |
-  | #{'-' * (pad - 1)}: | :------- |
+          | #{' ' * (pad - 7)}project | time     |
+          | #{'-' * (pad - 1)}: | :------- |
         EOHEADER
         sorted_tags_data.reverse.each do |k, v|
-          if v.positive?
-            output += "| #{' ' * (pad - k.length)}#{k} | #{v.time_string(format: :clock)} |\n"
-          end
+          output += "| #{' ' * (pad - k.length)}#{k} | #{v.time_string(format: :clock)} |\n" if v.positive?
         end
         tail = '[Tag Totals]'
         output + tail
@@ -173,6 +171,7 @@ EOTAIL
     def record_tag_times(item, seconds)
       item_hash = "#{item.date.strftime('%s')}#{item.title}#{item.section}"
       return if @recorded_items.include?(item_hash)
+
       item.title.scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
         k = m[0] == 'done' ? 'All' : m[0].downcase
         if @timers.key?(k)

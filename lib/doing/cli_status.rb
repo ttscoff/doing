@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Status
   def cols
     @cols ||= `tput cols`.strip.to_i
@@ -11,11 +13,14 @@ module Status
       tail = tail.join(', ')
     end
     tail.ltrunc!(max_width)
-    $stderr.print format("#{esc['kill']}#{esc['boldyellow']}> #{esc['boldgreen']}%s #{esc['white']}[#{esc['boldwhite']}%#{@commands.count.to_s.length}d#{esc['boldblack']}/#{esc['boldyellow']}%d#{esc['white']}]: #{esc['boldcyan']}%s#{esc['default']}\r", msg, idx, total, tail)
+    $stderr.print format(
+      "#{esc['kill']}#{esc['boldyellow']}> #{esc['boldgreen']}%s #{esc['white']}[#{esc['boldwhite']}%#{@commands.count.to_s.length}d#{esc['boldblack']}/#{esc['boldyellow']}%d#{esc['white']}]: #{esc['boldcyan']}%s#{esc['default']}\r", msg, idx, total, tail
+    )
   end
 
   def status(msg, reset: true, end_char: "\n")
-    $stderr.print format("#{esc['kill']}#{esc['boldyellow']}> #{esc['whiteboard']}%s#{esc['default']}%s", msg, reset ? "\r" : end_char)
+    $stderr.print format("#{esc['kill']}#{esc['boldyellow']}> #{esc['whiteboard']}%s#{esc['default']}%s", msg,
+                         reset ? "\r" : end_char)
   end
 
   def msg(msg, reset: true, color: 'green', end_char: "\n")

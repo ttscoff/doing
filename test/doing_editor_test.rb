@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'test_helper'
@@ -92,7 +94,8 @@ class NoteEditorTest < Test::Unit::TestCase
   end
 
   def doing(*args, stdin: nil)
-    doing_with_env({'DOING_EDITOR_TEST' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args, stdin: stdin)
+    doing_with_env({ 'DOING_EDITOR_TEST' => 'true', 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir },
+                   '--doing_file', @wwid_file, *args, stdin: stdin)
   end
 
   def doing_env(env, *args, stdin: nil)

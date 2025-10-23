@@ -48,7 +48,7 @@ module Doing
       gsub(%r{(?mi)(?x:
       (?<!["'\[(\\])
       (?<protocol>(?:http|https)://)
-      (?<domain>[\w\-]+(?:\.[\w\-]+)+)
+      (?<domain>[\w-]+(?:\.[\w-]+)+)
       (?<path>[\w\-.,@?^=%&;:/~+#]*[\w\-@^=%&;/~+#])?
       )}) do |_match|
         m = Regexp.last_match

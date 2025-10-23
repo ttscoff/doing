@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@tag
 desc 'Add tag(s) to last entry'
 long_desc 'Add (or remove) tags from the last entry, or from multiple entries
@@ -17,9 +19,12 @@ arg_name 'TAG', :multiple
 command :tag do |c|
   c.example 'doing tag mytag', desc: 'Add @mytag to the last entry created'
   c.example 'doing tag --remove mytag', desc: 'Remove @mytag from the last entry created'
-  c.example 'doing tag --rename "other*" --count 10 newtag', desc: 'Rename tags beginning with "other" (wildcard) to @newtag on the last 10 entries'
-  c.example 'doing tag --search "developing" coding', desc: 'Add @coding to the last entry containing string "developing" (fuzzy matching)'
-  c.example 'doing tag --interactive --tag project1 coding', desc: 'Create an interactive menu from entries tagged @project1, selection(s) will be tagged with @coding'
+  c.example 'doing tag --rename "other*" --count 10 newtag',
+            desc: 'Rename tags beginning with "other" (wildcard) to @newtag on the last 10 entries'
+  c.example 'doing tag --search "developing" coding',
+            desc: 'Add @coding to the last entry containing string "developing" (fuzzy matching)'
+  c.example 'doing tag --interactive --tag project1 coding',
+            desc: 'Create an interactive menu from entries tagged @project1, selection(s) will be tagged with @coding'
 
   c.desc 'Section'
   c.arg_name 'SECTION_NAME'
@@ -69,9 +74,7 @@ command :tag do |c|
 
     section = 'All'
 
-    if options[:section]
-      section = @wwid.guess_section(options[:section]) || options[:section].cap_first
-    end
+    section = @wwid.guess_section(options[:section]) || options[:section].cap_first if options[:section]
 
     search_tags = options[:tag].nil? ? [] : options[:tag]
 
@@ -112,16 +115,15 @@ command :tag do |c|
       matches = @wwid.filter_items([], opt: options).count
 
       if matches > 5
-        if options[:search]
-          section_q = ' matching your search terms'
-        elsif options[:tag]
-          section_q = ' matching your tag search'
-        elsif section == 'All'
-          section_q = ''
-        else
-          section_q = " in section #{section}"
-        end
-
+        section_q = if options[:search]
+                      ' matching your search terms'
+                    elsif options[:tag]
+                      ' matching your tag search'
+                    elsif section == 'All'
+                      ''
+                    else
+                      " in section #{section}"
+                    end
 
         question = if options[:autotag]
                      "Are you sure you want to autotag #{matches} records#{section_q}"

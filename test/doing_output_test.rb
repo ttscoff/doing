@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -22,7 +24,7 @@ class DoingOutputTest < Test::Unit::TestCase
     @backup_dir = File.join(@basedir, 'doing_backup')
     @config_file = File.join(File.dirname(__FILE__), 'test.doingrc')
     @import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
-    @config = YAML.load(IO.read(@config_file))
+    @config = YAML.safe_load(IO.read(@config_file))
   end
 
   def teardown
@@ -86,7 +88,8 @@ class DoingOutputTest < Test::Unit::TestCase
 
   def test_sections_command
     result = doing('sections').uncolor.strip
-    assert_match(/^#{@config['current_section']}$/, result, "#{@config['current_section']} should be the only section shown")
+    assert_match(/^#{@config['current_section']}$/, result,
+                 "#{@config['current_section']} should be the only section shown")
   end
 
   def test_plugins_command
@@ -142,7 +145,7 @@ class DoingOutputTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end
-

@@ -49,4 +49,3 @@ class DoingUnitNoteTest < Test::Unit::TestCase
     assert_not_equal(true, new_note.equal?(other_note), 'Notes should be different')
   end
 end
-

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@done @@did
 desc 'Add a completed item with @done(date). No argument finishes last entry'
 long_desc 'Use this command to add an entry after you\'ve already finished it. It will be immediately marked as @done.
@@ -7,8 +9,10 @@ arg_name 'ENTRY', optional: true
 command %i[done did] do |c|
   c.example 'doing done', desc: 'Tag the last entry @done'
   c.example 'doing done I already finished this', desc: 'Add a new entry and immediately mark it @done'
-  c.example 'doing done --back 30m This took me half an hour', desc: 'Add an entry with a start date 30 minutes ago and a @done date of right now'
-  c.example 'doing done --at 3pm --took 1h Started and finished this afternoon', desc: 'Add an entry with a @done date of 3pm and a start date of 2pm (3pm - 1h)'
+  c.example 'doing done --back 30m This took me half an hour',
+            desc: 'Add an entry with a start date 30 minutes ago and a @done date of right now'
+  c.example 'doing done --at 3pm --took 1h Started and finished this afternoon',
+            desc: 'Add an entry with a @done date of 3pm and a start date of 2pm (3pm - 1h)'
 
   c.desc 'Remove @done tag'
   c.switch %i[r remove], negatable: false, default_value: false
@@ -78,11 +82,11 @@ command %i[done did] do |c|
       donedate = finish_date.strftime('%F %R')
     end
 
-    if options[:section]
-      section = @wwid.guess_section(options[:section]) || options[:section].cap_first
-    else
-      section = Doing.setting('current_section')
-    end
+    section = if options[:section]
+                @wwid.guess_section(options[:section]) || options[:section].cap_first
+              else
+                Doing.setting('current_section')
+              end
 
     note = Doing::Note.new
     note.add(options[:note]) if options[:note]
@@ -95,7 +99,9 @@ command %i[done did] do |c|
       is_new = false
 
       if args.empty?
-        last_entry = @wwid.filter_items([], opt: { unfinished: options[:unfinished], section: section, count: 1, age: :newest }).max_by { |item| item.date }
+        last_entry = @wwid.filter_items([],
+                                        opt: { unfinished: options[:unfinished], section: section, count: 1,
+                                               age: :newest }).max_by(&:date)
 
         unless last_entry
           Doing.logger.debug('Skipped:', options[:unfinished] ? 'No unfinished entry' : 'Last entry already @done')
@@ -104,7 +110,8 @@ command %i[done did] do |c|
 
         old_entry = last_entry.clone
         last_entry.note.add(note)
-        input = ["#{last_entry.date.strftime('%F %R | ')}#{last_entry.title}", last_entry.note.strip_lines.join("\n")].join("\n")
+        input = ["#{last_entry.date.strftime('%F %R | ')}#{last_entry.title}",
+                 last_entry.note.strip_lines.join("\n")].join("\n")
       else
         is_new = true
         input = ["#{date.strftime('%F %R | ')}#{args.join(' ')}", note.strip_lines.join("\n")].join("\n")
@@ -135,7 +142,7 @@ command %i[done did] do |c|
         end
       end
 
-      if (is_new)
+      if is_new
         Doing::Hooks.trigger :pre_entry_add, @wwid, new_entry
         @wwid.content.push(new_entry)
         Doing::Hooks.trigger :post_entry_added, @wwid, new_entry
@@ -163,7 +170,7 @@ command %i[done did] do |c|
           note: note,
           section: section,
           tags: ['done'],
-          took: took == 0 ? nil : took,
+          took: took.zero? ? nil : took,
           unfinished: options[:unfinished]
         }
         @wwid.tag_last(opt)
@@ -196,7 +203,7 @@ command %i[done did] do |c|
       @wwid.write(@wwid.doing_file)
       Doing.logger.info('New entry:', %(added "#{new_entry.date.relative_date}: #{new_entry.title}" to #{section}))
     elsif !global_options[:stdin].nil?
-      note = Doing::Note.new(options[:note])
+      Doing::Note.new(options[:note])
       d, title, note = @wwid.format_input(global_options[:stdin])
       unless d.nil?
         Doing.logger.debug('Parser:', 'Date detected in input, overriding command line values')

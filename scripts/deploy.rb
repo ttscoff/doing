@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'tty-spinner'
 require 'tty-cursor'
@@ -6,7 +7,7 @@ require 'pastel'
 require 'fileutils'
 
 pastel = Pastel.new
-format = "[#{pastel.yellow(':spinner')}] " + pastel.white("Release Gem")
+format = "[#{pastel.yellow(':spinner')}] " + pastel.white('Release Gem')
 spinners = TTY::Spinner::Multi.new(format, format: :dots, success_mark: pastel.green('✔'), error_mark: pastel.red('✖'))
 sp_v = spinners.register "[#{pastel.cyan(':spinner')}] :msg"
 sp_t = spinners.register "[#{pastel.cyan(':spinner')}] Run tests :msg"
@@ -46,7 +47,6 @@ sp_v.run do |spinner|
   spinner.success
 end
 
-
 sp_t.run do |spinner|
   spinner.update(msg: '')
   start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -72,7 +72,6 @@ sp_d.auto_spin
 `rake yard &> results.log`
 sp_d.success
 
-
 sp_w.run do |spinner|
   spinner.update(msg: '- Updating All Commands')
   `./rdoc_to_mmd.rb > /Users/ttscoff/Desktop/Code/doing.wiki/commands.source`
@@ -90,7 +89,7 @@ sp_w.run do |spinner|
   sp_w.success
 end
 
-sp_r = spinners.register "[:spinner] Releasing gem :msg"
+sp_r = spinners.register '[:spinner] Releasing gem :msg'
 
 sp_r.run do |spinner|
   spinner.update(msg: '- Preparing git release')

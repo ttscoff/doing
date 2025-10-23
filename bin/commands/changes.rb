@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@changelog @@changes
 require 'tty-markdown'
 
@@ -18,7 +20,7 @@ MARKDOWN_THEME = {
 module Doing
   # changes command methods
   class ChangesCommand
-    CHANGE_RX = /^(?:(?:(?:[<>=]+|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[0-9.*?]{1,10} *)+|(?:[\d.]+ *(?:-|to)+ *[0-9.]{1,10}))$/
+    CHANGE_RX = /^(?:(?:(?:[<>=]+|p(?:rior)|b(?:efore)|o(?:lder)|s(?:ince)|a(?:fter)|n(?:ewer))? *[0-9.*?]{1,10} *)+|(?:[\d.]+ *(?:-|to)+ *[0-9.]{1,10}))$/.freeze
 
     def add_options(cmd)
       cmd.desc 'Display all versions'

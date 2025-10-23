@@ -51,7 +51,7 @@ module Doing
 
         items_out << {
           date: i.date.strftime('%a %-I:%M%p'),
-          title: title.gsub(/(@[^ (]+(\(.*?\))?)/im, '<span class="tag">\1</span>').strip, #+ " #{note}"
+          title: title.gsub(/(@[^ (]+(\(.*?\))?)/im, '<span class="tag">\1</span>').strip, # + " #{note}"
           note: note,
           time: interval,
           section: i.section
@@ -74,10 +74,10 @@ module Doing
       engine = Haml::Engine.new(template)
       Doing.logger.debug('HTML Export:', "#{items_out.count} items output to HTML")
       @out = engine.render(Object.new,
-                         { :@items => items_out, :@page_title => variables[:page_title], :@style => style, :@totals => totals })
+                           { :@items => items_out, :@page_title => variables[:page_title], :@style => style,
+                             :@totals => totals })
     end
 
     Doing::Plugins.register 'html', :export, self
   end
 end
-

@@ -45,7 +45,7 @@ module Doing
     ## @param      prefix  [String] (Optional) A prefix to add to each line
     ##
     def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', color: '', after: '', reset: '', pad_first: false)
-      last_color = color.empty? ? '' : after.last_color
+      color.empty? ? '' : after.last_color
       note_rx = /(?mi)(?<!\\)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?note/
       note = ''
       after = after.dup if after.frozen?
@@ -84,13 +84,13 @@ module Doing
       last_color = ''
       out[0] = format("%-#{pad}s%s%s", out[0], last_color, after)
 
-      out.map.with_index { |l, idx|
-        if !pad_first && idx == 0
+      out.map.with_index do |l, idx|
+        if !pad_first && idx.zero?
           "#{color}#{prefix}#{l}#{last_color}"
         else
           "#{left_pad}#{color}#{prefix}#{l}#{last_color}"
         end
-      }.join("\n") + " #{note}".chomp
+      end.join("\n") + " #{note}".chomp
       # res.join("\n").strip + last_color + " #{note}".chomp
     end
 
@@ -100,9 +100,7 @@ module Doing
     ## @return     Capitalized string
     ##
     def cap_first
-      sub(/^\w/) do |m|
-        m.upcase
-      end
+      sub(/^\w/, &:upcase)
     end
 
     ##
@@ -166,9 +164,16 @@ module Doing
     end
 
     def titlecase
-      tr('_', ' ').
-      gsub(/\s+/, ' ').
-      gsub(/\b\w/){ $`[-1,1] == "'" ? $& : $&.upcase }
+      tr('_', ' ')
+        .gsub(/\s+/, ' ')
+        .gsub(/\b\w/) do
+        if ::Regexp.last_match.pre_match[-1,
+                                         1] == "'"
+          ::Regexp.last_match(0)
+        else
+          ::Regexp.last_match(0).upcase
+        end
+      end
     end
   end
 end

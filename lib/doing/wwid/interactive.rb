@@ -25,14 +25,14 @@ module Doing
       opt[:query] = "!#{opt[:query]}" if opt[:query] && opt[:not]
       opt[:multiple] = true
       opt[:show_if_single] = true
-      filter_options = %i[after before case date_filter from fuzzy not search section val].each_with_object({}) {
+      filter_options = %i[after before case date_filter from fuzzy not search section val].each_with_object({}) do
         |k, hsh| hsh[k] = opt[k]
-      }
+      end
       items = filter_items(Items.new, opt: filter_options)
 
-      menu_options = %i[search query exact multiple show_if_single menu sort case].each_with_object({}) {
-        |k, hsh| hsh[k] = opt[k]
-      }
+      menu_options = %i[search query exact multiple show_if_single menu sort case].each_with_object({}) do |k, hsh|
+        hsh[k] = opt[k]
+      end
       include_section = (opt[:section].is_a?(Array) && opt[:section][0] =~ /^all$/i) || (opt[:section].is_a?(String) && opt[:section] =~ /^all$/i)
 
       selection = Prompt.choose_from_items(items, include_section: include_section, **menu_options)
@@ -255,8 +255,8 @@ module Doing
 
       if opt[:editor]
         sleep 2 # This seems to be necessary between running fzf
-                # and forking the editor, otherwise vim gets all
-                # screwy and I can't figure out why
+        # and forking the editor, otherwise vim gets all
+        # screwy and I can't figure out why
         edit_items(items) # hooked
 
         write(@doing_file)

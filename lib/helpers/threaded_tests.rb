@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'tty-spinner'
 require 'tty-progressbar'
@@ -18,27 +19,25 @@ class ThreadedTests
     start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     @results = File.expand_path('results.log')
 
-    max_threads = 1000 if max_threads.to_i == 0
+    max_threads = 1000 if max_threads.to_i.zero?
 
     c = Doing::Color
     c.coloring = true
 
     shuffle = false
 
-    unless pattern =~ /shuffle/i
-      pattern = "test/doing_*#{pattern}*_test.rb"
-    else
-      pattern = "test/doing_*_test.rb"
+    if pattern =~ /shuffle/i
+      pattern = 'test/doing_*_test.rb'
       shuffle = true
+    else
+      pattern = "test/doing_*#{pattern}*_test.rb"
     end
 
     tests = Dir.glob(pattern)
 
     tests.shuffle! if shuffle
 
-    if max_tests.to_i > 0
-      tests = tests.slice(0, max_tests.to_i - 1)
-    end
+    tests = tests.slice(0, max_tests.to_i - 1) if max_tests.to_i.positive?
 
     puts "#{tests.count} test files".boldcyan
 
@@ -94,16 +93,18 @@ class ThreadedTests
           end
         end
 
-        @threads.each { |t| t.join }
+        @threads.each(&:join)
       end
 
       finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
       progress.finish
-    rescue
+    rescue StandardError
       progress.stop
     ensure
-      msg = @running_tests.map { |t| t[1].format.uncolor.sub(/^\[:bar\] (.*?):status/, "#{c.bold}#{c.white}\\1#{c.reset}#{t[2]}") }.join("\n")
+      msg = @running_tests.map do |t|
+        t[1].format.uncolor.sub(/^\[:bar\] (.*?):status/, "#{c.bold}#{c.white}\\1#{c.reset}#{t[2]}")
+      end.join("\n")
 
       Doing::Prompt.clear_screen(msg)
 
@@ -194,19 +195,18 @@ class ThreadedTests
   end
 
   def next_test
-    if @children.count.positive?
-      t = Thread.new do
-        s = @children.shift
-        # s[1].start
-        # s[1].advance(status: ": #{'running'.green}")
-        run_test(s)
-      end
+    return unless @children.count.positive?
 
-      t.join
+    t = Thread.new do
+      s = @children.shift
+      # s[1].start
+      # s[1].advance(status: ": #{'running'.green}")
+      run_test(s)
     end
+
+    t.join
   end
 end
-
 
 # require 'pastel'
 ### Individual tests, multiple spinners

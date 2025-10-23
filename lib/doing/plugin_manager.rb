@@ -59,7 +59,6 @@ module Doing
         paths.map { |d| File.expand_path(d) }
       end
 
-
       # Register a plugin
       #
       # @param      title  [String|Array] The name of the
@@ -209,7 +208,7 @@ module Doing
       def plugin_regex(type: :export)
         type = valid_type(type)
         pattern = []
-        plugins[type].each do |_, options|
+        plugins[type].each_value do |options|
           pattern << options[:trigger].normalize_trigger
         end
         Regexp.new("^(?:#{pattern.sort.uniq.join('|')})$", true)
@@ -227,7 +226,7 @@ module Doing
         type = valid_type(type)
         templates = []
         plugs = plugins[type].clone
-        plugs.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
+        plugs.delete_if { |_t, o| o[:templates].nil? }.each_value do |options|
           options[:templates].each do |t|
             out = t[:name]
             out += " (#{t[:format]})" if t.key?(:format)
@@ -251,7 +250,7 @@ module Doing
         type = valid_type(type)
         pattern = []
         plugs = plugins[type].clone
-        plugs.delete_if { |_, o| o[:templates].nil? }.each do |_, options|
+        plugs.delete_if { |_, o| o[:templates].nil? }.each_value do |options|
           options[:templates].each do |t|
             pattern << t[:trigger].normalize_trigger
           end
@@ -274,7 +273,7 @@ module Doing
       ## @return     [String] string content of template for trigger
       ##
       def template_for_trigger(trigger, type: :export, save_to: nil)
-        plugins[valid_type(type)].clone.delete_if { |_t, o| o[:templates].nil? }.each do |_, options|
+        plugins[valid_type(type)].clone.delete_if { |_t, o| o[:templates].nil? }.each_value do |options|
           options[:templates].each do |t|
             next unless trigger =~ /^(?:#{t[:trigger].normalize_trigger})$/
 

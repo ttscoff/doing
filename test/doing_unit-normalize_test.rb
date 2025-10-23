@@ -32,4 +32,3 @@ class DoingUnitNormalizeTest < Test::Unit::TestCase
     assert_equal(:not, 'none'.normalize_bool)
   end
 end
-

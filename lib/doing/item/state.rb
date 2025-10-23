@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Doing
   # State queries for a Doing entry
   module ItemState

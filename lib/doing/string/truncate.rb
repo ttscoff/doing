@@ -61,6 +61,7 @@ module Doing
     ##
     def truncmiddle(len, ellipsis: '...')
       return self if length <= len
+
       len -= (ellipsis.length / 2).to_i
       half = (len / 2).to_i
       start = trunc(half, ellipsis: ellipsis)

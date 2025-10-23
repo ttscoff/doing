@@ -17,7 +17,7 @@ module Doing
     end
 
     def get_binding
-      binding()
+      binding
     end
   end
 
@@ -44,7 +44,6 @@ module Doing
     end
 
     def self.render(wwid, items, variables: {})
-
       return unless items.good?
 
       config = Doing.settings
@@ -82,15 +81,18 @@ module Doing
         tags.concat(i.tag_array).sort!.uniq!
         flagged = day_flagged = true if i.tags?(config['marker_tag'])
 
-        interval = wwid.get_interval(i, record: true) if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+        if i.title =~ /@done\((\d{4}-\d\d-\d\d \d\d:\d\d.*?)\)/ && opt[:times]
+          interval = wwid.get_interval(i,
+                                       record: true)
+        end
         interval ||= false
         human_time = false
         if interval
           d, h, m = wwid.get_interval(i, formatted: false).format_time
           human_times = []
-          human_times << format('%<d>d day%<p>s', d: d, p: d == 1 ? '' : 's') if d > 0
-          human_times << format('%<h>d hour%<p>s', h: h, p: h == 1 ? '' : 's') if h > 0
-          human_times << format('%<m>d minute%<p>s', m: m, p: m == 1 ? '' : 's') if m > 0
+          human_times << format('%<d>d day%<p>s', d: d, p: d == 1 ? '' : 's') if d.positive?
+          human_times << format('%<h>d hour%<p>s', h: h, p: h == 1 ? '' : 's') if h.positive?
+          human_times << format('%<m>d minute%<p>s', m: m, p: m == 1 ? '' : 's') if m.positive?
           human_time = human_times.join(', ')
         end
 
@@ -111,19 +113,11 @@ module Doing
         }
         all_items << item
 
-
-        if days.key?(date_key)
-          days[date_key][:starred] = true if day_flagged
-          days[date_key][:tags] = days[date_key][:tags].concat(i.tag_array).sort.uniq
-          days[date_key][:entries].push(item)
-        else
-          days[date_key] ||= { tags: [], entries: [], starred: false }
-          days[date_key][:starred] = true if day_flagged
-          days[date_key][:tags] = days[date_key][:tags].concat(i.tag_array).sort.uniq
-          days[date_key][:entries].push(item)
-        end
+        days[date_key] ||= { tags: [], entries: [], starred: false } unless days.key?(date_key)
+        days[date_key][:starred] = true if day_flagged
+        days[date_key][:tags] = days[date_key][:tags].concat(i.tag_array).sort.uniq
+        days[date_key][:entries].push(item)
       end
-
 
       template = if config['export_templates']['dayone'] && File.exist?(File.expand_path(config['export_templates']['dayone']))
                    IO.read(File.expand_path(config['export_templates']['dayone']))
@@ -131,7 +125,12 @@ module Doing
                    self.template('dayone')
                  end
 
-      totals = opt[:totals] ? wwid.tag_times(format: :markdown, sort_by: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+      totals = if opt[:totals]
+                 wwid.tag_times(format: :markdown, sort_by: opt[:sort_tags],
+                                sort_order: opt[:tag_order])
+               else
+                 ''
+               end
 
       case digest
       when :day
@@ -162,18 +161,19 @@ module Doing
         end
       else
         to_dayone(template: template,
-                    title: variables[:page_title],
-                    items: all_items,
-                    totals: totals,
-                    date: Time.now,
-                    tags: tags,
-                    starred: flagged)
+                  title: variables[:page_title],
+                  items: all_items,
+                  totals: totals,
+                  date: Time.now,
+                  tags: tags,
+                  starred: flagged)
       end
 
       @out = ''
     end
 
-    def self.to_dayone(template: self.template(nil), title: 'doing', items: [], totals: '', date: Time.now, tags: [], starred: false)
+    def self.to_dayone(template: self.template(nil), title: 'doing', items: [], totals: '', date: Time.now, tags: [],
+                       starred: false)
       mdx = DayOneRenderer.new(title, items, totals)
 
       engine = ERB.new(template)
@@ -201,7 +201,8 @@ module Doing
         f.puts plist.to_plist
       end
 
-      Doing.logger.count(:exported, level: :info, count: items.count, message: '%count %items exported to Day One import folder')
+      Doing.logger.count(:exported, level: :info, count: items.count,
+                                    message: '%count %items exported to Day One import folder')
     end
 
     Doing::Plugins.register 'dayone', :export, self

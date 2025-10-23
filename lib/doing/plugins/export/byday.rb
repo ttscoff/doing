@@ -38,7 +38,7 @@ module Doing
         end
       end
       width = wwid.config['plugins']['byday']['item_width'].to_i || 60
-      divider = "{wd}+{xk}#{'-' *10}{wd}+{xk}#{'-' * width}{wd}+{xk}#{'-' * 8}{wd}+{x}"
+      divider = "{wd}+{xk}#{'-' * 10}{wd}+{xk}#{'-' * width}{wd}+{xk}#{'-' * 8}{wd}+{x}"
       out = []
       out << divider
       out << "{wd}|{xm}date      {wd}|{xbw}item#{' ' * (width - 4)}{wd}|{xy}duration{wd}|{x}"

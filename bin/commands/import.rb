@@ -1,11 +1,16 @@
+# frozen_string_literal: true
+
 # @@import
 desc 'Import entries from an external source'
-long_desc "Imports entries from other sources. Available plugins: #{Doing::Plugins.plugin_names(type: :import, separator: ', ')}"
+long_desc "Imports entries from other sources. Available plugins: #{Doing::Plugins.plugin_names(type: :import,
+                                                                                                separator: ', ')}"
 arg_name 'PATH'
 command :import do |c|
   c.example 'doing import --type timing "~/Desktop/All Activities.json"', desc: 'Import a Timing.app JSON report'
-  c.example 'doing import --type doing --tag imported --no-autotag ~/doing_backup.md', desc: 'Import an Doing archive, tag all entries with @imported, skip autotagging'
-  c.example 'doing import --type doing --from "10/1 to 10/15" ~/doing_backup.md', desc: 'Import a Doing archive, only importing entries between two dates'
+  c.example 'doing import --type doing --tag imported --no-autotag ~/doing_backup.md',
+            desc: 'Import an Doing archive, tag all entries with @imported, skip autotagging'
+  c.example 'doing import --type doing --from "10/1 to 10/15" ~/doing_backup.md',
+            desc: 'Import a Doing archive, only importing entries between two dates'
 
   c.desc "Import type (#{Doing::Plugins.plugin_names(type: :import)})"
   c.arg_name 'TYPE'
@@ -40,9 +45,7 @@ command :import do |c|
 
   c.action do |_global_options, options, args|
     options[:fuzzy] = false
-    if options[:section]
-      options[:section] = @wwid.guess_section(options[:section]) || options[:section].cap_first
-    end
+    options[:section] = @wwid.guess_section(options[:section]) || options[:section].cap_first if options[:section]
 
     if options[:search]
       search = options[:search]
@@ -60,12 +63,12 @@ command :import do |c|
       options[:date_filter][0] = options[:after] || Time.now - (1 << 64)
     end
 
-    if options[:type] =~ Doing::Plugins.plugin_regex(type: :import)
-      options[:no_overlap] = !options[:overlap]
-      @wwid.import(args, options)
-      @wwid.write(@wwid.doing_file)
-    else
+    unless options[:type] =~ Doing::Plugins.plugin_regex(type: :import)
       raise InvalidPluginType, "Invalid import type: #{options[:type]}"
     end
+
+    options[:no_overlap] = !options[:overlap]
+    @wwid.import(args, options)
+    @wwid.write(@wwid.doing_file)
   end
 end

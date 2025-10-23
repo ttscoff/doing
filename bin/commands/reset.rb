@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@reset @@begin
 desc 'Reset the start time of an entry'
 long_desc 'Update the start time of the last entry or the last entry matching a tag/search filter.
@@ -6,9 +8,11 @@ If a date string is provided as an argument, the start time will be set to the p
 arg_name 'DATE_STRING', optional: true
 command %i[reset begin] do |c|
   c.example 'doing reset', desc: 'Reset the start time of the last entry to the current time'
-  c.example 'doing reset --tag project1', desc: 'Reset the start time of the most recent entry tagged @project1 to the current time'
+  c.example 'doing reset --tag project1',
+            desc: 'Reset the start time of the most recent entry tagged @project1 to the current time'
   c.example 'doing reset 3pm', desc: 'Reset the start time of the last entry to 3pm of the current day'
-  c.example 'doing begin --tag todo --resume', desc: 'alias for reset. Updates the last @todo entry to the current time, removing @done tag.'
+  c.example 'doing begin --tag todo --resume',
+            desc: 'alias for reset. Updates the last @todo entry to the current time, removing @done tag.'
 
   c.desc 'Limit search to section'
   c.arg_name 'NAME'
@@ -37,7 +41,7 @@ command %i[reset begin] do |c|
   add_options(:search, c)
   add_options(:tag_filter, c)
 
-  c.action do |global_options, options, args|
+  c.action do |_global_options, options, args|
     if args.count.positive?
       reset_date = args.join(' ').chronify(guess: :begin)
       raise InvalidArgument, 'Invalid date string' unless reset_date

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'stringio'
 require 'time'
 require 'fileutils'
@@ -10,7 +12,7 @@ module GLI
         @exe = app.exe_name
         if File.exist?('COMMANDS.md') # Back up existing README
           FileUtils.mv('COMMANDS.md', 'COMMANDS.bak')
-          $stderr.puts "Backing up existing COMMANDS.md"
+          warn 'Backing up existing COMMANDS.md'
         end
         @io = File.new('COMMANDS.md', 'w')
         @nest = '#'
@@ -18,8 +20,7 @@ module GLI
         @parent_command = []
       end
 
-      def beginning
-      end
+      def beginning; end
 
       # Called when processing has completed
       def ending
@@ -61,32 +62,32 @@ module GLI
         @io.puts "*v#{version}*"
         @io.puts
         # Hacking in the overview file
-        if File.exist?('OVERVIEW.md')
-          @io.puts IO.read('OVERVIEW.md')
-          @io.puts
-        end
+        return unless File.exist?('OVERVIEW.md')
+
+        @io.puts IO.read('OVERVIEW.md')
+        @io.puts
       end
 
       def options
         if @nest.size == 1
-          @io.puts "## Global Options"
+          @io.puts '## Global Options'
         else
-          @io.puts header("Options", 1)
+          @io.puts header('Options', 1)
         end
         @io.puts
       end
 
       # Gives you a flag in the current context
       def flag(name, aliases, desc, long_desc, default_value, arg_name, must_match, _type)
-        invocations = ([name] + Array(aliases)).map { |_| "`" + add_dashes(_) + "`" }.join(' | ')
+        invocations = ([name] + Array(aliases)).map { |_| "`#{add_dashes(_)}`" }.join(' | ')
         usage = "#{invocations} #{arg_name || 'arg'}"
         @io.puts header(usage, 2)
         @io.puts
         @io.puts String(desc).strip
         @io.puts "\n*Default Value:* `#{default_value || 'None'}`\n" unless default_value.nil?
-        @io.puts "\n*Must Match:* `#{must_match.to_s}`\n" unless must_match.nil?
+        @io.puts "\n*Must Match:* `#{must_match}`\n" unless must_match.nil?
         cmd_desc = String(long_desc).strip
-        @io.puts "> #{cmd_desc}\n" unless cmd_desc.length == 0
+        @io.puts "> #{cmd_desc}\n" unless cmd_desc.empty?
         @io.puts
       end
 
@@ -94,22 +95,21 @@ module GLI
       def switch(name, aliases, desc, long_desc, negatable)
         if negatable
           name = "[no-]#{name}" if name.to_s.length > 1
-          aliases = aliases.map { |_|  _.to_s.length > 1 ? "[no-]#{_}" : _ }
+          aliases = aliases.map { |_| _.to_s.length > 1 ? "[no-]#{_}" : _ }
         end
-        invocations = ([name] + aliases).map { |_| "`" + add_dashes(_).strip + "`" }.join('|')
-        @io.puts header("#{invocations}", 2)
+        invocations = ([name] + aliases).map { |_| "`#{add_dashes(_).strip}`" }.join('|')
+        @io.puts header(invocations.to_s, 2)
         @io.puts
         @io.puts String(desc).strip
         cmd_desc = String(long_desc).strip
-        @io.puts "\n> #{cmd_desc}\n" unless cmd_desc.length == 0
+        @io.puts "\n> #{cmd_desc}\n" unless cmd_desc.empty?
         @io.puts
       end
 
-      def end_options
-      end
+      def end_options; end
 
       def commands
-        @io.puts header("Commands", 1)
+        @io.puts header('Commands', 1)
         @io.puts
         increment_nest
       end
@@ -124,7 +124,7 @@ module GLI
         @io.puts "*#{String(desc).strip}*"
         @io.puts
         cmd_desc = String(long_desc).strip.split("\n").map { |_| "> #{_}" }.join("\n")
-        @io.puts "#{cmd_desc}\n\n" unless cmd_desc.length == 0
+        @io.puts "#{cmd_desc}\n\n" unless cmd_desc.empty?
         increment_nest
       end
 
@@ -156,16 +156,16 @@ module GLI
         if @nest.size + increment > 6
           "**#{content}**"
         else
-          "#{@nest}#{'#'*increment} #{content}"
+          "#{@nest}#{'#' * increment} #{content}"
         end
       end
 
-      def increment_nest(increment=1)
-        @nest = "#{@nest}#{'#'*increment}"
+      def increment_nest(increment = 1)
+        @nest = "#{@nest}#{'#' * increment}"
       end
 
-      def decrement_nest(increment=1)
-        @nest.gsub!(/#{'#'*increment}$/, '')
+      def decrement_nest(increment = 1)
+        @nest.gsub!(/#{'#' * increment}$/, '')
       end
     end
   end

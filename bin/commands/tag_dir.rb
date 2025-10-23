@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@tag_dir
 desc 'Set the default tags for the current directory'
 long_desc 'Adds default_tags to a .doingrc file in the current directory. Any entry created in this directory or its
@@ -5,7 +7,8 @@ subdirectories will be tagged with the default tags. You can modify these any ti
 manually editing the .doingrc file.'
 arg_name 'TAG [TAG..]'
 command :tag_dir do |c|
-  c.example 'doing tag_dir project1 project2', desc: 'Add @project1 and @project2 to to any entries created from the current directory'
+  c.example 'doing tag_dir project1 project2',
+            desc: 'Add @project1 and @project2 to to any entries created from the current directory'
   c.example 'doing tag_dir --clear', desc: 'Clear the default tags for the directory'
 
   c.desc 'Remove all default_tags from the local .doingrc'
@@ -20,7 +23,7 @@ command :tag_dir do |c|
   c.action do |global, options, args|
     if args.empty? && !options[:clear] && !options[:editor]
       all_tags = @wwid.content.all_tags
-      $stderr.puts Doing::Color.boldwhite('Enter tags separated by spaces, tab to complete')
+      warn Doing::Color.boldwhite('Enter tags separated by spaces, tab to complete')
       input = Doing::Prompt.read_line(prompt: "Tags to #{options[:remove] ? 'remove' : 'add'}", completions: all_tags)
       tags = input.split_tags
     else

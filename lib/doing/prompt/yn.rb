@@ -14,7 +14,7 @@ module Doing
     ## @return     [Boolean] yes or no
     ##
     def yn(question, default_response: false)
-      return @force_answer == :yes ? true : false unless @force_answer.nil?
+      return @force_answer == :yes unless @force_answer.nil?
 
       $stdin.reopen('/dev/tty')
 
@@ -31,10 +31,8 @@ module Doing
       return default unless $stdout.isatty
 
       # clear the buffer
-      if ARGV&.length
-        ARGV.length.times do
-          ARGV.shift
-        end
+      ARGV.length&.times do
+        ARGV.shift
       end
       system 'stty cbreak'
 
@@ -43,10 +41,10 @@ module Doing
       cbg = boldgreen
       cd = Color.default
 
-      options = unless default.nil?
-                  "#{cw}[#{default ? "#{cbg}Y#{cw}/#{cbw}n" : "#{cbw}y#{cw}/#{cbg}N"}#{cw}]#{cd}"
-                else
+      options = if default.nil?
                   "#{cw}[#{cbw}y#{cw}/#{cbw}n#{cw}]#{cd}"
+                else
+                  "#{cw}[#{default ? "#{cbg}Y#{cw}/#{cbw}n" : "#{cbw}y#{cw}/#{cbg}N"}#{cw}]#{cd}"
                 end
       $stdout.syswrite "#{cbw}#{question.sub(/\?$/, '')} #{options}#{cbw}?#{cd} "
       res = $stdin.sysread 1

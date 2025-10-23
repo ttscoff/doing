@@ -16,13 +16,12 @@ class DoingItemsTest < Test::Unit::TestCase
 
   def setup
     @wwid = WWID.new
-    @sections = ['Currently', 'temp section 1', 'temp_section 2'].map { |s| Section.new(s, original: "#{s.to_s}:") }
+    @sections = ['Currently', 'temp section 1', 'temp_section 2'].map { |s| Section.new(s, original: "#{s}:") }
     @tags = %w[tag1 tag2 tag3 tag4 tag5 tag6]
     @content = generate_items
   end
 
-  def teardown
-  end
+  def teardown; end
 
   def generate_items(max = 6)
     items = Items.new
@@ -79,10 +78,11 @@ class DoingItemsTest < Test::Unit::TestCase
   def test_add_section
     new_section = 'Test Section Added'
     @content.add_section(new_section)
-    assert(@content.sections.map { |s| s.title }.include?(new_section), 'Section 1 should have been added from String input')
+    assert(@content.sections.map(&:title).include?(new_section), 'Section 1 should have been added from String input')
 
     @content.add_section(Section.new('Test Section 2'))
-    assert(@content.sections.map { |s| s.title }.include?('Test Section 2'), 'Section 2 should have been added from Section input')
+    assert(@content.sections.map(&:title).include?('Test Section 2'),
+           'Section 2 should have been added from Section input')
   end
 
   def test_search_id

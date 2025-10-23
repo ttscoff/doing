@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@note
 desc 'Add a note to the last entry'
 long_desc %(
@@ -12,7 +14,8 @@ command :note do |c|
   c.example 'doing note', desc: 'Open the last entry in $EDITOR to append a note'
   c.example 'doing note "Just a quick annotation"', desc: 'Add a quick note to the last entry'
   c.example 'doing note --tag done "Keeping it real or something"', desc: 'Add a note to the last item tagged @done'
-  c.example 'doing note --search "late night" -e', desc: 'Open $EDITOR to add a note to the last item containing "late night" (fuzzy matched)'
+  c.example 'doing note --search "late night" -e',
+            desc: 'Open $EDITOR to add a note to the last item containing "late night" (fuzzy matched)'
 
   c.desc 'Section'
   c.arg_name 'NAME'
@@ -71,8 +74,8 @@ command :note do |c|
     end
 
     if (new_note.empty? && !options[:remove]) || options[:ask]
-      $stderr.puts last_note if last_note.good?
-      $stderr.puts new_note if new_note.good?
+      warn last_note if last_note.good?
+      warn new_note if new_note.good?
       new_note.add(Doing::Prompt.read_lines(prompt: 'Add a note'))
     end
 

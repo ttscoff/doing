@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -33,26 +35,27 @@ class DoingImportTest < Test::Unit::TestCase
 
   def test_doing_import
     result = doing('--stdout', '--debug', 'import', '--type', 'doing', @doing_import_file)
-    assert_match(/Imported: 126 items/, result, "Should have imported 126 entries")
+    assert_match(/Imported: 126 items/, result, 'Should have imported 126 entries')
     result = doing('--stdout', '--debug', 'import', '--type', 'doing', @doing_import_file)
-    assert_match(/Skipped: 126 duplicate items/, result, "Should have skipped 126 duplicate entries")
+    assert_match(/Skipped: 126 duplicate items/, result, 'Should have skipped 126 duplicate entries')
   end
 
   def test_doing_import_date_range
     result = doing('--stdout', '--debug', 'import', '--type', 'doing', '--from', '9/29/21', @doing_import_file)
-    assert_match(/Imported: 2 items/, result, "Should have imported 2 entries")
+    assert_match(/Imported: 2 items/, result, 'Should have imported 2 entries')
   end
 
   def test_doing_import_search_filter
-    result = doing('--stdout', '--debug', 'import', '--type', 'doing', '--search', 'cool.devo.build', @doing_import_file)
-    assert_match(/Imported: 3 items/, result, "Should have imported 3 entries")
+    result = doing('--stdout', '--debug', 'import', '--type', 'doing', '--search', 'cool.devo.build',
+                   @doing_import_file)
+    assert_match(/Imported: 3 items/, result, 'Should have imported 3 entries')
   end
 
   def test_doing_import_no_overlap
     doing('done', '--back="2021-10-08 13:00"', '--took="30m"', 'Testing overlapping entry')
     result = doing('--stdout', '--debug', 'import', '--type', 'doing', '--no-overlap', @doing_import_file)
-    assert_match(/Skipped: 1 items/, result, "Should have skipped 1 duplicate entries")
-    assert_match(/Imported: 125 items/, result, "Should have imported 125 entries")
+    assert_match(/Skipped: 1 items/, result, 'Should have skipped 1 duplicate entries')
+    assert_match(/Imported: 125 items/, result, 'Should have imported 125 entries')
   end
 
   def test_user_plugin
@@ -78,7 +81,6 @@ class DoingImportTest < Test::Unit::TestCase
     assert_equal(count, shown.uncolor.strip.scan(ENTRY_REGEX).count, message)
   end
 
-
   def mktmpdir
     tmpdir = Dir.mktmpdir
     @tmpdirs.push(tmpdir)
@@ -87,7 +89,7 @@ class DoingImportTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end
-

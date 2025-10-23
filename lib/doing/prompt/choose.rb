@@ -29,7 +29,7 @@ module Doing
       options.sort! if sorted
 
       res = `echo #{Shellwords.escape(options.join("\n"))}|#{fzf} #{default_args.join(' ')}`
-      return false if res.strip.size.zero?
+      return false if res.strip.empty?
 
       res
     end
@@ -72,10 +72,10 @@ module Doing
         ]
         if include_section
           out.concat([
-            ' (',
-            item.section,
-            ') '
-          ])
+                       ' (',
+                       item.section,
+                       ') '
+                     ])
         end
         out.join('')
       end
@@ -97,7 +97,6 @@ module Doing
                     '-i'
                   end
       fzf_args << '-e' if opt.fetch(:exact, false)
-
 
       unless opt.fetch(:menu)
         raise InvalidArgument, "Can't skip menu when no query is provided" unless query && !query.empty?

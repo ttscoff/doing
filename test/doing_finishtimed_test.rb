@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 require 'time'
@@ -34,7 +36,7 @@ class DoingFinishTimedTest < Test::Unit::TestCase
     assert(d, "#{r} should have @done timestamp")
     start = Time.parse(t['ts'])
 
-    assert_within_tolerance((start + (60 * 60)), Time.parse(d['ts']),
+    assert_within_tolerance(start + (60 * 60), Time.parse(d['ts']),
                             message: 'Finished time should be 60 minutes after start')
 
     assert_within_tolerance(start, Time.now - (60 * 60),
@@ -63,7 +65,7 @@ class DoingFinishTimedTest < Test::Unit::TestCase
     assert_equal(count, shown.uncolor.strip.scan(ENTRY_REGEX).count, message)
   end
 
-  def assert_within_tolerance(t1, t2, message: "Times should be within tolerance of each other", tolerance: 2)
+  def assert_within_tolerance(t1, t2, message: 'Times should be within tolerance of each other', tolerance: 2)
     assert(t1.close_enough?(t2, tolerance: tolerance), message)
   end
 
@@ -75,6 +77,7 @@ class DoingFinishTimedTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir}, '--doing_file', @wwid_file, *args)
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+                   *args)
   end
 end

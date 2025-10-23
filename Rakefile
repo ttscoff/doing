@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rake/clean'
 require 'rubygems'
 require 'rubygems/package_task'
@@ -11,9 +13,9 @@ require 'parallel_tests/tasks'
 require 'tty-spinner'
 
 YARD::Rake::YardocTask.new do |t|
- t.files = ['lib/doing/*.rb']
- t.options = ['--markup-provider=redcarpet', '--markup=markdown', '--no-private', '-p', 'yard_templates']
- # t.stats_options = ['--list-undoc']
+  t.files = ['lib/doing/*.rb']
+  t.options = ['--markup-provider=redcarpet', '--markup=markdown', '--no-private', '-p', 'yard_templates']
+  # t.stats_options = ['--list-undoc']
 end
 
 task :doc, [*Rake.application[:yard].arg_names] => [:yard]

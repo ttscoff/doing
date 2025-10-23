@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 desc 'Output a tag wiki'
 command :wiki do |c|
   c.desc 'Section to rotate'

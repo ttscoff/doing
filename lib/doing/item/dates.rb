@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Doing
   module ItemDates
     # def date=(new_date)
@@ -10,7 +12,7 @@ module Doing
 
       return nil if @title =~ /(?<=^| )@done\b/
 
-      return Time.now - @date
+      Time.now - @date
     end
 
     ##

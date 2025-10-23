@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module Doing
   module Completion
     module StringUtils
-
       ##
       ## Get short description for command completion
       ##

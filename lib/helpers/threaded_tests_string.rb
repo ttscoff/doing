@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ThreadedTestString
   class ::String
     include Doing::Color

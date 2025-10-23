@@ -18,7 +18,7 @@ module Doing
     ##             has content
     ##
     def good?
-      !nil? && !self&.empty? || false
+      !nil? && !empty? || false
     end
   end
 

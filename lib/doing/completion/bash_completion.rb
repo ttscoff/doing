@@ -11,35 +11,33 @@ module Doing
         out = []
         logic = []
 
-        @commands.each_with_index do |cmd, i|
+        @commands.each_with_index do |cmd, _i|
           @bar.advance(status: cmd[:commands].first)
 
           data = Completion.get_help_sections(cmd[:commands].first)
 
           arg = data[:synopsis].join(' ').strip.split(/ /).last
-          case arg
-          when /(path|file)/i
-            type = :file
-          when /sect/i
-            type = 'sections'
-          when /view/i
-            type = 'views'
+          type = case arg
+                 when /(path|file)/i
+                   :file
+                 when /sect/i
+                   'sections'
+                 when /view/i
+                   'views'
+                 end
+
+          next unless data[:command_options]
+
+          options = Completion.parse_options(data[:command_options])
+          out << command_function(cmd[:commands].first, options, type)
+
+          if first
+            op = 'if'
+            first = false
           else
-            type = nil
+            op = 'elif'
           end
-
-          if data[:command_options]
-            options = Completion.parse_options(data[:command_options])
-            out << command_function(cmd[:commands].first, options, type)
-
-            if first
-              op = 'if'
-              first = false
-            else
-              op = 'elif'
-            end
-            logic << %(#{op} [[ $last =~ (#{cmd[:commands].join('|')}) ]]; then _doing_#{cmd[:commands].first})
-          end
+          logic << %(#{op} [[ $last =~ (#{cmd[:commands].join('|')}) ]]; then _doing_#{cmd[:commands].first})
         end
 
         out << <<~EOFUNC
@@ -71,25 +69,23 @@ module Doing
           short_options << o[:short] if o[:short]
         end
 
-        long = long_options.map! {|o| "--#{o}"}.join(' ')
-        short = short_options.map! {|o| "-#{o}"}.join(' ')
+        long = long_options.map! { |o| "--#{o}" }.join(' ')
+        short = short_options.map! { |o| "-#{o}" }.join(' ')
         words = ''
         logic = ''
-        words, logic = get_words(type) if type && type.is_a?(String)
+        words, logic = get_words(type) if type.is_a?(String)
 
-        func = <<~ENDFUNC
-        _doing_#{command}() {
-          #{words}
-          if [[ "$token" == --* ]]; then
-            COMPREPLY=( $( compgen -W '#{long}' -- $token ) )
-          elif [[ "$token" == -* ]]; then
-            COMPREPLY=( $( compgen -W '#{short} #{long}' -- $token ) )
-          #{logic}
-          fi
-        }
+        <<~ENDFUNC
+          _doing_#{command}() {
+            #{words}
+            if [[ "$token" == --* ]]; then
+              COMPREPLY=( $( compgen -W '#{long}' -- $token ) )
+            elif [[ "$token" == -* ]]; then
+              COMPREPLY=( $( compgen -W '#{short} #{long}' -- $token ) )
+            #{logic}
+            fi
+          }
         ENDFUNC
-
-        func
       end
 
       def get_words(type)
@@ -126,7 +122,8 @@ module Doing
         data = Completion.get_help_sections
         @global_options = Completion.parse_options(data[:global_options])
         @commands = Completion.parse_commands(data[:commands])
-        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Bash completions: \033[0;35;40m[:bar] :status\033[0m", total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'Reading subcommands')
+        @bar = TTY::ProgressBar.new("\033[0;0;33mGenerating Bash completions: \033[0;35;40m[:bar] :status\033[0m",
+                                    total: @commands.count + 1, bar_format: :square, hide_cursor: true, status: 'Reading subcommands')
         width = TTY::Screen.columns - 45
         @bar.resize(width)
       end

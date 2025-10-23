@@ -9,91 +9,106 @@ module Doing
     ##
     def list_section(opt, items: Items.new)
       logger.measure(:list_section) do
-        opt[:config_template] ||= 'default'
+        cfg = nil
+        logger.measure(:list_section_config) do
+          opt[:config_template] ||= 'default'
 
-        tpl_cfg = Doing.setting(['templates', opt[:config_template]])
+          tpl_cfg = Doing.setting(['templates', opt[:config_template]])
 
-        cfg = if opt[:view_template]
-                Doing.setting(['views', opt[:view_template]]).deep_merge(tpl_cfg,
-                                                                         { extend_existing_arrays: true,
-                                                                           sort_merged_arrays: true })
-              else
-                tpl_cfg
-              end
+          cfg = if opt[:view_template]
+                  Doing.setting(['views', opt[:view_template]]).deep_merge(tpl_cfg,
+                                                                           { extend_existing_arrays: true,
+                                                                             sort_merged_arrays: true })
+                else
+                  tpl_cfg
+                end
 
-        cfg.deep_merge({
-                         'wrap_width' => Doing.setting('wrap_width') || 0,
-                         'date_format' => Doing.setting('default_date_format'),
-                         'order' => Doing.setting('order') || :asc,
-                         'tags_color' => Doing.setting('tags_color'),
-                         'duration' => Doing.setting('duration'),
-                         'interval_format' => Doing.setting('interval_format')
-                       }, { extend_existing_arrays: true, sort_merged_arrays: true })
+          cfg.deep_merge({
+                           'wrap_width' => Doing.setting('wrap_width') || 0,
+                           'date_format' => Doing.setting('default_date_format'),
+                           'order' => Doing.setting('order') || :asc,
+                           'tags_color' => Doing.setting('tags_color'),
+                           'duration' => Doing.setting('duration'),
+                           'interval_format' => Doing.setting('interval_format')
+                         }, { extend_existing_arrays: true, sort_merged_arrays: true })
+        end
 
-        opt[:duration] ||= cfg['duration'] || false
-        opt[:interval_format] ||= cfg['interval_format'] || 'text'
-        opt[:count] ||= 0
-        opt[:age] ||= :newest
-        opt[:age] = opt[:age].normalize_age
-        opt[:format] ||= cfg['date_format']
-        opt[:order] ||= cfg['order'] || :asc
-        opt[:tag_order] ||= :asc
-        opt[:tags_color] = cfg['tags_color'] || false if opt[:tags_color].nil?
-        opt[:template] ||= cfg['template']
-        opt[:sort_tags] ||= opt[:tag_sort]
+        logger.measure(:list_section_options) do
+          opt[:duration] ||= cfg['duration'] || false
+          opt[:interval_format] ||= cfg['interval_format'] || 'text'
+          opt[:count] ||= 0
+          opt[:age] ||= :newest
+          opt[:age] = opt[:age].normalize_age
+          opt[:format] ||= cfg['date_format']
+          opt[:order] ||= cfg['order'] || :asc
+          opt[:tag_order] ||= :asc
+          opt[:tags_color] = cfg['tags_color'] || false if opt[:tags_color].nil?
+          opt[:template] ||= cfg['template']
+          opt[:sort_tags] ||= opt[:tag_sort]
+        end
 
-        # opt[:highlight] ||= true
         title = ''
         is_single = true
-        if opt[:section].nil?
-          opt[:section] = choose_section
-          title = opt[:section]
-        elsif opt[:section].is_a?(Array)
-          title = opt[:section].join(', ')
-        elsif opt[:section].is_a?(String)
-          title = if opt[:section] =~ /^all$/i
-                    if opt[:page_title]
-                      opt[:page_title]
-                    elsif opt[:tag_filter] && opt[:tag_filter]['bool'].normalize_bool != :not
-                      opt[:tag_filter]['tags'].map { |tag| "@#{tag}" }.join(' + ')
+        logger.measure(:list_section_title) do
+          # opt[:highlight] ||= true
+          if opt[:section].nil?
+            opt[:section] = choose_section
+            title = opt[:section]
+          elsif opt[:section].is_a?(Array)
+            title = opt[:section].join(', ')
+          elsif opt[:section].is_a?(String)
+            title = if opt[:section] =~ /^all$/i
+                      if opt[:page_title]
+                        opt[:page_title]
+                      elsif opt[:tag_filter] && opt[:tag_filter]['bool'].normalize_bool != :not
+                        opt[:tag_filter]['tags'].map { |tag| "@#{tag}" }.join(' + ')
+                      else
+                        'doing'
+                      end
                     else
-                      'doing'
+                      guess_section(opt[:section])
                     end
-                  else
-                    guess_section(opt[:section])
-                  end
+          end
         end
 
-        items = filter_items(items, opt: opt)
-
-        items.reverse! unless opt[:order].normalize_order == :desc
-
-        if opt[:delete]
-          delete_items(items, force: opt[:force])
-
-          write(@doing_file)
-          return
-        elsif opt[:editor]
-          edit_items(items)
-
-          write(@doing_file)
-          return
-        elsif opt[:interactive]
-          opt[:menu] = !opt[:force]
-          opt[:query] = '' # opt[:search]
-          opt[:multiple] = true
-          selected = Prompt.choose_from_items(items.reverse, include_section: opt[:section] =~ /^all$/i, **opt)
-
-          raise NoResults, 'no items selected' if selected.nil? || selected.empty?
-
-          act_on(selected, opt)
-          return
+        logger.measure(:list_section_filter) do
+          items = filter_items(items, opt: opt)
         end
 
-        opt[:output] ||= 'template'
-        opt[:wrap_width] ||= Doing.setting('templates.default.wrap_width', 0)
+        logger.measure(:list_section_sort) do
+          items.reverse! unless opt[:order].normalize_order == :desc
+        end
 
-        output(items, title, is_single, opt)
+        logger.measure(:list_section_actions) do
+          if opt[:delete]
+            delete_items(items, force: opt[:force])
+
+            write(@doing_file)
+            return
+          elsif opt[:editor]
+            edit_items(items)
+
+            write(@doing_file)
+            return
+          elsif opt[:interactive]
+            opt[:menu] = !opt[:force]
+            opt[:query] = '' # opt[:search]
+            opt[:multiple] = true
+            selected = Prompt.choose_from_items(items.reverse, include_section: opt[:section] =~ /^all$/i, **opt)
+
+            raise NoResults, 'no items selected' if selected.nil? || selected.empty?
+
+            act_on(selected, opt)
+            return
+          end
+        end
+
+        logger.measure(:list_section_output) do
+          opt[:output] ||= 'template'
+          opt[:wrap_width] ||= Doing.setting('templates.default.wrap_width', 0)
+
+          output(items, title, is_single, opt)
+        end
       end
     end
 
@@ -220,33 +235,40 @@ module Doing
     ## @param      opt      [Hash] Additional Options
     ##
     def recent(count = 10, section = nil, opt)
-      opt ||= {}
-      opt[:times] ||= false
-      opt[:totals] ||= false
-      opt[:sort_tags] ||= false
+      logger.measure(:recent_method) do
+        opt ||= {}
+        opt[:times] ||= false
+        opt[:totals] ||= false
+        opt[:sort_tags] ||= false
 
-      cfg = Doing.setting('templates.recent').deep_merge(Doing.setting('templates.default'), { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
-                                                                                                                                                                      'wrap_width' => Doing.setting('wrap_width') || 0,
-                                                                                                                                                                      'date_format' => Doing.setting('default_date_format'),
-                                                                                                                                                                      'order' => Doing.setting('order') || :asc,
-                                                                                                                                                                      'tags_color' => Doing.setting('tags_color'),
-                                                                                                                                                                      'duration' => Doing.setting('duration'),
-                                                                                                                                                                      'interval_format' => Doing.setting('interval_format')
-                                                                                                                                                                    }, { extend_existing_arrays: true, sort_merged_arrays: true })
-      opt[:duration] ||= cfg['duration'] || false
-      opt[:interval_format] ||= cfg['interval_format'] || 'text'
+        cfg = nil
+        logger.measure(:recent_config_merge) do
+          cfg = Doing.setting('templates.recent').deep_merge(Doing.setting('templates.default'), { extend_existing_arrays: true, sort_merged_arrays: true }).deep_merge({
+                                                                                                                                                                          'wrap_width' => Doing.setting('wrap_width') || 0,
+                                                                                                                                                                          'date_format' => Doing.setting('default_date_format'),
+                                                                                                                                                                          'order' => Doing.setting('order') || :asc,
+                                                                                                                                                                          'tags_color' => Doing.setting('tags_color'),
+                                                                                                                                                                          'duration' => Doing.setting('duration'),
+                                                                                                                                                                          'interval_format' => Doing.setting('interval_format')
+                                                                                                                                                                        }, { extend_existing_arrays: true, sort_merged_arrays: true })
+          opt[:duration] ||= cfg['duration'] || false
+          opt[:interval_format] ||= cfg['interval_format'] || 'text'
+        end
 
-      section ||= Doing.setting('current_section')
-      section = guess_section(section)
+        logger.measure(:recent_section_setup) do
+          section ||= Doing.setting('current_section')
+          section = guess_section(section)
 
-      opt[:section] = section
-      opt[:wrap_width] = cfg['wrap_width']
-      opt[:count] = count
-      opt[:format] = cfg['date_format']
-      opt[:template] = opt[:template] || cfg['template']
-      opt[:order] = :asc
+          opt[:section] = section
+          opt[:wrap_width] = cfg['wrap_width']
+          opt[:count] = count
+          opt[:format] = cfg['date_format']
+          opt[:template] = opt[:template] || cfg['template']
+          opt[:order] = :asc
+        end
 
-      list_section(opt)
+        list_section(opt)
+      end
     end
 
     ##
@@ -367,20 +389,28 @@ module Doing
         opt ||= {}
         out = nil
 
-        unless opt[:output] =~ Plugins.plugin_regex(type: :export)
-          raise InvalidPlugin.new('Unknown output format', opt[:output])
-
+        logger.measure(:output_validation) do
+          unless opt[:output] =~ Plugins.plugin_regex(type: :export)
+            raise InvalidPlugin.new('Unknown output format', opt[:output])
+          end
         end
 
-        export_options = { page_title: title, is_single: is_single, options: opt }
+        export_options = nil
+        logger.measure(:output_setup) do
+          export_options = { page_title: title, is_single: is_single, options: opt }
+        end
 
-        Hooks.trigger :pre_export, self, opt[:output], items
+        logger.measure(:output_hooks) do
+          Hooks.trigger :pre_export, self, opt[:output], items
+        end
 
-        Plugins.plugins[:export].each_value do |options|
-          next unless opt[:output] =~ /^(#{options[:trigger].normalize_trigger})$/i
+        logger.measure(:output_render) do
+          Plugins.plugins[:export].each_value do |options|
+            next unless opt[:output] =~ /^(#{options[:trigger].normalize_trigger})$/i
 
-          out = options[:class].render(self, items, variables: export_options)
-          break
+            out = options[:class].render(self, items, variables: export_options)
+            break
+          end
         end
 
         logger.debug('Output:', "#{items.count} #{items.count == 1 ? 'item' : 'items'} shown")
