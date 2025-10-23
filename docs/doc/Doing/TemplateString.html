@@ -6,7 +6,7 @@
 <title>
   Class: Doing::TemplateString
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -264,7 +264,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(string, placeholders: {}, force_color: false, wrap_width: 0, color: &#39;&#39;, tags_color: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; TemplateString </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(string, placeholders: {}, force_color: false, disable_color: false, wrap_width: 0, color: &#39;&#39;, tags_color: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; TemplateString </a>
     
 
     
@@ -389,7 +389,7 @@
   
   
   <h3 class="inherited">Methods included from <span class='object_link'><a href="Color.html" title="Doing::Color (module)">Color</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="Color.html#attributes-instance_method" title="Doing::Color#attributes (method)">#attributes</a></span>, <span class='object_link'><a href="Color.html#coloring%3F-class_method" title="Doing::Color.coloring? (method)">coloring?</a></span>, <span class='object_link'><a href="Color.html#rgb-instance_method" title="Doing::Color#rgb (method)">#rgb</a></span>, <span class='object_link'><a href="Color.html#support%3F-instance_method" title="Doing::Color#support? (method)">#support?</a></span>, <span class='object_link'><a href="Color.html#template-class_method" title="Doing::Color.template (method)">template</a></span>, <span class='object_link'><a href="Color.html#uncolor-instance_method" title="Doing::Color#uncolor (method)">#uncolor</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="Color.html#attributes-class_method" title="Doing::Color.attributes (method)">attributes</a></span>, <span class='object_link'><a href="Color.html#coloring%3F-class_method" title="Doing::Color.coloring? (method)">coloring?</a></span>, <span class='object_link'><a href="Color.html#rgb-instance_method" title="Doing::Color#rgb (method)">#rgb</a></span>, <span class='object_link'><a href="Color.html#support%3F-instance_method" title="Doing::Color#support? (method)">#support?</a></span>, <span class='object_link'><a href="Color.html#template-class_method" title="Doing::Color.template (method)">template</a></span>, <span class='object_link'><a href="Color.html#uncolor-class_method" title="Doing::Color.uncolor (method)">uncolor</a></span>, <span class='object_link'><a href="Color.html#uncolor-instance_method" title="Doing::Color#uncolor (method)">#uncolor</a></span></p>
 
   
   
@@ -400,7 +400,7 @@
   
   
   <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../String.html" title="String (class)">String</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="../String.html#good%3F-instance_method" title="String#good? (method)">#good?</a></span>, <span class='object_link'><a href="../String.html#last_color_code-instance_method" title="String#last_color_code (method)">#last_color_code</a></span>, <span class='object_link'><a href="../String.html#normalize_color-instance_method" title="String#normalize_color (method)">#normalize_color</a></span>, <span class='object_link'><a href="../String.html#sanitize-instance_method" title="String#sanitize (method)">#sanitize</a></span>, <span class='object_link'><a href="../String.html#utf8-instance_method" title="String#utf8 (method)">#utf8</a></span>, <span class='object_link'><a href="../String.html#valid_id%3F-instance_method" title="String#valid_id? (method)">#valid_id?</a></span>, <span class='object_link'><a href="../String.html#validate_color-instance_method" title="String#validate_color (method)">#validate_color</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="../String.html#good%3F-instance_method" title="String#good? (method)">#good?</a></span>, <span class='object_link'><a href="../String.html#last_color_code-instance_method" title="String#last_color_code (method)">#last_color_code</a></span>, <span class='object_link'><a href="../String.html#normalize_color-instance_method" title="String#normalize_color (method)">#normalize_color</a></span>, <span class='object_link'><a href="../String.html#sanitize-instance_method" title="String#sanitize (method)">#sanitize</a></span>, <span class='object_link'><a href="../String.html#uncolor-instance_method" title="String#uncolor (method)">#uncolor</a></span>, <span class='object_link'><a href="../String.html#utf8-instance_method" title="String#utf8 (method)">#utf8</a></span>, <span class='object_link'><a href="../String.html#valid_id%3F-instance_method" title="String#valid_id? (method)">#valid_id?</a></span>, <span class='object_link'><a href="../String.html#validate_color-instance_method" title="String#validate_color (method)">#validate_color</a></span></p>
 
   
   
@@ -506,7 +506,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(string, placeholders: {}, force_color: false, wrap_width: 0, color: &#39;&#39;, tags_color: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; <tt><span class='object_link'><a href="" title="Doing::TemplateString (class)">TemplateString</a></span></tt> 
+    #<strong>initialize</strong>(string, placeholders: {}, force_color: false, disable_color: false, wrap_width: 0, color: &#39;&#39;, tags_color: &#39;&#39;, reset: &#39;&#39;)  &#x21d2; <tt><span class='object_link'><a href="" title="Doing::TemplateString (class)">TemplateString</a></span></tt> 
   
 
   
@@ -802,9 +802,9 @@ of colors and string locations</p>
 </div>
 
       <div id="footer">
-  Generated on Mon May 19 04:38:01 2025 by
+  Generated on Thu Oct 23 08:05:21 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.4.4).
+  0.9.37 (ruby-3.4.4).
 </div>
 
     </div>

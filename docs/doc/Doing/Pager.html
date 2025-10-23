@@ -6,7 +6,7 @@
 <title>
   Module: Doing::Pager
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.37
   
 </title>
 
@@ -97,6 +97,37 @@
 
 
 
+  <h2>Class Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#paginate-class_method" title="paginate (class method)">.<strong>paginate</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Boolean determines whether output is paginated.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
 
 
 
@@ -107,6 +138,29 @@
     </h2>
 
     <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#external_pager-class_method" title="external_pager (class method)">.<strong>external_pager</strong>(text)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>External pager using IO.popen for optimal performance and UX.</p>
+</div></span>
+  
+</li>
+
       
         <li class="public ">
   <span class="summary_signature">
@@ -131,55 +185,38 @@
 </li>
 
       
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#paginate-class_method" title="paginate (class method)">.<strong>paginate</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Boolean determines whether output is paginated.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#paginate=-class_method" title="paginate= (class method)">.<strong>paginate=</strong>(should_paginate)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>Enable/disable pagination.</p>
-</div></span>
-  
-</li>
-
-      
     </ul>
   
 
+
+  <div id="class_attr_details" class="attr_details">
+    <h2>Class Attribute Details</h2>
+    
+      
+      <span id="paginate=-class_method"></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="paginate-class_method">
+  
+    .<strong>paginate</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Boolean determines whether output is paginated</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+</div>
+    
+  </div>
 
 
   <div id="class_method_details" class="method_details_list">
@@ -187,7 +224,29 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="page-class_method">
+  <h3 class="signature first" id="external_pager-class_method">
+  
+    .<strong>external_pager</strong>(text)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>External pager using IO.popen for optimal performance and UX</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="page-class_method">
   
     .<strong>page</strong>(text)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
   
@@ -228,77 +287,14 @@ STDOUT</p>
 </div>
 </div>
     
-      <div class="method_details ">
-  <h3 class="signature " id="paginate-class_method">
-  
-    .<strong>paginate</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Boolean determines whether output is paginated</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="paginate=-class_method">
-  
-    .<strong>paginate=</strong>(should_paginate)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Enable/disable pagination</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>should_paginate</span>
-      
-      
-        <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>true to paginate</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div>
-</div>
-    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Mon May 19 04:38:00 2025 by
+  Generated on Thu Oct 23 08:05:21 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.4.4).
+  0.9.37 (ruby-3.4.4).
 </div>
 
     </div>
