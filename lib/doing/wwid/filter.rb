@@ -13,7 +13,9 @@ module Doing
     # @return     [Items] Filtered Items array
     #
     def fuzzy_filter_items(items, query, case_type: :smart)
-      scannable = items.map.with_index { |item, idx| "#{item.title} #{item.note.join(' ')}".gsub(/[|*?!]/, '') + "|#{idx}" }.join("\n")
+      scannable = items.map.with_index do |item, idx|
+        "#{item.title} #{item.note.join(' ')}".gsub(/[|*?!]/, '') + "|#{idx}"
+      end.join("\n")
 
       res = `echo #{Shellwords.escape(scannable)}|#{Prompt.fzf} #{fuzzy_filter_args(query, case_type).join(' ')}`
       selected = Items.new
@@ -59,59 +61,58 @@ module Doing
     ## @option opt [Array] :val (nil) Array of tag value queries
     ##
     def filter_items(items = Items.new, opt: {})
-      logger.benchmark(:filter_items, :start)
-      time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/i
+      logger.measure(:filter_items) do
+        time_rx = /^(\d{1,2}+(:\d{1,2}+)?( *(am|pm))?|midnight|noon)$/i
 
-      if items.nil? || items.empty?
-        section = !opt[:section] || opt[:section].empty? ? 'All' : guess_section(opt[:section])
-        if section.is_a?(Array)
-          section.each do |s|
-            s = s[0] if s.is_a?(Array)
-            items.concat(s =~ /^all$/i ? @content.clone : @content.in_section(s))
+        if items.nil? || items.empty?
+          section = !opt[:section] || opt[:section].empty? ? 'All' : guess_section(opt[:section])
+          if section.is_a?(Array)
+            section.each do |s|
+              s = s[0] if s.is_a?(Array)
+              items.concat(s =~ /^all$/i ? @content.clone : @content.in_section(s))
+            end
+          else
+            items = section =~ /^all$/i ? @content.clone : @content.in_section(section)
           end
+        end
+
+        unless opt[:time_filter]
+          opt[:time_filter] = [nil, nil]
+          if opt[:from] && !opt[:date_filter]
+            if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
+              opt[:time_filter] = opt[:from]
+            elsif opt[:from][0].is_a?(Time)
+              opt[:date_filter] = opt[:from]
+            end
+          end
+        end
+
+        if opt[:before].is_a?(String) && opt[:before] =~ time_rx
+          opt[:time_filter][1] = opt[:before]
+          opt[:before] = nil
+        end
+
+        if opt[:after].is_a?(String) && opt[:after] =~ time_rx
+          opt[:time_filter][0] = opt[:after]
+          opt[:after] = nil
+        end
+
+        items.sort_by! { |item| [item.date, item.title.downcase] }.reverse
+
+        filtered_items = items.select { |item| item.keep_item?(opt) }
+
+        count = opt[:count].to_i&.positive? ? opt[:count].to_i : filtered_items.count
+
+        output = Items.new
+
+        if opt[:age] && opt[:age].normalize_age == :oldest
+          output.concat(filtered_items.slice(0, count).reverse)
         else
-          items = section =~ /^all$/i ? @content.clone : @content.in_section(section)
+          output.concat(filtered_items.reverse.slice(0, count))
         end
+
+        output
       end
-
-      unless opt[:time_filter]
-        opt[:time_filter] = [nil, nil]
-        if opt[:from] && !opt[:date_filter]
-          if opt[:from][0].is_a?(String) && opt[:from][0] =~ time_rx
-            opt[:time_filter] = opt[:from]
-          elsif opt[:from][0].is_a?(Time)
-            opt[:date_filter] = opt[:from]
-          end
-        end
-      end
-
-      if opt[:before].is_a?(String) && opt[:before] =~ time_rx
-        opt[:time_filter][1] = opt[:before]
-        opt[:before] = nil
-      end
-
-      if opt[:after].is_a?(String) && opt[:after] =~ time_rx
-        opt[:time_filter][0] = opt[:after]
-        opt[:after] = nil
-      end
-
-      items.sort_by! { |item| [item.date, item.title.downcase] }.reverse
-
-      filtered_items = items.select { |item| item.keep_item?(opt) }
-
-      count = opt[:count].to_i&.positive? ? opt[:count].to_i : filtered_items.count
-
-      output = Items.new
-
-      if opt[:age] && opt[:age].normalize_age == :oldest
-        output.concat(filtered_items.slice(0, count).reverse)
-      else
-        output.concat(filtered_items.reverse.slice(0, count))
-      end
-
-      logger.benchmark(:filter_items, :finish)
-
-      output
     end
   end
 end

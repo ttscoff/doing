@@ -270,58 +270,126 @@ module Doing
     def benchmark(key, state)
       return unless ENV['DOING_BENCHMARK']
 
+      # Pre-allocate benchmarks hash to avoid repeated allocation
       @benchmarks ||= {}
-      @benchmarks[key] ||= { start: nil, finish: nil }
+
+      # Use direct assignment instead of ||= for better performance
+      @benchmarks[key] = { start: nil, finish: nil } if @benchmarks[key].nil?
       @benchmarks[key][state] = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
 
-    def log_benchmarks
-      if ENV['DOING_BENCHMARK']
+    # Measure execution time of a block with automatic start/finish
+    def measure(key, &_block)
+      return yield unless ENV['DOING_BENCHMARK']
 
-        output = []
-        beginning = @benchmarks[:total][:start]
-        ending = @benchmarks[:total][:finish]
-        total = ending - beginning
-        factor = TTY::Screen.columns / total
+      benchmark(key, :start)
+      result = yield
+      benchmark(key, :finish)
+      result
+    end
 
-        cols = Array.new(TTY::Screen.columns)
+    # Get benchmark statistics for a specific key
+    def benchmark_stats(key)
+      return nil unless @benchmarks.dig(key, :start) && @benchmarks.dig(key, :finish)
 
-        colors = %w[bgred bggreen bgyellow bgblue bgmagenta bgcyan bgwhite boldbgred boldbggreen boldbgyellow boldbgblue boldbgwhite]
-        idx = 0
-        # @benchmarks.delete(:total)
+      {
+        key: key,
+        duration: (@benchmarks[key][:finish] - @benchmarks[key][:start]).round(4),
+        start_time: @benchmarks[key][:start].round(4),
+        end_time: @benchmarks[key][:finish].round(4)
+      }
+    end
 
-        @benchmarks.sort_by { |_, timers| [timers[:start], timers[:finish]] }.each do |k, timers|
-          if timers[:finish] && timers[:start]
-            color = colors[idx % colors.count]
-            fg = if idx < 7
-                   Color.boldblack
-                 else
-                   Color.boldwhite
-                 end
-            color = Color.send(color) + fg
+    # Get all benchmark statistics sorted by duration
+    def all_benchmark_stats
+      return [] unless @benchmarks
 
-            start = ((timers[:start] - beginning) * factor).floor
-            finish = ((timers[:finish] - beginning) * factor).ceil
+      @benchmarks.map do |key, timers|
+        next unless timers[:start] && timers[:finish]
 
-            cols.fill("#{color}-", start..finish)
-            cols[start] = "#{color}|"
-            cols[finish] = "#{color}|"
-            output << "#{color}#{k}#{Color.default}: #{timers[:finish] - timers[:start]}"
-          else
-            output << "#{k}: error"
-          end
+        {
+          key: key,
+          duration: (timers[:finish] - timers[:start]).round(4),
+          start_time: timers[:start].round(4),
+          end_time: timers[:finish].round(4)
+        }
+      end.compact.sort_by { |stats| -stats[:duration] }
+    end
 
-          idx += 1
-        end
+    # Generate a compact benchmark summary
+    def benchmark_summary
+      return unless ENV['DOING_BENCHMARK'] && @benchmarks
 
-        output.each do |msg|
-          $stdout.puts color_message(:debug, 'Benchmark:', msg)
-        end
+      stats = all_benchmark_stats
+      return if stats.empty?
 
-        $stdout.puts color_message(:debug, 'Benchmark:', "Total: #{total}")
+      total_duration = stats.find { |s| s[:key] == :total }&.dig(:duration) || 0
+      return if total_duration <= 0
 
-        $stdout.puts cols[0..TTY::Screen.columns-1].join + Color.reset
+      output = []
+      output << "Benchmark Summary (Total: #{total_duration.round(4)}s):"
+      stats.reject { |s| s[:key] == :total }.each do |stat|
+        percentage = (stat[:duration] / total_duration * 100).round(1)
+        output << "  #{stat[:key]}: #{stat[:duration]}s (#{percentage}%)"
       end
+
+      output.join("\n")
+    end
+
+    def log_benchmarks
+      return unless ENV['DOING_BENCHMARK'] && @benchmarks
+
+      # Cache screen width to avoid repeated calls
+      screen_width = TTY::Screen.columns
+      return if screen_width <= 0
+
+      beginning = @benchmarks[:total]&.dig(:start)
+      ending = @benchmarks[:total]&.dig(:finish)
+      return unless beginning && ending
+
+      total = ending - beginning
+      return if total <= 0
+
+      factor = screen_width.to_f / total
+      cols = Array.new(screen_width, ' ')
+      output = []
+
+      # Pre-allocate colors array to avoid repeated allocation
+      colors = %w[bgred bggreen bgyellow bgblue bgmagenta bgcyan bgwhite
+                  boldbgred boldbggreen boldbgyellow boldbgblue boldbgwhite]
+      color_count = colors.size
+
+      # Sort benchmarks once and cache the result
+      sorted_benchmarks = @benchmarks.reject { |k, _| k == :total }
+                                     .select { |_, timers| timers[:finish] && timers[:start] }
+                                     .sort_by { |_, timers| timers[:start] }
+
+      sorted_benchmarks.each_with_index do |(key, timers), idx|
+        color_name = colors[idx % color_count]
+        fg_color = idx < 7 ? Color.boldblack : Color.boldwhite
+        color = Color.send(color_name) + fg_color
+
+        start_pos = ((timers[:start] - beginning) * factor).floor
+        finish_pos = ((timers[:finish] - beginning) * factor).ceil
+
+        # Ensure positions are within bounds
+        start_pos = [start_pos, 0].max
+        finish_pos = [finish_pos, screen_width - 1].min
+
+        if start_pos < finish_pos
+          cols.fill("#{color}-", start_pos..finish_pos)
+          cols[start_pos] = "#{color}|"
+          cols[finish_pos] = "#{color}|"
+        end
+
+        duration = (timers[:finish] - timers[:start]).round(4)
+        output << "#{color}#{key}#{Color.default}: #{duration}"
+      end
+
+      # Output all messages at once to reduce I/O overhead
+      output.each { |msg| $stdout.puts color_message(:debug, 'Benchmark:', msg) }
+      $stdout.puts color_message(:debug, 'Benchmark:', "Total: #{total.round(4)}")
+      $stdout.puts cols.join + Color.reset
     end
 
     def log_change(tags_added: [], tags_removed: [], count: 1, item: nil, single: false)
@@ -467,9 +535,9 @@ module Doing
 
       message.sub!(/^(\s*\S.*?): (.*?)$/) do
         m = Regexp.last_match
-        msg = m[2] =~ /(\e\[[\d;]+m)/ ? msg : "#{message_fg}#{m[2]}"
+        msg_content = m[2] =~ /(\e\[[\d;]+m)/ ? m[2] : "#{message_fg}#{m[2]}"
 
-        "#{topic_fg}#{m[1]}#{colors.reset}: #{message_fg}#{m[2]}"
+        "#{topic_fg}#{m[1]}#{colors.reset}: #{msg_content}"
       end
 
       "#{prefix} #{message.highlight_tags}#{colors.reset}"

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'zlib'
 
 module Doing
@@ -17,7 +18,7 @@ module Doing
         backups = get_backups(filename)
         return unless backups.count > limit
 
-        backups[limit..-1].each do |file|
+        backups[limit..].each do |file|
           FileUtils.rm(File.join(backup_dir, file))
         end
 
@@ -45,18 +46,18 @@ module Doing
       ##                       different from default
       ##
       def restore_last_backup(filename = nil, count: 1)
-        Doing.logger.benchmark(:restore_backup, :start)
-        filename ||= Doing.setting('doing_file')
+        Doing.logger.measure(:restore_backup) do
+          filename ||= Doing.setting('doing_file')
 
-        backup_file = last_backup(filename, count: count)
-        raise HistoryLimitError, 'End of undo history' if backup_file.nil?
+          backup_file = last_backup(filename, count: count)
+          raise HistoryLimitError, 'End of undo history' if backup_file.nil?
 
-        save_undone(filename)
-        move_backup(backup_file, filename)
+          save_undone(filename)
+          move_backup(backup_file, filename)
 
-        prune_backups_after(File.basename(backup_file))
-        Doing.logger.warn('File update:', "restored from #{backup_file}")
-        Doing.logger.benchmark(:restore_backup, :finish)
+          prune_backups_after(File.basename(backup_file))
+          Doing.logger.warn('File update:', "restored from #{backup_file}")
+        end
       end
 
       ##
@@ -138,13 +139,15 @@ module Doing
         options = get_backups(filename).each_with_object([]) do |file, arr|
           d, _base = date_of_backup(file)
           next if d.nil?
+
           arr.push("#{d.time_ago}\t#{File.join(backup_dir, file)}")
         end
 
         raise MissingBackupFile, 'No backup files to load' if options.empty?
 
         backup_file = show_menu(options, filename)
-        Util.write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename), backup: false)
+        Util.write_to_file(File.join(backup_dir, "undone___#{File.basename(filename)}"), IO.read(filename),
+                           backup: false)
         move_backup(backup_file, filename)
         prune_backups_after(File.basename(backup_file))
         Doing.logger.warn('File update:', "restored from #{backup_file}")
@@ -157,25 +160,25 @@ module Doing
       ## @param      filename  [String] The filename
       ##
       def write_backup(filename = nil)
-        Doing.logger.benchmark(:_write_backup, :start)
-        filename ||= Doing.setting('doing_file')
+        Doing.logger.measure(:_write_backup) do
+          filename ||= Doing.setting('doing_file')
 
-        unless File.exist?(filename)
-          Doing.logger.debug('Backup:', "original file doesn't exist (#{filename})")
-          return
+          unless File.exist?(filename)
+            Doing.logger.debug('Backup:', "original file doesn't exist (#{filename})")
+            return
+          end
+
+          backup_file = File.join(backup_dir, "#{timestamp_filename}___#{File.basename(filename)}")
+          # compressed = Zlib::Deflate.deflate(content)
+          # Zlib::GzipWriter.open(backup_file + '.gz') do |gz|
+          #   gz.write(IO.read(filename))
+          # end
+
+          FileUtils.cp(filename, backup_file)
+
+          prune_backups(filename, Doing.setting('history_size').to_i)
+          clear_undone(filename)
         end
-
-        backup_file = File.join(backup_dir, "#{timestamp_filename}___#{File.basename(filename)}")
-        # compressed = Zlib::Deflate.deflate(content)
-        # Zlib::GzipWriter.open(backup_file + '.gz') do |gz|
-        #   gz.write(IO.read(filename))
-        # end
-
-        FileUtils.cp(filename, backup_file)
-
-        prune_backups(filename, Doing.setting('history_size').to_i)
-        clear_undone(filename)
-        Doing.logger.benchmark(:_write_backup, :finish)
       end
 
       private

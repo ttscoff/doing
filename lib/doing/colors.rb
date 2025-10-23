@@ -110,7 +110,9 @@ module Doing
         compiled = ''
         normalize_color.split('').each do |char|
           compiled += char
-          valid_color = compiled if Color.attributes.include?(compiled.to_sym) || compiled =~ /^([fb]g?)?#([a-f0-9]{6})$/i
+          if Color.attributes.include?(compiled.to_sym) || compiled =~ /^([fb]g?)?#([a-f0-9]{6})$/i
+            valid_color = compiled
+          end
         end
 
         valid_color
@@ -182,13 +184,43 @@ module Doing
         escape += "\e[#{rgbf}m" if rgbf
         escape + "\e[#{[fg, bg].delete_if(&:nil?).join(';')}m"
       end
+
+      # Define string extension methods for all color attributes
+      ATTRIBUTES.each do |c, v|
+        new_method = <<-EOSCRIPT
+          def #{c}
+            result = ''
+            result << "\e[#{v}m" if Doing::Color.coloring?
+            result << self
+            result << "\e[0m" if Doing::Color.coloring?
+            result
+          end
+        EOSCRIPT
+
+        class_eval(new_method)
+
+        next unless c =~ /bold/
+
+        # Accept brightwhite in addition to boldwhite
+        new_method = <<-EOSCRIPT
+          def #{c.to_s.sub(/bold/, 'bright')}
+            result = ''
+            result << "\e[#{v}m" if Doing::Color.coloring?
+            result << self
+            result << "\e[0m" if Doing::Color.coloring?
+            result
+          end
+        EOSCRIPT
+
+        class_eval(new_method)
+      end
     end
 
     class << self
       # Returns true if the coloring function of this module
       # is switched on, false otherwise.
       def coloring?
-        @coloring
+        @coloring ||= true
       end
 
       attr_writer :coloring
@@ -236,51 +268,56 @@ module Doing
 
         fmt.empty? ? input : format(fmt, colors)
       end
-    end
 
-    ATTRIBUTES.each do |c, v|
-      new_method = <<-EOSCRIPT
-        def #{c}(string = nil)
-          result = ''
-          result << "\e[#{v}m" if Doing::Color.coloring?
-          if block_given?
-            result << yield
-          elsif string.respond_to?(:to_str)
-            result << string.to_str
-          elsif respond_to?(:to_str)
-            result << to_str
-          else
-            return result #only switch on
+      ATTRIBUTES.each do |c, v|
+        new_method = <<-EOSCRIPT
+          def #{c}(string = nil)
+            result = ''
+            result << "\e[#{v}m" if Doing::Color.coloring?
+            if block_given?
+              result << yield
+            elsif string.respond_to?(:to_str)
+              result << string.to_str
+            elsif respond_to?(:to_str)
+              result << to_str
+            else
+              return result #only switch on
+            end
+            result << "\e[0m" if Doing::Color.coloring?
+            result
           end
-          result << "\e[0m" if Doing::Color.coloring?
-          result
-        end
-      EOSCRIPT
+        EOSCRIPT
 
-      module_eval(new_method)
+        module_eval(new_method)
 
-      next unless c =~ /bold/
+        next unless c =~ /bold/
 
-      # Accept brightwhite in addition to boldwhite
-      new_method = <<-EOSCRIPT
-        def #{c.to_s.sub(/bold/, 'bright')}(string = nil)
-          result = ''
-          result << "\e[#{v}m" if Doing::Color.coloring?
-          if block_given?
-            result << yield
-          elsif string.respond_to?(:to_str)
-            result << string.to_str
-          elsif respond_to?(:to_str)
-            result << to_str
-          else
-            return result #only switch on
+        # Accept brightwhite in addition to boldwhite
+        new_method = <<-EOSCRIPT
+          def #{c.to_s.sub(/bold/, 'bright')}(string = nil)
+            result = ''
+            result << "\e[#{v}m" if Doing::Color.coloring?
+            if block_given?
+              result << yield
+            elsif string.respond_to?(:to_str)
+              result << string.to_str
+            elsif respond_to?(:to_str)
+              result << to_str
+            else
+              return result #only switch on
+            end
+            result << "\e[0m" if Doing::Color.coloring?
+            result
           end
-          result << "\e[0m" if Doing::Color.coloring?
-          result
-        end
-      EOSCRIPT
+        EOSCRIPT
 
-      module_eval(new_method)
+        module_eval(new_method)
+      end
+
+      # Returns an array of all Doing::Color attributes as symbols.
+      def attributes
+        ATTRIBUTE_NAMES
+      end
     end
 
     def rgb(hex)
@@ -292,7 +329,6 @@ module Doing
       %w[r g b].each do |e|
         t << parts[e].hex
       end
-      color =
       "\e[#{is_bg ? '48' : '38'};2;#{t.join(';')}m"
     end
 
@@ -309,11 +345,5 @@ module Doing
         ''
       end
     end
-
-    # Returns an array of all Doing::Color attributes as symbols.
-    def attributes
-      ATTRIBUTE_NAMES
-    end
-    extend self
   end
 end

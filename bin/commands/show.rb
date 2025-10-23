@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @@show
 desc 'List all entries'
 long_desc %(
@@ -15,14 +17,16 @@ command :show do |c|
   c.example 'doing show Later @doing', desc: 'Show entries from the Later section tagged @doing'
   c.example 'doing show @oracle @writing --bool and', desc: 'Show entries tagged both @oracle and @writing'
   c.example 'doing show Currently @devo --bool not', desc: 'Show entries in Currently NOT tagged @devo'
-  c.example 'doing show Ideas @doing --from "mon to fri"', desc: 'Show entries tagged @doing from the Ideas section added between monday and friday of the current week.'
-  c.example 'doing show --interactive Later @doing', desc: 'Create a menu from entries from the Later section tagged @doing to perform batch actions'
+  c.example 'doing show Ideas @doing --from "mon to fri"',
+            desc: 'Show entries tagged @doing from the Ideas section added between monday and friday of the current week.'
+  c.example 'doing show --interactive Later @doing',
+            desc: 'Create a menu from entries from the Later section tagged @doing to perform batch actions'
 
   c.desc 'Max count to show'
   c.arg_name 'MAX'
   c.flag %i[c count], default_value: 0, must_match: /^\d+$/, type: Integer
 
-  c.desc "Highlight search matches in output. Only affects command line output"
+  c.desc 'Highlight search matches in output. Only affects command line output'
   c.switch %i[h hilite], default_value: Doing.settings.dig('search', 'highlight')
 
   c.desc "Edit matching entries with #{Doing::Util.default_editor}"
@@ -111,11 +115,11 @@ command :show do |c|
     options[:times] = true if options[:totals]
 
     template = Doing.setting(['templates', options[:config_template]]).deep_merge({
-                              'wrap_width' => Doing.setting('wrap_width') || 0,
-                              'date_format' => Doing.setting('default_date_format'),
-                              'order' => Doing.setting('order')&.normalize_order || :asc,
-                              'tags_color' => Doing.setting('tags_color')
-                            })
+                                                                                    'wrap_width' => Doing.setting('wrap_width') || 0,
+                                                                                    'date_format' => Doing.setting('default_date_format'),
+                                                                                    'order' => Doing.setting('order')&.normalize_order || :asc,
+                                                                                    'tags_color' => Doing.setting('tags_color')
+                                                                                  })
 
     if options[:search]
       search = options[:search]
@@ -138,19 +142,19 @@ command :show do |c|
     items = @wwid.filter_items([], opt: options)
 
     if options[:menu]
-      Doing.logger.benchmark(:menu, :start)
-      tag = @wwid.choose_tag(section, items: items, include_all: true)
-      raise UserCancelled unless tag
+      Doing.logger.measure(:menu) do
+        tag = @wwid.choose_tag(section, items: items, include_all: true)
+        raise UserCancelled unless tag
 
-      tags = tag.split(/ +/).map { |t| t.strip.sub(/^@?/, '') } if tag =~ /^@/
-      if tags.good?
-        tag_filter = {
-          'tags' => tags,
-          'bool' => options[:bool]
-        }
-        options[:tag_filter] = tag_filter
+        tags = tag.split(/ +/).map { |t| t.strip.sub(/^@?/, '') } if tag =~ /^@/
+        if tags.good?
+          tag_filter = {
+            'tags' => tags,
+            'bool' => options[:bool]
+          }
+          options[:tag_filter] = tag_filter
+        end
       end
-      Doing.logger.benchmark(:menu, :finish)
     end
 
     options[:age] ||= :newest

@@ -55,9 +55,9 @@ end
 
 Doing.logger.benchmark(:total, :start)
 
-Doing.logger.benchmark(:configure, :start)
-Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true }) if ENV['DOING_CONFIG']
-Doing.logger.benchmark(:configure, :finish)
+Doing.logger.measure(:configure) do
+  Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true }) if ENV['DOING_CONFIG']
+end
 
 Doing.set('backup_dir', ENV['DOING_BACKUP_DIR']) if ENV['DOING_BACKUP_DIR']
 
@@ -89,10 +89,7 @@ accept TagSortSymbol do |value|
 end
 
 accept ExportTemplate do |value|
-  if value !~ Doing::Plugins.plugin_regex(type: :export)
-    raise Doing::Errors::InvalidPlugin.new('output', value)
-
-  end
+  raise Doing::Errors::InvalidPlugin.new('output', value) if value !~ Doing::Plugins.plugin_regex(type: :export)
 
   tpl = nil
 
@@ -258,11 +255,10 @@ end
 on_error do |exception|
   case exception
   when GLI::UnknownCommand
+    exit run(['view'].concat(ARGV.unshift(@command))) if @wwid.get_view(@command, fallback: false)
     if ARGV.count > 1
-      exit run(['view'].concat(ARGV.unshift(@command))) if @wwid.get_view(@command, fallback: false)
       exit run(['now'].concat(ARGV.unshift(@command)))
     else
-      exit run(['view'].concat(ARGV.unshift(@command))) if @wwid.get_view(@command, fallback: false)
 
       Doing::Color.coloring = $stdout.isatty
       Doing.logger.error('Unknown Command:', @command)
@@ -287,62 +283,63 @@ post do |_global, _command, _options, _args|
 end
 
 around do |global, command, _options, _arguments, code|
-  Doing.logger.benchmark("command_#{command.name}".to_sym, :start)
-  # pager_msg = "Global: #{global[:pager]}, Config: #{Doing.setting('paginate')}, Pager: #{Doing::Pager.paginate}"
-  # Doing.logger.debug('Pager:', pager_msg)
-  Doing.logger.adjust_verbosity(global) if env_log_level.nil?
+  Doing.logger.measure("command_#{command.name}".to_sym) do
+    # pager_msg = "Global: #{global[:pager]}, Config: #{Doing.setting('paginate')}, Pager: #{Doing::Pager.paginate}"
+    # Doing.logger.debug('Pager:', pager_msg)
+    Doing.logger.adjust_verbosity(global) if env_log_level.nil?
 
-  global[:stdin] = $stdin.read.strip if $stdin.stat.size.positive? || $stdin.fcntl(Fcntl::F_GETFL, 0).zero?
-  global[:stdin] = nil unless global[:stdin].good?
+    global[:stdin] = $stdin.read.strip if $stdin.stat.size.positive? || $stdin.fcntl(Fcntl::F_GETFL, 0).zero?
+    global[:stdin] = nil unless global[:stdin].good?
 
-  Doing.logger.logdev = $stdout if global[:stdout]
+    Doing.logger.logdev = $stdout if global[:stdout]
 
-  if global[:yes]
-    Doing::Prompt.force_answer = :yes
-    Doing.config.force_answer = true
-  elsif global[:no]
-    Doing::Prompt.force_answer = :no
-    Doing.config.force_answer = false
-  else
-    Doing::Prompt.default_answer = if $stdout.isatty
-                                     global[:default]
-                                   else
-                                     true
-                                   end
+    if global[:yes]
+      Doing::Prompt.force_answer = :yes
+      Doing.config.force_answer = true
+    elsif global[:no]
+      Doing::Prompt.force_answer = :no
+      Doing.config.force_answer = false
+    else
+      Doing::Prompt.default_answer = if $stdout.isatty
+                                       global[:default]
+                                     else
+                                       true
+                                     end
 
-    Doing.config.force_answer = global[:default] ? true : false
+      Doing.config.force_answer = global[:default] ? true : false
+    end
+
+    if global[:config_file] && global[:config_file] != Doing.config.config_file
+      msg = Doing::Color.template(['{Rwb}WARNING:{x} {br}The use of --config_file is deprecated,',
+                                   'please set the environment variable DOING_CONFIG instead.{x}'])
+      Doing.logger.warn(msg)
+      msg = Doing::Color.template(['{r}To set it just for the current command, use:',
+                                   '{bw}DOING_CONFIG=/path/to/doingrc doing [command]{x}'])
+      Doing.logger.warn(msg)
+
+      cf = File.expand_path(global[:config_file])
+      raise MissingConfigFile, "Config file not found (#{global[:config_file]})" unless File.exist?(cf)
+
+      Doing.config.config_file = cf
+      Doing.config_with(cf, { ignore_local: true })
+    end
+
+    Doing.logger.measure(:init) do
+      if global[:doing_file]
+        @wwid.init_doing_file(global[:doing_file])
+      else
+        @wwid.init_doing_file
+      end
+    end
+
+    Doing.auto_tag = !global[:noauto]
+
+    Doing.set('include_notes', false) unless global[:notes]
+
+    global[:wwid] = @wwid
+
+    code.call
   end
-
-  if global[:config_file] && global[:config_file] != Doing.config.config_file
-    msg = Doing::Color.template(['{Rwb}WARNING:{x} {br}The use of --config_file is deprecated,',
-                                 'please set the environment variable DOING_CONFIG instead.{x}'])
-    Doing.logger.warn(msg)
-    msg = Doing::Color.template(['{r}To set it just for the current command, use:',
-                                 '{bw}DOING_CONFIG=/path/to/doingrc doing [command]{x}'])
-    Doing.logger.warn(msg)
-
-    cf = File.expand_path(global[:config_file])
-    raise MissingConfigFile, "Config file not found (#{global[:config_file]})" unless File.exist?(cf)
-
-    Doing.config.config_file = cf
-    Doing.config_with(cf, { ignore_local: true })
-  end
-  Doing.logger.benchmark(:init, :start)
-  if global[:doing_file]
-    @wwid.init_doing_file(global[:doing_file])
-  else
-    @wwid.init_doing_file
-  end
-  Doing.logger.benchmark(:init, :finish)
-  Doing.auto_tag = !global[:noauto]
-
-  Doing.set('include_notes', false) unless global[:notes]
-
-  global[:wwid] = @wwid
-
-  code.call
-
-  Doing.logger.benchmark("command_#{command.name}".to_sym, :finish)
 end
 
 commands_from File.expand_path(Doing.setting('plugins.command_path')) if Doing.setting('plugins.command_path')

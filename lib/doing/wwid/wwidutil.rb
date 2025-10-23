@@ -32,7 +32,7 @@ module Doing
     ##
     def import(paths, opt)
       opt ||= {}
-      Plugins.plugins[:import].each do |_, options|
+      Plugins.plugins[:import].each_value do |options|
         next unless opt[:type] =~ /^(#{options[:trigger].normalize_trigger})$/i
 
         if paths.count.positive?
@@ -54,17 +54,15 @@ module Doing
     ##                       alternative config file
     ##
     def configure(filename = nil)
-      logger.benchmark(:configure, :start)
+      logger.measure(:configure) do
+        if filename
+          Doing.config_with(filename, { ignore_local: true })
+        elsif ENV['DOING_CONFIG']
+          Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
+        end
 
-      if filename
-        Doing.config_with(filename, { ignore_local: true })
-      elsif ENV['DOING_CONFIG']
-        Doing.config_with(ENV['DOING_CONFIG'], { ignore_local: true })
+        Doing.set('backup_dir', ENV['DOING_BACKUP_DIR']) if ENV['DOING_BACKUP_DIR']
       end
-
-      logger.benchmark(:configure, :finish)
-
-      Doing.set('backup_dir', ENV['DOING_BACKUP_DIR']) if ENV['DOING_BACKUP_DIR']
     end
 
     ##
