@@ -8,11 +8,12 @@ module Doing
     attr_reader :original
 
     include Color
-    def initialize(string, placeholders: {}, force_color: false, wrap_width: 0, color: '', tags_color: '', reset: '')
+    def initialize(string, placeholders: {}, force_color: false, disable_color: false, wrap_width: 0, color: '', tags_color: '', reset: '')
       Color.coloring = true if force_color
+      Color.coloring = false if disable_color
       @colors = nil
       @original = string
-      super(Color.reset + string)
+      super(Doing::Color.coloring? ? Color.reset + string : string)
 
       placeholders.each { |k, v| fill(k, v, wrap_width: wrap_width, color: color, tags_color: tags_color) }
     end

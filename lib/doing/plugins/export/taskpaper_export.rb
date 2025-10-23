@@ -24,6 +24,7 @@ module Doing
       options[:tags_color] = false
       options[:output] = 'template'
       options[:template] = '- %title @date(%date)%note'
+      options[:disable_color] = true
 
       Doing.logger.debug('TaskPaper Export:', "#{items.count} items output to TaskPaper format")
       @out = wwid.list_section(options)

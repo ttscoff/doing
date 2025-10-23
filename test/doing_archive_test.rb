@@ -33,7 +33,7 @@ class DoingArchiveTest < Test::Unit::TestCase
   end
 
   def test_archive
-    entries = doing('show').scan(ENTRY_REGEX).count
+    entries = doing('show').uncolor.strip.scan(ENTRY_REGEX).count
     result = doing('--stdout', 'archive')
     assert_match(/Archived: #{entries} items from #{@config['current_section']} to Archive/, result,
                  "Should have archived #{entries} items")
@@ -41,7 +41,7 @@ class DoingArchiveTest < Test::Unit::TestCase
   end
 
   def test_archive_tag
-    entries = doing('show').scan(ENTRY_REGEX).count
+    entries = doing('show').uncolor.strip.scan(ENTRY_REGEX).count
     result = doing('--stdout', 'archive', '--tag', 'podcasting')
     assert_match(/Archived: 2 items/, result, 'Should have archived 2 items')
     result = doing('--stdout', 'archive', '--tag', 'writing,bunch', '--bool', 'or')
@@ -52,7 +52,7 @@ class DoingArchiveTest < Test::Unit::TestCase
   end
 
   def test_archive_search
-    entries = doing('show').scan(ENTRY_REGEX).count
+    entries = doing('show').uncolor.strip.scan(ENTRY_REGEX).count
 
     result = doing('--stdout', 'archive', '--search', 'Overtired 446')
     assert_match(/New section: "Archive"/, result, 'Archive section should have been added')
@@ -87,7 +87,7 @@ class DoingArchiveTest < Test::Unit::TestCase
   end
 
   def test_archive_destination
-    entries = doing('show').scan(ENTRY_REGEX).count
+    entries = doing('show').uncolor.strip.scan(ENTRY_REGEX).count
     doing('add_section', 'Testing')
     result = doing('--stdout', 'archive', '-t', 'Testing')
     assert_match(/Moved: #{entries} items from #{@config['current_section']} to Testing/, result,

@@ -36,12 +36,12 @@ module Doing
           prompt = Color.template("{bw}Did you mean `{xy}doing {by}view {xy}#{alt}`{bw}?{x}")
           meant_view = Prompt.yn(prompt, default_response: 'n')
 
-          msg = format('%<y>srun with `%<w>sdoing view %<alt>s%<y>s`', w: boldwhite, y: yellow, alt: alt)
+          msg = format('%<y>srun with `%<w>sdoing view %<alt>s%<y>s`', w: Color.boldwhite, y: Color.yellow, alt: alt)
           raise Errors::WrongCommand.new(msg, topic: 'Try again:') if meant_view
 
         end
 
-        res = Prompt.yn("#{boldwhite}Section #{frag.yellow}#{boldwhite} not found, create it", default_response: 'n')
+        res = Prompt.yn("#{Color.boldwhite}Section #{Color.yellow(frag)}#{Color.boldwhite} not found, create it", default_response: 'n')
 
         if res
           @content.add_section(frag.cap_first, log: true)
@@ -80,7 +80,7 @@ module Doing
         meant_view = Prompt.yn(prompt, default_response: 'n')
 
         if meant_view
-          msg = format('%<y>srun with `%<w>sdoing show %<alt>s%<y>s`', w: boldwhite, y: yellow, alt: alt)
+          msg = format('%<y>srun with `%<w>sdoing show %<alt>s%<y>s`', w: Color.boldwhite, y: Color.yellow, alt: alt)
           raise Errors::WrongCommand.new(msg, topic: 'Try again:')
 
         end

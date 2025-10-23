@@ -202,9 +202,9 @@ module Doing
       if opt[:tags].empty? && !opt[:autotag]
         completions = opt[:remove] ? all_tags(items) : all_tags(@content)
         if opt[:remove]
-          puts "#{yellow}Available tags: #{boldwhite}#{completions.map(&:add_at).join(', ')}"
+          puts "#{Color.yellow}Available tags: #{Color.boldwhite}#{completions.map(&:add_at).join(', ')}"
         else
-          puts "#{yellow}Use tab to complete known tags"
+          puts "#{Color.yellow}Use tab to complete known tags"
         end
         opt[:tags] = Doing::Prompt.read_line(prompt: "Enter tag(s) to #{opt[:remove] ? 'remove' : 'add'}",
                                              completions: completions,
@@ -268,7 +268,7 @@ module Doing
               if max_elapsed.positive? && (elapsed > max_elapsed) && !opt[:took]
                 puts boldwhite(item.title)
                 human = elapsed.time_string(format: :natural)
-                res = Prompt.yn(yellow("Did this actually take #{human}"), default_response: true)
+                res = Prompt.yn(Color.yellow("Did this actually take #{human}"), default_response: true)
                 unless res
                   new_elapsed = Prompt.enter_text('How long did it take?').chronify_qty
                   raise InvalidTimeExpression, 'Unrecognized time span entry' unless new_elapsed.positive?

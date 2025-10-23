@@ -112,7 +112,8 @@ module Doing
                                              placeholders: placeholders,
                                              reset: reset,
                                              tags_color: opt[:tags_color],
-                                             wrap_width: opt[:wrap_width]).colored
+                                             wrap_width: opt[:wrap_width],
+                                             disable_color: opt[:disable_color]).colored
 
           output.gsub!(/(?<!\\)%(\S)?hr(_under)?/) do
             o = ''

@@ -4,7 +4,7 @@
 module Doing
   # Terminal output color functions.
   module Color
-    ESCAPE_REGEX = /(?<=\[)(?:(?:(?:[349]|10)[0-9]|[0-9])?;?)+(?=m)/.freeze
+    ESCAPE_REGEX = /\e\[[0-9;]*m/.freeze
     # All available color names. Available as methods and string extensions.
     #
     # @example Use a color as a method. Color reset will be added to end of string.
@@ -214,13 +214,19 @@ module Doing
 
         class_eval(new_method)
       end
+
+      # Returns an uncolored version of the string, that is all
+      # ANSI-sequences are stripped from the string.
+      def uncolor
+        gsub(ESCAPE_REGEX, '')
+      end
     end
 
     class << self
       # Returns true if the coloring function of this module
       # is switched on, false otherwise.
       def coloring?
-        @coloring ||= true
+        @coloring.nil? ? true : @coloring
       end
 
       attr_writer :coloring
@@ -317,6 +323,12 @@ module Doing
       # Returns an array of all Doing::Color attributes as symbols.
       def attributes
         ATTRIBUTE_NAMES
+      end
+
+      # Returns an uncolored version of the string, that is all
+      # ANSI-sequences are stripped from the string.
+      def uncolor(string)
+        string.to_str.gsub(ESCAPE_REGEX, '')
       end
     end
 

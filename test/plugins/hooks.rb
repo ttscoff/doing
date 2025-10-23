@@ -7,7 +7,7 @@ end
 Doing::Hooks.register :post_read do |wwid|
   if ENV['HOOK_TEST']
     total = 0
-    wwid.content.each_value { |v| total += v.items.count }
+    wwid.content.sections.each { |section| total += wwid.content.in_section(section.title).count }
     puts "Post read hook! Read #{total} items."
   end
 end

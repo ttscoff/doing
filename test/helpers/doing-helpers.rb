@@ -40,7 +40,7 @@ module DoingHelpers
   end
 
   def get_start_date(string)
-    date_str = string.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}) *\|/)
+    date_str = string.uncolor.strip.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}) *\|/)
 
     return false unless date_str
 

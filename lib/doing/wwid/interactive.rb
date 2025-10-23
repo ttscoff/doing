@@ -118,7 +118,7 @@ module Doing
             tags = type == 'add' ? all_tags(@content) : all_tags(items)
 
             add_msg = type == 'add' ? ', include values with tag(value)' : ''
-            puts "#{yellow}Separate multiple tags with spaces, hit tab to complete known tags#{add_msg}"
+            puts "#{Color.yellow}Separate multiple tags with spaces, hit tab to complete known tags#{add_msg}"
             puts "#{boldgreen}Available tags: #{boldwhite}#{tags.sort.map(&:add_at).join(', ')}" if type == 'remove'
             tag = Prompt.read_line(prompt: "Tags to #{type}", completions: tags)
 
@@ -367,7 +367,7 @@ module Doing
       if max_elapsed.positive? && (elapsed > max_elapsed)
         puts boldwhite(title) if title
         human = elapsed.time_string(format: :natural)
-        res = Prompt.yn(yellow("Did this entry actually take #{human}"), default_response: true)
+        res = Prompt.yn(Color.yellow("Did this entry actually take #{human}"), default_response: true)
         unless res
           new_elapsed = Prompt.enter_text('How long did it take?').chronify_qty
           raise InvalidTimeExpression, 'Unrecognized time span entry' unless new_elapsed.positive?

@@ -36,9 +36,9 @@ module Doing
       end
       system 'stty cbreak'
 
-      cw = white
-      cbw = boldwhite
-      cbg = boldgreen
+      cw = Color.white
+      cbw = Color.boldwhite
+      cbg = Color.boldgreen
       cd = Color.default
 
       options = if default.nil?
