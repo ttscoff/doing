@@ -60,7 +60,7 @@ command :tags do |c|
     elsif options[:line]
       puts tags.map { |t, _c| t }.to_tags.join(' ')
     else
-      tags.each_key { |t| puts t }
+      tags.each { |t, _| puts t }
     end
   end
 end

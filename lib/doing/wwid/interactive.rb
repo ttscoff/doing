@@ -365,7 +365,7 @@ module Doing
       elapsed = finish_date - date
 
       if max_elapsed.positive? && (elapsed > max_elapsed)
-        puts boldwhite(title) if title
+        puts Color.boldwhite(title) if title
         human = elapsed.time_string(format: :natural)
         res = Prompt.yn(Color.yellow("Did this entry actually take #{human}"), default_response: true)
         unless res

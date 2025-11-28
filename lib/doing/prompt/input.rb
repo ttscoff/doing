@@ -20,7 +20,7 @@ module Doing
       $stdin.reopen('/dev/tty')
       return default_response if @default_answer
 
-      print "#{yellow(prompt).sub(/:?$/, ':')} #{reset}"
+      print "#{Color.yellow(prompt).sub(/:?$/, ':')} #{Color.reset}"
       $stdin.gets.strip
     end
 
@@ -50,7 +50,7 @@ module Doing
       end
 
       begin
-        Readline.readline("#{yellow(prompt).sub(/:?$/, ':')} #{reset}", true).strip
+        Readline.readline("#{Color.yellow(prompt).sub(/:?$/, ':')} #{Color.reset}", true).strip
       rescue Interrupt
         raise UserCancelled
       end
@@ -82,8 +82,8 @@ module Doing
                    '(%<keycolor>sreturn twice%<textcolor>s)',
                    'to end editing and save,',
                    '%<keycolor>sCTRL-C%<textcolor>s to cancel%<reset>s'].join(' '),
-                  { promptcolor: boldgreen, prompt: prompt.sub(/:?$/, ':'),
-                    textcolor: yellow, keycolor: boldwhite, reset: reset })
+                  { promptcolor: Color.boldgreen, prompt: prompt.sub(/:?$/, ':'),
+                    textcolor: Color.yellow, keycolor: Color.boldwhite, reset: Color.reset })
 
       res = []
 
@@ -116,10 +116,10 @@ module Doing
 
       ask_note = []
       reader = TTY::Reader.new(interrupt: -> { raise Errors::UserCancelled }, track_history: false)
-      puts "#{boldgreen(prompt.sub(/:?$/,
-                                   ':'))} #{yellow('Hit return for a new line, ')}#{boldwhite('enter a blank line (')}#{boldyellow('return twice')}#{boldwhite(') to end editing')}"
+      puts "#{Color.boldgreen(prompt.sub(/:?$/,
+                                         ':'))} #{Color.yellow('Hit return for a new line, ')}#{Color.boldwhite('enter a blank line (')}#{Color.boldyellow('return twice')}#{Color.boldwhite(') to end editing')}"
       loop do
-        res = reader.read_line(green('> '))
+        res = reader.read_line(Color.green('> '))
         break if res.strip.empty?
 
         ask_note.push(res)

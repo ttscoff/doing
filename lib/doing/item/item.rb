@@ -105,7 +105,7 @@ module Doing
         when :date
           output << format('%13s |', @date.relative_date).cyan
         when :section
-          output << "#{magenta}(#{white(@section)}#{magenta})"
+          output << "#{Color.magenta}(#{Color.white(@section)}#{Color.magenta})"
         when :title
           output << @title.white.highlight_tags('cyan')
         end

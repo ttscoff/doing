@@ -399,7 +399,7 @@ module Doing
     ##
     def delete_items(items, force: false)
       items.slice(0, 5).each { |i| puts i.to_pretty } unless force
-      puts softpurple("+ #{items.size - 5} additional #{'item'.to_p(items.size - 5)}") if items.size > 5 && !force
+      puts Color.softpurple("+ #{items.size - 5} additional #{'item'.to_p(items.size - 5)}") if items.size > 5 && !force
 
       res = force ? true : Prompt.yn("Delete #{items.size} #{'item'.to_p(items.size)}?", default_response: 'y')
       return unless res

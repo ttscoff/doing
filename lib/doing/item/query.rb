@@ -78,8 +78,8 @@ module Doing
 
       if search.rx? || matching == :fuzzy
         rx = search.to_rx(distance: distance, case_type: case_type)
-        new_title = @title.gsub(rx) { |m| yellow(m) }
-        new_note.add(@note.to_s.gsub(rx) { |m| yellow(m) })
+        new_title = @title.gsub(rx) { |m| Color.yellow(m) }
+        new_note.add(@note.to_s.gsub(rx) { |m| Color.yellow(m) })
       else
         query = search.strip.to_phrase_query
 
@@ -89,8 +89,8 @@ module Doing
         end
         query[:must].concat(query[:should]).each do |s|
           rx = Regexp.new(s.wildcard_to_rx, ignore_case(s, case_type))
-          new_title = @title.gsub(rx) { |m| yellow(m) }
-          new_note.add(@note.to_s.gsub(rx) { |m| yellow(m) })
+          new_title = @title.gsub(rx) { |m| Color.yellow(m) }
+          new_note.add(@note.to_s.gsub(rx) { |m| Color.yellow(m) })
         end
       end
 
