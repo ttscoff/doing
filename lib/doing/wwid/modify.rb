@@ -186,7 +186,8 @@ module Doing
       items = filter_items(Items.new, opt: opt)
 
       if opt[:interactive]
-        items = Prompt.choose_from_items(items, include_section: opt[:section] =~ /^all$/i, menu: true,
+        include_section = Array(opt[:section]).any? { |sec| sec.to_s =~ /^all$/i }
+        items = Prompt.choose_from_items(items, include_section: include_section, menu: true,
                                                 header: '',
                                                 prompt: 'Select entries to tag > ',
                                                 multiple: true,
