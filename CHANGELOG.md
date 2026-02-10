@@ -1,6 +1,11 @@
 ### 2.1.93
 
-2026-02-10 04:09
+2026-02-10 04:10
+
+#### CHANGED
+
+- Allow interactive finish tagging to treat section filters that resolve to multiple values as matching "All" when any selected section name is "all"
+- Fix error when running "doing finish --interactive" that raised "undefined method '=~' for an instance of Array" when section options produced an Array
 
 ### 2.1.91
 
