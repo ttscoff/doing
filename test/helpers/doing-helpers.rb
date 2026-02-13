@@ -8,7 +8,10 @@ require 'doing/string/string'
 require 'doing/errors'
 
 module DoingHelpers
-  DOING_EXEC = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'doing')
+  DOING_BIN = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'doing')
+  GEMFILE = File.join(File.dirname(__FILE__), '..', '..', 'Gemfile')
+  # Use bundle exec so subprocess uses project gems (avoids Temple/Haml version mismatch with system gems)
+  DOING_CMD = File.exist?(GEMFILE) ? ['bundle', 'exec', 'ruby', DOING_BIN] : [DOING_BIN]
   TEST_CONFIG = File.join(File.dirname(__FILE__), '..', 'test.doingrc')
 
   def trunc_minutes(ts)
@@ -16,7 +19,7 @@ module DoingHelpers
   end
 
   def doing_with_env(env, *args, stdin: nil)
-    pread(env, DOING_EXEC, *args, stdin: stdin)
+    pread(env, *DOING_CMD, *args, stdin: stdin)
   end
 
   def pread(env, *cmd, stdin: nil)

@@ -223,7 +223,7 @@ add_commands(%w[now done finish note select tag])
 ## View commands
 add_commands(%w[grep last recent show on view])
 ## Utility commands
-add_commands(%w[config open commands])
+add_commands(%w[config open commands budget])
 ## File handling/batch modification commands
 add_commands(%w[archive import rotate])
 ## History commands

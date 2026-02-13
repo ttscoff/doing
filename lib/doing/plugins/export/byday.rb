@@ -28,6 +28,7 @@ module Doing
 
       totals = {}
       total = 0
+      tag_totals = Hash.new(0)
 
       days.each do |day, day_items|
         day_items.each do |item|
@@ -35,8 +36,40 @@ module Doing
           duration = item.interval || 0
           totals[day] += duration
           total += duration
+
+          item.title.scan(/(?mi)@(\S+?)(\(.*\))?(?=\s|$)/).each do |m|
+            tag = m[0].downcase
+            next if tag == 'done'
+
+            tag_totals[tag] += duration
+          end
         end
       end
+
+      budgets = Doing.setting('budgets', {}) || {}
+      budgets = budgets.transform_keys { |k| k.to_s.downcase }
+      budgets_total = 0
+
+      budget_fmt = lambda do |secs|
+        secs = secs.to_i
+        return '0h' if secs <= 0
+
+        minutes = (secs / 60).to_i
+        hours = (minutes / 60).to_i
+        mins = (minutes % 60).to_i
+        return format('%<h>dh', h: hours) if mins.zero?
+        return format('%<m>dm', m: mins) if hours.zero?
+
+        format('%<h>dh%<m>dm', h: hours, m: mins)
+      end
+
+      budgets.each do |tag, budget_secs|
+        used = tag_totals[tag].to_i
+        remaining = budget_secs.to_i - used
+        remaining = 0 if remaining.negative?
+        budgets_total += remaining
+      end
+
       width = wwid.config['plugins']['byday']['item_width'].to_i || 60
       divider = "{wd}+{xk}#{'-' * 10}{wd}+{xk}#{'-' * width}{wd}+{xk}#{'-' * 8}{wd}+{x}"
       out = []
@@ -54,11 +87,17 @@ module Doing
           out << "{wd}|          |{xbw}#{title}{wd}|{xy}#{interval}{wd}|{x}"
         end
         day_total = "Total: #{totals[day].time_string(format: :clock)}"
+        if budgets_total.positive?
+          day_total += " (total budgets left #{budget_fmt.call(budgets_total)})"
+        end
         out << divider
         out << "{wd}|{xg}#{day_total.rjust(width + 20)}{wd}|{x}"
         out << divider
       end
       all_total = "Grand Total: #{total.time_string(format: :clock)}"
+      if budgets_total.positive?
+        all_total += " (total budgets left #{budget_fmt.call(budgets_total)})"
+      end
       out << "{wd}|{xrb}#{all_total.rjust(width + 20)}{wd}|{x}"
       out << divider
       Doing::Color.template(out.join("\n"))

@@ -41,6 +41,8 @@ module Doing
       'never_finish' => [],
       'date_tags' => ['done', 'defer(?:red)?', 'waiting'],
 
+      'budgets' => {},
+
       'timer_format' => 'text',
       'interval_format' => 'text',
 
@@ -175,8 +177,8 @@ module Doing
 
       return @config_file if @force_answer
 
-      if @additional_configs&.count&.positive? || create
-        choices = [@config_file].concat(@additional_configs)
+      if additional_configs&.count&.positive? || create
+        choices = [@config_file].concat(additional_configs)
         choices.push('Create a new .doingrc in the current directory') if create && !File.exist?('.doingrc')
         res = Doing::Prompt.choose_from(choices.uniq.sort.reverse,
                                         sorted: false,

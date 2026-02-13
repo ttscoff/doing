@@ -16,6 +16,34 @@ module Doing
 
       @timers.delete('meanwhile')
 
+      timers_snapshot = @timers.dup
+
+      budgets = Doing.setting('budgets', {}) || {}
+      budgets = budgets.transform_keys { |k| k.to_s.downcase }
+      remaining_map = {}
+      budgets_total = 0
+
+      budget_fmt = lambda do |secs|
+        secs = secs.to_i
+        return '0h' if secs <= 0
+
+        minutes = (secs / 60).to_i
+        hours = (minutes / 60).to_i
+        mins = (minutes % 60).to_i
+        return format('%dh', hours) if mins.zero?
+        return format('%dm', mins) if hours.zero?
+
+        format('%dh%dm', hours, mins)
+      end
+
+      budgets.each do |tag, budget_secs|
+        used = timers_snapshot[tag].to_i
+        remaining = budget_secs.to_i - used
+        remaining = 0 if remaining.negative?
+        remaining_map[tag] = remaining
+        budgets_total += remaining
+      end
+
       max = @timers.keys.sort_by(&:length).reverse[0].length + 1
 
       total = @timers.delete('All')
@@ -47,9 +75,13 @@ module Doing
           <tbody>
 EOHEAD
         sorted_tags_data.reverse.each do |k, v|
-          if v.positive?
-            output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{v.time_string(format: :clock)}</td></tr>\n"
+          next unless v.positive?
+
+          budget_str = ''
+          if remaining_map.key?(k) && remaining_map[k].positive?
+            budget_str = " (budget left #{budget_fmt.call(remaining_map[k])})"
           end
+          output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{v.time_string(format: :clock)}#{budget_str}</td></tr>\n"
         end
         tail = <<EOTAIL
         <tr>
@@ -59,7 +91,7 @@ EOHEAD
         <tfoot>
         <tr>
           <td style="text-align:left;"><strong>Total</strong></td>
-          <td style="text-align:left;">#{total.time_string(format: :clock)}</td>
+          <td style="text-align:left;">#{total.time_string(format: :clock)}#{" (total budgets left #{budget_fmt.call(budgets_total)})" if budgets_total.positive?}</td>
         </tr>
         </tfoot>
         </table>
@@ -73,7 +105,13 @@ EOTAIL
           | #{'-' * (pad - 1)}: | :------- |
         EOHEADER
         sorted_tags_data.reverse.each do |k, v|
-          output += "| #{' ' * (pad - k.length)}#{k} | #{v.time_string(format: :clock)} |\n" if v.positive?
+          next unless v.positive?
+
+          budget_str = ''
+          if remaining_map.key?(k) && remaining_map[k].positive?
+            budget_str = " (budget left #{budget_fmt.call(remaining_map[k])})"
+          end
+          output += "| #{' ' * (pad - k.length)}#{k} | #{v.time_string(format: :clock)}#{budget_str} |\n"
         end
         tail = '[Tag Totals]'
         output + tail
@@ -83,7 +121,10 @@ EOTAIL
           output << {
             'tag' => k,
             'seconds' => v,
-            'formatted' => v.time_string(format: :clock)
+            'formatted' => v.time_string(format: :clock),
+            'budget' => budgets[k],
+            'remaining' => remaining_map[k],
+            'remaining_formatted' => (remaining_map[k] && remaining_map[k].positive? ? budget_fmt.call(remaining_map[k]) : nil)
           }
         end
         output
@@ -94,7 +135,12 @@ EOTAIL
           (max - k.length).times do
             spacer += ' '
           end
-          output.push("┃ #{spacer}#{k}:#{v.time_string(format: :hm)} ┃")
+          line = "┃ #{spacer}#{k}:#{v.time_string(format: :hm)}"
+          if remaining_map.key?(k) && remaining_map[k].positive?
+            line += " (budget left #{budget_fmt.call(remaining_map[k])})"
+          end
+          line += ' ┃'
+          output.push(line)
         end
 
         header = '┏━━ Tag Totals '
@@ -115,6 +161,9 @@ EOTAIL
         total_time = total.time_string(format: :hm)
         total = "┃ #{spacer}total: "
         total += total_time
+        if budgets_total.positive?
+          total += " (total budgets left #{budget_fmt.call(budgets_total)})"
+        end
         total += ' ┃'
         output += "\n#{total}"
         output += "\n#{footer}"
@@ -126,11 +175,19 @@ EOTAIL
           (max - k.length).times do
             spacer += ' '
           end
-          output.push("#{k}:#{spacer}#{v.time_string(format: :clock)}")
+          line = "#{k}:#{spacer}#{v.time_string(format: :clock)}"
+          if remaining_map.key?(k) && remaining_map[k].positive?
+            line += " (budget left #{budget_fmt.call(remaining_map[k])})"
+          end
+          output.push(line)
         end
 
         output = output.empty? ? '' : "\n--- Tag Totals ---\n#{output.join("\n")}"
-        output += "\n\nTotal tracked: #{total.time_string(format: :clock)}\n"
+        output += "\n\nTotal tracked: #{total.time_string(format: :clock)}"
+        if budgets_total.positive?
+          output += " (total budgets left #{budget_fmt.call(budgets_total)})"
+        end
+        output += "\n"
         output
       end
     end
