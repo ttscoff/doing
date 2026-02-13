@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.93
+v2.1.94
 
 === Global Options
 === --config_file arg
@@ -343,6 +343,22 @@ Select item(s) to tag from a menu of matching entries
 
 ===== -u|--unfinished
 Autotag last entry (or entries) not marked @done
+
+
+
+==== Command: <tt>budget  [TAG [AMOUNT]]</tt>
+Set, list, and remove tag time budgets
+
+Manage simple time budgets for tags.
+
+Run without arguments to list configured budgets.
+
+Use `doing budget TAG AMOUNT` to set a budget (e.g. `doing budget dev 100h`).
+
+Use `doing budget TAG --remove` to delete a budget.
+===== Options
+===== -r|--remove
+Delete specified tag budget
 
 
 

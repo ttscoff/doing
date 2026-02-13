@@ -12,6 +12,7 @@ function _doing() {
                   'archive:Move entries between sections'
                   'move:Move entries between sections'
                   'autotag:Autotag last entry or filtered entries'
+                  'budget:Set'
                   'cancel:End last X entries with no time tracked'
                   'changes:List recent changes in Doing'
                   'changelog:List recent changes in Doing'
@@ -81,6 +82,9 @@ function _doing() {
             ;;
             autotag) 
                 args=( "--bool[Boolean]:BOOLEAN:" {'(--count)-c','(-c)--count'}"[How many recent entries to autotag]:COUNT:" "--force[Don't ask permission to autotag all entries when count is 0]" {'(--interactive)-i','(-i)--interactive'}"[Select item(s) to tag from a menu of matching entries]" {'(--section)-s','(-s)--section'}"[Section]:SECTION_NAME:" "--search[Autotag entries matching search filter]:QUERY:" "--tag[Autotag the last X entries containing TAG]:TAG:" {'(--unfinished)-u','(-u)--unfinished'}"[Autotag last entry]" )
+            ;;
+            budget) 
+                args=( {'(--remove)-r','(-r)--remove'}"[Delete specified tag budget]" )
             ;;
             cancel) 
                 args=( {'(--archive)-a','(-a)--archive'}"[Archive entries]" "--bool[Boolean used to combine multiple tags]:BOOLEAN:" "--case[Case sensitivity for search string matching [(c)ase-sensitive]:TYPE:" {'(--interactive)-i','(-i)--interactive'}"[Select item(s) to cancel from a menu of matching entries]" "--not[Cancel items that *don't* match search/tag filters]" {'(--section)-s','(-s)--section'}"[Section]:NAME:" "--search[Filter entries using a search query]:QUERY:" "--tag[Filter entries by tag]:TAG:" {'(--unfinished)-u','(-u)--unfinished'}"[Cancel last entry]" "--val[Perform a tag value query]:QUERY:" {'(--exact)-x','(-x)--exact'}"[Force exact search string matching]" )

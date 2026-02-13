@@ -138,6 +138,7 @@ __fish_doing_complete_args tag
 complete -xc doing -n '__fish_doing_needs_command' -a 'again resume' -d Repeat\ last\ entry\ as\ new\ entry
 complete -xc doing -n '__fish_doing_needs_command' -a 'archive move' -d Move\ entries\ between\ sections
 complete -xc doing -n '__fish_doing_needs_command' -a 'autotag' -d Autotag\ last\ entry\ or\ filtered\ entries
+complete -xc doing -n '__fish_doing_needs_command' -a 'budget' -d Set
 complete -xc doing -n '__fish_doing_needs_command' -a 'cancel' -d End\ last\ X\ entries\ with\ no\ time\ tracked
 complete -xc doing -n '__fish_doing_needs_command' -a 'changes changelog' -d List\ recent\ changes\ in\ Doing
 complete -xc doing -n '__fish_doing_needs_command' -a 'colors' -d List\ available\ color\ variables\ for\ configuration\ templates\ and\ views
@@ -214,6 +215,7 @@ complete -c doing -l section -s s -f -r -n '__fish_doing_using_command autotag' 
 complete -c doing -l search  -f -r -n '__fish_doing_using_command autotag' -d Autotag\ entries\ matching\ search\ filter
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command autotag' -d Autotag\ the\ last\ X\ entries\ containing\ TAG
 complete -c doing -l unfinished -s u -f  -n '__fish_doing_using_command autotag' -d Autotag\ last\ entry
+complete -c doing -l remove -s r -f  -n '__fish_doing_using_command budget' -d Delete\ specified\ tag\ budget
 complete -c doing -l archive -s a -f  -n '__fish_doing_using_command cancel' -d Archive\ entries
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command cancel' -d Boolean\ used\ to\ combine\ multiple\ tags
 complete -c doing -l case  -f -r -n '__fish_doing_using_command cancel' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive

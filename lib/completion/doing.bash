@@ -48,6 +48,16 @@ _doing_autotag() {
   fi
 }
 
+_doing_budget() {
+  
+  if [[ "$token" == --* ]]; then
+    COMPREPLY=( $( compgen -W '--remove' -- $token ) )
+  elif [[ "$token" == -* ]]; then
+    COMPREPLY=( $( compgen -W '-r --remove' -- $token ) )
+  
+  fi
+}
+
 _doing_cancel() {
   
   if [[ "$token" == --* ]]; then
@@ -456,6 +466,7 @@ _doing()
   if [[ $last =~ (again|resume) ]]; then _doing_again
     elif [[ $last =~ (archive|move) ]]; then _doing_archive
     elif [[ $last =~ (autotag) ]]; then _doing_autotag
+    elif [[ $last =~ (budget) ]]; then _doing_budget
     elif [[ $last =~ (cancel) ]]; then _doing_cancel
     elif [[ $last =~ (changes|changelog) ]]; then _doing_changes
     elif [[ $last =~ (completion) ]]; then _doing_completion

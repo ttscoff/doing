@@ -599,6 +599,20 @@ const completionSpec: Fig.Spec = {
     },
 
     {
+      name: "budget",
+      description: "Set",
+      options: [
+          {
+            name: ["-r", "--remove"],
+            description: "Delete specified tag budget",
+            
+          },
+
+        ],
+
+    },
+
+    {
       name: "cancel",
       description: "End last X entries with no time tracked",
       options: [

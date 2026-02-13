@@ -1,3 +1,24 @@
+### 2.1.94
+
+2026-02-13 07:16
+
+#### CHANGED
+
+- Allow interactive finish tagging to treat section filters that resolve to multiple values as matching "All" when any selected section name is "all"
+- Tag totals (--totals) show remaining budget per tag and total budgets left when budgets are configured
+- Byday export shows total budgets left in daily and grand total lines
+- JSON tag totals output includes budget, remaining, and remaining_formatted fields for each tag
+
+#### NEW
+
+- Add budget command to set, list, and remove time budgets for tags (e.g. doing budget dev 100h)
+
+#### FIXED
+
+- Fix error when running "doing finish --interactive" that raised "undefined method '=~' for an instance of Array" when section options produced an Array
+- Fix choose_config raising nil when additional_configs was not initialized
+- Fix HTML output test failing with undefined method "to_hash" by running doing subprocess via bundle exec to use project gems
+
 ### 2.1.93
 
 2026-02-10 04:10
