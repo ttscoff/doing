@@ -143,14 +143,25 @@ EOTAIL
           output.push(line)
         end
 
+        total_content = "┃ #{' ' * (max - 6)}total: #{total.time_string(format: :hm)}"
+        total_content += " (total budgets left #{budget_fmt.call(budgets_total)})" if budgets_total.positive?
+        total_content += ' ┃'
+        max_line_len = (output + [total_content]).map(&:length).max
+
+        pad_line = lambda do |line|
+          pad = max_line_len - line.length
+          pad.positive? ? "#{line[0..-3]} #{' ' * pad}┃" : line
+        end
+        output = output.map { |l| pad_line.call(l) }
+
         header = '┏━━ Tag Totals '
-        (max - 2).times { header += '━' }
+        [(max_line_len - 16), 0].max.times { header += '━' }
         header += '┓'
         footer = '┗'
-        (max + 12).times { footer += '━' }
+        [(max_line_len - 2), 0].max.times { footer += '━' }
         footer += '┛'
         divider = '┣'
-        (max + 12).times { divider += '━' }
+        [(max_line_len - 2), 0].max.times { divider += '━' }
         divider += '┫'
         output = output.empty? ? '' : "\n#{header}\n#{output.join("\n")}"
         output += "\n#{divider}"
@@ -159,13 +170,12 @@ EOTAIL
           spacer += ' '
         end
         total_time = total.time_string(format: :hm)
-        total = "┃ #{spacer}total: "
-        total += total_time
-        if budgets_total.positive?
-          total += " (total budgets left #{budget_fmt.call(budgets_total)})"
-        end
-        total += ' ┃'
-        output += "\n#{total}"
+        total_line = "┃ #{spacer}total: "
+        total_line += total_time
+        total_line += " (total budgets left #{budget_fmt.call(budgets_total)})" if budgets_total.positive?
+        total_line += ' ┃'
+        total_line = pad_line.call(total_line)
+        output += "\n#{total_line}"
         output += "\n#{footer}"
         output
       else
