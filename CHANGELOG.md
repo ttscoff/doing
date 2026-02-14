@@ -1,3 +1,11 @@
+### 2.1.97
+
+2026-02-14 06:57
+
+#### FIXED
+
+- Tag totals table (timer_format: human) now expands to fit budget text and pads shorter lines so borders align correctly instead of breaking layout
+
 ### 2.1.94
 
 2026-02-13 07:16
