@@ -1,3 +1,18 @@
+### 2.1.99
+
+2026-03-21 04:11
+
+#### IMPROVED
+
+- The CLI now falls back to `reline` when `readline` is unavailable (for example on Ruby 4 builds) so commands and tests still run.
+
+#### FIXED
+
+- Tag totals table (timer_format: human) now expands to fit budget text and pads shorter lines so borders align correctly instead of breaking layout
+- `doing done --from` now correctly handles `12pm to 1pm` and `noon to 1:00pm` without parse errors.
+- Time range values from `--from` are now normalized before date formatting so `done` and `reset` no longer fail with string/time type errors.
+- Non-interactive runs now return default prompt answers without reopening `/dev/tty`, preventing CLI failures in automated test contexts.
+
 ### 2.1.97
 
 2026-02-14 06:57
