@@ -9,7 +9,13 @@ require 'tempfile'
 require 'zlib'
 require 'base64'
 require 'plist'
-require 'readline'
+begin
+  require 'readline'
+rescue LoadError
+  # Ruby 4 builds may not ship native readline; use stdlib Reline API-compatible fallback.
+  require 'reline'
+  Readline = Reline unless defined?(Readline)
+end
 require 'haml'
 require 'json'
 require 'logger'

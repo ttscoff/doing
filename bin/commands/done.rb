@@ -40,9 +40,7 @@ command %i[done did] do |c|
     donedate = nil
 
     if options[:from]
-      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
-        time =~ REGEX_TIME ? "today #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}" : time
-      end.join(' to ').split_date_range
+      options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map(&:strip).join(' to ').split_date_range
       date, finish_date = options[:from]
       finish_date ||= Time.now
     else
@@ -76,7 +74,13 @@ command %i[done did] do |c|
     end
 
     if options[:date]
-      date = date.chronify(guess: :begin, context: :today) if date.is_a? String
+      if options[:from]
+        date = date.chronify(guess: :begin) if date.is_a? String
+        finish_date = finish_date.chronify(guess: :begin) if finish_date.is_a? String
+      else
+        date = date.chronify(guess: :begin, context: :today) if date.is_a? String
+        finish_date = finish_date.chronify(guess: :begin, context: :today) if finish_date.is_a? String
+      end
       finish_date = @wwid.verify_duration(date, finish_date) unless options[:took] || options[:from]
 
       donedate = finish_date.strftime('%F %R')

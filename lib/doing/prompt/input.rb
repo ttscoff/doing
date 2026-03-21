@@ -17,8 +17,9 @@ module Doing
     ## @deprecated Use {#read_line} instead
     ##
     def enter_text(prompt, default_response: '')
-      $stdin.reopen('/dev/tty')
       return default_response if @default_answer
+
+      $stdin.reopen('/dev/tty')
 
       print "#{Color.yellow(prompt).sub(/:?$/, ':')} #{Color.reset}"
       $stdin.gets.strip
@@ -39,8 +40,9 @@ module Doing
     ## @return     [String] User input string
     ##
     def read_line(prompt: 'Enter text', completions: [], default_response: '')
-      $stdin.reopen('/dev/tty')
       return default_response if @default_answer
+
+      $stdin.reopen('/dev/tty')
 
       unless completions.empty?
         completions.sort!
@@ -71,8 +73,9 @@ module Doing
     ## @return     [String] Multi-line result, joined with newlines
     ##
     def read_lines(prompt: 'Enter text', completions: [], default_response: '')
-      $stdin.reopen('/dev/tty')
       return default_response if @default_answer
+
+      $stdin.reopen('/dev/tty')
 
       completions.sort!
       comp = proc { |s| completions.grep(/^#{Regexp.escape(s)}/) }
@@ -111,8 +114,9 @@ module Doing
     ##
     ## @deprecated Use {#read_lines} instead
     def request_lines(prompt: 'Enter text', default_response: '')
-      $stdin.reopen('/dev/tty')
       return default_response if @default_answer
+
+      $stdin.reopen('/dev/tty')
 
       ask_note = []
       reader = TTY::Reader.new(interrupt: -> { raise Errors::UserCancelled }, track_history: false)

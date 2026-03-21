@@ -137,6 +137,40 @@ class DoingDoneTest < Test::Unit::TestCase
                             message: 'Finish time should be equal to the nearest minute')
   end
 
+  def test_done_from_noon_range
+    doing('done', '--from', '12pm to 1pm', 'Noon range test')
+    result = doing('show', '-c', '1').uncolor.strip
+    t = result.match(ENTRY_TS_REGEX)
+    d = result.match(ENTRY_DONE_REGEX)
+
+    assert(t, 'Entry should have start timestamp')
+    assert(d, 'Entry should have @done with timestamp')
+
+    start_time = Time.parse(t['ts'])
+    end_time = Time.parse(d['ts'])
+
+    assert_equal(12, start_time.hour, 'Start hour should be 12 (noon)')
+    assert_equal(13, end_time.hour, 'Finish hour should be 13 (1pm)')
+    assert_equal(start_time.strftime('%F'), end_time.strftime('%F'),
+                 'Start and finish should be on the same date for a time-only range')
+  end
+
+  def test_done_from_noon_keyword_range
+    doing('done', '--from', 'noon to 1:00pm', 'Noon keyword range test')
+    result = doing('show', '-c', '1').uncolor.strip
+    t = result.match(ENTRY_TS_REGEX)
+    d = result.match(ENTRY_DONE_REGEX)
+
+    assert(t, 'Entry should have start timestamp')
+    assert(d, 'Entry should have @done with timestamp')
+
+    start_time = Time.parse(t['ts'])
+    end_time = Time.parse(d['ts'])
+
+    assert_equal(12, start_time.hour, 'Start hour should be 12 (noon)')
+    assert_equal(13, end_time.hour, 'Finish hour should be 13 (1pm)')
+  end
+
   private
 
   def assert_count_entries(count, shown, message = 'Should be X entries shown')

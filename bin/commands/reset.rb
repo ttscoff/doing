@@ -82,10 +82,10 @@ command %i[reset begin] do |c|
     finish_date = nil
 
     if from
-      from = from.split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
-        time =~ REGEX_TIME ? "today #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}" : time
-      end.join(' to ').split_date_range
+      from = from.split(/#{REGEX_RANGE_INDICATOR}/).map(&:strip).join(' to ').split_date_range
       reset_date, finish_date = from
+      reset_date = reset_date.chronify(guess: :begin, context: :today) if reset_date.is_a?(String)
+      finish_date = finish_date.chronify(guess: :begin, context: :today) if finish_date.is_a?(String)
       options[:resume] = false if finish_date
     end
 

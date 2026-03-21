@@ -178,7 +178,7 @@ module Doing
     ##   "mon 3pm to mon 5pm".split_date_range
     ##
     def split_date_range
-      time_rx = /^(\d{1,2}(:\d{1,2})?( *(am|pm))?|midnight|noon)$/
+      time_rx = /^(\d{1,2}(:\d{1,2})?( *(am|pm))?|midnight|noon)$/i
       range_rx = / (to|through|thru|(?:un)?til|-+) /
 
       date_string = dup
@@ -191,8 +191,8 @@ module Doing
         dates = date_string.split(range_rx)
 
         if dates[0].strip =~ time_rx && dates[-1].strip =~ time_rx
-          start = dates[0].strip
-          finish = dates[-1].strip
+          start = dates[0].strip.sub(/^today +/i, '')
+          finish = dates[-1].strip.sub(/^today +/i, '')
         else
           start = dates[0].chronify(guess: :begin, future: false)
           finish = dates[-1].chronify(guess: inclusive ? :end : :begin, future: true)

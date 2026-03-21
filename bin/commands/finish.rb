@@ -51,7 +51,7 @@ module Doing
 
     def handle_from(options)
       options[:from] = options[:from].split(/#{REGEX_RANGE_INDICATOR}/).map do |time|
-        time =~ REGEX_TIME ? "today #{time.sub(/(?mi)(^.*?(?=\d+)|(?<=[ap]m).*?$)/, '')}" : time
+        time.strip
       end.join(' to ').split_date_range
       start_date, finish_date = options[:from]
       finish_date ||= Time.now

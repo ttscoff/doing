@@ -16,8 +16,6 @@ module Doing
     def yn(question, default_response: false)
       return @force_answer == :yes unless @force_answer.nil?
 
-      $stdin.reopen('/dev/tty')
-
       default = if default_response.is_a?(String)
                   default_response =~ /y/i ? true : false
                 else
@@ -29,6 +27,8 @@ module Doing
 
       # if this isn't an interactive shell, answer default
       return default unless $stdout.isatty
+
+      $stdin.reopen('/dev/tty')
 
       # clear the buffer
       ARGV.length&.times do
