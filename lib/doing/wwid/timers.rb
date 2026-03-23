@@ -256,7 +256,8 @@ EOTAIL
         output = output.map { |l| pad_line.call(l) }
 
         header = "┏━━ #{title} "
-        [(max_line_len - title.length - 5), 0].max.times { header += '━' }
+        # Keep top border width aligned with body/footer width.
+        [(max_line_len - title.length - 6), 0].max.times { header += '━' }
         header += '┓'
         footer = '┗'
         [(max_line_len - 2), 0].max.times { footer += '━' }
