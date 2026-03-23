@@ -1519,6 +1519,16 @@ const completionSpec: Fig.Spec = {
           },
 
           {
+            name: ["--totals_format"],
+            description: "Time format for totals output",
+            args: {
+                  name: "FORMAT",
+                  description: "FORMAT",
+            },
+
+          },
+
+          {
             name: ["--val"],
             description: "Perform a tag value query",
             args: {
@@ -1744,6 +1754,16 @@ const completionSpec: Fig.Spec = {
             name: ["--totals"],
             description: "Show time totals at the end of output",
             
+          },
+
+          {
+            name: ["--totals_format"],
+            description: "Time format for totals output",
+            args: {
+                  name: "FORMAT",
+                  description: "FORMAT",
+            },
+
           },
 
           {
@@ -2802,6 +2822,16 @@ const completionSpec: Fig.Spec = {
           },
 
           {
+            name: ["--totals_format"],
+            description: "Time format for totals output",
+            args: {
+                  name: "FORMAT",
+                  description: "FORMAT",
+            },
+
+          },
+
+          {
             name: ["--val"],
             description: "Perform a tag value query",
             args: {
@@ -3005,6 +3035,16 @@ const completionSpec: Fig.Spec = {
             name: ["--totals"],
             description: "Show time totals at the end of output",
             
+          },
+
+          {
+            name: ["--totals_format"],
+            description: "Time format for totals output",
+            args: {
+                  name: "FORMAT",
+                  description: "FORMAT",
+            },
+
           },
 
         ],
@@ -3814,6 +3854,16 @@ const completionSpec: Fig.Spec = {
           },
 
           {
+            name: ["--totals_format"],
+            description: "Time format for totals output",
+            args: {
+                  name: "FORMAT",
+                  description: "FORMAT",
+            },
+
+          },
+
+          {
             name: ["--val"],
             description: "Perform a tag value query",
             args: {
@@ -3995,6 +4045,16 @@ const completionSpec: Fig.Spec = {
             name: ["--totals"],
             description: "Show time totals at the end of output",
             
+          },
+
+          {
+            name: ["--totals_format"],
+            description: "Time format for totals output",
+            args: {
+                  name: "FORMAT",
+                  description: "FORMAT",
+            },
+
           },
 
           {
@@ -4503,6 +4563,16 @@ const completionSpec: Fig.Spec = {
             
           },
 
+          {
+            name: ["--totals_format"],
+            description: "Time format for totals output",
+            args: {
+                  name: "FORMAT",
+                  description: "FORMAT",
+            },
+
+          },
+
         ],
 
     },
@@ -4804,6 +4874,16 @@ const completionSpec: Fig.Spec = {
           },
 
           {
+            name: ["--totals_format"],
+            description: "Time format for totals output",
+            args: {
+                  name: "FORMAT",
+                  description: "FORMAT",
+            },
+
+          },
+
+          {
             name: ["--val"],
             description: "Perform a tag value query",
             args: {
@@ -5089,6 +5169,16 @@ const completionSpec: Fig.Spec = {
             name: ["--totals"],
             description: "Show time totals at the end of output",
             
+          },
+
+          {
+            name: ["--totals_format"],
+            description: "Time format for totals output",
+            args: {
+                  name: "FORMAT",
+                  description: "FORMAT",
+            },
+
           },
 
         ],

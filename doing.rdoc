@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.103
+v2.1.105
 
 === Global Options
 === --config_file arg
@@ -1025,6 +1025,14 @@ Title string to be used for output formats that require it
 [Default Value] None
 
 
+===== --totals_format FORMAT
+
+Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:averages|clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m)$)
+
+
 ===== --val QUERY
 
 Perform a tag value query ("@done > two hours ago" or "@progress < 50").
@@ -1729,6 +1737,14 @@ Title string to be used for output formats that require it
 [Default Value] None
 
 
+===== --totals_format FORMAT
+
+Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:averages|clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m)$)
+
+
 ===== --val QUERY
 
 Perform a tag value query ("@done > two hours ago" or "@progress < 50").
@@ -1886,6 +1902,14 @@ Override output format with a template string containing %placeholders
 Title string to be used for output formats that require it
 
 [Default Value] None
+
+
+===== --totals_format FORMAT
+
+Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:averages|clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m)$)
 
 
 ===== --[no-]duration
@@ -2466,6 +2490,14 @@ Title string to be used for output formats that require it
 [Default Value] None
 
 
+===== --totals_format FORMAT
+
+Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:averages|clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m)$)
+
+
 ===== --val QUERY
 
 Perform a tag value query ("@done > two hours ago" or "@progress < 50").
@@ -2626,6 +2658,14 @@ Override output format with a template string containing %placeholders
 Title string to be used for output formats that require it
 
 [Default Value] None
+
+
+===== --totals_format FORMAT
+
+Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:averages|clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m)$)
 
 
 ===== --val QUERY
@@ -3039,6 +3079,14 @@ Title string to be used for output formats that require it
 [Default Value] None
 
 
+===== --totals_format FORMAT
+
+Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:averages|clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m)$)
+
+
 ===== --[no-]duration
 Show elapsed time on entries without @done tag
 
@@ -3252,6 +3300,14 @@ Sort tags by (name|time)
 Override output format with a template string containing %placeholders
 
 [Default Value] None
+
+
+===== --totals_format FORMAT
+
+Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:averages|clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m)$)
 
 
 ===== --val QUERY
@@ -3490,6 +3546,14 @@ Override output format with a template string containing %placeholders
 Title string to be used for output formats that require it
 
 [Default Value] None
+
+
+===== --totals_format FORMAT
+
+Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:averages|clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m)$)
 
 
 ===== --[no-]duration

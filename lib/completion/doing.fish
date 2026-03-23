@@ -296,6 +296,7 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command grep search'
 complete -c doing -l template  -f -r -n '__fish_doing_using_command grep search' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l title  -f -r -n '__fish_doing_using_command grep search' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l totals  -f  -n '__fish_doing_using_command grep search' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals_format  -f -r -n '__fish_doing_using_command grep search' -d Time\ format\ for\ totals\ output
 complete -c doing -l val  -f -r -n '__fish_doing_using_command grep search' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command grep search' -d Force\ exact\ string\ matching
 complete -c doing -F -n '__fish_doing_using_command import'
@@ -392,6 +393,7 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command on' -d Sort\
 complete -c doing -l template  -f -r -n '__fish_doing_using_command on' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l title  -f -r -n '__fish_doing_using_command on' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l totals  -f  -n '__fish_doing_using_command on' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals_format  -f -r -n '__fish_doing_using_command on' -d Time\ format\ for\ totals\ output
 complete -c doing -l val  -f -r -n '__fish_doing_using_command on' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command on' -d Force\ exact\ search\ string\ matching
 complete -c doing -l app -s a -f -r -n '__fish_doing_using_command open' -d Open\ with\ app\ name
@@ -413,6 +415,7 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command recent' -d S
 complete -c doing -l template  -f -r -n '__fish_doing_using_command recent' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l title  -f -r -n '__fish_doing_using_command recent' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l totals  -f  -n '__fish_doing_using_command recent' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals_format  -f -r -n '__fish_doing_using_command recent' -d Time\ format\ for\ totals\ output
 complete -c doing -l file -s f -f -r -n '__fish_doing_using_command redo' -d Specify\ alternate\ doing\ file
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command redo' -d Select\ from\ an\ interactive\ menu
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command reset begin' -d Boolean\ used\ to\ combine\ multiple\ tags
@@ -489,6 +492,7 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command show' -d Sor
 complete -c doing -l template  -f -r -n '__fish_doing_using_command show' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l title  -f -r -n '__fish_doing_using_command show' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l totals  -f  -n '__fish_doing_using_command show' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals_format  -f -r -n '__fish_doing_using_command show' -d Time\ format\ for\ totals\ output
 complete -c doing -l val  -f -r -n '__fish_doing_using_command show' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command show' -d Force\ exact\ search\ string\ matching
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command since' -d Boolean\ used\ to\ combine\ multiple\ tags
@@ -509,6 +513,7 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command since' -d So
 complete -c doing -l template  -f -r -n '__fish_doing_using_command since' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l title  -f -r -n '__fish_doing_using_command since' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l totals  -f  -n '__fish_doing_using_command since' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals_format  -f -r -n '__fish_doing_using_command since' -d Time\ format\ for\ totals\ output
 complete -c doing -l val  -f -r -n '__fish_doing_using_command since' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command since' -d Force\ exact\ search\ string\ matching
 complete -c doing -l autotag -s a -f  -n '__fish_doing_using_command tag' -d Autotag\ entries\ based\ on\ autotag\ configuration\ in\ \~/
@@ -565,6 +570,7 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command today' -d So
 complete -c doing -l template  -f -r -n '__fish_doing_using_command today' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l title  -f -r -n '__fish_doing_using_command today' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l totals  -f  -n '__fish_doing_using_command today' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals_format  -f -r -n '__fish_doing_using_command today' -d Time\ format\ for\ totals\ output
 complete -c doing -l ask  -f  -n '__fish_doing_using_command todo' -d Prompt\ for\ note\ via\ multi-line\ input
 complete -c doing -l editor -s e -f  -n '__fish_doing_using_command todo' -d Edit\ entry\ with\ vim
 complete -c doing -l note -s n -f -r -n '__fish_doing_using_command todo' -d Note
@@ -597,6 +603,7 @@ complete -c doing -l tag_order  -f -r -n '__fish_doing_using_command view' -d Ta
 complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command view' -d Sort\ tags\ by
 complete -c doing -l template  -f -r -n '__fish_doing_using_command view' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l totals  -f  -n '__fish_doing_using_command view' -d Show\ intervals\ with\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals_format  -f -r -n '__fish_doing_using_command view' -d Time\ format\ for\ totals\ output
 complete -c doing -l val  -f -r -n '__fish_doing_using_command view' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command view' -d Force\ exact\ search\ string\ matching
 complete -c doing -l column -s c -f  -n '__fish_doing_using_command views' -d List\ in\ single\ column
@@ -627,6 +634,7 @@ complete -c doing -l tag_sort  -f -r -n '__fish_doing_using_command yesterday' -
 complete -c doing -l template  -f -r -n '__fish_doing_using_command yesterday' -d Override\ output\ format\ with\ a\ template\ string\ containing\ \%placeholders
 complete -c doing -l title  -f -r -n '__fish_doing_using_command yesterday' -d Title\ string\ to\ be\ used\ for\ output\ formats\ that\ require\ it
 complete -c doing -l totals  -f  -n '__fish_doing_using_command yesterday' -d Show\ time\ totals\ at\ the\ end\ of\ output
+complete -c doing -l totals_format  -f -r -n '__fish_doing_using_command yesterday' -d Time\ format\ for\ totals\ output
 complete -f -c doing -s o -l output -x -n '__fish_doing_using_command grep search last on recent select show since today view views yesterday' -a '(__fish_doing_export_plugin)'
 complete -f -c doing -s b -l bool -x -n '__fish_doing_using_command again resume archive move autotag cancel finish grep search last mark flag note on reset begin rotate show since tag tags view wiki' -a 'and or not pattern'
 complete -f -c doing -l case -x -n '__fish_doing_using_command again resume archive move cancel finish grep search import last mark flag note on reset begin rotate select show since tag tags view' -a 'case-sensitive ignore smart'
