@@ -46,6 +46,8 @@ analyzing the results.
 Recent CLI conveniences:
 
 - Totals output now supports `--by` grouping (for example `--by tags` and/or `--by section`, repeatable for ordering).
+- Totals output now supports `--totals_format` (for example `clock`, `hmclock`, and `averages`) with `totals_format` config fallback.
+- The `averages` totals format appends summary stats like `(<hours>h <minutes> min, <avg>h/day)` to `Total tracked`.
 - Long flags with underscores also accept dashes (for example `--only_timed` or `--only-timed`).
 - Underscored subcommands also accept dashed aliases (for example `doing tag_dir` or `doing tag-dir`).
 
