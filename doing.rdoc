@@ -5,7 +5,7 @@ record of what you've been doing, complete with tag-based time tracking. The
 command line tool allows you to add entries, annotate with tags and notes, and
 view your entries with myriad options, with a focus on a "natural" language syntax.
 
-v2.1.99
+v2.1.101
 
 === Global Options
 === --config_file arg
@@ -933,6 +933,14 @@ Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and -
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
+===== --by GROUP
+
+Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?|p(?:roj(?:ect|ects)?)?)$)
+
+
 ===== --case TYPE
 
 Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
@@ -1624,6 +1632,14 @@ Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and -
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
+===== --by GROUP
+
+Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?|p(?:roj(?:ect|ects)?)?)$)
+
+
 ===== --case TYPE
 
 Case sensitivity for search string matching [(c)ase-sensitive, (i)gnore, (s)mart]
@@ -1806,6 +1822,14 @@ List recent entries
 
 
 ===== Options
+===== --by GROUP
+
+Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?|p(?:roj(?:ect|ects)?)?)$)
+
+
 ===== --config_template TEMPLATE_KEY
 
 Output using a template from configuration
@@ -2326,6 +2350,14 @@ Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and -
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
 
 
+===== --by GROUP
+
+Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?|p(?:roj(?:ect|ects)?)?)$)
+
+
 ===== -c|--count MAX
 
 Max count to show
@@ -2505,6 +2537,14 @@ Boolean used to combine multiple tags (AND|OR|NOT). Use PATTERN to parse + and -
 
 [Default Value] pattern
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
+
+
+===== --by GROUP
+
+Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?|p(?:roj(?:ect|ects)?)?)$)
 
 
 ===== --case TYPE
@@ -2925,6 +2965,14 @@ View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 [Default Value] None
 
 
+===== --by GROUP
+
+Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?|p(?:roj(?:ect|ects)?)?)$)
+
+
 ===== --config_template TEMPLATE_KEY
 
 Output using a template from configuration
@@ -3110,6 +3158,14 @@ Boolean used to combine multiple tags. Use PATTERN to parse + and - as booleans
 
 [Default Value] None
 [Must Match] (?i-mx:^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$)
+
+
+===== --by GROUP
+
+Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?|p(?:roj(?:ect|ects)?)?)$)
 
 
 ===== -c|--count COUNT
@@ -3360,6 +3416,14 @@ View entries after specified time (e.g. 8am, 12:30pm, 15:00)
 View entries before specified time (e.g. 8am, 12:30pm, 15:00)
 
 [Default Value] None
+
+
+===== --by GROUP
+
+Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section
+
+[Default Value] None
+[Must Match] (?i-mx:^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?|p(?:roj(?:ect|ects)?)?)$)
 
 
 ===== --config_template TEMPLATE_KEY

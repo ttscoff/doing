@@ -1345,6 +1345,16 @@ const completionSpec: Fig.Spec = {
           },
 
           {
+            name: ["--by"],
+            description: "Totals grouping",
+            args: {
+                  name: "GROUP",
+                  description: "GROUP",
+            },
+
+          },
+
+          {
             name: ["--case"],
             description: "Case sensitivity for search string matching [(c)ase-sensitive",
             args: {
@@ -1558,6 +1568,16 @@ const completionSpec: Fig.Spec = {
             args: {
                   name: "BOOLEAN",
                   description: "BOOLEAN",
+            },
+
+          },
+
+          {
+            name: ["--by"],
+            description: "Totals grouping",
+            args: {
+                  name: "GROUP",
+                  description: "GROUP",
             },
 
           },
@@ -2622,6 +2642,16 @@ const completionSpec: Fig.Spec = {
           },
 
           {
+            name: ["--by"],
+            description: "Totals grouping",
+            args: {
+                  name: "GROUP",
+                  description: "GROUP",
+            },
+
+          },
+
+          {
             name: ["--case"],
             description: "Case sensitivity for search string matching [(c)ase-sensitive",
             args: {
@@ -2857,6 +2887,16 @@ const completionSpec: Fig.Spec = {
       name: "recent",
       description: "List recent entries",
       options: [
+          {
+            name: ["--by"],
+            description: "Totals grouping",
+            args: {
+                  name: "GROUP",
+                  description: "GROUP",
+            },
+
+          },
+
           {
             name: ["--config_template"],
             description: "Output using a template from configuration",
@@ -3570,6 +3610,16 @@ const completionSpec: Fig.Spec = {
           },
 
           {
+            name: ["--by"],
+            description: "Totals grouping",
+            args: {
+                  name: "GROUP",
+                  description: "GROUP",
+            },
+
+          },
+
+          {
             name: ["-c", "--count"],
             description: "Max count to show",
             args: {
@@ -3793,6 +3843,16 @@ const completionSpec: Fig.Spec = {
             args: {
                   name: "BOOLEAN",
                   description: "BOOLEAN",
+            },
+
+          },
+
+          {
+            name: ["--by"],
+            description: "Totals grouping",
+            args: {
+                  name: "GROUP",
+                  description: "GROUP",
             },
 
           },
@@ -4320,6 +4380,16 @@ const completionSpec: Fig.Spec = {
           },
 
           {
+            name: ["--by"],
+            description: "Totals grouping",
+            args: {
+                  name: "GROUP",
+                  description: "GROUP",
+            },
+
+          },
+
+          {
             name: ["--config_template"],
             description: "Output using a template from configuration",
             args: {
@@ -4561,6 +4631,16 @@ const completionSpec: Fig.Spec = {
             args: {
                   name: "BOOLEAN",
                   description: "BOOLEAN",
+            },
+
+          },
+
+          {
+            name: ["--by"],
+            description: "Totals grouping",
+            args: {
+                  name: "GROUP",
+                  description: "GROUP",
             },
 
           },
@@ -4883,6 +4963,16 @@ const completionSpec: Fig.Spec = {
             args: {
                   name: "TIME_STRING",
                   description: "TIME_STRING",
+            },
+
+          },
+
+          {
+            name: ["--by"],
+            description: "Totals grouping",
+            args: {
+                  name: "GROUP",
+                  description: "GROUP",
             },
 
           },

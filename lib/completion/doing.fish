@@ -275,6 +275,7 @@ complete -c doing -l exact -s x -f  -n '__fish_doing_using_command finish' -d Fo
 complete -c doing -l after  -f -r -n '__fish_doing_using_command grep search' -d Search\ entries\ newer\ than\ date
 complete -c doing -l before  -f -r -n '__fish_doing_using_command grep search' -d Search\ entries\ older\ than\ date
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command grep search' -d Boolean\ used\ to\ combine\ multiple\ tags
+complete -c doing -l by  -f -r -n '__fish_doing_using_command grep search' -d Totals\ grouping
 complete -c doing -l case  -f -r -n '__fish_doing_using_command grep search' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command grep search' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l delete -s d -f  -n '__fish_doing_using_command grep search' -d Delete\ matching\ entries
@@ -373,6 +374,7 @@ complete -c doing -l section -s s -f -r -n '__fish_doing_using_command now next'
 complete -c doing -l after  -f -r -n '__fish_doing_using_command on' -d View\ entries\ after\ specified\ time
 complete -c doing -l before  -f -r -n '__fish_doing_using_command on' -d View\ entries\ before\ specified\ time
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command on' -d Boolean\ used\ to\ combine\ multiple\ tags
+complete -c doing -l by  -f -r -n '__fish_doing_using_command on' -d Totals\ grouping
 complete -c doing -l case  -f -r -n '__fish_doing_using_command on' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command on' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command on' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
@@ -397,6 +399,7 @@ complete -c doing -l bundle_id -s b -f -r -n '__fish_doing_using_command open' -
 complete -c doing -l editor -s e -f -r -n '__fish_doing_using_command open' -d Open\ with\ editor\ command
 complete -c doing -l column -s c -f  -n '__fish_doing_using_command plugins' -d List\ in\ single\ column\ for\ completion
 complete -c doing -l type -s t -f -r -n '__fish_doing_using_command plugins' -d List\ plugins\ of\ type
+complete -c doing -l by  -f -r -n '__fish_doing_using_command recent' -d Totals\ grouping
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command recent' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command recent' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
 complete -c doing -l interactive -s i -f  -n '__fish_doing_using_command recent' -d Select\ from\ a\ menu\ of\ matching\ entries\ to\ perform\ additional\ operations
@@ -462,6 +465,7 @@ complete -c doing -l age -s a -f -r -n '__fish_doing_using_command show' -d Age
 complete -c doing -l after  -f -r -n '__fish_doing_using_command show' -d Show\ entries\ newer\ than\ date
 complete -c doing -l before  -f -r -n '__fish_doing_using_command show' -d Show\ entries\ older\ than\ date
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command show' -d Boolean\ used\ to\ combine\ multiple\ tags
+complete -c doing -l by  -f -r -n '__fish_doing_using_command show' -d Totals\ grouping
 complete -c doing -l count -s c -f -r -n '__fish_doing_using_command show' -d Max\ count\ to\ show
 complete -c doing -l case  -f -r -n '__fish_doing_using_command show' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command show' -d Output\ using\ a\ template\ from\ configuration
@@ -488,6 +492,7 @@ complete -c doing -l totals  -f  -n '__fish_doing_using_command show' -d Show\ t
 complete -c doing -l val  -f -r -n '__fish_doing_using_command show' -d Perform\ a\ tag\ value\ query
 complete -c doing -l exact -s x -f  -n '__fish_doing_using_command show' -d Force\ exact\ search\ string\ matching
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command since' -d Boolean\ used\ to\ combine\ multiple\ tags
+complete -c doing -l by  -f -r -n '__fish_doing_using_command since' -d Totals\ grouping
 complete -c doing -l case  -f -r -n '__fish_doing_using_command since' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command since' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command since' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
@@ -546,6 +551,7 @@ complete -c doing -l path -s p -f -r -n '__fish_doing_using_command template' -d
 complete -c doing -l save -s s -f  -n '__fish_doing_using_command template' -d Save\ template\ to\ file\ instead\ of\ STDOUT
 complete -c doing -l after  -f -r -n '__fish_doing_using_command today' -d View\ entries\ after\ specified\ time
 complete -c doing -l before  -f -r -n '__fish_doing_using_command today' -d View\ entries\ before\ specified\ time
+complete -c doing -l by  -f -r -n '__fish_doing_using_command today' -d Totals\ grouping
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command today' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command today' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
 complete -c doing -l from  -f -r -n '__fish_doing_using_command today' -d Time\ range\ to\ show\ \`doing\ today\ --from\ \"12pm\ to\ 4pm\"\`
@@ -571,6 +577,7 @@ complete -c doing -l after  -f -r -n '__fish_doing_using_command view' -d Show\ 
 complete -c doing -l age  -f -r -n '__fish_doing_using_command view' -d Age
 complete -c doing -l before  -f -r -n '__fish_doing_using_command view' -d Show\ entries\ older\ than\ date
 complete -c doing -l bool  -f -r -n '__fish_doing_using_command view' -d Boolean\ used\ to\ combine\ multiple\ tags
+complete -c doing -l by  -f -r -n '__fish_doing_using_command view' -d Totals\ grouping
 complete -c doing -l count -s c -f -r -n '__fish_doing_using_command view' -d Count\ to\ display
 complete -c doing -l case  -f -r -n '__fish_doing_using_command view' -d Case\ sensitivity\ for\ search\ string\ matching\ \[\(c\)ase-sensitive
 complete -c doing -l color  -f  -n '__fish_doing_using_command view' -d Include\ colors\ in\ output
@@ -606,6 +613,7 @@ complete -c doing -l search  -f -r -n '__fish_doing_using_command wiki' -d Searc
 complete -c doing -l tag  -f -r -n '__fish_doing_using_command wiki' -d Tag\ filter
 complete -c doing -l after  -f -r -n '__fish_doing_using_command yesterday' -d View\ entries\ after\ specified\ time
 complete -c doing -l before  -f -r -n '__fish_doing_using_command yesterday' -d View\ entries\ before\ specified\ time
+complete -c doing -l by  -f -r -n '__fish_doing_using_command yesterday' -d Totals\ grouping
 complete -c doing -l config_template  -f -r -n '__fish_doing_using_command yesterday' -d Output\ using\ a\ template\ from\ configuration
 complete -c doing -l duration  -f  -n '__fish_doing_using_command yesterday' -d Show\ elapsed\ time\ on\ entries\ without\ @done\ tag
 complete -c doing -l from  -f -r -n '__fish_doing_using_command yesterday' -d Time\ range\ to\ show\ \`doing\ yesterday\ --from\ \"12pm\ to\ 4pm\"\`
