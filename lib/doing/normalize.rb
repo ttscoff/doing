@@ -170,7 +170,7 @@ module Doing
       case self
       when /^t/i
         :tags
-      when /^s/i
+      when /^[sp]/i
         :section
       else
         default.is_a?(Symbol) ? default : default.normalize_totals_by

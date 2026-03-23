@@ -43,6 +43,12 @@ night.
 Doing has over 30 commands for tracking your status, recording your time, and
 analyzing the results.
 
+Recent CLI conveniences:
+
+- Totals output now supports `--by` grouping (for example `--by tags` and/or `--by section`, repeatable for ordering).
+- Long flags with underscores also accept dashes (for example `--only_timed` or `--only-timed`).
+- Underscored subcommands also accept dashed aliases (for example `doing tag_dir` or `doing tag-dir`).
+
 See [the wiki][wiki] for installation and usage instructions.
 
 ## Launchbar/Alfred
@@ -67,7 +73,7 @@ See the [doing project on BrettTerpstra.com][bt doing] for the download.
 
 <!--END GITHUB-->
 <!--JEKYLL
-{% download 117 %} 
+{% download 117 %}
 -->
 
 Evan Lovely has created an [Alfred workflow][] as well.

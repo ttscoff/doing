@@ -109,6 +109,14 @@ class DoingShowTest < Test::Unit::TestCase
     assert_match(/--- Section Totals ---/, result, 'should have section totals')
     assert_no_match(/--- Tag Totals ---/, result, 'should not have tag totals when only section requested')
 
+    result = doing('--stdout', 'show', '--count', '0', '--totals', '--by', 'project')
+    assert_match(/--- Section Totals ---/, result, 'project alias should map to section totals')
+    assert_no_match(/--- Tag Totals ---/, result, 'project alias should suppress tag totals when only section requested')
+
+    result = doing('--stdout', 'show', '--count', '0', '--totals', '--by', 'p')
+    assert_match(/--- Section Totals ---/, result, 'p alias should map to section totals')
+    assert_no_match(/--- Tag Totals ---/, result, 'p alias should suppress tag totals when only section requested')
+
     # test show --by with argument order
     result = doing('--stdout', 'show', '--count', '0', '--totals', '--by', 'section', '--by', 'tags')
     tag_pos = result.index('--- Tag Totals ---')
