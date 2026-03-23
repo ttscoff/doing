@@ -75,6 +75,14 @@ class DoingViewTest < Test::Unit::TestCase
                      [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
                    ], result)
 
+    result = doing('--stdout', 'view', '-c', '4', '--totals', '--only-timed', 'test3')
+    assert_count_entries(4, result, '4 entries should be shown with dashed only-timed alias')
+    assert_matches([
+                     [/Tag Totals/, 'Should contain tag totals', false],
+                     [/untimed entry/, 'Should not show untimed entry', true],
+                     [/\d\d:\d\d:\d\d/, 'Entries should contain interval', false]
+                   ], result)
+
     result = doing('--stdout', 'view', '--no-times', 'test3')
     assert_matches([
                      [/\d\d:\d\d:\d\d/, 'Entries should not contain intervals', true]
@@ -88,6 +96,16 @@ class DoingViewTest < Test::Unit::TestCase
     result = doing('--stdout', 'view', '--tag_sort=name', '--tag_order=asc', 'test2')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/bunch/, first_tag[1], 'First tag should be bunch')
+
+    result = doing('--stdout', 'view', '--tag-sort=name', '--tag-order=asc', 'test2')
+    first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
+    assert_match(/bunch/, first_tag[1], 'First tag should be bunch with dashed tag sort aliases')
+
+    # tokens after `--` are positional arguments and must not be normalized/parsing as options
+    result = doing('--stdout', 'view', 'test3', '--', '--only-timed')
+    assert_matches([
+                     [/untimed entry/, 'Should still show untimed entry when dashed token is after --', false]
+                   ], result)
 
     # date limit
     result = doing('view', '--before', '9/14/2021', '--after', '9/12/2021', 'test2')

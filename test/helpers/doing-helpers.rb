@@ -10,8 +10,15 @@ require 'doing/errors'
 module DoingHelpers
   DOING_BIN = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'doing')
   GEMFILE = File.join(File.dirname(__FILE__), '..', '..', 'Gemfile')
-  # Use bundle exec so subprocess uses project gems (avoids Temple/Haml version mismatch with system gems)
-  DOING_CMD = File.exist?(GEMFILE) ? ['bundle', 'exec', 'ruby', DOING_BIN] : [DOING_BIN]
+  # If tests are already running inside Bundler, skip nested `bundle exec` for each subprocess.
+  # This avoids a large per-call startup tax while keeping gem resolution pinned to project deps.
+  DOING_CMD = if defined?(Bundler)
+                ['ruby', DOING_BIN]
+              elsif File.exist?(GEMFILE)
+                ['bundle', 'exec', 'ruby', DOING_BIN]
+              else
+                [DOING_BIN]
+              end
   TEST_CONFIG = File.join(File.dirname(__FILE__), '..', 'test.doingrc')
 
   def trunc_minutes(ts)

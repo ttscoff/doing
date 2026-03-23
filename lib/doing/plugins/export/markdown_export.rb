@@ -82,7 +82,8 @@ module Doing
 
       totals = if opt[:totals]
                  wwid.tag_times(format: :markdown, sort_by: opt[:sort_tags],
-                                sort_order: opt[:tag_order])
+                                sort_order: opt[:tag_order],
+                                by: opt[:by])
                else
                  ''
                end

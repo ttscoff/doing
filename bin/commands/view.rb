@@ -48,6 +48,10 @@ command :view do |c|
   c.desc 'Only show items with recorded time intervals (override view settings)'
   c.switch [:only_timed], default_value: false, negatable: false
 
+  c.desc 'Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section'
+  c.arg_name 'GROUP'
+  c.flag [:by], must_match: REGEX_TOTALS_BY, multiple: true, type: TotalsBySymbol
+
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
 
@@ -155,6 +159,7 @@ command :view do |c|
       opts[:tag_filter] = tag_filter
       opts[:tag_order] = tag_order
       opts[:totals] = totals
+      opts[:by] = options[:by] if options[:by]
       opts[:view_template] = title
 
       Doing::Pager.page @wwid.list_section(opts)

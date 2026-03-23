@@ -162,6 +162,27 @@ module Doing
     end
 
     ##
+    ## Convert totals-by string to a symbol
+    ##
+    ## @return     Symbol :tags or :section
+    ##
+    def normalize_totals_by(default = :tags)
+      case self
+      when /^t/i
+        :tags
+      when /^s/i
+        :section
+      else
+        default.is_a?(Symbol) ? default : default.normalize_totals_by
+      end
+    end
+
+    ## @see #normalize_totals_by
+    def normalize_totals_by!(default = :tags)
+      replace normalize_totals_by(default)
+    end
+
+    ##
     ## Adds ?: to any parentheticals in a regular expression
     ## to avoid match groups
     ##
@@ -216,6 +237,10 @@ module Doing
 
     def normalize_matching(default = :pattern)
       to_s.normalize_matching(default)
+    end
+
+    def normalize_totals_by(default = :tags)
+      to_s.normalize_totals_by(default)
     end
   end
 end

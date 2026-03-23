@@ -6,8 +6,6 @@ require 'gli'
 require 'doing/help_monkey_patch'
 require 'doing/add_options'
 require 'doing'
-require 'tempfile'
-require 'pp'
 
 def class_exists?(class_name)
   klass = Module.const_get(class_name)
@@ -23,6 +21,91 @@ end
 
 include GLI::App
 include Doing::Errors
+
+# Known long options that are declared with underscores in this CLI.
+# Allow dashed aliases (e.g. --only-timed) by rewriting them before GLI parses.
+UNDERSCORE_LONG_OPTIONS = Set.new(
+  %w[
+    bundle_id
+    config_file
+    config_template
+    doing_file
+    finish_last
+    only_timed
+    save_to
+    tag_order
+    tag_sort
+  ]
+).freeze
+
+def normalize_dashed_aliases!(argv)
+  argv.each_with_index do |token, idx|
+    break if token == '--'
+    next unless token.start_with?('--')
+
+    m = token.match(/\A--(?<name>[^=]+)(?<suffix>=.*)?\z/)
+    next unless m
+
+    name = m['name']
+    suffix = m['suffix'] || ''
+
+    if name.start_with?('no-')
+      option_name = name.sub(/\Ano-/, '').tr('-', '_')
+      next unless UNDERSCORE_LONG_OPTIONS.include?(option_name)
+
+      argv[idx] = "--no-#{option_name}#{suffix}"
+    else
+      option_name = name.tr('-', '_')
+      next unless UNDERSCORE_LONG_OPTIONS.include?(option_name)
+
+      argv[idx] = "--#{option_name}#{suffix}"
+    end
+  end
+end
+
+GLOBAL_OPTIONS_WITH_VALUES = Set.new(%w[
+  config_file
+  doing_file
+]).freeze
+
+GLOBAL_SHORT_OPTIONS_WITH_VALUES = Set.new(%w[
+  f
+]).freeze
+
+def normalize_dashed_command_alias!(argv, underscore_commands)
+  idx = 0
+  while idx < argv.length
+    token = argv[idx]
+    break if token == '--'
+
+    if token.start_with?('--')
+      if token.include?('=')
+        idx += 1
+        next
+      end
+
+      option_name = token.sub(/\A--/, '').tr('-', '_')
+      idx += if GLOBAL_OPTIONS_WITH_VALUES.include?(option_name)
+               2
+             else
+               1
+             end
+      next
+    end
+
+    if token.start_with?('-') && token != '-'
+      short = token.sub(/\A-/, '')
+      consumes_value = GLOBAL_SHORT_OPTIONS_WITH_VALUES.include?(short) ||
+                       GLOBAL_SHORT_OPTIONS_WITH_VALUES.any? { |opt| short.start_with?(opt) && short.length > 1 }
+      idx += consumes_value ? 2 : 1
+      next
+    end
+
+    normalized = token.tr('-', '_')
+    argv[idx] = normalized if token.include?('-') && underscore_commands.include?(normalized)
+    break
+  end
+end
 
 version Doing::VERSION
 hide_commands_without_desc true
@@ -86,6 +169,10 @@ end
 
 accept TagSortSymbol do |value|
   value.normalize_tag_sort(Doing.config.fetch('tag_sort', :name))
+end
+
+accept TotalsBySymbol do |value|
+  value.normalize_totals_by(:tags)
 end
 
 accept ExportTemplate do |value|
@@ -344,6 +431,9 @@ end
 
 commands_from File.expand_path(Doing.setting('plugins.command_path')) if Doing.setting('plugins.command_path')
 
+normalize_dashed_aliases!(ARGV)
+underscore_commands = commands.keys.map(&:to_s).select { |name| name.include?('_') }.to_set
+normalize_dashed_command_alias!(ARGV, underscore_commands)
 @command = ARGV[0]
 
 exit run(ARGV)

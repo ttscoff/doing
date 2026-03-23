@@ -70,7 +70,7 @@ module Doing
                 self.template('css')
               end
 
-      totals = opt[:totals] ? wwid.tag_times(format: :html, sort_by: opt[:sort_tags], sort_order: opt[:tag_order]) : ''
+      totals = opt[:totals] ? wwid.tag_times(format: :html, sort_by: opt[:sort_tags], sort_order: opt[:tag_order], by: opt[:by]) : ''
       engine = Haml::Engine.new(template)
       Doing.logger.debug('HTML Export:', "#{items_out.count} items output to HTML")
       @out = engine.render(Object.new,

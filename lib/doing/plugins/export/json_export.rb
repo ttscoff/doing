@@ -104,7 +104,8 @@ module Doing
                                'items' => items_out,
                                'timers' => wwid.tag_times(format: :json,
                                                           sort_by: opt[:sort_tags],
-                                                          sort_order: opt[:tag_order])
+                                                          sort_order: opt[:tag_order],
+                                                          by: opt[:by])
                              })
       when 'timeline'
         template = <<~EOTEMPLATE

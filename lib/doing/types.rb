@@ -6,6 +6,7 @@ module Doing
     REGEX_TAG_SORT = /^(?:n(?:ame)?|t(?:ime)?)$/i.freeze
     REGEX_BOOL = /^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$/i.freeze
     REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i.freeze
+    REGEX_TOTALS_BY = /^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?)$/i.freeze
     REGEX_VALUE_QUERY = /^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$/.freeze
     REGEX_CLOCK = '(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)'
     REGEX_TIME = /^#{REGEX_CLOCK}$/i.freeze
@@ -30,6 +31,7 @@ module Doing
     OrderSymbol = Class.new(Symbol)
     TagArray = Class.new(Array)
     TagSortSymbol = Class.new(Symbol)
+    TotalsBySymbol = Class.new(Symbol)
     TemplateName = Class.new(String)
   end
 end

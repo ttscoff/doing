@@ -4,6 +4,7 @@ require 'fileutils'
 require 'tempfile'
 require 'time'
 require 'json'
+require 'yaml'
 
 require 'helpers/doing-helpers'
 require 'test_helper'
@@ -20,7 +21,7 @@ class DoingTagTest < Test::Unit::TestCase
     @basedir = mktmpdir
     @wwid_file = File.join(@basedir, 'wwid.md')
     @backup_dir = File.join(@basedir, 'doing_backup')
-    @config_file = File.join(File.dirname(__FILE__), 'test2.doingrc')
+    @config_file = File.expand_path(File.join(File.dirname(__FILE__), 'test2.doingrc'))
     @import_file = File.join(File.dirname(__FILE__), 'All Activities 2.json')
   end
 
@@ -119,6 +120,24 @@ class DoingTagTest < Test::Unit::TestCase
     assert_match(/@ermygerd\(\d{4}-\d{2}-\d{2} \d{2}:\d{2}\)/, result, 'Result should contain new tag with datestamp')
   end
 
+  def test_tag_dir_dashed_subcommand_alias
+    Dir.chdir(@basedir) do
+      doing('tag-dir', 'project-one')
+      local_cfg = YAML.safe_load(IO.read(File.join(@basedir, '.doingrc')))
+      assert_equal(['project-one'], local_cfg['default_tags'],
+                   'Dashed subcommand alias should map to tag_dir without modifying tag string arguments')
+    end
+  end
+
+  def test_tag_dir_dashed_subcommand_alias_after_global_flag
+    Dir.chdir(@basedir) do
+      doing('--stdout', 'tag-dir', 'project-two')
+      local_cfg = YAML.safe_load(IO.read(File.join(@basedir, '.doingrc')))
+      assert_equal(['project-two'], local_cfg['default_tags'],
+                   'Dashed subcommand alias should work after global flags')
+    end
+  end
+
   private
 
   def assert_count_entries(count, shown, message = 'Should be X entries shown')
@@ -133,7 +152,7 @@ class DoingTagTest < Test::Unit::TestCase
   end
 
   def doing(*args)
-    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir }, '--doing_file', @wwid_file,
+    doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir, 'BUNDLE_GEMFILE' => GEMFILE }, '--doing_file', @wwid_file,
                    *args)
   end
 end

@@ -140,7 +140,8 @@ module Doing
         if opt[:totals]
           out += wwid.tag_times(format: Doing.setting('timer_format').to_sym,
                                 sort_by: opt[:sort_tags],
-                                sort_order: opt[:tag_order])
+                                sort_order: opt[:tag_order],
+                                by: opt[:by])
         end
         out
       end

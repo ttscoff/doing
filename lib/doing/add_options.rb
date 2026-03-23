@@ -134,6 +134,10 @@ def add_options(type, cmd, default_template: 'default')
 
     cmd.desc 'Only show items with recorded time intervals'
     cmd.switch [:only_timed], default_value: false, negatable: false
+
+    cmd.desc 'Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section'
+    cmd.arg_name 'GROUP'
+    cmd.flag [:by], must_match: REGEX_TOTALS_BY, multiple: true, type: TotalsBySymbol
   when :tag_filter
     cmd.desc 'Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
     cmd.arg_name 'TAG'

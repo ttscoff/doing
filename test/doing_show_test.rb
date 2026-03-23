@@ -89,6 +89,12 @@ class DoingShowTest < Test::Unit::TestCase
     result = doing('--stdout', 'show', '--tag_sort=time', '--tag_order=desc', '--totals')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/development/, first_tag[1], 'First tag should be development')
+
+    # Dashed aliases for underscore long options
+    result = doing('--stdout', 'show', '--tag-sort=time', '--tag-order=desc', '--totals')
+    first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
+    assert_match(/development/, first_tag[1], 'Dashed aliases should match underscore option behavior')
+
     # Tag sort by name ascending
     result = doing('--stdout', 'show', '--tag_sort=name', '--tag_order=asc', '--totals')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
@@ -97,6 +103,22 @@ class DoingShowTest < Test::Unit::TestCase
     result = doing('--stdout', 'show', '--tag_sort=name', '--tag_order=desc', '--totals')
     first_tag = result.match(/--- Tag Totals ---\n(\w+?):/)
     assert_match(/writing/, first_tag[1], 'First tag should be writing')
+
+    # test show --by section
+    result = doing('--stdout', 'show', '--count', '0', '--totals', '--by', 'section')
+    assert_match(/--- Section Totals ---/, result, 'should have section totals')
+    assert_no_match(/--- Tag Totals ---/, result, 'should not have tag totals when only section requested')
+
+    # test show --by with argument order
+    result = doing('--stdout', 'show', '--count', '0', '--totals', '--by', 'section', '--by', 'tags')
+    tag_pos = result.index('--- Tag Totals ---')
+    section_pos = result.index('--- Section Totals ---')
+    assert(section_pos && tag_pos && section_pos < tag_pos, 'Section totals should appear before tag totals')
+
+    result = doing('--stdout', 'show', '--count', '0', '--totals', '--by', 't', '--by', 's')
+    tag_pos = result.index('--- Tag Totals ---')
+    section_pos = result.index('--- Section Totals ---')
+    assert(tag_pos && section_pos && tag_pos < section_pos, 'Tag totals should appear before section totals')
 
     # test show --val queries
     result = doing('--stdout', 'show', '--val', 'done < 2021-09-13', '--val', 'done > 2021-09-12')
