@@ -7,6 +7,7 @@ module Doing
     REGEX_BOOL = /^(?:and|all|any|or|not|none|p(?:at(?:tern)?)?)$/i.freeze
     REGEX_SORT_ORDER = /^(?:a(?:sc)?|d(?:esc)?)$/i.freeze
     REGEX_TOTALS_BY = /^(?:t(?:ag(?:s)?)?|s(?:ec(?:tion|tions)?)?|p(?:roj(?:ect|ects)?)?)$/i.freeze
+    REGEX_TOTALS_FORMAT = /^(?:averages|clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m)$/i.freeze
     REGEX_VALUE_QUERY = /^(?:!)?@?(?:\S+) +(?:!?[<>=][=*]?|[$*^]=) +(?:.*?)$/.freeze
     REGEX_CLOCK = '(?:\d{1,2}+(?::\d{1,2}+)?(?: *(?:am|pm))?|midnight|noon)'
     REGEX_TIME = /^#{REGEX_CLOCK}$/i.freeze
@@ -32,6 +33,7 @@ module Doing
     TagArray = Class.new(Array)
     TagSortSymbol = Class.new(Symbol)
     TotalsBySymbol = Class.new(Symbol)
+    TotalsFormatSymbol = Class.new(String)
     TemplateName = Class.new(String)
   end
 end

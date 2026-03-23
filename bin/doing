@@ -32,6 +32,7 @@ UNDERSCORE_LONG_OPTIONS = Set.new(
     doing_file
     finish_last
     only_timed
+    totals_format
     save_to
     tag_order
     tag_sort
@@ -173,6 +174,10 @@ end
 
 accept TotalsBySymbol do |value|
   value.normalize_totals_by(:tags)
+end
+
+accept TotalsFormatSymbol do |value|
+  value.to_s.downcase
 end
 
 accept ExportTemplate do |value|

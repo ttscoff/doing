@@ -138,6 +138,10 @@ def add_options(type, cmd, default_template: 'default')
     cmd.desc 'Totals grouping (tags|section). Can be repeated, e.g. --by tags --by section'
     cmd.arg_name 'GROUP'
     cmd.flag [:by], must_match: REGEX_TOTALS_BY, multiple: true, type: TotalsBySymbol
+
+    cmd.desc 'Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)'
+    cmd.arg_name 'FORMAT'
+    cmd.flag [:totals_format], must_match: REGEX_TOTALS_FORMAT, type: TotalsFormatSymbol
   when :tag_filter
     cmd.desc 'Filter entries by tag. Combine multiple tags with a comma. Wildcards allowed (*, ?)'
     cmd.arg_name 'TAG'

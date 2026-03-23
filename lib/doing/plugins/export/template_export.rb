@@ -141,7 +141,9 @@ module Doing
           out += wwid.tag_times(format: Doing.setting('timer_format').to_sym,
                                 sort_by: opt[:sort_tags],
                                 sort_order: opt[:tag_order],
-                                by: opt[:by])
+                                by: opt[:by],
+                                totals_format: opt[:totals_format],
+                                items: items)
         end
         out
       end

@@ -53,6 +53,20 @@ class DoingBudgetTest < Test::Unit::TestCase
                  'Totals footer should include total budgets left')
   end
 
+  def test_totals_format_from_config_and_cli_override
+    doing('import', '--type', 'timing', @import_file)
+
+    cfg = YAML.safe_load(File.read(@config_file))
+    cfg['totals_format'] = 'hmclock'
+    File.write(@config_file, YAML.dump(cfg))
+
+    config_result = doing('--stdout', 'show', '--count', '0', '--totals')
+    assert_match(/Total tracked: \d{2,}:\d{2}/, config_result, 'Config totals_format should affect totals output')
+
+    cli_result = doing('--stdout', 'show', '--count', '0', '--totals', '--totals_format', 'clock')
+    assert_match(/Total tracked: \d{2}:\d{2}:\d{2}/, cli_result, 'CLI totals_format should override config setting')
+  end
+
   def test_budget_affects_byday_output_footer
     doing('import', '--type', 'timing', @import_file)
     doing('--yes', 'budget', 'development', '100h')

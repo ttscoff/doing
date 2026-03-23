@@ -52,6 +52,10 @@ command :view do |c|
   c.arg_name 'GROUP'
   c.flag [:by], must_match: REGEX_TOTALS_BY, multiple: true, type: TotalsBySymbol
 
+  c.desc 'Time format for totals output (clock|hmclock|hm|dhm|ydhm|tight|natural|speech|m|averages)'
+  c.arg_name 'FORMAT'
+  c.flag [:totals_format], must_match: REGEX_TOTALS_FORMAT, type: TotalsFormatSymbol
+
   c.desc 'Select from a menu of matching entries to perform additional operations'
   c.switch %i[i interactive], negatable: false, default_value: false
 
@@ -159,6 +163,7 @@ command :view do |c|
       opts[:tag_filter] = tag_filter
       opts[:tag_order] = tag_order
       opts[:totals] = totals
+      opts[:totals_format] = options[:totals_format] if options[:totals_format]
       opts[:by] = options[:by] if options[:by]
       opts[:view_template] = title
 

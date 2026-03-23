@@ -80,6 +80,17 @@ class DoingShowTest < Test::Unit::TestCase
     assert(totals[1], 'should have tag totals')
     tags = totals[1].scan(/^\w+:\s+\d{2}:\d{2}:\d{2}$/).count
     assert_equal(11, tags, 'Should be 11 tags listed')
+    assert_match(/Total tracked: \d{2}:\d{2}:\d{2}/, result, 'Default totals format should remain clock')
+
+    # test show --totals_format hmclock
+    hmclock_result = doing('--stdout', 'show', '--count', '0', '--totals', '--totals_format', 'hmclock')
+    assert_match(/Total tracked: \d{2,}:\d{2}/, hmclock_result, 'hmclock totals should show cumulative hours and minutes')
+
+    # test show --totals_format averages
+    averages_result = doing('--stdout', 'show', '--count', '0', '--totals', '--totals_format', 'averages')
+    assert_match(/Total tracked: \d{2,}:\d{2} \(\d+h \d+ min, \d+(?:\.\d{2})?h\/day\)/,
+                 averages_result,
+                 'averages totals should include hours/minutes and h/day')
 
     # test show --tag_sort
     result = doing('--stdout', 'show', '--totals')

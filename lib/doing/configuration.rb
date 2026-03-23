@@ -44,6 +44,7 @@ module Doing
       'budgets' => {},
 
       'timer_format' => 'text',
+      'totals_format' => 'clock',
       'interval_format' => 'text',
 
       'order' => 'asc',

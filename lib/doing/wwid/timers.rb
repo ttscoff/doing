@@ -11,10 +11,11 @@ module Doing
     ## @param      sort_by       [Symbol] Sort by :name or :time
     ## @param      sort_order    [Symbol] The sort order (:asc or :desc)
     ##
-    def tag_times(format: :text, sort_by: :time, sort_order: :asc, by: nil)
+    def tag_times(format: :text, sort_by: :time, sort_order: :asc, by: nil, totals_format: nil, items: nil)
       groupings = normalize_totals_groupings(by)
       totals = collect_totals(groupings)
       return '' if totals.empty?
+      totals_format = normalize_totals_format(totals_format)
 
       timers_snapshot = totals[:tags] || {}
 
@@ -54,6 +55,8 @@ module Doing
           timer_data: timer_data,
           sort_by: sort_by,
           sort_order: sort_order,
+          totals_format: totals_format,
+          items: items,
           remaining_map: remaining_map,
           budgets: budgets,
           budgets_total: budgets_total,
@@ -144,7 +147,7 @@ module Doing
       sorted
     end
 
-    def render_totals_group(format:, group:, timer_data:, sort_by:, sort_order:, remaining_map:, budgets:, budgets_total:, budget_fmt:)
+    def render_totals_group(format:, group:, timer_data:, sort_by:, sort_order:, totals_format:, items:, remaining_map:, budgets:, budgets_total:, budget_fmt:)
       timer_data = timer_data.dup
       timer_data.delete('meanwhile')
 
@@ -155,6 +158,7 @@ module Doing
 
       title = group == :section ? 'Section Totals' : 'Tag Totals'
       label = group == :section ? 'section' : 'tag'
+      line_format = totals_format == :averages ? :hmclock : totals_format
 
       case format
       when :html
@@ -180,7 +184,7 @@ EOHEAD
           if group == :tags && remaining_map.key?(k) && remaining_map[k].positive?
             budget_str = " (budget left #{budget_fmt.call(remaining_map[k])})"
           end
-          output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{v.time_string(format: :clock)}#{budget_str}</td></tr>\n"
+          output += "<tr><td style='text-align:left;'>#{k}</td><td style='text-align:left;'>#{v.time_string(format: line_format)}#{budget_str}</td></tr>\n"
         end
         output += <<EOTAIL
         <tr>
@@ -190,7 +194,7 @@ EOHEAD
         <tfoot>
         <tr>
           <td style="text-align:left;"><strong>Total</strong></td>
-          <td style="text-align:left;">#{total.time_string(format: :clock)}#{group == :tags && budgets_total.positive? ? " (total budgets left #{budget_fmt.call(budgets_total)})" : ''}</td>
+          <td style="text-align:left;">#{total.time_string(format: line_format)}#{group == :tags && budgets_total.positive? ? " (total budgets left #{budget_fmt.call(budgets_total)})" : ''}</td>
         </tr>
         </tfoot>
         </table>
@@ -210,7 +214,7 @@ EOTAIL
           if group == :tags && remaining_map.key?(k) && remaining_map[k].positive?
             budget_str = " (budget left #{budget_fmt.call(remaining_map[k])})"
           end
-          output += "| #{' ' * (pad - k.length)}#{k} | #{v.time_string(format: :clock)}#{budget_str} |\n"
+          output += "| #{' ' * (pad - k.length)}#{k} | #{v.time_string(format: line_format)}#{budget_str} |\n"
         end
         output + "[#{title}]"
       when :json
@@ -219,7 +223,7 @@ EOTAIL
           row = {
             label => k,
             'seconds' => v,
-            'formatted' => v.time_string(format: :clock)
+            'formatted' => v.time_string(format: line_format)
           }
           if group == :tags
             row['budget'] = budgets[k]
@@ -287,7 +291,7 @@ EOTAIL
           (max - k.length).times do
             spacer += ' '
           end
-          line = "#{k}:#{spacer}#{v.time_string(format: :clock)}"
+          line = "#{k}:#{spacer}#{v.time_string(format: line_format)}"
           if group == :tags && remaining_map.key?(k) && remaining_map[k].positive?
             line += " (budget left #{budget_fmt.call(remaining_map[k])})"
           end
@@ -295,11 +299,45 @@ EOTAIL
         end
 
         output = output.empty? ? '' : "\n--- #{title} ---\n#{output.join("\n")}"
-        output += "\n\nTotal tracked: #{total.time_string(format: :clock)}"
+        output += "\n\nTotal tracked: #{total.time_string(format: line_format)}"
+        output += totals_average_suffix(total, items) if totals_format == :averages
         output += " (total budgets left #{budget_fmt.call(budgets_total)})" if group == :tags && budgets_total.positive?
         output += "\n"
         output
       end
+    end
+
+    def normalize_totals_format(value)
+      format = (value || Doing.setting('totals_format') || 'clock').to_s.downcase
+      format = 'clock' if format.empty?
+      return :averages if format == 'averages'
+
+      format.to_sym
+    end
+
+    def totals_average_suffix(total_seconds, items)
+      return '' unless items.respond_to?(:empty?) && !items.empty?
+
+      total_hours = total_seconds.to_f / 3600
+      total_hours_floor = total_hours.floor
+      total_minutes = ((total_hours - total_hours_floor) * 60).round
+      if total_minutes == 60
+        total_hours_floor += 1
+        total_minutes = 0
+      end
+
+      dates = items.map { |item| item.date.to_date }.compact
+      return '' if dates.empty?
+
+      start_date = dates.min
+      end_date = dates.max
+      time_span_in_days = [(end_date - start_date).to_i + 1, 1].max
+      avg_hours_per_day = total_hours / time_span_in_days
+
+      format(' (%<hours>dh %<minutes>d min, %<avg>.2fh/day)',
+             hours: total_hours_floor,
+             minutes: total_minutes,
+             avg: avg_hours_per_day)
     end
   end
 end
