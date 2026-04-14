@@ -537,6 +537,7 @@ module Doing
     end
 
     def load_plugins(add_dir = nil)
+      add_dir = File.expand_path(add_dir) if add_dir
       FileUtils.mkdir_p(add_dir) if add_dir && !File.exist?(add_dir)
 
       Plugins.load_plugins(add_dir)
