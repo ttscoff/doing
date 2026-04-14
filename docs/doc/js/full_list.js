@@ -20,17 +20,6 @@ function escapeShortcut() {
   });
 }
 
-function navResizer() {
-  $(window).mousemove(function(e) {
-    window.parent.postMessage({
-      action: 'mousemove', event: {pageX: e.pageX, which: e.which}
-    }, '*');
-  }).mouseup(function(e) {
-    window.parent.postMessage({action: 'mouseup'}, '*');
-  });
-  window.parent.postMessage("navReady", "*");
-}
-
 function clearSearchTimeout() {
   clearTimeout(searchTimeout);
   searchTimeout = null;
@@ -44,14 +33,21 @@ function enableLinks() {
     $clicked.addClass('clicked');
     evt.stopPropagation();
 
-    if (evt.target.tagName === 'A') return true;
+    if (window.origin === "null") {
+      if (evt.target.tagName === 'A') return true;
 
-    var elem = $clicked.find('> .item .object_link a')[0];
-    var e = evt.originalEvent;
-    var newEvent = new MouseEvent(evt.originalEvent.type);
-    newEvent.initMouseEvent(e.type, e.canBubble, e.cancelable, e.view, e.detail, e.screenX, e.screenY, e.clientX, e.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, e.button, e.relatedTarget);
-    elem.dispatchEvent(newEvent);
-    evt.preventDefault();
+      var elem = $clicked.find('> .item .object_link a')[0];
+      var e = evt.originalEvent;
+      var newEvent = new MouseEvent(evt.originalEvent.type);
+      newEvent.initMouseEvent(e.type, e.canBubble, e.cancelable, e.view, e.detail, e.screenX, e.screenY, e.clientX, e.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, e.button, e.relatedTarget);
+      elem.dispatchEvent(newEvent);
+      evt.preventDefault();
+    } else {
+      window.top.postMessage({
+        action: "navigate",
+        url: $clicked.find('.object_link a').attr('href'),
+      }, "*");
+    }
     return false;
   });
 }
@@ -62,7 +58,24 @@ function enableToggles() {
     evt.stopPropagation();
     evt.preventDefault();
     $(this).parent().parent().toggleClass('collapsed');
+    $(this).attr('aria-expanded', function (i, attr) {
+        return attr == 'true' ? 'false' : 'true'
+    });
     highlight();
+  });
+
+  // navigation of nested classes using keyboard
+  $('#full_list a.toggle').on('keypress',function(evt) {
+    // enter key is pressed
+    if (evt.which == 13) {
+      evt.stopPropagation();
+      evt.preventDefault();
+      $(this).parent().parent().toggleClass('collapsed');
+      $(this).attr('aria-expanded', function (i, attr) {
+          return attr == 'true' ? 'false' : 'true'
+      });
+      highlight();
+    }
   });
 }
 
@@ -91,7 +104,7 @@ function enableSearch() {
     }
   });
 
-  $('#full_list').after("<div id='noresults' style='display:none'></div>");
+  $('#full_list').after("<div id='noresults' role='status' style='display: none'></div>");
 }
 
 function ignoredKeyPress(event) {
@@ -154,11 +167,14 @@ function partialSearch(searchString, offset) {
 function searchDone() {
   searchTimeout = null;
   highlight();
-  if ($('#full_list li:visible').size() === 0) {
-    $('#noresults').text('No results were found.').hide().fadeIn();
+  var found = $('#full_list li:visible').size();
+  if (found === 0) {
+    $('#noresults').text('No results were found.');
   } else {
-    $('#noresults').text('').hide();
+    // This is read out to screen readers
+    $('#noresults').text('There are ' + found + ' results.');
   }
+  $('#noresults').show();
   $('#content').removeClass('insearch');
 }
 
@@ -179,6 +195,13 @@ function highlight() {
   });
 }
 
+function isInView(element) {
+  const rect = element.getBoundingClientRect();
+  const windowHeight =
+    window.innerHeight || document.documentElement.clientHeight;
+  return rect.left >= 0 && rect.bottom <= windowHeight;
+}
+  
 /**
  * Expands the tree to the target element and its immediate
  * children.
@@ -188,7 +211,13 @@ function expandTo(path) {
   $target.addClass('clicked');
   $target.removeClass('collapsed');
   $target.parentsUntil('#full_list', 'li').removeClass('collapsed');
-  if($target[0]) {
+
+  $target.find('a.toggle').attr('aria-expanded', 'true')
+  $target.parentsUntil('#full_list', 'li').each(function(i, el) {
+    $(el).find('> div > a.toggle').attr('aria-expanded', 'true');
+  });
+
+  if($target[0] && !isInView($target[0])) {
     window.scrollTo(window.scrollX, $target.offset().top - 250);
     highlight();
   }
@@ -206,7 +235,6 @@ window.addEventListener("message", windowEvents, false);
 
 $(document).ready(function() {
   escapeShortcut();
-  navResizer();
   enableLinks();
   enableToggles();
   populateSearchCache();
