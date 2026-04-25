@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module Doing
-  VERSION = '2.1.111'
+  VERSION = '2.1.112'
 end

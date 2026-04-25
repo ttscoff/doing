@@ -46,6 +46,11 @@ class DoingUtilTest < Test::Unit::TestCase
     assert_equal('testtag', '@testtag'.remove_at, '@ symbol should be removed')
   end
 
+  def test_uncolor_removes_reset_sequences
+    assert_equal('release generated files @doing @done(2026-04-25 02:15)',
+                 "release generated files @doing\e[0m\e[m @done\e[0m\e[m(2026-04-25 02:15)".uncolor)
+  end
+
   def test_format_time
     item = Doing::Item.new(Time.now - 3600, "Test item @done(#{(Time.now - 1200).strftime('%F %R')})",
                            @wwid.current_section)
