@@ -46,13 +46,21 @@ module Doing
         if date_string.match(Types::REGEX_DAY) && now.strftime('%a') =~ /^#{Regexp.last_match(1)}/i
           date_string = 'today'
         end
-        date_string = "#{options[:context]} #{date_string}" if date_string =~ Types::REGEX_TIME && options[:context]
+        clock_time_with_context = date_string =~ Types::REGEX_TIME && options[:context]
+        date_string = "#{options[:context]} #{date_string}" if clock_time_with_context
 
         res = Chronic.parse(date_string, {
                               guess: options.fetch(:guess, :begin),
                               context: options.fetch(:future, false) ? :future : :past,
                               ambiguous_time_range: 8
                             })
+        if res.nil? && clock_time_with_context && options[:context] == :today && !options.fetch(:future, false)
+          res = Chronic.parse("yesterday #{self}", {
+                                guess: options.fetch(:guess, :begin),
+                                context: :past,
+                                ambiguous_time_range: 8
+                              })
+        end
 
         Doing.logger.debug('Parser:', %(date/time string "#{self}" interpreted as #{res}))
       end

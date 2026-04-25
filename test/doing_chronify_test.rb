@@ -6,6 +6,7 @@ require 'time'
 
 require 'helpers/doing-helpers'
 require 'test_helper'
+require 'doing'
 
 # Tests for natural language date processing
 class DoingChronifyTest < Test::Unit::TestCase
@@ -56,7 +57,26 @@ class DoingChronifyTest < Test::Unit::TestCase
     assert_equal(entry_time, yesterday, 'new entry is the wrong time')
   end
 
+  def test_future_today_clock_time_resolves_to_yesterday
+    now = Time.local(2026, 4, 25, 0, 42, 0)
+    expected = Time.local(2026, 4, 24, 14, 30, 0)
+
+    with_time_now(now) do
+      assert_equal(expected, '2:30pm'.chronify(guess: :begin, context: :today))
+    end
+  end
+
   private
+
+  def with_time_now(now)
+    time_singleton = class << Time; self; end
+    original_now = Time.method(:now)
+
+    time_singleton.define_method(:now) { now }
+    yield
+  ensure
+    time_singleton.define_method(:now, original_now)
+  end
 
   def assert_within_tolerance(t1, t2, message: 'Times should be within tolerance of each other', tolerance: 2)
     assert(t1.close_enough?(t2, tolerance: tolerance), message)
