@@ -49,6 +49,10 @@ class DoingUtilTest < Test::Unit::TestCase
   def test_uncolor_removes_reset_sequences
     assert_equal('release generated files @doing @done(2026-04-25 02:15)',
                  "release generated files @doing\e[0m\e[m @done\e[0m\e[m(2026-04-25 02:15)".uncolor)
+    assert_equal('release generated files @doing @done(2026-04-25 02:15)',
+                 Doing::StringHighlight.instance_method(:uncolor).bind(
+                   "release generated files @doing\e[0m\e[m @done\e[0m\e[m(2026-04-25 02:15)"
+                 ).call)
   end
 
   def test_format_time

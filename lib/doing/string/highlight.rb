@@ -5,7 +5,7 @@ module Doing
   module StringHighlight
     ## @param (see #highlight_tags)
     def highlight_tags!(color = 'yellow', last_color: nil)
-      replace highlight_tags(color)
+      replace highlight_tags(color, last_color: last_color)
     end
 
     ##
@@ -71,7 +71,13 @@ module Doing
     # @return     [String]  All escape codes in string
     #
     def last_color
-      scan(/\e\[[\d;]+m/).join('')
+      scan(Doing::Color::ESCAPE_REGEX).join('')
+    end
+
+    def last_color_code
+      return '' unless match?(Doing::Color::ESCAPE_REGEX)
+
+      super
     end
 
     ##
@@ -80,7 +86,7 @@ module Doing
     ## @return     clean string
     ##
     def uncolor
-      gsub(/\e\[[\d;]+m/, '')
+      gsub(Doing::Color::ESCAPE_REGEX, '')
     end
 
     ##

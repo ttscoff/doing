@@ -112,6 +112,20 @@ class DoingOutputTest < Test::Unit::TestCase
     assert_equal(matches.count, 2, 'There should be 2 entries shown by `doing recent`')
   end
 
+  def test_no_color_last_strips_stored_escape_sequences
+    @config_file = File.join(@basedir, 'test_tags_color.doingrc')
+    File.write(@config_file, "#{IO.read(File.join(File.dirname(__FILE__), 'test.doingrc'))}\ntags_color: magenta\n")
+    File.write(@wwid_file, [
+                 'Currently:',
+                 "\t- 2026-04-25 04:25 | version bump @doing\e[0m\e[m @done\e[0m\e[m(2026-04-25 04:25)"
+               ].join("\n"))
+
+    result = doing('--no-color', 'last')
+
+    assert_no_match(Doing::Color::ESCAPE_REGEX, result, 'Output should not contain ANSI escape sequences')
+    assert_match(/version bump @doing @done\(2026-04-25 04:25\)/, result)
+  end
+
   def test_template_command
     result = doing('template', 'haml')
     assert_match(/^!!!\s*\n%html/, result, 'Output should be a HAML template')

@@ -42,7 +42,7 @@ module DoingHelpers
 
   def assert_valid_file(file)
     contents = IO.read(file)
-    assert_no_match(/\e\[(?:(?:[349]|10)[0-7]|[0-9])?m/, contents, 'File should not contain any escape codes')
+    assert_no_match(Doing::Color::ESCAPE_REGEX, contents, 'File should not contain any escape codes')
   end
 
   def assert_count_entries(count, shown, message = 'Should be X entries shown')
