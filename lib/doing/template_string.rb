@@ -167,10 +167,11 @@ module Doing
                   line = l.gsub(/%/, '\%').strip.wrap(width, pad: pad, indent: indent, offset: 0, prefix: prefix,
                                                              color: last_color, after: after, reset: reset, pad_first: true)
                   line.highlight_tags!(tags_color, last_color: last_color) unless !tags_color || !tags_color.good?
-                  "#{line}  "
+                  pad.positive? ? line : "#{line}  "
                 end
               end.join("\n")
-              "\n#{last_color}#{mark}#{outstring}  "
+              suffix = pad.positive? ? '' : '  '
+              "\n#{last_color}#{mark}#{outstring}#{suffix}"
             else
               out = format("\n%s%s%s%#{pad}s%s", indent, prefix, last_color,
                            value.join("\n#{indent}#{prefix}").gsub(/%/, '\%').sub(/\s*$/, ''), after)
@@ -209,12 +210,14 @@ module Doing
           natural = natural_placeholder_width(name, value)
           if width_token == '*'
             if block_placeholder?(name)
+              reserved_width += 1
               queues[name] << block_placeholder_width(terminal_width, token)
             else
+              reserved_width += visible_literal_width(token['prefix'].to_s)
               stretch_tokens << token
             end
           else
-            reserved_width += reserved_placeholder_width(width_token, natural)
+            reserved_width += reserved_placeholder_width(name, width_token, natural)
           end
         end
 
@@ -240,7 +243,7 @@ module Doing
     end
 
     def natural_placeholder_width(name, value)
-      # note placeholders are rendered on their own wrapped lines and should not
+      # Block placeholders are rendered on their own wrapped lines and should not
       # reserve horizontal width on the title line
       return 0 if block_placeholder?(name)
       return 0 unless value.good?
@@ -256,11 +259,17 @@ module Doing
       normalized.split("\n").map { |line| visible_literal_width(line) }.max || 0
     end
 
-    def reserved_placeholder_width(width_token, natural_width)
+    def reserved_placeholder_width(name, width_token, natural_width)
+      return implicit_shortdate_width if name == 'shortdate' && (width_token.nil? || width_token.empty?)
       return natural_width if width_token.nil? || width_token.empty?
 
       minimum = width_token.to_i.abs
       [natural_width, minimum].max
+    end
+
+    def implicit_shortdate_width
+      fmt_string = Doing.setting('shortdate_format.older', '%m/%d/%y %_I:%M%P', exact: true)
+      Date.today.strftime(fmt_string).length
     end
 
     def block_placeholder?(name)
@@ -296,6 +305,9 @@ module Doing
     end
 
     def detected_terminal_width
+      env_width = ENV['COLUMNS'].to_i
+      return env_width if env_width.positive?
+
       if $stdout.tty?
         begin
           require 'io/console'
@@ -309,9 +321,6 @@ module Doing
 
       tty_width = TTY::Screen.columns.to_i
       return tty_width if tty_width.positive?
-
-      env_width = ENV['COLUMNS'].to_i
-      return env_width if env_width.positive?
 
       80
     end

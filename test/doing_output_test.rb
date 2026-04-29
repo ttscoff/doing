@@ -161,11 +161,41 @@ class DoingOutputTest < Test::Unit::TestCase
     doing('note', '1', 'A long note line that should not shrink title width')
 
     first_line = doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir, 'COLUMNS' => '80' },
-                                '--doing_file', @wwid_file, '--stdout', 'recent', '1').uncolor.lines.first.chomp
+                                '--doing_file', @wwid_file, '--stdout',
+                                'recent', '1').force_encoding('UTF-8').uncolor.lines.first.chomp
 
     assert_match(/deliberately long title that should stay/, first_line,
                  'Note placeholder width should not collapse stretch title width')
     assert_operator(first_line.length, :>, 60, 'Stretch title should use most of the 80-column line')
+  end
+
+  def test_recent_template_version_2_preserves_inline_note_stretch_width
+    cfg = YAML.safe_load(IO.read(File.join(File.dirname(__FILE__), 'test.doingrc')))
+    cfg['template_version'] = 2
+    cfg['templates']['recent'] = {
+      'date_format' => '%_I:%M%P',
+      'template' => '%shortdate | %*title %*_14│ note',
+      'elements' => %w[title],
+      'placeholders' => {
+        'title' => { 'width' => 'stretch' }
+      },
+      'wrap_width' => 80,
+      'count' => 10,
+      'order' => 'asc'
+    }
+
+    @config_file = File.join(@basedir, 'template_v2_inline_note_stretch.doingrc')
+    File.write(@config_file, YAML.dump(cfg))
+
+    doing('now', 'Short title')
+    doing('note', '1',
+          'Reading Features now includes Wiki Navigation moved from Writing Features and a dedicated Zoom Overview page; Interface Features links to Zoom Overview and keeps going for a while longer')
+
+    output = doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir, 'COLUMNS' => '140' },
+                            '--doing_file', @wwid_file, '--stdout', 'recent', '1').force_encoding('UTF-8').uncolor
+    note_line = output.lines.find { |line| line.include?('Reading Features') }.chomp
+
+    assert_operator(note_line.length, :>, 120, 'Inline %*note should survive template_version 2 placeholder config')
   end
 
   def test_no_color_last_strips_stored_escape_sequences

@@ -53,6 +53,7 @@ module Doing
         note = Regexp.last_match(0)
         ''
       end
+      after.sub!(/[ \t]+\z/, '') unless note.empty?
 
       left_pad = ' ' * offset
       left_pad += indent
@@ -82,7 +83,20 @@ module Doing
       out.push(line.join(' '))
 
       last_color = ''
-      out[0] = format("%-#{pad}s%s%s", out[0], last_color, after)
+      if pad_first && pad.positive?
+        out.map!.with_index do |l, idx|
+          suffix = idx.zero? ? "#{last_color}#{after}" : last_color
+          format("%-#{pad}s%s", l, suffix)
+        end
+      else
+        out[0] = format("%-#{pad}s%s%s", out[0], last_color, after)
+      end
+
+      suffix = if note.empty?
+                 pad_first && pad.positive? ? '' : ' '
+               else
+                 " #{note}".chomp
+               end
 
       out.map.with_index do |l, idx|
         if !pad_first && idx.zero?
@@ -90,7 +104,7 @@ module Doing
         else
           "#{left_pad}#{color}#{prefix}#{l}#{last_color}"
         end
-      end.join("\n") + " #{note}".chomp
+      end.join("\n") + suffix
       # res.join("\n").strip + last_color + " #{note}".chomp
     end
 

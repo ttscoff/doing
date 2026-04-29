@@ -9,12 +9,19 @@ class DoingTemplateStringTest < Test::Unit::TestCase
   def with_terminal_columns(columns)
     original_columns = TTY::Screen.method(:columns)
     original_console = IO.method(:console)
+    original_env_columns = ENV.fetch('COLUMNS', nil)
     without_warnings do
       TTY::Screen.singleton_class.send(:define_method, :columns) { columns }
       IO.singleton_class.send(:define_method, :console) { nil }
     end
+    ENV.delete('COLUMNS')
     yield
   ensure
+    if original_env_columns.nil?
+      ENV.delete('COLUMNS')
+    else
+      ENV['COLUMNS'] = original_env_columns
+    end
     without_warnings do
       TTY::Screen.singleton_class.send(:define_method, :columns, original_columns)
       IO.singleton_class.send(:define_method, :console, original_console)
@@ -44,6 +51,18 @@ class DoingTemplateStringTest < Test::Unit::TestCase
     yield
   ensure
     $VERBOSE = original_verbose
+  end
+
+  def with_columns_env(columns)
+    original_columns = ENV.fetch('COLUMNS', nil)
+    ENV['COLUMNS'] = columns.to_s
+    yield
+  ensure
+    if original_columns.nil?
+      ENV.delete('COLUMNS')
+    else
+      ENV['COLUMNS'] = original_columns
+    end
   end
 
   def test_star_title_uses_remaining_width
@@ -175,7 +194,7 @@ class DoingTemplateStringTest < Test::Unit::TestCase
       output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 80).colored.uncolor
       first_line = output.lines.first.chomp
 
-      assert_match(/deliberately long title that should remain wide/, first_line)
+      assert_match(/deliberately long title/, first_line)
       assert_operator(first_line.length, :>, 60)
     end
   end
@@ -191,9 +210,9 @@ class DoingTemplateStringTest < Test::Unit::TestCase
       output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
       lines = output.split("\n")
 
-      assert_equal('alpha beta gamma delta epsilon zeta      ', lines[0])
+      assert_equal('alpha beta gamma delta epsilon zeta    ', lines[0])
       assert_equal('    │ one two three four five six seven ', lines[1])
-      assert_equal('    │ eight nine ten     ', lines[2])
+      assert_equal('    │ eight nine ten                    ', lines[2])
     end
   end
 
@@ -235,6 +254,49 @@ class DoingTemplateStringTest < Test::Unit::TestCase
         assert_match(/This title should not wrap at thirty-two columns/, first_line)
         assert_operator(first_line.length, :>, 32)
       end
+    end
+  end
+
+  def test_star_title_prefers_columns_env_over_live_console_width
+    with_terminal_columns(120) do
+      with_console_width(120) do
+        with_columns_env(40) do
+          template = '%20shortdate | %*title [%-10section]'
+          placeholders = {
+            'shortdate' => '2026-04-28',
+            'title' => 'This title should wrap at forty columns despite a wider terminal',
+            'section' => 'Currently'
+          }
+
+          output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true,
+                                                       wrap_width: 0).colored.uncolor
+          first_line = output.lines.first.chomp
+
+          assert_operator(first_line.length, :<=, 40)
+          refute_match(/despite a wider terminal/, first_line)
+        end
+      end
+    end
+  end
+
+  def test_prefixed_star_title_reserves_implicit_shortdate_and_prefix_width
+    with_terminal_columns(100) do
+      template = '%reset%cyan%shortdate %boldwhite%*║ title %dark%boldmagenta[%boldwhite%-15section%boldmagenta]%reset ' \
+                 '%yellow%interval%boldred%duration%dark%white%*_15│ note'
+      placeholders = {
+        'shortdate' => '8:26am',
+        'title' => 'optimize @terminalwidgetapp @done(2026-04-29 08:26)',
+        'section' => 'Projects',
+        'interval' => '',
+        'duration' => '',
+        'note' => []
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+      first_line = output.lines.first.chomp
+
+      assert_operator(first_line.length, :<=, 100)
+      assert_match(/\[Projects\s+\]/, first_line)
     end
   end
 end

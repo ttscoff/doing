@@ -380,18 +380,20 @@ module Doing
       placeholders = cfg['placeholders']
       return template unless placeholders.is_a?(Hash)
 
-      apply_placeholder_widths(template, placeholders)
+      apply_placeholder_widths(template, placeholders, cfg['elements'])
     end
 
-    def apply_placeholder_widths(template, placeholders)
+    def apply_placeholder_widths(template, placeholders, elements)
       keys = TEMPLATE_WIDTH_PLACEHOLDERS.map { |k| Regexp.escape(k) }.sort_by(&:length).reverse
       token_rx = /(?<!\\)%(?<width>\*|-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?(?<name>#{keys.join('|')})/i
+      managed_elements = Array(elements).map(&:to_s)
 
       template.gsub(token_rx) do
         m = Regexp.last_match
         name = m['name']
 
-        width = normalized_placeholder_width(placeholders[name] || placeholders[name.to_sym])
+        width = normalized_placeholder_width(placeholders[name] || placeholders[name.to_sym], m['width'],
+                                             managed_elements.include?(name))
         mchar = m['mchar'] ? "^#{m['mchar']}" : ''
         indent = m['ichar'] ? "#{m['ichar']}#{m['icount']}" : ''
         prefix = m['prefix'] || ''
@@ -400,10 +402,11 @@ module Doing
       end
     end
 
-    def normalized_placeholder_width(config)
+    def normalized_placeholder_width(config, existing_width, managed)
       width = config['width'] || config[:width] if config.is_a?(Hash)
 
-      return '' if width.nil?
+      return '' if width.nil? && managed
+      return existing_width.to_s if width.nil?
 
       case width.to_s
       when /^stretch$/i
