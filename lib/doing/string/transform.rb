@@ -46,7 +46,7 @@ module Doing
     ##
     def wrap(len, pad: 0, indent: '  ', offset: 0, prefix: '', color: '', after: '', reset: '', pad_first: false)
       color.empty? ? '' : after.last_color
-      note_rx = /(?mi)(?<!\\)%(?<width>-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?note/
+      note_rx = /(?mi)(?<!\\)%(?<width>\*|-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?note/
       note = ''
       after = after.dup if after.frozen?
       after.sub!(note_rx) do

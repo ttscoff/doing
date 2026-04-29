@@ -112,13 +112,69 @@ class DoingOutputTest < Test::Unit::TestCase
     assert_equal(matches.count, 2, 'There should be 2 entries shown by `doing recent`')
   end
 
+  def test_recent_template_version_2_applies_placeholder_widths
+    cfg = YAML.safe_load(IO.read(File.join(File.dirname(__FILE__), 'test.doingrc')))
+    cfg['template_version'] = 2
+    cfg['templates']['recent'] = {
+      'date_format' => '%F',
+      'template' => '%20date | %*title [%-10section]',
+      'elements' => %w[date title section],
+      'placeholders' => {
+        'title' => { 'width' => 'stretch' }
+      },
+      'wrap_width' => 0,
+      'count' => 10,
+      'order' => 'asc'
+    }
+
+    @config_file = File.join(@basedir, 'template_v2.doingrc')
+    File.write(@config_file, YAML.dump(cfg))
+
+    doing('now', 'This is a deliberately long title for stretch testing')
+    first_line = doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir, 'COLUMNS' => '60' },
+                                '--doing_file', @wwid_file, '--stdout', 'recent', '1').uncolor.lines.first
+
+    assert_match(/^\d{4}-\d{2}-\d{2} \|/, first_line, 'Date placeholder should no longer keep stale fixed padding in template_version 2')
+    assert_match(/deliberately long title/, first_line, 'Stretch title should expand once stale fixed widths are removed')
+  end
+
+  def test_recent_template_version_2_does_not_reserve_note_width_for_stretch_title
+    cfg = YAML.safe_load(IO.read(File.join(File.dirname(__FILE__), 'test.doingrc')))
+    cfg['template_version'] = 2
+    cfg['templates']['recent'] = {
+      'date_format' => '%_I:%M%P',
+      'template' => '%20shortdate ║ %*title [%-10section] %80_14│ note',
+      'elements' => %w[shortdate title section note],
+      'placeholders' => {
+        'title' => { 'width' => 'stretch' },
+        'duration' => { 'width' => 10 }
+      },
+      'wrap_width' => 80,
+      'count' => 10,
+      'order' => 'asc'
+    }
+
+    @config_file = File.join(@basedir, 'template_v2_note.doingrc')
+    File.write(@config_file, YAML.dump(cfg))
+
+    doing('now', 'This is a deliberately long title that should stay wide with stretch title support')
+    doing('note', '1', 'A long note line that should not shrink title width')
+
+    first_line = doing_with_env({ 'DOING_CONFIG' => @config_file, 'DOING_BACKUP_DIR' => @backup_dir, 'COLUMNS' => '80' },
+                                '--doing_file', @wwid_file, '--stdout', 'recent', '1').uncolor.lines.first.chomp
+
+    assert_match(/deliberately long title that should stay/, first_line,
+                 'Note placeholder width should not collapse stretch title width')
+    assert_operator(first_line.length, :>, 60, 'Stretch title should use most of the 80-column line')
+  end
+
   def test_no_color_last_strips_stored_escape_sequences
     @config_file = File.join(@basedir, 'test_tags_color.doingrc')
     File.write(@config_file, "#{IO.read(File.join(File.dirname(__FILE__), 'test.doingrc'))}\ntags_color: magenta\n")
     File.write(@wwid_file, [
-                 'Currently:',
-                 "\t- 2026-04-25 04:25 | version bump @doing\e[0m\e[m @done\e[0m\e[m(2026-04-25 04:25)"
-               ].join("\n"))
+      'Currently:',
+      "\t- 2026-04-25 04:25 | version bump @doing\e[0m\e[m @done\e[0m\e[m(2026-04-25 04:25)"
+    ].join("\n"))
 
     result = doing('--no-color', 'last')
 

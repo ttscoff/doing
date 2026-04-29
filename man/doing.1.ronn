@@ -199,6 +199,8 @@ The config also contains templates for various command outputs. Include placehol
 
 Date formats are based on Ruby [`strftime`](http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime) formatting.
 
+`%title` and `%note` placeholders accept optional width formatting. Numeric width (for example `%60title`) wraps to that width. Negative width applies a minimum padded width. You can also use `*` as a stretch width marker (for example `%*title`), which expands that placeholder to fill remaining space on the template line based on terminal columns. Stretch width now accounts for the rendered minimum width of trailing fixed placeholders, so `%*title` expands up to where right-side content begins and that trailing content can sit at the right edge. Placeholders without any width marker keep natural rendered width and do not expand. When multiple `%*...` placeholders are on one line, remaining width is split evenly from left to right.
+
 My normal template for the `recent` command looks like this:
 
     recent:

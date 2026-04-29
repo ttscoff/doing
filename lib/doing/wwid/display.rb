@@ -2,6 +2,7 @@
 
 module Doing
   class WWID
+    TEMPLATE_WIDTH_PLACEHOLDERS = %w[id tags date interval duration shortdate section title note idnote odnote chompnote].freeze
     ##
     ## Display contents of a section based on options
     ##
@@ -43,7 +44,7 @@ module Doing
           opt[:order] ||= cfg['order'] || :asc
           opt[:tag_order] ||= :asc
           opt[:tags_color] = cfg['tags_color'] || false if opt[:tags_color].nil?
-          opt[:template] ||= cfg['template']
+          opt[:template] ||= resolved_template(cfg)
           opt[:sort_tags] ||= opt[:tag_sort]
         end
 
@@ -263,7 +264,7 @@ module Doing
           opt[:wrap_width] = cfg['wrap_width']
           opt[:count] = count
           opt[:format] = cfg['date_format']
-          opt[:template] = opt[:template] || cfg['template']
+          opt[:template] = opt[:template] || resolved_template(cfg)
           opt[:order] = :asc
         end
 
@@ -371,6 +372,48 @@ module Doing
     end
 
     private
+
+    def resolved_template(cfg)
+      template = cfg['template']
+      return template unless Doing.setting('template_version', 1).to_i >= 2
+
+      placeholders = cfg['placeholders']
+      return template unless placeholders.is_a?(Hash)
+
+      apply_placeholder_widths(template, placeholders)
+    end
+
+    def apply_placeholder_widths(template, placeholders)
+      keys = TEMPLATE_WIDTH_PLACEHOLDERS.map { |k| Regexp.escape(k) }.sort_by(&:length).reverse
+      token_rx = /(?<!\\)%(?<width>\*|-?\d+)?(?:\^(?<mchar>.))?(?:(?<ichar>[ _t]|[^a-z0-9])(?<icount>\d+))?(?<prefix>.[ _t]?)?(?<name>#{keys.join('|')})/i
+
+      template.gsub(token_rx) do
+        m = Regexp.last_match
+        name = m['name']
+
+        width = normalized_placeholder_width(placeholders[name] || placeholders[name.to_sym])
+        mchar = m['mchar'] ? "^#{m['mchar']}" : ''
+        indent = m['ichar'] ? "#{m['ichar']}#{m['icount']}" : ''
+        prefix = m['prefix'] || ''
+
+        "%#{width}#{mchar}#{indent}#{prefix}#{name}"
+      end
+    end
+
+    def normalized_placeholder_width(config)
+      width = config['width'] || config[:width] if config.is_a?(Hash)
+
+      return '' if width.nil?
+
+      case width.to_s
+      when /^stretch$/i
+        '*'
+      when /^auto$/i, /^$/
+        ''
+      else
+        width.to_i.to_s
+      end
+    end
 
     ##
     ## Generate output using available export plugins

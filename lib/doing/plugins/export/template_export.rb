@@ -103,7 +103,7 @@ module Doing
           template = opt[:template].dup
           note_rx = /(?i-m)(?x:^([\s\S]*?)
                       (%(?:[io]d|(?:\^[\s\S])?
-                      (?:(?:[ _t]|[^a-z0-9])?\d+)?
+                      (?:(?:[ _t]|[^a-z0-9])?(?:\*|\d+))?
                       (?:[\s\S][ _t]?)?)?note)
                       ([\s\S]*?)$)/
           template.sub!(note_rx, '\1\3\2')

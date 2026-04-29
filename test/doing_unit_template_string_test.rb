@@ -1,0 +1,199 @@
+# frozen_string_literal: true
+
+require 'test_helper'
+
+$LOAD_PATH.unshift File.join(__dir__, '..', 'lib')
+require 'doing'
+
+class DoingTemplateStringTest < Test::Unit::TestCase
+  def with_terminal_columns(columns)
+    original = TTY::Screen.method(:columns)
+    TTY::Screen.singleton_class.send(:define_method, :columns) { columns }
+    yield
+  ensure
+    TTY::Screen.singleton_class.send(:define_method, :columns, original)
+  end
+
+  def with_console_width(width)
+    console = Struct.new(:winsize).new([24, width])
+    original_console = IO.method(:console)
+    original_tty = $stdout.method(:tty?)
+
+    IO.singleton_class.send(:define_method, :console) { console }
+    $stdout.singleton_class.send(:define_method, :tty?) { true }
+    yield
+  ensure
+    IO.singleton_class.send(:define_method, :console, original_console)
+    $stdout.singleton_class.send(:define_method, :tty?, original_tty)
+  end
+
+  def test_star_title_uses_remaining_width
+    with_terminal_columns(30) do
+      template = '%date | %*title'
+      placeholders = {
+        'date' => '2026-01-01',
+        'title' => 'alpha beta gamma delta epsilon'
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+      lines = output.split("\n")
+
+      assert_equal(2, lines.length)
+      assert_equal('2026-01-01 | alpha beta gamma ', lines[0])
+      assert_equal('             delta epsilon ', lines[1])
+    end
+  end
+
+  def test_placeholders_without_width_use_natural_width
+    with_terminal_columns(30) do
+      template = '%date | %*title (%section)'
+      placeholders = {
+        'date' => '2026-01-01',
+        'title' => 'alpha beta gamma',
+        'section' => 'ABC'
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+      lines = output.split("\n")
+
+      assert_equal(2, lines.length)
+      assert_equal('2026-01-01 | alpha beta  (ABC)', lines[0])
+      assert_equal('             gamma ', lines[1])
+    end
+  end
+
+  def test_star_title_respects_trailing_negative_minimum_width
+    with_terminal_columns(36) do
+      template = '%date | %*title | %-10section'
+      placeholders = {
+        'date' => '2026-01-01',
+        'title' => 'alpha beta gamma delta',
+        'section' => 'ABC'
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+      lines = output.split("\n")
+
+      assert_equal(3, lines.length)
+      assert_equal('2026-01-01 | alpha beta | ABC       ', lines[0])
+      assert_equal('             gamma', lines[1])
+      assert_equal('             delta ', lines[2])
+      assert_equal(36, lines[0].length)
+    end
+  end
+
+  def test_numeric_width_behavior_is_unchanged
+    with_terminal_columns(200) do
+      template = '%date | %10title'
+      placeholders = {
+        'date' => '2026-01-01',
+        'title' => 'alpha beta gamma'
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+      assert_equal("2026-01-01 | alpha beta\n             gamma ", output)
+    end
+  end
+
+  def test_negative_width_behavior_is_unchanged
+    with_terminal_columns(200) do
+      template = '%date | %-10title'
+      placeholders = {
+        'date' => '2026-01-01',
+        'title' => 'abc'
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+      assert_equal('2026-01-01 | abc       ', output)
+    end
+  end
+
+  def test_multiple_star_placeholders_split_evenly
+    with_terminal_columns(40) do
+      template = '%*title -- %*section'
+      placeholders = {
+        'title' => 'alpha beta gamma delta',
+        'section' => 'project-rocket-surgery'
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+      lines = output.split("\n")
+
+      assert_equal(2, lines.length)
+      assert_equal('alpha beta gamma   -- project-rocket-surgery', lines[0])
+      assert_equal('delta ', lines[1])
+    end
+  end
+
+  def test_star_title_ignores_template_color_tokens_for_stretch_width
+    with_terminal_columns(55) do
+      template = '%reset%magenta%20shortdate %boldwhite║ %*title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset'
+      placeholders = {
+        'shortdate' => '2026-04-28',
+        'title' => 'alpha beta gamma delta epsilon',
+        'section' => 'ABC'
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+      lines = output.split("\n")
+
+      assert_equal(2, lines.length)
+      assert_equal('          2026-04-28 ║ alpha beta gamma    [ABC       ]', lines[0])
+      assert_equal('                       delta epsilon ', lines[1])
+    end
+  end
+
+  def test_star_title_does_not_reserve_note_placeholder_natural_width
+    with_terminal_columns(80) do
+      template = '%shortdate ║ %*title [%section] %_14│ note'
+      placeholders = {
+        'shortdate' => ' 4:09pm',
+        'title' => 'This is a deliberately long title that should remain wide despite note content',
+        'section' => 'Currently',
+        'note' => ['this note should not reduce title width']
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 80).colored.uncolor
+      first_line = output.lines.first.chomp
+
+      assert_match(/deliberately long title that should remain wide/, first_line)
+      assert_operator(first_line.length, :>, 60)
+    end
+  end
+
+  def test_star_note_uses_full_block_width_without_shrinking_title
+    with_terminal_columns(40) do
+      template = '%*title %*_4│ note'
+      placeholders = {
+        'title' => 'alpha beta gamma delta epsilon zeta',
+        'note' => ['one two three four five six seven eight nine ten']
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+      lines = output.split("\n")
+
+      assert_equal('alpha beta gamma delta epsilon zeta      ', lines[0])
+      assert_equal('    │ one two three four five six seven ', lines[1])
+      assert_equal('    │ eight nine ten     ', lines[2])
+    end
+  end
+
+  def test_star_title_prefers_live_console_width_over_small_tty_fallback
+    with_console_width(120) do
+      with_terminal_columns(32) do
+        template = '%20shortdate | %*title [%-10section]'
+        placeholders = {
+          'shortdate' => '2026-04-28',
+          'title' => 'This title should not wrap at thirty-two columns in an interactive terminal',
+          'section' => 'Currently'
+        }
+
+        output = Doing::TemplateString.new(template, placeholders: placeholders, disable_color: true, wrap_width: 0).colored.uncolor
+        first_line = output.lines.first.chomp
+
+        assert_match(/This title should not wrap at thirty-two columns/, first_line)
+        assert_operator(first_line.length, :>, 32)
+      end
+    end
+  end
+end
