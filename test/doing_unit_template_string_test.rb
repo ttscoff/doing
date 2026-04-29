@@ -7,11 +7,18 @@ require 'doing'
 
 class DoingTemplateStringTest < Test::Unit::TestCase
   def with_terminal_columns(columns)
-    original = TTY::Screen.method(:columns)
-    TTY::Screen.singleton_class.send(:define_method, :columns) { columns }
+    original_columns = TTY::Screen.method(:columns)
+    original_console = IO.method(:console)
+    without_warnings do
+      TTY::Screen.singleton_class.send(:define_method, :columns) { columns }
+      IO.singleton_class.send(:define_method, :console) { nil }
+    end
     yield
   ensure
-    TTY::Screen.singleton_class.send(:define_method, :columns, original)
+    without_warnings do
+      TTY::Screen.singleton_class.send(:define_method, :columns, original_columns)
+      IO.singleton_class.send(:define_method, :console, original_console)
+    end
   end
 
   def with_console_width(width)
@@ -19,12 +26,24 @@ class DoingTemplateStringTest < Test::Unit::TestCase
     original_console = IO.method(:console)
     original_tty = $stdout.method(:tty?)
 
-    IO.singleton_class.send(:define_method, :console) { console }
-    $stdout.singleton_class.send(:define_method, :tty?) { true }
+    without_warnings do
+      IO.singleton_class.send(:define_method, :console) { console }
+      $stdout.singleton_class.send(:define_method, :tty?) { true }
+    end
     yield
   ensure
-    IO.singleton_class.send(:define_method, :console, original_console)
-    $stdout.singleton_class.send(:define_method, :tty?, original_tty)
+    without_warnings do
+      IO.singleton_class.send(:define_method, :console, original_console)
+      $stdout.singleton_class.send(:define_method, :tty?, original_tty)
+    end
+  end
+
+  def without_warnings
+    original_verbose = $VERBOSE
+    $VERBOSE = nil
+    yield
+  ensure
+    $VERBOSE = original_verbose
   end
 
   def test_star_title_uses_remaining_width
@@ -191,7 +210,9 @@ class DoingTemplateStringTest < Test::Unit::TestCase
         'note' => ['note text here']
       }
 
-      output = Doing::TemplateString.new(template, placeholders: placeholders, force_color: true, wrap_width: 0).colored
+      output = without_warnings do
+        Doing::TemplateString.new(template, placeholders: placeholders, force_color: true, wrap_width: 0).colored
+      end
       note_line = output.lines.find { |line| line.include?('│ note text here') }
 
       assert_include(note_line, "\e[34m│ note text here", 'Note prefix should use the blue color from the note line')
@@ -199,8 +220,8 @@ class DoingTemplateStringTest < Test::Unit::TestCase
   end
 
   def test_star_title_prefers_live_console_width_over_small_tty_fallback
-    with_console_width(120) do
-      with_terminal_columns(32) do
+    with_terminal_columns(32) do
+      with_console_width(120) do
         template = '%20shortdate | %*title [%-10section]'
         placeholders = {
           'shortdate' => '2026-04-28',

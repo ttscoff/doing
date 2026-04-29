@@ -40,7 +40,7 @@ end
 
 namespace :test do
   FileList['test/*_test.rb'].each do |rakefile|
-    test_name = File.basename(rakefile, '.rb').sub(/^.*?_(.*?)_.*?$/, '\1')
+    test_name = File.basename(rakefile, '.rb').sub(/doing_(.*?)_test/, '\1')
 
     Rake::TestTask.new(:"#{test_name}") do |t|
       t.libs << ['test', 'test/helpers']
