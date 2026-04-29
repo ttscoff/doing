@@ -178,6 +178,26 @@ class DoingTemplateStringTest < Test::Unit::TestCase
     end
   end
 
+  def test_star_note_uses_color_from_its_own_template_line
+    with_terminal_columns(80) do
+      template = "%reset%magenta%20shortdate %boldwhite║ %*title %dark%boldmagenta[%boldwhite%-10section%boldmagenta]%reset\n" \
+                 '      %yellow%interval%boldred%duration%dark%blue%*_14│ note'
+      placeholders = {
+        'shortdate' => '2026-04-28',
+        'title' => 'alpha beta',
+        'section' => 'Currently',
+        'interval' => '',
+        'duration' => '',
+        'note' => ['note text here']
+      }
+
+      output = Doing::TemplateString.new(template, placeholders: placeholders, force_color: true, wrap_width: 0).colored
+      note_line = output.lines.find { |line| line.include?('│ note text here') }
+
+      assert_include(note_line, "\e[34m│ note text here", 'Note prefix should use the blue color from the note line')
+    end
+  end
+
   def test_star_title_prefers_live_console_width_over_small_tty_fallback
     with_console_width(120) do
       with_terminal_columns(32) do

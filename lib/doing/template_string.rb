@@ -105,7 +105,8 @@ module Doing
       return unless ph
 
       placeholder_offset = ph.begin(0)
-      last_colors = parsed_colors[:colors].select { |v| v[:index] <= placeholder_offset + 4 }
+      color_offset = parsed_colors[:string].match(rx)&.begin(0) || placeholder_offset
+      last_colors = parsed_colors[:colors].select { |v| v[:index] <= color_offset + 4 }
 
       last_color = last_colors.map { |v| v[:color] }.pop(3).join('')
 
