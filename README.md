@@ -12,7 +12,7 @@ _If you're one of the rare people like me who find this useful, feel free to
 
 <!--README-->
 
-The current version of `doing` is <!--VER-->2.1.120<!--END VER-->.
+The current version of `doing` is <!--VER-->2.1.122<!--END VER-->.
 
 Find all of the documentation in the [doing wiki][wiki].
 
@@ -98,7 +98,7 @@ with changes. Please target the `develop` branch with pull requests.
 [touch bar]: https://brettterpstra.com/2021/07/21/crazy-bettertouchtool-touch-bar-simulator/
 [create a plugin]: https://github.com/ttscoff/doing/wiki/Creating-Plugins
 [contact]: https://brettterpstra.com/contact/
-[alfred workflow]: http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/
+[alfred workflow]: https://github.com/EvanLovely/alfred--doing
 
 <!--END README-->
 
