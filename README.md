@@ -12,7 +12,7 @@ _If you're one of the rare people like me who find this useful, feel free to
 
 <!--README-->
 
-The current version of `doing` is <!--VER-->2.1.90<!--END VER-->.
+The current version of `doing` is <!--VER-->2.1.122<!--END VER-->.
 
 Find all of the documentation in the [doing wiki][wiki].
 
@@ -43,6 +43,14 @@ night.
 Doing has over 30 commands for tracking your status, recording your time, and
 analyzing the results.
 
+Recent CLI conveniences:
+
+- Totals output now supports `--by` grouping (for example `--by tags` and/or `--by section`, repeatable for ordering).
+- Totals output now supports `--totals_format` (for example `clock`, `hmclock`, and `averages`) with `totals_format` config fallback.
+- The `averages` totals format appends summary stats like `(<hours>h <minutes> min, <avg>h/day)` to `Total tracked`.
+- Long flags with underscores also accept dashes (for example `--only_timed` or `--only-timed`).
+- Underscored subcommands also accept dashed aliases (for example `doing tag_dir` or `doing tag-dir`).
+
 See [the wiki][wiki] for installation and usage instructions.
 
 ## Launchbar/Alfred
@@ -67,7 +75,7 @@ See the [doing project on BrettTerpstra.com][bt doing] for the download.
 
 <!--END GITHUB-->
 <!--JEKYLL
-{% download 117 %} 
+{% download 117 %}
 -->
 
 Evan Lovely has created an [Alfred workflow][] as well.
@@ -90,7 +98,7 @@ with changes. Please target the `develop` branch with pull requests.
 [touch bar]: https://brettterpstra.com/2021/07/21/crazy-bettertouchtool-touch-bar-simulator/
 [create a plugin]: https://github.com/ttscoff/doing/wiki/Creating-Plugins
 [contact]: https://brettterpstra.com/contact/
-[alfred workflow]: http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/
+[alfred workflow]: https://github.com/EvanLovely/alfred--doing
 
 <!--END README-->
 
