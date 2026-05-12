@@ -19,7 +19,7 @@ command :budget do |c|
   c.switch %i[r remove], negatable: false, default_value: false
 
   c.action do |_global_options, options, args|
-    budgets = Doing.setting('budgets', {}) || {}
+    budgets = Doing.setting('budgets') || {}
 
     budget_fmt = lambda do |secs|
       secs = secs.to_i

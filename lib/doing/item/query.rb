@@ -70,7 +70,7 @@ module Doing
     end
 
     def highlight_search(search, distance: nil, negate: false, case_type: nil)
-      prefs = Doing.setting('search', {})
+      prefs = Doing.setting('search') || {}
       matching = prefs.fetch('matching', 'pattern').normalize_matching
       distance ||= prefs.fetch('distance', 3).to_i
       case_type ||= prefs.fetch('case', 'smart').normalize_case
@@ -109,7 +109,7 @@ module Doing
     ## @return     [Boolean] matches search criteria
     ##
     def search(search, distance: nil, negate: false, case_type: nil)
-      prefs = Doing.setting('search', {})
+      prefs = Doing.setting('search') || {}
       matching = prefs.fetch('matching', 'pattern').normalize_matching
       distance ||= prefs.fetch('distance', 3).to_i
       case_type ||= prefs.fetch('case', 'smart').normalize_case

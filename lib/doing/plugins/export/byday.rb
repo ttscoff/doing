@@ -46,7 +46,7 @@ module Doing
         end
       end
 
-      budgets = Doing.setting('budgets', {}) || {}
+      budgets = Doing.setting('budgets') || {}
       budgets = budgets.transform_keys { |k| k.to_s.downcase }
       budgets_total = 0
 

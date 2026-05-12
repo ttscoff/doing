@@ -19,7 +19,7 @@ module Doing
 
       timers_snapshot = totals[:tags] || {}
 
-      budgets = Doing.setting('budgets', {}) || {}
+      budgets = Doing.setting('budgets') || {}
       budgets = budgets.transform_keys { |k| k.to_s.downcase }
       remaining_map = {}
       budgets_total = 0
